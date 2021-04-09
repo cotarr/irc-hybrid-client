@@ -17,7 +17,7 @@
 //
 
 function textCommandParser (inputObj) {
-  console.log('textCommandParser inputObj:' + JSON.stringify(inputObj, null, 2));
+  // console.log('textCommandParser inputObj:' + JSON.stringify(inputObj, null, 2));
 
   // Internal function, detect whitespace character
   function _isWS(inChar) {
@@ -216,8 +216,8 @@ function textCommandParser (inputObj) {
   } // after command
 
 
-  console.log('Remain: >' + inStr.slice(idx, inStrLen) + '<');
-  console.log('parsedCommand ' + JSON.stringify(parsedCommand, null, 2));
+  // console.log('Remain: >' + inStr.slice(idx, inStrLen) + '<');
+  // console.log('parsedCommand ' + JSON.stringify(parsedCommand, null, 2));
 
   // default message
   let ircMessage = null;
@@ -236,6 +236,16 @@ function textCommandParser (inputObj) {
       }
       if (parsedCommand.params.length === 2) {
         ircMessage = 'JOIN ' + parsedCommand.params[1] + ' ' + parsedCommand.restOf[1];
+      }
+      break;
+    case 'ME':
+      if (inputObj.originType === 'channel') {
+        ircMessage = 'PRIVMSG ' + inputObj.originName + ' :' + String.fromCharCode(1) +
+          'ACTION ' + parsedCommand.restOf[0] + String.fromCharCode(1);
+      }
+      if (inputObj.originType === 'private') {
+        ircMessage = 'PRIVMSG ' + inputObj.originName + ' :' + String.fromCharCode(1) +
+          'ACTION ' + parsedCommand.restOf[0] + String.fromCharCode(1);
       }
       break;
     case 'NOP':

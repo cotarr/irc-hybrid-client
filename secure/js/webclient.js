@@ -720,7 +720,6 @@ function displayNoticeMessage(parsedMessage) {
         }
         // TODO not updated to channels[]
         if (ircState.channels.indexOf(parsedMessage.params[0].toLowerCase()) >= 0) {
-          console.log('Debug 232');
           // parsedMessage.nick = 'Notice(parsedMessage.nick)' + ':';
           document.dispatchEvent(new CustomEvent('channel-message',
             {

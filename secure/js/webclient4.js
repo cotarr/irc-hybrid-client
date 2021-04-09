@@ -18,7 +18,7 @@ function _sendPrivMessageToUser(targetNickname, textAreaEl) {
         {
           inputString: text,
           originType: 'private',
-          originName: ircState.nickName
+          originName: targetNickname
         }
       );
       // clear input element

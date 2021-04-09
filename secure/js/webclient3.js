@@ -153,7 +153,7 @@ function createChannelEl (name) {
 
   // names button
   let channelNamesButtonEl = document.createElement('button');
-  channelNamesButtonEl.textContent = 'Refresh Names';
+  channelNamesButtonEl.textContent = '@,+ refresh';
   channelNamesButtonEl.classList.add('channel-button');
 
   // --------------------------------
