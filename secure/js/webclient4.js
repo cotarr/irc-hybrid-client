@@ -51,7 +51,7 @@ function _createPrivateMessageEl (name, parsedMessage) {
 
   // section-div
   let privMsgSectionEl = document.createElement('div');
-  privMsgSectionEl.classList.add('section-div');
+  privMsgSectionEl.classList.add('aa-section-div');
   privMsgSectionEl.classList.add('priv-msg-section-div');
 
   // Top Element (non-hidden element)

@@ -54,7 +54,7 @@ function createChannelEl (name) {
 
   // section-div
   let channelSectionEl = document.createElement('div');
-  channelSectionEl.classList.add('section-div');
+  channelSectionEl.classList.add('aa-section-div');
   channelSectionEl.classList.add('chan-msg-section-div');
 
   // Top Element (non-hidden element)
@@ -460,7 +460,7 @@ function _newChannel() {
 }
 document.getElementById('newChannelNameInputId').addEventListener('input', function(event) {
   if (((event.inputType === 'insertText') && (event.data === null)) ||
-    _(event.inputType === 'insertLineBreak')) {
+    (event.inputType === 'insertLineBreak')) {
     _newChannel();
   }
 }.bind(this));
