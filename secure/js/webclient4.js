@@ -42,7 +42,7 @@ function _sendPrivMessageToUser(targetNickname, textAreaEl) {
   }
 }; // _sendPrivMessageToUser
 
-const _createPrivateMessageEl = function(name, parsedMessage) {
+function _createPrivateMessageEl (name, parsedMessage) {
   // console.log('Creating private message Element for ' + name);
   let privMsgIndex = webState.activePrivateMessageNicks.indexOf(name);
 

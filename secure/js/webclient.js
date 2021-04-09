@@ -84,6 +84,7 @@ webState.channels = [];
 webState.resizeableTextareaIds = [];
 webState.resizeableChanareaIds = [];
 webState.activePrivateMessageNicks = [];
+webState.rawShowHex = false;
 
 // -------------------------------
 // Build URL from page location
@@ -138,7 +139,7 @@ document.getElementById('errorDiv').addEventListener('click', function() {
 // ------------------------------------------------
 // This is called 1 / second as part of global timer
 // ------------------------------------------------
-const errorTimerTickHandler = function() {
+function errorTimerTickHandler () {
   if (errorRemainSeconds > 0) {
     errorRemainSeconds--;
     if (errorRemainSeconds === 0) {
@@ -270,7 +271,7 @@ document.addEventListener('hide-all-divs', function(event) {
 });
 
 
-const nextChannelName = function (index) {
+function nextChannelName (index) {
   if (index) {
     document.getElementById('newChannelNameInputId').value = ircState.channelList[index];
   } else {
@@ -291,7 +292,7 @@ const nextChannelName = function (index) {
 //
 // Called by getIrcState() and onHeartbeatTimerTick()
 // --------------------------------------------------------
-const setVariablesShowingIRCDisconnected = function() {
+function setVariablesShowingIRCDisconnected () {
   document.getElementById('headerUser').textContent = '';
   document.getElementById('headerServer').textContent = '';
 
@@ -318,13 +319,13 @@ const setVariablesShowingIRCDisconnected = function() {
 const heartbeatExpirationTimeSeconds = 15;
 var heartbeatUpCounter = 0;
 // One second global timer
-const resetHeartbeatTimer = function () {
+function resetHeartbeatTimer () {
   heartbeatUpCounter = 0;
 };
-const onHeartbeatReceived = function () {
+function onHeartbeatReceived () {
   heartbeatUpCounter = 0;
 };
-const onHeartbeatTimerTick = function () {
+function onHeartbeatTimerTick () {
   // console.log('tick');
   heartbeatUpCounter++;
   if (webState.webConnected) {
@@ -747,13 +748,28 @@ function displayWallopsMessage(parsedMessage) {
   }
 } // displayWallopsMessage
 
+
+function displayRawMessage (inString) {
+  document.getElementById('rawMessageDisplay').textContent += inString + '\n';
+  document.getElementById('rawMessageDisplay').scrollTop =
+    document.getElementById('rawMessageDisplay').scrollHeight;
+};
+
+function displayRawMessageInHex (message) {
+  let hexString = '';
+  for (let i=0; i<message.length; i++) {
+    hexString += message.charCodeAt(i).toString(16).padStart(2, '0') + ' ';
+  }
+  displayRawMessage(hexString);
+};
+
 // -------------------------------------------------------------
 // This function will accept one line of text from IRC server
 // First it will check for "UPDATE" request
 // else will parse message string into prefix, command, and arugments
 // the parse the command.
 // -------------------------------------------------------------
-const _parseBufferMessage = function (message) {
+function _parseBufferMessage (message) {
   if (message === 'HEARTBEAT' ) {
     // console.log('heartbeat');
     onHeartbeatReceived();
@@ -774,11 +790,13 @@ const _parseBufferMessage = function (message) {
       }
     }
     //
+    // Display raw message in Hexadecimal
+    //
+    if (webState.rawShowHex) displayRawMessageInHex(message);
+    //
     // Display raw message from IRC server
     //
-    document.getElementById('rawMessageDisplay').textContent += message + '\n';
-    document.getElementById('rawMessageDisplay').scrollTop =
-      document.getElementById('rawMessageDisplay').scrollHeight;
+    displayRawMessage(message);
 
     // Do not process back echo message prefixed with '-->'.
     if (message.split(' ')[0] === '-->') return;
@@ -875,7 +893,7 @@ const _parseBufferMessage = function (message) {
 // as an API response. The contents are then parsed as if
 // the message were real time.
 // -------------------------------------------------
-const updateFromCache = function() {
+function updateFromCache () {
   // Fire event to clear previous contents
   // TODO this is async, could clear after fetch
   document.dispatchEvent(new CustomEvent('erase-before-reload',
@@ -930,7 +948,7 @@ var wsocket = null;
 // ---------------------------------------------
 // Function to connect web socket to web server.
 // ---------------------------------------------
-const connectWebSocket = function() {
+function connectWebSocket () {
   // Create WebSocket connection.
   wsocket = new WebSocket(webSocketUrl + '/irc/ws');
 
@@ -987,7 +1005,7 @@ const connectWebSocket = function() {
   // If left over characters not terminated in CR-LF, save as next fragment
   // -------------------------------------------------------------------------
   var previousBufferFragment = '';
-  const parseStreamBuffer = function (inBuffer) {
+  function parseStreamBuffer (inBuffer) {
     if (!inBuffer) return;
     let data = previousBufferFragment.concat(inBuffer);
     previousBufferFragment = '';

@@ -136,6 +136,15 @@ document.getElementById('variablesButtonId').addEventListener('click', function(
     'webState = ' + JSON.stringify(webState, null, 2);
 }.bind(this));
 
+document.getElementById('rawDisplayHexButtonId').addEventListener('click', function() {
+  if (webState.rawShowHex) {
+    webState.rawShowHex = false;
+    document.getElementById('rawDisplayHexButtonId').classList.remove('button-on-color');
+  } else {
+    webState.rawShowHex = true;
+    document.getElementById('rawDisplayHexButtonId').classList.add('button-on-color');
+  }
+});
 
 // -------------------------
 //  Show/Hide license info
@@ -206,7 +215,7 @@ document.getElementById('eraseCacheButton').addEventListener('click', function()
 // --------------------------------------------
 // Fetch web login user's name and update top
 // --------------------------------------------
-const updateUsername = function() {
+function updateUsername () {
   let fetchURL = webServerUrl + '/userinfo';
   let fetchOptions = {
     method: 'GET',

@@ -25,6 +25,9 @@ textarea {
 .button-div {
   margin-bottom: 4px;
 }
+.button-on-color {
+  background-color: #72e1fc;
+}
 
 .chan-msg-section-div {
   background-color: #bef7bf;

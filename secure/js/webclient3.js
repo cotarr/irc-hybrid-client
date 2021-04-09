@@ -43,7 +43,7 @@ function _sendTextToChannel(channelIndex, textAreaEl) {
   }
 };
 
-const createChannelEl = function(name) {
+function createChannelEl (name) {
   // console.log('creating Channel Element ' + name);
   let channelIndex = ircState.channels.indexOf(name);
   // console.log('channel state obj ' +

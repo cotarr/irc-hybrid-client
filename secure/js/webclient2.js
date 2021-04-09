@@ -16,7 +16,7 @@
 // }
 //
 
-const textCommandParser = function(inputObj) {
+function textCommandParser (inputObj) {
   console.log('textCommandParser inputObj:' + JSON.stringify(inputObj, null, 2));
 
   // Internal function, detect whitespace character
