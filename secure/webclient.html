@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1.0">
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="./js/webclient.js" defer></script>
+    <script src="./js/webclient2.js" defer></script>
+    <script src="./js/webclient3.js" defer></script>
+    <script src="./js/webclient4.js" defer></script>
+    <script src="./js/webclient5.js" defer></script>
+    <script src="./js/webclient6.js" defer></script>
+    <title>Test IRC Client</title>
+  </head>
+  <body>
+    <div class="error-div" id='errorDiv' hidden>
+      <div id='errorContentDiv'>
+        <!-- Errors dynamically generated -->
+      </div>
+      <div class='error-title' id='errorTitle'>
+        Tap to Close
+      </div>
+    </div>
+
+    <div class="logout-confirm-div" id="logoutConfirmDiv" hidden>
+      <div>
+        You are still connected to IRC.<br><br>
+        Leaving the web page will not disconnect the server from IRC.
+        Your nickname will remain present on IRC.
+        Otherwise use the [Quit] button located below before leaving.
+      </div>
+      <div>
+        <a href="/logout"><button>Web Logout</button></a>
+        <button id="cancelLogoutConfirmButton">Cancel</button>
+      </div>
+    </div>
+    <div class="aa-section-div">
+      <div class='head-flex'>
+        <div class="head-left">
+          <button id="hideLoginSectionButton">-</button>
+          <button id="connectButton">Connect</button>
+          <button id="quitButton">Quit</button>
+        </div>
+        <div class="head-center">
+        </div>
+        <div class="head-right">
+          <button id="showAllDivsButton">+ all</button>
+          <button id="hideAllDivsButton">- all</button>
+          <button id='webLogoutButton'>logout</button>
+        </div>
+      </div>
+      <div class="vh10"></div>
+      <div>
+        <div class="connect-icon" id="webConnectIconId">Web</div>
+        <div class="connect-icon" id="ircConnectIconId">IRC</div>
+        <span class="user-span" id="headerUser"></span>
+        <span class="user-span">/</span>
+        <span class="user-span" id="headerServer">server</span>
+      </div>
+      <div id="hideLoginSection">
+        <div class="vh10"></div>
+        <div class="button-div">
+          <input type="text" id="ircServerAddrInputId" size="30" value="" disabled>
+          <div class="input-label-right">Server/Port</div>
+        </div>
+        <div class="button-div">
+          <input type="text" id="nickNameInputId" value="">
+          <div class="input-label-right">Nickname</div>
+        </div>
+        <div class="button-div">
+          <input type="text" id="userNameInputId" value="">
+          <div class="input-label-right">Username</div>
+        </div>
+        <div class="button-div">
+          <input type="text" id="realNameInputId" value="">
+          <div class="input-label-right">Real Name</div>
+        </div>
+        <div class="button-div">
+          <input type="text" id = "userModeInputId" size="6" value="">
+          <div class="input-label-right">Initial User Mode</div>
+        </div>
+      </div>
+    </div>
+
+    <div id='ircDisconnectedHiddenDiv' hidden>
+
+      <div class="aa-section-div chan-msg-section-div" id="channelMenuDiv">
+        <div class="button-div">
+            <button id="newChannelButton" class="rm20">Join Channel</button>
+            <textarea id="newChannelNameInputId" cols="20" rows="1" ></textarea>
+        </div>
+      </div>
+      <div id="channelContainerDiv">
+      </div>
+
+      <div class="aa-section-div priv-msg-section-div" id="privMsgSectionDiv">
+        <div>
+          <button id="privMsgMainHiddenButton">-</button>
+          <span>Private Messages</span>
+        </div>
+        <div id="privMsgMainHiddenDiv" hidden>
+          <div class="vh10"></div>
+          <div class="button-div">
+            <div class="input-label-left">Private Msg to</div>
+            <input type="text" id="pmNickNameInputId" size="12" value="">
+          </div>
+          <div class="vh10"></div>
+          <div class="button-div">
+          <textarea id="userPrivMsgInputId" cols="83" rows="1" ></textarea>
+          </div>
+          <div class="button-div">
+            <button id="UserPrivMsgSendButton">Send</button>
+            <button id="whoisButton">Whois</button>
+          </div>
+        </div>
+      </div>
+      <div id="privateMessageContainerDiv">
+      </div>
+
+
+      <div class="aa-section-div notice-section-div" id="noticeSectionDiv" hidden>
+        <div class='head-flex'>
+          <div class="head-left">
+            <button class="notice-button" id="closeNoticeButton">-</button>
+            <span>Notice</span>
+          </div>
+          <div class="head-center">
+          </div>
+          <div class="head-right">
+            <button id="noticeTallerButton">Taller</button>
+            <button id="noticeNormalButton">Normal</button>
+            <button id="noticeClearButton">Clear</button>
+          </div>
+        </div>
+        <textarea id="noticeMessageDisplay" cols="120" rows="5" spellCheck="false" readonly></textarea>
+      </div>
+
+      <div class="aa-section-div wallops-section-div" id="wallopsSectionDiv" hidden>
+        <div class='head-flex'>
+          <div class="head-left">
+            <button class="notice-button" id="wallopsCloseButton">-</button>
+            <span>Wallops</span>
+          </div>
+          <div class="head-center">
+          </div>
+          <div class="head-right">
+            <button id="wallopsTallerButton">Taller</button>
+            <button id="wallopsNormalButton">Normal</button>
+            <button id="wallopsClearButton">Clear</button>
+          </div>
+        </div>
+        <textarea id="wallopsMessageDisplay" cols="120" rows="5" spellCheck="false" readonly></textarea>
+      </div>
+    </div>
+
+    <div class="aa-section-div raw-section-div">
+      <div class='head-flex'>
+        <div class="head-left">
+          <button class="notice-button" id="rawHiddenElementsButton">-</button>
+          <span>Server</span>
+        </div>
+        <div class="head-center">
+        </div>
+        <div class="head-right">
+          <div id='rawHeadRightButtons'>
+            <button id="rawTallerButton">Taller</button>
+            <button id="rawNormalButton">Normal</button>
+            <button id="rawClearButton">Clear</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Do not hide rawHiddenElements in HTML.
+      It is used to calculate width and it
+      breaks if the area is hidden.
+      See end of source webclient6.js -->
+      <div id="rawHiddenElements">
+
+        <div>
+          <textarea id="rawMessageDisplay" cols="120" rows="10" spellCheck="false" readonly></textarea>
+        </div>
+        <div id='hideRawButtons'>
+          <textarea spellcheck="false" id="rawMessageInputId" cols="83" rows="1" ></textarea>
+          <div class="button-div">
+            <button id="sendRawMessageButton">Send</button>
+            <button id="loadFromCacheButton">Reload All</button>
+            <button id="eraseCacheButton">Erase Cache</button>
+            <button id="showDebugButton">Debug</button>
+          </div>
+          <div id="hiddenDebugDiv" hidden>
+            <div class="vh10"></div>
+            <div class="button-div">
+              <button id="disconnectButton">Force Disconnect</button>
+              <button id="variablesButtonId">variables</button>
+            </div>
+            <div class="button-div">
+              <button id="test1Button">Test 1</button>
+              <button id="test2Button">Test 2</button>
+              <button id="test3Button">Test 3</button>
+              <button id="test4Button">Test 4</button>
+            </div>
+            <div class='variables-div' id="variablesDivId" hidden><pre id=variablesPreId>
+            </pre></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="aa-section-div info-section-div" id="infoSectionDiv">
+      <div class='head-flex'>
+        <div class="head-left">
+          <button class="notice-button" id="infoOpenCloseButton">-</button>
+          <span>Info / License</span>
+        </div>
+        <div class="head-center">
+        </div>
+        <div class="head-right">
+        </div>
+      </div>
+      <div id='hiddenInfoDiv' hidden>
+        <div class="info-license-div">
+
+<p>
+MIT License
+</p><p>
+Copyright (c) 2021 Dave Bolenbaugh
+</p></p>
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+</p></p>
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+</p></p>
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+</p>
+
+        </div>
+        <div class="info-license-div">
+<pre .class="info-pre-help">
+Available IRC Text Commands
+
+/JOIN &lt#channel&gt
+/NOP ...inert testing command...
+/PART [#channel] [Optional part message]
+/QUIT [optional quit message]
+/QUOTE &ltIRC server raw command&gt
+
+If the command you are looking for is not
+available, please use the /QUOTE to send
+a raw command to the IRC server directly.
+</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  </body>
+</html>

@@ -1,0 +1,18 @@
+{
+  "serverCount": 1,
+  "serverArray": [
+    {
+      "name": "server1",
+      "host": "192.168.0.80",
+      "port": 6667,
+      "tls": false,
+      "password": "",
+      "identifyCommand": "",
+      "nick": "mynick",
+      "user": "myuser",
+      "real": "My Name",
+      "modes": "+i",
+      "channelList": ["#test1", "#test2"]
+    }
+  ]
+}
