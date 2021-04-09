@@ -410,4 +410,5 @@ setInterval(function() {
   // Clear error display after expire time
   //
   errorTimerTickHandler();
+  onHeartbeatTimerTick();
 }.bind(this), 1000);

@@ -269,6 +269,75 @@ document.addEventListener('hide-all-divs', function(event) {
   document.getElementById('rawHeadRightButtons').setAttribute('hidden', '');
 });
 
+
+const nextChannelName = function (index) {
+  if (index) {
+    document.getElementById('newChannelNameInputId').value = ircState.channelList[index];
+  } else {
+    document.getElementById('newChannelNameInputId').value = '';
+    if (ircState.channelList.length > 0) {
+      for (let i=0; i<ircState.channelList.length; i++) {
+        if (ircState.channels.indexOf(ircState.channelList[i].toLowerCase()) < 0) {
+          document.getElementById('newChannelNameInputId').value = ircState.channelList[i];
+          break;
+        }
+      }
+    }
+  }
+};
+
+// --------------------------------------------------------
+// Update variables to indicate disconnected state
+//
+// Called by getIrcState() and onHeartbeatTimerTick()
+// --------------------------------------------------------
+const setVariablesShowingIRCDisconnected = function() {
+  document.getElementById('headerUser').textContent = '';
+  document.getElementById('headerServer').textContent = '';
+
+  // populate first channel for this server
+  nextChannelName(0);
+
+  let channelContainerDivEl = document.getElementById('channelContainerDiv');
+  while (channelContainerDivEl.firstChild) {
+    channelContainerDivEl.removeChild(channelContainerDivEl.firstChild);
+  }
+  webState.lastPMNick = '';
+  webState.channels = [];
+  webState.resizeableTextareaIds = [];
+  webState.resizeableChanareaIds = [];
+  webState.activePrivateMessageNicks = [];
+};
+
+//------------------------------------------------------------------------------
+// Group of heartbeat functions.
+//
+// Web server sends websocket message 'HEARTBEAT' at 10 second intervals
+// Command parser intercept the HEATBEAT message and calls onHeartbeatReceived()
+//------------------------------------------------------------------------------
+const heartbeatExpirationTimeSeconds = 15;
+var heartbeatUpCounter = 0;
+// One second global timer
+const resetHeartbeatTimer = function () {
+  heartbeatUpCounter = 0;
+};
+const onHeartbeatReceived = function () {
+  heartbeatUpCounter = 0;
+};
+const onHeartbeatTimerTick = function () {
+  // console.log('tick');
+  heartbeatUpCounter++;
+  if (webState.webConnected) {
+    if (heartbeatUpCounter > heartbeatExpirationTimeSeconds) {
+      webState.webConnected = false;
+      setVariablesShowingIRCDisconnected();
+      showError('Error: WebSocket timed out');
+      updateDivVisibility();
+      console.log('HEARTBEAT stopped, websocket timed out.');
+    }
+  }
+};
+
 // -------------------------------------------------
 //  Notify web server to expect connection request
 //  within the next 10 seconds. The request
@@ -315,21 +384,6 @@ var lastHostPort = {
   port: ''
 };
 
-const nextChannelName = function (index) {
-  if (index) {
-    document.getElementById('newChannelNameInputId').value = ircState.channelList[index];
-  } else {
-    document.getElementById('newChannelNameInputId').value = '';
-    if (ircState.channelList.length > 0) {
-      for (let i=0; i<ircState.channelList.length; i++) {
-        if (ircState.channels.indexOf(ircState.channelList[i].toLowerCase()) < 0) {
-          document.getElementById('newChannelNameInputId').value = ircState.channelList[i];
-          break;
-        }
-      }
-    }
-  }
-};
 
 // --------------------------------------
 // Contact web server and get state of
@@ -358,8 +412,6 @@ function getIrcState (callback) {
       // console.log('getIrcState() ' + JSON.stringify(responseJson, null, 2));
       let lastIrcState = ircState;
       ircState = responseJson;
-      // show or hide display sections according to state variables
-      updateDivVisibility();
       //
       // ---------------------------------------------------------------
       // Based on state of connection between web server and IRC server
@@ -399,23 +451,8 @@ function getIrcState (callback) {
       }
       // Since disconnected from IRC remove all channel plugin div
       if (!ircState.ircConnected) {
-        document.getElementById('headerUser').textContent = '';
-        document.getElementById('headerServer').textContent = '';
-
-        // populate first channel for this server
-        nextChannelName(0);
-
-        let channelContainerDivEl = document.getElementById('channelContainerDiv');
-        while (channelContainerDivEl.firstChild) {
-          channelContainerDivEl.removeChild(channelContainerDivEl.firstChild);
-        }
-        webState.lastPMNick = '';
-        webState.channels = [];
-        webState.resizeableTextareaIds = [];
-        webState.resizeableChanareaIds = [];
-        webState.activePrivateMessageNicks = [];
+        setVariablesShowingIRCDisconnected();
       }
-
 
       // Fire custom event
       document.dispatchEvent(new CustomEvent('irc-state-changed',
@@ -424,6 +461,9 @@ function getIrcState (callback) {
           detail: {
           }
         }));
+
+      // show or hide display sections according to state variables
+      updateDivVisibility();
 
       if (callback) {
         callback(null, ircState);
@@ -716,6 +756,7 @@ function displayWallopsMessage(parsedMessage) {
 const _parseBufferMessage = function (message) {
   if (message === 'HEARTBEAT' ) {
     // console.log('heartbeat');
+    onHeartbeatReceived();
   } else if ( message === 'UPDATE' ) {
     // console.log('update');
     // calling this updates state itself
@@ -899,6 +940,7 @@ const connectWebSocket = function() {
   wsocket.addEventListener('open', function (event) {
     // console.log('Connected to WS Server');
     webState.webConnected = true;
+    resetHeartbeatTimer();
     updateDivVisibility();
     // These will load in parallel asychronously
     getIrcState();
