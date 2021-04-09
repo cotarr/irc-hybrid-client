@@ -715,13 +715,21 @@ function displayNoticeMessage(parsedMessage) {
         if (parsedMessage.params[0] === ircState.nickName) {
           _addText(parsedMessage.timestamp + ' -' +
           parsedMessage.nick + '- ' + parsedMessage.params[1]);
+          webState.noticeOpen = true;
+          updateDivVisibility();
         }
-        if (parsedMessage.params[0].toLowerCase() === ircState.channel) {
-          _addText(parsedMessage.timestamp + ' -' +
-            parsedMessage.nick + '/' + parsedMessage.params[0] + '- ' + parsedMessage.params[1]);
+        // TODO not updated to channels[]
+        if (ircState.channels.indexOf(parsedMessage.params[0].toLowerCase()) >= 0) {
+          console.log('Debug 232');
+          // parsedMessage.nick = 'Notice(parsedMessage.nick)' + ':';
+          document.dispatchEvent(new CustomEvent('channel-message',
+            {
+              bubbles: true,
+              detail: {
+                parsedMessage: parsedMessage
+              }
+            }));
         }
-        webState.noticeOpen = true;
-        updateDivVisibility();
       }
       break;
     //
@@ -762,6 +770,61 @@ function displayRawMessageInHex (message) {
   }
   displayRawMessage(hexString);
 };
+
+function _parseCtcpMessage (parsedMessage) {
+  function _addNoticeText (text) {
+    document.getElementById('noticeMessageDisplay').textContent += text + '\n';
+    document.getElementById('noticeMessageDisplay').scrollTop =
+      document.getElementById('noticeMessageDisplay').scrollHeight;
+  }
+  const ctcpDelim = 1;
+  let ctcpMessage = parsedMessage.params[1];
+  let end = ctcpMessage.length - 1;
+  if (ctcpMessage.charCodeAt(0) !== 1) {
+    console.log('_parseCtcpMessage() missing CTCP start delimiter');
+    return;
+  }
+
+  let i = 1;
+  let ctcpCommand = '';
+  let ctcpRest = '';
+  while ((ctcpMessage.charAt(i) !== ' ') && (i <= end)) {
+    if (ctcpMessage.charCodeAt(i) !== ctcpDelim) {
+      ctcpCommand += ctcpMessage.charAt(i);
+    }
+    i++;
+  }
+  ctcpCommand = ctcpCommand.toUpperCase();
+  // console.log('ctcpCommand ' + ctcpCommand);
+  while ((ctcpMessage.charAt(i) === ' ') && (i <= end)) {
+    i++;
+  }
+  while ((ctcpMessage.charCodeAt(i) !== ctcpDelim) && (i <= end)) {
+    ctcpRest += ctcpMessage.charAt(i);
+    i++;
+  }
+  // console.log('ctcpRest ' + ctcpRest);
+  //
+  //   ACTION
+  //
+  if (ctcpCommand === 'ACTION') {
+    let index = ircState.channels.indexOf(parsedMessage.params[0].toLowerCase());
+    if (index >= 0) {
+      parsedMessage.params[1] = parsedMessage.nick + ' ' + ctcpRest;
+      parsedMessage.nick = '*';
+      displayChannelMessage(parsedMessage);
+    } else {
+      // TODO actino sent as regular PM for now
+      parsedMessage.params[1] = ctcpRest;
+      displayPrivateMessage(parsedMessage);
+    }
+  } else {
+    _addNoticeText(parsedMessage.timestamp + ' ' +
+      parsedMessage.nick + ' CTCP ' + ctcpCommand + ' to ' + parsedMessage.params[0]);
+    webState.noticeOpen = true;
+    updateDivVisibility();
+  }
+}
 
 // -------------------------------------------------------------
 // This function will accept one line of text from IRC server
@@ -807,6 +870,7 @@ function _parseBufferMessage (message) {
     let parsedMessage = _parseIrcMessage(message);
     // console.log('parsedMessage' + JSON.stringify(parsedMessage, null, 2));
     //
+
     // Decoding complete, Parse commands
     //
     switch(parsedMessage.command) {
@@ -859,11 +923,19 @@ function _parseBufferMessage (message) {
         break;
       case 'PRIVMSG':
         if (true) {
-          let index = ircState.channels.indexOf(parsedMessage.params[0].toLowerCase());
-          if (index >= 0) {
-            displayChannelMessage(parsedMessage);
+          // first check for CTCP message
+          const ctcpDelim = 1;
+          if (parsedMessage.params[1].charCodeAt(0) === ctcpDelim) {
+            // case of CTCP message
+            _parseCtcpMessage(parsedMessage);
           } else {
-            displayPrivateMessage(parsedMessage);
+            // else not a CTCP message
+            let index = ircState.channels.indexOf(parsedMessage.params[0].toLowerCase());
+            if (index >= 0) {
+              displayChannelMessage(parsedMessage);
+            } else {
+              displayPrivateMessage(parsedMessage);
+            }
           }
         }
         break;

@@ -366,6 +366,17 @@ function createChannelEl (name) {
             '] by ' + parsedMessage.nick);
         }
         break;
+      case 'NOTICE':
+        if (parsedMessage.params[0].toLowerCase() === name.toLowerCase()) {
+          _addText(parsedMessage.timestamp + ' ' + 'Notice(' +
+            parsedMessage.nick + '/' + parsedMessage.params[0] + ') ' +
+            parsedMessage.params[1]);
+          // Upon channel message, make sectino visible.
+          channelBottomDivEl.removeAttribute('hidden');
+          channelHideButtonEl.textContent = '-';
+        }
+        break;
+
       case 'PART':
         if (parsedMessage.params[0].toLowerCase() === name.toLowerCase()) {
           _addText(parsedMessage.timestamp + ' * ' +
