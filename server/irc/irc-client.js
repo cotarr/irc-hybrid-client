@@ -91,7 +91,7 @@
   // Write data to IRC server socket (Internal function)
   // Includes check of socket status
   // ----------------------------------------------------
-  function _writeSocket(socket, message) {
+  const _writeSocket = function (socket, message) {
     if ((socket) && (socket.writable)) {
       //
       // First validate UTF-8, then send message to IRC server.
@@ -139,7 +139,7 @@
       // TODO should this disconnect?
       global.sendToBrowser('webServer: IRC Error: server socket not writable\n');
     }
-  } // _writeSocket
+  }; // _writeSocket
 
   // -------------------------------------------
   //  On Ready Event Handler (Internal function)

@@ -1,3 +1,4 @@
+'use strict';
 
 // native node packages
 const http = require('http');

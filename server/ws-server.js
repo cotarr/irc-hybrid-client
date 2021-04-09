@@ -1,3 +1,5 @@
+'use strict';
+
 const path = require('path');
 const ws = require('ws');
 const url = require('url');
@@ -158,7 +160,7 @@ setInterval(function() {
   global.sendToBrowser('HEARTBEAT\n');
 }, 10000);
 
-wsOnUpgrade = function (request, socket, head) {
+const wsOnUpgrade = function (request, socket, head) {
   let now = new Date();
   let timeString = now.toISOString() + ' ';
   const pathname = url.parse(request.url).pathname;
