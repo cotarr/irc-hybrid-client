@@ -191,6 +191,29 @@ app.post('/login-authorize', userAuth.loginAuthorize);
 app.get('/logout', userAuth.logout);
 app.get('/blocked', userAuth.blockedCookies);
 
+//
+// To Terminate remote server
+//
+app.post('/terminate', authorizeOrFail, function(req, res, next) {
+  let now = new Date();
+  let dieMessage = now.toISOString() + ' Terminate reqeust ';
+  try {
+    dieMessage += ' user=' + req.session.sessionAuth.user;
+  } catch (err) {
+    // ignore
+  }
+  try {
+    dieMessage += ' at ' + req._remoteAddress;
+  } catch (err) {
+    // ignore
+  }
+  console.log(dieMessage);
+  setTimeout(function() {
+    process.exit(1);
+  }, 1000);
+  res.json({message: 'Terminate received'});
+});
+
 // -----------------------------------------
 //          Websocket Auth
 //

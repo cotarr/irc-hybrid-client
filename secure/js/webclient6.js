@@ -146,6 +146,40 @@ document.getElementById('rawDisplayHexButtonId').addEventListener('click', funct
   }
 });
 
+// -----------------------
+// Die (Server) button
+// -----------------------
+document.getElementById('serverTerminateButton').addEventListener('click', function() {
+  console.log('Requesting backend server to terminate');
+  let fetchURL = webServerUrl + '/terminate';
+  let fetchOptions = {
+    method: 'POST',
+    timeout: 10000,
+    // credentials: 'include',
+    headers: {
+      'Content-type': 'application/json',
+      'Accept': 'application/json'
+    },
+    body: JSON.stringify({terminate: 'YES'})
+  };
+  fetch(fetchURL, fetchOptions)
+    .then( (response) => {
+      // console.log(response.status);
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error('Fetch status ' + response.status + ' ' + response.statusText);
+      }
+    })
+    .then( (responseJson) => {
+      console.log(JSON.stringify(responseJson));
+    })
+    .catch( (error) => {
+      showError('Terminate: Unable to connect');
+      console.log(error);
+    });
+});
+
 // -------------------------
 //  Show/Hide license info
 // -------------------------
