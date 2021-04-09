@@ -449,9 +449,6 @@ document.getElementById('rawHeadRightButtons').setAttribute('hidden', '');
 // 1 second utility timer
 //
 setInterval(function() {
-  //
-  // Clear error display after expire time
-  //
   errorTimerTickHandler();
   onHeartbeatTimerTick();
 }.bind(this), 1000);

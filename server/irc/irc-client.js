@@ -337,6 +337,115 @@
     };
   }; // _parseIrcMessage
 
+  // ----------------------------
+  // CTCP flood detections
+  // ----------------------------
+  const ctcpFloodTimeSec = 5;
+  const ctcpMaxFlood = 3;
+  var ctcpDownCounterSeconds = 0;
+  var ctcpReplyCounter = 0;
+  const checkCtcpNotFlood = function() {
+    if (ctcpDownCounterSeconds === 0) ctcpDownCounterSeconds = ctcpFloodTimeSec;
+    ctcpReplyCounter++;
+    if (ctcpReplyCounter > ctcpMaxFlood) return false;
+    return true;
+  };
+  const ctcpTimerTick = function() {
+    if (ctcpDownCounterSeconds > 0) {
+      ctcpDownCounterSeconds--;
+      if (ctcpDownCounterSeconds < 1) {
+        ctcpReplyCounter = 0;
+      }
+    }
+  };
+
+  // ----------------------------
+  // Handle CTCP requests
+  // ----------------------------
+  const _parseCtcpMessage = function (socket, parsedMessage) {
+    const ctcpDelim = 1;
+    let ctcpMessage = parsedMessage.params[1];
+    let end = ctcpMessage.length - 1;
+    if (ctcpMessage.charCodeAt(0) !== 1) {
+      console.log('_parseCtcpMessage() missing CTCP start delimiter');
+      return;
+    }
+
+    let i = 1;
+    let ctcpCommand = '';
+    let ctcpRest = '';
+    while ((ctcpMessage.charAt(i) !== ' ') && (i <= end)) {
+      if (ctcpMessage.charCodeAt(i) !== ctcpDelim) {
+        ctcpCommand += ctcpMessage.charAt(i);
+      }
+      i++;
+    }
+    ctcpCommand = ctcpCommand.toUpperCase();
+    // console.log('ctcpCommand ' + ctcpCommand);
+    while ((ctcpMessage.charAt(i) === ' ') && (i <= end)) {
+      i++;
+    }
+    while ((ctcpMessage.charCodeAt(i) !== ctcpDelim) && (i <= end)) {
+      ctcpRest += ctcpMessage.charAt(i);
+      i++;
+    }
+
+    // console.log(JSON.stringify(parsedMessage, null, 2));
+    // console.log('ctcpCommand: ' + ctcpCommand + ' ctcpRest ' + ctcpRest);
+
+    switch (ctcpCommand) {
+      case 'CLIENTINFO':
+        if (true) {
+          let ircMessage = 'NOTICE ' + parsedMessage.nick + ' :' +
+          String.fromCharCode(ctcpDelim) + 'CLIENTINFO ' +
+          // ------- List of CTCP --------
+          'ACTION ' +
+          'CLIENTINFO ' +
+          'PING ' +
+          'TIME ' +
+          'VERSION ' +
+          // --------- End list ----------
+          String.fromCharCode(ctcpDelim);
+          if (checkCtcpNotFlood()) _writeSocket(socket, ircMessage);
+        }
+        break;
+
+      case 'PING':
+        if (true) {
+          let d = new Date;
+          // d.toString() -->
+          let ircMessage = 'NOTICE ' + parsedMessage.nick + ' :' +
+          String.fromCharCode(ctcpDelim) + 'PING ' +
+          ctcpRest +
+          String.fromCharCode(ctcpDelim);
+          if (checkCtcpNotFlood()) _writeSocket(socket, ircMessage);
+        }
+        break;
+
+      case 'TIME':
+        if (true) {
+          let d = new Date;
+          // d.toString() -->
+          let ircMessage = 'NOTICE ' + parsedMessage.nick + ' :' +
+          String.fromCharCode(ctcpDelim) + 'TIME ' +
+          d.toString().split('(')[0];
+          String.fromCharCode(ctcpDelim);
+          if (checkCtcpNotFlood()) _writeSocket(socket, ircMessage);
+        }
+        break;
+      //
+      case 'VERSION':
+        if (true) {
+          let ircMessage = 'NOTICE ' + parsedMessage.nick + ' :' +
+          String.fromCharCode(ctcpDelim) + 'VERSION ' + 'MyVersion' +
+          String.fromCharCode(ctcpDelim);
+          if (checkCtcpNotFlood()) _writeSocket(socket, ircMessage);
+        }
+        break;
+      default:
+    }
+  };
+
   //-----------------------------------------------------------------
   //
   //  I R C   M E S S A G E   C O M M A N D   P A R S E R
@@ -630,6 +739,16 @@
             }
           } else {
             console.log('Error message PART for non-existant channel');
+          }
+        }
+        break;
+      case 'PRIVMSG':
+        if (true) {
+          // check for CTCP message
+          const ctcpDelim = 1;
+          if (parsedMessage.params[1].charCodeAt(0) === ctcpDelim) {
+            // case of CTCP message
+            _parseCtcpMessage(socket, parsedMessage);
           }
         }
         break;
@@ -1087,6 +1206,13 @@
     // -----------------------------------------
     res.json({error: false});
   };
+
+  //
+  // 1 second utility timer
+  //
+  setInterval(function() {
+    ctcpTimerTick();
+  }.bind(this), 1000);
 
   module.exports = {
     connectHandler: connectHandler,

@@ -239,13 +239,14 @@ function textCommandParser (inputObj) {
       }
       break;
     case 'ME':
+      let ctcpDelim = 1;
       if (inputObj.originType === 'channel') {
-        ircMessage = 'PRIVMSG ' + inputObj.originName + ' :' + String.fromCharCode(1) +
-          'ACTION ' + parsedCommand.restOf[0] + String.fromCharCode(1);
+        ircMessage = 'PRIVMSG ' + inputObj.originName + ' :' + String.fromCharCode(ctcpDelim) +
+          'ACTION ' + parsedCommand.restOf[0] + String.fromCharCode(ctcpDelim);
       }
       if (inputObj.originType === 'private') {
-        ircMessage = 'PRIVMSG ' + inputObj.originName + ' :' + String.fromCharCode(1) +
-          'ACTION ' + parsedCommand.restOf[0] + String.fromCharCode(1);
+        ircMessage = 'PRIVMSG ' + inputObj.originName + ' :' + String.fromCharCode(ctcpDelim) +
+          'ACTION ' + parsedCommand.restOf[0] + String.fromCharCode(ctcpDelim);
       }
       break;
     case 'NOP':
