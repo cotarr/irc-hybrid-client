@@ -50,6 +50,7 @@
   ircState.showPingPong = false;
   ircState.ircConnected = false;
   ircState.ircConnecting = false;
+  ircState.ircRegistered = false;
 
   ircState.ircServerName = servers.serverArray[0].name;
   ircState.ircServerHost = servers.serverArray[0].host;
@@ -169,6 +170,7 @@
         // case of error handler reset ircConnecting before timer expired (TLS error probgably)
         ircState.ircConnecting = false;
         ircState.ircConnected = false;
+        ircState.ircRegistered = false;
         global.sendToBrowser('UPDATE\n');
       }
       // reset the state variables
@@ -569,6 +571,10 @@
     //
     switch(parsedMessage.command) {
       case '001':
+        // case of successful register with nickname, set registered state
+        ircState.ircRegistered = true;
+
+        // extract my client info from last argument in 001 message
         let splitparams1 = parsedMessage.params[1].split(' ');
         let parsedNick = splitparams1[splitparams1.length - 1].split('!')[0];
         let parsedUserhost = splitparams1[splitparams1.length - 1].split('!')[1];
@@ -582,6 +588,7 @@
           socket.destroy();
           ircState.ircConnecting = false;
           ircState.ircConnected = false;
+          ircState.ircRegistered = false;
           global.sendToBrowser('UPDATE\n');
         }
         break;
@@ -639,10 +646,37 @@
         }
         break;
       //
+      // 433 ERR_NICKNAMEINUSE
+      //
+      case '433':
+        if (true) {
+          // Connect to IRC has failed, nickname already in use, disconnect to try again
+          if (!ircState.ircRegistered) {
+            if (socket) {
+              socket.destroy();
+              ircState.ircConnecting = false;
+              ircState.ircConnected = false;
+              ircState.ircRegistered = false;
+              global.sendToBrowser('UPDATE\n');
+            }
+          }
+        }
+        break;
+      //
       // 451 ERR_NOTREGISERED
-      // TODO
+      //
       case '451':
         if (true) {
+          // Connect to IRC has failed, disconnect to try again
+          if (!ircState.ircRegistered) {
+            if (socket) {
+              socket.destroy();
+              ircState.ircConnecting = false;
+              ircState.ircConnected = false;
+              ircState.ircRegistered = false;
+              global.sendToBrowser('UPDATE\n');
+            }
+          }
         }
         break;
       //
@@ -888,6 +922,7 @@
       });
     }
 
+
     // TODO add size validation, character allowlist
     ircState.nickName = req.body.nickName;
     ircState.userName = req.body.userName;
@@ -899,6 +934,7 @@
     ircState.channelStates = [];
     ircState.ircConnected = false;
     ircState.ircConnecting = true;
+    ircState.ircRegistered = false;
 
     let connectMessage = 'webServer: Opening socket to ' + ircState.ircServerName + ' ' +
       ircState.ircServerHost + ':' + ircState.ircServerPort;
@@ -927,6 +963,7 @@
       if (!ircSocket.writable) {
         ircState.ircConnecting = false;
         ircState.ircConnected = false;
+        ircState.ircRegistered = false;
         global.sendToBrowser('UPDATE\nwebServer: Socket not writable, connected flags reset\n');
       }
     };
@@ -938,6 +975,7 @@
       // Response to POST request
       ircState.ircConnecting = false;
       ircState.ircConnected = false;
+      ircState.ircRegistered = false;
       // Send some over over websocket too
       let errMsg = 'UPDATE\nwebServer: Error opening TCP socket to ' +
         ircState.ircServerName + ' ' +
@@ -1000,6 +1038,7 @@
       console.log('Event: close, hadError=' + hadError + ' destroyed=' + ircSocket.destroyed);
       ircState.ircConnecting = false;
       ircState.ircConnected = false;
+      ircState.ircRegistered = false;
       global.sendToBrowser('UPDATE\nwebServer: Socket to IRC server closed, hadError: ' +
         hadError.toString() + '\n');
     });
@@ -1075,10 +1114,10 @@
         i++;
       }
     }
-    console.log('outboundCommand ' + outboundCommand);
-    console.log('outboundCommandRest ' + outboundCommandRest);
-    console.log('outboundArg1 ' + outboundArg1);
-    console.log('outboundArg1Rest ' + outboundArg1Rest);
+    // console.log('outboundCommand ' + outboundCommand);
+    // console.log('outboundCommandRest ' + outboundCommandRest);
+    // console.log('outboundArg1 ' + outboundArg1);
+    // console.log('outboundArg1Rest ' + outboundArg1Rest);
 
     switch (outboundCommand) {
       case 'JOIN':
@@ -1233,6 +1272,7 @@
       ircSocket.destroy();
       ircState.ircConnecting = false;
       ircState.ircConnected = false;
+      ircState.ircRegistered = false;
       global.sendToBrowser('UPDATE\n');
       res.json({error: false});
     } else {
