@@ -347,21 +347,6 @@ document.getElementById('test2Button').addEventListener('click', function() {
 // --------------------
 document.getElementById('test3Button').addEventListener('click', function() {
   console.log('Test3 button pressed.');
-
-  // send over socket to web server
-  // console.log('Sent to WebServer Socket: Test 2 pressed');
-  // wsocket.send('Sent to WebServer Socket: Test 2 pressed');
-
-  document.dispatchEvent(new CustomEvent('show-error-message',
-    {
-      bubbles: true,
-      detail: {
-        message: 'A test error has occurred.'
-      }
-    }));
-
-  // document.getElementById('rawMessageDisplay').textContent +=
-  //   'innerWidth ' + window.innerWidth + '\n';
 });
 
 // --------------------
@@ -369,13 +354,6 @@ document.getElementById('test3Button').addEventListener('click', function() {
 // --------------------
 document.getElementById('test4Button').addEventListener('click', function() {
   console.log('Test4 button pressed.');
-  getIrcState(function(err, data) {
-    if (err) {
-      console.log(err);
-    } else {
-      console.log(JSON.stringify(data, null, 2));
-    }
-  });
 });
 
 // ---------------------------------------------------------------------------

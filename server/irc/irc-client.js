@@ -65,6 +65,10 @@
   ircState.userMode = servers.serverArray[0].modes;
   ircState.userHost = '';
 
+  // get name and version number from npm package.json
+  ircState.botVersion = require('../../package.json').version;
+  ircState.botName = require('../../package.json').name;
+
   // Channel schema
   //
   // channelStates {
@@ -134,7 +138,6 @@
         }
       }
       global.sendToBrowser(commandMsgPrefix + filtered + '\n');
-      ircLog.writeIrcLog(commandMsgPrefix + filtered);
     } else {
       // TODO should this disconnect?
       global.sendToBrowser('webServer: IRC Error: server socket not writable\n');
@@ -363,6 +366,21 @@
   // Handle CTCP requests
   // ----------------------------
   const _parseCtcpMessage = function (socket, parsedMessage) {
+    // Internal function
+    function _sendCtcpMessage (socket, ircMessage, ctcpReply) {
+      // It is necessary to fake out a message back to self to show the reply
+      let now = new Date;
+      let nowSeconds = parseInt(now.valueOf()/1000);
+      let outgoingBackToSelf = nowSeconds.toString() +
+        ' :' + ircState.nickName + '!*@* NOTICE ' + ircState.nickName +
+        ' :CTCP Reply: ' + ctcpReply;
+
+      if (checkCtcpNotFlood()) {
+        global.sendToBrowser(outgoingBackToSelf + '\r\n');
+        ircMessageCache.addMessage(Buffer.from(outgoingBackToSelf));
+        _writeSocket(socket, ircMessage);
+      }
+    }
     const ctcpDelim = 1;
     let ctcpMessage = parsedMessage.params[1];
     let end = ctcpMessage.length - 1;
@@ -396,50 +414,44 @@
     switch (ctcpCommand) {
       case 'CLIENTINFO':
         if (true) {
-          let ircMessage = 'NOTICE ' + parsedMessage.nick + ' :' +
-          String.fromCharCode(ctcpDelim) + 'CLIENTINFO ' +
-          // ------- List of CTCP --------
+          let ctcpReply = 'CLIENTINFO ' +
           'ACTION ' +
           'CLIENTINFO ' +
           'PING ' +
           'TIME ' +
-          'VERSION ' +
-          // --------- End list ----------
-          String.fromCharCode(ctcpDelim);
-          if (checkCtcpNotFlood()) _writeSocket(socket, ircMessage);
+          'VERSION ';
+          let ircMessage = 'NOTICE ' + parsedMessage.nick + ' :' +
+          String.fromCharCode(ctcpDelim) + ctcpReply + String.fromCharCode(ctcpDelim);
+          _sendCtcpMessage(socket, ircMessage, ctcpReply);
         }
         break;
 
       case 'PING':
         if (true) {
           let d = new Date;
-          // d.toString() -->
+          let ctcpReply = 'PING ' + ctcpRest;
           let ircMessage = 'NOTICE ' + parsedMessage.nick + ' :' +
-          String.fromCharCode(ctcpDelim) + 'PING ' +
-          ctcpRest +
-          String.fromCharCode(ctcpDelim);
-          if (checkCtcpNotFlood()) _writeSocket(socket, ircMessage);
+          String.fromCharCode(ctcpDelim) + ctcpReply + String.fromCharCode(ctcpDelim);
+          _sendCtcpMessage(socket, ircMessage, ctcpReply);
         }
         break;
 
       case 'TIME':
         if (true) {
           let d = new Date;
-          // d.toString() -->
+          let ctcpReply = 'TIME ' + d.toString().split('(')[0];
           let ircMessage = 'NOTICE ' + parsedMessage.nick + ' :' +
-          String.fromCharCode(ctcpDelim) + 'TIME ' +
-          d.toString().split('(')[0];
-          String.fromCharCode(ctcpDelim);
-          if (checkCtcpNotFlood()) _writeSocket(socket, ircMessage);
+          String.fromCharCode(ctcpDelim) + ctcpReply + String.fromCharCode(ctcpDelim);
+          _sendCtcpMessage(socket, ircMessage, ctcpReply);
         }
         break;
       //
       case 'VERSION':
         if (true) {
+          let ctcpReply = 'VERSION ' + ircState.botName + '-' + ircState.botVersion;
           let ircMessage = 'NOTICE ' + parsedMessage.nick + ' :' +
-          String.fromCharCode(ctcpDelim) + 'VERSION ' + 'MyVersion' +
-          String.fromCharCode(ctcpDelim);
-          if (checkCtcpNotFlood()) _writeSocket(socket, ircMessage);
+          String.fromCharCode(ctcpDelim) + ctcpReply + String.fromCharCode(ctcpDelim);
+          _sendCtcpMessage(socket, ircMessage, ctcpReply);
         }
         break;
       default:
@@ -688,7 +700,7 @@
         if (true) {
           if (parsedMessage.params[0] === ircState.nickName) {
             // case of me, my MODE has changed
-            console.log('TODO you mode on server has changed.');
+            console.log('TODO your user mode on server has been changed changed.');
           } else if (channelPrefixChars.indexOf(parsedMessage.params[0].charAt(0) >= 0)) {
             // case of this appears to be a channel name
             console.log('TODO mode change in channel update nickname list');
@@ -1063,6 +1075,12 @@
         }
       }
       return {error: false};
+    }
+    //
+    // NOTICE TODO
+    //
+    if (message.split(' ')[0] === 'NOTICE') {
+      console.log('TODO echo NOTICE from me in PM and Channel');
     }
     //
     //    PRIVMSG
