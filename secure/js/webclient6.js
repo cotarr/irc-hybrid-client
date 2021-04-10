@@ -424,9 +424,9 @@ adjustInputToWidowWidth(window.innerWidth);
 //
 // After everything is sized, the area may be hidden
 //
-document.getElementById('rawHiddenElements').setAttribute('hidden', '');
-document.getElementById('rawHiddenElementsButton').textContent = '+';
-document.getElementById('rawHeadRightButtons').setAttribute('hidden', '');
+// document.getElementById('rawHiddenElements').setAttribute('hidden', '');
+// document.getElementById('rawHiddenElementsButton').textContent = '+';
+// document.getElementById('rawHeadRightButtons').setAttribute('hidden', '');
 
 //
 // 1 second utility timer

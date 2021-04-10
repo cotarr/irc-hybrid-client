@@ -17,8 +17,6 @@
 //
 
 function textCommandParser (inputObj) {
-  // console.log('textCommandParser inputObj:' + JSON.stringify(inputObj, null, 2));
-
   // Internal function, detect whitespace character
   function _isWS(inChar) {
     if (inChar.charAt(0) === ' ') return true;
@@ -217,17 +215,26 @@ function textCommandParser (inputObj) {
 
 
   // console.log('Remain: >' + inStr.slice(idx, inStrLen) + '<');
+  // console.log('textCommandParser inputObj:' + JSON.stringify(inputObj, null, 2));
   // console.log('parsedCommand ' + JSON.stringify(parsedCommand, null, 2));
 
   // default message
   let ircMessage = null;
 
   switch (parsedCommand.command) {
+    //
+    case 'ADMIN':
+      ircMessage = 'ADMIN';
+      if (parsedCommand.restOf.length === 1) {
+        ircMessage = 'ADMIN ' + parsedCommand.restOf[0];
+      }
+      break;
+    //
     case 'JOIN':
       if (parsedCommand.params.length < 1) {
         return {
           error: true,
-          message: 'Expect: /JOIN #channel ',
+          message: 'Expect: /JOIN <#channel>',
           ircMessage: null
         };
       }
@@ -239,6 +246,13 @@ function textCommandParser (inputObj) {
       }
       break;
     case 'ME':
+      if (parsedCommand.params.length < 1) {
+        return {
+          error: true,
+          message: 'Expect: /ME <action-message>',
+          ircMessage: null
+        };
+      }
       let ctcpDelim = 1;
       if (inputObj.originType === 'channel') {
         ircMessage = 'PRIVMSG ' + inputObj.originName + ' :' + String.fromCharCode(ctcpDelim) +
@@ -249,13 +263,50 @@ function textCommandParser (inputObj) {
           'ACTION ' + parsedCommand.restOf[0] + String.fromCharCode(ctcpDelim);
       }
       break;
+      //
+    case 'MOTD':
+      ircMessage = 'MOTD';
+      if (parsedCommand.restOf.length === 1) {
+        ircMessage = 'MOTD ' + parsedCommand.restOf[0];
+      }
+      break;
+    //
+    case 'MSG':
+      if ((parsedCommand.params.length > 1) &&
+        (channelPrefixChars.indexOf(parsedCommand.params[1].charAt(0)) < 0)) {
+        ircMessage = 'PRIVMSG ' + parsedCommand.params[1] + ' :' + parsedCommand.restOf[1];
+      } else {
+        return {
+          error: true,
+          message: 'Expect: /MSG <nickname> <message-text>',
+          ircMessage: null
+        };
+      }
+      break;
+    //
+    case 'NICK':
+      if (parsedCommand.params.length < 1) {
+        return {
+          error: true,
+          message: 'Expect: /NICK <new-nickanme>',
+          ircMessage: null
+        };
+      }
+      ircMessage = 'NICK ' + parsedCommand.restOf[0];
+      break;
+    //
+    // No-Operation (invalid command)
     case 'NOP':
+    // This is used to observe parsedCommand without command execution
+      console.log('textCommandParser inputObj:' + JSON.stringify(inputObj, null, 2));
+      console.log('parsedCommand ' + JSON.stringify(parsedCommand, null, 2));
       return {
         error: false,
         message: null,
         ircMessage: null
       };
       break;
+    //
     case 'PART':
       if (parsedCommand.params.length < 1) {
         if (inputObj.originType === 'channel') {
@@ -277,12 +328,14 @@ function textCommandParser (inputObj) {
         }
       }
       break;
+    //
     case 'QUIT':
       ircMessage = 'QUIT';
       if (parsedCommand.restOf.length > 0) {
         ircMessage ='QUIT :' + parsedCommand.restOf[0];
       }
       break;
+    //
     case 'QUOTE':
       if (parsedCommand.restOf.length > 0) {
         ircMessage = parsedCommand.restOf[0];
@@ -293,7 +346,30 @@ function textCommandParser (inputObj) {
           ircMessage: null
         };
       }
+    //
+    case 'TOPIC':
+      if ((parsedCommand.params.length > 1) &&
+        (ircState.channels.indexOf(parsedCommand.params[1]) >= 0)) {
+        ircMessage = 'TOPIC ' + parsedCommand.params[1] + ' :' + parsedCommand.restOf[1];
+      } else if ((parsedCommand.params.length > 0) &&
+        (channelPrefixChars.indexOf(parsedCommand.restOf[0].charAt(0)) < 0) &&
+        (inputObj.originType === 'channel')) {
+        ircMessage = 'TOPIC ' + inputObj.originName + ' :' + parsedCommand.restOf[0];
+      } else {
+        return {
+          error: true,
+          message: 'Expect: /TOPIC <#channel> <New-channel-topic-message>',
+          ircMessage: null
+        };
+      }
       break;
+    case 'VERSION':
+      ircMessage = 'VERSION';
+      if (parsedCommand.restOf.length === 1) {
+        ircMessage = 'VERSION ' + parsedCommand.restOf[0];
+      }
+      break;
+    //
     default:
   }
 

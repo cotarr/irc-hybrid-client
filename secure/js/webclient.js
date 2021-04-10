@@ -871,7 +871,7 @@ function _parseBufferMessage (message) {
     //
     // parse message into: prefix, command, and param array
     let parsedMessage = _parseIrcMessage(message);
-    console.log('parsedMessage' + JSON.stringify(parsedMessage, null, 2));
+    // console.log('parsedMessage' + JSON.stringify(parsedMessage, null, 2));
     //
 
     if ((parseInt(parsedMessage.command) >= 400) &&
