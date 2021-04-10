@@ -215,7 +215,9 @@ function updateDivVisibility() {
       document.getElementById('quitButton').setAttribute('disabled', '');
       document.getElementById('eraseCacheButton').removeAttribute('disabled');
       document.getElementById('ircDisconnectedHiddenDiv').setAttribute('hidden', '');
+      webState.noticeOpen = false;
       document.getElementById('noticeSectionDiv').setAttribute('hidden', '');
+      webState.wallopsOpen = false;
       document.getElementById('wallopsSectionDiv').setAttribute('hidden', '');
     }
   } else {
@@ -232,7 +234,9 @@ function updateDivVisibility() {
     document.getElementById('quitButton').setAttribute('disabled', '');
     document.getElementById('eraseCacheButton').setAttribute('disabled', '');
     document.getElementById('ircDisconnectedHiddenDiv').setAttribute('hidden', '');
+    webState.noticeOpen = false;
     document.getElementById('noticeSectionDiv').setAttribute('hidden', '');
+    webState.wallopsOpen = false;
     document.getElementById('wallopsSectionDiv').setAttribute('hidden', '');
   }
 }
@@ -244,11 +248,13 @@ document.addEventListener('show-all-divs', function(event) {
   document.getElementById('hideLoginSectionButton').textContent = '-';
   document.getElementById('privMsgMainHiddenDiv').removeAttribute('hidden');
   document.getElementById('privMsgMainHiddenButton').textContent = '-';
-  document.getElementById('noticeSectionDiv').removeAttribute('hidden');
-  document.getElementById('wallopsSectionDiv').removeAttribute('hidden');
   document.getElementById('rawHiddenElements').removeAttribute('hidden');
   document.getElementById('rawHiddenElementsButton').textContent = '-';
   document.getElementById('rawHeadRightButtons').removeAttribute('hidden');
+  webState.noticeOpen = true;
+  webState.wallopsOpen = true;
+  document.getElementById('noticeSectionDiv').removeAttribute('hidden');
+  document.getElementById('wallopsSectionDiv').removeAttribute('hidden');
 });
 
 // Event to hide all divs
@@ -258,11 +264,13 @@ document.addEventListener('hide-all-divs', function(event) {
   document.getElementById('hideLoginSectionButton').textContent = '+';
   document.getElementById('privMsgMainHiddenDiv').setAttribute('hidden', '');
   document.getElementById('privMsgMainHiddenButton').textContent = '+';
-  document.getElementById('noticeSectionDiv').setAttribute('hidden', '');
-  document.getElementById('wallopsSectionDiv').setAttribute('hidden', '');
   document.getElementById('rawHiddenElements').setAttribute('hidden', '');
   document.getElementById('rawHiddenElementsButton').textContent = '+';
   document.getElementById('rawHeadRightButtons').setAttribute('hidden', '');
+  webState.noticeOpen = false;
+  document.getElementById('noticeSectionDiv').setAttribute('hidden', '');
+  webState.wallopsOpen = false;
+  document.getElementById('wallopsSectionDiv').setAttribute('hidden', '');
 });
 
 
