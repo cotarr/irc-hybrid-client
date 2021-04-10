@@ -871,22 +871,20 @@ function _parseBufferMessage (message) {
     //
     // parse message into: prefix, command, and param array
     let parsedMessage = _parseIrcMessage(message);
-    // console.log('parsedMessage' + JSON.stringify(parsedMessage, null, 2));
+    console.log('parsedMessage' + JSON.stringify(parsedMessage, null, 2));
     //
 
+    if ((parseInt(parsedMessage.command) >= 400) &&
+      (parseInt(parsedMessage.command) <500)) {
+      // TODO temporarily remove timestamp with slice, can use better parse.
+      _showNotExpiredError(message.slice(12, message.length));
+    }
     // Decoding complete, Parse commands
     //
     switch(parsedMessage.command) {
       // NAMES
       case '353':
         displayChannelMessage(parsedMessage);
-        break;
-      //
-      case '401': // No such nick/channel
-        _showNotExpiredError('401 ' + parsedMessage.params[2] + ' ' + parsedMessage.params[1]);
-        break;
-      case '403': // No such channel
-        _showNotExpiredError('403 ' + parsedMessage.params[2] + ' ' + parsedMessage.params[1]);
         break;
       case 'ERROR':
         // console.log(message.toString());

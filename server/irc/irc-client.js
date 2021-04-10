@@ -639,6 +639,13 @@
         }
         break;
       //
+      // 451 ERR_NOTREGISERED
+      // TODO
+      case '451':
+        if (true) {
+        }
+        break;
+      //
       case 'ERROR':
         console.log(message.toString());
         global.sendToBrowser('UPDATE\n');
@@ -1025,102 +1032,161 @@
   //  web-broswer --> web server --> [THIS PARSER] --> irc-server
   //-----------------------------------------------------------------
   const parseBrowserMessageForCommand = function (message) {
-    // console.log('Browser --> backend message: ' + message);
+    console.log('Browser --> backend message: ' + message);
 
-    // XXXXXXXXXXXXXXXXXXXXX
-    // TODO better parse of white space, then fix below
-    // XXXXXXXXXXXXXXXXXXXXX
+    let i = 0;
+    let end = message.length - 1;
+    // parsed sub-strings
+    let outboundCommand = '';
+    let outboundCommandRest = '';
+    let outboundArg1 = '';
+    let outboundArg1Rest = '';
 
-    //
-    //    JOIN
-    //
-    if (message.split(' ')[0] === 'JOIN') {
-      if (true) {
-        let channel =
-          message.split(' ')[1].toLowerCase().toLowerCase().replace('\r', '').replace('\n', '');
-        let index = ircState.channels.indexOf(channel);
-        if ((index >= 0) && (ircState.channelStates[index].joined)) {
-          // case of already in this channel
-          return {
-            error: true,
-            message: 'Error, can not join a channel you are already in.'
-          };
-        }
-        if (channel.length < 2) {
-          return {
-            error: true,
-            message: 'Channel name too short'
-          };
-        }
-        // Clear names list, a new one will arrive after join
-        if (index >= 0) {
-          console.log('JOIN clearing nicklist');
-          ircState.channelStates[index].names = [];
-        }
+    while ((message.charAt(i) !== ' ') && (i <= end)) {
+      if ((message.charAt(i) !== '\r') && (message.charAt(i) !== '\n')) {
+        outboundCommand += message.charAt(i);
       }
-      return {error: false};
+      i++;
     }
-    //
-    //    NAMES
-    //
-    if (message.split(' ')[0] === 'NAMES') {
-      if (true) {
-        let channel =
-          message.split(' ')[1].toLowerCase().toLowerCase().replace('\r', '').replace('\n', '');
-        let index = ircState.channels.indexOf(channel);
+    outboundCommand = outboundCommand.toUpperCase();
+    while ((message.charAt(i) === ' ') && (i <= end)) {
+      i++;
+    }
+    // Note: outboundCommandRest may start with leading colon ':'
+    while (i <= end) {
+      if ((message.charAt(i) !== '\r') && (message.charAt(i) !== '\n')) {
+        outboundCommandRest += message.charAt(i);
+      }
+      i++;
+    }
+    if (outboundCommandRest.length > 0) {
+      i = 0;
+      end = outboundCommandRest.length - 1;
+      while ((outboundCommandRest.charAt(i) !== ' ') && (i <= end)) {
+        outboundArg1 += outboundCommandRest.charAt(i);
+        i++;
+      }
+      while ((outboundCommandRest.charAt(i) === ' ') && (i <= end)) {
+        i++;
+      }
+      // Note: outboundArg1Rest may start with leading colon ':'
+      while (i <= end) {
+        outboundArg1Rest += outboundCommandRest.charAt(i);
+        i++;
+      }
+    }
+    console.log('outboundCommand ' + outboundCommand);
+    console.log('outboundCommandRest ' + outboundCommandRest);
+    console.log('outboundArg1 ' + outboundArg1);
+    console.log('outboundArg1Rest ' + outboundArg1Rest);
 
-        // Clear names list, a new one will arrive after join
-        if (index >= 0) {
-          ircState.channelStates[index].names = [];
+    switch (outboundCommand) {
+      case 'JOIN':
+        if (true) {
+          let index = ircState.channels.indexOf(outboundArg1);
+          if ((index >= 0) && (ircState.channelStates[index].joined)) {
+            // case of already in this channel
+            return {
+              error: true,
+              message: 'Error, can not join a channel you are already in.'
+            };
+          }
+          if (outboundArg1.length < 2) {
+            return {
+              error: true,
+              message: 'Channel name too short'
+            };
+          }
+          // Clear names list, a new one will arrive after join
+          if (index >= 0) {
+            console.log('JOIN clearing nicklist');
+            ircState.channelStates[index].names = [];
+          }
         }
-      }
-      return {error: false};
-    }
-    //
-    // NOTICE TODO
-    //
-    if (message.split(' ')[0] === 'NOTICE') {
-      console.log('TODO echo NOTICE from me in PM and Channel');
-    }
-    //
-    //    PRIVMSG
-    //
-    if (message.split(' ')[0] === 'PRIVMSG') {
-      if (true) {
-        //
-        // case of channel message
-        //
-        let channel = message.split(' ')[1].toLowerCase().replace('\r', '').replace('\n', '');
-        let index = ircState.channels.indexOf(channel);
-        if ((index >= 0) && (ircState.channelStates[index].joined)) {
-          let fromMessage = timestamp() + ' ' +
-          ':' + ircState.nickName + '!*@* ' + message;
-          ircMessageCache.addMessage(fromMessage);
-          global.sendToBrowser(fromMessage + '\r\n');
-          return {error: false};
+        return {error: false};
+        break;
+      case 'NAMES':
+        if (true) {
+          let index = ircState.channels.indexOf(outboundArg1);
+          // Clear names list, a new one will arrive after join
+          if (index >= 0) {
+            ircState.channelStates[index].names = [];
+          }
         }
-      }
+        return {error: false};
+        break;
       //
-      // case of private message
-      //
-      // fc = first character of target
-      if (true) {
-        let target = message.split(' ')[1].toLowerCase().replace('\r', '').replace('\n', '');
-        let index = ircState.channels.indexOf(target);
-        let fc = target.charAt(0);
-        if ((fc !== '#') && (fc !== '&') && (fc !== '+') && (fc !== '!')) {
-          let fromMessage = timestamp() + ' ' +
+      case 'NOTICE':
+        if (true) {
+          //
+          // case of channel notice
+          //
+          let index = ircState.channels.indexOf(outboundArg1);
+          if ((index >= 0) && (ircState.channelStates[index].joined)) {
+            let fromMessage = timestamp() + ' ' +
             ':' + ircState.nickName + '!*@* ' + message;
-          ircMessageCache.addMessage(fromMessage);
-          global.sendToBrowser(fromMessage + '\r\n');
-          return {error: false};
+            ircMessageCache.addMessage(fromMessage);
+            global.sendToBrowser(fromMessage + '\r\n');
+            return {error: false};
+          }
         }
-        return {
-          error: true,
-          message: 'Error parsing PRIVMSG message before send to IRC server.'
-        };
-      }
+        //
+        // case of private notice
+        //
+        // fc = first character of target, channel start with reserved character
+        if (true) {
+          let fc = outboundArg1.charAt(0);
+          if ((fc !== '#') && (fc !== '&') && (fc !== '+') && (fc !== '!')) {
+            let fromMessage = timestamp() + ' ' +
+              ':' + ircState.nickName + '!*@* ' + message;
+            ircMessageCache.addMessage(fromMessage);
+            global.sendToBrowser(fromMessage + '\r\n');
+            return {error: false};
+          }
+          return {
+            error: true,
+            message: 'Error parsing NOTICE message before send to IRC server.'
+          };
+        }
+        break;
+      //
+      case 'PRIVMSG':
+        if (true) {
+          //
+          // case of channel message
+          //
+          let index = ircState.channels.indexOf(outboundArg1);
+          if ((index >= 0) && (ircState.channelStates[index].joined)) {
+            let fromMessage = timestamp() + ' ' +
+            ':' + ircState.nickName + '!*@* ' + message;
+            ircMessageCache.addMessage(fromMessage);
+            global.sendToBrowser(fromMessage + '\r\n');
+            return {error: false};
+          }
+        }
+        //
+        // case of private message
+        //
+        // fc = first character of target, channel start with reserved character
+        if (true) {
+          let fc = outboundArg1.charAt(0);
+          if ((fc !== '#') && (fc !== '&') && (fc !== '+') && (fc !== '!')) {
+            let fromMessage = timestamp() + ' ' +
+              ':' + ircState.nickName + '!*@* ' + message;
+            ircMessageCache.addMessage(fromMessage);
+            global.sendToBrowser(fromMessage + '\r\n');
+            return {error: false};
+          }
+          return {
+            error: true,
+            message: 'Error parsing PRIVMSG message before send to IRC server.'
+          };
+        }
+        break;
+      //
+      default:
     }
+
     // by default messages are valid
     return {error: false};
   }; // parseBrowserMessageForCommand
