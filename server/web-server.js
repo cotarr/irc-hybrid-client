@@ -263,6 +263,7 @@ app.get('/userinfo', authorizeOrFail, userAuth.getUserInfo);
 // ---------------------------------------
 // IRC client API routes served to browser
 // ---------------------------------------
+app.post('/irc/server', authorizeOrFail, ircClient.serverHandler);
 app.post('/irc/connect', authorizeOrFail, ircClient.connectHandler);
 app.post('/irc/disconnect', authorizeOrFail, ircClient.disconnectHandler);
 app.post('/irc/message', authorizeOrFail, ircClient.messageHandler);

@@ -52,8 +52,10 @@ const channelPrefixChars = '@#+!';
 //
 var ircState = {
   showPingPong: true,
+  ircServerIndex: 0,
   ircConnected: false,
   ircConnecting: false,
+  ircRegistered: false,
   ircTLSEnabled: false,
   ircServerHost: '',
   ircServerPort: '6667',
@@ -155,6 +157,7 @@ function errorTimerTickHandler () {
 // Check if connected, both web and irc
 // 1 = browser connect to web server only
 // 2 = require both web and IRC
+// 3 = require both web and IRC and Registered
 // --------------------------------------
 function checkConnect(code) {
   if ((code >= 1) && (!webState.webConnected)) {
@@ -162,6 +165,10 @@ function checkConnect(code) {
     return false;
   }
   if ((code >= 2) && (!ircState.ircConnected)) {
+    showError('Error: Not connected to IRC server.');
+    return false;
+  }
+  if ((code >= 3) && (!ircState.ircRegistered)) {
     showError('Error: Not connected to IRC server.');
     return false;
   }
@@ -179,6 +186,7 @@ function updateDivVisibility() {
     document.getElementById('sendRawMessageButton').removeAttribute('disabled');
     document.getElementById('loadFromCacheButton').removeAttribute('disabled');
     if (ircState.ircConnected) {
+      document.getElementById('cycleNextServerButton').setAttribute('disabled', '');
       document.getElementById('ircConnectIconId').setAttribute('connected', '');
       document.getElementById('hideLoginSection').setAttribute('hidden', '');
       document.getElementById('hideLoginSectionButton').textContent = '+';
@@ -204,6 +212,7 @@ function updateDivVisibility() {
       //
       // IRC Server Disconnected
       //
+      document.getElementById('cycleNextServerButton').removeAttribute('disabled');
       document.getElementById('ircConnectIconId').removeAttribute('connected');
       document.getElementById('hideLoginSection').removeAttribute('hidden');
       document.getElementById('hideLoginSectionButton').textContent = '-';
@@ -221,6 +230,7 @@ function updateDivVisibility() {
       document.getElementById('wallopsSectionDiv').setAttribute('hidden', '');
     }
   } else {
+    document.getElementById('cycleNextServerButton').setAttribute('disabled', '');
     document.getElementById('webConnectIconId').removeAttribute('connected');
     document.getElementById('ircConnectIconId').removeAttribute('connected');
     document.getElementById('nickNameInputId').setAttribute('disabled', '');
@@ -383,12 +393,7 @@ function initWebSocketAuth (callback) {
 // Connect the websocket on page load (do it now)
 initWebSocketAuth();
 
-var lastHostPort = {
-  host: '',
-  port: ''
-};
-
-
+var lastServerIndex = -1;
 // --------------------------------------
 // Contact web server and get state of
 // the connection to the IRC server
@@ -422,14 +427,15 @@ function getIrcState (callback) {
       // update display as necessary
       // ---------------------------------------------------------------
       // only update user info if server is changed from previous.
-      if ((!ircState.ircConnected) && (ircState.ircServerHost + ircState.ircServerPort !==
-        lastHostPort.host + lastHostPort.port)) {
-        lastHostPort.host = ircState.ircServerHost;
-        lastHostPort.port = ircState.ircServerPort;
-        document.getElementById('ircServerAddrInputId').value =
-        ircState.ircServerHost + ':' + ircState.ircServerPort;
+      if ((!ircState.ircConnected) && (lastServerIndex !== ircState.ircServerIndex)) {
+        lastServerIndex = ircState.ircServerIndex;
+        document.getElementById('ircServerNameInputId').value = ircState.ircServerName;
+        document.getElementById('ircServerAddrInputId').value = ircState.ircServerHost;
+        document.getElementById('ircServerPortInputId').value = ircState.ircServerPort;
         if (ircState.ircTLSEnabled) {
-          document.getElementById('ircServerAddrInputId').value += ' (TLS)';
+          document.getElementById('ircServerTlsCheck').setAttribute('checked', '');
+        } else {
+          document.getElementById('ircServerTlsCheck').removeAttribute('checked');
         }
         // populate first channel for this server
         nextChannelName(0);
@@ -1184,6 +1190,48 @@ initWebSocketAuth(function(err, data) {
 });
 // ----------------- API requests ---------------------------
 
+// ------------------------
+// Next Server Button
+// ------------------------
+document.getElementById('cycleNextServerButton').addEventListener('click', function() {
+  // Are we connected to web server?
+  if (ircState.ircConnected) {
+    showError('Can not change servers while connected');
+    return;
+  }
+
+  let fetchURL = webServerUrl + '/irc/server';
+  let fetchOptions = {
+    method: 'POST',
+    // credentials: 'include',
+    timeout: 10000,
+    headers: {
+      'Content-type': 'application/json',
+      'Accept': 'application/json'
+    },
+    body: JSON.stringify({index: -1})
+  };
+
+  fetch(fetchURL, fetchOptions)
+    .then( (response) => {
+      // console.log(response.status);
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error('Fetch status ' + response.status + ' ' + response.statusText);
+      }
+    })
+    .then( (responseJson) => {
+      // console.log(JSON.stringify(responseJson, null, 2));
+      if (responseJson.error) {
+        showError(responseJson.message);
+      }
+    })
+    .catch( (error) => {
+      console.log(error);
+      showError(error.toString());
+    });
+}); // connectButton
 // -------------------------
 // Connect Button Handler
 // -------------------------

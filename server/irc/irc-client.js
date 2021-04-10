@@ -52,6 +52,7 @@
   ircState.ircConnecting = false;
   ircState.ircRegistered = false;
 
+  ircState.ircServerIndex = 0;
   ircState.ircServerName = servers.serverArray[0].name;
   ircState.ircServerHost = servers.serverArray[0].host;
   ircState.ircServerPort = servers.serverArray[0].port;
@@ -905,6 +906,53 @@
   // -----------------------------------------------------
   //  Includes all socket event listeners
   // -----------------------------------------------------
+
+  //----------------------------------------
+  // Cycle server from available server list
+  //
+  // Route: /server
+  //----------------------------------------
+  const serverHandler = function(req, res, next) {
+    if ((!('serverArray' in servers)) || (servers.serverArray.length < 1)) {
+      return res.json({
+        error: true,
+        message: 'Server list empty.'
+      });
+    }
+    if (servers.serverArray.length === 1) {
+      return res.json({
+        error: true,
+        message: 'Only 1 server, can not cycle.'
+      });
+    }
+    ircState.ircServerIndex++;
+    if (ircState.ircServerIndex >= servers.serverArray.length) {
+      ircState.ircServerIndex = 0;
+    }
+    ircState.ircServerName = servers.serverArray[ircState.ircServerIndex].name;
+    ircState.ircServerHost = servers.serverArray[ircState.ircServerIndex].host;
+    ircState.ircServerPort = servers.serverArray[ircState.ircServerIndex].port;
+    ircState.ircTLSEnabled = servers.serverArray[ircState.ircServerIndex].tls;
+    ircServerPassword = servers.serverArray[ircState.ircServerIndex].password;
+    nsIdentifyCommand = servers.serverArray[ircState.ircServerIndex].identifyCommand;
+    ircState.channelList = servers.serverArray[ircState.ircServerIndex].channelList;
+
+    ircState.nickName = servers.serverArray[ircState.ircServerIndex].nick;
+    ircState.userName = servers.serverArray[ircState.ircServerIndex].user;
+    ircState.realName = servers.serverArray[ircState.ircServerIndex].real;
+    ircState.userMode = servers.serverArray[ircState.ircServerIndex].modes;
+    ircState.userHost = '';
+
+    global.sendToBrowser('UPDATE\n');
+
+    return res.json({
+      error: false,
+      message: null,
+      index: ircState.ircServerIndex,
+      name: ircState.ircServerName
+    });
+  };
+
   // placeholder
   var ircSocket = null;
   // -----------------------------------------------------
@@ -1339,6 +1387,7 @@
   }.bind(this), 1000);
 
   module.exports = {
+    serverHandler: serverHandler,
     connectHandler: connectHandler,
     messageHandler: messageHandler,
     disconnectHandler: disconnectHandler,

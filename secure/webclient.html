@@ -60,8 +60,15 @@
       <div id="hideLoginSection">
         <div class="vh10"></div>
         <div class="button-div">
-          <input type="text" id="ircServerAddrInputId" size="30" value="" disabled>
-          <div class="input-label-right">Server/Port</div>
+          <input type="text" id="ircServerNameInputId" size="10" value="" disabled>
+          <input type="checkbox" id="ircServerTlsCheck" disabled>
+          <span>TLS</splan>
+          <button id="cycleNextServerButton">Next Server</button>
+        </div>
+        <div class="button-div">
+          <input type="text" id="ircServerAddrInputId" size="26" value="" disabled>
+          <span>:</span>
+          <input type="text" id="ircServerPortInputId" size="4" value="" disabled>
         </div>
         <div class="button-div">
           <input type="text" id="nickNameInputId" value="">
