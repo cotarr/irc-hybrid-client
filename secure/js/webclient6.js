@@ -232,6 +232,11 @@ document.getElementById('eraseCacheButton').addEventListener('click', function()
       if (responseJson.error) {
         showError(responseJson.message);
       } else {
+        // remove dynamically created private message elements to match list
+        let privMsgSessionEl = document.getElementById('privateMessageContainerDiv');
+        while (privMsgSessionEl.firstChild) {
+          privMsgSessionEl.removeChild(privMsgSessionEl.firstChild);
+        }
         document.getElementById('noticeMessageDisplay').textContent = '';
         document.getElementById('wallopsMessageDisplay').textContent = '';
         document.getElementById('rawMessageDisplay').textContent = '';

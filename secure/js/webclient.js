@@ -310,7 +310,7 @@ function setVariablesShowingIRCDisconnected () {
   webState.channels = [];
   webState.resizeableTextareaIds = [];
   webState.resizeableChanareaIds = [];
-  webState.activePrivateMessageNicks = [];
+  // webState.activePrivateMessageNicks = [];
 };
 
 //------------------------------------------------------------------------------
@@ -998,6 +998,12 @@ function updateFromCache () {
     })
     .then( (responseArray) => {
       if ((Array.isArray(responseArray)) && (responseArray.length > 0)) {
+        // remove dynamically created private message elements to match list
+        let privMsgSessionEl = document.getElementById('privateMessageContainerDiv');
+        while (privMsgSessionEl.firstChild) {
+          privMsgSessionEl.removeChild(privMsgSessionEl.firstChild);
+        }
+        webState.activePrivateMessageNicks = [];
         document.getElementById('noticeMessageDisplay').textContent = '';
         document.getElementById('wallopsMessageDisplay').textContent = '';
         document.getElementById('rawMessageDisplay').textContent = '';
