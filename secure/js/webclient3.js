@@ -105,7 +105,7 @@ function createChannelEl (name) {
 
   //Channel topic
   let channelTopicDivEl = document.createElement('div');
-  channelTopicDivEl.textContent = ircState.channelStates[channelIndex].topic;
+  channelTopicDivEl.textContent = cleanFormatting(ircState.channelStates[channelIndex].topic);
   channelTopicDivEl.classList.add('chan-topic-div');
 
 
@@ -295,7 +295,7 @@ function createChannelEl (name) {
     // console.log('Event: irc-state-changed (createChannelEl)');
     let index = ircState.channels.indexOf(name);
     if (index >= 0) {
-      channelTopicDivEl.textContent = ircState.channelStates[index].topic;
+      channelTopicDivEl.textContent = cleanFormatting(ircState.channelStates[index].topic);
       if (ircState.channelStates[index].joined) {
         channelNamesDisplayEl.removeAttribute('disabled');
         channelTextAreaEl.removeAttribute('disabled');
@@ -341,7 +341,7 @@ function createChannelEl (name) {
   document.addEventListener('channel-message', function(event) {
     function _addText (text) {
       // append text to textarea
-      channelTextAreaEl.textContent += text + '\n';
+      channelTextAreaEl.textContent += cleanFormatting(text) + '\n';
       // move scroll bar so text is scrolled all the way up
       channelTextAreaEl.scrollTop = channelTextAreaEl.scrollHeight;
     }

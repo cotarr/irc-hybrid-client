@@ -87,6 +87,7 @@ webState.resizeableTextareaIds = [];
 webState.resizeableChanareaIds = [];
 webState.activePrivateMessageNicks = [];
 webState.rawShowHex = false;
+webState.rawNoClean = false;
 
 // -------------------------------
 // Build URL from page location
@@ -491,6 +492,85 @@ document.addEventListener('irc-state-changed', function(event) {
   // console.log('Event: irc-state-changed, detail:' + JSON.stringify(event.detail));
 });
 
+// ------------------------------------------
+// Function to strip colors from a string
+// ------------------------------------------
+function cleanFormatting (inString) {
+  // Filterable formatting codes
+  let formattingChars = [
+    2, // 0x02 bold
+    7, // 0x07 bell character
+    15, // 0x0F reset
+    17, // 0x11 mono-space
+    22, // 0x16 Reverse color
+    29, // 0x1D Italics
+    30, // 0x1E Strickthrough
+    31 // 0x1F Underline
+  ];
+  // Color encoding (2 methods)
+  // 0x03+color (1 or 2 digits in range 0-9)
+  // 0x04+color (6 digit hexadecimal color)
+  let outString = '';
+  // l = length of input string
+  let l = inString.length;
+  if (l === 0) return outString;
+  // i = index into input string
+  let i = 0;
+
+  // Loop through all characters in input string
+  while (i<l) {
+    // Filter format characters capable of toggle on/off
+    if ((i<l) && (formattingChars.indexOf(inString.charCodeAt(i)) >= 0)) i++;
+    // Removal of color codes 0x03 + (1 or 2 digit) in range ('0' to '9')
+    // followed by optional comma and background color.
+    // Examples
+    //     0x03 + '3'
+    //     0x03 + '03'
+    //     0x03 + '3,4'
+    //     0x03 + '03,04'
+    if ((i<l) && (inString.charCodeAt(i) === 3)) {
+      i++;
+      if ((i<l) && (inString.charAt(i) >= '0') && (inString.charAt(i) <= '9')) i++;
+      if ((i<l) && (inString.charAt(i) >= '0') && (inString.charAt(i) <= '9')) i++;
+      if ((i<l) && (inString.charAt(i) === ',')) {
+        i++;
+        if ((i<l) && (inString.charAt(i) >= '0') && (inString.charAt(i) <= '9')) i++;
+        if ((i<l) && (inString.charAt(i) >= '0') && (inString.charAt(i) <= '9')) i++;
+      }
+    }
+    // Hexadecimal colors 0x04 + 6 hexadecimal digits
+    // followed by optional comma and 6 hexadeciaml digits for background color
+    // In this case, 6 characters are removed regardless if 0-9, A-F
+    if ((i<l) && (inString.charCodeAt(i) === 4)) {
+      i++;
+      for (let j=0; j<6; j++) {
+        if (i<l) i++;
+      }
+      if ((i<l) && (inString.charAt(i) === ',')) {
+        i++;
+        for (let j=0; j<6; j++) {
+          if (i<l) i++;
+        }
+      }
+    }
+
+    if (i<l) outString += inString.charAt(i);
+    i++;
+  }
+  return outString;
+}
+
+// ------ This is a color format removal test -------------
+// let colorTest = 'This is ' +
+//   String.fromCharCode(3) + '04' + 'Red' + String.fromCharCode(3) + ' color ' +
+//   String.fromCharCode(3) + '04,12' + 'Red/Gray' + String.fromCharCode(3) + ' color ' +
+//   String.fromCharCode(4) + '0Fd7ff' + 'Hex-color' + String.fromCharCode(3) + ' color ' +
+//   String.fromCharCode(4) + '0Fd7ff,17a400' + 'Hex-color,hexcolor' +String.fromCharCode(4) +
+//   ' color ' +
+//   String.fromCharCode(2) + 'Bold' + String.fromCharCode(2) + ' text ';
+// console.log('colorTest ' + cleanFormatting(colorTest));
+// ------ end color format removal test -------------
+
 //
 // Internal function to parse one line of message from IRC server
 // Returns jason object with prefix, command and params array
@@ -712,7 +792,7 @@ function displayPrivateMessage(parsedMessage) {
 
 function displayNoticeMessage(parsedMessage) {
   function _addText (text) {
-    document.getElementById('noticeMessageDisplay').textContent += text + '\n';
+    document.getElementById('noticeMessageDisplay').textContent += cleanFormatting(text) + '\n';
     document.getElementById('noticeMessageDisplay').scrollTop =
       document.getElementById('noticeMessageDisplay').scrollHeight;
   }
@@ -747,7 +827,7 @@ function displayNoticeMessage(parsedMessage) {
 
 function displayWallopsMessage(parsedMessage) {
   function _addText (text) {
-    document.getElementById('wallopsMessageDisplay').textContent += text + '\n';
+    document.getElementById('wallopsMessageDisplay').textContent += cleanFormatting(text) + '\n';
     document.getElementById('wallopsMessageDisplay').scrollTop =
       document.getElementById('wallopsMessageDisplay').scrollHeight;
   }
@@ -766,7 +846,9 @@ function displayWallopsMessage(parsedMessage) {
 
 
 function displayRawMessage (inString) {
-  document.getElementById('rawMessageDisplay').textContent += inString + '\n';
+  let text = cleanFormatting(inString);
+  if (webState.rawNoClean) text = inString;
+  document.getElementById('rawMessageDisplay').textContent += text + '\n';
   document.getElementById('rawMessageDisplay').scrollTop =
     document.getElementById('rawMessageDisplay').scrollHeight;
 };

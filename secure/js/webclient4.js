@@ -156,7 +156,7 @@ function _createPrivateMessageEl (name, parsedMessage) {
   // we must add the message that generated the window open request.
   // -------------------------------------------
   privMsgTextAreaEl.textContent += parsedMessage.timestamp + ' ' +
-    parsedMessage.nick + ' ' + parsedMessage.params[1] + '\n';
+    parsedMessage.nick + ' ' + cleanFormatting(parsedMessage.params[1]) + '\n';
   // move scroll bar so text is scrolled all the way up
   privMsgTextAreaEl.scrollTop = privMsgTextAreaEl.scrollHeight;
 
@@ -245,7 +245,7 @@ function _createPrivateMessageEl (name, parsedMessage) {
   document.addEventListener('private-message', function(event) {
     function _addText (text) {
       // append text to textarea
-      privMsgTextAreaEl.textContent += text + '\n';
+      privMsgTextAreaEl.textContent += cleanFormatting(text) + '\n';
       // move scroll bar so text is scrolled all the way up
       privMsgTextAreaEl.scrollTop = privMsgTextAreaEl.scrollHeight;
     }

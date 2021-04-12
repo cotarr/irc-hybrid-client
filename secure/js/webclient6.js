@@ -146,6 +146,16 @@ document.getElementById('rawDisplayHexButtonId').addEventListener('click', funct
   }
 });
 
+document.getElementById('rawNoCleanFormatCodesButtonId').addEventListener('click', function() {
+  if (webState.rawNoClean) {
+    webState.rawNoClean = false;
+    document.getElementById('rawNoCleanFormatCodesButtonId').classList.remove('button-on-color');
+  } else {
+    webState.rawNoClean = true;
+    document.getElementById('rawNoCleanFormatCodesButtonId').classList.add('button-on-color');
+  }
+});
+
 // -----------------------
 // Die (Server) button
 // -----------------------
