@@ -400,7 +400,7 @@ const adjustInputToWidowWidth = function (innerWidth) {
   }
   if (webState.resizeableChanareaIds.length > 0) {
     webState.resizeableChanareaIds.forEach(function(id) {
-      if (window.innerWidth > 600) {
+      if (window.innerWidth > 760) {
         document.getElementById(id).setAttribute('cols', (cols-23).toString());
       } else {
         document.getElementById(id).setAttribute('cols', cols.toString());

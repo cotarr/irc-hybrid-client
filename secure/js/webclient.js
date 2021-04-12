@@ -45,6 +45,7 @@
 // --------------------
 //
 const channelPrefixChars = '@#+!';
+const nickChannelSpacer = ' | ';
 // Do not edit ircState, represents state on web server end
 // Object updated from getIrcState() fetch request
 //
@@ -597,10 +598,9 @@ function _parseIrcMessage (message) {
       outString = null;
     } else {
       let timeObj = new Date(parseInt(timeString) * 1000);
-      if (timeObj.getHours() < 10) outString += '0';
-      outString += timeObj.getHours() + ':';
-      if (timeObj.getMinutes() < 10) outString += '0';
-      outString += timeObj.getMinutes();
+      outString += timeObj.getHours().toString().padStart(2, '0') + ':';
+      outString += timeObj.getMinutes().toString().padStart(2, '0') + ':';
+      outString += timeObj.getSeconds().toString().padStart(2, '0');
     }
     return {
       data: outString,

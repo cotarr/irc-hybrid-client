@@ -44,6 +44,7 @@ function _sendTextToChannel(channelIndex, textAreaEl) {
 };
 
 function createChannelEl (name) {
+  var maxNickLength = 0;
   // console.log('creating Channel Element ' + name);
   let channelIndex = ircState.channels.indexOf(name);
   // console.log('channel state obj ' +
@@ -320,11 +321,13 @@ function createChannelEl (name) {
   function _updateNickList() {
     let index = ircState.channels.indexOf(name.toLowerCase());
     if (index >= 0) {
+      maxNickLength = 0;
       if (ircState.channelStates[index].names.length > 0) {
         channelNamesDisplayEl.textContent = '';
         sortedNames = ircState.channelStates[index].names.sort();
         for (let i=0; i<sortedNames.length; i++) {
           channelNamesDisplayEl.textContent += sortedNames[i] + '\n';
+          if (maxNickLength < sortedNames[i].length) maxNickLength = sortedNames[i].length;
         }
       }
     }
@@ -339,6 +342,12 @@ function createChannelEl (name) {
   }.bind(this));
 
   document.addEventListener('channel-message', function(event) {
+    function _optionalTime(timestamp) {
+      // if (window.innerWidth < 600) {
+      //   return '';
+      // }
+      return timestamp + ' ';
+    }
     function _addText (text) {
       // append text to textarea
       channelTextAreaEl.textContent += cleanFormatting(text) + '\n';
@@ -353,14 +362,16 @@ function createChannelEl (name) {
       //
       case 'JOIN':
         if (parsedMessage.params[0].toLowerCase() === name.toLowerCase()) {
-          _addText(parsedMessage.timestamp + ' * ' +
+          _addText(_optionalTime(parsedMessage.timestamp) +
+          '*'.padStart(maxNickLength, ' ') + nickChannelSpacer +
           parsedMessage.nick + ' (' +
           parsedMessage.host + ') has joined');
         }
         break;
       case 'MODE':
         if (parsedMessage.params[0].toLowerCase() === name.toLowerCase()) {
-          _addText(parsedMessage.timestamp + ' ' +
+          _addText(_optionalTime(parsedMessage.timestamp) +
+            '*'.padStart(maxNickLength, ' ') + nickChannelSpacer +
             'Mode ' + parsedMessage.params[0] + ' [' +
             parsedMessage.params[1] + ' ' + parsedMessage.params[2] +
             '] by ' + parsedMessage.nick);
@@ -368,7 +379,9 @@ function createChannelEl (name) {
         break;
       case 'NOTICE':
         if (parsedMessage.params[0].toLowerCase() === name.toLowerCase()) {
-          _addText(parsedMessage.timestamp + ' ' + 'Notice(' +
+          _addText(_optionalTime(parsedMessage.timestamp) +
+            '*'.padStart(maxNickLength, ' ') + nickChannelSpacer +
+            'Notice(' +
             parsedMessage.nick + '/' + parsedMessage.params[0] + ') ' +
             parsedMessage.params[1]);
           // Upon channel message, make sectino visible.
@@ -379,15 +392,17 @@ function createChannelEl (name) {
 
       case 'PART':
         if (parsedMessage.params[0].toLowerCase() === name.toLowerCase()) {
-          _addText(parsedMessage.timestamp + ' * ' +
-          parsedMessage.nick + ' (' +
-          parsedMessage.host + ') has left');
+          _addText(_optionalTime(parsedMessage.timestamp) +
+            '*'.padStart(maxNickLength, ' ') + nickChannelSpacer +
+            parsedMessage.nick + ' (' +
+            parsedMessage.host + ') has left');
         }
         break;
       case 'PRIVMSG':
         if (parsedMessage.params[0].toLowerCase() === name.toLowerCase()) {
-          _addText(parsedMessage.timestamp + ' ' +
-          parsedMessage.nick + ' ' + parsedMessage.params[1]);
+          _addText(_optionalTime(parsedMessage.timestamp) +
+            parsedMessage.nick.padStart(maxNickLength, ' ') + nickChannelSpacer +
+            parsedMessage.params[1]);
           // Upon channel message, make sectino visible.
           channelBottomDivEl.removeAttribute('hidden');
           channelHideButtonEl.textContent = '-';
@@ -395,7 +410,8 @@ function createChannelEl (name) {
         break;
       case 'TOPIC':
         if (parsedMessage.params[0].toLowerCase() === name.toLowerCase()) {
-          _addText(parsedMessage.timestamp + ' ' +
+          _addText(_optionalTime(parsedMessage.timestamp) +
+            '*'.padStart(maxNickLength, ' ') + nickChannelSpacer +
             'Topic for ' + parsedMessage.params[0] + ' changed to \"' +
             parsedMessage.params[1] + '\" by ' + parsedMessage.nick);
         }

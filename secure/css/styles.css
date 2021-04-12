@@ -10,6 +10,8 @@ body {
 
 textarea {
   resize: none;
+  /* for Chrome IOS */
+  font-family: monospace;
 }
 
 .aa-section-div {

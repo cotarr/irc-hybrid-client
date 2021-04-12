@@ -346,6 +346,7 @@ function textCommandParser (inputObj) {
           ircMessage: null
         };
       }
+      break;
     //
     case 'TOPIC':
       if ((parsedCommand.params.length > 1) &&
