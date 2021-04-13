@@ -399,15 +399,23 @@ const adjustInputToWidowWidth = function (innerWidth) {
   // array of text areas generated dynamically by javascript.
   if (webState.resizeableTextareaIds.length > 0) {
     webState.resizeableTextareaIds.forEach(function(id) {
-      document.getElementById(id).setAttribute('cols', cols.toString());
+      if (document.getElementById(id)) {
+        document.getElementById(id).setAttribute('cols', cols.toString());
+      } else {
+        console.log('Error: ' + id);
+      }
     });
   }
   if (webState.resizeableChanareaIds.length > 0) {
     webState.resizeableChanareaIds.forEach(function(id) {
-      if (window.innerWidth > 600) {
-        document.getElementById(id).setAttribute('cols', (cols-23).toString());
+      if (document.getElementById(id)) {
+        if (window.innerWidth > 600) {
+          document.getElementById(id).setAttribute('cols', (cols-23).toString());
+        } else {
+          document.getElementById(id).setAttribute('cols', cols.toString());
+        }
       } else {
-        document.getElementById(id).setAttribute('cols', cols.toString());
+        console.log('Error: ' + id);
       }
     });
   }

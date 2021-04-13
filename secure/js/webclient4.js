@@ -321,7 +321,7 @@ function _buildPrivateMessageText() {
     document.getElementById('userPrivMsgInputId').value = '';
     // close window after sending, because a new one will open on server response.
     document.getElementById('privMsgMainHiddenDiv').setAttribute('hidden', '');
-    document.getElementById('openClosePrivMessageButton').textContent = '+';
+    document.getElementById('privMsgMainHiddenButton').textContent = '+';
   }
 };
 document.getElementById('userPrivMsgInputId').addEventListener('input', function(event) {
@@ -345,7 +345,7 @@ document.getElementById('whoisButton').addEventListener('click', function() {
     _sendIrcServerMessage(message);
     // open up server messages to show
     document.getElementById('rawHiddenElements').removeAttribute('hidden');
-    document.getElementById('rawOpenCloseButton').textContent = '-';
+    document.getElementById('rawHiddenElementsButton').textContent = '-';
   } else {
     showError('Input required');
   }
