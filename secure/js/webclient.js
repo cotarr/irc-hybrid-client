@@ -88,13 +88,16 @@ webState.webConnected = false;
 webState.webConnecting = false;
 webState.noticeOpen = false;
 webState.wallopsOpen = false;
-webState.channels = [];
-webState.resizeableTextareaIds = [];
-webState.resizeableChanareaIds = [];
-webState.activePrivateMessageNicks = [];
 webState.rawShowHex = false;
 webState.rawNoClean = false;
-
+// Some IRC channel local variables (most in ircState)
+webState.channels = [];
+webState.resizableChannelTextareaIds = [];
+webState.resizableChanSplitTextareaIds = [];
+// Private message variables
+webState.lastPMNick = '';
+webState.activePrivateMessageNicks = [];
+webState.resizablePrivMsgTextareaIds = [];
 // -------------------------------
 // Build URL from page location
 // -------------------------------
@@ -342,11 +345,11 @@ function setVariablesShowingIRCDisconnected () {
   while (channelContainerDivEl.firstChild) {
     channelContainerDivEl.removeChild(channelContainerDivEl.firstChild);
   }
-  webState.lastPMNick = '';
   webState.channels = [];
-  webState.resizeableTextareaIds = [];
-  webState.resizeableChanareaIds = [];
-  // webState.activePrivateMessageNicks = [];
+  webState.resizableChannelTextareaIds = [];
+  webState.resizableChanSplitTextareaIds = [];
+  // Note PM area arrays managed during reload instead of Disconnect
+  // This is because they are not in ircState and there managed in the browser.
 };
 
 //------------------------------------------------------------------------------
@@ -1114,7 +1117,9 @@ function updateFromCache () {
         while (privMsgSessionEl.firstChild) {
           privMsgSessionEl.removeChild(privMsgSessionEl.firstChild);
         }
+        webState.lastPMNick = '';
         webState.activePrivateMessageNicks = [];
+        webState.resizablePrivMsgTextareaIds = [];
         document.getElementById('noticeMessageDisplay').textContent = '';
         document.getElementById('wallopsMessageDisplay').textContent = '';
         document.getElementById('rawMessageDisplay').textContent = '';

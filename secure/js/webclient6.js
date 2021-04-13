@@ -396,9 +396,11 @@ const adjustInputToWidowWidth = function (innerWidth) {
   document.getElementById('wallopsMessageDisplay').setAttribute('cols', cols.toString());
   document.getElementById('rawMessageDisplay').setAttribute('cols', cols.toString());
   document.getElementById('rawMessageInputId').setAttribute('cols', cols.toString());
-  // array of text areas generated dynamically by javascript.
-  if (webState.resizeableTextareaIds.length > 0) {
-    webState.resizeableTextareaIds.forEach(function(id) {
+
+  // This is for dynamically generated elements
+  // IRC Channel <textarea> element for auto-resize
+  if (webState.resizableChannelTextareaIds.length > 0) {
+    webState.resizableChannelTextareaIds.forEach(function(id) {
       if (document.getElementById(id)) {
         document.getElementById(id).setAttribute('cols', cols.toString());
       } else {
@@ -406,14 +408,27 @@ const adjustInputToWidowWidth = function (innerWidth) {
       }
     });
   }
-  if (webState.resizeableChanareaIds.length > 0) {
-    webState.resizeableChanareaIds.forEach(function(id) {
+  // In the IRC channel area, this is to handle main
+  //     text area when it is split with nickname list.
+  if (webState.resizableChanSplitTextareaIds.length > 0) {
+    webState.resizableChanSplitTextareaIds.forEach(function(id) {
       if (document.getElementById(id)) {
         if (window.innerWidth > 600) {
           document.getElementById(id).setAttribute('cols', (cols-23).toString());
         } else {
           document.getElementById(id).setAttribute('cols', cols.toString());
         }
+      } else {
+        console.log('Error: ' + id);
+      }
+    });
+  }
+  // This is for dynamically generated elements
+  // Private message <textarea> element for auto-resize
+  if (webState.resizablePrivMsgTextareaIds.length > 0) {
+    webState.resizablePrivMsgTextareaIds.forEach(function(id) {
+      if (document.getElementById(id)) {
+        document.getElementById(id).setAttribute('cols', cols.toString());
       } else {
         console.log('Error: ' + id);
       }

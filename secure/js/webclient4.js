@@ -42,9 +42,17 @@ function _sendPrivMessageToUser(targetNickname, textAreaEl) {
   }
 }; // _sendPrivMessageToUser
 
-function _createPrivateMessageEl (name, parsedMessage) {
+function createPrivateMessageEl (name, parsedMessage) {
+  // if already exists, return
+  if (webState.activePrivateMessageNicks.indexOf(name.toLowerCase()) >= 0) {
+    console.log('createPrivateMessageEl: Private message element already exist');
+    return;
+  }
+  // Add to local browser list of active PM windows
+  webState.activePrivateMessageNicks.push(name.toLowerCase());
+
   // console.log('Creating private message Element for ' + name);
-  let privMsgIndex = webState.activePrivateMessageNicks.indexOf(name);
+  let privMsgIndex = webState.activePrivateMessageNicks.indexOf(name.toLowerCase());
 
   // This is static HTML element created in webclient.html (Insert point)
   let privMsgContainerDivEl = document.getElementById('privateMessageContainerDiv');
@@ -285,8 +293,8 @@ function _createPrivateMessageEl (name, parsedMessage) {
   // -----------------------------------------------------------
   // Setup textarea elements as dynamically resizable (globally)
   // -----------------------------------------------------------
-  webState.resizeableTextareaIds.push(privMsgTextAreaId);
-  webState.resizeableTextareaIds.push(privMsgInputAreaId);
+  webState.resizablePrivMsgTextareaIds.push(privMsgTextAreaId);
+  webState.resizablePrivMsgTextareaIds.push(privMsgInputAreaId);
   document.dispatchEvent(new CustomEvent('element-resize', {bubbles: true}));
 };
 
@@ -304,8 +312,7 @@ document.addEventListener('private-message', function(event) {
   // check if a private message section exists, if not create it
   //
   if (webState.activePrivateMessageNicks.indexOf(name.toLowerCase()) < 0) {
-    webState.activePrivateMessageNicks.push(name.toLowerCase());
-    _createPrivateMessageEl(name, event.detail.parsedMessage);
+    createPrivateMessageEl(name, event.detail.parsedMessage);
   }
 });
 

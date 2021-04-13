@@ -1170,7 +1170,7 @@
     switch (outboundCommand) {
       case 'JOIN':
         if (true) {
-          let index = ircState.channels.indexOf(outboundArg1);
+          let index = ircState.channels.indexOf(outboundArg1.toLowerCase());
           if ((index >= 0) && (ircState.channelStates[index].joined)) {
             // case of already in this channel
             return {
@@ -1194,7 +1194,7 @@
         break;
       case 'NAMES':
         if (true) {
-          let index = ircState.channels.indexOf(outboundArg1);
+          let index = ircState.channels.indexOf(outboundArg1.toLowerCase());
           // Clear names list, a new one will arrive after join
           if (index >= 0) {
             ircState.channelStates[index].names = [];
@@ -1208,7 +1208,7 @@
           //
           // case of channel notice
           //
-          let index = ircState.channels.indexOf(outboundArg1);
+          let index = ircState.channels.indexOf(outboundArg1.toLowerCase());
           if ((index >= 0) && (ircState.channelStates[index].joined)) {
             let fromMessage = timestamp() + ' ' +
             ':' + ircState.nickName + '!*@* ' + message;
@@ -1242,7 +1242,7 @@
           //
           // case of channel message
           //
-          let index = ircState.channels.indexOf(outboundArg1);
+          let index = ircState.channels.indexOf(outboundArg1.toLowerCase());
           if ((index >= 0) && (ircState.channelStates[index].joined)) {
             let fromMessage = timestamp() + ' ' +
             ':' + ircState.nickName + '!*@* ' + message;

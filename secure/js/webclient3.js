@@ -44,9 +44,18 @@ function _sendTextToChannel(channelIndex, textAreaEl) {
 };
 
 function createChannelEl (name) {
+  // if channel already exist abort
+  if (webState.channels.indexOf(name.toLowerCase()) >= 0) {
+    console.log('createChannelEl: channel already exist');
+    return;
+  }
+  // Add to local browser list of open channels
+  webState.channels.push(name.toLowerCase());
+
   var maxNickLength = 0;
   // console.log('creating Channel Element ' + name);
-  let channelIndex = ircState.channels.indexOf(name);
+
+  let channelIndex = ircState.channels.indexOf(name.toLowerCase());
   // console.log('channel state obj ' +
   //   JSON.stringify(ircState.channelStates[channelIndex], null, 2));
 
@@ -294,7 +303,7 @@ function createChannelEl (name) {
 
   function updateVisibility() {
     // console.log('Event: irc-state-changed (createChannelEl)');
-    let index = ircState.channels.indexOf(name);
+    let index = ircState.channels.indexOf(name.toLowerCase);
     if (index >= 0) {
       channelTopicDivEl.textContent = cleanFormatting(ircState.channelStates[index].topic);
       if (ircState.channelStates[index].joined) {
@@ -431,8 +440,8 @@ function createChannelEl (name) {
   // -----------------------------------------------------------
   // Setup textarea elements as dynamically resizable (globally)
   // -----------------------------------------------------------
-  webState.resizeableChanareaIds.push(channelTextAreaId);
-  webState.resizeableTextareaIds.push(channelInputAreaId);
+  webState.resizableChannelTextareaIds.push(channelInputAreaId);
+  webState.resizableChanSplitTextareaIds.push(channelTextAreaId);
   document.dispatchEvent(new CustomEvent('element-resize', {bubbles: true}));
 
   //
@@ -450,9 +459,8 @@ document.addEventListener('irc-state-changed', function(event) {
   // console.log('checking for channel updates');
   if (ircState.channels.length > 0) {
     ircState.channels.forEach(function(name) {
-      if (webState.channels.indexOf(name) === -1) {
+      if (webState.channels.indexOf(name.toLowerCase()) === -1) {
         // console.log('Creating new channel ' + name);
-        webState.channels.push(name);
         createChannelEl(name);
       }
     });

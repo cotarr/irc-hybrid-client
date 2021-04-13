@@ -350,7 +350,7 @@ function textCommandParser (inputObj) {
     //
     case 'TOPIC':
       if ((parsedCommand.params.length > 1) &&
-        (ircState.channels.indexOf(parsedCommand.params[1]) >= 0)) {
+        (ircState.channels.indexOf(parsedCommand.params[1].toLowerCase()) >= 0)) {
         ircMessage = 'TOPIC ' + parsedCommand.params[1] + ' :' + parsedCommand.restOf[1];
       } else if ((parsedCommand.params.length > 0) &&
         (channelPrefixChars.indexOf(parsedCommand.restOf[0].charAt(0)) < 0) &&
