@@ -89,132 +89,147 @@
       </div>
     </div>
 
-    <div id='ircDisconnectedHiddenDiv' hidden>
+    <!-- No hidden attreibute for webDisconnectedHiddenDiv (breaks auto-resize) -->
+    <div id="webDisconnectedHiddenDiv">
 
-      <div class="aa-section-div chan-msg-section-div" id="channelMenuDiv">
-        <div class="button-div">
-          <textarea id="newChannelNameInputId" cols="20" rows="1" ></textarea>
-            <button id="newChannelButton" class="rm20">Join Channel</button>
-        </div>
-      </div>
-      <div id="channelContainerDiv">
-      </div>
+      <div id="ircDisconnectedHiddenDiv" hidden>
 
-      <div class="aa-section-div priv-msg-section-div" id="privMsgSectionDiv">
-        <div>
-          <button id="privMsgMainHiddenButton">-</button>
-          <span>Private Messages</span>
-        </div>
-        <div id="privMsgMainHiddenDiv" hidden>
-          <div class="vh10"></div>
+        <div class="aa-section-div chan-msg-section-div" id="channelMenuDiv">
           <div class="button-div">
-            <div class="input-label-left">Private Msg to</div>
-            <input type="text" id="pmNickNameInputId" size="12" value="">
-          </div>
-          <div class="vh10"></div>
-          <div class="button-div">
-          <textarea id="userPrivMsgInputId" cols="83" rows="1" ></textarea>
-          </div>
-          <div class="button-div">
-            <button id="UserPrivMsgSendButton">Send</button>
-            <button id="whoisButton">Whois</button>
+            <textarea id="newChannelNameInputId" cols="20" rows="1" ></textarea>
+              <button id="newChannelButton" class="rm20">Join Channel</button>
           </div>
         </div>
-      </div>
-      <div id="privateMessageContainerDiv">
-      </div>
+        <div id="channelContainerDiv">
+        </div>
+
+        <div class="aa-section-div priv-msg-section-div" id="privMsgSectionDiv">
+          <div>
+            <button id="privMsgMainHiddenButton">-</button>
+            <span>Private Messages</span>
+          </div>
+          <div id="privMsgMainHiddenDiv" hidden>
+            <div class="vh10"></div>
+            <div class="button-div">
+              <div class="input-label-left">Private Msg to</div>
+              <input type="text" id="pmNickNameInputId" size="12" value="">
+            </div>
+            <div class="vh10"></div>
+            <div class="button-div">
+            <textarea id="userPrivMsgInputId" cols="83" rows="1" ></textarea>
+            </div>
+            <div class="button-div">
+              <button id="UserPrivMsgSendButton">Send</button>
+              <button id="whoisButton">Whois</button>
+            </div>
+          </div>
+        </div>
+        <div id="privateMessageContainerDiv">
+        </div>
 
 
-      <div class="aa-section-div notice-section-div" id="noticeSectionDiv" hidden>
+        <div class="aa-section-div notice-section-div" id="noticeSectionDiv" hidden>
+          <div class='head-flex'>
+            <div class="head-left">
+              <button class="notice-button" id="closeNoticeButton">-</button>
+              <span>Notice</span>
+            </div>
+            <div class="head-center">
+            </div>
+            <div class="head-right">
+              <button id="noticeTallerButton">Taller</button>
+              <button id="noticeNormalButton">Normal</button>
+              <button id="noticeClearButton">Clear</button>
+            </div>
+          </div>
+          <textarea id="noticeMessageDisplay" cols="120" rows="5" spellCheck="false" readonly></textarea>
+        </div>
+
+        <div class="aa-section-div wallops-section-div" id="wallopsSectionDiv" hidden>
+          <div class='head-flex'>
+            <div class="head-left">
+              <button class="notice-button" id="wallopsCloseButton">-</button>
+              <span>Wallops</span>
+            </div>
+            <div class="head-center">
+            </div>
+            <div class="head-right">
+              <button id="wallopsTallerButton">Taller</button>
+              <button id="wallopsNormalButton">Normal</button>
+              <button id="wallopsClearButton">Clear</button>
+            </div>
+          </div>
+          <textarea id="wallopsMessageDisplay" cols="120" rows="5" spellCheck="false" readonly></textarea>
+        </div>
+
+      </div>
+      <div class="aa-section-div raw-section-div">
         <div class='head-flex'>
           <div class="head-left">
-            <button class="notice-button" id="closeNoticeButton">-</button>
-            <span>Notice</span>
+            <button class="notice-button" id="rawHiddenElementsButton">-</button>
+            <span>Server</span>
           </div>
           <div class="head-center">
           </div>
           <div class="head-right">
-            <button id="noticeTallerButton">Taller</button>
-            <button id="noticeNormalButton">Normal</button>
-            <button id="noticeClearButton">Clear</button>
+            <div id='rawHeadRightButtons'>
+              <button id="rawTallerButton">Taller</button>
+              <button id="rawNormalButton">Normal</button>
+              <button id="rawClearButton">Clear</button>
+            </div>
           </div>
         </div>
-        <textarea id="noticeMessageDisplay" cols="120" rows="5" spellCheck="false" readonly></textarea>
-      </div>
 
-      <div class="aa-section-div wallops-section-div" id="wallopsSectionDiv" hidden>
-        <div class='head-flex'>
-          <div class="head-left">
-            <button class="notice-button" id="wallopsCloseButton">-</button>
-            <span>Wallops</span>
+        <!-- Do not hide rawHiddenElements in HTML.
+        It is used to calculate width and it
+        breaks if the area is hidden.
+        See end of source webclient6.js -->
+        <div id="rawHiddenElements">
+
+          <div>
+            <textarea id="rawMessageDisplay" cols="120" rows="10" spellCheck="false" readonly></textarea>
           </div>
-          <div class="head-center">
-          </div>
-          <div class="head-right">
-            <button id="wallopsTallerButton">Taller</button>
-            <button id="wallopsNormalButton">Normal</button>
-            <button id="wallopsClearButton">Clear</button>
+          <div id='hideRawButtons'>
+            <textarea spellcheck="false" id="rawMessageInputId" cols="83" rows="1" ></textarea>
+            <div class="button-div">
+              <button id="sendRawMessageButton">Send</button>
+              <button id="loadFromCacheButton">Reload All</button>
+              <button id="eraseCacheButton">Erase Cache</button>
+              <button id="showDebugButton">Debug</button>
+            </div>
+            <div id="hiddenDebugDiv" hidden>
+              <div class="vh10"></div>
+              <div class="button-div">
+                <button id="variablesButtonId">Variables</button>
+                <button id="rawDisplayHexButtonId">Raw in Hex</button>
+                <button id="rawNoCleanFormatCodesButtonId">Raw no clean</button>
+              </div>
+              <div class="button-div">
+                <button id="disconnectButton">Force Disconnect</button>
+                <button id="serverTerminateButton">Die Server</button>
+              </div>
+              <div class="button-div">
+                <button id="test1Button">Test 1</button>
+                <button id="test2Button">Test 2</button>
+                <button id="test3Button">Test 3</button>
+                <button id="test4Button">Test 4</button>
+              </div>
+              <div class='variables-div' id="variablesDivId" hidden><pre id=variablesPreId>
+              </pre></div>
+            </div>
           </div>
         </div>
-        <textarea id="wallopsMessageDisplay" cols="120" rows="5" spellCheck="false" readonly></textarea>
       </div>
     </div>
 
-    <div class="aa-section-div raw-section-div">
-      <div class='head-flex'>
-        <div class="head-left">
-          <button class="notice-button" id="rawHiddenElementsButton">-</button>
-          <span>Server</span>
+    <div id="webDisconnectedVisibleDiv" hidden>
+      <div class="reconnect-div" id="reconnectDivId">
+        <h2>Disconnected from Web Server</h2>
+        <div class="button-div">
+          <button id="manualWebSocketReconnectButton">Reconnect to Web Site</button>
         </div>
-        <div class="head-center">
-        </div>
-        <div class="head-right">
-          <div id='rawHeadRightButtons'>
-            <button id="rawTallerButton">Taller</button>
-            <button id="rawNormalButton">Normal</button>
-            <button id="rawClearButton">Clear</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Do not hide rawHiddenElements in HTML.
-      It is used to calculate width and it
-      breaks if the area is hidden.
-      See end of source webclient6.js -->
-      <div id="rawHiddenElements">
-
-        <div>
-          <textarea id="rawMessageDisplay" cols="120" rows="10" spellCheck="false" readonly></textarea>
-        </div>
-        <div id='hideRawButtons'>
-          <textarea spellcheck="false" id="rawMessageInputId" cols="83" rows="1" ></textarea>
-          <div class="button-div">
-            <button id="sendRawMessageButton">Send</button>
-            <button id="loadFromCacheButton">Reload All</button>
-            <button id="eraseCacheButton">Erase Cache</button>
-            <button id="showDebugButton">Debug</button>
-          </div>
-          <div id="hiddenDebugDiv" hidden>
-            <div class="vh10"></div>
-            <div class="button-div">
-              <button id="variablesButtonId">Variables</button>
-              <button id="rawDisplayHexButtonId">Raw in Hex</button>
-              <button id="rawNoCleanFormatCodesButtonId">Raw no clean</button>
-            </div>
-            <div class="button-div">
-              <button id="disconnectButton">Force Disconnect</button>
-              <button id="serverTerminateButton">Die Server</button>
-            </div>
-            <div class="button-div">
-              <button id="test1Button">Test 1</button>
-              <button id="test2Button">Test 2</button>
-              <button id="test3Button">Test 3</button>
-              <button id="test4Button">Test 4</button>
-            </div>
-            <div class='variables-div' id="variablesDivId" hidden><pre id=variablesPreId>
-            </pre></div>
-          </div>
-        </div>
+        <pre class="reconnect-status-div" id="reconnectStatusDiv">
+        </pre>
       </div>
     </div>
 

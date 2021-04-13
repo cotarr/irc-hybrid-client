@@ -32,8 +32,9 @@
 // cookie values and expiration are exchanged with app.js.
 //
 // Connection sequence.
-//    1) Web page POST request to /irc/wcauth
-//    2) Upon receipt of response event, initiate websocket connection
+//    1) Call initWebSocketAuth(callback) with callback to connectWebSocket()
+//    1) initWebSocketAuth send POST request to /irc/wsauth starting 10 second auth window
+//    2) Upon POST response, callback function calls connectWebSocket() to initiate connection
 //    3) Browser passes current cookie to the websocket server for validation
 //    5) Upon successful open event of web socket, web page calls getIrcState().
 //    6) Upon successful recponse event from ircGetState, browser is "connected"
@@ -74,13 +75,17 @@ var ircState = {
 
 document.getElementById('webConnectIconId').removeAttribute('connected');
 document.getElementById('ircConnectIconId').removeAttribute('connected');
+document.getElementById('webConnectIconId').removeAttribute('connecting');
+document.getElementById('ircConnectIconId').removeAttribute('connecting');
 
 //
 // webState represents state of web page in browser
 //
 var webState = {};
 webState.loginUser = {};
+webState.webConnectOn = true;
 webState.webConnected = false;
+webState.webConnecting = false;
 webState.noticeOpen = false;
 webState.wallopsOpen = false;
 webState.channels = [];
@@ -101,6 +106,11 @@ if (document.location.protocol === 'http:') {
 }
 webServerUrl += window.location.hostname + ':' + window.location.port;
 webSocketUrl += window.location.hostname + ':' + window.location.port;
+
+// -----------------------
+// WebSocket placeholder
+// -----------------------
+var wsocket = null;
 
 // --------------------------
 // Error display functions
@@ -183,7 +193,11 @@ function checkConnect(code) {
 function updateDivVisibility() {
   // return; // uncomment to show hidden divs.
   if (webState.webConnected) {
+    document.getElementById('webDisconnectedVisibleDiv').setAttribute('hidden', '');
+    document.getElementById('webDisconnectedHiddenDiv').removeAttribute('hidden');
+    document.getElementById('reconnectStatusDiv').textContent = '';
     document.getElementById('webConnectIconId').setAttribute('connected', '');
+    document.getElementById('webConnectIconId').removeAttribute('connecting');
     document.getElementById('rawMessageInputId').removeAttribute('disabled');
     document.getElementById('sendRawMessageButton').removeAttribute('disabled');
     document.getElementById('loadFromCacheButton').removeAttribute('disabled');
@@ -232,24 +246,34 @@ function updateDivVisibility() {
       document.getElementById('wallopsSectionDiv').setAttribute('hidden', '');
     }
   } else {
+    // Else, WEb server disconnected
+    document.getElementById('webDisconnectedVisibleDiv').removeAttribute('hidden');
+    document.getElementById('webDisconnectedHiddenDiv').setAttribute('hidden', '');
     document.getElementById('cycleNextServerButton').setAttribute('disabled', '');
-    document.getElementById('webConnectIconId').removeAttribute('connected');
+    if (webState.webConnecting) {
+      document.getElementById('webConnectIconId').removeAttribute('connected');
+      document.getElementById('webConnectIconId').setAttribute('connecting', '');
+    } else {
+      document.getElementById('webConnectIconId').removeAttribute('connected');
+      document.getElementById('webConnectIconId').removeAttribute('connecting');
+    }
     document.getElementById('ircConnectIconId').removeAttribute('connected');
+    document.getElementById('hideLoginSection').setAttribute('hidden', '');
     document.getElementById('nickNameInputId').setAttribute('disabled', '');
     document.getElementById('userNameInputId').setAttribute('disabled', '');
     document.getElementById('realNameInputId').setAttribute('disabled', '');
     document.getElementById('userModeInputId').setAttribute('disabled', '');
-    document.getElementById('rawMessageInputId').setAttribute('disabled', '');
-    document.getElementById('sendRawMessageButton').setAttribute('disabled', '');
-    document.getElementById('loadFromCacheButton').setAttribute('disabled', '');
     document.getElementById('connectButton').setAttribute('disabled', '');
     document.getElementById('quitButton').setAttribute('disabled', '');
-    document.getElementById('eraseCacheButton').setAttribute('disabled', '');
-    document.getElementById('ircDisconnectedHiddenDiv').setAttribute('hidden', '');
-    webState.noticeOpen = false;
-    document.getElementById('noticeSectionDiv').setAttribute('hidden', '');
-    webState.wallopsOpen = false;
-    document.getElementById('wallopsSectionDiv').setAttribute('hidden', '');
+    // document.getElementById('eraseCacheButton').setAttribute('disabled', '');
+    // document.getElementById('rawMessageInputId').setAttribute('disabled', '');
+    // document.getElementById('sendRawMessageButton').setAttribute('disabled', '');
+    // document.getElementById('loadFromCacheButton').setAttribute('disabled', '');
+    // document.getElementById('ircDisconnectedHiddenDiv').setAttribute('hidden', '');
+    // webState.noticeOpen = false;
+    // document.getElementById('noticeSectionDiv').setAttribute('hidden', '');
+    // webState.wallopsOpen = false;
+    // document.getElementById('wallopsSectionDiv').setAttribute('hidden', '');
   }
 }
 
@@ -305,7 +329,7 @@ function nextChannelName (index) {
 // --------------------------------------------------------
 // Update variables to indicate disconnected state
 //
-// Called by getIrcState() and onHeartbeatTimerTick()
+// Called by getIrcState() and heartbeatTimerTickHandler()
 // --------------------------------------------------------
 function setVariablesShowingIRCDisconnected () {
   document.getElementById('headerUser').textContent = '';
@@ -340,16 +364,16 @@ function resetHeartbeatTimer () {
 function onHeartbeatReceived () {
   heartbeatUpCounter = 0;
 };
-function onHeartbeatTimerTick () {
+function heartbeatTimerTickHandler () {
   // console.log('tick');
   heartbeatUpCounter++;
   if (webState.webConnected) {
     if (heartbeatUpCounter > heartbeatExpirationTimeSeconds) {
-      webState.webConnected = false;
-      setVariablesShowingIRCDisconnected();
-      showError('Error: WebSocket timed out');
-      updateDivVisibility();
       console.log('HEARTBEAT stopped, websocket timed out.');
+      if (wsocket) {
+        // Closing the web socket will generate a 'close' event.
+        wsocket.close(3000, 'Heartbeat timeout');
+      }
     }
   }
 };
@@ -387,13 +411,14 @@ function initWebSocketAuth (callback) {
     })
     .catch( (error) => {
       console.log(error);
+      webState.webConnected = false;
+      webState.webConnecting = false;
+      updateDivVisibility();
       if (callback) {
         callback(error, {});
       }
     });
 } // initWebSocketAuth
-// Connect the websocket on page load (do it now)
-initWebSocketAuth();
 
 var lastServerIndex = -1;
 // --------------------------------------
@@ -1107,16 +1132,12 @@ function updateFromCache () {
     });
 }; // updateFromCache;
 
-// -----------------------
-// WebSocket placeholder
-// -----------------------
-var wsocket = null;
-
 // ---------------------------------------------
 // Function to connect web socket to web server.
 // ---------------------------------------------
 function connectWebSocket () {
   // Create WebSocket connection.
+  // This replaces temporary dummy variable
   wsocket = new WebSocket(webSocketUrl + '/irc/ws');
 
   // -----------------------
@@ -1125,6 +1146,7 @@ function connectWebSocket () {
   wsocket.addEventListener('open', function (event) {
     // console.log('Connected to WS Server');
     webState.webConnected = true;
+    webState.webConnecting = false;
     resetHeartbeatTimer();
     updateDivVisibility();
     // These will load in parallel asychronously
@@ -1138,9 +1160,14 @@ function connectWebSocket () {
   wsocket.addEventListener('close', function (event) {
     console.log('Websocket closed code: ' + event.code + ' ' + event.reason);
     if (webState.webConnected) {
-      showError('WebSocket has closed.');
+      console.log('Web Socket closed.');
+      document.getElementById('reconnectStatusDiv').textContent =
+        'Web socket connection closed.\n' +
+        'Code: ' + event.code + ' ' + event.reason + '\n';
     }
     webState.webConnected = false;
+    webState.webConnecting = false;
+    setVariablesShowingIRCDisconnected();
     updateDivVisibility();
   });
 
@@ -1149,7 +1176,7 @@ function connectWebSocket () {
   // -----------------------
   wsocket.addEventListener('error', function (error) {
     console.log('Websocket error');
-    showError('WebSocket error occurred.');
+    // showError('WebSocket error occurred.');
   });
 
   // -----------------------------------------------------------------------------
@@ -1255,21 +1282,199 @@ function _sendIrcServerMessage (message) {
     });
 } // _sendIrcServerMessage
 
+// --------------------------------------
+// Function to manage re-connection of
+// disconnected web socket
+// --------------------------------------
+function reconnectWebSocketAfterDisconnect() {
+  let statusURL = webServerUrl + '/status';
+  let secureStatusURL = webServerUrl + '/secure';
+  let fetchOptions = {
+    method: 'GET',
+    // credentials: 'include',
+    timeout: 10000,
+    headers: {
+      'Accept': 'application/json'
+    }
+  };
+  //
+  // ----------------------------------------------
+  // Step 1, make non-authenticated (no cookie)
+  // GET to see if server is up and internet is connected.
+  // ----------------------------------------------
+  fetch(statusURL, fetchOptions)
+    .then( (response) => {
+      // console.log(response.status);
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error('Fetch status ' + response.status + ' ' + response.statusText);
+      }
+    })
+    .then( (responseJson) => {
+      // console.log(JSON.stringify(responseJson));
+      document.getElementById('reconnectStatusDiv').textContent +=
+        'Server found, Checking authoriztion.\n';
+      //
+      // --------------------------------------
+      // Step 2, now-make an authorized GET with
+      // valid cookie to make sure cookie is not
+      // expired.
+      // --------------------------------------
+      fetch(secureStatusURL, fetchOptions)
+        .then( (response) => {
+          console.log(response.status);
+          // if (response.status === 403) {
+          //   window.location.href = '/login';
+          //   throw new Error('Fetch status ' + response.status + ' ' + response.statusText);
+          // }
+          if (response.ok) {
+            return response.json();
+          } else {
+            if (response.status === 403) window.location.href = '/login';
+            throw new Error('Fetch status ' + response.status + ' ' + response.statusText);
+          }
+        })
+        .then( (responseJson) => {
+          // console.log(JSON.stringify(responseJson));
+          document.getElementById('reconnectStatusDiv').textContent +=
+            'Authorizton confirmed, opening web socket.\n';
+          //-------------------------------------------
+          // Step 3, initiate the 10 second auth window
+          // for the web socket to conenct.
+          //-------------------------------------------
+          initWebSocketAuth(function(err, data) {
+            if (err) {
+              showError('Error connecting web socket');
+              console.log(err);
+            } else {
+              // --------------------------------------
+              // step 4 - 10 second auth window valid
+              // Perform a HTTP Upgrade request
+              // with cookie to authorize.
+              // --------------------------------------
+              setTimeout(function() {
+                connectWebSocket();
+              }.bind(this), 100);
+            }
+          });
+        })
+        .catch( (error) => {
+          console.log(error);
+          document.getElementById('reconnectStatusDiv').textContent +=
+            'Error: Error checking authorization\n';
+          webState.webConnected = false;
+          webState.webConnecting = false;
+          updateDivVisibility();
+        });
+    })
+    .catch( (error) => {
+      console.log(error);
+      document.getElementById('reconnectStatusDiv').textContent +=
+        'Error: No internet or server down\n';
+      webState.webConnected = false;
+      webState.webConnecting = false;
+      updateDivVisibility();
+    });
+}
+
+
 // ---------------------------------------------
 // Upon page load, initiate web socket auth
 // from web server, then connect web socket
 // Includes small delay timer
+//
+// This is called at the end of all JavaScript load
 // ---------------------------------------------
-initWebSocketAuth(function(err, data) {
-  if (err) {
-    showError('Error connecting web socket');
-    console.log(err);
-  } else {
-    setTimeout(function() {
-      connectWebSocket();
-    }.bind(this), 100);
+function firstWebSocketConnectOnPageLoad() {
+  if ((!webState.webConnected) && (!webState.webConnecting)) {
+    webState.webConnecting = true;
+    initWebSocketAuth(function(err, data) {
+      if (err) {
+        showError('Error connecting web socket');
+        console.log(err);
+      } else {
+        setTimeout(function() {
+          connectWebSocket();
+        }.bind(this), 100);
+      }
+    });
+  }
+}
+
+// ------------------------------------------------
+// Button to initiate manual web socket reconnect
+// ------------------------------------------------
+document.getElementById('manualWebSocketReconnectButton').addEventListener('click', function() {
+  if ((!webState.webConnected) && (!webState.webConnecting)) {
+    webState.webConnectOn = true;
+    webState.webConnecting = true;
+    document.getElementById('reconnectStatusDiv').textContent +=
+      'Reconnect to web server initiated (Manual)\n';
+    reconnectWebSocketAfterDisconnect();
   }
 });
+
+//---------------------------------
+// Timer called once per second to
+// manage web-socket reconnection.
+//---------------------------------
+var wsReconnectCounter = 0;
+var wsReconnectTimer = 0;
+function reconnectTimerTickHandler() {
+  // If disabled, or if connection successful, reset counter/timer
+  if ((!webState.webConnectOn) || (webState.webConnected)) {
+    wsReconnectCounter = 0;
+    wsReconnectTimer = 0;
+    return;
+  }
+
+  // increment timer
+  wsReconnectTimer++;
+  // connection in progress, skip.
+  if (webState.webConnecting) return;
+
+
+  // first time on first timer tick (immediately)
+  if (wsReconnectCounter === 0) {
+    if (wsReconnectTimer > 0) {
+      webState.webConnecting = true;
+      wsReconnectTimer = 0;
+      wsReconnectCounter++;
+      document.getElementById('reconnectStatusDiv').textContent +=
+        'Reconnect to web server initiated (Timer)\n';
+      reconnectWebSocketAfterDisconnect();
+    }
+    return;
+  } else if (wsReconnectCounter === 1) {
+    // then second try in 5 seconds
+    if (wsReconnectTimer > 5) {
+      webState.webConnecting = true;
+      wsReconnectTimer = 0;
+      wsReconnectCounter++;
+      document.getElementById('reconnectStatusDiv').textContent +=
+        'Reconnect to web server initiated (Timer)\n';
+      reconnectWebSocketAfterDisconnect();
+    }
+    return;
+  } else if (wsReconnectCounter > 10) {
+    // Stop at the limit
+    webState.webConnectOn = false;
+    return;
+  } else {
+    if (wsReconnectTimer > 15) {
+      webState.webConnecting = true;
+      wsReconnectTimer = 0;
+      wsReconnectCounter++;
+      document.getElementById('reconnectStatusDiv').textContent +=
+        'Reconnect to web server initiated (Timer)\n';
+      reconnectWebSocketAfterDisconnect();
+    }
+    return;
+  }
+  return;
+}
+
 // ----------------- API requests ---------------------------
 
 // ------------------------

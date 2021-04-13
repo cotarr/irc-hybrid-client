@@ -214,6 +214,9 @@ app.post('/terminate', authorizeOrFail, function(req, res, next) {
   res.json({message: 'Terminate received'});
 });
 
+// Route used to verify cookie not expired before reconnecting
+app.get('/secure', authorizeOrFail, (req, res) => res.json({secure: 'ok'}));
+
 // -----------------------------------------
 //          Websocket Auth
 //

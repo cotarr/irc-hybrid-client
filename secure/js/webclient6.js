@@ -362,6 +362,7 @@ document.getElementById('test2Button').addEventListener('click', function() {
 // --------------------
 document.getElementById('test3Button').addEventListener('click', function() {
   console.log('Test3 button pressed.');
+  heartbeatUpCounter = 1000;
 });
 
 // --------------------
@@ -369,6 +370,7 @@ document.getElementById('test3Button').addEventListener('click', function() {
 // --------------------
 document.getElementById('test4Button').addEventListener('click', function() {
   console.log('Test4 button pressed.');
+  wsocket.close(3999, 'Web socket closed for testing');
 });
 
 // ---------------------------------------------------------------------------
@@ -379,13 +381,15 @@ document.getElementById('test4Button').addEventListener('click', function() {
 // Save this factor as a constant
 // Get the window innerWidth and divide by the factor.
 // ---------------------------------------------------------------------------
-const colummSize =
+const columnSize =
   (document.getElementById('rawMessageDisplay').getBoundingClientRect().width + 10)/ 120;
 
+// console.log('columnSize ' + columnSize);
+// console.log(document.getElementById('rawMessageDisplay').getBoundingClientRect());
 //
 // Function called both initially and also no event
 const adjustInputToWidowWidth = function (innerWidth) {
-  let cols = parseInt((window.innerWidth / colummSize) - 4);
+  let cols = parseInt((window.innerWidth / columnSize) - 4);
   // static text area defined in webclient.html
   document.getElementById('userPrivMsgInputId').setAttribute('cols', cols.toString());
   document.getElementById('noticeMessageDisplay').setAttribute('cols', cols.toString());
@@ -400,7 +404,7 @@ const adjustInputToWidowWidth = function (innerWidth) {
   }
   if (webState.resizeableChanareaIds.length > 0) {
     webState.resizeableChanareaIds.forEach(function(id) {
-      if (window.innerWidth > 760) {
+      if (window.innerWidth > 600) {
         document.getElementById(id).setAttribute('cols', (cols-23).toString());
       } else {
         document.getElementById(id).setAttribute('cols', cols.toString());
@@ -416,7 +420,7 @@ const adjustInputToWidowWidth = function (innerWidth) {
 // Event listener for resize widnow
 //
 window.addEventListener('resize', function(event) {
-  if (colummSize) {
+  if (columnSize) {
     adjustInputToWidowWidth(event.currentTarget.innerWidth);
   }
 }.bind(this));
@@ -434,6 +438,7 @@ adjustInputToWidowWidth(window.innerWidth);
 //
 // After everything is sized, the area may be hidden
 //
+// document.getElementById('webDisconnectedHiddenDiv').setAttribute('hidden', '');
 // document.getElementById('rawHiddenElements').setAttribute('hidden', '');
 // document.getElementById('rawHiddenElementsButton').textContent = '+';
 // document.getElementById('rawHeadRightButtons').setAttribute('hidden', '');
@@ -443,5 +448,11 @@ adjustInputToWidowWidth(window.innerWidth);
 //
 setInterval(function() {
   errorTimerTickHandler();
-  onHeartbeatTimerTick();
+  heartbeatTimerTickHandler();
+  reconnectTimerTickHandler();
 }.bind(this), 1000);
+
+// -----------------------------
+//   D O   T H I S   L A S T
+// -----------------------------
+firstWebSocketConnectOnPageLoad();
