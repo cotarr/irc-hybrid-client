@@ -312,23 +312,6 @@ document.addEventListener('hide-all-divs', function(event) {
   document.getElementById('wallopsSectionDiv').setAttribute('hidden', '');
 });
 
-
-function nextChannelName (index) {
-  if (index) {
-    document.getElementById('newChannelNameInputId').value = ircState.channelList[index];
-  } else {
-    document.getElementById('newChannelNameInputId').value = '';
-    if (ircState.channelList.length > 0) {
-      for (let i=0; i<ircState.channelList.length; i++) {
-        if (ircState.channels.indexOf(ircState.channelList[i].toLowerCase()) < 0) {
-          document.getElementById('newChannelNameInputId').value = ircState.channelList[i];
-          break;
-        }
-      }
-    }
-  }
-};
-
 // --------------------------------------------------------
 // Update variables to indicate disconnected state
 //
@@ -337,9 +320,6 @@ function nextChannelName (index) {
 function setVariablesShowingIRCDisconnected () {
   document.getElementById('headerUser').textContent = '';
   document.getElementById('headerServer').textContent = '';
-
-  // populate first channel for this server
-  nextChannelName(0);
 
   let channelContainerDivEl = document.getElementById('channelContainerDiv');
   while (channelContainerDivEl.firstChild) {
@@ -467,8 +447,6 @@ function getIrcState (callback) {
         } else {
           document.getElementById('ircServerTlsCheck').removeAttribute('checked');
         }
-        // populate first channel for this server
-        nextChannelName(0);
 
         document.getElementById('nickNameInputId').value = ircState.nickName;
         document.getElementById('userNameInputId').value = ircState.userName;
@@ -1007,10 +985,6 @@ function _parseBufferMessage (message) {
         break;
       case 'JOIN':
         displayChannelMessage(parsedMessage);
-        // if JOIN is this client, populate next channel into input field
-        if (parsedMessage.nick === ircState.nickName) {
-          nextChannelName();
-        }
         break;
       case 'MODE':
         if (true) {
