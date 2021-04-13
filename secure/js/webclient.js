@@ -1136,6 +1136,9 @@ function updateFromCache () {
       console.log(error);
     });
 }; // updateFromCache;
+window.addEventListener('update-from-cache', function(event) {
+  updateFromCache();
+}.bind(this));
 
 // ---------------------------------------------
 // Function to connect web socket to web server.
@@ -1419,6 +1422,19 @@ document.getElementById('manualWebSocketReconnectButton').addEventListener('clic
     reconnectWebSocketAfterDisconnect();
   }
 });
+
+// ------------------------------------------------
+// Button to stop manual web socket reconnect
+// ------------------------------------------------
+document.getElementById('stopWebSocketReconnectButton').addEventListener('click', function() {
+  if (!webState.webConnected) {
+    webState.webConnectOn = false;
+    webState.webConnecting = false;
+    document.getElementById('reconnectStatusDiv').textContent =
+      'Reconnect disabled\n';
+  }
+});
+
 
 //---------------------------------
 // Timer called once per second to

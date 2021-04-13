@@ -163,8 +163,13 @@ function createChannelEl (name) {
 
   // names button
   let channelNamesButtonEl = document.createElement('button');
-  channelNamesButtonEl.textContent = '+,@ refresh';
+  channelNamesButtonEl.textContent = '+,@ Update';
   channelNamesButtonEl.classList.add('channel-button');
+
+  // refresh button
+  let channelRefreshButtonEl = document.createElement('button');
+  channelRefreshButtonEl.textContent = 'Refresh';
+  channelRefreshButtonEl.classList.add('channel-button');
 
   // --------------------------------
   // Append child element to DOM
@@ -186,6 +191,7 @@ function createChannelEl (name) {
   channelButtonDiv1El.appendChild(channelJoinButtonEl);
   channelButtonDiv1El.appendChild(channelPartButtonEl);
   channelButtonDiv1El.appendChild(channelNamesButtonEl);
+  channelButtonDiv1El.appendChild(channelRefreshButtonEl);
 
   channelBottomDivEl.appendChild(channelTopicDivEl);
   channelBottomDivEl.appendChild(channelNamesDisplayEl);
@@ -284,6 +290,13 @@ function createChannelEl (name) {
     _sendIrcServerMessage(message);
   });
 
+  // -------------------------
+  // Refresh button handler
+  // -------------------------
+  channelRefreshButtonEl.addEventListener('click', function() {
+    document.dispatchEvent(new CustomEvent('update-from-cache', {bubbles: true}));
+  });
+
   // -------------
   // send button
   // -------------
@@ -332,6 +345,7 @@ function createChannelEl (name) {
     if (index >= 0) {
       maxNickLength = 0;
       if (ircState.channelStates[index].names.length > 0) {
+        console.log('updateing nicklist');
         channelNamesDisplayEl.textContent = '';
         let opList = [];
         let otherList = [];

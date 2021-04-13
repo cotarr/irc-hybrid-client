@@ -104,7 +104,8 @@ document.getElementById('showDebugButton').addEventListener('click', function() 
 // Update from cache (button)
 // --------------------------------
 document.getElementById('loadFromCacheButton').addEventListener('click', function() {
-  updateFromCache();
+  // updateFromCache();
+  document.dispatchEvent(new CustomEvent('update-from-cache', {bubbles: true}));
 }.bind(this));
 
 // -----------------------
@@ -361,7 +362,8 @@ document.getElementById('test2Button').addEventListener('click', function() {
 // Test Button #3
 // --------------------
 document.getElementById('test3Button').addEventListener('click', function() {
-  console.log('Test3 button pressed.');
+  console.log('Test 3 button pressed.');
+  console.log('Test 3 button: expire heartb eat timer');
   heartbeatUpCounter = 1000;
 });
 
@@ -369,8 +371,9 @@ document.getElementById('test3Button').addEventListener('click', function() {
 // Test Button #4
 // --------------------
 document.getElementById('test4Button').addEventListener('click', function() {
-  console.log('Test4 button pressed.');
-  wsocket.close(3999, 'Web socket closed for testing');
+  console.log('Test 4 button pressed.');
+  console.log('Test 4 getIrcState()');
+  getIrcState();
 });
 
 // ---------------------------------------------------------------------------

@@ -193,7 +193,7 @@
             <textarea spellcheck="false" id="rawMessageInputId" cols="83" rows="1" ></textarea>
             <div class="button-div">
               <button id="sendRawMessageButton">Send</button>
-              <button id="loadFromCacheButton">Reload All</button>
+              <button id="loadFromCacheButton">Refresh</button>
               <button id="eraseCacheButton">Erase Cache</button>
               <button id="showDebugButton">Debug</button>
             </div>
@@ -205,8 +205,8 @@
                 <button id="rawNoCleanFormatCodesButtonId">Raw no clean</button>
               </div>
               <div class="button-div">
-                <button id="disconnectButton">Force Disconnect</button>
-                <button id="serverTerminateButton">Die Server</button>
+                <button id="disconnectButton">Force IRC Disconnect</button>
+                <button id="serverTerminateButton">Die Web Server</button>
               </div>
               <div class="button-div">
                 <button id="test1Button">Test 1</button>
@@ -227,6 +227,7 @@
         <h2>Disconnected from Web Server</h2>
         <div class="button-div">
           <button id="manualWebSocketReconnectButton">Reconnect to Web Site</button>
+          <button id="stopWebSocketReconnectButton">Stop</button>
         </div>
         <pre class="reconnect-status-div" id="reconnectStatusDiv">
         </pre>
