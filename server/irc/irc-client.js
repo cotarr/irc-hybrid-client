@@ -343,6 +343,73 @@
     };
   }; // _parseIrcMessage
 
+  // -----------------------------------------
+  // #Channel MODE changes to Op/Voice status
+  //
+  // Parse mode command from server
+  // Search for matching users in the channel
+  // Update the +@ in front of their name
+  // -----------------------------------------
+  const parseChannelModeChanges = function (socket, parsedMessage) {
+    // console.log('parseChannelModeChanges ' + JSON.stringify(parsedMessage, null, 2));
+    //
+    // Example, up to 3 modes per RFC2812
+    // "params": [
+    //   "#channelname",
+    //   "+oo-v",
+    //   "nick1",
+    //   "nick2",
+    //   "user3"
+    // ]
+    //
+    const selectorChars = '+-';
+    const userModeChars = 'ov';
+    const modeChars = '@+';
+    const modeQueue = [];
+    const userQueue = [];
+    let selector = '';
+    if (ircState.channels.length === 0) return;
+    for (let i=0; i<ircState.channels.length; i++) {
+      if (parsedMessage.params[0].toLowerCase() === ircState.channels[i]) {
+        // index into ircState.channels[]
+        let chanIndex = i;
+        let modeList = parsedMessage.params[1];
+        if (modeList.length > 0) {
+          for (let j=0; j<modeList.length; j++) {
+            if (selectorChars.indexOf(modeList.charAt(j)) >= 0) {
+              // selector is "+" or "-"
+              selector = modeList.charAt(j);
+            }
+            if (userModeChars.indexOf(modeList.charAt(j)) >= 0) {
+              modeQueue.push(selector + modeList.charAt(j));
+            }
+          }
+        } // params[1].length
+        if ((modeQueue.length > 0) && (modeQueue.length + 2 === parsedMessage.params.length)) {
+          for (let j=0; j<modeQueue.length; j++) {
+            userQueue.push(parsedMessage.params[j+2]);
+          }
+          let strippedNicks = [];
+          for (let j=0; j<ircState.channelStates[chanIndex].names.length; j++) {
+            let tempNick = ircState.channelStates[chanIndex].names[j];
+            if (modeChars.indexOf(tempNick.charAt(0)) >= 0) {
+              tempNick = tempNick.slice(1, tempNick.length);
+            }
+            strippedNicks.push(tempNick);
+          }
+          for (let j=0; j<modeQueue.length; j++) {
+            let userIndex = strippedNicks.indexOf(userQueue[j]);
+            let tempNick = strippedNicks[userIndex];
+            if (modeQueue[j] === '+v') tempNick = '+' + tempNick;
+            if (modeQueue[j] === '+o') tempNick = '@' + tempNick;
+            ircState.channelStates[chanIndex].names[userIndex] = tempNick;
+          }
+          global.sendToBrowser('UPDATE\n');
+        }
+      }
+    } // next i
+  };
+
   // ----------------------------
   // CTCP flood detections
   // ----------------------------
@@ -741,11 +808,11 @@
       case 'MODE':
         if (true) {
           if (parsedMessage.params[0] === ircState.nickName) {
-            // case of me, my MODE has changed
+            // Case of User mode for IRC client has changed
             console.log('TODO your user mode on server has been changed changed.');
-          } else if (channelPrefixChars.indexOf(parsedMessage.params[0].charAt(0) >= 0)) {
-            // case of this appears to be a channel name
-            console.log('TODO mode change in channel update nickname list');
+          } else if (ircState.channels.indexOf(parsedMessage.params[0].toLowerCase() >= 0)) {
+            // This is case of a #channel mode has changed.
+            parseChannelModeChanges(socket, parsedMessage);
           } else {
             console.log('Error: MODE message not for myself or channel');
           }

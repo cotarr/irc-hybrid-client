@@ -119,7 +119,7 @@ function createChannelEl (name) {
   channelTopicDivEl.classList.add('chan-topic-div');
 
 
-  // names display
+  // list of nick names display
   let channelNamesDisplayEl = document.createElement('textarea');
   channelNamesDisplayEl.classList.add('channel-names-display');
   channelNamesDisplayEl.setAttribute('cols', '20');
@@ -161,11 +161,6 @@ function createChannelEl (name) {
   channelPartButtonEl.textContent = 'Part';
   channelPartButtonEl.classList.add('channel-button');
 
-  // names button
-  let channelNamesButtonEl = document.createElement('button');
-  channelNamesButtonEl.textContent = '+,@ Update';
-  channelNamesButtonEl.classList.add('channel-button');
-
   // refresh button
   let channelRefreshButtonEl = document.createElement('button');
   channelRefreshButtonEl.textContent = 'Refresh';
@@ -190,7 +185,6 @@ function createChannelEl (name) {
   channelButtonDiv1El.appendChild(channelSendButtonEl);
   channelButtonDiv1El.appendChild(channelJoinButtonEl);
   channelButtonDiv1El.appendChild(channelPartButtonEl);
-  channelButtonDiv1El.appendChild(channelNamesButtonEl);
   channelButtonDiv1El.appendChild(channelRefreshButtonEl);
 
   channelBottomDivEl.appendChild(channelTopicDivEl);
@@ -283,18 +277,14 @@ function createChannelEl (name) {
   });
 
   // -------------------------
-  // Names button handler
-  // -------------------------
-  channelNamesButtonEl.addEventListener('click', function() {
-    let message = 'NAMES ' + name;
-    _sendIrcServerMessage(message);
-  });
-
-  // -------------------------
   // Refresh button handler
   // -------------------------
   channelRefreshButtonEl.addEventListener('click', function() {
+    // this forces a global update which will refreesh text area
     document.dispatchEvent(new CustomEvent('update-from-cache', {bubbles: true}));
+    // THis will request a new nickname list from IRC server.
+    channelNamesDisplayEl.textContent = '';
+    _sendIrcServerMessage('NAMES ' + name);
   });
 
   // -------------
@@ -345,7 +335,6 @@ function createChannelEl (name) {
     if (index >= 0) {
       maxNickLength = 0;
       if (ircState.channelStates[index].names.length > 0) {
-        console.log('updateing nicklist');
         channelNamesDisplayEl.textContent = '';
         let opList = [];
         let otherList = [];
@@ -415,11 +404,10 @@ function createChannelEl (name) {
         break;
       case 'MODE':
         if (parsedMessage.params[0].toLowerCase() === name.toLowerCase()) {
+          // this could be more elegant than stringify.
           _addText(_optionalTime(parsedMessage.timestamp) +
             '*'.padStart(maxNickLength, ' ') + nickChannelSpacer +
-            'Mode ' + parsedMessage.params[0] + ' [' +
-            parsedMessage.params[1] + ' ' + parsedMessage.params[2] +
-            '] by ' + parsedMessage.nick);
+            'Mode ' + JSON.stringify(parsedMessage.params) + ' by ' + parsedMessage.nick);
         }
         break;
       case 'NOTICE':
