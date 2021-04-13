@@ -333,14 +333,36 @@ function createChannelEl (name) {
       maxNickLength = 0;
       if (ircState.channelStates[index].names.length > 0) {
         channelNamesDisplayEl.textContent = '';
-        sortedNames = ircState.channelStates[index].names.sort();
-        for (let i=0; i<sortedNames.length; i++) {
-          channelNamesDisplayEl.textContent += sortedNames[i] + '\n';
-          if (maxNickLength < sortedNames[i].length) maxNickLength = sortedNames[i].length;
+        let opList = [];
+        let otherList = [];
+        for (let i=0; i<ircState.channelStates[index].names.length; i++) {
+          if (ircState.channelStates[index].names[i].charAt(0) === '@') {
+            opList.push(ircState.channelStates[index].names[i]);
+          } else {
+            otherList.push(ircState.channelStates[index].names[i]);
+          }
+        }
+        let sortedOpList = opList.sort();
+        let sortedOtherList = otherList.sort();
+        if (sortedOpList.length > 0) {
+          for (let i=0; i<sortedOpList.length; i++) {
+            channelNamesDisplayEl.textContent += sortedOpList[i] + '\n';
+            if (maxNickLength < sortedOpList[i].length) {
+              maxNickLength = sortedOpList[i].length;
+            }
+          }
+        }
+        if (sortedOtherList.length > 0) {
+          for (let i=0; i<sortedOtherList.length; i++) {
+            channelNamesDisplayEl.textContent += sortedOtherList[i] + '\n';
+            if (maxNickLength < sortedOtherList[i].length) {
+              maxNickLength = sortedOtherList[i].length;
+            }
+          }
         }
       }
     }
-  }
+  } //_updateNickList()
   // populate it initially on creating the element
   _updateNickList();
 
