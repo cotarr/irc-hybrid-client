@@ -49,6 +49,9 @@ function createChannelEl (name) {
     console.log('createChannelEl: channel already exist');
     return;
   }
+
+  const defaultHeightInRows = '18';
+
   // Add to local browser list of open channels
   webState.channels.push(name.toLowerCase());
 
@@ -123,14 +126,16 @@ function createChannelEl (name) {
   let channelNamesDisplayEl = document.createElement('textarea');
   channelNamesDisplayEl.classList.add('channel-names-display');
   channelNamesDisplayEl.setAttribute('cols', '20');
-  channelNamesDisplayEl.setAttribute('rows', '10');
+  channelNamesDisplayEl.setAttribute('rows', defaultHeightInRows);
+  channelNamesDisplayEl.setAttribute('spellCheck', 'false');
+  channelNamesDisplayEl.setAttribute('readonly', '');
 
   // resizable text area
   let channelTextAreaEl = document.createElement('textarea');
   let channelTextAreaId = 'chan' + channelIndex.toString() + 'TextAreaId';
   channelTextAreaEl.id = channelTextAreaId;
   channelTextAreaEl.setAttribute('cols', '30');
-  channelTextAreaEl.setAttribute('rows', '10');
+  channelTextAreaEl.setAttribute('rows', defaultHeightInRows);
   channelTextAreaEl.setAttribute('spellCheck', 'false');
   channelTextAreaEl.setAttribute('readonly', '');
 
@@ -161,6 +166,15 @@ function createChannelEl (name) {
   channelPartButtonEl.textContent = 'Part';
   channelPartButtonEl.classList.add('channel-button');
 
+  // Text Format button
+  let channelFormatButtonEl = document.createElement('button');
+  if (window.innerWidth < 600) {
+    channelFormatButtonEl.textContent = 'Brief';
+  } else {
+    channelFormatButtonEl.textContent = 'Full';
+  }
+  channelFormatButtonEl.classList.add('channel-button');
+
   // refresh button
   let channelRefreshButtonEl = document.createElement('button');
   channelRefreshButtonEl.textContent = 'Refresh';
@@ -185,6 +199,7 @@ function createChannelEl (name) {
   channelButtonDiv1El.appendChild(channelSendButtonEl);
   channelButtonDiv1El.appendChild(channelJoinButtonEl);
   channelButtonDiv1El.appendChild(channelPartButtonEl);
+  channelButtonDiv1El.appendChild(channelFormatButtonEl);
   channelButtonDiv1El.appendChild(channelRefreshButtonEl);
 
   channelBottomDivEl.appendChild(channelTopicDivEl);
@@ -230,8 +245,8 @@ function createChannelEl (name) {
   // Normal button handler
   // -------------------------
   channelNormalButtonEl.addEventListener('click', function() {
-    channelTextAreaEl.setAttribute('rows', '10');
-    channelNamesDisplayEl.setAttribute('rows', '10');
+    channelTextAreaEl.setAttribute('rows', defaultHeightInRows);
+    channelNamesDisplayEl.setAttribute('rows', defaultHeightInRows);
   });
 
   // -------------------------
@@ -239,8 +254,8 @@ function createChannelEl (name) {
   // -------------------------
   channelClearButtonEl.addEventListener('click', function() {
     channelTextAreaEl.textContent = '';
-    channelTextAreaEl.setAttribute('rows', '10');
-    channelNamesDisplayEl.setAttribute('rows', '10');
+    channelTextAreaEl.setAttribute('rows', defaultHeightInRows);
+    channelNamesDisplayEl.setAttribute('rows', defaultHeightInRows);
   });
 
   // ----------------
@@ -274,6 +289,17 @@ function createChannelEl (name) {
   channelPartButtonEl.addEventListener('click', function() {
     let message = 'PART ' + name;
     _sendIrcServerMessage(message);
+  });
+
+  // -------------------------
+  // Text Format button handler
+  // -------------------------
+  channelFormatButtonEl.addEventListener('click', function() {
+    if (channelFormatButtonEl.textContent === 'Full') {
+      channelFormatButtonEl.textContent = 'Brief';
+    } else {
+      channelFormatButtonEl.textContent = 'Full';
+    }
   });
 
   // -------------------------
@@ -376,18 +402,28 @@ function createChannelEl (name) {
   }.bind(this));
 
   document.addEventListener('channel-message', function(event) {
-    function _optionalTime(timestamp) {
-      // if (window.innerWidth < 600) {
-      //   return '';
-      // }
-      return timestamp + ' ';
-    }
-    function _addText (text) {
+    function _addText (timestamp, nick, text) {
+      //
+      let out = '';
+      if (channelFormatButtonEl.textContent === 'Full') {
+        out = timestamp + ' ' +
+        nick.padStart(maxNickLength, ' ') + nickChannelSpacer +
+        cleanFormatting(text) + '\n';
+      } else {
+        out = timestamp + ' ';
+        if (nick === '*') {
+          out += nick + nickChannelSpacer;
+        } else {
+          out += nick + nickChannelSpacer + '\n';
+        }
+        out += cleanFormatting(text) + '\n\n';
+      }
       // append text to textarea
-      channelTextAreaEl.textContent += cleanFormatting(text) + '\n';
+      channelTextAreaEl.textContent += out;
       // move scroll bar so text is scrolled all the way up
       channelTextAreaEl.scrollTop = channelTextAreaEl.scrollHeight;
     }
+
     let parsedMessage = event.detail.parsedMessage;
     // console.log('Event channel-message: ' + JSON.stringify(parsedMessage, null, 2));
     switch(parsedMessage.command) {
@@ -396,27 +432,31 @@ function createChannelEl (name) {
       //
       case 'JOIN':
         if (parsedMessage.params[0].toLowerCase() === name.toLowerCase()) {
-          _addText(_optionalTime(parsedMessage.timestamp) +
-          '*'.padStart(maxNickLength, ' ') + nickChannelSpacer +
-          parsedMessage.nick + ' (' +
-          parsedMessage.host + ') has joined');
+          if (channelFormatButtonEl.textContent === 'Full') {
+            _addText(parsedMessage.timestamp,
+              '*',
+              parsedMessage.nick + ' (' + parsedMessage.host + ') has joined');
+          } else {
+            _addText(parsedMessage.timestamp,
+              '*',
+              parsedMessage.nick + ' has joined');
+          }
         }
         break;
       case 'MODE':
         if (parsedMessage.params[0].toLowerCase() === name.toLowerCase()) {
           // this could be more elegant than stringify.
-          _addText(_optionalTime(parsedMessage.timestamp) +
-            '*'.padStart(maxNickLength, ' ') + nickChannelSpacer +
+          _addText(parsedMessage.timestamp,
+            '*',
             'Mode ' + JSON.stringify(parsedMessage.params) + ' by ' + parsedMessage.nick);
         }
         break;
       case 'NOTICE':
         if (parsedMessage.params[0].toLowerCase() === name.toLowerCase()) {
-          _addText(_optionalTime(parsedMessage.timestamp) +
-            '*'.padStart(maxNickLength, ' ') + nickChannelSpacer +
+          _addText(parsedMessage.timestamp,
+            '*',
             'Notice(' +
-            parsedMessage.nick + '/' + parsedMessage.params[0] + ') ' +
-            parsedMessage.params[1]);
+            parsedMessage.nick + '/' + parsedMessage.params[0] + ') ' + parsedMessage.params[1]);
           // Upon channel message, make sectino visible.
           channelBottomDivEl.removeAttribute('hidden');
           channelHideButtonEl.textContent = '-';
@@ -424,27 +464,58 @@ function createChannelEl (name) {
         break;
 
       case 'PART':
+        // console.log('PART ' + JSON.stringify(parsedMessage, null, 2));
         if (parsedMessage.params[0].toLowerCase() === name.toLowerCase()) {
-          _addText(_optionalTime(parsedMessage.timestamp) +
-            '*'.padStart(maxNickLength, ' ') + nickChannelSpacer +
-            parsedMessage.nick + ' (' +
-            parsedMessage.host + ') has left');
+          let reason = ' ';
+          if (parsedMessage.params[1]) reason = parsedMessage.params[1];
+          if (channelFormatButtonEl.textContent === 'Full') {
+            _addText(parsedMessage.timestamp,
+              '*',
+              parsedMessage.nick + ' (' + parsedMessage.host + ') has left ' +
+              '(' + reason + ')' );
+          } else {
+            _addText(parsedMessage.timestamp,
+              '*',
+              parsedMessage.nick + ' has left');
+          }
         }
         break;
       case 'PRIVMSG':
         if (parsedMessage.params[0].toLowerCase() === name.toLowerCase()) {
-          _addText(_optionalTime(parsedMessage.timestamp) +
-            parsedMessage.nick.padStart(maxNickLength, ' ') + nickChannelSpacer +
+          _addText(parsedMessage.timestamp,
+            parsedMessage.nick,
             parsedMessage.params[1]);
           // Upon channel message, make sectino visible.
           channelBottomDivEl.removeAttribute('hidden');
           channelHideButtonEl.textContent = '-';
         }
         break;
+      case 'QUIT':
+        // console.log('QUIT ' + JSON.stringify(parsedMessage, null, 2));
+        if (true) {
+          // TODO, this will send Quit message to all channels, even if
+          // the quitting nick is not in them.
+          // Problem is the nick is no longer in the name array
+          // when this message is received, so attendance can not
+          // be checked.
+          let reason = ' ';
+          if (parsedMessage.params[0]) reason = parsedMessage.params[0];
+          if (channelFormatButtonEl.textContent === 'Full') {
+            _addText(parsedMessage.timestamp,
+              '*',
+              parsedMessage.nick + ' (' + parsedMessage.host + ') has quit ' +
+              '(' + reason + ')' );
+          } else {
+            _addText(parsedMessage.timestamp,
+              '*',
+              parsedMessage.nick + ' has quit');
+          }
+        }
+        break;
       case 'TOPIC':
         if (parsedMessage.params[0].toLowerCase() === name.toLowerCase()) {
-          _addText(_optionalTime(parsedMessage.timestamp) +
-            '*'.padStart(maxNickLength, ' ') + nickChannelSpacer +
+          _addText(parsedMessage.timestamp,
+            '*',
             'Topic for ' + parsedMessage.params[0] + ' changed to \"' +
             parsedMessage.params[1] + '\" by ' + parsedMessage.nick);
         }

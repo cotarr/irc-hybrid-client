@@ -1031,6 +1031,9 @@ function _parseBufferMessage (message) {
         }
         break;
       //
+      case 'QUIT':
+        displayChannelMessage(parsedMessage);
+        break;
       case 'TOPIC':
         if (true) {
           if (channelPrefixChars.indexOf(parsedMessage.params[0].charAt(0)) >= 0) {

@@ -38,10 +38,8 @@
       <div class='head-flex'>
         <div class="head-left">
           <button id="hideLoginSectionButton">-</button>
-          <button id="connectButton">Connect</button>
-          <button id="quitButton">Quit</button>
-        </div>
-        <div class="head-center">
+          <div class="connect-icon" id="webConnectIconId">Web</div>
+          <div class="connect-icon" id="ircConnectIconId">IRC</div>
         </div>
         <div class="head-right">
           <button id="showAllDivsButton">+ all</button>
@@ -50,13 +48,6 @@
         </div>
       </div>
       <div class="vh10"></div>
-      <div>
-        <div class="connect-icon" id="webConnectIconId">Web</div>
-        <div class="connect-icon" id="ircConnectIconId">IRC</div>
-        <span class="user-span" id="headerUser"></span>
-        <span class="user-span">/</span>
-        <span class="user-span" id="headerServer">server</span>
-      </div>
       <div id="hideLoginSection">
         <div class="vh10"></div>
         <div class="button-div">
@@ -87,6 +78,15 @@
           <div class="input-label-right">Initial User Mode</div>
         </div>
       </div>
+      <div class="vh10"></div>
+      <div class="button-div">
+        <button id="connectButton">Connect IRC</button>
+        <button id="quitButton">/Quit IRC</button>
+        <span class="user-span" id="headerUser"></span>
+        <span class="user-span">/</span>
+        <span class="user-span" id="headerServer">server</span>
+      </div>
+
     </div>
 
     <!-- No hidden attreibute for webDisconnectedHiddenDiv (breaks auto-resize) -->
