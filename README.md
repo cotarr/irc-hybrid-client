@@ -68,3 +68,9 @@ cp example-servers.json servers.json
 # 4) Initial nick name, user, real name and initial user modes.
 # 5) Preferred list of channels for this server.
 ```
+
+# To use gulp
+```
+npm install -g gulp-cli
+gulp dist
+```

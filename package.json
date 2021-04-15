@@ -30,5 +30,16 @@
     "morgan": "^1.10.0",
     "utf-8-validate": "^5.0.4",
     "ws": "^7.4.4"
+  },
+  "devDependencies": {
+    "del": "^5.1.0",
+    "gulp": "^4.0.2",
+    "gulp-clean-css": "^4.3.0",
+    "gulp-concat": "^2.6.1",
+    "gulp-htmlmin": "^5.0.1",
+    "gulp-insert": "^0.5.0",
+    "gulp-minify": "^3.1.0",
+    "gulp-rename": "^2.0.0",
+    "gulp-replace": "^1.0.0"
   }
 }
