@@ -224,6 +224,7 @@ function textCommandParser (inputObj) {
   switch (parsedCommand.command) {
     //
     case 'ADMIN':
+      showRawMessageWindow();
       ircMessage = 'ADMIN';
       if (parsedCommand.restOf.length === 1) {
         ircMessage = 'ADMIN ' + parsedCommand.restOf[0];
@@ -245,6 +246,16 @@ function textCommandParser (inputObj) {
         ircMessage = 'JOIN ' + parsedCommand.params[1] + ' ' + parsedCommand.restOf[1];
       }
       break;
+    //
+    case 'LIST':
+      showRawMessageWindow();
+      if (parsedCommand.params.length === 0) {
+        ircMessage = 'LIST';
+      } else {
+        ircMessage = 'LIST ' + parsedCommand.restOf[0];
+      }
+      break;
+    //
     case 'ME':
       if (parsedCommand.params.length < 1) {
         return {
@@ -265,6 +276,7 @@ function textCommandParser (inputObj) {
       break;
       //
     case 'MOTD':
+      showRawMessageWindow();
       ircMessage = 'MOTD';
       if (parsedCommand.restOf.length === 1) {
         ircMessage = 'MOTD ' + parsedCommand.restOf[0];
@@ -292,6 +304,7 @@ function textCommandParser (inputObj) {
           ircMessage: null
         };
       }
+      showRawMessageWindow();
       ircMessage = 'NICK ' + parsedCommand.restOf[0];
       break;
     //
@@ -305,6 +318,19 @@ function textCommandParser (inputObj) {
         message: null,
         ircMessage: null
       };
+      break;
+    //
+    case 'NOTICE':
+      // Note: this will send to either channel or user
+      if ((parsedCommand.params.length > 1) && (parsedCommand.restOf[1].length > 0)) {
+        ircMessage = 'NOTICE ' + parsedCommand.params[1] + ' :' + parsedCommand.restOf[1];
+      } else {
+        return {
+          error: true,
+          message: 'Expect: /NOTICE <nickname> <message-text>',
+          ircMessage: null
+        };
+      }
       break;
     //
     case 'PART':
@@ -329,6 +355,19 @@ function textCommandParser (inputObj) {
       }
       break;
     //
+    case 'QUERY':
+      if ((parsedCommand.params.length > 1) &&
+        (channelPrefixChars.indexOf(parsedCommand.params[1].charAt(0)) < 0)) {
+        ircMessage = 'PRIVMSG ' + parsedCommand.params[1] + ' :' + parsedCommand.restOf[1];
+      } else {
+        return {
+          error: true,
+          message: 'Expect: /QUERY <nickname> <message-text>',
+          ircMessage: null
+        };
+      }
+      break;
+    //
     case 'QUIT':
       ircMessage = 'QUIT';
       if (parsedCommand.restOf.length > 0) {
@@ -338,6 +377,7 @@ function textCommandParser (inputObj) {
     //
     case 'QUOTE':
       if (parsedCommand.restOf.length > 0) {
+        showRawMessageWindow();
         ircMessage = parsedCommand.restOf[0];
       } else {
         return {
@@ -365,10 +405,22 @@ function textCommandParser (inputObj) {
       }
       break;
     case 'VERSION':
+      showRawMessageWindow();
       ircMessage = 'VERSION';
       if (parsedCommand.restOf.length === 1) {
         ircMessage = 'VERSION ' + parsedCommand.restOf[0];
       }
+      break;
+    case 'WHOIS':
+      if (parsedCommand.params.length < 1) {
+        return {
+          error: true,
+          message: 'Expect: /WHOIS <nickanme>',
+          ircMessage: null
+        };
+      }
+      showRawMessageWindow();
+      ircMessage = 'WHOIS ' + parsedCommand.restOf[0];
       break;
     //
     default:

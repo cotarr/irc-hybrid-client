@@ -451,6 +451,13 @@ function createChannelEl (name) {
             'Mode ' + JSON.stringify(parsedMessage.params) + ' by ' + parsedMessage.nick);
         }
         break;
+      case 'NICK':
+        if (true) {
+          _addText(parsedMessage.timestamp,
+            '*',
+            parsedMessage.nick + ' is now known as ' + parsedMessage.params[0]);
+        }
+        break;
       case 'NOTICE':
         if (parsedMessage.params[0].toLowerCase() === name.toLowerCase()) {
           _addText(parsedMessage.timestamp,
@@ -464,7 +471,6 @@ function createChannelEl (name) {
         break;
 
       case 'PART':
-        // console.log('PART ' + JSON.stringify(parsedMessage, null, 2));
         if (parsedMessage.params[0].toLowerCase() === name.toLowerCase()) {
           let reason = ' ';
           if (parsedMessage.params[1]) reason = parsedMessage.params[1];
@@ -491,7 +497,6 @@ function createChannelEl (name) {
         }
         break;
       case 'QUIT':
-        // console.log('QUIT ' + JSON.stringify(parsedMessage, null, 2));
         if (true) {
           // TODO, this will send Quit message to all channels, even if
           // the quitting nick is not in them.

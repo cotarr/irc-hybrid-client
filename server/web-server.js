@@ -80,10 +80,10 @@ if (nodeEnv === 'development') {
       encoding: 'utf8',
       mode: 0o644,
       flags: 'a'
-    }),
-    skip: function (req, res) {
-      return (res.statusCode < 400);
-    }
+    })
+    // skip: function (req, res) {
+    //   return (res.statusCode < 400);
+    // }
   }));
 }
 

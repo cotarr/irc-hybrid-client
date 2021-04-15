@@ -119,7 +119,7 @@ var wsocket = null;
 // Error display functions
 // --------------------------
 
-const errorExpireSeconds = 10;
+const errorExpireSeconds = 5;
 var errorRemainSeconds = 0;
 
 function clearError() {
@@ -850,6 +850,14 @@ function displayWallopsMessage(parsedMessage) {
   }
 } // displayWallopsMessage
 
+function showRawMessageWindow() {
+  document.getElementById('rawHiddenElements').removeAttribute('hidden');
+  document.getElementById('rawHiddenElementsButton').textContent = '-';
+  document.getElementById('rawHeadRightButtons').removeAttribute('hidden');
+  // scroll message to most recent
+  document.getElementById('rawMessageDisplay').scrollTop =
+    document.getElementById('rawMessageDisplay').scrollHeight;
+}
 
 function displayRawMessage (inString) {
   let text = cleanFormatting(inString);
@@ -976,10 +984,6 @@ function _parseBufferMessage (message) {
     // Decoding complete, Parse commands
     //
     switch(parsedMessage.command) {
-      // NAMES
-      case '353':
-        displayChannelMessage(parsedMessage);
-        break;
       case 'ERROR':
         // console.log(message.toString());
         break;
@@ -997,6 +1001,9 @@ function _parseBufferMessage (message) {
             console.log('Error message MODE to unknown recipient');
           }
         }
+        break;
+      case 'NICK':
+        displayChannelMessage(parsedMessage);
         break;
       case 'PART':
         displayChannelMessage(parsedMessage);
@@ -1308,7 +1315,7 @@ function reconnectWebSocketAfterDisconnect() {
       // --------------------------------------
       fetch(secureStatusURL, fetchOptions)
         .then( (response) => {
-          console.log(response.status);
+          // console.log(response.status);
           // if (response.status === 403) {
           //   window.location.href = '/login';
           //   throw new Error('Fetch status ' + response.status + ' ' + response.statusText);

@@ -37,12 +37,7 @@ function _parseInputForIRCCommands(textAreaEl) {
 // -------------------------
 document.getElementById('rawHiddenElementsButton').addEventListener('click', function() {
   if (document.getElementById('rawHiddenElements').hasAttribute('hidden')) {
-    document.getElementById('rawHiddenElements').removeAttribute('hidden');
-    document.getElementById('rawHiddenElementsButton').textContent = '-';
-    document.getElementById('rawHeadRightButtons').removeAttribute('hidden');
-    // scroll message to most recent
-    document.getElementById('rawMessageDisplay').scrollTop =
-      document.getElementById('rawMessageDisplay').scrollHeight;
+    showRawMessageWindow();
   } else {
     document.getElementById('rawHiddenElements').setAttribute('hidden', '');
     document.getElementById('rawHiddenElementsButton').textContent = '+';

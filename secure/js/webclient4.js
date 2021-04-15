@@ -348,6 +348,7 @@ document.getElementById('UserPrivMsgSendButton').addEventListener('click', funct
 // -------------------------
 document.getElementById('whoisButton').addEventListener('click', function() {
   if (document.getElementById('pmNickNameInputId').value.length > 0) {
+    showRawMessageWindow();
     let message = 'WHOIS ' + document.getElementById('pmNickNameInputId').value;
     _sendIrcServerMessage(message);
     // open up server messages to show
