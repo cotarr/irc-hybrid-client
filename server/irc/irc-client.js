@@ -52,13 +52,16 @@
   ircState.ircConnecting = false;
   ircState.ircRegistered = false;
 
-  ircState.ircServerIndex = 0;
+
   ircState.ircServerName = servers.serverArray[0].name;
   ircState.ircServerHost = servers.serverArray[0].host;
   ircState.ircServerPort = servers.serverArray[0].port;
   ircState.ircTLSEnabled = servers.serverArray[0].tls;
   var ircServerPassword = servers.serverArray[0].password;
   var nsIdentifyCommand = servers.serverArray[0].identifyCommand;
+  // index into servers.json file
+  ircState.ircServerIndex = 0;
+  // List of favorite channels
   ircState.channelList = servers.serverArray[0].channelList;
 
   ircState.nickName = servers.serverArray[0].nick;
@@ -67,10 +70,8 @@
   ircState.userMode = servers.serverArray[0].modes;
   ircState.userHost = '';
 
-  // get name and version number from npm package.json
-  ircState.botVersion = require('../../package.json').version;
-  ircState.botName = require('../../package.json').name;
-
+  // ircChannels format ['#channel1', '#channel2']
+  ircState.channels = [];
   // Channel schema
   //
   // channelStates {
@@ -80,8 +81,11 @@
   //   joined: true,
   //   kicked: false
   // }
-  ircState.channels = [];
   ircState.channelStates = [];
+
+  // get name and version number from npm package.json
+  ircState.botVersion = require('../../package.json').version;
+  ircState.botName = require('../../package.json').name;
 
   ircState.websocketCount = 0;
 

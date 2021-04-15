@@ -28,8 +28,7 @@
 // These HTML pages are authenticated by session cookies.
 // The API routes (GET, POST) are authenticated by session cookies.
 // The websocket connection (ws://, wss://) upgrade request is manually
-// authenticated in the ws-server.js module where
-// cookie values and expiration are exchanged with app.js.
+// authenticated in backend using the browser provided cookie.
 //
 // Connection sequence.
 //    1) Call initWebSocketAuth(callback) with callback to connectWebSocket()
@@ -47,21 +46,25 @@
 //
 const channelPrefixChars = '@#+!';
 const nickChannelSpacer = ' | ';
+
+// ----------------------------------------------------------
 // Do not edit ircState, represents state on web server end
 // Object updated from getIrcState() fetch request
 //
 //   R E A D   O N L Y
 //
 var ircState = {
-  showPingPong: true,
-  ircServerIndex: 0,
+  showPingPong: false,
   ircConnected: false,
   ircConnecting: false,
   ircRegistered: false,
-  ircTLSEnabled: false,
+
+  ircServerName: '',
   ircServerHost: '',
-  ircServerPort: '6667',
-  websocketCount: 0,
+  ircServerPort: 6667,
+  ircTLSEnabled: false,
+  ircServerIndex: 0,
+  channelList: [],
 
   nickName: '',
   userName: '',
@@ -70,7 +73,12 @@ var ircState = {
   userHost: '',
 
   channels: [],
-  channelStates: []
+  channelStates: [],
+
+  botVersion: '0.0.0',
+  botName: '',
+
+  websocketCount: 0
 };
 
 document.getElementById('webConnectIconId').removeAttribute('connected');
@@ -98,6 +106,7 @@ webState.resizableChanSplitTextareaIds = [];
 webState.lastPMNick = '';
 webState.activePrivateMessageNicks = [];
 webState.resizablePrivMsgTextareaIds = [];
+
 // -------------------------------
 // Build URL from page location
 // -------------------------------
@@ -268,15 +277,6 @@ function updateDivVisibility() {
     document.getElementById('userModeInputId').setAttribute('disabled', '');
     document.getElementById('connectButton').setAttribute('disabled', '');
     document.getElementById('quitButton').setAttribute('disabled', '');
-    // document.getElementById('eraseCacheButton').setAttribute('disabled', '');
-    // document.getElementById('rawMessageInputId').setAttribute('disabled', '');
-    // document.getElementById('sendRawMessageButton').setAttribute('disabled', '');
-    // document.getElementById('loadFromCacheButton').setAttribute('disabled', '');
-    // document.getElementById('ircDisconnectedHiddenDiv').setAttribute('hidden', '');
-    // webState.noticeOpen = false;
-    // document.getElementById('noticeSectionDiv').setAttribute('hidden', '');
-    // webState.wallopsOpen = false;
-    // document.getElementById('wallopsSectionDiv').setAttribute('hidden', '');
   }
 }
 
@@ -1370,7 +1370,6 @@ function reconnectWebSocketAfterDisconnect() {
     });
 }
 
-
 // ---------------------------------------------
 // Upon page load, initiate web socket auth
 // from web server, then connect web socket
@@ -1465,6 +1464,11 @@ function reconnectTimerTickHandler() {
   } else if (wsReconnectCounter > 10) {
     // Stop at the limit
     webState.webConnectOn = false;
+    if (wsReconnectCounter === 11) {
+      // only do the message one time
+      document.getElementById('reconnectStatusDiv').textContent +=
+        'Reconnect disabled\n';
+    }
     return;
   } else {
     if (wsReconnectTimer > 15) {

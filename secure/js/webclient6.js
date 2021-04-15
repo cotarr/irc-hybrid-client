@@ -433,7 +433,8 @@ const adjustInputToWidowWidth = function (innerWidth) {
     });
   }
   document.getElementById('errorDiv').style.width = '100%';
-  // for see width of phone
+
+  // Debug: To watch a variable, put it here.
   if (!webState.watch) webState.watch = {};
   webState.watch.innerWidth = window.innerWidth.toString() + 'px';
 };
