@@ -227,6 +227,16 @@ app.get('/secure', authorizeOrFail, (req, res) => res.json({secure: 'ok'}));
 // The websocket module does not have access
 // to the express (req, res, next) objects
 // and therefore not express session (req.session).
+//
+// The approach here relies on the assumption
+// that the signed cookie in the /wsauth POST
+// is trusted, because express-session verified the signature.
+// Therefore, if the decoded cookie value is saved for a few seconds
+// it can be used to verify the web socket upgrade request.
+//
+// There may be some risk in this because the cookie in this
+// function originally came from the client browser.
+//
 // This route and function exchanges cookie value
 // and expiration timestamp with the webscket module
 // for independant (manual) cookie validation
@@ -235,7 +245,7 @@ app.get('/secure', authorizeOrFail, (req, res) => res.json({secure: 'ok'}));
 // Data stored globally, time expiration 10 seconds.
 //
 // -----------------------------------------
-app.post('/irc/wsauth', function(req, res, next) {
+app.post('/irc/wsauth', authorizeOrFail, function(req, res, next) {
   global.webSocketAuth = {
     expire: 0,
     cookie: ''

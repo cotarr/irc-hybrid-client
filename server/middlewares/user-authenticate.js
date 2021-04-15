@@ -31,7 +31,7 @@
   }
 
   //
-  // Custom log file (setup to fail2ban to parse IP addresses)
+  // Custom log file (Option: setup to fail2ban to block IP addresses)
   //
   const authLogFilename = path.join(__dirname, '../../logs/auth.log');
   const customLog = function (req, errString) {

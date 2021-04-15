@@ -87,6 +87,10 @@
   ircState.botVersion = require('../../package.json').version;
   ircState.botName = require('../../package.json').name;
 
+  ircLog.setRawMessageLogEnabled(servers.serverArray[0].rawMessageLog);
+
+  console.log('Starting ' + ircState.botName + ' ' + ircState.botVersion);
+
   ircState.websocketCount = 0;
 
   const timestamp = function() {
@@ -1013,6 +1017,8 @@
     ircState.realName = servers.serverArray[ircState.ircServerIndex].real;
     ircState.userMode = servers.serverArray[ircState.ircServerIndex].modes;
     ircState.userHost = '';
+
+    ircLog.setRawMessageLogEnabled(servers.serverArray[ircState.ircServerIndex].rawMessageLog);
 
     global.sendToBrowser('UPDATE\n');
 

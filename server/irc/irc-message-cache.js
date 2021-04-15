@@ -1,4 +1,5 @@
 (function() {
+  // size in lines of text
   const cacheSize = 100;
   var cacheInPointer = 0;
   var cacheArray = [];

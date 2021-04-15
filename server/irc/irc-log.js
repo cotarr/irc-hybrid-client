@@ -4,6 +4,8 @@
   const path = require('path');
   const ircLogFilename = path.join(__dirname, '../../logs/irc.log');
 
+  var rawMessageLogEnabled = false;
+
   const writeIrcLog = function (logString) {
     //
     // build log text string
@@ -14,8 +16,7 @@
     //
     // Append string to file
     //
-    // if (nodeEnv === 'production') {
-    if (true) {
+    if (rawMessageLogEnabled) {
       fs.writeFile(
         ircLogFilename,
         logEntry + '\n',
@@ -32,10 +33,17 @@
         }
       );
     } else {
-      // console.log(logEntry);
+      //console.log(logEntry);
+    }
+  };
+
+  const setRawMessageLogEnabled = function (flag) {
+    if (typeof flag === 'boolean') {
+      rawMessageLogEnabled = flag;
     }
   };
   module.exports = {
-    writeIrcLog: writeIrcLog
+    writeIrcLog: writeIrcLog,
+    setRawMessageLogEnabled: setRawMessageLogEnabled
   };
 })();

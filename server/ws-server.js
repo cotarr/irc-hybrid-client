@@ -22,21 +22,21 @@ const cookieSecret = credentials.cookieSecret;
 // and therefore does not have access to express-session authentication status.
 // The websocket server must extract cookie from request object
 // and validate the cookie manually using handshake values between
-// app.js and ws-server.js.
+// web-server.js and ws-server.js.
 //
 // 1) Browser attempts to load IRC web client page
 // 2) If cookie invalid, redirect to user login, validate user, then redirect back
 // 3) Browser loads web client page webclient.html
 // 4) On load javascript webclient.js, browser fetchs POST request to /irc/wsauth
-// 5) In app.js, /irc/wsauth POST request, session cookie validated by express-session.
-// 5) In app.js, route handler, cookie value obtained from cookieParser in req object
-// 6) In app.js, route handler, Cookie value and +10 second expire time saved as global variable
+// 5) In web-server.js, /irc/wsauth POST request, session cookie validated by express-session.
+// 5) In web-server.js, route handler, cookie value obtained from cookieParser in req object
+// 6) In web-server.js, route handler, Cookie value and +10 second expiry saved as global variable
 // 7) Upon POST received event, browser attempts to open websocket
 // 8) Thd websocket server (bin/www) calls on 'upgrade' handler in ws-server.js
 // 9) wsOnUpgrade() calls _authorizeWebSocket
 // 10) Check: cookie present
 // 11) Validate cookie signature
-// 12) Timeing safe compare cookie value against stored global cookie value (from app.js POST route)
+// 12) Safe compare cookie value against stored global cookie value (from web-server.js POST route)
 // 13) and... global timetamp (10 seconds) is not expired.
 // 14) Authorize web socket to upgrade
 // 15) On web socket open event, request ircState from web server by calling getIrcState().

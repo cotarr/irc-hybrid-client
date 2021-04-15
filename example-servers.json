@@ -12,7 +12,8 @@
       "user": "myuser",
       "real": "My Name",
       "modes": "+i",
-      "channelList": ["#test1", "#test2"]
+      "channelList": ["#test1", "#test2"],
+      "rawMessageLog": true
     }
   ]
 }
