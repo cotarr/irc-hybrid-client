@@ -232,7 +232,7 @@ app.get('/secure', authorizeOrFail, (req, res) => res.json({secure: 'ok'}));
 // that the signed cookie in the /wsauth POST
 // is trusted, because express-session verified the signature.
 // Therefore, if the decoded cookie value is saved for a few seconds
-// it can be used to verify the web socket upgrade request.
+// it can be used to verify the websocket upgrade request.
 //
 // There may be some risk in this because the cookie in this
 // function originally came from the client browser.

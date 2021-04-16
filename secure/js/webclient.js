@@ -45,11 +45,15 @@
 // --------------------
 //
 const channelPrefixChars = '@#+!';
+const nicknamePrefixChars = '~&@%+';
 const nickChannelSpacer = ' | ';
 
 // ----------------------------------------------------------
 // Do not edit ircState, represents state on web server end
 // Object updated from getIrcState() fetch request
+//
+// ircState represents the state of the IRC connection
+//    within the backend web server.
 //
 //   R E A D   O N L Y
 //
@@ -495,9 +499,9 @@ function getIrcState (callback) {
     });
 } // getIrcState
 
-document.addEventListener('irc-state-changed', function(event) {
-  // console.log('Event: irc-state-changed, detail:' + JSON.stringify(event.detail));
-});
+// document.addEventListener('irc-state-changed', function(event) {
+//   console.log('Event: irc-state-changed, detail:' + JSON.stringify(event.detail));
+// });
 
 // ------------------------------------------
 // Function to strip colors from a string
@@ -669,6 +673,9 @@ function _parseIrcMessage (message) {
       nextIndex: i + 1
     };
   }
+  //
+  // Extract nickname
+  //
   // nick!user@host.domain
   // nick!user@nn:nn:nn:nn: (ipv6)
   function _extractNickname(inText) {
@@ -685,6 +692,9 @@ function _parseIrcMessage (message) {
       return null;
     }
   }
+  //
+  // Extract hostname
+  //
   function _extractHostname(inText) {
     if (inText) {
       if ((inText.indexOf('!') >= 0 ) &&
@@ -875,6 +885,14 @@ function displayRawMessageInHex (message) {
   displayRawMessage(hexString);
 };
 
+// ---------------------------------------------
+// CTCP message parser
+//
+// Note: CTCP replies to other users are handled
+// in the backend web server. This parser is
+// for user interactive CTCP requests,
+// primarily ACTIION from /ME commands.
+// ---------------------------------------------
 function _parseCtcpMessage (parsedMessage) {
   function _addNoticeText (text) {
     document.getElementById('noticeMessageDisplay').textContent += text + '\n';
@@ -939,13 +957,18 @@ function _parseCtcpMessage (parsedMessage) {
 // -------------------------------------------------------------
 function _parseBufferMessage (message) {
   if (message === 'HEARTBEAT' ) {
+    // 1) Check if websocket heartbeat
     // console.log('heartbeat');
     onHeartbeatReceived();
   } else if ( message === 'UPDATE' ) {
+    // 2) Else check if backend requests browser to
+    //       poll the state API and update
     // console.log('update');
     // calling this updates state itself
     getIrcState();
   } else {
+    // 3) Else, this is IRC message to be parsed for IRC browser user.
+
     // Internal function
     function _showNotExpiredError(errStr) {
       // current UNIX time in seconds
@@ -957,10 +980,12 @@ function _parseBufferMessage (message) {
         showError(errStr);
       }
     }
+
     //
     // Display raw message in Hexadecimal
     //
     if (webState.rawShowHex) displayRawMessageInHex(message);
+
     //
     // Display raw message from IRC server
     //
@@ -968,19 +993,27 @@ function _parseBufferMessage (message) {
 
     // Do not process back echo message prefixed with '-->'.
     if (message.split(' ')[0] === '-->') return;
+
     // Do not process server info message
     if (message.split(' ')[0] === 'Webserver:') return;
+
+    //
+    // Main Parser
     //
     // parse message into: prefix, command, and param array
+    //
     let parsedMessage = _parseIrcMessage(message);
     // console.log('parsedMessage' + JSON.stringify(parsedMessage, null, 2));
-    //
 
+    //
+    // Check if server is responding with error code
+    //
     if ((parseInt(parsedMessage.command) >= 400) &&
       (parseInt(parsedMessage.command) <500)) {
       // TODO temporarily remove timestamp with slice, can use better parse.
       _showNotExpiredError(message.slice(12, message.length));
     }
+
     // Decoding complete, Parse commands
     //
     switch(parsedMessage.command) {
@@ -1277,6 +1310,11 @@ function _sendIrcServerMessage (message) {
 // --------------------------------------
 // Function to manage re-connection of
 // disconnected web socket
+//
+// 1) Test /status
+// 2) Test /secure
+// 3) Call function to open socket
+//
 // --------------------------------------
 function reconnectWebSocketAfterDisconnect() {
   let statusURL = webServerUrl + '/status';

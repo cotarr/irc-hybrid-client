@@ -20,7 +20,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 // -----------------------------------------------------------------------------
-
+//
+//     Node/Express IRC Client backend for irc-hybrid-client
+//
+// -----------------------------------------------------------------------------
 (function() {
   'use strict';
 
@@ -44,6 +47,7 @@
   // ----------------------------------------------------
 
   const channelPrefixChars = '@#+!';
+  const nicknamePrefixChars = '~&@%+';
 
   var ircState = {};
 

@@ -205,7 +205,7 @@
   };
 
   //
-  // Timing safe compare, from express-basic-auth
+  // Timing safe compare (From github.com/LionC/express-basic-auth)
   //
   const safeCompare = function(userInput, secret) {
     const userInputLength = Buffer.byteLength(userInput);
