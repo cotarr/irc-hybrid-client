@@ -1,480 +1,372 @@
-// ------------------------------------------------------------
-// webclient6 - Display raw server messages and program info
-//              End of javascript load initializations
-// ------------------------------------------------------------
+// --------------------------------------------
+// webclient4.js - Private Message Functions
+// --------------------------------------------
 
-function _parseInputForIRCCommands(textAreaEl) {
+// --------------------------------------------
+// Send text as private message to other user
+//     (internal function)
+// --------------------------------------------
+function _sendPrivMessageToUser(targetNickname, textAreaEl) {
   if ((textAreaEl.value.length > 0)) {
     let text = textAreaEl.value;
     text = text.replace('\r', '').replace('\n', '');
 
-    // TODO copy/paste multiple lines
-
-    let commandAction = textCommandParser(
-      {
-        inputString: text,
-        originType: 'generic',
-        originName: null
-      }
-    );
-    // clear input element
-    textAreaEl.value = '';
-    if (commandAction.error) {
-      showError(commandAction.message);
-      return;
-    } else {
-      if ((commandAction.ircMessage) && (commandAction.ircMessage.length > 0)) {
-        _sendIrcServerMessage(commandAction.ircMessage);
-      }
-      return;
-    }
-  }
-};
-
-
-// -------------------------
-// raw Show/Hide button handler
-// -------------------------
-document.getElementById('rawHiddenElementsButton').addEventListener('click', function() {
-  if (document.getElementById('rawHiddenElements').hasAttribute('hidden')) {
-    showRawMessageWindow();
-  } else {
-    document.getElementById('rawHiddenElements').setAttribute('hidden', '');
-    document.getElementById('rawHiddenElementsButton').textContent = '+';
-    document.getElementById('rawHeadRightButtons').setAttribute('hidden', '');
-  }
-});
-
-// -------------------------
-// raw Clear button handler
-// -------------------------
-document.getElementById('rawClearButton').addEventListener('click', function() {
-  document.getElementById('rawMessageDisplay').textContent = '';
-  document.getElementById('rawMessageDisplay').setAttribute('rows', '10');
-});
-// -------------------------
-// raw Taller button handler
-// -------------------------
-document.getElementById('rawTallerButton').addEventListener('click', function() {
-  let newRows =
-    parseInt(document.getElementById('rawMessageDisplay').getAttribute('rows')) + 10;
-  document.getElementById('rawMessageDisplay').setAttribute('rows', newRows.toString());
-}.bind(this));
-
-// -------------------------
-// raw Normal button handler
-// -------------------------
-document.getElementById('rawNormalButton').addEventListener('click', function() {
-  document.getElementById('rawMessageDisplay').setAttribute('rows', '10');
-}.bind(this));
-
-// --------------------------------
-// Send IRC command button pressed
-// --------------------------------
-document.getElementById('sendRawMessageButton').addEventListener('click', function() {
-  _parseInputForIRCCommands(document.getElementById('rawMessageInputId'));
-}.bind(this));
-// --------------------------------
-// Send IRC command Enter pressed
-// --------------------------------
-document.getElementById('rawMessageInputId').addEventListener('input', function(event) {
-  if (((event.inputType === 'insertText') && (event.data === null)) ||
-    (event.inputType === 'insertLineBreak')) {
-    _parseInputForIRCCommands(document.getElementById('rawMessageInputId'));
-  }
-}.bind(this));
-
-// -----------------------------
-// Show Debug button handler
-// -----------------------------
-document.getElementById('showDebugButton').addEventListener('click', function() {
-  if (document.getElementById('hiddenDebugDiv').hasAttribute('hidden')) {
-    document.getElementById('hiddenDebugDiv').removeAttribute('hidden');
-  } else {
-    document.getElementById('hiddenDebugDiv').setAttribute('hidden', '');
-  }
-}.bind(this));
-
-// --------------------------------
-// Update from cache (button)
-// --------------------------------
-document.getElementById('loadFromCacheButton').addEventListener('click', function() {
-  // updateFromCache();
-  document.dispatchEvent(new CustomEvent('update-from-cache', {bubbles: true}));
-}.bind(this));
-
-// -----------------------
-// Show all divs button
-// -----------------------
-document.getElementById('showAllDivsButton').addEventListener('click', function() {
-  // Emit event for dynamically generated hidden divs
-  document.dispatchEvent(new CustomEvent('show-all-divs', {bubbles: true}));
-}.bind(this));
-
-// -----------------------
-// Hide all divs button
-// -----------------------
-document.getElementById('hideAllDivsButton').addEventListener('click', function() {
-  // Emit event for dynamically generated hidden divs
-  document.dispatchEvent(new CustomEvent('hide-all-divs', {bubbles: true}));
-}.bind(this));
-
-// -----------------------
-// Variables button
-// -----------------------
-document.getElementById('variablesButtonId').addEventListener('click', function() {
-  document.getElementById('variablesDivId').removeAttribute('hidden');
-  document.getElementById('variablesPreId').textContent =
-    'Press [Variables] to refresh\n' +
-    'Press [Debug] to close\n' +
-    '----------------------------\n\n' +
-    'ircState = ' + JSON.stringify(ircState, null, 2) + '\n\n' +
-    'webState = ' + JSON.stringify(webState, null, 2);
-}.bind(this));
-
-document.getElementById('rawDisplayHexButtonId').addEventListener('click', function() {
-  if (webState.rawShowHex) {
-    webState.rawShowHex = false;
-    document.getElementById('rawDisplayHexButtonId').classList.remove('button-on-color');
-  } else {
-    webState.rawShowHex = true;
-    document.getElementById('rawDisplayHexButtonId').classList.add('button-on-color');
-  }
-});
-
-document.getElementById('rawNoCleanFormatCodesButtonId').addEventListener('click', function() {
-  if (webState.rawNoClean) {
-    webState.rawNoClean = false;
-    document.getElementById('rawNoCleanFormatCodesButtonId').classList.remove('button-on-color');
-  } else {
-    webState.rawNoClean = true;
-    document.getElementById('rawNoCleanFormatCodesButtonId').classList.add('button-on-color');
-  }
-});
-
-// -----------------------
-// Die (Server) button
-// -----------------------
-document.getElementById('serverTerminateButton').addEventListener('click', function() {
-  console.log('Requesting backend server to terminate');
-  let fetchURL = webServerUrl + '/terminate';
-  let fetchOptions = {
-    method: 'POST',
-    timeout: 10000,
-    // credentials: 'include',
-    headers: {
-      'Content-type': 'application/json',
-      'Accept': 'application/json'
-    },
-    body: JSON.stringify({terminate: 'YES'})
-  };
-  fetch(fetchURL, fetchOptions)
-    .then( (response) => {
-      // console.log(response.status);
-      if (response.ok) {
-        return response.json();
+    // Check slash character to see if it is an IRC command
+    if (text.charAt(0) === '/') {
+      // yes, it is command
+      let commandAction = textCommandParser(
+        {
+          inputString: text,
+          originType: 'private',
+          originName: targetNickname
+        }
+      );
+      // clear input element
+      textAreaEl.value = '';
+      if (commandAction.error) {
+        showError(commandAction.message);
+        return;
       } else {
-        throw new Error('Fetch status ' + response.status + ' ' + response.statusText);
+        if ((commandAction.ircMessage) && (commandAction.ircMessage.length > 0)) {
+          _sendIrcServerMessage(commandAction.ircMessage);
+        }
+        return;
       }
-    })
-    .then( (responseJson) => {
-      console.log(JSON.stringify(responseJson));
-    })
-    .catch( (error) => {
-      showError('Terminate: Unable to connect');
-      console.log(error);
-    });
-});
+    }
 
-// -------------------------
-//  Show/Hide license info
-// -------------------------
-document.getElementById('infoOpenCloseButton').addEventListener('click', function() {
-  if (document.getElementById('hiddenInfoDiv').hasAttribute('hidden')) {
-    document.getElementById('hiddenInfoDiv').removeAttribute('hidden');
-  } else {
-    document.getElementById('hiddenInfoDiv').setAttribute('hidden', '');
+    // Else not slash / command, assume is input intended to send to private message.
+    let message = 'PRIVMSG ' + targetNickname +
+      ' :' + text;
+    _sendIrcServerMessage(message);
+    textAreaEl.value = '';
   }
-});
+}; // _sendPrivMessageToUser
 
-
-// ---------------------------------------
-// Request server to erase message cache
-//
-// Route:  /erase
-// ---------------------------------------
-document.getElementById('eraseCacheButton').addEventListener('click', function() {
-  if (ircState.ircConnected) {
-    showError('You must be disconnected from IRC to clear cache.');
+function createPrivateMessageEl (name, parsedMessage) {
+  // if already exists, return
+  if (webState.activePrivateMessageNicks.indexOf(name.toLowerCase()) >= 0) {
+    console.log('createPrivateMessageEl: Private message element already exist');
     return;
   }
-  document.dispatchEvent(new CustomEvent('erase-before-reload',
-    {
-      bubbles: true,
-      detail: {
-      }
-    }));
-  let fetchURL = webServerUrl + '/irc/erase';
-  let fetchOptions = {
-    method: 'POST',
-    timeout: 10000,
-    // credentials: 'include',
-    headers: {
-      'Content-type': 'application/json',
-      'Accept': 'application/json'
-    },
-    body: JSON.stringify({erase: 'YES'})
-  };
-  fetch(fetchURL, fetchOptions)
-    .then( (response) => {
-      // console.log(response.status);
-      if (response.ok) {
-        return response.json();
-      } else {
-        throw new Error('Fetch status ' + response.status + ' ' + response.statusText);
-      }
-    })
-    .then( (responseJson) => {
-      if (responseJson.error) {
-        showError(responseJson.message);
-      } else {
-        // remove dynamically created private message elements to match list
-        let privMsgSessionEl = document.getElementById('privateMessageContainerDiv');
-        while (privMsgSessionEl.firstChild) {
-          privMsgSessionEl.removeChild(privMsgSessionEl.firstChild);
-        }
-        document.getElementById('noticeMessageDisplay').textContent = '';
-        document.getElementById('wallopsMessageDisplay').textContent = '';
-        document.getElementById('rawMessageDisplay').textContent = '';
-        webState.privMsgOpen = false;
-        webState.noticeOpen = false;
-        webState.wallopsOpen = false;
-        updateDivVisibility();
-      }
-    })
-    .catch( (error) => {
-      console.log(error);
-    });
-});
+  // Add to local browser list of active PM windows
+  webState.activePrivateMessageNicks.push(name.toLowerCase());
 
-// --------------------------------------------
-// Fetch web login user's name and update top
-// --------------------------------------------
-function updateUsername () {
-  let fetchURL = webServerUrl + '/userinfo';
-  let fetchOptions = {
-    method: 'GET',
-    timeout: 10000,
-    // credentials: 'include',
-    headers: {
-      'Accept': 'application/json'
+  // console.log('Creating private message Element for ' + name);
+  let privMsgIndex = webState.activePrivateMessageNicks.indexOf(name.toLowerCase());
+
+  // This is static HTML element created in webclient.html (Insert point)
+  let privMsgContainerDivEl = document.getElementById('privateMessageContainerDiv');
+
+  // section-div
+  let privMsgSectionEl = document.createElement('div');
+  privMsgSectionEl.classList.add('aa-section-div');
+  privMsgSectionEl.classList.add('priv-msg-section-div');
+
+  // Top Element (non-hidden element)
+  let privMsgTopDivEl = document.createElement('div');
+  privMsgTopDivEl.classList.add('head-flex');
+
+  // left flexbox div
+  let privMsgTopLeftDivEl = document.createElement('div');
+  privMsgTopLeftDivEl.classList.add('head-left');
+
+  // center if needed here
+
+  // right flexbox div
+  let privMsgTopRightDivEl = document.createElement('div');
+  privMsgTopRightDivEl.classList.add('head-right');
+
+  // right hidable div
+  let privMsgTopRightHidableDivEl = document.createElement('div');
+
+  // show/hide button
+  let privMsgHideButtonEl = document.createElement('button');
+  privMsgHideButtonEl.textContent = '-';
+  privMsgHideButtonEl.classList.add('channel-button');
+
+  // Top Private Message name (Nickname)
+  let privMsgNameDivEl = document.createElement('div');
+  privMsgNameDivEl.textContent = name;
+  privMsgNameDivEl.classList.add('chan-name-div');
+
+  // Taller button
+  let privMsgTallerButtonEl = document.createElement('button');
+  privMsgTallerButtonEl.textContent = 'Taller';
+  privMsgTallerButtonEl.classList.add('channel-button');
+
+  // Normal button
+  let privMsgNormalButtonEl = document.createElement('button');
+  privMsgNormalButtonEl.textContent = 'Normal';
+  privMsgNormalButtonEl.classList.add('channel-button');
+
+  // Clear button
+  let privMsgClearButtonEl = document.createElement('button');
+  privMsgClearButtonEl.textContent = 'Clear';
+  privMsgClearButtonEl.classList.add('channel-button');
+
+  // Bottom Element (optionally hidden)
+  let privMsgBottomDivEl = document.createElement('div');
+
+  // resizable text area
+  let privMsgTextAreaEl = document.createElement('textarea');
+  let privMsgTextAreaId = 'privMsg' + privMsgIndex.toString() + 'TextAreaId';
+  privMsgTextAreaEl.id = privMsgTextAreaId;
+  privMsgTextAreaEl.setAttribute('cols', '120');
+  privMsgTextAreaEl.setAttribute('rows', '6');
+  privMsgTextAreaEl.setAttribute('spellCheck', 'false');
+  privMsgTextAreaEl.setAttribute('readonly', '');
+
+  // signle line user input
+  let privMsgInputAreaEl = document.createElement('textarea');
+  let privMsgInputAreaId = 'privMsg' + privMsgIndex.toString() + 'InputAreaId';
+  privMsgInputAreaEl.id = privMsgInputAreaId;
+  privMsgInputAreaEl.setAttribute('cols', '120');
+  privMsgInputAreaEl.setAttribute('rows', '1');
+
+  // button-div
+  let privMsgButtonDiv1El = document.createElement('div');
+  privMsgButtonDiv1El.classList.add('button-div');
+
+  // send button
+  let privMsgSendButtonEl = document.createElement('button');
+  privMsgSendButtonEl.textContent = 'Send';
+  privMsgSendButtonEl.classList.add('channel-button');
+
+  // --------------------------------
+  // Append child element to DOM
+  // --------------------------------
+
+  privMsgTopLeftDivEl.appendChild(privMsgHideButtonEl);
+  privMsgTopLeftDivEl.appendChild(privMsgNameDivEl);
+
+  privMsgTopRightHidableDivEl.appendChild(privMsgTallerButtonEl);
+  privMsgTopRightHidableDivEl.appendChild(privMsgNormalButtonEl);
+  privMsgTopRightHidableDivEl.appendChild(privMsgClearButtonEl);
+
+  privMsgTopRightDivEl.appendChild(privMsgTopRightHidableDivEl);
+
+  privMsgTopDivEl.appendChild(privMsgTopLeftDivEl);
+  privMsgTopDivEl.appendChild(privMsgTopRightDivEl);
+
+  privMsgButtonDiv1El.appendChild(privMsgSendButtonEl);
+
+  privMsgBottomDivEl.appendChild(privMsgTextAreaEl);
+  privMsgBottomDivEl.appendChild(privMsgInputAreaEl);
+  privMsgBottomDivEl.appendChild(privMsgButtonDiv1El);
+
+  privMsgSectionEl.appendChild(privMsgTopDivEl);
+  privMsgSectionEl.appendChild(privMsgBottomDivEl);
+
+  privMsgContainerDivEl.appendChild(privMsgSectionEl);
+
+  // -------------------------------------------
+  // Add initial message, special case of opening new window
+  // we must add the message that generated the window open request.
+  // -------------------------------------------
+  privMsgTextAreaEl.textContent += parsedMessage.timestamp + ' ' +
+    parsedMessage.nick + ' ' + cleanFormatting(parsedMessage.params[1]) + '\n';
+  // move scroll bar so text is scrolled all the way up
+  privMsgTextAreaEl.scrollTop = privMsgTextAreaEl.scrollHeight;
+
+  document.addEventListener('erase-before-reload', function(event) {
+    // console.log('Event erase-before-reload');
+    privMsgTextAreaEl.textContent = '';
+    privMsgInputAreaEl.textContent = '';
+  }.bind(this));
+
+  // --------------------------
+  // Private Message Event listeners
+  // ---------------------------
+
+  // -------------------------
+  // How/Hide button handler
+  // -------------------------
+  privMsgHideButtonEl.addEventListener('click', function() {
+    if (privMsgBottomDivEl.hasAttribute('hidden')) {
+      privMsgBottomDivEl.removeAttribute('hidden');
+      privMsgHideButtonEl.textContent = '-';
+      privMsgTopRightHidableDivEl.removeAttribute('hidden');
+    } else {
+      privMsgBottomDivEl.setAttribute('hidden', '');
+      privMsgHideButtonEl.textContent = '+';
+      privMsgTopRightHidableDivEl.setAttribute('hidden', '');
     }
-  };
-  fetch(fetchURL, fetchOptions)
-    .then( (response) => {
-      // console.log(response.status);
-      if (response.ok) {
-        return response.json();
-      } else {
-        throw new Error('Fetch status ' + response.status + ' ' + response.statusText);
-      }
-    })
-    .then( (responseJson) => {
-      webState.loginUser = responseJson;
-    })
-    .catch( (error) => {
-      console.log(error);
-    });
-};
-updateUsername();
+  });
 
-// --------------------
-// Test Button #1
-// --------------------
-document.getElementById('test1Button').addEventListener('click', function() {
-  console.log('Test1 button pressed.');
+  // -------------------------
+  // Taller button handler
+  // -------------------------
+  privMsgTallerButtonEl.addEventListener('click', function() {
+    let newRows = parseInt(privMsgTextAreaEl.getAttribute('rows')) + 5;
+    privMsgTextAreaEl.setAttribute('rows', newRows.toString());
+  });
 
-  let fetchURL = webServerUrl + '/irc/test1';
-  let fetchOptions = {
-    method: 'GET',
-    timeout: 10000,
-    // credentials: 'include',
-    headers: {
-      'Accept': 'application/json'
+  // -------------------------
+  // Normal button handler
+  // -------------------------
+  privMsgNormalButtonEl.addEventListener('click', function() {
+    privMsgTextAreaEl.setAttribute('rows', '6');
+  });
+
+  // -------------------------
+  // Clear button handler
+  // -------------------------
+  privMsgClearButtonEl.addEventListener('click', function() {
+    privMsgTextAreaEl.textContent = '';
+    privMsgTextAreaEl.setAttribute('rows', '6');
+  });
+
+  // ----------------
+  // show all event
+  // ----------------
+  document.addEventListener('show-all-divs', function(event) {
+    privMsgBottomDivEl.removeAttribute('hidden');
+    privMsgHideButtonEl.textContent = '-';
+    privMsgTopRightHidableDivEl.removeAttribute('hidden');
+  });
+  // ----------------
+  // hide all event
+  // ----------------
+  document.addEventListener('hide-all-divs', function(event) {
+    privMsgBottomDivEl.setAttribute('hidden', '');
+    privMsgHideButtonEl.textContent = '+';
+    privMsgTopRightHidableDivEl.setAttribute('hidden', '');
+  });
+
+  // -------------
+  // send button
+  // -------------
+  privMsgSendButtonEl.addEventListener('click', function() {
+    _sendPrivMessageToUser(name, privMsgInputAreaEl);
+  }.bind(this));
+
+  // ---------------
+  // Enter pressed
+  // ---------------
+  privMsgInputAreaEl.addEventListener('input', function(event) {
+    if (((event.inputType === 'insertText') && (event.data === null)) ||
+      (event.inputType === 'insertLineBreak')) {
+      _sendPrivMessageToUser(name, privMsgInputAreaEl);
     }
-  };
-  fetch(fetchURL, fetchOptions)
-    .then( (response) => {
-      // console.log(response.status);
-      if (response.ok) {
-        return response.json();
-      } else {
-        throw new Error('Fetch status ' + response.status + ' ' + response.statusText);
-      }
-    })
-    .then( (responseJson) => {
-      console.log(JSON.stringify(responseJson, null, 2));
-    })
-    .catch( (error) => {
-      console.log(error);
-    });
-});
+  }.bind(this));
 
-// --------------------
-// Test Button #2
-// --------------------
-document.getElementById('test2Button').addEventListener('click', function() {
-  console.log('Test2 button pressed.');
-
-  let fetchURL = webServerUrl + '/irc/test2';
-  let fetchOptions = {
-    method: 'GET',
-    timeout: 10000,
-    // credentials: 'include',
-    headers: {
-      'Accept': 'application/json'
+  document.addEventListener('private-message', function(event) {
+    function _addText (text) {
+      // append text to textarea
+      privMsgTextAreaEl.textContent += cleanFormatting(text) + '\n';
+      // move scroll bar so text is scrolled all the way up
+      privMsgTextAreaEl.scrollTop = privMsgTextAreaEl.scrollHeight;
     }
-  };
-  fetch(fetchURL, fetchOptions)
-    .then( (response) => {
-      // console.log(response.status);
-      if (response.ok) {
-        return response.json();
-      } else {
-        console.log(response);
-        throw new Error('Fetch status ' + response.status + ' ' + response.statusText);
-      }
-    })
-    .then( (responseJson) => {
-      console.log(JSON.stringify(responseJson, null, 2));
-    })
-    .catch( (error) => {
-      console.log(error);
-    });
-});
+    let parsedMessage = event.detail.parsedMessage;
+    // console.log('Event private-message: ' + JSON.stringify(parsedMessage, null, 2));
+    switch(parsedMessage.command) {
+      //
+      // TODO cases for user left IRC or other error
 
-// --------------------
-// Test Button #3
-// --------------------
-document.getElementById('test3Button').addEventListener('click', function() {
-  console.log('Test 3 button pressed.');
-  console.log('Test 3 button: expire heartb eat timer');
-  heartbeatUpCounter = 1000;
-});
-
-// --------------------
-// Test Button #4
-// --------------------
-document.getElementById('test4Button').addEventListener('click', function() {
-  console.log('Test 4 button pressed.');
-  console.log('Test 4 getIrcState()');
-  getIrcState();
-});
-
-// ---------------------------------------------------------------------------
-// This is some code to dynamically resize the width of the textarea elements
-//
-// First, html file defines textarea with width of 120 columns.
-// Next get the width in pixels for 120 columns (font dependant?)
-// Save this factor as a constant
-// Get the window innerWidth and divide by the factor.
-// ---------------------------------------------------------------------------
-const columnSize =
-  (document.getElementById('rawMessageDisplay').getBoundingClientRect().width + 10)/ 120;
-
-// console.log('columnSize ' + columnSize);
-// console.log(document.getElementById('rawMessageDisplay').getBoundingClientRect());
-//
-// Function called both initially and also no event
-const adjustInputToWidowWidth = function (innerWidth) {
-  let cols = parseInt((window.innerWidth / columnSize) - 4);
-  // static text area defined in webclient.html
-  document.getElementById('userPrivMsgInputId').setAttribute('cols', cols.toString());
-  document.getElementById('noticeMessageDisplay').setAttribute('cols', cols.toString());
-  document.getElementById('wallopsMessageDisplay').setAttribute('cols', cols.toString());
-  document.getElementById('rawMessageDisplay').setAttribute('cols', cols.toString());
-  document.getElementById('rawMessageInputId').setAttribute('cols', cols.toString());
-
-  // This is for dynamically generated elements
-  // IRC Channel <textarea> element for auto-resize
-  if (webState.resizableChannelTextareaIds.length > 0) {
-    webState.resizableChannelTextareaIds.forEach(function(id) {
-      if (document.getElementById(id)) {
-        document.getElementById(id).setAttribute('cols', cols.toString());
-      } else {
-        console.log('Error: ' + id);
-      }
-    });
-  }
-  // In the IRC channel area, this is to handle main
-  //     text area when it is split with nickname list.
-  if (webState.resizableChanSplitTextareaIds.length > 0) {
-    webState.resizableChanSplitTextareaIds.forEach(function(id) {
-      if (document.getElementById(id)) {
-        if (window.innerWidth > 600) {
-          document.getElementById(id).setAttribute('cols', (cols-23).toString());
+      case 'PRIVMSG':
+        // there may be multiple windows open with other nicknames
+        // This does a nickname match and acts only on message for this intended window.
+        if (parsedMessage.nick === ircState.nickName) {
+          // case of this is outgoing message from me
+          if (parsedMessage.params[0].toLowerCase() === name.toLowerCase()) {
+            _addText(parsedMessage.timestamp + ' ' +
+              parsedMessage.nick + ' ' + parsedMessage.params[1]);
+            // Upon privMsg message, make sectino visible.
+            privMsgBottomDivEl.removeAttribute('hidden');
+            privMsgHideButtonEl.textContent = '-';
+          }
         } else {
-          document.getElementById(id).setAttribute('cols', cols.toString());
+          // case of incoming message from others.
+          if (parsedMessage.nick.toLowerCase() === name.toLowerCase()) {
+            _addText(parsedMessage.timestamp + ' ' +
+              parsedMessage.nick + ' ' + parsedMessage.params[1]);
+            // Upon privMsg message, make sectino visible.
+            privMsgBottomDivEl.removeAttribute('hidden');
+            privMsgHideButtonEl.textContent = '-';
+          }
         }
-      } else {
-        console.log('Error: ' + id);
-      }
-    });
-  }
-  // This is for dynamically generated elements
-  // Private message <textarea> element for auto-resize
-  if (webState.resizablePrivMsgTextareaIds.length > 0) {
-    webState.resizablePrivMsgTextareaIds.forEach(function(id) {
-      if (document.getElementById(id)) {
-        document.getElementById(id).setAttribute('cols', cols.toString());
-      } else {
-        console.log('Error: ' + id);
-      }
-    });
-  }
-  document.getElementById('errorDiv').style.width = '100%';
+        break;
+      default:
+    }
+  });
 
-  // Debug: To watch a variable, put it here.
-  if (!webState.watch) webState.watch = {};
-  webState.watch.innerWidth = window.innerWidth.toString() + 'px';
+  // -----------------------------------------------------------
+  // Setup textarea elements as dynamically resizable (globally)
+  // -----------------------------------------------------------
+  webState.resizablePrivMsgTextareaIds.push(privMsgTextAreaId);
+  webState.resizablePrivMsgTextareaIds.push(privMsgInputAreaId);
+  document.dispatchEvent(new CustomEvent('element-resize', {bubbles: true}));
 };
-//
-// Event listener for resize widnow
-//
-window.addEventListener('resize', function(event) {
-  if (columnSize) {
-    adjustInputToWidowWidth(event.currentTarget.innerWidth);
+
+// Event listener for messages to create new window
+document.addEventListener('private-message', function(event) {
+  // console.log('Event: private-message ' + JSON.stringify(event.detail, null, 2));
+  // Determine if message is ingoing or outgoing
+  // assume it is incoming
+  let name = event.detail.parsedMessage.nick;
+  // then if outgoing reverse it
+  if (name === ircState.nickName) {
+    name = event.detail.parsedMessage.params[0];
+  }
+  //
+  // check if a private message section exists, if not create it
+  //
+  if (webState.activePrivateMessageNicks.indexOf(name.toLowerCase()) < 0) {
+    createPrivateMessageEl(name, event.detail.parsedMessage);
+  }
+});
+
+// --------------------------------
+// Send private message
+// --------------------------------
+function _buildPrivateMessageText() {
+  if ((document.getElementById('pmNickNameInputId').value.length > 0) &&
+    (document.getElementById('userPrivMsgInputId').value.length > 0)) {
+    let targetNick = document.getElementById('pmNickNameInputId').value;
+    let inputAreaEl = document.getElementById('userPrivMsgInputId');
+    _sendPrivMessageToUser(targetNick, inputAreaEl);
+    document.getElementById('userPrivMsgInputId').value = '';
+    // close window after sending, because a new one will open on server response.
+    document.getElementById('privMsgMainHiddenDiv').setAttribute('hidden', '');
+    document.getElementById('privMsgMainHiddenButton').textContent = '+';
+  }
+};
+document.getElementById('userPrivMsgInputId').addEventListener('input', function(event) {
+  if ((event.inputType === 'insertText') && (event.data === null)) {
+    _buildPrivateMessageText();
+  }
+  if (event.inputType === 'insertLineBreak') {
+    _buildPrivateMessageText();
   }
 }.bind(this));
-//
-// Resize on request by fire event
-//
-window.addEventListener('element-resize', function(event) {
-  adjustInputToWidowWidth(window.innerWidth);
+document.getElementById('UserPrivMsgSendButton').addEventListener('click', function() {
+  _buildPrivateMessageText();
 }.bind(this));
-//
-// Do initially on page load
-//
-adjustInputToWidowWidth(window.innerWidth);
 
-//
-// After everything is sized, the area may be hidden
-//
-// document.getElementById('webDisconnectedHiddenDiv').setAttribute('hidden', '');
-// document.getElementById('rawHiddenElements').setAttribute('hidden', '');
-// document.getElementById('rawHiddenElementsButton').textContent = '+';
-// document.getElementById('rawHeadRightButtons').setAttribute('hidden', '');
-
-//
-// 1 second utility timer
-//
-setInterval(function() {
-  errorTimerTickHandler();
-  heartbeatTimerTickHandler();
-  reconnectTimerTickHandler();
-}.bind(this), 1000);
-
-// -----------------------------
-//   D O   T H I S   L A S T
-// -----------------------------
-firstWebSocketConnectOnPageLoad();
+// -------------------------
+// Whois button handler
+// -------------------------
+document.getElementById('whoisButton').addEventListener('click', function() {
+  if (document.getElementById('pmNickNameInputId').value.length > 0) {
+    showRawMessageWindow();
+    let message = 'WHOIS ' + document.getElementById('pmNickNameInputId').value;
+    _sendIrcServerMessage(message);
+    // open up server messages to show
+    document.getElementById('rawHiddenElements').removeAttribute('hidden');
+    document.getElementById('rawHiddenElementsButton').textContent = '-';
+  } else {
+    showError('Input required');
+  }
+});
+// -------------------------------------
+// Private Message (Open/Close) Buttons
+// -------------------------------------
+document.getElementById('privMsgMainHiddenButton').addEventListener('click', function() {
+  if (document.getElementById('privMsgMainHiddenDiv').hasAttribute('hidden')) {
+    document.getElementById('privMsgMainHiddenDiv').removeAttribute('hidden');
+    document.getElementById('privMsgMainHiddenButton').textContent = '-';
+  } else {
+    document.getElementById('privMsgMainHiddenDiv').setAttribute('hidden', '');
+    document.getElementById('privMsgMainHiddenButton').textContent = '+';
+  }
+}.bind(this));

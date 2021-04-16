@@ -1,372 +1,445 @@
-// --------------------------------------------
-// webclient4.js - Private Message Functions
-// --------------------------------------------
+// -----------------------------------
+// webclient2.js Text Command Parser
+// -----------------------------------
 
-// --------------------------------------------
-// Send text as private message to other user
-//     (internal function)
-// --------------------------------------------
-function _sendPrivMessageToUser(targetNickname, textAreaEl) {
-  if ((textAreaEl.value.length > 0)) {
-    let text = textAreaEl.value;
-    text = text.replace('\r', '').replace('\n', '');
+//
+// inputObj = {
+//   inputString: '/'+command [arguments...]
+//   originType: ('channel', 'private', 'generic')
+//   originName: (target channel or target private message nickname)
+// }
+//
+// returnObj = {
+//   error: false,
+//   message: null, (for or string if error)
+//   ircMessage: '<command> [<argument1>] [<augument2] ... [:Some output string value]'
+// }
+//
 
-    // Check slash character to see if it is an IRC command
-    if (text.charAt(0) === '/') {
-      // yes, it is command
-      let commandAction = textCommandParser(
-        {
-          inputString: text,
-          originType: 'private',
-          originName: targetNickname
-        }
-      );
-      // clear input element
-      textAreaEl.value = '';
-      if (commandAction.error) {
-        showError(commandAction.message);
-        return;
-      } else {
-        if ((commandAction.ircMessage) && (commandAction.ircMessage.length > 0)) {
-          _sendIrcServerMessage(commandAction.ircMessage);
-        }
-        return;
+function textCommandParser (inputObj) {
+  // Internal function, detect whitespace character
+  function _isWS(inChar) {
+    if (inChar.charAt(0) === ' ') return true;
+    if (inChar.charCodeAt(0) === 9) return true;
+    return false;
+  }
+  function _isEOL(inChar) {
+    if (inChar.charAt(0) === '\n') return true;
+    if (inChar.charAt(0) === '\r') return true;
+    return false;
+  }
+
+  let inStr = inputObj.inputString;
+
+  // If tailing CR-LF, remove them
+  if ((inStr.length > 0) && (_isEOL(inStr.charAt(inStr.length-1)))) {
+    inStr = inStr.slice(0, inStr.length - 1);
+  }
+  if ((inStr.length > 0) && (_isEOL(inStr.charAt(inStr.length-1)))) {
+    inStr = inStr.slice(0, inStr.length - 1);
+  }
+
+  let inStrLen = inStr.length;
+
+  // Example decoded line
+  //
+  // "input string": "/test one two three four five six seven eight",
+  //
+  // parsedCommand {
+  //   "command": "test",
+  //   "params": [
+  //     null,
+  //     "one",
+  //     "two",
+  //     "three",
+  //     "four",
+  //     "five"
+  //   ],
+  //   "restOf": [
+  //     "one two three four five six seven eight",
+  //     "two three four five six seven eight",
+  //     "three four five six seven eight",
+  //     "four five six seven eight",
+  //     "five six seven eight",
+  //     "six seven eight"
+  //   ]
+  // }
+  //
+  let parsedCommand = {
+    command: '',
+    params: [],
+    restOf: []
+  };
+
+  if (inStr.length < 2) {
+    return {
+      error: true,
+      message: 'Error no command not found',
+      ircMessage: null
+    };
+  }
+
+  if (inStr.charAt(0) !== '/') {
+    return {
+      error: true,
+      message: 'Error missing / before command',
+      ircMessage: null
+    };
+  }
+  if (_isWS(inStr.charAt(1))) {
+    return {
+      error: true,
+      message: 'Error space after slash',
+      ircMessage: null
+    };
+  }
+
+  // character index, start after slash /
+  idx = 1;
+
+  // ----------------
+  // C O M M A N D
+  // ----------------
+  // parse command chars until whitespace or end of string
+  while ((!_isWS(inStr.charAt(idx))) && (idx < inStrLen)) {
+    parsedCommand.command += inStr.charAt(idx);
+    idx++;
+  }
+  // advance past and ignore whitespace chars until non-whitespace or end of string
+  while ((_isWS(inStr.charAt(idx))) && (idx < inStrLen)) {
+    idx++;
+  }
+  // case of command only, no tailing parameter date
+  parsedCommand.command = parsedCommand.command.toUpperCase();
+
+  // no array data pushed
+  // else... more data to parse
+  if (inStr.slice(idx, inStrLen).length > 0) {
+    parsedCommand.params.push(null);
+    parsedCommand.restOf.push(inStr.slice(idx, inStrLen));
+
+    // ------------------------------------
+    // No Param, but all is ending string
+    // ------------------------------------
+    // parse param chars until whitespace or end of string
+    let chars1 = '';
+    while ((!_isWS(inStr.charAt(idx))) && (idx < inStrLen)) {
+      chars1 += inStr.charAt(idx);
+      idx++;
+    }
+    // advance past and ignore whitespace chars until non-whitespace or end of string
+    while ((_isWS(inStr.charAt(idx))) && (idx < inStrLen)) {
+      idx++;
+    }
+    // if more to parse remaining
+    if (inStr.slice(idx, inStrLen).length > 0) {
+      parsedCommand.params.push(chars1);
+      parsedCommand.restOf.push(inStr.slice(idx, inStrLen));
+      // ------------------------------------
+      // One parameter plus optional ending string
+      // ------------------------------------
+      // parse command chars until whitespace or end of string
+      let chars2 = '';
+      while ((!_isWS(inStr.charAt(idx))) && (idx < inStrLen)) {
+        chars2 += inStr.charAt(idx);
+        idx++;
       }
-    }
-
-    // Else not slash / command, assume is input intended to send to private message.
-    let message = 'PRIVMSG ' + targetNickname +
-      ' :' + text;
-    _sendIrcServerMessage(message);
-    textAreaEl.value = '';
-  }
-}; // _sendPrivMessageToUser
-
-function createPrivateMessageEl (name, parsedMessage) {
-  // if already exists, return
-  if (webState.activePrivateMessageNicks.indexOf(name.toLowerCase()) >= 0) {
-    console.log('createPrivateMessageEl: Private message element already exist');
-    return;
-  }
-  // Add to local browser list of active PM windows
-  webState.activePrivateMessageNicks.push(name.toLowerCase());
-
-  // console.log('Creating private message Element for ' + name);
-  let privMsgIndex = webState.activePrivateMessageNicks.indexOf(name.toLowerCase());
-
-  // This is static HTML element created in webclient.html (Insert point)
-  let privMsgContainerDivEl = document.getElementById('privateMessageContainerDiv');
-
-  // section-div
-  let privMsgSectionEl = document.createElement('div');
-  privMsgSectionEl.classList.add('aa-section-div');
-  privMsgSectionEl.classList.add('priv-msg-section-div');
-
-  // Top Element (non-hidden element)
-  let privMsgTopDivEl = document.createElement('div');
-  privMsgTopDivEl.classList.add('head-flex');
-
-  // left flexbox div
-  let privMsgTopLeftDivEl = document.createElement('div');
-  privMsgTopLeftDivEl.classList.add('head-left');
-
-  // center if needed here
-
-  // right flexbox div
-  let privMsgTopRightDivEl = document.createElement('div');
-  privMsgTopRightDivEl.classList.add('head-right');
-
-  // right hidable div
-  let privMsgTopRightHidableDivEl = document.createElement('div');
-
-  // show/hide button
-  let privMsgHideButtonEl = document.createElement('button');
-  privMsgHideButtonEl.textContent = '-';
-  privMsgHideButtonEl.classList.add('channel-button');
-
-  // Top Private Message name (Nickname)
-  let privMsgNameDivEl = document.createElement('div');
-  privMsgNameDivEl.textContent = name;
-  privMsgNameDivEl.classList.add('chan-name-div');
-
-  // Taller button
-  let privMsgTallerButtonEl = document.createElement('button');
-  privMsgTallerButtonEl.textContent = 'Taller';
-  privMsgTallerButtonEl.classList.add('channel-button');
-
-  // Normal button
-  let privMsgNormalButtonEl = document.createElement('button');
-  privMsgNormalButtonEl.textContent = 'Normal';
-  privMsgNormalButtonEl.classList.add('channel-button');
-
-  // Clear button
-  let privMsgClearButtonEl = document.createElement('button');
-  privMsgClearButtonEl.textContent = 'Clear';
-  privMsgClearButtonEl.classList.add('channel-button');
-
-  // Bottom Element (optionally hidden)
-  let privMsgBottomDivEl = document.createElement('div');
-
-  // resizable text area
-  let privMsgTextAreaEl = document.createElement('textarea');
-  let privMsgTextAreaId = 'privMsg' + privMsgIndex.toString() + 'TextAreaId';
-  privMsgTextAreaEl.id = privMsgTextAreaId;
-  privMsgTextAreaEl.setAttribute('cols', '120');
-  privMsgTextAreaEl.setAttribute('rows', '6');
-  privMsgTextAreaEl.setAttribute('spellCheck', 'false');
-  privMsgTextAreaEl.setAttribute('readonly', '');
-
-  // signle line user input
-  let privMsgInputAreaEl = document.createElement('textarea');
-  let privMsgInputAreaId = 'privMsg' + privMsgIndex.toString() + 'InputAreaId';
-  privMsgInputAreaEl.id = privMsgInputAreaId;
-  privMsgInputAreaEl.setAttribute('cols', '120');
-  privMsgInputAreaEl.setAttribute('rows', '1');
-
-  // button-div
-  let privMsgButtonDiv1El = document.createElement('div');
-  privMsgButtonDiv1El.classList.add('button-div');
-
-  // send button
-  let privMsgSendButtonEl = document.createElement('button');
-  privMsgSendButtonEl.textContent = 'Send';
-  privMsgSendButtonEl.classList.add('channel-button');
-
-  // --------------------------------
-  // Append child element to DOM
-  // --------------------------------
-
-  privMsgTopLeftDivEl.appendChild(privMsgHideButtonEl);
-  privMsgTopLeftDivEl.appendChild(privMsgNameDivEl);
-
-  privMsgTopRightHidableDivEl.appendChild(privMsgTallerButtonEl);
-  privMsgTopRightHidableDivEl.appendChild(privMsgNormalButtonEl);
-  privMsgTopRightHidableDivEl.appendChild(privMsgClearButtonEl);
-
-  privMsgTopRightDivEl.appendChild(privMsgTopRightHidableDivEl);
-
-  privMsgTopDivEl.appendChild(privMsgTopLeftDivEl);
-  privMsgTopDivEl.appendChild(privMsgTopRightDivEl);
-
-  privMsgButtonDiv1El.appendChild(privMsgSendButtonEl);
-
-  privMsgBottomDivEl.appendChild(privMsgTextAreaEl);
-  privMsgBottomDivEl.appendChild(privMsgInputAreaEl);
-  privMsgBottomDivEl.appendChild(privMsgButtonDiv1El);
-
-  privMsgSectionEl.appendChild(privMsgTopDivEl);
-  privMsgSectionEl.appendChild(privMsgBottomDivEl);
-
-  privMsgContainerDivEl.appendChild(privMsgSectionEl);
-
-  // -------------------------------------------
-  // Add initial message, special case of opening new window
-  // we must add the message that generated the window open request.
-  // -------------------------------------------
-  privMsgTextAreaEl.textContent += parsedMessage.timestamp + ' ' +
-    parsedMessage.nick + ' ' + cleanFormatting(parsedMessage.params[1]) + '\n';
-  // move scroll bar so text is scrolled all the way up
-  privMsgTextAreaEl.scrollTop = privMsgTextAreaEl.scrollHeight;
-
-  document.addEventListener('erase-before-reload', function(event) {
-    // console.log('Event erase-before-reload');
-    privMsgTextAreaEl.textContent = '';
-    privMsgInputAreaEl.textContent = '';
-  }.bind(this));
-
-  // --------------------------
-  // Private Message Event listeners
-  // ---------------------------
-
-  // -------------------------
-  // How/Hide button handler
-  // -------------------------
-  privMsgHideButtonEl.addEventListener('click', function() {
-    if (privMsgBottomDivEl.hasAttribute('hidden')) {
-      privMsgBottomDivEl.removeAttribute('hidden');
-      privMsgHideButtonEl.textContent = '-';
-      privMsgTopRightHidableDivEl.removeAttribute('hidden');
-    } else {
-      privMsgBottomDivEl.setAttribute('hidden', '');
-      privMsgHideButtonEl.textContent = '+';
-      privMsgTopRightHidableDivEl.setAttribute('hidden', '');
-    }
-  });
-
-  // -------------------------
-  // Taller button handler
-  // -------------------------
-  privMsgTallerButtonEl.addEventListener('click', function() {
-    let newRows = parseInt(privMsgTextAreaEl.getAttribute('rows')) + 5;
-    privMsgTextAreaEl.setAttribute('rows', newRows.toString());
-  });
-
-  // -------------------------
-  // Normal button handler
-  // -------------------------
-  privMsgNormalButtonEl.addEventListener('click', function() {
-    privMsgTextAreaEl.setAttribute('rows', '6');
-  });
-
-  // -------------------------
-  // Clear button handler
-  // -------------------------
-  privMsgClearButtonEl.addEventListener('click', function() {
-    privMsgTextAreaEl.textContent = '';
-    privMsgTextAreaEl.setAttribute('rows', '6');
-  });
-
-  // ----------------
-  // show all event
-  // ----------------
-  document.addEventListener('show-all-divs', function(event) {
-    privMsgBottomDivEl.removeAttribute('hidden');
-    privMsgHideButtonEl.textContent = '-';
-    privMsgTopRightHidableDivEl.removeAttribute('hidden');
-  });
-  // ----------------
-  // hide all event
-  // ----------------
-  document.addEventListener('hide-all-divs', function(event) {
-    privMsgBottomDivEl.setAttribute('hidden', '');
-    privMsgHideButtonEl.textContent = '+';
-    privMsgTopRightHidableDivEl.setAttribute('hidden', '');
-  });
-
-  // -------------
-  // send button
-  // -------------
-  privMsgSendButtonEl.addEventListener('click', function() {
-    _sendPrivMessageToUser(name, privMsgInputAreaEl);
-  }.bind(this));
-
-  // ---------------
-  // Enter pressed
-  // ---------------
-  privMsgInputAreaEl.addEventListener('input', function(event) {
-    if (((event.inputType === 'insertText') && (event.data === null)) ||
-      (event.inputType === 'insertLineBreak')) {
-      _sendPrivMessageToUser(name, privMsgInputAreaEl);
-    }
-  }.bind(this));
-
-  document.addEventListener('private-message', function(event) {
-    function _addText (text) {
-      // append text to textarea
-      privMsgTextAreaEl.textContent += cleanFormatting(text) + '\n';
-      // move scroll bar so text is scrolled all the way up
-      privMsgTextAreaEl.scrollTop = privMsgTextAreaEl.scrollHeight;
-    }
-    let parsedMessage = event.detail.parsedMessage;
-    // console.log('Event private-message: ' + JSON.stringify(parsedMessage, null, 2));
-    switch(parsedMessage.command) {
-      //
-      // TODO cases for user left IRC or other error
-
-      case 'PRIVMSG':
-        // there may be multiple windows open with other nicknames
-        // This does a nickname match and acts only on message for this intended window.
-        if (parsedMessage.nick === ircState.nickName) {
-          // case of this is outgoing message from me
-          if (parsedMessage.params[0].toLowerCase() === name.toLowerCase()) {
-            _addText(parsedMessage.timestamp + ' ' +
-              parsedMessage.nick + ' ' + parsedMessage.params[1]);
-            // Upon privMsg message, make sectino visible.
-            privMsgBottomDivEl.removeAttribute('hidden');
-            privMsgHideButtonEl.textContent = '-';
-          }
-        } else {
-          // case of incoming message from others.
-          if (parsedMessage.nick.toLowerCase() === name.toLowerCase()) {
-            _addText(parsedMessage.timestamp + ' ' +
-              parsedMessage.nick + ' ' + parsedMessage.params[1]);
-            // Upon privMsg message, make sectino visible.
-            privMsgBottomDivEl.removeAttribute('hidden');
-            privMsgHideButtonEl.textContent = '-';
-          }
+      // advance past and ignore whitespace chars until non-whitespace or end of string
+      while ((_isWS(inStr.charAt(idx))) && (idx < inStrLen)) {
+        idx++;
+      }
+      // if more to parse remaining
+      if (inStr.slice(idx, inStrLen).length > 0) {
+        parsedCommand.params.push(chars2);
+        parsedCommand.restOf.push(inStr.slice(idx, inStrLen));
+        // ------------------------------------
+        // Two parameter plus optional ending string
+        // ------------------------------------
+        // parse command chars until whitespace or end of string
+        let chars3 = '';
+        while ((!_isWS(inStr.charAt(idx))) && (idx < inStrLen)) {
+          chars3 += inStr.charAt(idx);
+          idx++;
         }
-        break;
-      default:
-    }
-  });
+        // advance past and ignore whitespace chars until non-whitespace or end of string
+        while ((_isWS(inStr.charAt(idx))) && (idx < inStrLen)) {
+          idx++;
+        }
+        // if more to parse remaining
+        if (inStr.slice(idx, inStrLen).length > 0) {
+          parsedCommand.params.push(chars3);
+          parsedCommand.restOf.push(inStr.slice(idx, inStrLen));
+          // ------------------------------------
+          // Three parameter plus optional ending string
+          // ------------------------------------
+          // parse command chars until whitespace or end of string
+          let chars4 = '';
+          while ((!_isWS(inStr.charAt(idx))) && (idx < inStrLen)) {
+            chars4 += inStr.charAt(idx);
+            idx++;
+          }
+          // advance past and ignore whitespace chars until non-whitespace or end of string
+          while ((_isWS(inStr.charAt(idx))) && (idx < inStrLen)) {
+            idx++;
+          }
+          // if more to parse remaining
+          if (inStr.slice(idx, inStrLen).length > 0) {
+            parsedCommand.params.push(chars4);
+            parsedCommand.restOf.push(inStr.slice(idx, inStrLen));
+            // ------------------------------------
+            // Four parameter plus optional ending string
+            // ------------------------------------
+            // parse command chars until whitespace or end of string
+            let chars5 = '';
+            while ((!_isWS(inStr.charAt(idx))) && (idx < inStrLen)) {
+              chars5 += inStr.charAt(idx);
+              idx++;
+            }
+            // advance past and ignore whitespace chars until non-whitespace or end of string
+            while ((_isWS(inStr.charAt(idx))) && (idx < inStrLen)) {
+              idx++;
+            }
+            // if more to parse remaining
+            if (inStr.slice(idx, inStrLen).length > 0) {
+              parsedCommand.params.push(chars5);
+              parsedCommand.restOf.push(inStr.slice(idx, inStrLen));
+              //
+              // TBD if deepend needed go another cycle here
+              //
+            } // after 4 parameters + optional string
+          } // after 3 param + optional string
+        } // after 2 param + optional string
+      } // after 1 param + optional string
+    } // after no param + optional string
+  } // after command
 
-  // -----------------------------------------------------------
-  // Setup textarea elements as dynamically resizable (globally)
-  // -----------------------------------------------------------
-  webState.resizablePrivMsgTextareaIds.push(privMsgTextAreaId);
-  webState.resizablePrivMsgTextareaIds.push(privMsgInputAreaId);
-  document.dispatchEvent(new CustomEvent('element-resize', {bubbles: true}));
+
+  // console.log('Remain: >' + inStr.slice(idx, inStrLen) + '<');
+  // console.log('textCommandParser inputObj:' + JSON.stringify(inputObj, null, 2));
+  // console.log('parsedCommand ' + JSON.stringify(parsedCommand, null, 2));
+
+  // default message
+  let ircMessage = null;
+
+  switch (parsedCommand.command) {
+    //
+    case 'ADMIN':
+      showRawMessageWindow();
+      ircMessage = 'ADMIN';
+      if (parsedCommand.restOf.length === 1) {
+        ircMessage = 'ADMIN ' + parsedCommand.restOf[0];
+      }
+      break;
+    //
+    case 'JOIN':
+      if (parsedCommand.params.length < 1) {
+        return {
+          error: true,
+          message: 'Expect: /JOIN <#channel>',
+          ircMessage: null
+        };
+      }
+      if (parsedCommand.params.length === 1) {
+        ircMessage = 'JOIN ' + parsedCommand.restOf[0];
+      }
+      if (parsedCommand.params.length === 2) {
+        ircMessage = 'JOIN ' + parsedCommand.params[1] + ' ' + parsedCommand.restOf[1];
+      }
+      break;
+    //
+    case 'LIST':
+      showRawMessageWindow();
+      if (parsedCommand.params.length === 0) {
+        ircMessage = 'LIST';
+      } else {
+        ircMessage = 'LIST ' + parsedCommand.restOf[0];
+      }
+      break;
+    //
+    case 'ME':
+      if (parsedCommand.params.length < 1) {
+        return {
+          error: true,
+          message: 'Expect: /ME <action-message>',
+          ircMessage: null
+        };
+      }
+      let ctcpDelim = 1;
+      if (inputObj.originType === 'channel') {
+        ircMessage = 'PRIVMSG ' + inputObj.originName + ' :' + String.fromCharCode(ctcpDelim) +
+          'ACTION ' + parsedCommand.restOf[0] + String.fromCharCode(ctcpDelim);
+      }
+      if (inputObj.originType === 'private') {
+        ircMessage = 'PRIVMSG ' + inputObj.originName + ' :' + String.fromCharCode(ctcpDelim) +
+          'ACTION ' + parsedCommand.restOf[0] + String.fromCharCode(ctcpDelim);
+      }
+      break;
+      //
+    case 'MOTD':
+      showRawMessageWindow();
+      ircMessage = 'MOTD';
+      if (parsedCommand.restOf.length === 1) {
+        ircMessage = 'MOTD ' + parsedCommand.restOf[0];
+      }
+      break;
+    //
+    case 'MSG':
+      if ((parsedCommand.params.length > 1) &&
+        (channelPrefixChars.indexOf(parsedCommand.params[1].charAt(0)) < 0)) {
+        ircMessage = 'PRIVMSG ' + parsedCommand.params[1] + ' :' + parsedCommand.restOf[1];
+      } else {
+        return {
+          error: true,
+          message: 'Expect: /MSG <nickname> <message-text>',
+          ircMessage: null
+        };
+      }
+      break;
+    //
+    case 'NICK':
+      if (parsedCommand.params.length < 1) {
+        return {
+          error: true,
+          message: 'Expect: /NICK <new-nickanme>',
+          ircMessage: null
+        };
+      }
+      showRawMessageWindow();
+      ircMessage = 'NICK ' + parsedCommand.restOf[0];
+      break;
+    //
+    // No-Operation (invalid command)
+    case 'NOP':
+    // This is used to observe parsedCommand without command execution
+      console.log('textCommandParser inputObj:' + JSON.stringify(inputObj, null, 2));
+      console.log('parsedCommand ' + JSON.stringify(parsedCommand, null, 2));
+      return {
+        error: false,
+        message: null,
+        ircMessage: null
+      };
+      break;
+    //
+    case 'NOTICE':
+      // Note: this will send to either channel or user
+      if ((parsedCommand.params.length > 1) && (parsedCommand.restOf[1].length > 0)) {
+        ircMessage = 'NOTICE ' + parsedCommand.params[1] + ' :' + parsedCommand.restOf[1];
+      } else {
+        return {
+          error: true,
+          message: 'Expect: /NOTICE <nickname> <message-text>',
+          ircMessage: null
+        };
+      }
+      break;
+    //
+    case 'PART':
+      if (parsedCommand.params.length < 1) {
+        if (inputObj.originType === 'channel') {
+          ircMessage = 'PART ' + inputObj.originName;
+        } else {
+          return {
+            error: true,
+            message: 'Expect: /PART #channel [Optional message]',
+            ircMessage: null
+          };
+        }
+      } else {
+        if (parsedCommand.params.length === 1) {
+          // specify channel without message
+          ircMessage = 'PART ' + parsedCommand.restOf[0];
+        } else {
+          // specify channel and PART message
+          ircMessage = 'PART ' + parsedCommand.params[1] + ' :' + parsedCommand.restOf[1];
+        }
+      }
+      break;
+    //
+    case 'QUERY':
+      if ((parsedCommand.params.length > 1) &&
+        (channelPrefixChars.indexOf(parsedCommand.params[1].charAt(0)) < 0)) {
+        ircMessage = 'PRIVMSG ' + parsedCommand.params[1] + ' :' + parsedCommand.restOf[1];
+      } else {
+        return {
+          error: true,
+          message: 'Expect: /QUERY <nickname> <message-text>',
+          ircMessage: null
+        };
+      }
+      break;
+    //
+    case 'QUIT':
+      ircMessage = 'QUIT';
+      if (parsedCommand.restOf.length > 0) {
+        ircMessage ='QUIT :' + parsedCommand.restOf[0];
+      }
+      break;
+    //
+    case 'QUOTE':
+      if (parsedCommand.restOf.length > 0) {
+        showRawMessageWindow();
+        ircMessage = parsedCommand.restOf[0];
+      } else {
+        return {
+          error: true,
+          message: 'Expect: /QUOTE RAWCOMMAND [arguments]',
+          ircMessage: null
+        };
+      }
+      break;
+    //
+    case 'TOPIC':
+      if ((parsedCommand.params.length > 1) &&
+        (ircState.channels.indexOf(parsedCommand.params[1].toLowerCase()) >= 0)) {
+        ircMessage = 'TOPIC ' + parsedCommand.params[1] + ' :' + parsedCommand.restOf[1];
+      } else if ((parsedCommand.params.length > 0) &&
+        (channelPrefixChars.indexOf(parsedCommand.restOf[0].charAt(0)) < 0) &&
+        (inputObj.originType === 'channel')) {
+        ircMessage = 'TOPIC ' + inputObj.originName + ' :' + parsedCommand.restOf[0];
+      } else {
+        return {
+          error: true,
+          message: 'Expect: /TOPIC <#channel> <New-channel-topic-message>',
+          ircMessage: null
+        };
+      }
+      break;
+    case 'VERSION':
+      showRawMessageWindow();
+      ircMessage = 'VERSION';
+      if (parsedCommand.restOf.length === 1) {
+        ircMessage = 'VERSION ' + parsedCommand.restOf[0];
+      }
+      break;
+    case 'WHOIS':
+      if (parsedCommand.params.length < 1) {
+        return {
+          error: true,
+          message: 'Expect: /WHOIS <nickanme>',
+          ircMessage: null
+        };
+      }
+      showRawMessageWindow();
+      ircMessage = 'WHOIS ' + parsedCommand.restOf[0];
+      break;
+    //
+    default:
+  }
+
+  // parsing complete. Opon success, ircMessage will contain IRC command
+  // If so, send it to IRC server.
+  if (ircMessage) {
+    return {
+      error: false,
+      message: null,
+      ircMessage: ircMessage
+    };
+  }
+
+  return {
+    error: true,
+    message: 'Command "/' + parsedCommand.command +
+      '" unknown command.',
+    ircMessage: null
+  };
 };
-
-// Event listener for messages to create new window
-document.addEventListener('private-message', function(event) {
-  // console.log('Event: private-message ' + JSON.stringify(event.detail, null, 2));
-  // Determine if message is ingoing or outgoing
-  // assume it is incoming
-  let name = event.detail.parsedMessage.nick;
-  // then if outgoing reverse it
-  if (name === ircState.nickName) {
-    name = event.detail.parsedMessage.params[0];
-  }
-  //
-  // check if a private message section exists, if not create it
-  //
-  if (webState.activePrivateMessageNicks.indexOf(name.toLowerCase()) < 0) {
-    createPrivateMessageEl(name, event.detail.parsedMessage);
-  }
-});
-
-// --------------------------------
-// Send private message
-// --------------------------------
-function _buildPrivateMessageText() {
-  if ((document.getElementById('pmNickNameInputId').value.length > 0) &&
-    (document.getElementById('userPrivMsgInputId').value.length > 0)) {
-    let targetNick = document.getElementById('pmNickNameInputId').value;
-    let inputAreaEl = document.getElementById('userPrivMsgInputId');
-    _sendPrivMessageToUser(targetNick, inputAreaEl);
-    document.getElementById('userPrivMsgInputId').value = '';
-    // close window after sending, because a new one will open on server response.
-    document.getElementById('privMsgMainHiddenDiv').setAttribute('hidden', '');
-    document.getElementById('privMsgMainHiddenButton').textContent = '+';
-  }
-};
-document.getElementById('userPrivMsgInputId').addEventListener('input', function(event) {
-  if ((event.inputType === 'insertText') && (event.data === null)) {
-    _buildPrivateMessageText();
-  }
-  if (event.inputType === 'insertLineBreak') {
-    _buildPrivateMessageText();
-  }
-}.bind(this));
-document.getElementById('UserPrivMsgSendButton').addEventListener('click', function() {
-  _buildPrivateMessageText();
-}.bind(this));
-
-// -------------------------
-// Whois button handler
-// -------------------------
-document.getElementById('whoisButton').addEventListener('click', function() {
-  if (document.getElementById('pmNickNameInputId').value.length > 0) {
-    showRawMessageWindow();
-    let message = 'WHOIS ' + document.getElementById('pmNickNameInputId').value;
-    _sendIrcServerMessage(message);
-    // open up server messages to show
-    document.getElementById('rawHiddenElements').removeAttribute('hidden');
-    document.getElementById('rawHiddenElementsButton').textContent = '-';
-  } else {
-    showError('Input required');
-  }
-});
-// -------------------------------------
-// Private Message (Open/Close) Buttons
-// -------------------------------------
-document.getElementById('privMsgMainHiddenButton').addEventListener('click', function() {
-  if (document.getElementById('privMsgMainHiddenDiv').hasAttribute('hidden')) {
-    document.getElementById('privMsgMainHiddenDiv').removeAttribute('hidden');
-    document.getElementById('privMsgMainHiddenButton').textContent = '-';
-  } else {
-    document.getElementById('privMsgMainHiddenDiv').setAttribute('hidden', '');
-    document.getElementById('privMsgMainHiddenButton').textContent = '+';
-  }
-}.bind(this));
