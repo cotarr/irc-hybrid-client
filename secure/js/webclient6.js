@@ -1,12 +1,12 @@
-// --------------------------------------------
-// webclient4.js - Private Message Functions
-// --------------------------------------------
+// ---------------------------------------
+// webclient6.js - IRC Channel Functions
+// ---------------------------------------
 
-// --------------------------------------------
-// Send text as private message to other user
+// ------------------------------------------
+// Send text to channel (internal function)
 //     (internal function)
-// --------------------------------------------
-function _sendPrivMessageToUser(targetNickname, textAreaEl) {
+// ------------------------------------------
+function _sendTextToChannel(channelIndex, textAreaEl) {
   if ((textAreaEl.value.length > 0)) {
     let text = textAreaEl.value;
     text = text.replace('\r', '').replace('\n', '');
@@ -17,8 +17,8 @@ function _sendPrivMessageToUser(targetNickname, textAreaEl) {
       let commandAction = textCommandParser(
         {
           inputString: text,
-          originType: 'private',
-          originName: targetNickname
+          originType: 'channel',
+          originName: ircState.channelStates[channelIndex].name
         }
       );
       // clear input element
@@ -34,339 +34,607 @@ function _sendPrivMessageToUser(targetNickname, textAreaEl) {
       }
     }
 
-    // Else not slash / command, assume is input intended to send to private message.
-    let message = 'PRIVMSG ' + targetNickname +
+    // Else not slash / command, assume is input intended to send to channel.
+    let message = 'PRIVMSG ' +
+      ircState.channelStates[channelIndex].name +
       ' :' + text;
     _sendIrcServerMessage(message);
     textAreaEl.value = '';
   }
-}; // _sendPrivMessageToUser
+};
 
-function createPrivateMessageEl (name, parsedMessage) {
-  // if already exists, return
-  if (webState.activePrivateMessageNicks.indexOf(name.toLowerCase()) >= 0) {
-    console.log('createPrivateMessageEl: Private message element already exist');
+function createChannelEl (name) {
+  // if channel already exist abort
+  if (webState.channels.indexOf(name.toLowerCase()) >= 0) {
+    console.log('createChannelEl: channel already exist');
     return;
   }
-  // Add to local browser list of active PM windows
-  webState.activePrivateMessageNicks.push(name.toLowerCase());
 
-  // console.log('Creating private message Element for ' + name);
-  let privMsgIndex = webState.activePrivateMessageNicks.indexOf(name.toLowerCase());
+  const defaultHeightInRows = '18';
+
+  // Add to local browser list of open channels
+  webState.channels.push(name.toLowerCase());
+
+  var maxNickLength = 0;
+  // console.log('creating Channel Element ' + name);
+
+  let channelIndex = ircState.channels.indexOf(name.toLowerCase());
+  // console.log('channel state obj ' +
+  //   JSON.stringify(ircState.channelStates[channelIndex], null, 2));
 
   // This is static HTML element created in webclient.html (Insert point)
-  let privMsgContainerDivEl = document.getElementById('privateMessageContainerDiv');
+  let channelContainerDivEl = document.getElementById('channelContainerDiv');
 
   // section-div
-  let privMsgSectionEl = document.createElement('div');
-  privMsgSectionEl.classList.add('aa-section-div');
-  privMsgSectionEl.classList.add('priv-msg-section-div');
+  let channelSectionEl = document.createElement('div');
+  channelSectionEl.classList.add('aa-section-div');
+  channelSectionEl.classList.add('chan-msg-section-div');
 
   // Top Element (non-hidden element)
-  let privMsgTopDivEl = document.createElement('div');
-  privMsgTopDivEl.classList.add('head-flex');
+  let channelTopDivEl = document.createElement('div');
+  channelTopDivEl.classList.add('head-flex');
 
   // left flexbox div
-  let privMsgTopLeftDivEl = document.createElement('div');
-  privMsgTopLeftDivEl.classList.add('head-left');
+  let channelTopLeftDivEl = document.createElement('div');
+  channelTopLeftDivEl.classList.add('head-left');
 
   // center if needed here
 
   // right flexbox div
-  let privMsgTopRightDivEl = document.createElement('div');
-  privMsgTopRightDivEl.classList.add('head-right');
+  let channelTopRightDivEl = document.createElement('div');
+  channelTopRightDivEl.classList.add('head-right');
 
   // right hidable div
-  let privMsgTopRightHidableDivEl = document.createElement('div');
+  let channelTopRightHidableDivEl = document.createElement('div');
 
   // show/hide button
-  let privMsgHideButtonEl = document.createElement('button');
-  privMsgHideButtonEl.textContent = '-';
-  privMsgHideButtonEl.classList.add('channel-button');
+  let channelHideButtonEl = document.createElement('button');
+  channelHideButtonEl.textContent = '-';
+  channelHideButtonEl.classList.add('channel-button');
 
-  // Top Private Message name (Nickname)
-  let privMsgNameDivEl = document.createElement('div');
-  privMsgNameDivEl.textContent = name;
-  privMsgNameDivEl.classList.add('chan-name-div');
+  // Top Channel name
+  let channelNameDivEl = document.createElement('div');
+  channelNameDivEl.textContent = ircState.channelStates[channelIndex].name;
+  channelNameDivEl.classList.add('chan-name-div');
 
   // Taller button
-  let privMsgTallerButtonEl = document.createElement('button');
-  privMsgTallerButtonEl.textContent = 'Taller';
-  privMsgTallerButtonEl.classList.add('channel-button');
+  let channelTallerButtonEl = document.createElement('button');
+  channelTallerButtonEl.textContent = 'Taller';
+  channelTallerButtonEl.classList.add('channel-button');
 
   // Normal button
-  let privMsgNormalButtonEl = document.createElement('button');
-  privMsgNormalButtonEl.textContent = 'Normal';
-  privMsgNormalButtonEl.classList.add('channel-button');
+  let channelNormalButtonEl = document.createElement('button');
+  channelNormalButtonEl.textContent = 'Normal';
+  channelNormalButtonEl.classList.add('channel-button');
 
   // Clear button
-  let privMsgClearButtonEl = document.createElement('button');
-  privMsgClearButtonEl.textContent = 'Clear';
-  privMsgClearButtonEl.classList.add('channel-button');
+  let channelClearButtonEl = document.createElement('button');
+  channelClearButtonEl.textContent = 'Clear';
+  channelClearButtonEl.classList.add('channel-button');
+
 
   // Bottom Element (optionally hidden)
-  let privMsgBottomDivEl = document.createElement('div');
+  let channelBottomDivEl = document.createElement('div');
+
+  //Channel topic
+  let channelTopicDivEl = document.createElement('div');
+  channelTopicDivEl.textContent = cleanFormatting(ircState.channelStates[channelIndex].topic);
+  channelTopicDivEl.classList.add('chan-topic-div');
+
+
+  // list of nick names display
+  let channelNamesDisplayEl = document.createElement('textarea');
+  channelNamesDisplayEl.classList.add('channel-names-display');
+  channelNamesDisplayEl.setAttribute('cols', '20');
+  channelNamesDisplayEl.setAttribute('rows', defaultHeightInRows);
+  channelNamesDisplayEl.setAttribute('spellCheck', 'false');
+  channelNamesDisplayEl.setAttribute('readonly', '');
 
   // resizable text area
-  let privMsgTextAreaEl = document.createElement('textarea');
-  let privMsgTextAreaId = 'privMsg' + privMsgIndex.toString() + 'TextAreaId';
-  privMsgTextAreaEl.id = privMsgTextAreaId;
-  privMsgTextAreaEl.setAttribute('cols', '120');
-  privMsgTextAreaEl.setAttribute('rows', '6');
-  privMsgTextAreaEl.setAttribute('spellCheck', 'false');
-  privMsgTextAreaEl.setAttribute('readonly', '');
+  let channelTextAreaEl = document.createElement('textarea');
+  let channelTextAreaId = 'chan' + channelIndex.toString() + 'TextAreaId';
+  channelTextAreaEl.id = channelTextAreaId;
+  channelTextAreaEl.setAttribute('cols', '30');
+  channelTextAreaEl.setAttribute('rows', defaultHeightInRows);
+  channelTextAreaEl.setAttribute('spellCheck', 'false');
+  channelTextAreaEl.setAttribute('readonly', '');
 
-  // signle line user input
-  let privMsgInputAreaEl = document.createElement('textarea');
-  let privMsgInputAreaId = 'privMsg' + privMsgIndex.toString() + 'InputAreaId';
-  privMsgInputAreaEl.id = privMsgInputAreaId;
-  privMsgInputAreaEl.setAttribute('cols', '120');
-  privMsgInputAreaEl.setAttribute('rows', '1');
+
+  // single line user input
+  let channelInputAreaEl = document.createElement('textarea');
+  let channelInputAreaId = 'chan' + channelIndex.toString() + 'InputInputId';
+  channelInputAreaEl.id = channelInputAreaId;
+  channelInputAreaEl.setAttribute('cols', '120');
+  channelInputAreaEl.setAttribute('rows', '1');
 
   // button-div
-  let privMsgButtonDiv1El = document.createElement('div');
-  privMsgButtonDiv1El.classList.add('button-div');
+  let channelButtonDiv1El = document.createElement('div');
+  channelButtonDiv1El.classList.add('button-div');
 
   // send button
-  let privMsgSendButtonEl = document.createElement('button');
-  privMsgSendButtonEl.textContent = 'Send';
-  privMsgSendButtonEl.classList.add('channel-button');
+  let channelSendButtonEl = document.createElement('button');
+  channelSendButtonEl.textContent = 'Send';
+  channelSendButtonEl.classList.add('channel-button');
+
+  // join button
+  let channelJoinButtonEl = document.createElement('button');
+  channelJoinButtonEl.textContent = 'Join';
+  channelJoinButtonEl.classList.add('channel-button');
+
+  // part button
+  let channelPartButtonEl = document.createElement('button');
+  channelPartButtonEl.textContent = 'Part';
+  channelPartButtonEl.classList.add('channel-button');
+
+  // Text Format button
+  let channelFormatButtonEl = document.createElement('button');
+  if (window.innerWidth < 600) {
+    channelFormatButtonEl.textContent = 'Brief';
+  } else {
+    channelFormatButtonEl.textContent = 'Full';
+  }
+  channelFormatButtonEl.classList.add('channel-button');
+
+  // refresh button
+  let channelRefreshButtonEl = document.createElement('button');
+  channelRefreshButtonEl.textContent = 'Refresh';
+  channelRefreshButtonEl.classList.add('channel-button');
 
   // --------------------------------
   // Append child element to DOM
   // --------------------------------
 
-  privMsgTopLeftDivEl.appendChild(privMsgHideButtonEl);
-  privMsgTopLeftDivEl.appendChild(privMsgNameDivEl);
+  channelTopLeftDivEl.appendChild(channelHideButtonEl);
+  channelTopLeftDivEl.appendChild(channelNameDivEl);
 
-  privMsgTopRightHidableDivEl.appendChild(privMsgTallerButtonEl);
-  privMsgTopRightHidableDivEl.appendChild(privMsgNormalButtonEl);
-  privMsgTopRightHidableDivEl.appendChild(privMsgClearButtonEl);
+  channelTopRightHidableDivEl.appendChild(channelTallerButtonEl);
+  channelTopRightHidableDivEl.appendChild(channelNormalButtonEl);
+  channelTopRightHidableDivEl.appendChild(channelClearButtonEl);
 
-  privMsgTopRightDivEl.appendChild(privMsgTopRightHidableDivEl);
+  channelTopRightDivEl.appendChild(channelTopRightHidableDivEl);
 
-  privMsgTopDivEl.appendChild(privMsgTopLeftDivEl);
-  privMsgTopDivEl.appendChild(privMsgTopRightDivEl);
+  channelTopDivEl.appendChild(channelTopLeftDivEl);
+  channelTopDivEl.appendChild(channelTopRightDivEl);
 
-  privMsgButtonDiv1El.appendChild(privMsgSendButtonEl);
+  channelButtonDiv1El.appendChild(channelSendButtonEl);
+  channelButtonDiv1El.appendChild(channelJoinButtonEl);
+  channelButtonDiv1El.appendChild(channelPartButtonEl);
+  channelButtonDiv1El.appendChild(channelFormatButtonEl);
+  channelButtonDiv1El.appendChild(channelRefreshButtonEl);
 
-  privMsgBottomDivEl.appendChild(privMsgTextAreaEl);
-  privMsgBottomDivEl.appendChild(privMsgInputAreaEl);
-  privMsgBottomDivEl.appendChild(privMsgButtonDiv1El);
+  channelBottomDivEl.appendChild(channelTopicDivEl);
+  channelBottomDivEl.appendChild(channelNamesDisplayEl);
+  channelBottomDivEl.appendChild(channelTextAreaEl);
+  channelBottomDivEl.appendChild(channelInputAreaEl);
+  channelBottomDivEl.appendChild(channelButtonDiv1El);
 
-  privMsgSectionEl.appendChild(privMsgTopDivEl);
-  privMsgSectionEl.appendChild(privMsgBottomDivEl);
+  channelSectionEl.appendChild(channelTopDivEl);
+  channelSectionEl.appendChild(channelBottomDivEl);
 
-  privMsgContainerDivEl.appendChild(privMsgSectionEl);
-
-  // -------------------------------------------
-  // Add initial message, special case of opening new window
-  // we must add the message that generated the window open request.
-  // -------------------------------------------
-  privMsgTextAreaEl.textContent += parsedMessage.timestamp + ' ' +
-    parsedMessage.nick + ' ' + cleanFormatting(parsedMessage.params[1]) + '\n';
-  // move scroll bar so text is scrolled all the way up
-  privMsgTextAreaEl.scrollTop = privMsgTextAreaEl.scrollHeight;
-
-  document.addEventListener('erase-before-reload', function(event) {
-    // console.log('Event erase-before-reload');
-    privMsgTextAreaEl.textContent = '';
-    privMsgInputAreaEl.textContent = '';
-  }.bind(this));
+  channelContainerDivEl.appendChild(channelSectionEl);
 
   // --------------------------
-  // Private Message Event listeners
+  // Channel Event listeners
   // ---------------------------
 
   // -------------------------
-  // How/Hide button handler
+  // Show/Hide button handler
   // -------------------------
-  privMsgHideButtonEl.addEventListener('click', function() {
-    if (privMsgBottomDivEl.hasAttribute('hidden')) {
-      privMsgBottomDivEl.removeAttribute('hidden');
-      privMsgHideButtonEl.textContent = '-';
-      privMsgTopRightHidableDivEl.removeAttribute('hidden');
+  channelHideButtonEl.addEventListener('click', function() {
+    if (channelBottomDivEl.hasAttribute('hidden')) {
+      channelBottomDivEl.removeAttribute('hidden');
+      channelHideButtonEl.textContent = '-';
+      channelTopRightHidableDivEl.removeAttribute('hidden');
     } else {
-      privMsgBottomDivEl.setAttribute('hidden', '');
-      privMsgHideButtonEl.textContent = '+';
-      privMsgTopRightHidableDivEl.setAttribute('hidden', '');
+      channelBottomDivEl.setAttribute('hidden', '');
+      channelHideButtonEl.textContent = '+';
+      channelTopRightHidableDivEl.setAttribute('hidden', '');
     }
   });
 
   // -------------------------
   // Taller button handler
   // -------------------------
-  privMsgTallerButtonEl.addEventListener('click', function() {
-    let newRows = parseInt(privMsgTextAreaEl.getAttribute('rows')) + 5;
-    privMsgTextAreaEl.setAttribute('rows', newRows.toString());
+  channelTallerButtonEl.addEventListener('click', function() {
+    let newRows = parseInt(channelTextAreaEl.getAttribute('rows')) + 5;
+    channelTextAreaEl.setAttribute('rows', newRows.toString());
+    channelNamesDisplayEl.setAttribute('rows', newRows.toString());
   });
 
   // -------------------------
   // Normal button handler
   // -------------------------
-  privMsgNormalButtonEl.addEventListener('click', function() {
-    privMsgTextAreaEl.setAttribute('rows', '6');
+  channelNormalButtonEl.addEventListener('click', function() {
+    channelTextAreaEl.setAttribute('rows', defaultHeightInRows);
+    channelNamesDisplayEl.setAttribute('rows', defaultHeightInRows);
   });
 
   // -------------------------
   // Clear button handler
   // -------------------------
-  privMsgClearButtonEl.addEventListener('click', function() {
-    privMsgTextAreaEl.textContent = '';
-    privMsgTextAreaEl.setAttribute('rows', '6');
+  channelClearButtonEl.addEventListener('click', function() {
+    channelTextAreaEl.textContent = '';
+    channelTextAreaEl.setAttribute('rows', defaultHeightInRows);
+    channelNamesDisplayEl.setAttribute('rows', defaultHeightInRows);
   });
 
   // ----------------
   // show all event
   // ----------------
   document.addEventListener('show-all-divs', function(event) {
-    privMsgBottomDivEl.removeAttribute('hidden');
-    privMsgHideButtonEl.textContent = '-';
-    privMsgTopRightHidableDivEl.removeAttribute('hidden');
+    channelBottomDivEl.removeAttribute('hidden');
+    channelHideButtonEl.textContent = '-';
+    channelTopRightHidableDivEl.removeAttribute('hidden');
   });
   // ----------------
   // hide all event
   // ----------------
   document.addEventListener('hide-all-divs', function(event) {
-    privMsgBottomDivEl.setAttribute('hidden', '');
-    privMsgHideButtonEl.textContent = '+';
-    privMsgTopRightHidableDivEl.setAttribute('hidden', '');
+    channelBottomDivEl.setAttribute('hidden', '');
+    channelHideButtonEl.textContent = '+';
+    channelTopRightHidableDivEl.setAttribute('hidden', '');
+  });
+
+  // -------------------------
+  // Join button handler
+  // -------------------------
+  channelJoinButtonEl.addEventListener('click', function() {
+    let message = 'JOIN ' + name;
+    _sendIrcServerMessage(message);
+  });
+
+  // -------------------------
+  // Part button handler
+  // -------------------------
+  channelPartButtonEl.addEventListener('click', function() {
+    let message = 'PART ' + name;
+    _sendIrcServerMessage(message);
+  });
+
+  // -------------------------
+  // Text Format button handler
+  // -------------------------
+  channelFormatButtonEl.addEventListener('click', function() {
+    if (channelFormatButtonEl.textContent === 'Full') {
+      channelFormatButtonEl.textContent = 'Brief';
+    } else {
+      channelFormatButtonEl.textContent = 'Full';
+    }
+  });
+
+  // -------------------------
+  // Refresh button handler
+  // -------------------------
+  channelRefreshButtonEl.addEventListener('click', function() {
+    // this forces a global update which will refreesh text area
+    document.dispatchEvent(new CustomEvent('update-from-cache', {bubbles: true}));
+    // THis will request a new nickname list from IRC server.
+    channelNamesDisplayEl.textContent = '';
+    _sendIrcServerMessage('NAMES ' + name);
   });
 
   // -------------
   // send button
   // -------------
-  privMsgSendButtonEl.addEventListener('click', function() {
-    _sendPrivMessageToUser(name, privMsgInputAreaEl);
+  channelSendButtonEl.addEventListener('click', function() {
+    _sendTextToChannel(channelIndex, channelInputAreaEl);
   }.bind(this));
 
   // ---------------
   // Enter pressed
   // ---------------
-  privMsgInputAreaEl.addEventListener('input', function(event) {
+  channelInputAreaEl.addEventListener('input', function(event) {
     if (((event.inputType === 'insertText') && (event.data === null)) ||
       (event.inputType === 'insertLineBreak')) {
-      _sendPrivMessageToUser(name, privMsgInputAreaEl);
+      _sendTextToChannel(channelIndex, channelInputAreaEl);
     }
   }.bind(this));
 
-  document.addEventListener('private-message', function(event) {
-    function _addText (text) {
-      // append text to textarea
-      privMsgTextAreaEl.textContent += cleanFormatting(text) + '\n';
-      // move scroll bar so text is scrolled all the way up
-      privMsgTextAreaEl.scrollTop = privMsgTextAreaEl.scrollHeight;
+  function updateVisibility() {
+    // console.log('Event: irc-state-changed (createChannelEl)');
+    let index = ircState.channels.indexOf(name.toLowerCase());
+    if (index >= 0) {
+      channelTopicDivEl.textContent = cleanFormatting(ircState.channelStates[index].topic);
+      if (ircState.channelStates[index].joined) {
+        channelNamesDisplayEl.removeAttribute('disabled');
+        channelTextAreaEl.removeAttribute('disabled');
+        channelInputAreaEl.removeAttribute('disabled');
+        channelSendButtonEl.removeAttribute('disabled');
+        channelJoinButtonEl.setAttribute('disabled', '');
+        channelPartButtonEl.removeAttribute('disabled');
+      } else {
+        channelNamesDisplayEl.setAttribute('disabled', '');
+        channelTextAreaEl.setAttribute('disabled', '');
+        channelInputAreaEl.setAttribute('disabled', '');
+        channelSendButtonEl.setAttribute('disabled', '');
+        channelJoinButtonEl.removeAttribute('disabled');
+        channelPartButtonEl.setAttribute('disabled', '');
+      }
     }
+  }
+
+  //----------------
+  // Nickname list
+  //----------------
+  function _updateNickList() {
+    let index = ircState.channels.indexOf(name.toLowerCase());
+    if (index >= 0) {
+      maxNickLength = 0;
+      if (ircState.channelStates[index].names.length > 0) {
+        channelNamesDisplayEl.textContent = '';
+        let opList = [];
+        let otherList = [];
+        for (let i=0; i<ircState.channelStates[index].names.length; i++) {
+          if (ircState.channelStates[index].names[i].charAt(0) === '@') {
+            opList.push(ircState.channelStates[index].names[i]);
+          } else {
+            otherList.push(ircState.channelStates[index].names[i]);
+          }
+        }
+        let sortedOpList = opList.sort();
+        let sortedOtherList = otherList.sort();
+        if (sortedOpList.length > 0) {
+          for (let i=0; i<sortedOpList.length; i++) {
+            channelNamesDisplayEl.textContent += sortedOpList[i] + '\n';
+            if (maxNickLength < sortedOpList[i].length) {
+              maxNickLength = sortedOpList[i].length;
+            }
+          }
+        }
+        if (sortedOtherList.length > 0) {
+          for (let i=0; i<sortedOtherList.length; i++) {
+            channelNamesDisplayEl.textContent += sortedOtherList[i] + '\n';
+            if (maxNickLength < sortedOtherList[i].length) {
+              maxNickLength = sortedOtherList[i].length;
+            }
+          }
+        }
+      }
+    }
+  } //_updateNickList()
+  // populate it initially on creating the element
+  _updateNickList();
+
+  document.addEventListener('irc-state-changed', function(event) {
+    // console.log('Event: irc-state-changed (createChannelEl)');
+    _updateNickList();
+    updateVisibility();
+  }.bind(this));
+
+  document.addEventListener('channel-message', function(event) {
+    function _addText (timestamp, nick, text) {
+      //
+      let out = '';
+      if (channelFormatButtonEl.textContent === 'Full') {
+        out = timestamp + ' ' +
+        nick.padStart(maxNickLength, ' ') + nickChannelSpacer +
+        cleanFormatting(text) + '\n';
+      } else {
+        out = timestamp + ' ';
+        if (nick === '*') {
+          out += nick + nickChannelSpacer;
+        } else {
+          out += nick + nickChannelSpacer + '\n';
+        }
+        out += cleanFormatting(text) + '\n\n';
+      }
+      // append text to textarea
+      channelTextAreaEl.textContent += out;
+      // move scroll bar so text is scrolled all the way up
+      channelTextAreaEl.scrollTop = channelTextAreaEl.scrollHeight;
+    }
+
     let parsedMessage = event.detail.parsedMessage;
-    // console.log('Event private-message: ' + JSON.stringify(parsedMessage, null, 2));
+    // console.log('Event channel-message: ' + JSON.stringify(parsedMessage, null, 2));
     switch(parsedMessage.command) {
       //
-      // TODO cases for user left IRC or other error
+      // TODO cases for channel closed or other error
+      //
+      case 'JOIN':
+        if (parsedMessage.params[0].toLowerCase() === name.toLowerCase()) {
+          if (channelFormatButtonEl.textContent === 'Full') {
+            _addText(parsedMessage.timestamp,
+              '*',
+              parsedMessage.nick + ' (' + parsedMessage.host + ') has joined');
+          } else {
+            _addText(parsedMessage.timestamp,
+              '*',
+              parsedMessage.nick + ' has joined');
+          }
+        }
+        break;
+      case 'MODE':
+        if (parsedMessage.params[0].toLowerCase() === name.toLowerCase()) {
+          // this could be more elegant than stringify.
+          _addText(parsedMessage.timestamp,
+            '*',
+            'Mode ' + JSON.stringify(parsedMessage.params) + ' by ' + parsedMessage.nick);
+        }
+        break;
+      case 'NICK':
+        if (true) {
+          _addText(parsedMessage.timestamp,
+            '*',
+            parsedMessage.nick + ' is now known as ' + parsedMessage.params[0]);
+        }
+        break;
+      case 'NOTICE':
+        if (parsedMessage.params[0].toLowerCase() === name.toLowerCase()) {
+          _addText(parsedMessage.timestamp,
+            '*',
+            'Notice(' +
+            parsedMessage.nick + '/' + parsedMessage.params[0] + ') ' + parsedMessage.params[1]);
+          // Upon channel message, make sectino visible.
+          channelBottomDivEl.removeAttribute('hidden');
+          channelHideButtonEl.textContent = '-';
+        }
+        break;
 
+      case 'PART':
+        if (parsedMessage.params[0].toLowerCase() === name.toLowerCase()) {
+          let reason = ' ';
+          if (parsedMessage.params[1]) reason = parsedMessage.params[1];
+          if (channelFormatButtonEl.textContent === 'Full') {
+            _addText(parsedMessage.timestamp,
+              '*',
+              parsedMessage.nick + ' (' + parsedMessage.host + ') has left ' +
+              '(' + reason + ')' );
+          } else {
+            _addText(parsedMessage.timestamp,
+              '*',
+              parsedMessage.nick + ' has left');
+          }
+        }
+        break;
       case 'PRIVMSG':
-        // there may be multiple windows open with other nicknames
-        // This does a nickname match and acts only on message for this intended window.
-        if (parsedMessage.nick === ircState.nickName) {
-          // case of this is outgoing message from me
-          if (parsedMessage.params[0].toLowerCase() === name.toLowerCase()) {
-            _addText(parsedMessage.timestamp + ' ' +
-              parsedMessage.nick + ' ' + parsedMessage.params[1]);
-            // Upon privMsg message, make sectino visible.
-            privMsgBottomDivEl.removeAttribute('hidden');
-            privMsgHideButtonEl.textContent = '-';
+        if (parsedMessage.params[0].toLowerCase() === name.toLowerCase()) {
+          _addText(parsedMessage.timestamp,
+            parsedMessage.nick,
+            parsedMessage.params[1]);
+          // Upon channel message, make sectino visible.
+          channelBottomDivEl.removeAttribute('hidden');
+          channelHideButtonEl.textContent = '-';
+        }
+        break;
+      case 'QUIT':
+        if (true) {
+          // TODO, this will send Quit message to all channels, even if
+          // the quitting nick is not in them.
+          // Problem is the nick is no longer in the name array
+          // when this message is received, so attendance can not
+          // be checked.
+          let reason = ' ';
+          if (parsedMessage.params[0]) reason = parsedMessage.params[0];
+          if (channelFormatButtonEl.textContent === 'Full') {
+            _addText(parsedMessage.timestamp,
+              '*',
+              parsedMessage.nick + ' (' + parsedMessage.host + ') has quit ' +
+              '(' + reason + ')' );
+          } else {
+            _addText(parsedMessage.timestamp,
+              '*',
+              parsedMessage.nick + ' has quit');
           }
-        } else {
-          // case of incoming message from others.
-          if (parsedMessage.nick.toLowerCase() === name.toLowerCase()) {
-            _addText(parsedMessage.timestamp + ' ' +
-              parsedMessage.nick + ' ' + parsedMessage.params[1]);
-            // Upon privMsg message, make sectino visible.
-            privMsgBottomDivEl.removeAttribute('hidden');
-            privMsgHideButtonEl.textContent = '-';
-          }
+        }
+        break;
+      case 'TOPIC':
+        if (parsedMessage.params[0].toLowerCase() === name.toLowerCase()) {
+          _addText(parsedMessage.timestamp,
+            '*',
+            'Topic for ' + parsedMessage.params[0] + ' changed to \"' +
+            parsedMessage.params[1] + '\" by ' + parsedMessage.nick);
         }
         break;
       default:
     }
   });
 
+  document.addEventListener('erase-before-reload', function(event) {
+    // console.log('Event erase-before-reload');
+    channelTextAreaEl.textContent = '';
+    channelInputAreaEl.textContent = '';
+  }.bind(this));
+
+  // set visibility and divs
+  updateVisibility();
   // -----------------------------------------------------------
   // Setup textarea elements as dynamically resizable (globally)
   // -----------------------------------------------------------
-  webState.resizablePrivMsgTextareaIds.push(privMsgTextAreaId);
-  webState.resizablePrivMsgTextareaIds.push(privMsgInputAreaId);
+  webState.resizableChannelTextareaIds.push(channelInputAreaId);
+  webState.resizableChanSplitTextareaIds.push(channelTextAreaId);
   document.dispatchEvent(new CustomEvent('element-resize', {bubbles: true}));
+
+  //
+  // THIS IS A HACK (First 2 to 4 lines are missing sometimes, so refresh from cache)
+  //
+  setTimeout(function() {
+    updateFromCache();
+  }.bind(this), 250);
 };
 
-// Event listener for messages to create new window
-document.addEventListener('private-message', function(event) {
-  // console.log('Event: private-message ' + JSON.stringify(event.detail, null, 2));
-  // Determine if message is ingoing or outgoing
-  // assume it is incoming
-  let name = event.detail.parsedMessage.nick;
-  // then if outgoing reverse it
-  if (name === ircState.nickName) {
-    name = event.detail.parsedMessage.params[0];
-  }
-  //
-  // check if a private message section exists, if not create it
-  //
-  if (webState.activePrivateMessageNicks.indexOf(name.toLowerCase()) < 0) {
-    createPrivateMessageEl(name, event.detail.parsedMessage);
-  }
-});
+// ----------------------------------------------------------------------
+// A change in state occurred, check if new channel need to be created.
+// ----------------------------------------------------------------------
+// init to zero to force first update
+var lastChannelsArray = [0];
+document.addEventListener('irc-state-changed', function(event) {
+  // console.log('checking for channel updates');
 
-// --------------------------------
-// Send private message
-// --------------------------------
-function _buildPrivateMessageText() {
-  if ((document.getElementById('pmNickNameInputId').value.length > 0) &&
-    (document.getElementById('userPrivMsgInputId').value.length > 0)) {
-    let targetNick = document.getElementById('pmNickNameInputId').value;
-    let inputAreaEl = document.getElementById('userPrivMsgInputId');
-    _sendPrivMessageToUser(targetNick, inputAreaEl);
-    document.getElementById('userPrivMsgInputId').value = '';
-    // close window after sending, because a new one will open on server response.
-    document.getElementById('privMsgMainHiddenDiv').setAttribute('hidden', '');
-    document.getElementById('privMsgMainHiddenButton').textContent = '+';
+  // Check list of server's channels and create new if missing.
+  if (ircState.channels.length > 0) {
+    ircState.channels.forEach(function(name) {
+      if (webState.channels.indexOf(name.toLowerCase()) === -1) {
+        // console.log('Creating new channel ' + name);
+        createChannelEl(name);
+      }
+    });
   }
-};
-document.getElementById('userPrivMsgInputId').addEventListener('input', function(event) {
-  if ((event.inputType === 'insertText') && (event.data === null)) {
-    _buildPrivateMessageText();
-  }
-  if (event.inputType === 'insertLineBreak') {
-    _buildPrivateMessageText();
-  }
-}.bind(this));
-document.getElementById('UserPrivMsgSendButton').addEventListener('click', function() {
-  _buildPrivateMessageText();
-}.bind(this));
 
-// -------------------------
-// Whois button handler
-// -------------------------
-document.getElementById('whoisButton').addEventListener('click', function() {
-  if (document.getElementById('pmNickNameInputId').value.length > 0) {
-    showRawMessageWindow();
-    let message = 'WHOIS ' + document.getElementById('pmNickNameInputId').value;
+  // Add channel /JOIN buttons for favorite channels
+  let needButtonUpdate = false;
+  if (lastChannelsArray.length !== ircState.channels.length) {
+    // clase of different array size, need update
+    needButtonUpdate = true;
+  } else {
+    // case of same array size
+    if (ircState.channels.length > 0) {
+      // case of same length, check entries
+      for (let i=0; i<ircState.channels.length; i++) {
+        if (lastChannelsArray[i] !== ircState.channels[i]) needButtonUpdate = true;
+      }
+    }
+  }
+  if (needButtonUpdate) {
+    // remove old button elements
+    let channelJoinButtonContainerEl = document.getElementById('channelJoinButtonContainer');
+    while (channelJoinButtonContainerEl.firstChild) {
+      channelJoinButtonContainerEl.removeChild(channelJoinButtonContainerEl.firstChild);
+    }
+    if (ircState.channelList.length > 0) {
+      for (let i=0; i<ircState.channelList.length; i++) {
+        if (ircState.channels.indexOf(ircState.channelList[i]) < 0) {
+          // console.log('adding ' + ircState.channelList[i]);
+          let joinButtonEl = document.createElement('button');
+          joinButtonEl.textContent = ircState.channelList[i];
+          joinButtonEl.classList.add('channel-button');
+          channelJoinButtonContainerEl.appendChild(joinButtonEl);
+          joinButtonEl.addEventListener('click', function() {
+            _sendIrcServerMessage('JOIN ' + ircState.channelList[i]);
+          });
+        }
+      } // next i
+    }
+  } // needButtonUpdate
+  // make a shallow copy
+  lastChannelsArray = [];
+  if (ircState.channels.length > 0) {
+    for (let i=0; i<ircState.channels.length; i++) {
+      lastChannelsArray.push(ircState.channels[i]);
+    }
+  }
+}); // addEventListener('irc-state-changed
+
+// ---------------------------------------
+// Join New Channel (Button and Enter)
+// ---------------------------------------
+function _newChannel() {
+  let newChannel = document.getElementById('newChannelNameInputId').value;
+  document.getElementById('newChannelNameInputId').value = '';
+  let chanPrefixChars = '#&+!';
+  if ((newChannel.length > 1) &&
+    (chanPrefixChars.indexOf(newChannel.charAt(0)) >= 0)) {
+    let message = 'JOIN ' + newChannel;
     _sendIrcServerMessage(message);
-    // open up server messages to show
-    document.getElementById('rawHiddenElements').removeAttribute('hidden');
-    document.getElementById('rawHiddenElementsButton').textContent = '-';
   } else {
-    showError('Input required');
+    showError('Invalid Channel Name');
   }
-});
-// -------------------------------------
-// Private Message (Open/Close) Buttons
-// -------------------------------------
-document.getElementById('privMsgMainHiddenButton').addEventListener('click', function() {
-  if (document.getElementById('privMsgMainHiddenDiv').hasAttribute('hidden')) {
-    document.getElementById('privMsgMainHiddenDiv').removeAttribute('hidden');
-    document.getElementById('privMsgMainHiddenButton').textContent = '-';
-  } else {
-    document.getElementById('privMsgMainHiddenDiv').setAttribute('hidden', '');
-    document.getElementById('privMsgMainHiddenButton').textContent = '+';
+}
+document.getElementById('newChannelNameInputId').addEventListener('input', function(event) {
+  if (((event.inputType === 'insertText') && (event.data === null)) ||
+    (event.inputType === 'insertLineBreak')) {
+    _newChannel();
   }
 }.bind(this));
+document.getElementById('newChannelButton').addEventListener('click', function() {
+  _newChannel();
+});

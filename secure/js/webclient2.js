@@ -1,0 +1,657 @@
+// -------------------------------------------------------------
+// webclient2.js - Parse IRC messages from backend/IRC server
+// -------------------------------------------------------------
+//
+// ------------------------------------------
+// Function to strip colors from a string
+// ------------------------------------------
+function cleanFormatting (inString) {
+  // Filterable formatting codes
+  let formattingChars = [
+    2, // 0x02 bold
+    7, // 0x07 bell character
+    15, // 0x0F reset
+    17, // 0x11 mono-space
+    22, // 0x16 Reverse color
+    29, // 0x1D Italics
+    30, // 0x1E Strickthrough
+    31 // 0x1F Underline
+  ];
+  // Color encoding (2 methods)
+  // 0x03+color (1 or 2 digits in range 0-9)
+  // 0x04+color (6 digit hexadecimal color)
+  let outString = '';
+  // l = length of input string
+  let l = inString.length;
+  if (l === 0) return outString;
+  // i = index into input string
+  let i = 0;
+
+  // Loop through all characters in input string
+  while (i<l) {
+    // Filter format characters capable of toggle on/off
+    if ((i<l) && (formattingChars.indexOf(inString.charCodeAt(i)) >= 0)) i++;
+    // Removal of color codes 0x03 + (1 or 2 digit) in range ('0' to '9')
+    // followed by optional comma and background color.
+    // Examples
+    //     0x03 + '3'
+    //     0x03 + '03'
+    //     0x03 + '3,4'
+    //     0x03 + '03,04'
+    if ((i<l) && (inString.charCodeAt(i) === 3)) {
+      i++;
+      if ((i<l) && (inString.charAt(i) >= '0') && (inString.charAt(i) <= '9')) i++;
+      if ((i<l) && (inString.charAt(i) >= '0') && (inString.charAt(i) <= '9')) i++;
+      if ((i<l) && (inString.charAt(i) === ',')) {
+        i++;
+        if ((i<l) && (inString.charAt(i) >= '0') && (inString.charAt(i) <= '9')) i++;
+        if ((i<l) && (inString.charAt(i) >= '0') && (inString.charAt(i) <= '9')) i++;
+      }
+    }
+    // Hexadecimal colors 0x04 + 6 hexadecimal digits
+    // followed by optional comma and 6 hexadeciaml digits for background color
+    // In this case, 6 characters are removed regardless if 0-9, A-F
+    if ((i<l) && (inString.charCodeAt(i) === 4)) {
+      i++;
+      for (let j=0; j<6; j++) {
+        if (i<l) i++;
+      }
+      if ((i<l) && (inString.charAt(i) === ',')) {
+        i++;
+        for (let j=0; j<6; j++) {
+          if (i<l) i++;
+        }
+      }
+    }
+
+    if (i<l) outString += inString.charAt(i);
+    i++;
+  }
+  return outString;
+}
+
+// ------ This is a color format removal test -------------
+// let colorTest = 'This is ' +
+//   String.fromCharCode(3) + '04' + 'Red' + String.fromCharCode(3) + ' color ' +
+//   String.fromCharCode(3) + '04,12' + 'Red/Gray' + String.fromCharCode(3) + ' color ' +
+//   String.fromCharCode(4) + '0Fd7ff' + 'Hex-color' + String.fromCharCode(3) + ' color ' +
+//   String.fromCharCode(4) + '0Fd7ff,17a400' + 'Hex-color,hexcolor' +String.fromCharCode(4) +
+//   ' color ' +
+//   String.fromCharCode(2) + 'Bold' + String.fromCharCode(2) + ' text ';
+// console.log('colorTest ' + cleanFormatting(colorTest));
+// ------ end color format removal test -------------
+
+//
+// Internal function to parse one line of message from IRC server
+// Returns jason object with prefix, command and params array
+//
+function _parseIrcMessage (message) {
+  // ------------------------
+  // internal functions
+  // ------------------------
+  //
+  // 1) timestamp
+  //
+  // timestamp :prefix command param1 param2 .... :lastParam
+  // =========
+  //
+  function _extractTimeString(start, end, messageString) {
+    let i = start;
+    let timeString = '';
+    while ((messageString.charAt(i) !== ' ') && (i <= end)) {
+      timeString += messageString.charAt(i);
+      i++;
+    }
+    let outString = '';
+    if (timeString.length === 0) {
+      outString = null;
+    } else {
+      let timeObj = new Date(parseInt(timeString) * 1000);
+      outString += timeObj.getHours().toString().padStart(2, '0') + ':';
+      outString += timeObj.getMinutes().toString().padStart(2, '0') + ':';
+      outString += timeObj.getSeconds().toString().padStart(2, '0');
+    }
+    return {
+      data: outString,
+      nextIndex: i + 1
+    };
+  }
+  //
+  // 2) Check if colon string
+  //
+  // timestamp :prefix command param1 param2 .... :lastParam
+  //          ===                                ===
+  //
+  function _isColonString (start, messageString) {
+    if (messageString.charAt(start) === ':') {
+      return {
+        isColonStr: true,
+        nextIndex: start + 1
+      };
+    } else {
+      return {
+        isColonStr: false,
+        nextIndex: start
+      };
+    }
+  }
+  //
+  // 3) Command or param string, but not last param
+  //
+  // timestamp :prefix command param1 param2 .... :lastParam
+  //                   ======= ====== ======
+  //
+  function _extractMidString(start, end, messageString) {
+    let i = start;
+    let outString = '';
+    while ((messageString.charAt(i) !== ' ') && (i <= end)) {
+      outString += messageString.charAt(i);
+      i++;
+    }
+    if (outString.length === 0) outString = null;
+    return {
+      data: outString,
+      nextIndex: i + 1
+    };
+  }
+  // 4) Last param string (start with :)
+  //
+  // timestamp :prefix command param1 param2 .... :lastParam
+  //                                               =========
+  //
+  function _extractFinalString(start, end, messageString) {
+    let i = start;
+    let outString = '';
+    while (i <= end) {
+      outString += messageString.charAt(i);
+      i++;
+    }
+    if (outString.length === 0) outString = null;
+    return {
+      data: outString,
+      nextIndex: i + 1
+    };
+  }
+  //
+  // Extract nickname
+  //
+  // nick!user@host.domain
+  // nick!user@nn:nn:nn:nn: (ipv6)
+  function _extractNickname(inText) {
+    if (inText) {
+      if ((inText.indexOf('!') >= 0 ) &&
+        (inText.indexOf('@') >= 0) &&
+        (inText.indexOf('!') < inText.indexOf('@'))) {
+        let nick = inText.split('!')[0];
+        return nick;
+      } else {
+        return null;
+      }
+    } else {
+      return null;
+    }
+  }
+  //
+  // Extract hostname
+  //
+  function _extractHostname(inText) {
+    if (inText) {
+      if ((inText.indexOf('!') >= 0 ) &&
+        (inText.indexOf('@') >= 0) &&
+        (inText.indexOf('!') < inText.indexOf('@'))) {
+        let host = inText.split('!')[1];
+        return host;
+      } else {
+        return null;
+      }
+    } else {
+      return null;
+    }
+  }
+  // ---------------------------------------------------------
+  //                   Decode the line
+  // --------------------------------------------------------
+  // This accepts a Buffer as input with UTF8 characters
+  //
+  // Format:  [:prefix] command param1 [param2] .... [:lastParam]
+  // --------------------------------------------------------
+  //
+  //  Line composed of 3 parts, prefix, command, params
+  //
+  let timestamp = null;
+  let prefix = null;
+  let extNick = null;
+  let extHost = null;
+  let hostname = null;
+  let command = null;
+  let params = [];
+  //
+  // Parsing variables
+  let messageString = message.toString();
+  let end = messageString.length - 1;
+  let temp = {nextIndex: 0};
+
+  // 1) Extract timestamp
+  temp = _extractTimeString(temp.nextIndex, end, messageString);
+  timestamp = temp.data;
+
+  // 2) Check if prefix exist, if exit parse value, return nextIndex
+  temp = _isColonString(temp.nextIndex, messageString);
+  if (temp.isColonStr) {
+    temp = _extractMidString(temp.nextIndex, end, messageString);
+    prefix = temp.data;
+    extNick = _extractNickname(temp.data);
+    extHost = _extractHostname(temp.data);
+  }
+
+  // 3) extract command string
+  temp = _extractMidString(temp.nextIndex, end, messageString);
+  command = temp.data;
+
+  // 4) Extract optional params, in loop, until all params extracted.
+  let done = false;
+  while (!done) {
+    if (temp.nextIndex > end) {
+      done = true;
+    } else {
+      temp = _isColonString(temp.nextIndex, messageString);
+      if (temp.isColonStr) {
+        // case of colon string, this is last param
+        temp = _extractFinalString(temp.nextIndex, end, messageString);
+        params.push(temp.data);
+        done = true;
+      } else {
+        // else not colon string, must be middle param string
+        temp = _extractMidString(temp.nextIndex, end, messageString);
+        if ((temp.data) && (temp.data.length > 0)) {
+          params.push(temp.data);
+        } else {
+          // zero length must be done
+          done = true;
+        }
+      }
+    }
+  }
+  // console.log(prefix, command, JSON.stringify(params));
+  return {
+    timestamp: timestamp,
+    prefix: prefix,
+    nick: extNick,
+    host: extHost,
+    command: command,
+    params: params
+  };
+}; // _parseIrcMessage()
+
+// :nick!~user@host.domain PRIVMSG #channel :This is channel text message.
+function displayChannelMessage(parsedMessage) {
+  document.dispatchEvent(new CustomEvent('channel-message',
+    {
+      bubbles: true,
+      detail: {
+        parsedMessage: parsedMessage
+      }
+    }));
+} // displayChannelMessage()
+
+// :nick!~user@host.domain PRIVMSG nickname :This is private text message.
+function displayPrivateMessage(parsedMessage) {
+  document.dispatchEvent(new CustomEvent('private-message',
+    {
+      bubbles: true,
+      detail: {
+        parsedMessage: parsedMessage
+      }
+    }));
+} // displayPrivateMessage
+
+function displayNoticeMessage(parsedMessage) {
+  function _addText (text) {
+    document.getElementById('noticeMessageDisplay').textContent += cleanFormatting(text) + '\n';
+    document.getElementById('noticeMessageDisplay').scrollTop =
+      document.getElementById('noticeMessageDisplay').scrollHeight;
+  }
+  // console.log('Priv Msg: ' + JSON.stringify(parsedMessage, null, 2));
+  switch(parsedMessage.command) {
+    case 'NOTICE':
+      // skip last /QUIT notice from null for connection statistics
+      if (parsedMessage.nick) {
+        if (parsedMessage.params[0] === ircState.nickName) {
+          _addText(parsedMessage.timestamp + ' -' +
+          parsedMessage.nick + '- ' + parsedMessage.params[1]);
+          webState.noticeOpen = true;
+          updateDivVisibility();
+        }
+        // TODO not updated to channels[]
+        if (ircState.channels.indexOf(parsedMessage.params[0].toLowerCase()) >= 0) {
+          // parsedMessage.nick = 'Notice(parsedMessage.nick)' + ':';
+          document.dispatchEvent(new CustomEvent('channel-message',
+            {
+              bubbles: true,
+              detail: {
+                parsedMessage: parsedMessage
+              }
+            }));
+        }
+      }
+      break;
+    //
+    default:
+  }
+} // displayNoticeMessage()
+
+function displayWallopsMessage(parsedMessage) {
+  function _addText (text) {
+    document.getElementById('wallopsMessageDisplay').textContent += cleanFormatting(text) + '\n';
+    document.getElementById('wallopsMessageDisplay').scrollTop =
+      document.getElementById('wallopsMessageDisplay').scrollHeight;
+  }
+  // console.log('Priv Msg: ' + JSON.stringify(parsedMessage, null, 2));
+  switch(parsedMessage.command) {
+    case 'WALLOPS':
+      _addText(parsedMessage.timestamp + ' ' +
+        parsedMessage.nick + '/Wallops ' + parsedMessage.params[0]);
+      webState.wallopsOpen = true;
+      updateDivVisibility();
+      break;
+    //
+    default:
+  }
+} // displayWallopsMessage
+
+function showRawMessageWindow() {
+  document.getElementById('rawHiddenElements').removeAttribute('hidden');
+  document.getElementById('rawHiddenElementsButton').textContent = '-';
+  document.getElementById('rawHeadRightButtons').removeAttribute('hidden');
+  // scroll message to most recent
+  document.getElementById('rawMessageDisplay').scrollTop =
+    document.getElementById('rawMessageDisplay').scrollHeight;
+}
+
+function displayRawMessage (inString) {
+  let text = cleanFormatting(inString);
+  if (webState.rawNoClean) text = inString;
+  document.getElementById('rawMessageDisplay').textContent += text + '\n';
+  document.getElementById('rawMessageDisplay').scrollTop =
+    document.getElementById('rawMessageDisplay').scrollHeight;
+};
+
+function displayRawMessageInHex (message) {
+  let hexString = '';
+  for (let i=0; i<message.length; i++) {
+    hexString += message.charCodeAt(i).toString(16).padStart(2, '0') + ' ';
+  }
+  displayRawMessage(hexString);
+};
+
+// ---------------------------------------------
+// CTCP message parser
+//
+// Note: CTCP replies to other users are handled
+// in the backend web server. This parser is
+// for user interactive CTCP requests,
+// primarily ACTIION from /ME commands.
+// ---------------------------------------------
+function _parseCtcpMessage (parsedMessage) {
+  function _addNoticeText (text) {
+    document.getElementById('noticeMessageDisplay').textContent += text + '\n';
+    document.getElementById('noticeMessageDisplay').scrollTop =
+      document.getElementById('noticeMessageDisplay').scrollHeight;
+  }
+  const ctcpDelim = 1;
+  let ctcpMessage = parsedMessage.params[1];
+  let end = ctcpMessage.length - 1;
+  if (ctcpMessage.charCodeAt(0) !== 1) {
+    console.log('_parseCtcpMessage() missing CTCP start delimiter');
+    return;
+  }
+
+  let i = 1;
+  let ctcpCommand = '';
+  let ctcpRest = '';
+  while ((ctcpMessage.charAt(i) !== ' ') && (i <= end)) {
+    if (ctcpMessage.charCodeAt(i) !== ctcpDelim) {
+      ctcpCommand += ctcpMessage.charAt(i);
+    }
+    i++;
+  }
+  ctcpCommand = ctcpCommand.toUpperCase();
+  // console.log('ctcpCommand ' + ctcpCommand);
+  while ((ctcpMessage.charAt(i) === ' ') && (i <= end)) {
+    i++;
+  }
+  while ((ctcpMessage.charCodeAt(i) !== ctcpDelim) && (i <= end)) {
+    ctcpRest += ctcpMessage.charAt(i);
+    i++;
+  }
+  // console.log('ctcpRest ' + ctcpRest);
+  //
+  //   ACTION
+  //
+  if (ctcpCommand === 'ACTION') {
+    let index = ircState.channels.indexOf(parsedMessage.params[0].toLowerCase());
+    if (index >= 0) {
+      parsedMessage.params[1] = parsedMessage.nick + ' ' + ctcpRest;
+      parsedMessage.nick = '*';
+      displayChannelMessage(parsedMessage);
+    } else {
+      // TODO actino sent as regular PM for now
+      parsedMessage.params[1] = ctcpRest;
+      displayPrivateMessage(parsedMessage);
+    }
+  } else {
+    _addNoticeText(parsedMessage.timestamp + ' ' +
+      parsedMessage.nick + ' to ' + parsedMessage.params[0] +
+        ' CTCP Request: ' + ctcpCommand + ' ' + ctcpRest);
+    webState.noticeOpen = true;
+    updateDivVisibility();
+  }
+}
+
+// -------------------------------------------------------------
+// This function will accept one line of text from IRC server
+// First it will check for "UPDATE" request
+// else will parse message string into prefix, command, and arugments
+// the parse the command.
+// -------------------------------------------------------------
+function _parseBufferMessage (message) {
+  if (message === 'HEARTBEAT' ) {
+    // 1) Check if websocket heartbeat
+    // console.log('heartbeat');
+    onHeartbeatReceived();
+  } else if ( message === 'UPDATE' ) {
+    // 2) Else check if backend requests browser to
+    //       poll the state API and update
+    // console.log('update');
+    // calling this updates state itself
+    getIrcState();
+  } else {
+    // 3) Else, this is IRC message to be parsed for IRC browser user.
+
+    // Internal function
+    function _showNotExpiredError(errStr) {
+      // current UNIX time in seconds
+      let timeNow = new Date();
+      let timeNowSeconds = parseInt(timeNow/1000);
+      // subtract timestamp from (possibly chached) server messages
+      // and show error only if condition not expired
+      if (timeNowSeconds - message.split(' ')[0] < errorExpireSeconds) {
+        showError(errStr);
+      }
+    }
+
+    //
+    // Display raw message in Hexadecimal
+    //
+    if (webState.rawShowHex) displayRawMessageInHex(message);
+
+    //
+    // Display raw message from IRC server
+    //
+    displayRawMessage(message);
+
+    // Do not process back echo message prefixed with '-->'.
+    if (message.split(' ')[0] === '-->') return;
+
+    // Do not process server info message
+    if (message.split(' ')[0] === 'Webserver:') return;
+
+    //
+    // Main Parser
+    //
+    // parse message into: prefix, command, and param array
+    //
+    let parsedMessage = _parseIrcMessage(message);
+    // console.log('parsedMessage' + JSON.stringify(parsedMessage, null, 2));
+
+    //
+    // Check if server is responding with error code
+    //
+    if ((parseInt(parsedMessage.command) >= 400) &&
+      (parseInt(parsedMessage.command) <500)) {
+      // TODO temporarily remove timestamp with slice, can use better parse.
+      _showNotExpiredError(message.slice(12, message.length));
+    }
+
+    // Decoding complete, Parse commands
+    //
+    switch(parsedMessage.command) {
+      case 'ERROR':
+        // console.log(message.toString());
+        break;
+      case 'JOIN':
+        displayChannelMessage(parsedMessage);
+        break;
+      case 'MODE':
+        if (true) {
+          if (parsedMessage.params[0] === ircState.nickName) {
+            // Case of me, my MODE has changed
+          } else if (channelPrefixChars.indexOf(parsedMessage.params[0].charAt(0)) >= 0) {
+            // Case of channel name
+            displayChannelMessage(parsedMessage);
+          } else {
+            console.log('Error message MODE to unknown recipient');
+          }
+        }
+        break;
+      case 'NICK':
+        displayChannelMessage(parsedMessage);
+        break;
+      case 'PART':
+        displayChannelMessage(parsedMessage);
+        break;
+      case 'NOTICE':
+        if (true) {
+          let index = ircState.channels.indexOf(parsedMessage.params[0].toLowerCase());
+          if ((index >= 0) && (ircState.channelStates[index].joined)) {
+            displayNoticeMessage(parsedMessage);
+          }
+          if (parsedMessage.params[0] === ircState.nickName) {
+            displayNoticeMessage(parsedMessage);
+          }
+        }
+        break;
+      case 'PRIVMSG':
+        if (true) {
+          // first check for CTCP message
+          const ctcpDelim = 1;
+          if (parsedMessage.params[1].charCodeAt(0) === ctcpDelim) {
+            // case of CTCP message
+            _parseCtcpMessage(parsedMessage);
+          } else {
+            // else not a CTCP message
+            let index = ircState.channels.indexOf(parsedMessage.params[0].toLowerCase());
+            if (index >= 0) {
+              displayChannelMessage(parsedMessage);
+            } else {
+              displayPrivateMessage(parsedMessage);
+            }
+          }
+        }
+        break;
+      //
+      case 'QUIT':
+        displayChannelMessage(parsedMessage);
+        break;
+      case 'TOPIC':
+        if (true) {
+          if (channelPrefixChars.indexOf(parsedMessage.params[0].charAt(0)) >= 0) {
+            // Case of channel name
+            displayChannelMessage(parsedMessage);
+          } else {
+            console.log('Error message MODE to unknown recipient');
+          }
+        }
+        break;
+      case 'WALLOPS':
+        displayWallopsMessage(parsedMessage);
+        break;
+      //
+      default:
+    }
+  }
+};
+//
+// -------------------------------------------------
+// This function performs API request to obtain
+// the full IRC server message cache from the web server
+// as an API response. The contents are then parsed as if
+// the message were real time.
+// -------------------------------------------------
+function updateFromCache () {
+  // Fire event to clear previous contents
+  // TODO this is async, could clear after fetch
+  document.dispatchEvent(new CustomEvent('erase-before-reload',
+    {
+      bubbles: true,
+      detail: {
+      }
+    }));
+
+  let fetchURL = webServerUrl + '/irc/cache';
+  let fetchOptions = {
+    method: 'GET',
+    timeout: 10000,
+    // credentials: 'include',
+    headers: {
+      'Accept': 'application/json'
+    }
+  };
+  fetch(fetchURL, fetchOptions)
+    .then( (response) => {
+      // console.log(response.status);
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error('Fetch status ' + response.status + ' ' + response.statusText);
+      }
+    })
+    .then( (responseArray) => {
+      if ((Array.isArray(responseArray)) && (responseArray.length > 0)) {
+        // remove dynamically created private message elements to match list
+        let privMsgSessionEl = document.getElementById('privateMessageContainerDiv');
+        while (privMsgSessionEl.firstChild) {
+          privMsgSessionEl.removeChild(privMsgSessionEl.firstChild);
+        }
+        webState.lastPMNick = '';
+        webState.activePrivateMessageNicks = [];
+        webState.resizablePrivMsgTextareaIds = [];
+        document.getElementById('noticeMessageDisplay').textContent = '';
+        document.getElementById('wallopsMessageDisplay').textContent = '';
+        document.getElementById('rawMessageDisplay').textContent = '';
+        webState.noticeOpen = false;
+        webState.wallopsOpen = false;
+        for (let i=0; i<responseArray.length; i++) {
+          if (responseArray[i].length > 0) {
+            _parseBufferMessage(responseArray[i]);
+          }
+        }
+      }
+    })
+    .catch( (error) => {
+      console.log(error);
+    });
+}; // updateFromCache;
+window.addEventListener('update-from-cache', function(event) {
+  updateFromCache();
+}.bind(this));

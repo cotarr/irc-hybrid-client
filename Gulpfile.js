@@ -61,6 +61,9 @@ const htmlMinify = function() {
     .pipe(replace('<script src="./js/webclient4.js" defer></script>', ''))
     .pipe(replace('<script src="./js/webclient5.js" defer></script>', ''))
     .pipe(replace('<script src="./js/webclient6.js" defer></script>', ''))
+    .pipe(replace('<script src="./js/webclient7.js" defer></script>', ''))
+    .pipe(replace('<script src="./js/webclient8.js" defer></script>', ''))
+    .pipe(replace('<script src="./js/webclient9.js" defer></script>', ''))
     // .pipe(htmlmin(htmlMinifyOptions))
     .pipe(dest('build/secure'));
 };
@@ -75,7 +78,10 @@ const jsMinify = function () {
       'secure/js/webclient3.js',
       'secure/js/webclient4.js',
       'secure/js/webclient5.js',
-      'secure/js/webclient6.js'
+      'secure/js/webclient6.js',
+      'secure/js/webclient7.js',
+      'secure/js/webclient8.js',
+      'secure/js/webclient9.js'
     ])
     .pipe(concat('webclient.js'))
     // .pipe(minify(jsMinifyOptions))
