@@ -1,6 +1,6 @@
 # irc-hybrid-client
 
-Single user hybrid IRC client using JavaScript front end and Node/Express back end.
+Single user hybrid IRC client using JavaScript front end and Node/Express backend.
 
 ### Project Goals
 
@@ -10,9 +10,9 @@ Single user hybrid IRC client using JavaScript front end and Node/Express back e
 ### Coding Goals
 
 - Single HTML page
-- Hybrid native JavaScript front end integrated to back end Node/Express server.
-- Back end server manages IRC connections and IRC channel membership.
-- Back end server manages HTTP Username/password login and session cookies internally.
+- Hybrid native JavaScript front end integrated to backend Node/Express server.
+- Backend server manages IRC connections and IRC channel membership.
+- Backend server manages HTTP Username/password login and session cookies internally.
 - Front end browser manages IRC message display and parses user input, and IRC commands.
 - Front end JavaScript limited to native JavaScript without web framework or external libraries.
 - Browser Content Security Policy (CSP) "self" enforced. Policy "unsafe-inline" not allowed.
@@ -25,7 +25,7 @@ Single user hybrid IRC client using JavaScript front end and Node/Express back e
 - This is a chat application, not a channel protection bot, and does not include kick/ban enforcement.
 - Limited to one web login for one IRC user to one web server (i.e. Personal web hosted IRC client)
 - Limited to one IRC network connection at a time (for now...)
-- IRC Configuration JSON files located in back end server are not remotely configurable.
+- IRC Configuration JSON files located in backend server are not remotely configurable.
 
 # Installation
 

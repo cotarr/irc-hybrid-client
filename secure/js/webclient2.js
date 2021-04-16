@@ -2,6 +2,8 @@
 // webclient2.js - Parse IRC messages from backend/IRC server
 // -------------------------------------------------------------
 //
+'use strict';
+//
 // ------------------------------------------
 // Function to strip colors from a string
 // ------------------------------------------

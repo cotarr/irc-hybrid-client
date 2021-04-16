@@ -2,7 +2,7 @@
 // webclient9.js  - Display raw server messages and program info
 //                  End of javascript load initializations
 // ------------------------------------------------------------
-
+'use strict';
 function _parseInputForIRCCommands(textAreaEl) {
   if ((textAreaEl.value.length > 0)) {
     let text = textAreaEl.value;

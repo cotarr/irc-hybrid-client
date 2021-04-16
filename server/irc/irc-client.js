@@ -47,6 +47,7 @@
   // ----------------------------------------------------
 
   const channelPrefixChars = '@#+!';
+  const channelUserModeChars = 'qaohv';
   const nicknamePrefixChars = '~&@%+';
 
   var ircState = {};
@@ -375,8 +376,8 @@
     // ]
     //
     const selectorChars = '+-';
-    const userModeChars = 'ov';
-    const modeChars = '@+';
+    const userModeChars = channelUserModeChars; // 'qaohv'
+    const modeChars = nicknamePrefixChars; // '~&@%+'
     const modeQueue = [];
     const userQueue = [];
     let selector = '';
@@ -413,7 +414,10 @@
             let userIndex = strippedNicks.indexOf(userQueue[j]);
             let tempNick = strippedNicks[userIndex];
             if (modeQueue[j] === '+v') tempNick = '+' + tempNick;
+            if (modeQueue[j] === '+h') tempNick = '%' + tempNick;
             if (modeQueue[j] === '+o') tempNick = '@' + tempNick;
+            if (modeQueue[j] === '+a') tempNick = '&' + tempNick;
+            if (modeQueue[j] === '+q') tempNick = '~' + tempNick;
             ircState.channelStates[chanIndex].names[userIndex] = tempNick;
           }
           global.sendToBrowser('UPDATE\n');
@@ -1200,7 +1204,7 @@
   //  web-broswer --> web server --> [THIS PARSER] --> irc-server
   //-----------------------------------------------------------------
   const parseBrowserMessageForCommand = function (message) {
-    console.log('Browser --> backend message: ' + message);
+    // console.log('Browser --> backend message: ' + message);
 
     let i = 0;
     let end = message.length - 1;

@@ -17,7 +17,7 @@
 //    6) Upon successful recponse event from ircGetState, browser is "connected"
 //
 // --------------------------------------------------------------------------------
-
+'use strict';
 // ---------------------------------------------
 // Function to connect web socket to web server.
 // ---------------------------------------------

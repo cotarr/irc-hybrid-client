@@ -1,6 +1,7 @@
 // ----------------------------------------------
 // webclient5.js - User Input Text Command Parser
 // ----------------------------------------------
+'use strict';
 
 //
 // inputObj = {
@@ -95,7 +96,7 @@ function textCommandParser (inputObj) {
   }
 
   // character index, start after slash /
-  idx = 1;
+  var idx = 1;
 
   // ----------------
   // C O M M A N D

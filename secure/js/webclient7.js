@@ -1,7 +1,7 @@
 // --------------------------------------------
 // webclient7.js - Private Message Functions
 // --------------------------------------------
-
+'use strict';
 // --------------------------------------------
 // Send text as private message to other user
 //     (internal function)

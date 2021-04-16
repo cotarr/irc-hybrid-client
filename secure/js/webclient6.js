@@ -1,7 +1,7 @@
 // ---------------------------------------
 // webclient6.js - IRC Channel Functions
 // ---------------------------------------
-
+'use strict';
 // ------------------------------------------
 // Send text to channel (internal function)
 //     (internal function)
