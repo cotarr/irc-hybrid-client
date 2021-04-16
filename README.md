@@ -15,16 +15,17 @@ Single user hybrid IRC client using JavaScript front end and Node/Express back e
 - Back end server manages HTTP Username/password login and session cookies internally.
 - Front end browser manages IRC message display and parses user input, and IRC commands.
 - Front end JavaScript limited to native JavaScript without web framework or external libraries.
-- Front end JavaScript coded to enforce Content Security Policy (CSP) "self" only.
-- Limit IRC and API connections to one address/port (Same origin policy enforced).
-- TLS support both to browser and IRC server.
+- Browser Content Security Policy (CSP) "self" enforced. Policy "unsafe-inline" not allowed.
+- Browser Same origin policy enforced.
+- TLS support for both Web Server and IRC server. Works with Lets Encrypt certificates.
 
 ### Current Limitations
 
+- Assumption that user is comfortable in SSH, starting node servers, and can edit a JSON file.
 - This is a chat application, not a channel protection bot, and does not include kick/ban enforcement.
-- Limited to one web login for one IRC user to one server (i.e. personal web hosted IRC client)
-- Limited to one IRC network at a time (for now...)
-- IRC Configuration files located in back end server are not remotely configurable.
+- Limited to one web login for one IRC user to one web server (i.e. Personal web hosted IRC client)
+- Limited to one IRC network connection at a time (for now...)
+- IRC Configuration JSON files located in back end server are not remotely configurable.
 
 # Installation
 
@@ -46,7 +47,7 @@ cp example-credentials.json credentials.json
 # 3) set .well-known/security.txt data, or empty string.
 # 4) file path for PID file
 
-# It is necessary to assign one username and password.
+# It is necessary to assign one web page username and password.
 # This must be done after copying the
 # example-credentials.json into the project folder
 
@@ -67,10 +68,44 @@ cp example-servers.json servers.json
 # 3) IRC server password (if needed)
 # 4) Initial nick name, user, real name and initial user modes.
 # 5) Preferred list of channels for this server.
+
+# To start the app
+node bin/www
 ```
 
-# To use gulp
+
+
+# Minify and bundle for deployment
+
+This is not required. The repository can be cloned and run as-is.
+
+However running the gulp script will concatenate 9 of the JavaScript
+files into 1 bundled/minified JavaScript file.
+This will reduce the  download sized by about half.
+
+After running `gulp dist`, a build folder will be created with same
+folders as the base repository. The gulp script removed the individual
+script tags from webclient.html an consolidates the tags
+to a single javascript script tag.
+
+It is necessary to install gulp-cli globally, as gulp-cli
+is used by gulp to manage multiple gulp version. This is not
+listed in the pacakge.json
+
 ```
 npm install -g gulp-cli
+
+# bundle and minify to /build folder
 gulp dist
+
+# Deploy by any method
+
+# In deployed version, create logs folder
+# In deployed copy, then edit credentials.json and servers.json
+
+# In deployed version, run:
+npm ci
+
+# To run
+node bin/www
 ```
