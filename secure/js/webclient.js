@@ -81,6 +81,11 @@ var ircState = {
   botVersion: '0.0.0',
   botName: '',
 
+  times: {
+    programRun: 0,
+    ircConnect: 0
+  },
+
   websocketCount: 0
 };
 
@@ -109,6 +114,7 @@ webState.resizableChanSplitTextareaIds = [];
 webState.lastPMNick = '';
 webState.activePrivateMessageNicks = [];
 webState.resizablePrivMsgTextareaIds = [];
+webState.times = {webConnect: 0};
 
 // -------------------------------
 // Build URL from page location
@@ -178,6 +184,12 @@ function errorTimerTickHandler () {
         'Tap to Close (' + errorRemainSeconds.toString() + ')';
     }
   }
+};
+
+// Return UNIX timestamp in seconds
+function timestamp () {
+  let now = new Date;
+  return parseInt(now.valueOf() / 1000).toString();
 };
 
 // --------------------------------------
@@ -363,6 +375,47 @@ function heartbeatTimerTickHandler () {
     }
   }
 };
+
+// called 1/second by timer tick
+function updateElapsedTimeDisplay () {
+  function toTimeString(seconds) {
+    let remainSec = seconds;
+    let day = 0;
+    let hour = 0;
+    let min = 0;
+    let sec = 0;
+    day = parseInt(remainSec / 86400);
+    remainSec -= day * 86400;
+    hour = parseInt(remainSec / 3600);
+    remainSec -= hour * 3600;
+    min = parseInt(remainSec / 60);
+    sec = remainSec - (min * 60);
+    return day.toString().padStart(3, ' ') + ' D ' +
+      hour.toString().padStart(2, '0') + ':' +
+      min.toString().padStart(2, '0') + ':' +
+      sec.toString().padStart(2, '0');
+  }
+
+  let timePreEl = document.getElementById('elapsedTimeDiv');
+  let now = timestamp();
+  let timeStr = '';
+  if (webState.webConnected) {
+    timeStr += 'Web Connected: ' + toTimeString(now - webState.times.webConnect) + '\n';
+  } else {
+    timeStr += 'Web Connected: N/A\n';
+  }
+  if (ircState.ircConnected) {
+    timeStr += 'IRC Connected: ' + toTimeString(now - ircState.times.ircConnect) + '\n';
+  } else {
+    timeStr += 'IRC Connected: N/A\n';
+  }
+  if (webState.webConnected) {
+    timeStr += 'Backend Start: ' + toTimeString(now - ircState.times.programRun);
+  } else {
+    timeStr += 'Backend Start: N/A';
+  }
+  timePreEl.textContent = timeStr;
+}
 
 // -------------------------------------------------
 //  Notify web server to expect connection request

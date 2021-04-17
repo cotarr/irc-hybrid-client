@@ -184,6 +184,7 @@
               <button id="rawClearButton">Clear</button>
             </div>
           </div>
+
         </div>
 
         <!-- Do not hide rawHiddenElements in HTML.
@@ -201,10 +202,13 @@
               <button id="sendRawMessageButton">Send</button>
               <button id="loadFromCacheButton">Refresh</button>
               <button id="eraseCacheButton">Erase Cache</button>
-              <button id="showDebugButton">Debug</button>
+              <button id="showDebugButton">Debug Tools</button>
             </div>
-            <div id="hiddenDebugDiv" hidden>
-              <div class="vh10"></div>
+            <div class="hidden-debug-div" id="hiddenDebugDiv" hidden>
+              <div>
+                <pre id='elapsedTimeDiv'>
+                </pre>
+              </div>
               <div class="button-div">
                 <button id="variablesButtonId">Variables</button>
                 <button id="rawDisplayHexButtonId">Raw in Hex</button>

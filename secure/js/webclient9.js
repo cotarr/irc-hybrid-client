@@ -92,6 +92,7 @@ document.getElementById('showDebugButton').addEventListener('click', function() 
     document.getElementById('hiddenDebugDiv').removeAttribute('hidden');
   } else {
     document.getElementById('hiddenDebugDiv').setAttribute('hidden', '');
+    document.getElementById('variablesDivId').setAttribute('hidden', '');
   }
 }.bind(this));
 
@@ -472,6 +473,7 @@ setInterval(function() {
   errorTimerTickHandler();
   heartbeatTimerTickHandler();
   reconnectTimerTickHandler();
+  updateElapsedTimeDisplay();
 }.bind(this), 1000);
 
 // -----------------------------

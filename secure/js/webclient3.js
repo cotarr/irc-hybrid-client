@@ -33,6 +33,7 @@ function connectWebSocket () {
     // console.log('Connected to WS Server');
     webState.webConnected = true;
     webState.webConnecting = false;
+    webState.times.webConnect = timestamp();
     resetHeartbeatTimer();
     updateDivVisibility();
     // These will load in parallel asychronously
