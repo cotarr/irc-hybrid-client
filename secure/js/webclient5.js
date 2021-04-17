@@ -232,6 +232,22 @@ function textCommandParser (inputObj) {
       }
       break;
     //
+    //
+    case 'CTCP':
+      if (true) {
+        let ctcpDelim = 1;
+        if (parsedCommand.params.length !== 2) {
+          return {
+            error: true,
+            message: 'Expect: /CTCP <nickname> <ctcp_command>',
+            ircMessage: null
+          };
+        }
+        ircMessage = 'PRIVMSG ' + parsedCommand.params[1] + ' :' + String.fromCharCode(ctcpDelim) +
+          parsedCommand.restOf[1].toUpperCase() + String.fromCharCode(ctcpDelim);
+      }
+      break;
+    //
     case 'JOIN':
       if (parsedCommand.params.length < 1) {
         return {
@@ -258,21 +274,23 @@ function textCommandParser (inputObj) {
       break;
     //
     case 'ME':
-      if (parsedCommand.params.length < 1) {
-        return {
-          error: true,
-          message: 'Expect: /ME <action-message>',
-          ircMessage: null
-        };
-      }
-      let ctcpDelim = 1;
-      if (inputObj.originType === 'channel') {
-        ircMessage = 'PRIVMSG ' + inputObj.originName + ' :' + String.fromCharCode(ctcpDelim) +
-          'ACTION ' + parsedCommand.restOf[0] + String.fromCharCode(ctcpDelim);
-      }
-      if (inputObj.originType === 'private') {
-        ircMessage = 'PRIVMSG ' + inputObj.originName + ' :' + String.fromCharCode(ctcpDelim) +
-          'ACTION ' + parsedCommand.restOf[0] + String.fromCharCode(ctcpDelim);
+      if (true) {
+        if (parsedCommand.params.length < 1) {
+          return {
+            error: true,
+            message: 'Expect: /ME <action-message>',
+            ircMessage: null
+          };
+        }
+        let ctcpDelim = 1;
+        if (inputObj.originType === 'channel') {
+          ircMessage = 'PRIVMSG ' + inputObj.originName + ' :' + String.fromCharCode(ctcpDelim) +
+            'ACTION ' + parsedCommand.restOf[0] + String.fromCharCode(ctcpDelim);
+        }
+        if (inputObj.originType === 'private') {
+          ircMessage = 'PRIVMSG ' + inputObj.originName + ' :' + String.fromCharCode(ctcpDelim) +
+            'ACTION ' + parsedCommand.restOf[0] + String.fromCharCode(ctcpDelim);
+        }
       }
       break;
       //

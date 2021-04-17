@@ -463,7 +463,7 @@ function createChannelEl (name) {
           _addText(parsedMessage.timestamp,
             '*',
             'Notice(' +
-            parsedMessage.nick + '/' + parsedMessage.params[0] + ') ' + parsedMessage.params[1]);
+            parsedMessage.nick + ' to ' + parsedMessage.params[0] + ') ' + parsedMessage.params[1]);
           // Upon channel message, make sectino visible.
           channelBottomDivEl.removeAttribute('hidden');
           channelHideButtonEl.textContent = '-';

@@ -453,14 +453,14 @@
   // ----------------------------
   const _parseCtcpMessage = function (socket, parsedMessage) {
     // Internal function
-    function _sendCtcpMessage (socket, ircMessage, ctcpReply) {
+    function _sendCtcpMessage (socket, ircMessage, ctcpReply, ctcpTo) {
       // It is necessary to fake out a message back to self to show the reply
+      let ctcpDelim = 1;
       let now = new Date;
       let nowSeconds = parseInt(now.valueOf()/1000);
       let outgoingBackToSelf = nowSeconds.toString() +
-        ' :' + ircState.nickName + '!*@* NOTICE ' + ircState.nickName +
-        ' :CTCP Reply: ' + ctcpReply;
-
+        ' :' + ircState.nickName + '!*@* NOTICE ' + ctcpTo + ' ' +
+        String.fromCharCode(ctcpDelim) + ctcpReply + String.fromCharCode(ctcpDelim);
       if (checkCtcpNotFlood()) {
         global.sendToBrowser(outgoingBackToSelf + '\r\n');
         ircMessageCache.addMessage(Buffer.from(outgoingBackToSelf));
@@ -505,10 +505,10 @@
           'CLIENTINFO ' +
           'PING ' +
           'TIME ' +
-          'VERSION ';
+          'VERSION';
           let ircMessage = 'NOTICE ' + parsedMessage.nick + ' :' +
           String.fromCharCode(ctcpDelim) + ctcpReply + String.fromCharCode(ctcpDelim);
-          _sendCtcpMessage(socket, ircMessage, ctcpReply);
+          _sendCtcpMessage(socket, ircMessage, ctcpReply, parsedMessage.nick);
         }
         break;
 
@@ -518,7 +518,7 @@
           let ctcpReply = 'PING ' + ctcpRest;
           let ircMessage = 'NOTICE ' + parsedMessage.nick + ' :' +
           String.fromCharCode(ctcpDelim) + ctcpReply + String.fromCharCode(ctcpDelim);
-          _sendCtcpMessage(socket, ircMessage, ctcpReply);
+          _sendCtcpMessage(socket, ircMessage, ctcpReply, parsedMessage.nick);
         }
         break;
 
@@ -528,7 +528,7 @@
           let ctcpReply = 'TIME ' + d.toString().split('(')[0];
           let ircMessage = 'NOTICE ' + parsedMessage.nick + ' :' +
           String.fromCharCode(ctcpDelim) + ctcpReply + String.fromCharCode(ctcpDelim);
-          _sendCtcpMessage(socket, ircMessage, ctcpReply);
+          _sendCtcpMessage(socket, ircMessage, ctcpReply, parsedMessage.nick);
         }
         break;
       //
@@ -537,7 +537,7 @@
           let ctcpReply = 'VERSION ' + ircState.botName + '-' + ircState.botVersion;
           let ircMessage = 'NOTICE ' + parsedMessage.nick + ' :' +
           String.fromCharCode(ctcpDelim) + ctcpReply + String.fromCharCode(ctcpDelim);
-          _sendCtcpMessage(socket, ircMessage, ctcpReply);
+          _sendCtcpMessage(socket, ircMessage, ctcpReply, parsedMessage.nick);
         }
         break;
       default:
@@ -1305,10 +1305,9 @@
         //
         // case of private notice
         //
-        // fc = first character of target, channel start with reserved character
         if (true) {
-          let fc = outboundArg1.charAt(0);
-          if ((fc !== '#') && (fc !== '&') && (fc !== '+') && (fc !== '!')) {
+          let firstChar = outboundArg1.charAt(0);
+          if (channelPrefixChars.indexOf(firstChar) < 0) {
             let fromMessage = timestamp() + ' ' +
               ':' + ircState.nickName + '!*@* ' + message;
             ircMessageCache.addMessage(fromMessage);
@@ -1339,10 +1338,9 @@
         //
         // case of private message
         //
-        // fc = first character of target, channel start with reserved character
         if (true) {
-          let fc = outboundArg1.charAt(0);
-          if ((fc !== '#') && (fc !== '&') && (fc !== '+') && (fc !== '!')) {
+          let firstChar = outboundArg1.charAt(0);
+          if (channelPrefixChars.indexOf(firstChar) < 0) {
             let fromMessage = timestamp() + ' ' +
               ':' + ircState.nickName + '!*@* ' + message;
             ircMessageCache.addMessage(fromMessage);

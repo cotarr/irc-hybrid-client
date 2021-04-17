@@ -83,6 +83,28 @@ function cleanFormatting (inString) {
 // console.log('colorTest ' + cleanFormatting(colorTest));
 // ------ end color format removal test -------------
 
+
+// ------------------------------------------
+// Function to strip CTCP delimiter
+// ------------------------------------------
+function cleanCtcpDelimiter (inString) {
+  // Filterable formatting codes
+  let ctcpDelim = 1;
+  let outString = '';
+  let l = inString.length;
+  if (l === 0) return outString;
+  let i = 0;
+  while (i<l) {
+    if ((i<l) && (inString.charCodeAt(i) === ctcpDelim)) {
+      i++;
+    } else {
+      if (i<l) outString += inString.charAt(i);
+      i++;
+    }
+  }
+  return outString;
+}
+
 //
 // Internal function to parse one line of message from IRC server
 // Returns jason object with prefix, command and params array
@@ -309,31 +331,47 @@ function displayPrivateMessage(parsedMessage) {
 
 function displayNoticeMessage(parsedMessage) {
   function _addText (text) {
-    document.getElementById('noticeMessageDisplay').textContent += cleanFormatting(text) + '\n';
+    document.getElementById('noticeMessageDisplay').textContent +=
+      cleanFormatting(text) + '\n';
     document.getElementById('noticeMessageDisplay').scrollTop =
       document.getElementById('noticeMessageDisplay').scrollHeight;
   }
-  // console.log('Priv Msg: ' + JSON.stringify(parsedMessage, null, 2));
+  // console.log('parsedMessage ' + JSON.stringify(parsedMessage, null, 2));
   switch(parsedMessage.command) {
     case 'NOTICE':
       // skip last /QUIT notice from null for connection statistics
       if (parsedMessage.nick) {
-        if (parsedMessage.params[0] === ircState.nickName) {
-          _addText(parsedMessage.timestamp + ' -' +
-          parsedMessage.nick + '- ' + parsedMessage.params[1]);
-          webState.noticeOpen = true;
-          updateDivVisibility();
-        }
-        // TODO not updated to channels[]
-        if (ircState.channels.indexOf(parsedMessage.params[0].toLowerCase()) >= 0) {
-          // parsedMessage.nick = 'Notice(parsedMessage.nick)' + ':';
-          document.dispatchEvent(new CustomEvent('channel-message',
-            {
-              bubbles: true,
-              detail: {
-                parsedMessage: parsedMessage
-              }
-            }));
+        const ctcpDelim = 1;
+        if (((parsedMessage.params.length === 2) &&
+          (parsedMessage.params[1].charCodeAt(0) === ctcpDelim)) ||
+          ((parsedMessage.params.length === 3) &&
+          (parsedMessage.params[2].charCodeAt(0) === ctcpDelim))) {
+          // case of CTCP notice
+        } else {
+          if (parsedMessage.params[0] === ircState.nickName) {
+            // Case of regular notice, not CTCP reply
+            _addText(parsedMessage.timestamp + ' Notice(' +
+            parsedMessage.nick + ' to ' + parsedMessage.params[0] + ') ' +
+             parsedMessage.params[1]);
+            webState.noticeOpen = true;
+            updateDivVisibility();
+          } else if (ircState.channels.indexOf(parsedMessage.params[0].toLowerCase()) >= 0) {
+            // case of notice to #channel
+            document.dispatchEvent(new CustomEvent('channel-message',
+              {
+                bubbles: true,
+                detail: {
+                  parsedMessage: parsedMessage
+                }
+              }));
+          } else if (parsedMessage.nick === ircState.nickName) {
+            // Case of regular notice, not CTCP reply
+            _addText(parsedMessage.timestamp + ' Notice(' +
+            parsedMessage.nick + ' to ' + parsedMessage.params[0] + ') ' +
+             parsedMessage.params[1]);
+            webState.noticeOpen = true;
+            updateDivVisibility();
+          }
         }
       }
       break;
@@ -395,6 +433,7 @@ function displayRawMessageInHex (message) {
 // primarily ACTIION from /ME commands.
 // ---------------------------------------------
 function _parseCtcpMessage (parsedMessage) {
+  // console.log('_parseCtcpMessage ' + JSON.stringify(parsedMessage, null, 2));
   function _addNoticeText (text) {
     document.getElementById('noticeMessageDisplay').textContent += text + '\n';
     document.getElementById('noticeMessageDisplay').scrollTop =
@@ -418,7 +457,6 @@ function _parseCtcpMessage (parsedMessage) {
     i++;
   }
   ctcpCommand = ctcpCommand.toUpperCase();
-  // console.log('ctcpCommand ' + ctcpCommand);
   while ((ctcpMessage.charAt(i) === ' ') && (i <= end)) {
     i++;
   }
@@ -426,7 +464,7 @@ function _parseCtcpMessage (parsedMessage) {
     ctcpRest += ctcpMessage.charAt(i);
     i++;
   }
-  // console.log('ctcpRest ' + ctcpRest);
+  // console.log('ctcpCommand ' + ctcpCommand + ' ctcpRest ' + ctcpRest);
   //
   //   ACTION
   //
@@ -442,10 +480,54 @@ function _parseCtcpMessage (parsedMessage) {
       displayPrivateMessage(parsedMessage);
     }
   } else {
-    _addNoticeText(parsedMessage.timestamp + ' ' +
-      parsedMessage.nick + ' to ' + parsedMessage.params[0] +
-        ' CTCP Request: ' + ctcpCommand + ' ' + ctcpRest);
-    webState.noticeOpen = true;
+    if (parsedMessage.nick === ircState.nickName) {
+      // case of match my nickname
+      if (parsedMessage.command.toUpperCase() === 'PRIVMSG') {
+        // case of outgoing CTCP request from me to other client
+        _addNoticeText(parsedMessage.timestamp + ' ' +
+        'CTCP 1 Request to ' + parsedMessage.params[0] + ': ' +
+        ctcpCommand + ' ' + ctcpRest);
+        webState.noticeOpen = true;
+      } else {
+        // case of echo my CTCP reply to other client
+        //
+        // Outgoing CTCP reply has been parsed into
+        // individual array elements (words).
+        // This will (unparse) them back to a string
+        //
+        let replyContents = '';
+        if (parsedMessage.params.length > 2) {
+          for (let i=2; i<parsedMessage.params.length; i++) {
+            if (parsedMessage.params[i].charCodeAt(0) !== ctcpDelim) {
+              replyContents += cleanCtcpDelimiter(parsedMessage.params[i]);
+              if (i !== parsedMessage.params.length) {
+                replyContents += ' ';
+              }
+            }
+          }
+        }
+        _addNoticeText(parsedMessage.timestamp + ' ' +
+        'CTCP 2 Reply to ' + parsedMessage.params[0] + ': ' +
+        ctcpCommand + ' ' + replyContents);
+        webState.noticeOpen = true;
+      }
+    } else {
+      // case of ctcp message/reply for other remote IRC client
+      if (parsedMessage.command.toUpperCase() === 'PRIVMSG') {
+        // case of remote client request to me for CTCP response
+        _addNoticeText(parsedMessage.timestamp + ' ' +
+        'CTCP 3 Request from ' + parsedMessage.nick + ': ' +
+        ctcpCommand + ' ' + ctcpRest);
+        webState.noticeOpen = true;
+      } else {
+        // case of showing remote response to my CTCP request
+        _addNoticeText(parsedMessage.timestamp + ' ' +
+        'CTCP 4 Reply from ' +
+        parsedMessage.nick + ': ' +
+        ctcpCommand + ' ' + ctcpRest);
+        webState.noticeOpen = true;
+      }
+    }
     updateDivVisibility();
   }
 }
@@ -544,12 +626,21 @@ function _parseBufferMessage (message) {
         break;
       case 'NOTICE':
         if (true) {
-          let index = ircState.channels.indexOf(parsedMessage.params[0].toLowerCase());
-          if ((index >= 0) && (ircState.channelStates[index].joined)) {
-            displayNoticeMessage(parsedMessage);
-          }
-          if (parsedMessage.params[0] === ircState.nickName) {
-            displayNoticeMessage(parsedMessage);
+          const ctcpDelim = 1;
+          if (parsedMessage.params[1].charCodeAt(0) === ctcpDelim) {
+            // case of CTCP message
+            _parseCtcpMessage(parsedMessage);
+          } else {
+            let index = ircState.channels.indexOf(parsedMessage.params[0].toLowerCase());
+            if ((index >= 0) && (ircState.channelStates[index].joined)) {
+              // case of notice to channel that is joined
+              displayNoticeMessage(parsedMessage);
+            } else if (channelPrefixChars.indexOf(parsedMessage.params[0].charAt(0)) < 0) {
+              // case of not a channel name, must be nickname
+              displayNoticeMessage(parsedMessage);
+            } else {
+              console.log('Error parsing notice to proper recipient');
+            }
           }
         }
         break;
