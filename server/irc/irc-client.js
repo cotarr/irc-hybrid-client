@@ -98,6 +98,8 @@
   ircLog.setRawMessageLogEnabled(servers.serverArray[0].rawMessageLog);
 
   console.log('Starting ' + ircState.botName + ' ' + ircState.botVersion);
+  ircLog.writeIrcLog('-----------------------------------------');
+  ircLog.writeIrcLog('Starting ' + ircState.botName + ' ' + ircState.botVersion);
 
   const timestamp = function() {
     let now = new Date;
@@ -114,7 +116,7 @@
   const _writeSocket = function (socket, message) {
     if ((socket) && (socket.writable)) {
       //
-      // First validate UTF-8, then send message to IRC server.
+      // First validate UTF-8
       //
       let out = null;
       if (typeof message === 'string') {
@@ -126,34 +128,42 @@
       if (!isValidUTF8(out)) {
         out = null;
       }
-      if (out) {
-        socket.write(out.toString() + '\r\n', 'utf8');
-      } else {
-        console.log('Error, _writeSocket() string failed UTF8 validation.');
-        global.sendToBrowser('webServer: _writeSocket() failed UTF8 validation.\n');
-      }
+
       //
       // Second, filter passwords, then send to browser and write log file
       //
+      let filterWords = [
+        'OPER',
+        'PASS',
+        'NICKSERV',
+        'NS',
+        'CHANSERV',
+        'CS'
+      ];
+      let filterCommand = message.split(' ')[0].toUpperCase();
       let filtered = message;
-      if (message.split(' ')[0].toUpperCase() === 'OPER') {
+      if (filterWords.indexOf(filterCommand) >= 0) {
         if (!ircState.ircTLSEnabled) {
-          console.log('WARNING: OPER command without TLC encryption to IRC server');
+          console.log('WARNING: possible password without TLC encryption to IRC server');
         }
-        filtered = 'OPER ********';
-      }
-      if (message.split(' ')[0].toUpperCase() === 'PASS') {
-        if (!ircState.ircTLSEnabled) {
-          console.log('WARNING: PASS command without TLC encryption to IRC server');
-        }
-        filtered = 'PASS ********';
+        filtered = filterCommand + ' ***********';
       }
       if (message.split(' ')[0].toUpperCase() === 'JOIN') {
         if ((message.split(' ').length > 2) && (message.split(' ')[2].length > 0)) {
           filtered = 'JOIN ' + message.split(' ')[1] + ' ********';
         }
       }
+
       global.sendToBrowser(commandMsgPrefix + filtered + '\n');
+      //
+      // Third, send into socket to IRC server
+      //
+      if (out) {
+        socket.write(out.toString() + '\r\n', 'utf8');
+      } else {
+        console.log('Error, _writeSocket() string failed UTF8 validation.');
+        global.sendToBrowser('webServer: _writeSocket() failed UTF8 validation.\n');
+      }
     } else {
       // TODO should this disconnect?
       global.sendToBrowser('webServer: IRC Error: server socket not writable\n');
@@ -1185,7 +1195,9 @@
     ircSocket.connect(ircState.ircServerPort, ircState.ircServerHost, function() {
       let now = new Date();
       let timeString = now.toISOString() + ' ';
-      console.log(timeString + 'Connected to IRC server ' + ircState.ircServerName + ' ' +
+      // console.log(timeString + 'Connected to IRC server ' + ircState.ircServerName + ' ' +
+      //   ircState.ircServerHost + ':'+ ircState.ircServerPort);
+      ircLog.writeIrcLog('Connected to IRC server ' + ircState.ircServerName + ' ' +
         ircState.ircServerHost + ':'+ ircState.ircServerPort);
       res.json({error: false});
     });

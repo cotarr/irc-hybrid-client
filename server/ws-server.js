@@ -8,6 +8,7 @@ const url = require('url');
 const isValidUTF8 = require('utf-8-validate');
 
 const authorizeWebSocket = require('./middlewares/ws-authorize').authorizeWebSocket;
+const writeAccessLog = require('./irc/irc-log').writeAccessLog;
 
 // ----------------------------------------
 // Set up a headless websocket server
@@ -95,7 +96,9 @@ const wsOnUpgrade = function (request, socket, head) {
   const pathname = url.parse(request.url).pathname;
   if (pathname === '/irc/ws') {
     if (authorizeWebSocket(request)) {
-      console.log(timeString + request.connection.remoteAddress +
+      // console.log(timeString + request.connection.remoteAddress +
+      //   ' websocket-connect ' + request.url);
+      writeAccessLog('' + request.connection.remoteAddress +
         ' websocket-connect ' + request.url);
       wsServer.handleUpgrade(request, socket, head, function (socket) {
         wsServer.emit('connection', socket, request);
