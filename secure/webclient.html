@@ -26,15 +26,21 @@
     </div>
 
     <div class="logout-confirm-div" id="logoutConfirmDiv" hidden>
-      <div>
-        You are still connected to IRC.<br><br>
-        Leaving the web page will not disconnect the server from IRC.
-        Your nickname will remain present on IRC.
-        Otherwise use the [Quit] button located below before leaving.
-      </div>
-      <div>
-        <a href="/logout"><button>Web Logout</button></a>
-        <button id="cancelLogoutConfirmButton">Cancel</button>
+      <div class="head-flex">
+        <div class="head-left">
+          <div>
+            You are still connected to IRC.<br><br>
+            Leaving the web page will not disconnect the server from IRC.
+            Your nickname will remain present on IRC.
+            Otherwise use the [/Quit IRC] button located below before leaving.
+          </div>
+        </div>
+        <div class="head-right">
+          <div>
+            <a href="/logout"><button>Web Logout</button></a>
+            <button id="cancelLogoutConfirmButton">Cancel</button>
+          </div>
+        </div>
       </div>
     </div>
     <div class="aa-section-div">
@@ -100,8 +106,8 @@
 
         <div class="aa-section-div chan-msg-section-div" id="channelMenuDiv">
           <div class="button-div">
-            <textarea id="newChannelNameInputId" cols="20" rows="1" ></textarea>
-              <button id="newChannelButton" class="rm20">Join Channel</button>
+            <textarea class="va-middle" id="newChannelNameInputId" cols="20" rows="1" ></textarea>
+              <button class="va-middle" id="newChannelButton" class="rm20">Join Channel</button>
           </div>
           <div class="button-div" id="channelJoinButtonContainer">
           </div>

@@ -110,6 +110,7 @@ webState.rawNoClean = false;
 webState.channels = [];
 webState.resizableChannelTextareaIds = [];
 webState.resizableChanSplitTextareaIds = [];
+webState.resizableSendButtonTextareaIds = [];
 // Private message variables
 webState.lastPMNick = '';
 webState.activePrivateMessageNicks = [];
@@ -132,6 +133,21 @@ webSocketUrl += window.location.hostname + ':' + window.location.port;
 // WebSocket placeholder
 // -----------------------
 var wsocket = null;
+
+// -------------------------------------------
+// Default beep sound (Max 1 per 5 seconds)
+// -------------------------------------------
+const beep = new Audio('sounds/short-beep.mp3');
+var beepInhibitTimer = 0;
+function playBeepSound () {
+  if (beepInhibitTimer === 0) {
+    beep.play();
+    beepInhibitTimer = 5;
+  }
+}
+function beepTimerTick() {
+  if (beepInhibitTimer > 0) beepInhibitTimer--;
+}
 
 // --------------------------
 // Error display functions
@@ -336,6 +352,8 @@ function setVariablesShowingIRCDisconnected () {
   document.getElementById('headerUser').textContent = '';
   document.getElementById('headerServer').textContent = '';
 
+  document.dispatchEvent(new CustomEvent('cancel-beep-sounds', {bubbles: true}));
+
   let channelContainerDivEl = document.getElementById('channelContainerDiv');
   while (channelContainerDivEl.firstChild) {
     channelContainerDivEl.removeChild(channelContainerDivEl.firstChild);
@@ -343,6 +361,7 @@ function setVariablesShowingIRCDisconnected () {
   webState.channels = [];
   webState.resizableChannelTextareaIds = [];
   webState.resizableChanSplitTextareaIds = [];
+  webState.resizableSendButtonTextareaIds = [];
   // Note PM area arrays managed during reload instead of Disconnect
   // This is because they are not in ircState and there managed in the browser.
 };

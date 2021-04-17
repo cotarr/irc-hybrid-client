@@ -26,8 +26,9 @@ textarea {
 }
 
 .button-div {
-  margin-bottom: 4px;
+  margin-bottom: 5px;
 }
+
 .button-on-color {
   background-color: #72e1fc;
 }
@@ -198,7 +199,7 @@ textarea {
 }
 
 .reconnect-div {
-  background-color: #ff0000;
+  background-color: #1234ff;
   color: #ffffff;
   border: 1px solid black;
   border-radius: 6px;
@@ -229,6 +230,10 @@ textarea {
   padding: 6px;
 }
 
+.va-middle {
+  vertical-align: middle;
+}
+
 .vh5 {height: 5px;}
 .vh10 {height: 10px;}
 .vh20 {height: 20px;}
@@ -239,8 +244,4 @@ textarea {
 
 #rawMessages {
   font-size: 80%
-}
-
-#newChannelButton, #newChannelNameInputId {
-  vertical-align: middle;
 }

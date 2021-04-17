@@ -359,7 +359,7 @@ document.getElementById('test2Button').addEventListener('click', function() {
 // --------------------
 document.getElementById('test3Button').addEventListener('click', function() {
   console.log('Test 3 button pressed.');
-  console.log('Test 3 button: expire heartb eat timer');
+  console.log('Test 3 button: expire heart beat timer');
   heartbeatUpCounter = 1000;
 });
 
@@ -368,8 +368,12 @@ document.getElementById('test3Button').addEventListener('click', function() {
 // --------------------
 document.getElementById('test4Button').addEventListener('click', function() {
   console.log('Test 4 button pressed.');
+
   console.log('Test 4 getIrcState()');
   getIrcState();
+
+  // var beep = new Audio('sounds/short-beep.mp3');
+  // beep.play();
 });
 
 // ---------------------------------------------------------------------------
@@ -422,6 +426,18 @@ const adjustInputToWidowWidth = function (innerWidth) {
       }
     });
   }
+
+  // This is single line text area with SEND button next to it.
+  if (webState.resizableSendButtonTextareaIds.length > 0) {
+    webState.resizableSendButtonTextareaIds.forEach(function(id) {
+      if (document.getElementById(id)) {
+        document.getElementById(id).setAttribute('cols', (cols-8).toString());
+      } else {
+        console.log('Error: ' + id);
+      }
+    });
+  }
+
   // This is for dynamically generated elements
   // Private message <textarea> element for auto-resize
   if (webState.resizablePrivMsgTextareaIds.length > 0) {
@@ -473,6 +489,7 @@ setInterval(function() {
   errorTimerTickHandler();
   heartbeatTimerTickHandler();
   reconnectTimerTickHandler();
+  beepTimerTick();
   updateElapsedTimeDisplay();
 }.bind(this), 1000);
 

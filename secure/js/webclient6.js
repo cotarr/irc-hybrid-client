@@ -139,6 +139,9 @@ function createChannelEl (name) {
   channelTextAreaEl.setAttribute('spellCheck', 'false');
   channelTextAreaEl.setAttribute('readonly', '');
 
+  // div holding input area and send button
+  let channelInputDivEl = document.createElement('div');
+  channelInputDivEl.classList.add('button-div');
 
   // single line user input
   let channelInputAreaEl = document.createElement('textarea');
@@ -146,15 +149,17 @@ function createChannelEl (name) {
   channelInputAreaEl.id = channelInputAreaId;
   channelInputAreaEl.setAttribute('cols', '120');
   channelInputAreaEl.setAttribute('rows', '1');
-
-  // button-div
-  let channelButtonDiv1El = document.createElement('div');
-  channelButtonDiv1El.classList.add('button-div');
+  channelInputAreaEl.classList.add('va-middle');
+  channelInputAreaEl.classList.add('rm10');
 
   // send button
   let channelSendButtonEl = document.createElement('button');
   channelSendButtonEl.textContent = 'Send';
-  channelSendButtonEl.classList.add('channel-button');
+  channelSendButtonEl.classList.add('va-middle');
+
+  // button-div
+  let channelButtonDiv1El = document.createElement('div');
+  channelButtonDiv1El.classList.add('button-div');
 
   // join button
   let channelJoinButtonEl = document.createElement('button');
@@ -180,6 +185,11 @@ function createChannelEl (name) {
   channelRefreshButtonEl.textContent = 'Refresh';
   channelRefreshButtonEl.classList.add('channel-button');
 
+  // beep on message button
+  let channelBeepButtonEl = document.createElement('button');
+  channelBeepButtonEl.textContent = 'Beep';
+  channelBeepButtonEl.classList.add('channel-button');
+
   // --------------------------------
   // Append child element to DOM
   // --------------------------------
@@ -193,19 +203,22 @@ function createChannelEl (name) {
 
   channelTopRightDivEl.appendChild(channelTopRightHidableDivEl);
 
+  channelInputDivEl.appendChild(channelInputAreaEl);
+  channelInputDivEl.appendChild(channelSendButtonEl);
+
   channelTopDivEl.appendChild(channelTopLeftDivEl);
   channelTopDivEl.appendChild(channelTopRightDivEl);
 
-  channelButtonDiv1El.appendChild(channelSendButtonEl);
   channelButtonDiv1El.appendChild(channelJoinButtonEl);
   channelButtonDiv1El.appendChild(channelPartButtonEl);
   channelButtonDiv1El.appendChild(channelFormatButtonEl);
   channelButtonDiv1El.appendChild(channelRefreshButtonEl);
+  channelButtonDiv1El.appendChild(channelBeepButtonEl);
 
   channelBottomDivEl.appendChild(channelTopicDivEl);
   channelBottomDivEl.appendChild(channelNamesDisplayEl);
   channelBottomDivEl.appendChild(channelTextAreaEl);
-  channelBottomDivEl.appendChild(channelInputAreaEl);
+  channelBottomDivEl.appendChild(channelInputDivEl);
   channelBottomDivEl.appendChild(channelButtonDiv1El);
 
   channelSectionEl.appendChild(channelTopDivEl);
@@ -312,6 +325,26 @@ function createChannelEl (name) {
     channelNamesDisplayEl.textContent = '';
     _sendIrcServerMessage('NAMES ' + name);
   });
+
+  // -------------------------
+  // Beep On Message button handler
+  // -------------------------
+  channelBeepButtonEl.addEventListener('click', function() {
+    if (channelSectionEl.hasAttribute('beep-enabled')) {
+      channelSectionEl.removeAttribute('beep-enabled');
+      channelBeepButtonEl.classList.remove('button-on-color');
+    } else {
+      channelSectionEl.setAttribute('beep-enabled', '');
+      channelBeepButtonEl.classList.add('button-on-color');
+    }
+  });
+
+  // -----------------------
+  // Cancel all bepp sounds
+  // -----------------------
+  document.addEventListener('cancel-beep-sounds', function(event) {
+    channelSectionEl.removeAttribute('beep-enabled');
+  }.bind(this));
 
   // -------------
   // send button
@@ -491,6 +524,9 @@ function createChannelEl (name) {
           _addText(parsedMessage.timestamp,
             parsedMessage.nick,
             parsedMessage.params[1]);
+          if (channelSectionEl.hasAttribute('beep-enabled')) {
+            playBeepSound();
+          }
           // Upon channel message, make sectino visible.
           channelBottomDivEl.removeAttribute('hidden');
           channelHideButtonEl.textContent = '-';
@@ -540,7 +576,7 @@ function createChannelEl (name) {
   // -----------------------------------------------------------
   // Setup textarea elements as dynamically resizable (globally)
   // -----------------------------------------------------------
-  webState.resizableChannelTextareaIds.push(channelInputAreaId);
+  webState.resizableSendButtonTextareaIds.push(channelInputAreaId);
   webState.resizableChanSplitTextareaIds.push(channelTextAreaId);
   document.dispatchEvent(new CustomEvent('element-resize', {bubbles: true}));
 
@@ -571,19 +607,20 @@ document.addEventListener('irc-state-changed', function(event) {
   }
 
   // Add channel /JOIN buttons for favorite channels
-  let needButtonUpdate = false;
-  if (lastChannelsArray.length !== ircState.channels.length) {
-    // clase of different array size, need update
-    needButtonUpdate = true;
-  } else {
-    // case of same array size
-    if (ircState.channels.length > 0) {
-      // case of same length, check entries
-      for (let i=0; i<ircState.channels.length; i++) {
-        if (lastChannelsArray[i] !== ircState.channels[i]) needButtonUpdate = true;
-      }
-    }
-  }
+  // let needButtonUpdate = false;
+  // if (lastChannelsArray.length !== ircState.channels.length) {
+  //   // clase of different array size, need update
+  //   needButtonUpdate = true;
+  // } else {````
+  //   // case of same array size
+  //   if (ircState.channels.length > 0) {
+  //     // case of same length, check entries
+  //     for (let i=0; i<ircState.channels.length; i++) {
+  //       if (lastChannelsArray[i] !== ircState.channels[i]) needButtonUpdate = true;
+  //     }
+  //   }
+  // }
+  let needButtonUpdate = true;
   if (needButtonUpdate) {
     // remove old button elements
     let channelJoinButtonContainerEl = document.getElementById('channelJoinButtonContainer');

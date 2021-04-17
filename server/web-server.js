@@ -120,6 +120,7 @@ app.use(helmet.contentSecurityPolicy({
       scriptSrc: ["'self'"],
       connectSrc: ["'self'", "ws:", "wss:"],
       styleSrc: ["'self'"],
+      mediaSrc: ["'self'"],
       imgSrc: ["'self'"]
     }
 }));

@@ -131,6 +131,14 @@ const toolsCopy = function() {
     .pipe(dest('build/tools'));
 };
 
+// ------------------------------
+// copy sound files
+// ------------------------------
+const soundsCopy = function() {
+  return src('secure/sounds/*')
+    .pipe(dest('build/secure/sounds'));
+};
+
 //
 // default using 'gulp' command
 //
@@ -149,6 +157,7 @@ const buildProd = series(
   cssMinify,
   serverCopy,
   binCopy,
+  soundsCopy,
   toolsCopy
 );
 
