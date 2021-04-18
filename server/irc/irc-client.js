@@ -93,6 +93,7 @@
   ircState.botName = require('../../package.json').name;
 
   ircState.times = {programRun: 0, ircConnect: 0};
+  ircState.count = {ircConnect: 0};
   ircState.websocketCount = 0;
 
   ircLog.setRawMessageLogEnabled(servers.serverArray[0].rawMessageLog);
@@ -669,6 +670,7 @@
         // case of successful register with nickname, set registered state
         ircState.ircRegistered = true;
         ircState.times.ircConnect = timestamp();
+        ircState.count.ircConnect++;
 
         // extract my client info from last argument in 001 message
         let splitparams1 = parsedMessage.params[1].split(' ');

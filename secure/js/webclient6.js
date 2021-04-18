@@ -393,6 +393,7 @@ function createChannelEl (name) {
       channelMainSectionEl.removeAttribute('beep-enabled');
     } else {
       channelMainSectionEl.setAttribute('beep-enabled', '');
+      playBeepSound();
     }
     updateVisibility();
   });
@@ -493,7 +494,7 @@ function createChannelEl (name) {
       if (snippetArray.length > 0) {
         snippet = snippetArray[snippetArray.length - 1];
       }
-      console.log('snippet ' + snippet);
+      // console.log('snippet ' + snippet);
       if (name.toLowerCase().indexOf(snippet.toLowerCase()) === 0) {
         // #1 Check if # for channel name
         channelInputAreaEl.value =

@@ -34,6 +34,7 @@ function connectWebSocket () {
     webState.webConnected = true;
     webState.webConnecting = false;
     webState.times.webConnect = timestamp();
+    webState.count.webConnect++;
     resetHeartbeatTimer();
     updateDivVisibility();
     // These will load in parallel asychronously

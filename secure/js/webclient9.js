@@ -193,8 +193,10 @@ document.getElementById('serverTerminateButton').addEventListener('click', funct
 document.getElementById('infoOpenCloseButton').addEventListener('click', function() {
   if (document.getElementById('hiddenInfoDiv').hasAttribute('hidden')) {
     document.getElementById('hiddenInfoDiv').removeAttribute('hidden');
+    document.getElementById('infoOpenCloseButton').textContent = '-';
   } else {
     document.getElementById('hiddenInfoDiv').setAttribute('hidden', '');
+    document.getElementById('infoOpenCloseButton').textContent = '+';
   }
 });
 

@@ -746,5 +746,7 @@ function updateFromCache () {
     });
 }; // updateFromCache;
 window.addEventListener('update-from-cache', function(event) {
+  // inhibit beep for 5 seconds to avoid beeping on reloaded text.
+  inhibitBeep(5);
   updateFromCache();
 }.bind(this));

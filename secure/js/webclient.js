@@ -116,6 +116,7 @@ webState.lastPMNick = '';
 webState.activePrivateMessageNicks = [];
 webState.resizablePrivMsgTextareaIds = [];
 webState.times = {webConnect: 0};
+webState.count = {webConnect: 0};
 
 // -------------------------------
 // Build URL from page location
@@ -147,6 +148,10 @@ function playBeepSound () {
 }
 function beepTimerTick() {
   if (beepInhibitTimer > 0) beepInhibitTimer--;
+}
+function inhibitBeep(seconds) {
+  // used for reload/update
+  beepInhibitTimer = seconds;
 }
 
 // --------------------------
@@ -325,6 +330,8 @@ document.addEventListener('show-all-divs', function(event) {
   webState.wallopsOpen = true;
   document.getElementById('noticeSectionDiv').removeAttribute('hidden');
   document.getElementById('wallopsSectionDiv').removeAttribute('hidden');
+  document.getElementById('hiddenInfoDiv').removeAttribute('hidden');
+  document.getElementById('infoOpenCloseButton').textContent = '-';
 });
 
 // Event to hide all divs
@@ -341,6 +348,8 @@ document.addEventListener('hide-all-divs', function(event) {
   document.getElementById('noticeSectionDiv').setAttribute('hidden', '');
   webState.wallopsOpen = false;
   document.getElementById('wallopsSectionDiv').setAttribute('hidden', '');
+  document.getElementById('hiddenInfoDiv').setAttribute('hidden', '');
+  document.getElementById('infoOpenCloseButton').textContent = '+';
 });
 
 // --------------------------------------------------------
@@ -419,12 +428,14 @@ function updateElapsedTimeDisplay () {
   let now = timestamp();
   let timeStr = '';
   if (webState.webConnected) {
-    timeStr += 'Web Connected: ' + toTimeString(now - webState.times.webConnect) + '\n';
+    timeStr += 'Web Connected: ' + toTimeString(now - webState.times.webConnect) +
+      ' (' + webState.count.webConnect.toString() + ')\n';
   } else {
     timeStr += 'Web Connected: N/A\n';
   }
   if (ircState.ircConnected) {
-    timeStr += 'IRC Connected: ' + toTimeString(now - ircState.times.ircConnect) + '\n';
+    timeStr += 'IRC Connected: ' + toTimeString(now - ircState.times.ircConnect) +
+      ' (' + ircState.count.ircConnect.toString() + ')\n';
   } else {
     timeStr += 'IRC Connected: N/A\n';
   }
