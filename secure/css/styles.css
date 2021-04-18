@@ -33,6 +33,10 @@ textarea {
   background-color: #72e1fc;
 }
 
+.chan-top-section-div {
+  background-color: #bef7bf;
+}
+
 .channel-main-section-div {
   background-color: #bef7bf;
 }
@@ -50,6 +54,15 @@ textarea {
 .channel-bottom-div {}
 .channel-top-div {}
 .channel-head-right-hidable-div {}
+
+.channel-cb-cb {
+  vertical-align: middle;
+}
+.channel-cb-span {
+  margin-right: 10px;
+  font-size: 80%;
+  vertical-align: middle;
+}
 
 .channel-button {
   margin-right: 7px;

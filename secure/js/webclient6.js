@@ -178,15 +178,27 @@ function createChannelEl (name) {
 
   // beep on message checkbox
   let channelBeepCBInputEl = document.createElement('input');
+  channelBeepCBInputEl.classList.add('channel-cb-cb');
   channelBeepCBInputEl.setAttribute('type', 'checkbox');
   let channelBeepCBTitleEl = document.createElement('span');
+  channelBeepCBTitleEl.classList.add('channel-cb-span');
   channelBeepCBTitleEl.textContent = 'Beep';
 
-  // Text Format button
+  // Text Format checkbox
   let channelFormatCBInputEl = document.createElement('input');
+  channelFormatCBInputEl.classList.add('channel-cb-cb');
   channelFormatCBInputEl.setAttribute('type', 'checkbox');
   let channelFormatCBTitleEl = document.createElement('span');
+  channelFormatCBTitleEl.classList.add('channel-cb-span');
   channelFormatCBTitleEl.textContent = 'Brief';
+
+  // Auto-complete checkbox
+  let channelAutoCompCBInputEl = document.createElement('input');
+  channelAutoCompCBInputEl.classList.add('channel-cb-cb');
+  channelAutoCompCBInputEl.setAttribute('type', 'checkbox');
+  let channelAutoCompCBTitleEl = document.createElement('span');
+  channelAutoCompCBTitleEl.classList.add('channel-cb-span');
+  channelAutoCompCBTitleEl.textContent = 'Auto-comp';
 
   // --------------------------------
   // Append child element to DOM
@@ -215,6 +227,8 @@ function createChannelEl (name) {
   channelBottomDiv3El.appendChild(channelBeepCBTitleEl);
   channelBottomDiv3El.appendChild(channelFormatCBInputEl);
   channelBottomDiv3El.appendChild(channelFormatCBTitleEl);
+  channelBottomDiv3El.appendChild(channelAutoCompCBInputEl);
+  channelBottomDiv3El.appendChild(channelAutoCompCBTitleEl);
 
   channelBottomDivEl.appendChild(channelNamesDisplayEl);
   channelBottomDivEl.appendChild(channelTextAreaEl);
@@ -363,6 +377,11 @@ function createChannelEl (name) {
       } else {
         channelFormatCBInputEl.checked = false;
       }
+      if (channelMainSectionEl.hasAttribute('auto-comp-enabled')) {
+        channelAutoCompCBInputEl.checked = true;
+      } else {
+        channelAutoCompCBInputEl.checked = false;
+      }
     }
   }
 
@@ -379,7 +398,7 @@ function createChannelEl (name) {
   });
 
   // -----------------------
-  // Cancel all bepp sounds
+  // Cancel all beep sounds
   // -----------------------
   document.addEventListener('cancel-beep-sounds', function(event) {
     channelMainSectionEl.removeAttribute('beep-enabled');
@@ -394,7 +413,14 @@ function createChannelEl (name) {
     } else {
       channelMainSectionEl.setAttribute('brief-enabled', '');
     }
-    updateVisibility();
+    // updateVisibility();
+
+    // this forces a global update which will refreesh text area
+    document.dispatchEvent(new CustomEvent('update-from-cache', {bubbles: true}));
+
+    // THis will request a new nickname list from IRC server.
+    // channelNamesDisplayEl.textContent = '';
+    // _sendIrcServerMessage('NAMES ' + name);
   });
 
   // First time on page load
@@ -407,6 +433,112 @@ function createChannelEl (name) {
   }
   // show the brief/full setting in checkbox
   updateVisibility();
+
+  // -------------------------
+  // AutoCoplete checkbox handler
+  // -------------------------
+  channelAutoCompCBInputEl.addEventListener('click', function() {
+    if (channelMainSectionEl.hasAttribute('auto-comp-enabled')) {
+      channelMainSectionEl.removeAttribute('auto-comp-enabled');
+    } else {
+      channelMainSectionEl.setAttribute('auto-comp-enabled', '');
+    }
+    updateVisibility();
+  });
+  // Is browser capable of auto-complete?
+  // Check if beforeInput event is supported in this browser (part of InputEvent)
+  if ((window.InputEvent) && (typeof InputEvent.prototype.getTargetRanges === 'function')) {
+    channelMainSectionEl.setAttribute('auto-comp-enabled', '');
+    updateVisibility();
+  } else {
+    channelMainSectionEl.setAttribute('auto-comp-enabled', '');
+    updateVisibility();
+    channelAutoCompCBInputEl.setAttribute('disabled', '');
+  }
+
+  // ---------------------------------------
+  // textarea beforeinput event handler
+  //
+  // Auto complete function
+  // ---------------------------------------
+  const channelAutoComplete = function(e) {
+    if (channelAutoCompCBInputEl.hasAttribute('disabled')) return;
+    if (!channelMainSectionEl.hasAttribute('auto-comp-enabled')) return;
+    if (!e.data) return;
+    if(channelInputAreaEl.value.length < 2) return;
+
+    // Tab character not possible due to higher navigation binding
+    // Auto-complete on space
+    let autoCompleteKey = 32;
+    // console.log('key code ' + e.data.charCodeAt(0));
+    if (((e.data) && (e.data.charCodeAt(0) === autoCompleteKey)) &&
+      // and if previous character is also the auto-complete autoCompleteKey
+      (channelInputAreaEl.value.charCodeAt(channelInputAreaEl.value.length -1) ===
+        autoCompleteKey)) {
+      // strip previous occurrence of autoCompleteKey
+      channelInputAreaEl.value =
+        channelInputAreaEl.value.slice(0, channelInputAreaEl.value.length - 1);
+      // check one more character, if a third auto-compelte code, abort
+      if (channelInputAreaEl.value.charCodeAt(channelInputAreaEl.value.length - 1) ===
+        autoCompleteKey) {
+        // abort auto-complete
+        channelInputAreaEl.value += String.fromCharCode(autoCompleteKey) +
+          String.fromCharCode(autoCompleteKey);
+        e.preventDefault();
+        return;
+      }
+      // parse last space character delimitered string
+      let snippet = '';
+      let snippetArray = channelInputAreaEl.value.split(' ');
+      if (snippetArray.length > 0) {
+        snippet = snippetArray[snippetArray.length - 1];
+      }
+      console.log('snippet ' + snippet);
+      if (name.toLowerCase().indexOf(snippet.toLowerCase()) === 0) {
+        // #1 Check if # for channel name
+        channelInputAreaEl.value =
+          channelInputAreaEl.value.slice(0, channelInputAreaEl.value.length - snippet.length);
+        channelInputAreaEl.value += name;
+        channelInputAreaEl.value += String.fromCharCode(autoCompleteKey);
+      } else if (ircState.nickName.toLowerCase().indexOf(snippet.toLowerCase()) === 0) {
+        // #2 check if my nickname
+        channelInputAreaEl.value =
+          channelInputAreaEl.value.slice(0, channelInputAreaEl.value.length - snippet.length);
+        channelInputAreaEl.value += ircState.nickName;
+        channelInputAreaEl.value += String.fromCharCode(autoCompleteKey);
+      } else {
+        // #3 check channel nickname list
+        let completeNick = '';
+        let chanIndex = ircState.channels.indexOf(name);
+        if (chanIndex >= 0) {
+          if (ircState.channelStates[chanIndex].names.length > 0) {
+            for (let i=0; i<ircState.channelStates[chanIndex].names.length; i++) {
+              let matchNick = ircState.channelStates[chanIndex].names[i];
+              // if nick starts with op character, remove first character
+              if (nicknamePrefixChars.indexOf(matchNick.charAt(0)) >= 0) {
+                matchNick = matchNick.slice(1, matchNick.length);
+              }
+              if (matchNick.toLowerCase().indexOf(snippet.toLowerCase()) === 0) {
+                completeNick = matchNick;
+              }
+            }
+          }
+        }
+        if (completeNick.length > 0) {
+          channelInputAreaEl.value =
+            channelInputAreaEl.value.slice(0, channelInputAreaEl.value.length - snippet.length);
+          channelInputAreaEl.value += completeNick;
+          channelInputAreaEl.value += String.fromCharCode(autoCompleteKey);
+        } else {
+          // #4 not match other, abort
+          channelInputAreaEl.value += String.fromCharCode(autoCompleteKey) +
+            String.fromCharCode(autoCompleteKey);
+        }
+      }
+      e.preventDefault();
+    }
+  }.bind(this);
+  channelInputAreaEl.addEventListener('beforeinput', channelAutoComplete);
 
   //----------------
   // Nickname list
