@@ -65,13 +65,14 @@ function createChannelEl (name) {
   // This is static HTML element created in webclient.html (Insert point)
   let channelContainerDivEl = document.getElementById('channelContainerDiv');
 
-  // section-div
-  let channelSectionEl = document.createElement('div');
-  channelSectionEl.classList.add('aa-section-div');
-  channelSectionEl.classList.add('chan-msg-section-div');
+  // section-div (main element for each channel)
+  let channelMainSectionEl = document.createElement('div');
+  channelMainSectionEl.classList.add('channel-main-section-div');
+  channelMainSectionEl.classList.add('aa-section-div');
 
   // Top Element (non-hidden element)
   let channelTopDivEl = document.createElement('div');
+  channelTopDivEl.classList.add('channel-top-div');
   channelTopDivEl.classList.add('head-flex');
 
   // left flexbox div
@@ -86,6 +87,7 @@ function createChannelEl (name) {
 
   // right hidable div
   let channelTopRightHidableDivEl = document.createElement('div');
+  channelTopRightHidableDivEl.classList.add('head-right-hidable-div');
 
   // show/hide button
   let channelHideButtonEl = document.createElement('button');
@@ -112,15 +114,9 @@ function createChannelEl (name) {
   channelClearButtonEl.textContent = 'Clear';
   channelClearButtonEl.classList.add('channel-button');
 
-
   // Bottom Element (optionally hidden)
   let channelBottomDivEl = document.createElement('div');
-
-  //Channel topic
-  let channelTopicDivEl = document.createElement('div');
-  channelTopicDivEl.textContent = cleanFormatting(ircState.channelStates[channelIndex].topic);
-  channelTopicDivEl.classList.add('chan-topic-div');
-
+  channelBottomDivEl.classList.add('channel-bottom-div');
 
   // list of nick names display
   let channelNamesDisplayEl = document.createElement('textarea');
@@ -140,8 +136,8 @@ function createChannelEl (name) {
   channelTextAreaEl.setAttribute('readonly', '');
 
   // div holding input area and send button
-  let channelInputDivEl = document.createElement('div');
-  channelInputDivEl.classList.add('button-div');
+  let channelBottomDiv1El = document.createElement('div');
+  channelBottomDiv1El.classList.add('button-div');
 
   // single line user input
   let channelInputAreaEl = document.createElement('textarea');
@@ -158,8 +154,8 @@ function createChannelEl (name) {
   channelSendButtonEl.classList.add('va-middle');
 
   // button-div
-  let channelButtonDiv1El = document.createElement('div');
-  channelButtonDiv1El.classList.add('button-div');
+  let channelBottomDiv2El = document.createElement('div');
+  channelBottomDiv2El.classList.add('button-div');
 
   // join button
   let channelJoinButtonEl = document.createElement('button');
@@ -171,24 +167,26 @@ function createChannelEl (name) {
   channelPartButtonEl.textContent = 'Part';
   channelPartButtonEl.classList.add('channel-button');
 
-  // Text Format button
-  let channelFormatButtonEl = document.createElement('button');
-  if (window.innerWidth < 600) {
-    channelFormatButtonEl.textContent = 'Brief';
-  } else {
-    channelFormatButtonEl.textContent = 'Full';
-  }
-  channelFormatButtonEl.classList.add('channel-button');
-
   // refresh button
   let channelRefreshButtonEl = document.createElement('button');
   channelRefreshButtonEl.textContent = 'Refresh';
   channelRefreshButtonEl.classList.add('channel-button');
 
-  // beep on message button
-  let channelBeepButtonEl = document.createElement('button');
-  channelBeepButtonEl.textContent = 'Beep';
-  channelBeepButtonEl.classList.add('channel-button');
+  // button-div
+  let channelBottomDiv3El = document.createElement('div');
+  channelBottomDiv3El.classList.add('button-div');
+
+  // beep on message checkbox
+  let channelBeepCBInputEl = document.createElement('input');
+  channelBeepCBInputEl.setAttribute('type', 'checkbox');
+  let channelBeepCBTitleEl = document.createElement('span');
+  channelBeepCBTitleEl.textContent = 'Beep';
+
+  // Text Format button
+  let channelFormatCBInputEl = document.createElement('input');
+  channelFormatCBInputEl.setAttribute('type', 'checkbox');
+  let channelFormatCBTitleEl = document.createElement('span');
+  channelFormatCBTitleEl.textContent = 'Brief';
 
   // --------------------------------
   // Append child element to DOM
@@ -203,28 +201,31 @@ function createChannelEl (name) {
 
   channelTopRightDivEl.appendChild(channelTopRightHidableDivEl);
 
-  channelInputDivEl.appendChild(channelInputAreaEl);
-  channelInputDivEl.appendChild(channelSendButtonEl);
-
   channelTopDivEl.appendChild(channelTopLeftDivEl);
   channelTopDivEl.appendChild(channelTopRightDivEl);
 
-  channelButtonDiv1El.appendChild(channelJoinButtonEl);
-  channelButtonDiv1El.appendChild(channelPartButtonEl);
-  channelButtonDiv1El.appendChild(channelFormatButtonEl);
-  channelButtonDiv1El.appendChild(channelRefreshButtonEl);
-  channelButtonDiv1El.appendChild(channelBeepButtonEl);
+  channelBottomDiv1El.appendChild(channelInputAreaEl);
+  channelBottomDiv1El.appendChild(channelSendButtonEl);
 
-  channelBottomDivEl.appendChild(channelTopicDivEl);
+  channelBottomDiv2El.appendChild(channelJoinButtonEl);
+  channelBottomDiv2El.appendChild(channelPartButtonEl);
+  channelBottomDiv2El.appendChild(channelRefreshButtonEl);
+
+  channelBottomDiv3El.appendChild(channelBeepCBInputEl);
+  channelBottomDiv3El.appendChild(channelBeepCBTitleEl);
+  channelBottomDiv3El.appendChild(channelFormatCBInputEl);
+  channelBottomDiv3El.appendChild(channelFormatCBTitleEl);
+
   channelBottomDivEl.appendChild(channelNamesDisplayEl);
   channelBottomDivEl.appendChild(channelTextAreaEl);
-  channelBottomDivEl.appendChild(channelInputDivEl);
-  channelBottomDivEl.appendChild(channelButtonDiv1El);
+  channelBottomDivEl.appendChild(channelBottomDiv1El);
+  channelBottomDivEl.appendChild(channelBottomDiv2El);
+  channelBottomDivEl.appendChild(channelBottomDiv3El);
 
-  channelSectionEl.appendChild(channelTopDivEl);
-  channelSectionEl.appendChild(channelBottomDivEl);
+  channelMainSectionEl.appendChild(channelTopDivEl);
+  channelMainSectionEl.appendChild(channelBottomDivEl);
 
-  channelContainerDivEl.appendChild(channelSectionEl);
+  channelContainerDivEl.appendChild(channelMainSectionEl);
 
   // --------------------------
   // Channel Event listeners
@@ -305,17 +306,6 @@ function createChannelEl (name) {
   });
 
   // -------------------------
-  // Text Format button handler
-  // -------------------------
-  channelFormatButtonEl.addEventListener('click', function() {
-    if (channelFormatButtonEl.textContent === 'Full') {
-      channelFormatButtonEl.textContent = 'Brief';
-    } else {
-      channelFormatButtonEl.textContent = 'Full';
-    }
-  });
-
-  // -------------------------
   // Refresh button handler
   // -------------------------
   channelRefreshButtonEl.addEventListener('click', function() {
@@ -325,26 +315,6 @@ function createChannelEl (name) {
     channelNamesDisplayEl.textContent = '';
     _sendIrcServerMessage('NAMES ' + name);
   });
-
-  // -------------------------
-  // Beep On Message button handler
-  // -------------------------
-  channelBeepButtonEl.addEventListener('click', function() {
-    if (channelSectionEl.hasAttribute('beep-enabled')) {
-      channelSectionEl.removeAttribute('beep-enabled');
-      channelBeepButtonEl.classList.remove('button-on-color');
-    } else {
-      channelSectionEl.setAttribute('beep-enabled', '');
-      channelBeepButtonEl.classList.add('button-on-color');
-    }
-  });
-
-  // -----------------------
-  // Cancel all bepp sounds
-  // -----------------------
-  document.addEventListener('cancel-beep-sounds', function(event) {
-    channelSectionEl.removeAttribute('beep-enabled');
-  }.bind(this));
 
   // -------------
   // send button
@@ -367,7 +337,6 @@ function createChannelEl (name) {
     // console.log('Event: irc-state-changed (createChannelEl)');
     let index = ircState.channels.indexOf(name.toLowerCase());
     if (index >= 0) {
-      channelTopicDivEl.textContent = cleanFormatting(ircState.channelStates[index].topic);
       if (ircState.channelStates[index].joined) {
         channelNamesDisplayEl.removeAttribute('disabled');
         channelTextAreaEl.removeAttribute('disabled');
@@ -383,8 +352,61 @@ function createChannelEl (name) {
         channelJoinButtonEl.removeAttribute('disabled');
         channelPartButtonEl.setAttribute('disabled', '');
       }
+
+      if (channelMainSectionEl.hasAttribute('beep-enabled')) {
+        channelBeepCBInputEl.checked = true;
+      } else {
+        channelBeepCBInputEl.checked = false;
+      }
+      if (channelMainSectionEl.hasAttribute('brief-enabled')) {
+        channelFormatCBInputEl.checked = true;
+      } else {
+        channelFormatCBInputEl.checked = false;
+      }
     }
   }
+
+  // -------------------------
+  // Beep On Message checkbox handler
+  // -------------------------
+  channelBeepCBInputEl.addEventListener('click', function(e) {
+    if (channelMainSectionEl.hasAttribute('beep-enabled')) {
+      channelMainSectionEl.removeAttribute('beep-enabled');
+    } else {
+      channelMainSectionEl.setAttribute('beep-enabled', '');
+    }
+    updateVisibility();
+  });
+
+  // -----------------------
+  // Cancel all bepp sounds
+  // -----------------------
+  document.addEventListener('cancel-beep-sounds', function(event) {
+    channelMainSectionEl.removeAttribute('beep-enabled');
+  }.bind(this));
+
+  // -------------------------
+  // Text Format checkbox handler
+  // -------------------------
+  channelFormatCBInputEl.addEventListener('click', function() {
+    if (channelMainSectionEl.hasAttribute('brief-enabled')) {
+      channelMainSectionEl.removeAttribute('brief-enabled');
+    } else {
+      channelMainSectionEl.setAttribute('brief-enabled', '');
+    }
+    updateVisibility();
+  });
+
+  // First time on page load
+  if (window.innerWidth < 600) {
+    channelMainSectionEl.setAttribute('brief-enabled', '');
+    channelFormatCBInputEl.checked = true;
+  } else {
+    channelMainSectionEl.removeAttribute('brief-enabled');
+    channelFormatCBInputEl.checked = false;
+  }
+  // show the brief/full setting in checkbox
+  updateVisibility();
 
   //----------------
   // Nickname list
@@ -438,11 +460,7 @@ function createChannelEl (name) {
     function _addText (timestamp, nick, text) {
       //
       let out = '';
-      if (channelFormatButtonEl.textContent === 'Full') {
-        out = timestamp + ' ' +
-        nick.padStart(maxNickLength, ' ') + nickChannelSpacer +
-        cleanFormatting(text) + '\n';
-      } else {
+      if (channelMainSectionEl.hasAttribute('brief-enabled')) {
         out = timestamp + ' ';
         if (nick === '*') {
           out += nick + nickChannelSpacer;
@@ -450,6 +468,10 @@ function createChannelEl (name) {
           out += nick + nickChannelSpacer + '\n';
         }
         out += cleanFormatting(text) + '\n\n';
+      } else {
+        out = timestamp + ' ' +
+        nick.padStart(maxNickLength, ' ') + nickChannelSpacer +
+        cleanFormatting(text) + '\n';
       }
       // append text to textarea
       channelTextAreaEl.textContent += out;
@@ -465,14 +487,14 @@ function createChannelEl (name) {
       //
       case 'JOIN':
         if (parsedMessage.params[0].toLowerCase() === name.toLowerCase()) {
-          if (channelFormatButtonEl.textContent === 'Full') {
-            _addText(parsedMessage.timestamp,
-              '*',
-              parsedMessage.nick + ' (' + parsedMessage.host + ') has joined');
-          } else {
+          if (channelMainSectionEl.hasAttribute('brief-enabled')) {
             _addText(parsedMessage.timestamp,
               '*',
               parsedMessage.nick + ' has joined');
+          } else {
+            _addText(parsedMessage.timestamp,
+              '*',
+              parsedMessage.nick + ' (' + parsedMessage.host + ') has joined');
           }
         }
         break;
@@ -507,15 +529,15 @@ function createChannelEl (name) {
         if (parsedMessage.params[0].toLowerCase() === name.toLowerCase()) {
           let reason = ' ';
           if (parsedMessage.params[1]) reason = parsedMessage.params[1];
-          if (channelFormatButtonEl.textContent === 'Full') {
+          if (channelMainSectionEl.hasAttribute('brief-enabled')) {
+            _addText(parsedMessage.timestamp,
+              '*',
+              parsedMessage.nick + ' has left');
+          } else {
             _addText(parsedMessage.timestamp,
               '*',
               parsedMessage.nick + ' (' + parsedMessage.host + ') has left ' +
               '(' + reason + ')' );
-          } else {
-            _addText(parsedMessage.timestamp,
-              '*',
-              parsedMessage.nick + ' has left');
           }
         }
         break;
@@ -524,7 +546,7 @@ function createChannelEl (name) {
           _addText(parsedMessage.timestamp,
             parsedMessage.nick,
             parsedMessage.params[1]);
-          if (channelSectionEl.hasAttribute('beep-enabled')) {
+          if (channelMainSectionEl.hasAttribute('beep-enabled')) {
             playBeepSound();
           }
           // Upon channel message, make sectino visible.
@@ -541,15 +563,15 @@ function createChannelEl (name) {
           // be checked.
           let reason = ' ';
           if (parsedMessage.params[0]) reason = parsedMessage.params[0];
-          if (channelFormatButtonEl.textContent === 'Full') {
+          if (channelMainSectionEl.hasAttribute('brief-enabled')) {
+            _addText(parsedMessage.timestamp,
+              '*',
+              parsedMessage.nick + ' has quit');
+          } else {
             _addText(parsedMessage.timestamp,
               '*',
               parsedMessage.nick + ' (' + parsedMessage.host + ') has quit ' +
               '(' + reason + ')' );
-          } else {
-            _addText(parsedMessage.timestamp,
-              '*',
-              parsedMessage.nick + ' has quit');
           }
         }
         break;

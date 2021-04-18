@@ -33,7 +33,7 @@ textarea {
   background-color: #72e1fc;
 }
 
-.chan-msg-section-div {
+.channel-main-section-div {
   background-color: #bef7bf;
 }
 
@@ -46,6 +46,10 @@ textarea {
 .chan-topic-div {
   margin-bottom: 5px;
 }
+
+.channel-bottom-div {}
+.channel-top-div {}
+.channel-head-right-hidable-div {}
 
 .channel-button {
   margin-right: 7px;
