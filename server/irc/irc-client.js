@@ -598,6 +598,51 @@
 
     // Add a nicname to channel array list
     // If op or voice (@,+) not match, then update the existing name
+    function _exchangeNames(oldNick, newNick) {
+      if (!newNick) return;
+      if (newNick.length < 1) return;
+      if (!oldNick) return;
+      if (oldNick.length < 1) return;
+      if (ircState.channels.length === 0) return;
+
+      // There should be no operator characters, but check and strip them if they are there
+      let pureOldNick = oldNick;
+      if (nicknamePrefixChars.indexOf(pureOldNick.charAt(0)) >= 0) {
+        pureOldNick = pureOldNick.slice(1, pureOldNick.length);
+      }
+      let pureNewNick = newNick;
+      if (nicknamePrefixChars.indexOf(pureNewNick.charAt(0)) >= 0) {
+        pureNewNick = pureNewNick.slice(1, pureNewNick.length);
+      }
+      // ci = channel index into channels array
+      for (let ci=0; ci<ircState.channels.length; ci++) {
+        let nickCount = ircState.channelStates[ci].names.length;
+        if (nickCount > 0) {
+          let matchIndex = -1;
+          let opChar = '';
+          for (let i=0; i<nickCount; i++) {
+            let pureNick = ircState.channelStates[ci].names[i];
+            let tempOpChar = '';
+            if (nicknamePrefixChars.indexOf(pureNick.charAt(0)) >= 0) {
+              tempOpChar = pureNick.charAt(0);
+              pureNick = pureNick.slice(1, pureNick.length);
+            }
+            console.log('tempOpChar ' + tempOpChar + ' pureNick ' + pureNewNick);
+            if (pureOldNick === pureNick) {
+              matchIndex = i;
+              opChar = tempOpChar;
+            }
+          } // next i
+          if (matchIndex >= 0) {
+            ircState.channelStates[ci].names[matchIndex] = opChar + newNick;
+          }
+        }
+      } // next ci
+      return;
+    }
+
+    // Add a nicname to channel array list
+    // If op or voice (@,+) not match, then update the existing name
     function _addName(newNick, channel) {
       if (!newNick) return;
       if (newNick.length < 1) return;
@@ -607,21 +652,23 @@
         let nickCount = ircState.channelStates[channelIndex].names.length;
         if (nickCount > 0) {
           let matchIndex = -1;
+          let opChar = '';
           let pureNewNick = newNick;
-          if ((pureNewNick.charAt(0) === '@') || (pureNewNick.charAt(0) === '+')) {
+          if (nicknamePrefixChars.indexOf(pureNewNick.charAt(0)) >= 0) {
             pureNewNick = pureNewNick.slice(1, pureNewNick.length);
           }
           for (let i=0; i<nickCount; i++) {
             let pureNick = ircState.channelStates[channelIndex].names[i];
-            if ((pureNick.charAt(0) === '@') || (pureNick.charAt(0) === '+')) {
+            if (nicknamePrefixChars.indexOf(pureNick.charAt(0)) >= 0) {
+              opChar = pureNick.charAt(0);
               pureNick = pureNick.slice(1, pureNick.length);
             }
             if (pureNewNick === pureNick) matchIndex = i;
           }
           if (matchIndex >= 0) {
             // case of name exist, if @ or + prefix not match replace entire string
-            if (ircState.channelStates[channelIndex].names[i] !== newNick) {
-              ircState.channelStates[channelIndex].names[i];
+            if (ircState.channelStates[channelIndex].names[matchIndex] !== newNick) {
+              ircState.channelStates[channelIndex].names[matchIndex] = newNick;
             }
           } else {
             // case of nick not in list, add it
@@ -644,12 +691,12 @@
         if (nickCount > 0) {
           let matchIndex = -1;
           let pureOldNick = oldNick;
-          if ((pureOldNick.charAt(0) === '@') || (pureOldNick.charAt(0) === '+')) {
+          if (nicknamePrefixChars.indexOf(pureOldNick.charAt(0)) >= 0) {
             pureOldNick = pureOldNick.slice(1, pureOldNick.length);
           }
           for (let i=0; i<nickCount; i++) {
             let pureNick = ircState.channelStates[channelIndex].names[i];
-            if ((pureNick.charAt(0) === '@') || (pureNick.charAt(0) === '+')) {
+            if (nicknamePrefixChars.indexOf(pureNick.charAt(0)) >= 0) {
               pureNick = pureNick.slice(1, pureNick.length);
             }
             // console.log('pureOldNick pureNick' + pureOldNick + ' ' + pureNick);
@@ -858,14 +905,7 @@
           if (ircState.channels.length > 0) {
             let previousNick = parsedMessage.nick;
             let nextNick = parsedMessage.params[0];
-            for (let i=0; i<ircState.channels.length; i++) {
-              if (ircState.channelStates[i].joined) {
-                if (ircState.channelStates[i].names.indexOf(previousNick) >= 0) {
-                  _removeName(previousNick, ircState.channels[i]);
-                  _addName(nextNick, ircState.channels[i]);
-                }
-              }
-            }
+            _exchangeNames(previousNick, nextNick);
           }
           global.sendToBrowser('UPDATE\n');
         }

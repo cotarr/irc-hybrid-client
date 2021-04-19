@@ -627,6 +627,22 @@ function createChannelEl (name) {
       //
       // TODO cases for channel closed or other error
       //
+      case 'KICK':
+        if (parsedMessage.params[0].toLowerCase() === name.toLowerCase()) {
+          let reason = ' ';
+          if (parsedMessage.params[2]) reason = parsedMessage.params[2];
+          if (channelMainSectionEl.hasAttribute('brief-enabled')) {
+            _addText(parsedMessage.timestamp,
+              '*',
+              parsedMessage.nick + ' has kicked ' + parsedMessage.params[1]);
+          } else {
+            _addText(parsedMessage.timestamp,
+              '*',
+              parsedMessage.nick + ' has kicked ' + parsedMessage.params[1] +
+              ' (' + reason + ')' );
+          }
+        }
+        break;
       case 'JOIN':
         if (parsedMessage.params[0].toLowerCase() === name.toLowerCase()) {
           if (channelMainSectionEl.hasAttribute('brief-enabled')) {

@@ -406,6 +406,7 @@ const ircMessageCommandDisplayFilter = [
   '353', // Names
   '366', // End Names
   'JOIN',
+  'KICK',
   'MODE',
   'NICK',
   'NOTICE',
@@ -658,6 +659,9 @@ function _parseBufferMessage (message) {
     switch(parsedMessage.command) {
       case 'ERROR':
         // console.log(message.toString());
+        break;
+      case 'KICK':
+        displayChannelMessage(parsedMessage);
         break;
       case 'JOIN':
         displayChannelMessage(parsedMessage);

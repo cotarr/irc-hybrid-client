@@ -37,9 +37,14 @@ function connectWebSocket () {
     webState.count.webConnect++;
     resetHeartbeatTimer();
     updateDivVisibility();
-    // These will load in parallel asychronously
-    getIrcState();
-    updateFromCache();
+
+    // load state of IRC connection
+    getIrcState(function(err, data) {
+      if (!err) {
+        // then pull in existing data
+        updateFromCache();
+      }
+    });
   });
 
   // -----------------------
