@@ -400,6 +400,9 @@ function displayWallopsMessage(parsedMessage) {
 // unleses raw checkbox is checked. It is assumed they are displayed
 // in other windows.
 const ircMessageCommandDisplayFilter = [
+  '331', // Topic
+  '332', // Topic
+  '333', // Topic
   '353', // Names
   '366', // End Names
   'JOIN',

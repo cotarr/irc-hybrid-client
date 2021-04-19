@@ -118,6 +118,11 @@ function createChannelEl (name) {
   let channelBottomDivEl = document.createElement('div');
   channelBottomDivEl.classList.add('channel-bottom-div');
 
+  //Channel topic
+  let channelTopicDivEl = document.createElement('div');
+  channelTopicDivEl.textContent = cleanFormatting(ircState.channelStates[channelIndex].topic);
+  channelTopicDivEl.classList.add('chan-topic-div');
+
   // list of nick names display
   let channelNamesDisplayEl = document.createElement('textarea');
   channelNamesDisplayEl.classList.add('channel-names-display');
@@ -230,6 +235,7 @@ function createChannelEl (name) {
   channelBottomDiv3El.appendChild(channelAutoCompCBInputEl);
   channelBottomDiv3El.appendChild(channelAutoCompCBTitleEl);
 
+  channelBottomDivEl.appendChild(channelTopicDivEl);
   channelBottomDivEl.appendChild(channelNamesDisplayEl);
   channelBottomDivEl.appendChild(channelTextAreaEl);
   channelBottomDivEl.appendChild(channelBottomDiv1El);
@@ -352,6 +358,7 @@ function createChannelEl (name) {
     let index = ircState.channels.indexOf(name.toLowerCase());
     if (index >= 0) {
       if (ircState.channelStates[index].joined) {
+        channelTopicDivEl.textContent = cleanFormatting(ircState.channelStates[index].topic);
         channelNamesDisplayEl.removeAttribute('disabled');
         channelTextAreaEl.removeAttribute('disabled');
         channelInputAreaEl.removeAttribute('disabled');
@@ -613,7 +620,9 @@ function createChannelEl (name) {
     }
 
     let parsedMessage = event.detail.parsedMessage;
-    // console.log('Event channel-message: ' + JSON.stringify(parsedMessage, null, 2));
+    console.log('Event channel-message: ' + JSON.stringify(parsedMessage, null, 2));
+
+
     switch(parsedMessage.command) {
       //
       // TODO cases for channel closed or other error
@@ -734,13 +743,6 @@ function createChannelEl (name) {
   webState.resizableSendButtonTextareaIds.push(channelInputAreaId);
   webState.resizableChanSplitTextareaIds.push(channelTextAreaId);
   document.dispatchEvent(new CustomEvent('element-resize', {bubbles: true}));
-
-  //
-  // THIS IS A HACK (First 2 to 4 lines are missing sometimes, so refresh from cache)
-  //
-  setTimeout(function() {
-    updateFromCache();
-  }.bind(this), 250);
 };
 
 // ----------------------------------------------------------------------
