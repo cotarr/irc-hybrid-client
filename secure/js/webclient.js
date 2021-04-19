@@ -104,8 +104,9 @@ webState.webConnected = false;
 webState.webConnecting = false;
 webState.noticeOpen = false;
 webState.wallopsOpen = false;
-webState.rawShowHex = false;
-webState.rawNoClean = false;
+webState.viewRawMessages = false;
+webState.showRawInHex = false;
+
 // Some IRC channel local variables (most in ircState)
 webState.channels = [];
 webState.resizableChannelTextareaIds = [];

@@ -124,33 +124,42 @@ document.getElementById('hideAllDivsButton').addEventListener('click', function(
 // Variables button
 // -----------------------
 document.getElementById('variablesButtonId').addEventListener('click', function() {
-  document.getElementById('variablesDivId').removeAttribute('hidden');
-  document.getElementById('variablesPreId').textContent =
-    'Press [Variables] to refresh\n' +
-    'Press [Debug] to close\n' +
-    '----------------------------\n\n' +
-    'ircState = ' + JSON.stringify(ircState, null, 2) + '\n\n' +
-    'webState = ' + JSON.stringify(webState, null, 2);
+  if (document.getElementById('variablesDivId').hasAttribute('hidden')) {
+    document.getElementById('variablesDivId').removeAttribute('hidden');
+    document.getElementById('variablesPreId').textContent =
+      'Press [Show Variables] to refresh\n' +
+      '----------------------------\n\n' +
+      'ircState = ' + JSON.stringify(ircState, null, 2) + '\n\n' +
+      'webState = ' + JSON.stringify(webState, null, 2);
+  } else {
+    document.getElementById('variablesDivId').setAttribute('hidden', '');
+  }
 }.bind(this));
 
-document.getElementById('rawDisplayHexButtonId').addEventListener('click', function() {
-  if (webState.rawShowHex) {
-    webState.rawShowHex = false;
-    document.getElementById('rawDisplayHexButtonId').classList.remove('button-on-color');
+// -------------------------
+// Text Format checkbox handler
+// -------------------------
+document.getElementById('viewRawMessagesCheckbox').addEventListener('click', function(e) {
+  if (document.getElementById('viewRawMessagesCheckbox').checked) {
+    document.getElementById('showRawInHexCheckbox').removeAttribute('disabled');
+    webState.viewRawMessages = true;
   } else {
-    webState.rawShowHex = true;
-    document.getElementById('rawDisplayHexButtonId').classList.add('button-on-color');
+    document.getElementById('showRawInHexCheckbox').checked = false;
+    document.getElementById('showRawInHexCheckbox').setAttribute('disabled', '');
+    webState.viewRawMessages = false;
+    webState.showRawInHex = false;
   }
+  // this forces a global update which will refreesh text area
+  document.dispatchEvent(new CustomEvent('update-from-cache', {bubbles: true}));
 });
-
-document.getElementById('rawNoCleanFormatCodesButtonId').addEventListener('click', function() {
-  if (webState.rawNoClean) {
-    webState.rawNoClean = false;
-    document.getElementById('rawNoCleanFormatCodesButtonId').classList.remove('button-on-color');
+document.getElementById('showRawInHexCheckbox').addEventListener('click', function() {
+  if (document.getElementById('showRawInHexCheckbox').checked) {
+    webState.showRawInHex = true;
   } else {
-    webState.rawNoClean = true;
-    document.getElementById('rawNoCleanFormatCodesButtonId').classList.add('button-on-color');
+    webState.showRawInHex = false;
   }
+  // this forces a global update which will refreesh text area
+  document.dispatchEvent(new CustomEvent('update-from-cache', {bubbles: true}));
 });
 
 // -----------------------

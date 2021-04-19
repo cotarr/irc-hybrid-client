@@ -37,8 +37,8 @@
         </div>
         <div class="head-right">
           <div>
-            <a href="/logout"><button>Web Logout</button></a>
             <button id="cancelLogoutConfirmButton">Cancel</button>
+            <a href="/logout"><button>Web Logout</button></a>
           </div>
         </div>
       </div>
@@ -62,7 +62,7 @@
         <div class="button-div">
           <input type="text" id="ircServerNameInputId" size="10" value="" disabled>
           <input type="checkbox" id="ircServerTlsCheck" disabled>
-          <span>TLS</splan>
+          <span>TLS</span>
           <button id="cycleNextServerButton">Next Server</button>
         </div>
         <div class="button-div">
@@ -117,7 +117,7 @@
 
         <div class="aa-section-div priv-msg-section-div" id="privMsgSectionDiv">
           <div>
-            <button id="privMsgMainHiddenButton">-</button>
+            <button id="privMsgMainHiddenButton">+</button>
             <span>Private Messages</span>
           </div>
           <div id="privMsgMainHiddenDiv" hidden>
@@ -175,7 +175,7 @@
         </div>
 
       </div>
-      <div class="aa-section-div raw-section-div">
+      <div class="aa-section-div raw-section-div" id="rawSectionDiv">
         <div class='head-flex'>
           <div class="head-left">
             <button class="notice-button" id="rawHiddenElementsButton">-</button>
@@ -208,31 +208,45 @@
               <button id="sendRawMessageButton">Send</button>
               <button id="loadFromCacheButton">Refresh</button>
               <button id="eraseCacheButton">Erase Cache</button>
-              <button id="showDebugButton">Debug Tools</button>
+              <button id="showDebugButton">Tools...</button>
             </div>
-            <div class="hidden-debug-div" id="hiddenDebugDiv" hidden>
-              <div>
-                <pre id='elapsedTimeDiv'>
-                </pre>
+
+            <div id="hiddenDebugDiv" hidden>
+              <div class="button-div">
+                <input type="checkbox" id="viewRawMessagesCheckbox">
+                <span>View-Raw</span>
+                <input type="checkbox" id="showRawInHexCheckbox" disabled>
+                <span>View-Hex</span>
+              </div>
+              <div class="debug-div-time">
+                <div>
+                  <pre id='elapsedTimeDiv'>
+                  </pre>
+                </div>
               </div>
               <div class="button-div">
-                <button id="variablesButtonId">Variables</button>
-                <button id="rawDisplayHexButtonId">Raw in Hex</button>
-                <button id="rawNoCleanFormatCodesButtonId">Raw no clean</button>
+                <span>Server: </span>
+                <button id="test1Button">Test 1</button>
+                <button id="test2Button">Test 2</button>
+              </div>
+              <div class="button-div">
+                <span>Local: </span>
+                <button id="test3Button">Test 3</button>
+                <button id="test4Button">Test 4</button>
               </div>
               <div class="button-div">
                 <button id="disconnectButton">Force IRC Disconnect</button>
                 <button id="serverTerminateButton">Die Web Server</button>
               </div>
               <div class="button-div">
-                <button id="test1Button">Test 1</button>
-                <button id="test2Button">Test 2</button>
-                <button id="test3Button">Test 3</button>
-                <button id="test4Button">Test 4</button>
+                <button id="variablesButtonId">Show Variables</button>
               </div>
               <div class='variables-div' id="variablesDivId" hidden><pre id=variablesPreId>
               </pre></div>
             </div>
+
+
+
           </div>
         </div>
       </div>

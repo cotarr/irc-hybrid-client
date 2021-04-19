@@ -90,6 +90,14 @@ textarea {
   background-color: #ffffff;
 }
 
+.debug-div-time {
+  background-color: white;
+  border: 1px solid black;
+  border-radius: 5px;
+  padding-left: 10px;
+  margin-right: 10px;
+  margin-bottom: 10px;
+}
 
 .error-div {
   position: fixed;
@@ -131,13 +139,6 @@ textarea {
   text-align: center;
   padding-top: 5px;
   padding-bottom: 5px;
-}
-
-.hidden-debug-div {
-  background-color: white;
-  border: 1px solid black;
-  border-radius: 5px;
-  padding: 10px;
 }
 
 .info-help-div {
@@ -212,7 +213,7 @@ textarea {
 }
 
 .raw-section-div {
-  background-color: #8080a0;
+  background-color: #dbbaff;
 }
 
 .reconnect-div {

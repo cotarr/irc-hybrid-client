@@ -409,12 +409,27 @@ function showRawMessageWindow() {
 }
 
 function displayRawMessage (inString) {
-  let text = cleanFormatting(inString);
-  if (webState.rawNoClean) text = inString;
-  document.getElementById('rawMessageDisplay').textContent += text + '\n';
+  document.getElementById('rawMessageDisplay').textContent += inString + '\n';
+  // scroll to view new text
   document.getElementById('rawMessageDisplay').scrollTop =
     document.getElementById('rawMessageDisplay').scrollHeight;
 };
+
+// In messages from IRC server, these are NOT displayed in server window
+// unleses raw checkbox is checked. It is assumed they are displayed
+// in other windows.
+const ircMessageCommandDisplayFilter = [
+  '353', // Names
+  '366', // End Names
+  'JOIN',
+  'MODE',
+  'NICK',
+//  'NOTICE',
+  'PRIVMSG',
+  'QUIT',
+  'TOPIC',
+  'WALLOPS'
+];
 
 function displayRawMessageInHex (message) {
   let hexString = '';
@@ -564,21 +579,17 @@ function _parseBufferMessage (message) {
       }
     }
 
-    //
-    // Display raw message in Hexadecimal
-    //
-    if (webState.rawShowHex) displayRawMessageInHex(message);
+    // Echo of outgoing messages prefixed with '-->' should not be exposed to parser
+    if (message.split(' ')[0] === '-->') {
+      if (webState.viewRawMessages) displayRawMessage(message);
+      return;
+    }
 
-    //
-    // Display raw message from IRC server
-    //
-    displayRawMessage(message);
-
-    // Do not process back echo message prefixed with '-->'.
-    if (message.split(' ')[0] === '-->') return;
-
-    // Do not process server info message
-    if (message.split(' ')[0] === 'Webserver:') return;
+    // Misc server messages prefixed with 'Webserver: ' should not be exposed to parser
+    if (message.split(' ')[0] === 'Webserver:') {
+      if (webState.viewRawMessages) displayRawMessage(message);
+      return;
+    }
 
     //
     // Main Parser
@@ -587,6 +598,20 @@ function _parseBufferMessage (message) {
     //
     let parsedMessage = _parseIrcMessage(message);
     // console.log('parsedMessage' + JSON.stringify(parsedMessage, null, 2));
+
+    //
+    // Display of server messages
+    //
+    if (webState.viewRawMessages) {
+      // If selectred, display raw message in Hexadecimal
+      if (webState.showRawInHex) displayRawMessageInHex(message);
+      // then show raw server message (with control chars);
+      displayRawMessage(message);
+    } else {
+      if (ircMessageCommandDisplayFilter.indexOf(parsedMessage.command.toUpperCase()) < 0) {
+        displayRawMessage(cleanFormatting(cleanCtcpDelimiter(message)));
+      }
+    }
 
     //
     // Check if server is responding with error code
@@ -610,6 +635,9 @@ function _parseBufferMessage (message) {
         if (true) {
           if (parsedMessage.params[0] === ircState.nickName) {
             // Case of me, my MODE has changed
+            if (!webState.viewRawMessages) {
+              displayRawMessage(cleanFormatting(cleanCtcpDelimiter(message)));
+            }
           } else if (channelPrefixChars.indexOf(parsedMessage.params[0].charAt(0)) >= 0) {
             // Case of channel name
             displayChannelMessage(parsedMessage);
@@ -627,6 +655,7 @@ function _parseBufferMessage (message) {
       case 'NOTICE':
         if (true) {
           const ctcpDelim = 1;
+          if (parsedMessage.params[1] === null) parsedMessage.params[1] = '';
           if (parsedMessage.params[1].charCodeAt(0) === ctcpDelim) {
             // case of CTCP message
             _parseCtcpMessage(parsedMessage);
