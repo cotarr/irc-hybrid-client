@@ -596,8 +596,9 @@
     //
     ircLog.writeIrcLog(message);
 
-    // Add a nicname to channel array list
-    // If op or voice (@,+) not match, then update the existing name
+
+    // cycle through all channels and replace
+    // the new nickname, preserving op character
     function _exchangeNames(oldNick, newNick) {
       if (!newNick) return;
       if (newNick.length < 1) return;
@@ -627,7 +628,6 @@
               tempOpChar = pureNick.charAt(0);
               pureNick = pureNick.slice(1, pureNick.length);
             }
-            console.log('tempOpChar ' + tempOpChar + ' pureNick ' + pureNewNick);
             if (pureOldNick === pureNick) {
               matchIndex = i;
               opChar = tempOpChar;
