@@ -339,39 +339,36 @@ function displayNoticeMessage(parsedMessage) {
   // console.log('parsedMessage ' + JSON.stringify(parsedMessage, null, 2));
   switch(parsedMessage.command) {
     case 'NOTICE':
-      // skip last /QUIT notice from null for connection statistics
-      if (parsedMessage.nick) {
-        const ctcpDelim = 1;
-        if (((parsedMessage.params.length === 2) &&
-          (parsedMessage.params[1].charCodeAt(0) === ctcpDelim)) ||
-          ((parsedMessage.params.length === 3) &&
-          (parsedMessage.params[2].charCodeAt(0) === ctcpDelim))) {
-          // case of CTCP notice
-        } else {
-          if (parsedMessage.params[0] === ircState.nickName) {
-            // Case of regular notice, not CTCP reply
-            _addText(parsedMessage.timestamp + ' Notice(' +
-            parsedMessage.nick + ' to ' + parsedMessage.params[0] + ') ' +
-             parsedMessage.params[1]);
-            webState.noticeOpen = true;
-            updateDivVisibility();
-          } else if (ircState.channels.indexOf(parsedMessage.params[0].toLowerCase()) >= 0) {
-            // case of notice to #channel
-            document.dispatchEvent(new CustomEvent('channel-message',
-              {
-                bubbles: true,
-                detail: {
-                  parsedMessage: parsedMessage
-                }
-              }));
-          } else if (parsedMessage.nick === ircState.nickName) {
-            // Case of regular notice, not CTCP reply
-            _addText(parsedMessage.timestamp + ' Notice(' +
-            parsedMessage.nick + ' to ' + parsedMessage.params[0] + ') ' +
-             parsedMessage.params[1]);
-            webState.noticeOpen = true;
-            updateDivVisibility();
-          }
+      const ctcpDelim = 1;
+      if (((parsedMessage.params.length === 2) &&
+        (parsedMessage.params[1].charCodeAt(0) === ctcpDelim)) ||
+        ((parsedMessage.params.length === 3) &&
+        (parsedMessage.params[2].charCodeAt(0) === ctcpDelim))) {
+        // case of CTCP notice
+      } else {
+        if (parsedMessage.params[0] === ircState.nickName) {
+          // Case of regular notice, not CTCP reply
+          _addText(parsedMessage.timestamp + ' Notice(' +
+          parsedMessage.nick + ' to ' + parsedMessage.params[0] + ') ' +
+           parsedMessage.params[1]);
+          webState.noticeOpen = true;
+          updateDivVisibility();
+        } else if (ircState.channels.indexOf(parsedMessage.params[0].toLowerCase()) >= 0) {
+          // case of notice to #channel
+          document.dispatchEvent(new CustomEvent('channel-message',
+            {
+              bubbles: true,
+              detail: {
+                parsedMessage: parsedMessage
+              }
+            }));
+        } else if (parsedMessage.nick === ircState.nickName) {
+          // Case of regular notice, not CTCP reply
+          _addText(parsedMessage.timestamp + ' Notice(' +
+          parsedMessage.nick + ' to ' + parsedMessage.params[0] + ') ' +
+           parsedMessage.params[1]);
+          webState.noticeOpen = true;
+          updateDivVisibility();
         }
       }
       break;
@@ -399,22 +396,6 @@ function displayWallopsMessage(parsedMessage) {
   }
 } // displayWallopsMessage
 
-function showRawMessageWindow() {
-  document.getElementById('rawHiddenElements').removeAttribute('hidden');
-  document.getElementById('rawHiddenElementsButton').textContent = '-';
-  document.getElementById('rawHeadRightButtons').removeAttribute('hidden');
-  // scroll message to most recent
-  document.getElementById('rawMessageDisplay').scrollTop =
-    document.getElementById('rawMessageDisplay').scrollHeight;
-}
-
-function displayRawMessage (inString) {
-  document.getElementById('rawMessageDisplay').textContent += inString + '\n';
-  // scroll to view new text
-  document.getElementById('rawMessageDisplay').scrollTop =
-    document.getElementById('rawMessageDisplay').scrollHeight;
-};
-
 // In messages from IRC server, these are NOT displayed in server window
 // unleses raw checkbox is checked. It is assumed they are displayed
 // in other windows.
@@ -424,12 +405,43 @@ const ircMessageCommandDisplayFilter = [
   'JOIN',
   'MODE',
   'NICK',
-//  'NOTICE',
+  'NOTICE',
+  'PING',
   'PRIVMSG',
   'QUIT',
   'TOPIC',
   'WALLOPS'
 ];
+
+// This is the server message window view selector
+function showRawMessageWindow() {
+  document.getElementById('rawHiddenElements').removeAttribute('hidden');
+  document.getElementById('rawHiddenElementsButton').textContent = '-';
+  document.getElementById('rawHeadRightButtons').removeAttribute('hidden');
+  // scroll message to most recent
+  document.getElementById('rawMessageDisplay').scrollTop =
+    document.getElementById('rawMessageDisplay').scrollHeight;
+}
+
+// if a server message starts with time in seconds, convert to hour:minute:seconds
+function substituteHmsTime(inMessage) {
+  let timeSeconds = inMessage.split(' ')[0];
+  let restOfMessage = inMessage.slice(timeSeconds.length + 1, inMessage.length);
+  let timeObj = new Date(parseInt(timeSeconds) * 1000);
+  let hmsString = '';
+  hmsString += timeObj.getHours().toString().padStart(2, '0') + ':';
+  hmsString += timeObj.getMinutes().toString().padStart(2, '0') + ':';
+  hmsString += timeObj.getSeconds().toString().padStart(2, '0');
+  return hmsString + ' ' + restOfMessage;
+}
+
+// Add messages to the server window
+function displayRawMessage (inString) {
+  document.getElementById('rawMessageDisplay').textContent += inString + '\n';
+  // scroll to view new text
+  document.getElementById('rawMessageDisplay').scrollTop =
+    document.getElementById('rawMessageDisplay').scrollHeight;
+};
 
 function displayRawMessageInHex (message) {
   let hexString = '';
@@ -558,12 +570,18 @@ function _parseBufferMessage (message) {
     // 1) Check if websocket heartbeat
     // console.log('heartbeat');
     onHeartbeatReceived();
+    if (webState.showCommsMessages) {
+      displayRawMessage('HEARTBEAT');
+    }
   } else if ( message === 'UPDATE' ) {
     // 2) Else check if backend requests browser to
     //       poll the state API and update
     // console.log('update');
     // calling this updates state itself
     getIrcState();
+    if (webState.showCommsMessages) {
+      displayRawMessage('UPDATE');
+    }
   } else {
     // 3) Else, this is IRC message to be parsed for IRC browser user.
 
@@ -581,13 +599,13 @@ function _parseBufferMessage (message) {
 
     // Echo of outgoing messages prefixed with '-->' should not be exposed to parser
     if (message.split(' ')[0] === '-->') {
-      if (webState.viewRawMessages) displayRawMessage(message);
+      if (webState.showCommsMessages) displayRawMessage(message);
       return;
     }
 
     // Misc server messages prefixed with 'Webserver: ' should not be exposed to parser
-    if (message.split(' ')[0] === 'Webserver:') {
-      if (webState.viewRawMessages) displayRawMessage(message);
+    if (message.split(' ')[0] === 'webServer:') {
+      if (webState.showCommsMessages) displayRawMessage(message);
       return;
     }
 
@@ -609,7 +627,17 @@ function _parseBufferMessage (message) {
       displayRawMessage(message);
     } else {
       if (ircMessageCommandDisplayFilter.indexOf(parsedMessage.command.toUpperCase()) < 0) {
-        displayRawMessage(cleanFormatting(cleanCtcpDelimiter(message)));
+        let timeSeconds = message.split(' ')[0];
+        let restOfMessage = message.slice(timeSeconds.length + 1, message.length);
+        let timeObj = new Date(parseInt(timeSeconds) * 1000);
+        let hmsString = '';
+        hmsString += timeObj.getHours().toString().padStart(2, '0') + ':';
+        hmsString += timeObj.getMinutes().toString().padStart(2, '0') + ':';
+        hmsString += timeObj.getSeconds().toString().padStart(2, '0');
+        displayRawMessage(
+          cleanFormatting(
+            cleanCtcpDelimiter(
+              substituteHmsTime(message))));
       }
     }
 
@@ -636,7 +664,10 @@ function _parseBufferMessage (message) {
           if (parsedMessage.params[0] === ircState.nickName) {
             // Case of me, my MODE has changed
             if (!webState.viewRawMessages) {
-              displayRawMessage(cleanFormatting(cleanCtcpDelimiter(message)));
+              displayRawMessage(
+                cleanFormatting(
+                  cleanCtcpDelimiter(
+                    substituteHmsTime(message))));
             }
           } else if (channelPrefixChars.indexOf(parsedMessage.params[0].charAt(0)) >= 0) {
             // Case of channel name
@@ -654,21 +685,23 @@ function _parseBufferMessage (message) {
         break;
       case 'NOTICE':
         if (true) {
-          const ctcpDelim = 1;
-          if (parsedMessage.params[1] === null) parsedMessage.params[1] = '';
-          if (parsedMessage.params[1].charCodeAt(0) === ctcpDelim) {
-            // case of CTCP message
-            _parseCtcpMessage(parsedMessage);
+          if ((!parsedMessage.nick) || (parsedMessage.nick.length === 0)) {
+            // case of server messages, check raw disply to avoid duplication in server window
+            if (!webState.viewRawMessages) {
+              displayRawMessage(
+                cleanFormatting(
+                  cleanCtcpDelimiter(
+                    substituteHmsTime(message))));
+            }
           } else {
-            let index = ircState.channels.indexOf(parsedMessage.params[0].toLowerCase());
-            if ((index >= 0) && (ircState.channelStates[index].joined)) {
-              // case of notice to channel that is joined
-              displayNoticeMessage(parsedMessage);
-            } else if (channelPrefixChars.indexOf(parsedMessage.params[0].charAt(0)) < 0) {
-              // case of not a channel name, must be nickname
-              displayNoticeMessage(parsedMessage);
+            const ctcpDelim = 1;
+            if (parsedMessage.params[1] === null) parsedMessage.params[1] = '';
+            if (parsedMessage.params[1].charCodeAt(0) === ctcpDelim) {
+              // case of CTCP message
+              _parseCtcpMessage(parsedMessage);
             } else {
-              console.log('Error parsing notice to proper recipient');
+              // case of server, user, and channel notices.
+              displayNoticeMessage(parsedMessage);
             }
           }
         }

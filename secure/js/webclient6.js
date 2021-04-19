@@ -50,7 +50,7 @@ function createChannelEl (name) {
     return;
   }
 
-  const defaultHeightInRows = '18';
+  const defaultHeightInRows = '17';
 
   // Add to local browser list of open channels
   webState.channels.push(name.toLowerCase());

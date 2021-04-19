@@ -216,6 +216,16 @@ textarea {
   background-color: #dbbaff;
 }
 
+.raw-cb-cb {
+  vertical-align: middle;
+  margin-right: 0px;
+}
+.raw-cb-span {
+  margin-right: 5px;
+  font-size: 80%;
+  vertical-align: middle;
+}
+
 .reconnect-div {
   background-color: #1234ff;
   color: #ffffff;
@@ -241,6 +251,10 @@ textarea {
 .rm20 {margin-right: 20px;}
 .lm10 {margin-left: 10px;}
 
+.user-span {
+  font-size: 120%;
+  font-weight: bold;
+}
 .variables-div {
   background-color: #dbc8b6;
   border: 1px solid black;

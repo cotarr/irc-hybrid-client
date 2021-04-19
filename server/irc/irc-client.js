@@ -49,10 +49,11 @@
   const channelPrefixChars = '@#+!';
   const channelUserModeChars = 'qaohv';
   const nicknamePrefixChars = '~&@%+';
+  // Used to differentiate outgoing verses ingoing messages in display
+  const commandMsgPrefix = '--> ';
 
   var ircState = {};
 
-  ircState.showPingPong = false;
   ircState.ircConnected = false;
   ircState.ircConnecting = false;
   ircState.ircRegistered = false;
@@ -106,9 +107,6 @@
     let now = new Date;
     return parseInt(now.valueOf() / 1000).toString();
   };
-
-  // Used to differentiate outgoing verses ingoing messages in display
-  const commandMsgPrefix = '--> ';
 
   // ----------------------------------------------------
   // Write data to IRC server socket (Internal function)
@@ -573,10 +571,12 @@
 
     // PING is special case
     if (parsedMessage.command === 'PING') {
+      global.sendToBrowser(commandMsgPrefix + 'PONG ' + parsedMessage.params[0]+ '\n');
       socket.write('PONG ' + parsedMessage.params[0]+ '\r\n', 'utf8');
     }
     // Do not process excluded commands on this list
-    let excludedCommands = ['PING'];
+    let excludedCommands = [];
+    // excludedCommands.push('PING');
     if (excludedCommands.indexOf(parsedMessage.command) >=0) return;
 
     //
@@ -839,7 +839,7 @@
         if (true) {
           if (parsedMessage.params[0] === ircState.nickName) {
             // Case of User mode for IRC client has changed
-            console.log('TODO your user mode on server has been changed changed.');
+            // console.log('TODO your user mode on server has been changed changed.');
           } else if (ircState.channels.indexOf(parsedMessage.params[0].toLowerCase() >= 0)) {
             // This is case of a #channel mode has changed.
             parseChannelModeChanges(socket, parsedMessage);

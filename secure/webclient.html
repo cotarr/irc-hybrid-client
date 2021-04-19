@@ -29,10 +29,7 @@
       <div class="head-flex">
         <div class="head-left">
           <div>
-            You are still connected to IRC.<br><br>
-            Leaving the web page will not disconnect the server from IRC.
-            Your nickname will remain present on IRC.
-            Otherwise use the [/Quit IRC] button located below before leaving.
+            IRC is connected!
           </div>
         </div>
         <div class="head-right">
@@ -41,6 +38,14 @@
             <a href="/logout"><button>Web Logout</button></a>
           </div>
         </div>
+      </div>
+      <div class="vh10"></div>
+      <div>
+        Leaving the web page will not disconnect the server from IRC.
+        Your nickname will remain present on IRC.
+        Otherwise please
+        <button id="quitButton2">/Quit IRC</button>
+        before leaving the web page.
       </div>
     </div>
     <div class="aa-section-div">
@@ -55,6 +60,18 @@
           <button id="hideAllDivsButton">- all</button>
           <button id='webLogoutButton'>logout</button>
         </div>
+      </div>
+      <div class="vh10"></div>
+      <div class="button-div">
+        <button id="connectButton">Connect IRC</button>
+        <button id="quitButton">/Quit IRC</button>
+      </div>
+      <div class="vh10"></div>
+      <div class="button-div">
+        <span class="user-span" id="headerServer">server</span>
+        <span class="user-span"> (</span>
+        <span class="user-span" id="headerUser"></span>
+        <span class="user-span">)</span>
       </div>
       <div class="vh10"></div>
       <div id="hideLoginSection">
@@ -88,15 +105,6 @@
           <div class="input-label-right">Initial User Mode</div>
         </div>
       </div>
-      <div class="vh10"></div>
-      <div class="button-div">
-        <button id="connectButton">Connect IRC</button>
-        <button id="quitButton">/Quit IRC</button>
-        <span class="user-span" id="headerUser"></span>
-        <span class="user-span">/</span>
-        <span class="user-span" id="headerServer">server</span>
-      </div>
-
     </div>
 
     <!-- No hidden attreibute for webDisconnectedHiddenDiv (breaks auto-resize) -->
@@ -213,10 +221,12 @@
 
             <div id="hiddenDebugDiv" hidden>
               <div class="button-div">
-                <input type="checkbox" id="viewRawMessagesCheckbox">
-                <span>View-Raw</span>
-                <input type="checkbox" id="showRawInHexCheckbox" disabled>
-                <span>View-Hex</span>
+                <input class="raw-cb-cb" type="checkbox" id="viewRawMessagesCheckbox">
+                <span class="raw-cb-span">View-Raw</span>
+                <input class="raw-cb-cb" type="checkbox" id="showCommsCheckbox" disabled>
+                <span class="raw-cb-span">Add-Comms</span>
+                <input class="raw-cb-cb" type="checkbox" id="showRawInHexCheckbox" disabled>
+                <span class="raw-cb-span">Add-Hex</span>
               </div>
               <div class="debug-div-time">
                 <div>
@@ -306,8 +316,9 @@ SOFTWARE.
         </div>
         <div class="info-license-div">
 <pre .class="info-pre-help">
-In channel window, auto-complete character
-is double space, completing channel or nick.
+In channel window, auto-complete
+character is double space,
+completing channel or nick.
 
 Available IRC Text Commands
 

@@ -57,7 +57,6 @@ const nickChannelSpacer = ' | ';
 //   R E A D   O N L Y
 //
 var ircState = {
-  showPingPong: false,
   ircConnected: false,
   ircConnecting: false,
   ircRegistered: false,
@@ -106,6 +105,7 @@ webState.noticeOpen = false;
 webState.wallopsOpen = false;
 webState.viewRawMessages = false;
 webState.showRawInHex = false;
+webState.showCommsMessages = false;
 
 // Some IRC channel local variables (most in ircState)
 webState.channels = [];
@@ -541,10 +541,13 @@ function getIrcState (callback) {
         document.getElementById('userModeInputId').value = ircState.userMode;
       }
       if (ircState.ircConnected) {
-        document.getElementById('ircServerAddrInputId').value =
-        ircState.ircServerHost + ':' + ircState.ircServerPort;
+        document.getElementById('ircServerNameInputId').value = ircState.ircServerName;
+        document.getElementById('ircServerAddrInputId').value = ircState.ircServerHost;
+        document.getElementById('ircServerPortInputId').value = ircState.ircServerPort;
         if (ircState.ircTLSEnabled) {
-          document.getElementById('ircServerAddrInputId').value += ' (TLS)';
+          document.getElementById('ircServerTlsCheck').setAttribute('checked', '');
+        } else {
+          document.getElementById('ircServerTlsCheck').removeAttribute('checked');
         }
         document.getElementById('headerUser').textContent = ircState.nickName;
         document.getElementById('headerServer').textContent = ircState.ircServerName;

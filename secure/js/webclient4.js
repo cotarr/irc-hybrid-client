@@ -144,6 +144,9 @@ document.getElementById('disconnectButton').addEventListener('click', function()
 document.getElementById('quitButton').addEventListener('click', function() {
   _sendIrcServerMessage('QUIT :QUIT command');
 });
+document.getElementById('quitButton2').addEventListener('click', function() {
+  _sendIrcServerMessage('QUIT :QUIT command');
+});
 
 document.getElementById('hideLoginSectionButton').addEventListener('click', function() {
   if (document.getElementById('hideLoginSection').hasAttribute('hidden')) {

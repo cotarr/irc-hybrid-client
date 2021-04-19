@@ -142,12 +142,16 @@ document.getElementById('variablesButtonId').addEventListener('click', function(
 document.getElementById('viewRawMessagesCheckbox').addEventListener('click', function(e) {
   if (document.getElementById('viewRawMessagesCheckbox').checked) {
     document.getElementById('showRawInHexCheckbox').removeAttribute('disabled');
+    document.getElementById('showCommsCheckbox').removeAttribute('disabled');
     webState.viewRawMessages = true;
   } else {
     document.getElementById('showRawInHexCheckbox').checked = false;
     document.getElementById('showRawInHexCheckbox').setAttribute('disabled', '');
+    document.getElementById('showCommsCheckbox').checked = false;
+    document.getElementById('showCommsCheckbox').setAttribute('disabled', '');
     webState.viewRawMessages = false;
     webState.showRawInHex = false;
+    webState.showCommsMessages = false;
   }
   // this forces a global update which will refreesh text area
   document.dispatchEvent(new CustomEvent('update-from-cache', {bubbles: true}));
@@ -161,6 +165,16 @@ document.getElementById('showRawInHexCheckbox').addEventListener('click', functi
   // this forces a global update which will refreesh text area
   document.dispatchEvent(new CustomEvent('update-from-cache', {bubbles: true}));
 });
+document.getElementById('showCommsCheckbox').addEventListener('click', function() {
+  if (document.getElementById('showCommsCheckbox').checked) {
+    webState.showCommsMessages = true;
+  } else {
+    webState.showCommsMessages = false;
+  }
+  // this forces a global update which will refreesh text area
+  document.dispatchEvent(new CustomEvent('update-from-cache', {bubbles: true}));
+});
+
 
 // -----------------------
 // Die (Server) button
