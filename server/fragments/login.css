@@ -2,15 +2,23 @@ body {
   background-color: #d0d0d0;
   padding-left: 10px;
 }
-.button {
-  margin-top: 7px;
-  margin-bottom: 5px;
-  background-color: #b0b0b0;
-  color: #000000;
+button {
+  background-color: #f4f4f4;
+  border-top: 1px solid #777777;
+  border-right: 2px solid #444444;
+  border-bottom: 2px solid #444444;
+  border-left: 1px solid #777777;
+  border-radius: 5px;
+  box-shadow: 2px 2px 3px #808080;
+  color: black;
+  margin-top: 10px;
+  padding-top: 3px;
+  padding-bottom: 3px;
 }
-.button:hover {
-  opacity: 0.8;
+button:hover {
+  background-color: #e2e2e2;
 }
+
 .center {
   text-align: center;
 }

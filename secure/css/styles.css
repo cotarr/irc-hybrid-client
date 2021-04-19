@@ -15,6 +15,26 @@ textarea {
   font-size: 90%;
 }
 
+button {
+  background-color: #f4f4f4;
+  border-top: 1px solid #777777;
+  border-right: 2px solid #444444;
+  border-bottom: 2px solid #444444;
+  border-left: 1px solid #777777;
+  border-radius: 5px;
+  box-shadow: 2px 2px 3px #808080;
+  color: black;
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
+button:hover {
+  background-color: #e2e2e2;
+}
+button[disabled] {
+  background-color: #b8b8b8;
+  color: #444444
+}
+
 .aa-section-div {
   background-color: #aaaaaa;
   border: 1px solid black;
@@ -219,6 +239,7 @@ textarea {
 .raw-cb-cb {
   vertical-align: middle;
   margin-right: 0px;
+  box-shadow: 2px 2px 3px #777777;
 }
 .raw-cb-span {
   margin-right: 5px;
