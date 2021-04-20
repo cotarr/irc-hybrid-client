@@ -410,6 +410,7 @@ const ircMessageCommandDisplayFilter = [
   'MODE',
   'NICK',
   'NOTICE',
+  'PART',
   'PING',
   'PRIVMSG',
   'QUIT',

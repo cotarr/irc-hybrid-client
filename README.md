@@ -36,6 +36,10 @@ cd irc-hybrid-client
 # make log directory
 mkdir logs
 
+# Choose one...development or production, development redirects logging to console.
+export NODE_ENV=development
+export NODE_ENV=production
+
 # install packages
 npm install
 
@@ -73,15 +77,13 @@ cp example-servers.json servers.json
 node bin/www
 ```
 
-
-
 # Minify and bundle for deployment
 
 This is not required. The repository can be cloned and run as-is.
 
-However running the gulp script will concatenate 9 of the JavaScript
+However, running the gulp script will concatenate 9 of the JavaScript
 files into 1 bundled/minified JavaScript file.
-This will reduce the  download sized by about half.
+This will reduce the  download size by about half.
 
 After running `gulp dist`, a build folder will be created with same
 folders as the base repository. The gulp script removed the individual
@@ -89,7 +91,7 @@ script tags from webclient.html an consolidates the tags
 to a single javascript script tag.
 
 It is necessary to install gulp-cli globally, as gulp-cli
-is used by gulp to manage multiple gulp version. This is not
+is used by gulp to manage multiple gulp version. gulp-cli is not
 listed in the pacakge.json
 
 ```
@@ -100,7 +102,8 @@ gulp dist
 
 # Deploy by any method
 
-# In deployed version, create logs folder
+# In deployed version, create log folder `mkdir logs`
+# In deployed shell, `export NODE_ENV=production`
 # In deployed copy, then edit credentials.json and servers.json
 
 # In deployed version, run:
