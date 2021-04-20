@@ -799,6 +799,7 @@ function updateFromCache () {
         webState.lastPMNick = '';
         webState.activePrivateMessageNicks = [];
         webState.resizablePrivMsgTextareaIds = [];
+        webState.resizableSendButtonPMTextareaIds = [];
         document.getElementById('noticeMessageDisplay').textContent = '';
         document.getElementById('wallopsMessageDisplay').textContent = '';
         document.getElementById('rawMessageDisplay').textContent = '';

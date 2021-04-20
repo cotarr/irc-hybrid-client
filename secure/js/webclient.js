@@ -117,6 +117,7 @@ webState.resizableSendButtonTextareaIds = [];
 webState.lastPMNick = '';
 webState.activePrivateMessageNicks = [];
 webState.resizablePrivMsgTextareaIds = [];
+webState.resizableSendButtonPMTextareaIds = [];
 webState.times = {webConnect: 0};
 webState.count = {webConnect: 0};
 

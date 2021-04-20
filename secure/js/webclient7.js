@@ -64,6 +64,7 @@ function createPrivateMessageEl (name, parsedMessage) {
 
   // Top Element (non-hidden element)
   let privMsgTopDivEl = document.createElement('div');
+  privMsgTopDivEl.classList.add('bm10');
   privMsgTopDivEl.classList.add('head-flex');
 
   // left flexbox div
@@ -116,21 +117,23 @@ function createPrivateMessageEl (name, parsedMessage) {
   privMsgTextAreaEl.setAttribute('spellCheck', 'false');
   privMsgTextAreaEl.setAttribute('readonly', '');
 
-  // signle line user input
-  let privMsgInputAreaEl = document.createElement('textarea');
-  let privMsgInputAreaId = 'privMsg' + privMsgIndex.toString() + 'InputAreaId';
-  privMsgInputAreaEl.id = privMsgInputAreaId;
-  privMsgInputAreaEl.setAttribute('cols', '120');
-  privMsgInputAreaEl.setAttribute('rows', '1');
-
   // button-div
   let privMsgButtonDiv1El = document.createElement('div');
   privMsgButtonDiv1El.classList.add('button-div');
 
+  // signle line user input
+  let privMsgInputAreaEl = document.createElement('textarea');
+  let privMsgInputAreaId = 'privMsg' + privMsgIndex.toString() + 'InputAreaId';
+  privMsgInputAreaEl.id = privMsgInputAreaId;
+  privMsgInputAreaEl.classList.add('va-middle');
+  privMsgInputAreaEl.classList.add('rm10');
+  privMsgInputAreaEl.setAttribute('cols', '120');
+  privMsgInputAreaEl.setAttribute('rows', '1');
+
   // send button
   let privMsgSendButtonEl = document.createElement('button');
   privMsgSendButtonEl.textContent = 'Send';
-  privMsgSendButtonEl.classList.add('channel-button');
+  privMsgSendButtonEl.classList.add('va-middle');
 
   // --------------------------------
   // Append child element to DOM
@@ -148,10 +151,10 @@ function createPrivateMessageEl (name, parsedMessage) {
   privMsgTopDivEl.appendChild(privMsgTopLeftDivEl);
   privMsgTopDivEl.appendChild(privMsgTopRightDivEl);
 
+  privMsgButtonDiv1El.appendChild(privMsgInputAreaEl);
   privMsgButtonDiv1El.appendChild(privMsgSendButtonEl);
 
   privMsgBottomDivEl.appendChild(privMsgTextAreaEl);
-  privMsgBottomDivEl.appendChild(privMsgInputAreaEl);
   privMsgBottomDivEl.appendChild(privMsgButtonDiv1El);
 
   privMsgSectionEl.appendChild(privMsgTopDivEl);
@@ -168,25 +171,45 @@ function createPrivateMessageEl (name, parsedMessage) {
   // move scroll bar so text is scrolled all the way up
   privMsgTextAreaEl.scrollTop = privMsgTextAreaEl.scrollHeight;
 
+  // --------------------------
+  // Private Message Event listeners
+  // ---------------------------
+
+  // Erase before reload
+  // Remove text content, but do not change visibility
+  // This may not be necessary because child PM elements
+  // like this one are removed by the erase and reload process.
   document.addEventListener('erase-before-reload', function(event) {
     // console.log('Event erase-before-reload');
     privMsgTextAreaEl.textContent = '';
     privMsgInputAreaEl.textContent = '';
   }.bind(this));
 
-  // --------------------------
-  // Private Message Event listeners
-  // ---------------------------
+  // Hide PM window, Hide PM data section, Hide buttons
+  document.addEventListener('priv-msg-hide-all', function(event) {
+    privMsgBottomDivEl.setAttribute('hidden', '');
+    privMsgHideButtonEl.textContent = '+';
+    privMsgTopRightHidableDivEl.setAttribute('hidden', '');
+    privMsgSectionEl.setAttribute('hidden', '');
+  }.bind(this));
+
+  // Show PM window
+  document.addEventListener('priv-msg-show-all', function(event) {
+    privMsgSectionEl.removeAttribute('hidden');
+  }.bind(this));
 
   // -------------------------
   // How/Hide button handler
   // -------------------------
+  // if closed: Window unchanged, show Data secton, show Buttons
+  // if open:  Hide Window, hide Data section, Hide Buttons
   privMsgHideButtonEl.addEventListener('click', function() {
     if (privMsgBottomDivEl.hasAttribute('hidden')) {
       privMsgBottomDivEl.removeAttribute('hidden');
       privMsgHideButtonEl.textContent = '-';
       privMsgTopRightHidableDivEl.removeAttribute('hidden');
     } else {
+      privMsgSectionEl.setAttribute('hidden', '');
       privMsgBottomDivEl.setAttribute('hidden', '');
       privMsgHideButtonEl.textContent = '+';
       privMsgTopRightHidableDivEl.setAttribute('hidden', '');
@@ -219,18 +242,19 @@ function createPrivateMessageEl (name, parsedMessage) {
   // ----------------
   // show all event
   // ----------------
+  // show window, leaving data section and buttons unchanged (proabably closed)
   document.addEventListener('show-all-divs', function(event) {
-    privMsgBottomDivEl.removeAttribute('hidden');
-    privMsgHideButtonEl.textContent = '-';
-    privMsgTopRightHidableDivEl.removeAttribute('hidden');
+    privMsgSectionEl.removeAttribute('hidden');
   });
   // ----------------
   // hide all event
   // ----------------
+  // hide window, data section and buttons.
   document.addEventListener('hide-all-divs', function(event) {
     privMsgBottomDivEl.setAttribute('hidden', '');
     privMsgHideButtonEl.textContent = '+';
     privMsgTopRightHidableDivEl.setAttribute('hidden', '');
+    privMsgSectionEl.setAttribute('hidden', '');
   });
 
   // -------------
@@ -250,6 +274,11 @@ function createPrivateMessageEl (name, parsedMessage) {
     }
   }.bind(this));
 
+
+  // PM window PRIVMSG event handler
+  // if window closed,
+  //  - open control window,
+  //  - show window, data section and buttons.
   document.addEventListener('private-message', function(event) {
     function _addText (text) {
       // append text to textarea
@@ -272,8 +301,13 @@ function createPrivateMessageEl (name, parsedMessage) {
             _addText(parsedMessage.timestamp + ' ' +
               parsedMessage.nick + ' ' + parsedMessage.params[1]);
             // Upon privMsg message, make sectino visible.
+            privMsgSectionEl.removeAttribute('hidden');
             privMsgBottomDivEl.removeAttribute('hidden');
             privMsgHideButtonEl.textContent = '-';
+            privMsgTopRightHidableDivEl.removeAttribute('hidden');
+            // also show control section div
+            document.getElementById('privMsgMainHiddenDiv').removeAttribute('hidden');
+            document.getElementById('privMsgMainHiddenButton').textContent = '-';
           }
         } else {
           // case of incoming message from others.
@@ -281,8 +315,13 @@ function createPrivateMessageEl (name, parsedMessage) {
             _addText(parsedMessage.timestamp + ' ' +
               parsedMessage.nick + ' ' + parsedMessage.params[1]);
             // Upon privMsg message, make sectino visible.
+            privMsgSectionEl.removeAttribute('hidden');
             privMsgBottomDivEl.removeAttribute('hidden');
             privMsgHideButtonEl.textContent = '-';
+            privMsgTopRightHidableDivEl.removeAttribute('hidden');
+            // also show control section div
+            document.getElementById('privMsgMainHiddenDiv').removeAttribute('hidden');
+            document.getElementById('privMsgMainHiddenButton').textContent = '-';
           }
         }
         break;
@@ -290,11 +329,16 @@ function createPrivateMessageEl (name, parsedMessage) {
     }
   });
 
+  // Do this when creating the PM element for this user.
+  // Show control window, so open/close buttons are in sync
+  document.getElementById('privMsgMainHiddenDiv').removeAttribute('hidden');
+  document.getElementById('privMsgMainHiddenButton').textContent = '-';
+
   // -----------------------------------------------------------
   // Setup textarea elements as dynamically resizable (globally)
   // -----------------------------------------------------------
   webState.resizablePrivMsgTextareaIds.push(privMsgTextAreaId);
-  webState.resizablePrivMsgTextareaIds.push(privMsgInputAreaId);
+  webState.resizableSendButtonPMTextareaIds.push(privMsgInputAreaId);
   document.dispatchEvent(new CustomEvent('element-resize', {bubbles: true}));
 };
 
@@ -326,9 +370,6 @@ function _buildPrivateMessageText() {
     let inputAreaEl = document.getElementById('userPrivMsgInputId');
     _sendPrivMessageToUser(targetNick, inputAreaEl);
     document.getElementById('userPrivMsgInputId').value = '';
-    // close window after sending, because a new one will open on server response.
-    document.getElementById('privMsgMainHiddenDiv').setAttribute('hidden', '');
-    document.getElementById('privMsgMainHiddenButton').textContent = '+';
   }
 };
 document.getElementById('userPrivMsgInputId').addEventListener('input', function(event) {
@@ -365,8 +406,10 @@ document.getElementById('privMsgMainHiddenButton').addEventListener('click', fun
   if (document.getElementById('privMsgMainHiddenDiv').hasAttribute('hidden')) {
     document.getElementById('privMsgMainHiddenDiv').removeAttribute('hidden');
     document.getElementById('privMsgMainHiddenButton').textContent = '-';
+    document.dispatchEvent(new CustomEvent('priv-msg-show-all', {bubbles: true}));
   } else {
     document.getElementById('privMsgMainHiddenDiv').setAttribute('hidden', '');
     document.getElementById('privMsgMainHiddenButton').textContent = '+';
+    document.dispatchEvent(new CustomEvent('priv-msg-hide-all', {bubbles: true}));
   }
 }.bind(this));

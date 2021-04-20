@@ -419,7 +419,7 @@ const columnSize =
 const adjustInputToWidowWidth = function (innerWidth) {
   let cols = parseInt((window.innerWidth / columnSize) - 4);
   // static text area defined in webclient.html
-  document.getElementById('userPrivMsgInputId').setAttribute('cols', cols.toString());
+  document.getElementById('userPrivMsgInputId').setAttribute('cols', (cols-8).toString());
   document.getElementById('noticeMessageDisplay').setAttribute('cols', cols.toString());
   document.getElementById('wallopsMessageDisplay').setAttribute('cols', cols.toString());
   document.getElementById('rawMessageDisplay').setAttribute('cols', cols.toString());
@@ -436,6 +436,7 @@ const adjustInputToWidowWidth = function (innerWidth) {
       }
     });
   }
+
   // In the IRC channel area, this is to handle main
   //     text area when it is split with nickname list.
   if (webState.resizableChanSplitTextareaIds.length > 0) {
@@ -469,6 +470,15 @@ const adjustInputToWidowWidth = function (innerWidth) {
     webState.resizablePrivMsgTextareaIds.forEach(function(id) {
       if (document.getElementById(id)) {
         document.getElementById(id).setAttribute('cols', cols.toString());
+      } else {
+        console.log('Error: ' + id);
+      }
+    });
+  }
+  if (webState.resizableSendButtonPMTextareaIds.length > 0) {
+    webState.resizableSendButtonPMTextareaIds.forEach(function(id) {
+      if (document.getElementById(id)) {
+        document.getElementById(id).setAttribute('cols', (cols-8).toString());
       } else {
         console.log('Error: ' + id);
       }

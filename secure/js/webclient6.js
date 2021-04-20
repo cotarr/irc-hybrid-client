@@ -806,8 +806,9 @@ document.addEventListener('irc-state-changed', function(event) {
     });
   }
 
-  // Check if a new channel was added, if so re-create channel join buttions
-  // so that current channel button is removed.
+  // Check if a new channel was added, or old one /PARTed
+  // if so re-create channel join buttions from the favorite channel list
+  //
   let needButtonUpdate = false;
   let joinedChannelCount = 0;
   if (ircState.channels.length > 0) {
@@ -821,7 +822,6 @@ document.addEventListener('irc-state-changed', function(event) {
   }
 
   if (needButtonUpdate) {
-    console.log('updating buttons');
     // remove old button elements
     let channelJoinButtonContainerEl = document.getElementById('channelJoinButtonContainer');
     while (channelJoinButtonContainerEl.firstChild) {
