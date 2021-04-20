@@ -51,10 +51,6 @@ button[disabled] {
   margin-bottom: 5px;
 }
 
-.button-on-color {
-  background-color: #72e1fc;
-}
-
 .chan-top-section-div {
   background-color: #bef7bf;
 }
@@ -74,8 +70,8 @@ button[disabled] {
 }
 
 .channel-bottom-div {}
+
 .channel-top-div {}
-.channel-head-right-hidable-div {}
 
 .channel-cb-cb {
   vertical-align: middle;
@@ -126,7 +122,6 @@ button[disabled] {
   top: 0px;
   left: 0px;
   width: auto;
-
   color: white;
   background-color: red;
   padding-left: 15px;
@@ -155,20 +150,6 @@ button[disabled] {
 .head-right {
   display: inline;
   padding-right: 10px;
-}
-
-.header-button-div {
-  text-align: center;
-  padding-top: 5px;
-  padding-bottom: 5px;
-}
-
-.info-help-div {
-  background-color: white;
-  border: 1px solid black;
-  border-radius: 5px;
-  margin-right: 10px;
-  padding: 10px;
 }
 
 .info-license-div {
@@ -204,21 +185,11 @@ button[disabled] {
   margin-bottom: 4px;
 }
 
-.login-name-div {
-  display: inline-block;
-  font-size: 90%;
-  margin-left: 5px;
-}
+.lm10 {margin-left: 10px;}
 
 .logout-confirm-div {
   background-color: yellow;
   padding: 10px;
-}
-
-.logout-link-div {
-  display: inline-block;
-  font-size: 90%;
-  margin-left: 10px;
 }
 
 .notice-button {
@@ -272,7 +243,7 @@ button[disabled] {
 
 .rm10 {margin-right: 10px;}
 .rm20 {margin-right: 20px;}
-.lm10 {margin-left: 10px;}
+
 
 .user-span {
   font-size: 120%;
@@ -295,8 +266,4 @@ button[disabled] {
 
 .wallops-section-div {
   background-color: yellow;
-}
-
-#rawMessages {
-  font-size: 80%
 }

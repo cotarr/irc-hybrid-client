@@ -423,7 +423,7 @@ const adjustInputToWidowWidth = function (innerWidth) {
   document.getElementById('noticeMessageDisplay').setAttribute('cols', cols.toString());
   document.getElementById('wallopsMessageDisplay').setAttribute('cols', cols.toString());
   document.getElementById('rawMessageDisplay').setAttribute('cols', cols.toString());
-  document.getElementById('rawMessageInputId').setAttribute('cols', cols.toString());
+  document.getElementById('rawMessageInputId').setAttribute('cols', (cols-8).toString());
 
   // This is for dynamically generated elements
   // IRC Channel <textarea> element for auto-resize
