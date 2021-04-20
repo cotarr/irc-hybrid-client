@@ -8,7 +8,7 @@ const url = require('url');
 const isValidUTF8 = require('utf-8-validate');
 
 const authorizeWebSocket = require('./middlewares/ws-authorize').authorizeWebSocket;
-const writeAccessLog = require('./irc/irc-log').writeAccessLog;
+const customLog = require('./middlewares/ws-authorize').customLog;
 
 // ----------------------------------------
 // Set up a headless websocket server
@@ -29,7 +29,7 @@ wsServer.on('connection', function (socket) {
   // console.log('ws-server.js connection');
   socket.on('message', function (message) {
     // All messages ignored.
-    console.log('ws-server.js message ' + message);
+    console.log('ws-server.js: Unexpected websocket message: ' + message);
   });
 });
 
@@ -96,21 +96,16 @@ const wsOnUpgrade = function (request, socket, head) {
   const pathname = url.parse(request.url).pathname;
   if (pathname === '/irc/ws') {
     if (authorizeWebSocket(request)) {
-      // console.log(timeString + request.connection.remoteAddress +
-      //   ' websocket-connect ' + request.url);
-      writeAccessLog('' + request.connection.remoteAddress +
-        ' websocket-connect ' + request.url);
+      customLog(request, 'websocket-connection');
       wsServer.handleUpgrade(request, socket, head, function (socket) {
         wsServer.emit('connection', socket, request);
       });
     } else {
-      console.log(timeString + request.connection.remoteAddress +
-        ' websocket-auth-fail ' + request.url);
+      customLog(request, 'websocket-auth-fail');
       socket.destroy();
     }
   } else {
-    console.log(timeString + request.connection.remoteAddress +
-        ' websocket-path-not-found ' + request.url);
+    customLog(request, 'websocket-path-not-found');
     socket.destroy();
   }
 };

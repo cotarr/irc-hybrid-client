@@ -30,6 +30,7 @@
 (function() {
   'use strict';
 
+  const path = require('path');
   const fs = require('fs');
   const crypto = require('crypto');
   const signature = require('cookie-signature');
@@ -38,6 +39,51 @@
   const credentials = JSON.parse(fs.readFileSync('./credentials.json', 'utf8'));
   const cookieSecret = credentials.cookieSecret;
   // console.log('cookieSecret ' + cookieSecret);
+
+  var nodeEnv = process.env.NODE_ENV || 'development';
+
+  //
+  // Custom log file (Option: setup to fail2ban to block IP addresses)
+  //
+  const authLogFilename = path.join(__dirname, '../../logs/access.log');
+  const customLog = function (request, logString) {
+    //
+    // build log text string
+    //
+    let now = new Date();
+    let logEntry = now.toISOString();
+    if (('connection' in request) && ('remoteAddress' in request.connection)) {
+      logEntry += ' ' + request.connection.remoteAddress;
+    } else {
+      logEntry += ' NOADDRESS';
+    }
+    logEntry += ' ' + logString;
+    if ('url' in request) {
+      logEntry += ' ' + request.url;
+    }
+    //
+    // Append string to file
+    //
+    if (nodeEnv === 'production') {
+      fs.writeFile(
+        authLogFilename,
+        logEntry + '\n',
+        {
+          encoding: 'utf8',
+          mode: 0o644,
+          flag: 'a'
+        },
+        function(err) {
+          if (err) {
+            // in case disk full, kill server
+            throw new Error('Error writing auth.log');
+          }
+        }
+      );
+    } else {
+      console.log(logEntry);
+    }
+  };
 
   //
   // Timing safe compare (From github.com/LionC/express-basic-auth)
@@ -111,6 +157,7 @@
   };
 
   module.exports = {
-    authorizeWebSocket: authorizeWebSocket
+    authorizeWebSocket: authorizeWebSocket,
+    customLog, customLog
   };
 })();
