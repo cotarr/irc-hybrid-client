@@ -396,9 +396,6 @@ document.getElementById('test4Button').addEventListener('click', function() {
 
   console.log('Test 4 getIrcState()');
   getIrcState();
-
-  // var beep = new Audio('sounds/short-beep.mp3');
-  // beep.play();
 });
 
 // ---------------------------------------------------------------------------

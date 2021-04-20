@@ -141,22 +141,38 @@ var wsocket = null;
 // -------------------------------------------
 // Default beep sound (Max 1 per 5 seconds)
 // -------------------------------------------
-const beep = new Audio('sounds/short-beep.mp3');
-var beepInhibitTimer = 0;
-function playBeepSound () {
-  if (beepInhibitTimer === 0) {
-    beep.play();
-    beepInhibitTimer = 5;
-  }
-}
+// 1300 Hz 0.75 Amplitude 0.250 sec
+const beep1 = new Audio('sounds/short-beep1.mp3');
+// 850 Hz 0.75 Amplitude 0.400 Sec
+const beep2 = new Audio('sounds/short-beep2.mp3');
+
+var beep1InhibitTimer = 0;
+var beep2InhibitTimer = 0;
+
 function beepTimerTick() {
-  if (beepInhibitTimer > 0) beepInhibitTimer--;
-}
-function inhibitBeep(seconds) {
-  // used for reload/update
-  beepInhibitTimer = seconds;
+  if (beep1InhibitTimer > 0) beep1InhibitTimer--;
+  if (beep2InhibitTimer > 0) beep2InhibitTimer--;
 }
 
+function inhibitBeep(seconds) {
+  // used for reload/update
+  beep1InhibitTimer = seconds;
+  beep2InhibitTimer = seconds;
+}
+
+function playBeep1Sound () {
+  if (beep1InhibitTimer === 0) {
+    beep1.play();
+    beep1InhibitTimer = 5;
+  }
+}
+
+function playBeep2Sound () {
+  if (beep2InhibitTimer === 0) {
+    beep2.play();
+    beep2InhibitTimer = 5;
+  }
+}
 // --------------------------
 // Error display functions
 // --------------------------

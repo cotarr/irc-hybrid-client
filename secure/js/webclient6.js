@@ -186,14 +186,6 @@ function createChannelEl (name) {
   let channelBottomDiv3El = document.createElement('div');
   channelBottomDiv3El.classList.add('button-div');
 
-  // beep on message checkbox
-  let channelBeepCBInputEl = document.createElement('input');
-  channelBeepCBInputEl.classList.add('channel-cb-cb');
-  channelBeepCBInputEl.setAttribute('type', 'checkbox');
-  let channelBeepCBTitleEl = document.createElement('span');
-  channelBeepCBTitleEl.classList.add('channel-cb-span');
-  channelBeepCBTitleEl.textContent = 'Beep';
-
   // Text Format checkbox
   let channelFormatCBInputEl = document.createElement('input');
   channelFormatCBInputEl.classList.add('channel-cb-cb');
@@ -208,7 +200,36 @@ function createChannelEl (name) {
   channelAutoCompCBInputEl.setAttribute('type', 'checkbox');
   let channelAutoCompCBTitleEl = document.createElement('span');
   channelAutoCompCBTitleEl.classList.add('channel-cb-span');
-  channelAutoCompCBTitleEl.textContent = 'Auto-comp';
+  channelAutoCompCBTitleEl.textContent = 'Auto-complete (space-space)';
+
+  // button-div
+  let channelBottomDiv4El = document.createElement('div');
+  channelBottomDiv4El.classList.add('button-div');
+
+  // beep on message checkbox
+  let channelBeep1CBInputEl = document.createElement('input');
+  channelBeep1CBInputEl.classList.add('channel-cb-cb');
+  channelBeep1CBInputEl.setAttribute('type', 'checkbox');
+  let channelBeep1CBTitleEl = document.createElement('span');
+  channelBeep1CBTitleEl.classList.add('channel-cb-span');
+  channelBeep1CBTitleEl.textContent = 'Line-beep';
+
+  // beep on join checkbox
+  let channelBeep2CBInputEl = document.createElement('input');
+  channelBeep2CBInputEl.classList.add('channel-cb-cb');
+  channelBeep2CBInputEl.setAttribute('type', 'checkbox');
+  let channelBeep2CBTitleEl = document.createElement('span');
+  channelBeep2CBTitleEl.classList.add('channel-cb-span');
+  channelBeep2CBTitleEl.textContent = 'Join-beep';
+
+  // beep on matchNick my nickname checkbox
+  let channelBeep3CBInputEl = document.createElement('input');
+  channelBeep3CBInputEl.classList.add('channel-cb-cb');
+  channelBeep3CBInputEl.setAttribute('type', 'checkbox');
+  let channelBeep3CBTitleEl = document.createElement('span');
+  channelBeep3CBTitleEl.classList.add('channel-cb-span');
+  channelBeep3CBTitleEl.textContent = 'Name-beep';
+
 
   // --------------------------------
   // Append child element to DOM
@@ -233,12 +254,17 @@ function createChannelEl (name) {
   channelBottomDiv2El.appendChild(channelPartButtonEl);
   channelBottomDiv2El.appendChild(channelRefreshButtonEl);
 
-  channelBottomDiv3El.appendChild(channelBeepCBInputEl);
-  channelBottomDiv3El.appendChild(channelBeepCBTitleEl);
   channelBottomDiv3El.appendChild(channelFormatCBInputEl);
   channelBottomDiv3El.appendChild(channelFormatCBTitleEl);
   channelBottomDiv3El.appendChild(channelAutoCompCBInputEl);
   channelBottomDiv3El.appendChild(channelAutoCompCBTitleEl);
+
+  channelBottomDiv4El.appendChild(channelBeep1CBInputEl);
+  channelBottomDiv4El.appendChild(channelBeep1CBTitleEl);
+  channelBottomDiv4El.appendChild(channelBeep2CBInputEl);
+  channelBottomDiv4El.appendChild(channelBeep2CBTitleEl);
+  channelBottomDiv4El.appendChild(channelBeep3CBInputEl);
+  channelBottomDiv4El.appendChild(channelBeep3CBTitleEl);
 
   channelBottomDivEl.appendChild(channelTopicDivEl);
   channelBottomDivEl.appendChild(channelNamesDisplayEl);
@@ -246,6 +272,7 @@ function createChannelEl (name) {
   channelBottomDivEl.appendChild(channelBottomDiv1El);
   channelBottomDivEl.appendChild(channelBottomDiv2El);
   channelBottomDivEl.appendChild(channelBottomDiv3El);
+  channelBottomDivEl.appendChild(channelBottomDiv4El);
 
   channelMainSectionEl.appendChild(channelTopDivEl);
   channelMainSectionEl.appendChild(channelBottomDivEl);
@@ -379,10 +406,20 @@ function createChannelEl (name) {
         channelPartButtonEl.setAttribute('disabled', '');
       }
 
-      if (channelMainSectionEl.hasAttribute('beep-enabled')) {
-        channelBeepCBInputEl.checked = true;
+      if (channelMainSectionEl.hasAttribute('beep1-enabled')) {
+        channelBeep1CBInputEl.checked = true;
       } else {
-        channelBeepCBInputEl.checked = false;
+        channelBeep1CBInputEl.checked = false;
+      }
+      if (channelMainSectionEl.hasAttribute('beep2-enabled')) {
+        channelBeep2CBInputEl.checked = true;
+      } else {
+        channelBeep2CBInputEl.checked = false;
+      }
+      if (channelMainSectionEl.hasAttribute('beep3-enabled')) {
+        channelBeep3CBInputEl.checked = true;
+      } else {
+        channelBeep3CBInputEl.checked = false;
       }
       if (channelMainSectionEl.hasAttribute('brief-enabled')) {
         channelFormatCBInputEl.checked = true;
@@ -400,12 +437,38 @@ function createChannelEl (name) {
   // -------------------------
   // Beep On Message checkbox handler
   // -------------------------
-  channelBeepCBInputEl.addEventListener('click', function(e) {
-    if (channelMainSectionEl.hasAttribute('beep-enabled')) {
-      channelMainSectionEl.removeAttribute('beep-enabled');
+  channelBeep1CBInputEl.addEventListener('click', function(e) {
+    if (channelMainSectionEl.hasAttribute('beep1-enabled')) {
+      channelMainSectionEl.removeAttribute('beep1-enabled');
     } else {
-      channelMainSectionEl.setAttribute('beep-enabled', '');
-      playBeepSound();
+      channelMainSectionEl.setAttribute('beep1-enabled', '');
+      playBeep1Sound();
+    }
+    updateVisibility();
+  });
+
+  // -------------------------
+  // Beep On Join checkbox handler
+  // -------------------------
+  channelBeep2CBInputEl.addEventListener('click', function(e) {
+    if (channelMainSectionEl.hasAttribute('beep2-enabled')) {
+      channelMainSectionEl.removeAttribute('beep2-enabled');
+    } else {
+      channelMainSectionEl.setAttribute('beep2-enabled', '');
+      playBeep1Sound();
+    }
+    updateVisibility();
+  });
+
+  // -------------------------
+  // Beep On match my nickname checkbox handler
+  // -------------------------
+  channelBeep3CBInputEl.addEventListener('click', function(e) {
+    if (channelMainSectionEl.hasAttribute('beep3-enabled')) {
+      channelMainSectionEl.removeAttribute('beep3-enabled');
+    } else {
+      channelMainSectionEl.setAttribute('beep3-enabled', '');
+      playBeep2Sound();
     }
     updateVisibility();
   });
@@ -414,7 +477,9 @@ function createChannelEl (name) {
   // Cancel all beep sounds
   // -----------------------
   document.addEventListener('cancel-beep-sounds', function(event) {
-    channelMainSectionEl.removeAttribute('beep-enabled');
+    channelMainSectionEl.removeAttribute('beep1-enabled');
+    channelMainSectionEl.removeAttribute('beep2-enabled');
+    channelMainSectionEl.removeAttribute('beep3-enabled');
   }.bind(this));
 
   // -------------------------
@@ -681,6 +746,9 @@ function createChannelEl (name) {
               '*',
               parsedMessage.nick + ' (' + parsedMessage.host + ') has joined');
           }
+          if (channelMainSectionEl.hasAttribute('beep2-enabled')) {
+            playBeep1Sound();
+          }
         }
         break;
       case 'MODE':
@@ -731,8 +799,15 @@ function createChannelEl (name) {
           _addText(parsedMessage.timestamp,
             parsedMessage.nick,
             parsedMessage.params[1]);
-          if (channelMainSectionEl.hasAttribute('beep-enabled')) {
-            playBeepSound();
+          if (channelMainSectionEl.hasAttribute('beep1-enabled')) {
+            playBeep1Sound();
+          }
+          if (channelMainSectionEl.hasAttribute('beep3-enabled')) {
+            let checkLine = parsedMessage.params[1].toLowerCase();
+            if (checkLine.indexOf(ircState.nickName.toLowerCase()) >= 0) {
+              // timer to avoid overlap with line sound
+              setTimeout(playBeep2Sound, 250);
+            }
           }
           // Upon channel message, make sectino visible.
           channelBottomDivEl.removeAttribute('hidden');
