@@ -54,6 +54,11 @@ function createChannelEl (name) {
 
   // Add to local browser list of open channels
   webState.channels.push(name.toLowerCase());
+  // Initialize local state (note upon page refresh, channel joined may be false)
+  let initIrcStateIndex = ircState.channels.indexOf(name.toLowerCase());
+  webState.channelStates.push({
+    lastJoined: ircState.channelStates[initIrcStateIndex].joined
+  });
 
   var maxNickLength = 0;
   // console.log('creating Channel Element ' + name);
@@ -517,7 +522,7 @@ function createChannelEl (name) {
       } else {
         // #3 check channel nickname list
         let completeNick = '';
-        let chanIndex = ircState.channels.indexOf(name);
+        let chanIndex = ircState.channels.indexOf(name.toLowerCase());
         if (chanIndex >= 0) {
           if (ircState.channelStates[chanIndex].names.length > 0) {
             for (let i=0; i<ircState.channelStates[chanIndex].names.length; i++) {
@@ -592,7 +597,29 @@ function createChannelEl (name) {
 
   document.addEventListener('irc-state-changed', function(event) {
     // console.log('Event: irc-state-changed (createChannelEl)');
+
+    //
+    // If channel was previously joined, then parted, then re-joined
+    // Check for joined change to true and show channel if hidden
+    //
+    let ircStateIndex = ircState.channels.indexOf(name.toLowerCase());
+    let webStateIndex = webState.channels.indexOf(name.toLowerCase());
+    if ((ircStateIndex >= 0) && (webStateIndex >= 0)) {
+      if (ircState.channelStates[ircStateIndex].joined !==
+        webState.channelStates[webStateIndex].lastJoined) {
+        if ((ircState.channelStates[ircStateIndex].joined) &&
+          (!webState.channelStates[webStateIndex].lastJoined)) {
+          channelBottomDivEl.removeAttribute('hidden');
+          channelHideButtonEl.textContent = '-';
+          channelTopRightHidableDivEl.removeAttribute('hidden');
+        }
+        webState.channelStates[webStateIndex].lastJoined =
+          ircState.channelStates[ircStateIndex].joined;
+      }
+    }
+    // state object includes up to date list of nicks in a channel
     _updateNickList();
+    // show/hide disable or enable channel elements depend on state
     updateVisibility();
   }.bind(this));
 
@@ -765,7 +792,7 @@ function createChannelEl (name) {
 // A change in state occurred, check if new channel need to be created.
 // ----------------------------------------------------------------------
 // init to zero to force first update
-var lastChannelsArray = [0];
+var lastJoinedChannelCount = -1;
 document.addEventListener('irc-state-changed', function(event) {
   // console.log('checking for channel updates');
 
@@ -779,22 +806,22 @@ document.addEventListener('irc-state-changed', function(event) {
     });
   }
 
-  // Add channel /JOIN buttons for favorite channels
-  // let needButtonUpdate = false;
-  // if (lastChannelsArray.length !== ircState.channels.length) {
-  //   // clase of different array size, need update
-  //   needButtonUpdate = true;
-  // } else {````
-  //   // case of same array size
-  //   if (ircState.channels.length > 0) {
-  //     // case of same length, check entries
-  //     for (let i=0; i<ircState.channels.length; i++) {
-  //       if (lastChannelsArray[i] !== ircState.channels[i]) needButtonUpdate = true;
-  //     }
-  //   }
-  // }
-  let needButtonUpdate = true;
+  // Check if a new channel was added, if so re-create channel join buttions
+  // so that current channel button is removed.
+  let needButtonUpdate = false;
+  let joinedChannelCount = 0;
+  if (ircState.channels.length > 0) {
+    for (let i=0; i<ircState.channels.length; i++) {
+      if (ircState.channelStates[i].joined) joinedChannelCount++;
+    }
+  }
+  if (joinedChannelCount !== lastJoinedChannelCount) {
+    needButtonUpdate = true;
+    lastJoinedChannelCount = joinedChannelCount;
+  }
+
   if (needButtonUpdate) {
+    console.log('updating buttons');
     // remove old button elements
     let channelJoinButtonContainerEl = document.getElementById('channelJoinButtonContainer');
     while (channelJoinButtonContainerEl.firstChild) {
@@ -802,7 +829,8 @@ document.addEventListener('irc-state-changed', function(event) {
     }
     if (ircState.channelList.length > 0) {
       for (let i=0; i<ircState.channelList.length; i++) {
-        if (ircState.channels.indexOf(ircState.channelList[i]) < 0) {
+        let channelIndex = ircState.channels.indexOf(ircState.channelList[i].toLowerCase());
+        if ((channelIndex < 0) || (!ircState.channelStates[channelIndex].joined)) {
           // console.log('adding ' + ircState.channelList[i]);
           let joinButtonEl = document.createElement('button');
           joinButtonEl.textContent = ircState.channelList[i];
@@ -815,13 +843,6 @@ document.addEventListener('irc-state-changed', function(event) {
       } // next i
     }
   } // needButtonUpdate
-  // make a shallow copy
-  lastChannelsArray = [];
-  if (ircState.channels.length > 0) {
-    for (let i=0; i<ircState.channels.length; i++) {
-      lastChannelsArray.push(ircState.channels[i]);
-    }
-  }
 }); // addEventListener('irc-state-changed
 
 // ---------------------------------------

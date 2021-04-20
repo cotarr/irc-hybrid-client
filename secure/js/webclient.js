@@ -109,6 +109,7 @@ webState.showCommsMessages = false;
 
 // Some IRC channel local variables (most in ircState)
 webState.channels = [];
+webState.channelStates = [];
 webState.resizableChannelTextareaIds = [];
 webState.resizableChanSplitTextareaIds = [];
 webState.resizableSendButtonTextareaIds = [];
@@ -369,6 +370,7 @@ function setVariablesShowingIRCDisconnected () {
     channelContainerDivEl.removeChild(channelContainerDivEl.firstChild);
   }
   webState.channels = [];
+  webState.channelStates = [];
   webState.resizableChannelTextareaIds = [];
   webState.resizableChanSplitTextareaIds = [];
   webState.resizableSendButtonTextareaIds = [];
