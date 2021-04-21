@@ -101,6 +101,7 @@ webState.loginUser = {};
 webState.webConnectOn = true;
 webState.webConnected = false;
 webState.webConnecting = false;
+webState.websocketCount = 0;
 webState.noticeOpen = false;
 webState.wallopsOpen = false;
 webState.viewRawMessages = false;
@@ -410,12 +411,31 @@ function resetHeartbeatTimer () {
 function onHeartbeatReceived () {
   heartbeatUpCounter = 0;
 };
+// Websocket watchdog timer
+//
+// Case 1, socket still connected, but HEARTBEAT stopped
+// After increment second reaches limit, --> try to close socket with error code
+// If unsucccessful
+// Case 2, socket unresponsive to close, but no closed event triggered
+// After increment second to limit + 2 second,
+// Set applicatin to disconnected state.
+//
 function heartbeatTimerTickHandler () {
   // console.log('tick');
   heartbeatUpCounter++;
   if (webState.webConnected) {
-    if (heartbeatUpCounter > heartbeatExpirationTimeSeconds) {
-      console.log('HEARTBEAT stopped, websocket timed out.');
+    if (heartbeatUpCounter > heartbeatExpirationTimeSeconds + 1) {
+      console.log('HEARTBEAT timeout + 2 seconds, socket unresponsive, forcing disconnect');
+      document.getElementById('reconnectStatusDiv').textContent +=
+        'Web socket connection timeout, socket unresponsive, force disconnect\n';
+      webState.webConnected = false;
+      webState.webConnecting = false;
+      setVariablesShowingIRCDisconnected();
+      updateDivVisibility();
+    } else if (heartbeatUpCounter === heartbeatExpirationTimeSeconds) {
+      console.log('HEARTBEAT timeout + 0 seconds , attempting to closing socket');
+      document.getElementById('reconnectStatusDiv').textContent +=
+        'Web socket connection timeout, attempting to close\n';
       if (wsocket) {
         // Closing the web socket will generate a 'close' event.
         wsocket.close(3000, 'Heartbeat timeout');
@@ -591,6 +611,14 @@ function getIrcState (callback) {
 
       // show or hide display sections according to state variables
       updateDivVisibility();
+
+      // If not hidden up date variables JSON
+      // also updated in getElementById('variablesButtonId').addEventListener('click'
+      if (!document.getElementById('variablesDivId').hasAttribute('hidden')) {
+        document.getElementById('variablesPreId').textContent =
+        'ircState = ' + JSON.stringify(ircState, null, 2) + '\n\n' +
+        'webState = ' + JSON.stringify(webState, null, 2);
+      }
 
       if (callback) {
         callback(null, ircState);

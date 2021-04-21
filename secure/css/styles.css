@@ -105,7 +105,7 @@ button[disabled] {
   background-color: #00c71b;
 }
 .connect-icon[connecting] {
-  background-color: #ffffff;
+  background-color: #ffff00;
 }
 
 .debug-div-time {

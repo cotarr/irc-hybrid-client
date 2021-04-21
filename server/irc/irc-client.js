@@ -569,15 +569,24 @@
     let parsedMessage = _parseIrcMessage(message);
     // console.log('(IRC-->) parsedMessage ' + JSON.stringify(parsedMessage, null, 2));
 
-    // PING is special case
-    if (parsedMessage.command === 'PING') {
-      global.sendToBrowser(commandMsgPrefix + 'PONG ' + parsedMessage.params[0]+ '\n');
-      socket.write('PONG ' + parsedMessage.params[0]+ '\r\n', 'utf8');
-    }
     // Do not process excluded commands on this list
     let excludedCommands = [];
     // excludedCommands.push('PING');
-    if (excludedCommands.indexOf(parsedMessage.command) >=0) return;
+    // excludedCommands.push('PONG');
+
+    // PING is special case
+    if (parsedMessage.command === 'PING') {
+      if (excludedCommands.indexOf('PONG') < 0) {
+        global.sendToBrowser(commandMsgPrefix + 'PONG ' + parsedMessage.params[0]+ '\n');
+      }
+      socket.write('PONG ' + parsedMessage.params[0]+ '\r\n', 'utf8');
+    }
+    //
+    // Filter...
+    //
+    // Do not parse or act on commands that are listed in this array
+    //
+    if (excludedCommands.indexOf(parsedMessage.command) >= 0) return;
 
     //
     // For display in browser, and cache for browser refresh

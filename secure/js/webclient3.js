@@ -26,11 +26,14 @@ function connectWebSocket () {
   // This replaces temporary dummy variable
   wsocket = new WebSocket(webSocketUrl + '/irc/ws');
 
+  // Counter to avoid duplication of websockets
+  webState.websocketCount++;
+  console.log('Creating new websocket, count: ' + webState.websocketCount);
   // -----------------------
   // On Open event handler
   // -----------------------
   wsocket.addEventListener('open', function (event) {
-    // console.log('Connected to WS Server');
+    console.log('Websocket open, count: ' + webState.websocketCount);
     webState.webConnected = true;
     webState.webConnecting = false;
     webState.times.webConnect = timestamp();
@@ -51,17 +54,25 @@ function connectWebSocket () {
   // On Close event handler
   // -----------------------
   wsocket.addEventListener('close', function (event) {
-    console.log('Websocket closed code: ' + event.code + ' ' + event.reason);
-    if (webState.webConnected) {
-      console.log('Web Socket closed.');
-      document.getElementById('reconnectStatusDiv').textContent =
-        'Web socket connection closed.\n' +
-        'Code: ' + event.code + ' ' + event.reason + '\n';
+    // If a new socket is spawned before the fault one had disappeared,
+    // then allow multiple web sockets. When socket count is zero,
+    // then we are not reconnected, and must set the state to not-connected.
+    if (webState.websocketCount > 0) {
+      webState.websocketCount--;
+      console.log('Websocket closed, count: ' + webState.websocketCount +
+      ' code: ' + event.code + ' ' + event.reason);
+      if (webState.websocketCount === 0) {
+        if (webState.webConnected) {
+          document.getElementById('reconnectStatusDiv').textContent +=
+          'Web socket connection closed, count: ' + webState.websocketCount + '\n' +
+          'Code: ' + event.code + ' ' + event.reason + '\n';
+        }
+        webState.webConnected = false;
+        webState.webConnecting = false;
+        setVariablesShowingIRCDisconnected();
+        updateDivVisibility();
+      }
     }
-    webState.webConnected = false;
-    webState.webConnecting = false;
-    setVariablesShowingIRCDisconnected();
-    updateDivVisibility();
   });
 
   // -----------------------
@@ -70,6 +81,8 @@ function connectWebSocket () {
   wsocket.addEventListener('error', function (error) {
     console.log('Websocket error');
     // showError('WebSocket error occurred.');
+    webState.webConnected = false;
+    webState.webConnecting = false;
   });
 
   // -----------------------------------------------------------------------------
@@ -245,6 +258,11 @@ function reconnectWebSocketAfterDisconnect() {
             if (err) {
               showError('Error connecting web socket');
               console.log(err);
+              document.getElementById('reconnectStatusDiv').textContent +=
+                'Error: authorizing websocket.\n';
+              webState.webConnected = false;
+              webState.webConnecting = false;
+              updateDivVisibility();
             } else {
               // --------------------------------------
               // step 4 - 10 second auth window valid
@@ -339,20 +357,21 @@ function reconnectTimerTickHandler() {
     return;
   }
 
-  // increment timer
-  wsReconnectTimer++;
   // connection in progress, skip.
   if (webState.webConnecting) return;
 
+  // increment timer
+  wsReconnectTimer++;
 
   // first time on first timer tick (immediately)
   if (wsReconnectCounter === 0) {
     if (wsReconnectTimer > 0) {
       webState.webConnecting = true;
+      updateDivVisibility();
       wsReconnectTimer = 0;
       wsReconnectCounter++;
       document.getElementById('reconnectStatusDiv').textContent +=
-        'Reconnect to web server initiated (Timer)\n';
+        'Reconnect to web server initiated (Timer-1)\n';
       reconnectWebSocketAfterDisconnect();
     }
     return;
@@ -360,16 +379,18 @@ function reconnectTimerTickHandler() {
     // then second try in 5 seconds
     if (wsReconnectTimer > 5) {
       webState.webConnecting = true;
+      updateDivVisibility();
       wsReconnectTimer = 0;
       wsReconnectCounter++;
       document.getElementById('reconnectStatusDiv').textContent +=
-        'Reconnect to web server initiated (Timer)\n';
+        'Reconnect to web server initiated (Timer-2)\n';
       reconnectWebSocketAfterDisconnect();
     }
     return;
   } else if (wsReconnectCounter > 10) {
     // Stop at the limit
     webState.webConnectOn = false;
+    updateDivVisibility();
     if (wsReconnectCounter === 11) {
       // only do the message one time
       document.getElementById('reconnectStatusDiv').textContent +=
@@ -379,10 +400,11 @@ function reconnectTimerTickHandler() {
   } else {
     if (wsReconnectTimer > 15) {
       webState.webConnecting = true;
+      updateDivVisibility();
       wsReconnectTimer = 0;
       wsReconnectCounter++;
       document.getElementById('reconnectStatusDiv').textContent +=
-        'Reconnect to web server initiated (Timer)\n';
+        'Reconnect to web server initiated (Timer-3)\n';
       reconnectWebSocketAfterDisconnect();
     }
     return;

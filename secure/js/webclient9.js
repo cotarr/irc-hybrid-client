@@ -126,9 +126,9 @@ document.getElementById('hideAllDivsButton').addEventListener('click', function(
 document.getElementById('variablesButtonId').addEventListener('click', function() {
   if (document.getElementById('variablesDivId').hasAttribute('hidden')) {
     document.getElementById('variablesDivId').removeAttribute('hidden');
+
+    // also updated from getIrcState()
     document.getElementById('variablesPreId').textContent =
-      'Press [Show Variables] to refresh\n' +
-      '----------------------------\n\n' +
       'ircState = ' + JSON.stringify(ircState, null, 2) + '\n\n' +
       'webState = ' + JSON.stringify(webState, null, 2);
   } else {
@@ -384,8 +384,10 @@ document.getElementById('test2Button').addEventListener('click', function() {
 // --------------------
 document.getElementById('test3Button').addEventListener('click', function() {
   console.log('Test 3 button pressed.');
+  // ---------------------------------
   console.log('Test 3 button: expire heart beat timer');
-  heartbeatUpCounter = 1000;
+  heartbeatUpCounter = heartbeatExpirationTimeSeconds - 1;
+  // ---------------------------------
 });
 
 // --------------------
@@ -394,8 +396,10 @@ document.getElementById('test3Button').addEventListener('click', function() {
 document.getElementById('test4Button').addEventListener('click', function() {
   console.log('Test 4 button pressed.');
 
+  // ---------------------------------
   console.log('Test 4 getIrcState()');
   getIrcState();
+  // ---------------------------------
 });
 
 // ---------------------------------------------------------------------------

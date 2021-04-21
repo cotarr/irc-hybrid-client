@@ -660,6 +660,32 @@ function createChannelEl (name) {
   // populate it initially on creating the element
   _updateNickList();
 
+  function _isNickInChannel(nickString, channelString) {
+    if ((!nickString) || (nickString.length === 0)) return false;
+    if (ircState.channels.length === 0) return false;
+    let channelIndex = -1;
+    for (let i=0; i<ircState.channels.length; i++) {
+      if (channelString.toLowerCase() === ircState.channels[i].toLowerCase()) channelIndex = i;
+    }
+    if (channelIndex < 0) return false;
+    if (ircState.channelStates[channelIndex].names.length === 0) return false;
+    // if check nickname starts with an op character, remove it
+    let pureNick = nickString.toLowerCase();
+    if (nicknamePrefixChars.indexOf(pureNick.charAt(0)) >= 0) {
+      pureNick = pureNick.slice(1, pureNick.length);
+    }
+    let present = false;
+    for (let i=0; i<ircState.channelStates[channelIndex].names.length; i++) {
+      let checkNick = ircState.channelStates[channelIndex].names[i].toLowerCase();
+      // if channel nickname start with an OP character remove it
+      if (nicknamePrefixChars.indexOf(checkNick.charAt(0)) >= 0) {
+        checkNick = checkNick.slice(1, checkNick.length);
+      }
+      if (checkNick === pureNick) present = true;
+    }
+    return present;
+  } // _nickInChannel()
+
   document.addEventListener('irc-state-changed', function(event) {
     // console.log('Event: irc-state-changed (createChannelEl)');
 
@@ -815,12 +841,29 @@ function createChannelEl (name) {
         }
         break;
       case 'QUIT':
+        // this assumes:
+        // First: The "QUIT" message arrives through websocket
+        // The quit message is shown in the channel
+        // Second: The "UPDATE" comm is received
+        // In response to UPDATE request, getIrcState() is called
+        // and nickname list is updated when ircState changes
+        //
+        // However, if UPDATE is recieved first, the QUIT message would
+        // not be shown int he channel (This should not be the case)
+        //
+        // Issue:
+        //
+        // Case of reload page or refresh data
+        // QUIT messages for a nick will only be shown
+        // if the nick is in the channel when refreshed.
+        //
+        // TODO, new function _wasNickInChannel(), it would use a
+        // cache array of JOIN/NICK nicknames for QUIT/NICK processing on reload
+        //
+        // ---------
+        // Set true, quit messages will show in all channels.
         if (true) {
-          // TODO, this will send Quit message to all channels, even if
-          // the quitting nick is not in them.
-          // Problem is the nick is no longer in the name array
-          // when this message is received, so attendance can not
-          // be checked.
+        // if (_isNickInChannel(parsedMessage.nick, name)) {
           let reason = ' ';
           if (parsedMessage.params[0]) reason = parsedMessage.params[0];
           if (channelMainSectionEl.hasAttribute('brief-enabled')) {
