@@ -936,6 +936,7 @@ function createChannelEl (name) {
 // ----------------------------------------------------------------------
 // init to zero to force first update
 var lastJoinedChannelCount = -1;
+var lastIrcServerIndex = -1;
 document.addEventListener('irc-state-changed', function(event) {
   // console.log('checking for channel updates');
 
@@ -963,8 +964,13 @@ document.addEventListener('irc-state-changed', function(event) {
     needButtonUpdate = true;
     lastJoinedChannelCount = joinedChannelCount;
   }
+  if (ircState.ircServerIndex !== lastIrcServerIndex) {
+    needButtonUpdate = true;
+    lastIrcServerIndex = ircState.ircServerIndex;
+  }
 
   if (needButtonUpdate) {
+    console.log('Updating favorite channel buttons');
     // remove old button elements
     let channelJoinButtonContainerEl = document.getElementById('channelJoinButtonContainer');
     while (channelJoinButtonContainerEl.firstChild) {
