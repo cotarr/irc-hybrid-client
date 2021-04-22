@@ -40,7 +40,7 @@ function _removeCRLF (inStr) {
 console.log();
 console.log('Caution, you are editing the password file');
 console.log();
-console.log('This will set a new login user/password for userid = 1');
+console.log('This will set a new login user/password for userid=1 at array index=0');
 console.log('This is a static password not editable online');
 console.log('It is intended there is only one user for the program');
 console.log('This must be run from the tools folder to find credentials.json');

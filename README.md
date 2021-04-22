@@ -4,28 +4,28 @@ Single user hybrid IRC client using JavaScript front end and Node/Express backen
 
 ### Project Goals
 
-- Single user web IRC client, Chrome IOS browser, for iPhone plus with 375 pixel screen width.
-- Concurrent logins (desktop/tablet) with synchronized displays.
+- Single user web IRC client for iPhone plus with 375 pixel screen and Chrome IOS browser.
+- Concurrent logins (mobile/desktop/tablet) with synchronized displays.
 
 ### Coding Goals
 
 - Single HTML page
-- Hybrid native JavaScript front end integrated to backend Node/Express server.
-- Backend server manages IRC connections and IRC channel membership.
-- Backend server manages HTTP Username/password login and session cookies internally.
-- Front end browser manages IRC message display and parses user input, and IRC commands.
+- Hybrid native JavaScript front end integrated to Node/Express backend server.
+- Backend server controls IRC connections and IRC channel membership.
+- Backend server manages HTTP Username/password login and session cookies.
+- Web browser displays IRC messages, touch controls, and IRC text commands.
 - Front end JavaScript limited to native JavaScript without web framework or external libraries.
 - Browser Content Security Policy (CSP) "self" enforced. Policy "unsafe-inline" not allowed.
-- Browser Same origin policy enforced.
 - TLS support for both Web Server and IRC server. Works with Lets Encrypt certificates.
 
 ### Current Limitations
 
-- Assumption that user is comfortable in SSH, starting node servers, and can edit a JSON file.
+- User should be comfortable in SSH, starting node servers, and editing a custom JSON configuration files.
+- Limited to one IRC user per to node/express instance. (i.e. Personal web hosted IRC client).
 - This is a chat application, not a channel protection bot, and does not include kick/ban enforcement.
-- Limited to one web login for one IRC user to one web server (i.e. Personal web hosted IRC client)
 - Limited to one IRC network connection at a time (for now...)
-- IRC Configuration JSON files located in backend server are not remotely configurable.
+- IRC configuration JSON files are not remotely configurable from the web interface.
+- No automated tests are included.
 
 # Installation
 
@@ -86,9 +86,9 @@ files into 1 bundled/minified JavaScript file.
 This will reduce the  download size by about half.
 
 After running `gulp dist`, a build folder will be created with same
-folders as the base repository. The gulp script removed the individual
-script tags from webclient.html an consolidates the tags
-to a single javascript script tag.
+folders as the base repository. The gulp script will edit the individual
+script tags in webclient.html to replace multiple script tags
+with a single javascript script tag.
 
 It is necessary to install gulp-cli globally, as gulp-cli
 is used by gulp to manage multiple gulp version. gulp-cli is not
@@ -100,13 +100,13 @@ npm install -g gulp-cli
 # bundle and minify to /build folder
 gulp dist
 
-# Deploy by any method
+# You can deploy by any method
 
 # In deployed version, create log folder `mkdir logs`
-# In deployed shell, `export NODE_ENV=production`
-# In deployed copy, then edit credentials.json and servers.json
+# For deployment environment, `export NODE_ENV=production`
+# Configuration requires copy and edit of credentials.json and servers.json
 
-# In deployed version, run:
+# Install node packages by running:
 npm ci
 
 # To run
