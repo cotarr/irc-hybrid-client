@@ -664,7 +664,6 @@ function createChannelEl (name) {
   // Append user count to the end of the channel name string in title area
   //
   function _updateChannelTitle () {
-    console.log('debug');
     let titleStr = name + ' (';
     let index = ircState.channels.indexOf(name.toLowerCase());
     if (index >= 0) {

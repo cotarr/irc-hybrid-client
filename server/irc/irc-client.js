@@ -1517,14 +1517,20 @@
     console.log('test1 handler called');
     // -------- test code here -----------------
     // -----------------------------------------
-    res.json({error: false});
+    res.json({
+      error: false,
+      comment: 'No action assigned to test 1'
+    });
   };
 
   const test2Handler = function(req, res, next) {
     console.log('test2 handler called');
     // -------- test code here -----------------
     // -----------------------------------------
-    res.json({error: false});
+    res.json({
+      error: false,
+      comment: 'No action assigned to test 2'
+    });
   };
 
   // Program run timestamp
