@@ -1,5 +1,3 @@
-
-
 'use strict';
 
 const path = require('path');
@@ -86,8 +84,8 @@ setInterval(function() {
 // ----------------------------------------
 // HTTP --> WebSocket Upgrade Handler
 //
-// 1) validate route
-// 2) validate cookie on upgrade request
+// 1) Validate route
+// 2) Validate cookie on upgrade request
 // 3) Connect the webscket
 // ----------------------------------------
 const wsOnUpgrade = function (request, socket, head) {

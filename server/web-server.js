@@ -25,9 +25,11 @@ const authorizeOrFail = userAuth.authorizeOrFail;
 // Irc Client Module
 const ircClient = require('./irc/irc-client');
 
+// TLS certificate filenames
+// Web username, password credentials
 const credentials = JSON.parse(fs.readFileSync('./credentials.json', 'utf8'));
 
-// credentials
+// For session cookie
 const cookieSecret = credentials.cookieSecret;
 if (cookieSecret.length < 8) {
   throw new Error('Error, cookie secret required');
@@ -48,7 +50,7 @@ app.use(bodyParser.urlencoded({extended: false}));
 // cookieParser used for ws-server /irc/wsauth route cookie match
 app.use(cookieParser(cookieSecret));
 
-// Generic console log if various nodejs req object properties
+// Generic console log to debug various nodejs req object properties
 const logStuff = function(req, res, next) {
   // console.log('req.headers' + JSON.stringify(req.headers, null, 2));
   // console.log('req.rawHeaders ' + req.rawHeaders);
@@ -90,7 +92,6 @@ if (nodeEnv === 'development') {
 //
 // clean headers
 //
-
 app.use(helmet({
   hidePoweredBy: false
 }));
@@ -105,7 +106,7 @@ app.use(helmet.referrerPolicy({policy: 'no-referrer'}));
 // });
 
 //
-// /status, Is the server alive?
+//   /status    Is the server alive?
 //
 app.get('/status', (req, res) => res.json({status: 'ok'}));
 
@@ -221,10 +222,11 @@ app.get('/secure', authorizeOrFail, (req, res) => res.json({secure: 'ok'}));
 // -----------------------------------------
 //          Websocket Auth
 //
-// This app has as in effect two separate web servers.
-// There is a websocket server that accepts
-// node request object fo upgrade to websocket.
-// There is the express.js framework in this module.
+// This application includes two separate web servers:
+// 1) There is a websocket server that accepts
+//    node request object fo upgrade to websocket.
+// 2) There is the express.js framework in this module.
+//
 // The websocket module does not have access
 // to the express (req, res, next) objects
 // and therefore not express session (req.session).
