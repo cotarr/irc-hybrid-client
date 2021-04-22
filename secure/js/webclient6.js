@@ -660,6 +660,29 @@ function createChannelEl (name) {
   // populate it initially on creating the element
   _updateNickList();
 
+  //
+  // Append user count to the end of the channel name string in title area
+  //
+  function _updateChannelTitle () {
+    console.log('debug');
+    let titleStr = name + ' (';
+    let index = ircState.channels.indexOf(name.toLowerCase());
+    if (index >= 0) {
+      if (ircState.channelStates[index].joined) {
+        titleStr += parseInt(ircState.channelStates[index].names.length).toString();
+      } else {
+        if (ircState.channelStates[index].kicked) {
+          titleStr += 'Kicked';
+        } else {
+          titleStr += '0';
+        }
+      }
+    }
+    channelNameDivEl.textContent = titleStr + ')';
+  }
+  // do one upon channel creation
+  _updateChannelTitle();
+
   function _isNickInChannel(nickString, channelString) {
     if ((!nickString) || (nickString.length === 0)) return false;
     if (ircState.channels.length === 0) return false;
@@ -710,6 +733,8 @@ function createChannelEl (name) {
     }
     // state object includes up to date list of nicks in a channel
     _updateNickList();
+    // Update title string to include some data
+    _updateChannelTitle();
     // show/hide disable or enable channel elements depend on state
     updateVisibility();
   }.bind(this));

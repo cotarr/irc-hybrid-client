@@ -881,7 +881,7 @@
             ircState.channelStates[index].topic = '';
             ircState.channelStates[index].names = [];
             ircState.channelStates[index].joined = false;
-            ircState.channelStates[index].kicked = false;
+            ircState.channelStates[index].kicked = true;
             global.sendToBrowser('UPDATE\n');
           } else {
             // case of someone else was kicked
