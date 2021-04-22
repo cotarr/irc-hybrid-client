@@ -969,7 +969,7 @@ document.addEventListener('irc-state-changed', function(event) {
   }
 
   if (needButtonUpdate) {
-    console.log('Updating favorite channel buttons');
+    // console.log('Updating favorite channel buttons');
     // remove old button elements
     let channelJoinButtonContainerEl = document.getElementById('channelJoinButtonContainer');
     while (channelJoinButtonContainerEl.firstChild) {

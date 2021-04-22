@@ -57,6 +57,7 @@
   ircState.ircConnected = false;
   ircState.ircConnecting = false;
   ircState.ircRegistered = false;
+  ircState.ircIsAway = false;
 
 
   ircState.ircServerName = servers.serverArray[0].name;
@@ -195,6 +196,7 @@
         ircState.ircConnecting = false;
         ircState.ircConnected = false;
         ircState.ircRegistered = false;
+        ircState.ircIsAway = false;
         global.sendToBrowser('UPDATE\n');
       }
       // reset the state variables
@@ -743,7 +745,26 @@
           ircState.ircConnecting = false;
           ircState.ircConnected = false;
           ircState.ircRegistered = false;
+          ircState.ircIsAway = false;
           global.sendToBrowser('UPDATE\n');
+        }
+        break;
+      // 305 RPL_UNAWAY
+      case '305':
+        if (true) {
+          if (parsedMessage.params[0].toLowerCase() === ircState.nickName.toLowerCase()) {
+            ircState.ircIsAway = false;
+            global.sendToBrowser('UPDATE\n');
+          }
+        }
+        break;
+      // 305 RPL_NOWAWAY
+      case '306':
+        if (true) {
+          if (parsedMessage.params[0].toLowerCase() === ircState.nickName.toLowerCase()) {
+            ircState.ircIsAway = true;
+            global.sendToBrowser('UPDATE\n');
+          }
         }
         break;
       //
@@ -811,6 +832,7 @@
               ircState.ircConnecting = false;
               ircState.ircConnected = false;
               ircState.ircRegistered = false;
+              ircState.ircIsAway = false;
               global.sendToBrowser('UPDATE\n');
             }
           }
@@ -828,6 +850,7 @@
               ircState.ircConnecting = false;
               ircState.ircConnected = false;
               ircState.ircRegistered = false;
+              ircState.ircIsAway = false;
               global.sendToBrowser('UPDATE\n');
             }
           }
@@ -1131,6 +1154,7 @@
     ircState.ircConnected = false;
     ircState.ircConnecting = true;
     ircState.ircRegistered = false;
+    ircState.ircIsAway = false;
 
     let connectMessage = 'webServer: Opening socket to ' + ircState.ircServerName + ' ' +
       ircState.ircServerHost + ':' + ircState.ircServerPort;
@@ -1160,6 +1184,7 @@
         ircState.ircConnecting = false;
         ircState.ircConnected = false;
         ircState.ircRegistered = false;
+        ircState.ircIsAway = false;
         global.sendToBrowser('UPDATE\nwebServer: Socket not writable, connected flags reset\n');
       }
     };
@@ -1172,6 +1197,7 @@
       ircState.ircConnecting = false;
       ircState.ircConnected = false;
       ircState.ircRegistered = false;
+      ircState.ircIsAway = false;
       // Send some over over websocket too
       let errMsg = 'UPDATE\nwebServer: Error opening TCP socket to ' +
         ircState.ircServerName + ' ' +
@@ -1235,6 +1261,7 @@
       ircState.ircConnecting = false;
       ircState.ircConnected = false;
       ircState.ircRegistered = false;
+      ircState.ircIsAway = false;
       global.sendToBrowser('UPDATE\nwebServer: Socket to IRC server closed, hadError: ' +
         hadError.toString() + '\n');
     });
@@ -1469,6 +1496,7 @@
       ircState.ircConnecting = false;
       ircState.ircConnected = false;
       ircState.ircRegistered = false;
+      ircState.ircIsAway = false;
       global.sendToBrowser('UPDATE\n');
       res.json({error: false});
     } else {

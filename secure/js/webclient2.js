@@ -643,6 +643,7 @@ function _parseBufferMessage (message) {
           cleanFormatting(
             cleanCtcpDelimiter(
               substituteHmsTime(message))));
+        showRawMessageWindow();
       }
     }
 

@@ -24,85 +24,99 @@
         Tap to Close
       </div>
     </div>
-
-    <div class="logout-confirm-div" id="logoutConfirmDiv" hidden>
+    <div class="annunciator-background">
       <div class="head-flex">
         <div class="head-left">
-          <div>
-            IRC is connected!
-          </div>
-        </div>
-        <div class="head-right">
-          <div>
-            <button id="cancelLogoutConfirmButton">Cancel</button>
-            <a href="/logout"><button>Web Logout</button></a>
-          </div>
-        </div>
-      </div>
-      <div class="vh10"></div>
-      <div>
-        Leaving the web page will not disconnect the server from IRC.
-        Your nickname will remain present on IRC.
-        Otherwise please
-        <button id="quitButton2">/Quit IRC</button>
-        before leaving the web page.
-      </div>
-    </div>
-    <div class="aa-section-div">
-      <div class='head-flex'>
-        <div class="head-left">
-          <button id="hideLoginSectionButton">-</button>
-          <div class="connect-icon" id="webConnectIconId">Web</div>
-          <div class="connect-icon" id="ircConnectIconId">IRC</div>
         </div>
         <div class="head-right">
           <button id="showAllDivsButton">+ all</button>
           <button id="hideAllDivsButton">- all</button>
-          <button id='webLogoutButton'>logout</button>
         </div>
       </div>
-      <div class="vh10"></div>
-      <div class="button-div">
-        <button id="connectButton">Connect IRC</button>
-        <button id="quitButton">/Quit IRC</button>
-      </div>
-      <div class="vh10"></div>
-      <div class="button-div">
-        <span class="user-span" id="headerServer">server</span>
-        <span class="user-span"> (</span>
-        <span class="user-span" id="headerUser"></span>
-        <span class="user-span">)</span>
-      </div>
-      <div class="vh10"></div>
-      <div id="hideLoginSection">
-        <div class="vh10"></div>
-        <div class="button-div">
-          <input type="text" id="ircServerNameInputId" size="10" value="" disabled>
-          <input type="checkbox" id="ircServerTlsCheck" disabled>
-          <span>TLS</span>
-          <button id="cycleNextServerButton">Next Server</button>
-        </div>
-        <div class="button-div">
-          <input type="text" id="ircServerAddrInputId" size="26" value="" disabled>
-          <span>:</span>
-          <input type="text" id="ircServerPortInputId" size="4" value="" disabled>
+    </div>
+    <div class="annunciator-div">
+      <div class="annunciator-connect-icon" id="webConnectIconId">Web</div>
+      <div class="annunciator-connect-icon" id="ircConnectIconId">IRC</div>
+      <div class="annunciator-away-icon" id="ircIsAwayIconId" hidden>Away</div>
+    </div>
+
+    <div class="aa-start-scrollable">
+      <div class="logout-confirm-div" id="logoutConfirmDiv" hidden>
+        <div class="head-flex">
+          <div class="head-left">
+            <div>
+              IRC is connected!
+            </div>
+          </div>
+          <div class="head-right">
+            <div>
+              <button id="cancelLogoutConfirmButton">Cancel</button>
+              <a href="/logout"><button>Web Logout</button></a>
+            </div>
+          </div>
         </div>
         <div class="vh10"></div>
-        <div class="button-div">
-          <input type="text" id="nickNameInputId" value="">
-          <div class="input-label-right">Nickname</div>
+        <div>
+          Leaving the web page will not disconnect the server from IRC.
+          Your nickname will remain present on IRC.
+          Otherwise please
+          <button id="quitButton2">/Quit IRC</button>
+          before leaving the web page.
         </div>
-        <div class="button-div">
-          <input type="text" id="userNameInputId" value="">
-          <div class="input-label-right">Username</div>
+      </div>
+      <div class="aa-section-div">
+        <div class='head-flex'>
+          <div class="head-left">
+            <button id="hideLoginSectionButton">-</button>
+            <span>IRC Controls</span>
+          </div>
+          <div class="head-right">
+            <button id='webLogoutButton'>logout</button>
+          </div>
         </div>
+        <div class="vh10"></div>
         <div class="button-div">
-          <input type="text" id="realNameInputId" value="">
-          <div class="input-label-right">Real Name</div>
+          <button id="connectButton">Connect IRC</button>
+          <button id="quitButton">/Quit IRC</button>
         </div>
+        <div class="vh10"></div>
         <div class="button-div">
-          <input type="text" id = "userModeInputId" size="6" value="">
-          <div class="input-label-right">Initial User Mode</div>
+          <span class="user-span" id="headerServer">server</span>
+          <span class="user-span"> (</span>
+          <span class="user-span" id="headerUser"></span>
+          <span class="user-span">)</span>
+        </div>
+        <div class="vh10"></div>
+        <div id="hideLoginSection">
+          <div class="vh10"></div>
+          <div class="button-div">
+            <input type="text" id="ircServerNameInputId" size="10" value="" disabled>
+            <input type="checkbox" id="ircServerTlsCheck" disabled>
+            <span>TLS</span>
+            <button id="cycleNextServerButton">Next Server</button>
+          </div>
+          <div class="button-div">
+            <input type="text" id="ircServerAddrInputId" size="26" value="" disabled>
+            <span>:</span>
+            <input type="text" id="ircServerPortInputId" size="4" value="" disabled>
+          </div>
+          <div class="vh10"></div>
+          <div class="button-div">
+            <input type="text" id="nickNameInputId" value="">
+            <div class="input-label-right">Nickname</div>
+          </div>
+          <div class="button-div">
+            <input type="text" id="userNameInputId" value="">
+            <div class="input-label-right">Username</div>
+          </div>
+          <div class="button-div">
+            <input type="text" id="realNameInputId" value="">
+            <div class="input-label-right">Real Name</div>
+          </div>
+          <div class="button-div">
+            <input type="text" id = "userModeInputId" size="6" value="">
+            <div class="input-label-right">Initial User Mode</div>
+          </div>
         </div>
       </div>
     </div>

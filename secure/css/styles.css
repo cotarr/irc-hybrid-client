@@ -45,6 +45,64 @@ button[disabled] {
   margin-bottom: 8px;
 }
 
+.aa-start-scrollable{
+  margin-top: 50px;
+}
+
+.annunciator-background {
+  background-color: #707070;
+  border: 1px solid black;
+  border-radius: 6px;
+  padding-top: 7px;
+  padding-bottom: 7px;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  z-index: 4;
+}
+
+.annunciator-div {
+  position: fixed;
+  top: 8px;
+  left: 10px;
+  width: auto;
+  z-index: 5;
+}
+
+.annunciator-connect-icon {
+  background-color: #FF4444;
+  border: 1px solid black;
+  border-radius: 12px;
+  color: white;
+  font-weight: bold;
+  display: inline-block;
+  margin-right: 2px;
+  padding: 3px 10px 2px 10px;
+}
+
+.annunciator-connect-icon[connected] {
+  background-color: #00c71b;
+}
+.annunciator-connect-icon[connecting] {
+  background-color: #ffff00;
+  color: #000000;
+}
+
+.annunciator-away-icon {
+  background-color: blue;
+  border: 1px solid black;
+  border-radius: 12px;
+  color: white;
+  font-weight: bold;
+  display: inline-block;
+  margin-right: 2px;
+  padding: 3px 10px 2px 10px;
+}
+.annunciator-away-icon[hidden] {
+  display: none;
+}
+
 .bm10 {margin-bottom: 10px;}
 
 .button-div {
@@ -90,24 +148,6 @@ button[disabled] {
   margin-right: 2px;
 }
 
-.connect-icon {
-  background-color: #FF4444;
-  border: 1px solid black;
-  border-radius: 12px;
-  color: black;
-  font-weight: bold;
-  display: inline-block;
-  margin-right: 2px;
-  padding: 3px 10px 2px 10px;
-}
-
-.connect-icon[connected] {
-  background-color: #00c71b;
-}
-.connect-icon[connecting] {
-  background-color: #ffff00;
-}
-
 .debug-div-time {
   background-color: white;
   border: 1px solid black;
@@ -127,6 +167,7 @@ button[disabled] {
   padding-left: 15px;
   padding-top: 5px;
   padding-bottom: 5px;
+  z-index: 10;
 }
 
 .error-title {
@@ -188,6 +229,8 @@ button[disabled] {
 .lm10 {margin-left: 10px;}
 
 .logout-confirm-div {
+  border: 1px solid black;
+  border-radius: 6px;
   background-color: yellow;
   padding: 10px;
 }
