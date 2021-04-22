@@ -774,8 +774,6 @@ function updateFromCache () {
   let fetchURL = webServerUrl + '/irc/cache';
   let fetchOptions = {
     method: 'GET',
-    timeout: 10000,
-    // credentials: 'include',
     headers: {
       'Accept': 'application/json'
     }

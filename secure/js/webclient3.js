@@ -159,8 +159,6 @@ function _sendIrcServerMessage (message) {
   let fetchURL = webServerUrl + '/irc/message';
   let fetchOptions = {
     method: 'POST',
-    timeout: 10000,
-    // credentials: 'include',
     headers: {
       'Content-type': 'application/json',
       'Accept': 'application/json'
@@ -202,8 +200,6 @@ function reconnectWebSocketAfterDisconnect() {
   let secureStatusURL = webServerUrl + '/secure';
   let fetchOptions = {
     method: 'GET',
-    // credentials: 'include',
-    timeout: 10000,
     headers: {
       'Accept': 'application/json'
     }

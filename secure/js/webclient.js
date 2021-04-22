@@ -496,8 +496,6 @@ function initWebSocketAuth (callback) {
   let fetchURL = webServerUrl + '/irc/wsauth';
   let fetchOptions = {
     method: 'POST',
-    timeout: 10000,
-    // credentials: 'include',
     headers: {
       'Content-type': 'application/json',
       'Accept': 'application/json'
@@ -538,8 +536,6 @@ function getIrcState (callback) {
   let fetchURL = webServerUrl + '/irc/getircstate';
   let fetchOptions = {
     method: 'GET',
-    timeout: 10000,
-    // credentials: 'include',
     headers: {
       'Accept': 'application/json'
     }

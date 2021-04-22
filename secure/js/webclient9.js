@@ -184,8 +184,6 @@ document.getElementById('serverTerminateButton').addEventListener('click', funct
   let fetchURL = webServerUrl + '/terminate';
   let fetchOptions = {
     method: 'POST',
-    timeout: 10000,
-    // credentials: 'include',
     headers: {
       'Content-type': 'application/json',
       'Accept': 'application/json'
@@ -243,8 +241,6 @@ document.getElementById('eraseCacheButton').addEventListener('click', function()
   let fetchURL = webServerUrl + '/irc/erase';
   let fetchOptions = {
     method: 'POST',
-    timeout: 10000,
-    // credentials: 'include',
     headers: {
       'Content-type': 'application/json',
       'Accept': 'application/json'
@@ -290,8 +286,6 @@ function updateUsername () {
   let fetchURL = webServerUrl + '/userinfo';
   let fetchOptions = {
     method: 'GET',
-    timeout: 10000,
-    // credentials: 'include',
     headers: {
       'Accept': 'application/json'
     }
@@ -323,8 +317,6 @@ document.getElementById('test1Button').addEventListener('click', function() {
   let fetchURL = webServerUrl + '/irc/test1';
   let fetchOptions = {
     method: 'GET',
-    timeout: 10000,
-    // credentials: 'include',
     headers: {
       'Accept': 'application/json'
     }
@@ -355,8 +347,6 @@ document.getElementById('test2Button').addEventListener('click', function() {
   let fetchURL = webServerUrl + '/irc/test2';
   let fetchOptions = {
     method: 'GET',
-    timeout: 10000,
-    // credentials: 'include',
     headers: {
       'Accept': 'application/json'
     }

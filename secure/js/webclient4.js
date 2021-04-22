@@ -15,8 +15,6 @@ document.getElementById('cycleNextServerButton').addEventListener('click', funct
   let fetchURL = webServerUrl + '/irc/server';
   let fetchOptions = {
     method: 'POST',
-    // credentials: 'include',
-    timeout: 10000,
     headers: {
       'Content-type': 'application/json',
       'Accept': 'application/json'
@@ -70,8 +68,6 @@ document.getElementById('connectButton').addEventListener('click', function() {
   let fetchURL = webServerUrl + '/irc/connect';
   let fetchOptions = {
     method: 'POST',
-    // credentials: 'include',
-    timeout: 10000,
     headers: {
       'Content-type': 'application/json',
       'Accept': 'application/json'
@@ -110,8 +106,6 @@ document.getElementById('disconnectButton').addEventListener('click', function()
   let fetchURL = webServerUrl + '/irc/disconnect';
   let fetchOptions = {
     method: 'POST',
-    timeout: 10000,
-    // credentials: 'include',
     headers: {
       'Content-type': 'application/json',
       'Accept': 'application/json'
