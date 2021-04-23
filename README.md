@@ -112,3 +112,28 @@ npm ci
 # To run
 node bin/www
 ```
+
+# List of supported IRC text commands
+
+```
+/ADMIN [server]
+/AWAY [away-message]
+/CTCP <nickname> <ctcp-command>
+/JOIN <#channel>
+/LIST [#channel-mask]
+/ME <action-message>
+/MODE <#channel> [channel-mode(s)]
+/MODE <nickname> [user-mode(s)]
+/MOTD [server]
+/MSG <nickname> <private-message>
+/NICK <new-nickname>
+/NOP ...inert testing command...
+/NOTICE <nickname> <notice-message>
+/PART <#channel> [Optional part message]
+/QUERY <nickname> <private-message>
+/QUIT [optional quit message]
+/QUOTE <IRC server raw command>
+/TOPIC <#channel> <new-topic>
+/VERSION [server]
+/WHOIS <nickname>
+```
