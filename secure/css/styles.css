@@ -71,7 +71,7 @@ button[disabled] {
 }
 
 .annunciator-connect-icon {
-  background-color: #FF4444;
+  background-color: #e00000;
   border: 1px solid black;
   border-radius: 12px;
   color: white;
@@ -82,7 +82,7 @@ button[disabled] {
 }
 
 .annunciator-connect-icon[connected] {
-  background-color: #00c71b;
+  background-color: #00b800;
 }
 .annunciator-connect-icon[connecting] {
   background-color: #ffff00;

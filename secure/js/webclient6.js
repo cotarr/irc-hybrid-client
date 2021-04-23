@@ -238,9 +238,8 @@ function createChannelEl (name) {
   channelTopLeftDivEl.appendChild(channelHideButtonEl);
   channelTopLeftDivEl.appendChild(channelNameDivEl);
 
-  channelTopRightHidableDivEl.appendChild(channelTallerButtonEl);
-  channelTopRightHidableDivEl.appendChild(channelNormalButtonEl);
-  channelTopRightHidableDivEl.appendChild(channelClearButtonEl);
+  channelTopRightHidableDivEl.appendChild(channelJoinButtonEl);
+  channelTopRightHidableDivEl.appendChild(channelPartButtonEl);
 
   channelTopRightDivEl.appendChild(channelTopRightHidableDivEl);
 
@@ -250,9 +249,10 @@ function createChannelEl (name) {
   channelBottomDiv1El.appendChild(channelInputAreaEl);
   channelBottomDiv1El.appendChild(channelSendButtonEl);
 
-  channelBottomDiv2El.appendChild(channelJoinButtonEl);
-  channelBottomDiv2El.appendChild(channelPartButtonEl);
   channelBottomDiv2El.appendChild(channelRefreshButtonEl);
+  channelBottomDiv2El.appendChild(channelClearButtonEl);
+  channelBottomDiv2El.appendChild(channelTallerButtonEl);
+  channelBottomDiv2El.appendChild(channelNormalButtonEl);
 
   channelBottomDiv3El.appendChild(channelFormatCBInputEl);
   channelBottomDiv3El.appendChild(channelFormatCBTitleEl);
@@ -302,7 +302,7 @@ function createChannelEl (name) {
   // Taller button handler
   // -------------------------
   channelTallerButtonEl.addEventListener('click', function() {
-    let newRows = parseInt(channelTextAreaEl.getAttribute('rows')) + 5;
+    let newRows = parseInt(channelTextAreaEl.getAttribute('rows')) + 10;
     channelTextAreaEl.setAttribute('rows', newRows.toString());
     channelNamesDisplayEl.setAttribute('rows', newRows.toString());
   });
@@ -395,15 +395,17 @@ function createChannelEl (name) {
         channelTextAreaEl.removeAttribute('disabled');
         channelInputAreaEl.removeAttribute('disabled');
         channelSendButtonEl.removeAttribute('disabled');
-        channelJoinButtonEl.setAttribute('disabled', '');
-        channelPartButtonEl.removeAttribute('disabled');
+
+        channelJoinButtonEl.setAttribute('hidden', '');
+        channelPartButtonEl.removeAttribute('hidden');
       } else {
         channelNamesDisplayEl.setAttribute('disabled', '');
         channelTextAreaEl.setAttribute('disabled', '');
         channelInputAreaEl.setAttribute('disabled', '');
         channelSendButtonEl.setAttribute('disabled', '');
-        channelJoinButtonEl.removeAttribute('disabled');
-        channelPartButtonEl.setAttribute('disabled', '');
+
+        channelJoinButtonEl.removeAttribute('hidden');
+        channelPartButtonEl.setAttribute('hidden', '');
       }
 
       if (channelMainSectionEl.hasAttribute('beep1-enabled')) {
