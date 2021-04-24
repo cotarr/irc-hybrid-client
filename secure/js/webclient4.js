@@ -118,7 +118,7 @@ document.getElementById('ircConnectIconId').addEventListener('click', function()
   if (ircState.ircConnected) {
     //
     // disconnect
-    _sendIrcServerMessage('QUIT :QUIT command');
+    _sendIrcServerMessage('QUIT');
   } else {
     //
     // Connect
@@ -166,7 +166,7 @@ document.getElementById('disconnectButton').addEventListener('click', function()
 // Quit Button handler (Send QUIT message to IRC server)
 // ------------------------------------------------------
 document.getElementById('quitButton').addEventListener('click', function() {
-  _sendIrcServerMessage('QUIT :QUIT command');
+  _sendIrcServerMessage('QUIT');
 });
 
 document.getElementById('hideLoginSectionButton').addEventListener('click', function() {

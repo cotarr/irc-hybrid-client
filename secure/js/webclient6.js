@@ -174,7 +174,7 @@ function createChannelEl (name) {
 
   // part button
   let channelPartButtonEl = document.createElement('button');
-  channelPartButtonEl.textContent = 'Part';
+  channelPartButtonEl.textContent = 'Leave';
   channelPartButtonEl.classList.add('channel-button');
 
   // refresh button
