@@ -175,7 +175,6 @@ document.getElementById('showCommsCheckbox').addEventListener('click', function(
   document.dispatchEvent(new CustomEvent('update-from-cache', {bubbles: true}));
 });
 
-
 // -----------------------
 // Die (Server) button
 // -----------------------
@@ -220,7 +219,6 @@ document.getElementById('infoOpenCloseButton').addEventListener('click', functio
     document.getElementById('infoOpenCloseButton').textContent = '+';
   }
 });
-
 
 // ---------------------------------------
 // Request server to erase message cache
@@ -337,6 +335,7 @@ document.getElementById('test1Button').addEventListener('click', function() {
       console.log(error);
     });
 });
+document.getElementById('test1ButtonDesc').textContent = 'GET /irc/test1 - (available)';
 
 // --------------------
 // Test Button #2
@@ -368,6 +367,7 @@ document.getElementById('test2Button').addEventListener('click', function() {
       console.log(error);
     });
 });
+document.getElementById('test2ButtonDesc').textContent = 'GET /irc/test2 - (available)';
 
 // --------------------
 // Test Button #3
@@ -377,8 +377,10 @@ document.getElementById('test3Button').addEventListener('click', function() {
   // ---------------------------------
   console.log('Test 3 button: expire heart beat timer');
   heartbeatUpCounter = heartbeatExpirationTimeSeconds - 1;
+  // webState.webConnectOn = false;
   // ---------------------------------
 });
+document.getElementById('test3ButtonDesc').textContent = 'Emulate websocket timeout';
 
 // --------------------
 // Test Button #4
@@ -391,6 +393,7 @@ document.getElementById('test4Button').addEventListener('click', function() {
   getIrcState();
   // ---------------------------------
 });
+document.getElementById('test4ButtonDesc').textContent = 'Call getIrcState()';
 
 // ---------------------------------------------------------------------------
 // This is some code to dynamically resize the width of the textarea elements

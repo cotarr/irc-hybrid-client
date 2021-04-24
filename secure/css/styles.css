@@ -81,12 +81,16 @@ button[disabled] {
   padding: 3px 10px 2px 10px;
 }
 
-.annunciator-connect-icon[connected] {
-  background-color: #00b800;
+.annunciator-connect-icon[unavailable] {
+  background-color: #000000;
+  color: #bbbbbb;
 }
 .annunciator-connect-icon[connecting] {
   background-color: #ffff00;
   color: #000000;
+}
+.annunciator-connect-icon[connected] {
+  background-color: #00b800;
 }
 
 .annunciator-away-icon {

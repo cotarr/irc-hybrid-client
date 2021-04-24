@@ -63,9 +63,18 @@ function connectWebSocket () {
       ' code: ' + event.code + ' ' + event.reason);
       if (webState.websocketCount === 0) {
         if (webState.webConnected) {
-          document.getElementById('reconnectStatusDiv').textContent +=
-          'Web socket connection closed, count: ' + webState.websocketCount + '\n' +
-          'Code: ' + event.code + ' ' + event.reason + '\n';
+          if (('code' in event) && (event.code === 3001)) {
+            document.getElementById('reconnectStatusDiv').textContent +=
+              'Web page disconnected at user request\n';
+          } else {
+            document.getElementById('reconnectStatusDiv').textContent +=
+            'Web socket connection closed, count: ' + webState.websocketCount + '\n' +
+            'Code: ' + event.code + ' ' + event.reason + '\n';
+            if (!webState.webConnectOn) {
+              document.getElementById('reconnectStatusDiv').textContent +=
+              'Automatic web reconnect is disabled. \nPlease reconnect manually.\n';
+            }
+          }
         }
         webState.webConnected = false;
         webState.webConnecting = false;
@@ -320,9 +329,42 @@ document.getElementById('manualWebSocketReconnectButton').addEventListener('clic
   if ((!webState.webConnected) && (!webState.webConnecting)) {
     webState.webConnectOn = true;
     webState.webConnecting = true;
+    updateDivVisibility();
     document.getElementById('reconnectStatusDiv').textContent +=
       'Reconnect to web server initiated (Manual)\n';
     reconnectWebSocketAfterDisconnect();
+  }
+});
+
+// ------------------------------------------------
+// Tap "Web" status icon to connect/disconnect
+// ------------------------------------------------
+var webStatusIconTouchDebounce = false;
+document.getElementById('webConnectIconId').addEventListener('click', function() {
+  // debounce button
+  if (webStatusIconTouchDebounce) return;
+  webStatusIconTouchDebounce = true;
+  setTimeout(function() {
+    webStatusIconTouchDebounce = false;
+  }, 1000);
+  //
+  // Connect
+  //
+  if ((!webState.webConnected) && (!webState.webConnecting)) {
+    webState.webConnectOn = true;
+    webState.webConnecting = true;
+    updateDivVisibility();
+    document.getElementById('reconnectStatusDiv').textContent +=
+      'Reconnect to web server initiated (Manual)\n';
+    reconnectWebSocketAfterDisconnect();
+    return;
+  }
+  //
+  // Disconnect
+  //
+  if (webState.webConnected) {
+    webState.webConnectOn = false;
+    wsocket.close(3001, 'Disconnect on reqeust');
   }
 });
 

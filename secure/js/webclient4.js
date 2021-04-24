@@ -41,11 +41,14 @@ document.getElementById('cycleNextServerButton').addEventListener('click', funct
       console.log(error);
       showError(error.toString());
     });
-}); // connectButton
+}); // cycleNextServerButton()
+
 // -------------------------
 // Connect Button Handler
 // -------------------------
-document.getElementById('connectButton').addEventListener('click', function() {
+function connectButtonHandler() {
+  // change color of icon
+  webState.ircConnecting = true;
   // Are we connected to web server?
   if (!checkConnect(1)) return;
   // Is web server already connected to IRC?
@@ -94,7 +97,34 @@ document.getElementById('connectButton').addEventListener('click', function() {
     .catch( (error) => {
       console.log(error);
     });
-}); // connectButton
+}; // connectButtonHandler
+
+document.getElementById('connectButton').addEventListener('click', function() {
+  connectButtonHandler();
+}.bind(this));
+
+// ------------------------------------------------
+// Tap "Web" status icon to connect/disconnect
+// ------------------------------------------------
+var ircStatusIconTouchDebounce = false;
+document.getElementById('ircConnectIconId').addEventListener('click', function() {
+  if (!webState.webConnected) return;
+  // debounce button
+  if (ircStatusIconTouchDebounce) return;
+  ircStatusIconTouchDebounce = true;
+  setTimeout(function() {
+    ircStatusIconTouchDebounce = false;
+  }, 1000);
+  if (ircState.ircConnected) {
+    //
+    // disconnect
+    _sendIrcServerMessage('QUIT :QUIT command');
+  } else {
+    //
+    // Connect
+    connectButtonHandler();
+  }
+});
 
 // ----------------------------------
 // Force Disconnect Button Handler
@@ -138,9 +168,6 @@ document.getElementById('disconnectButton').addEventListener('click', function()
 document.getElementById('quitButton').addEventListener('click', function() {
   _sendIrcServerMessage('QUIT :QUIT command');
 });
-document.getElementById('quitButton2').addEventListener('click', function() {
-  _sendIrcServerMessage('QUIT :QUIT command');
-});
 
 document.getElementById('hideLoginSectionButton').addEventListener('click', function() {
   if (document.getElementById('hideLoginSection').hasAttribute('hidden')) {
@@ -153,7 +180,7 @@ document.getElementById('hideLoginSectionButton').addEventListener('click', func
 });
 
 document.getElementById('webLogoutButton').addEventListener('click', function() {
-  if ((ircState.ircConnected) && (webState.webConnected)) {
+  if (((ircState.ircConnected) && (webState.webConnected)) || (!webState.webConnected)) {
     document.getElementById('logoutConfirmDiv').removeAttribute('hidden');
   } else {
     window.location.href='/logout';
@@ -161,4 +188,13 @@ document.getElementById('webLogoutButton').addEventListener('click', function() 
 });
 document.getElementById('cancelLogoutConfirmButton').addEventListener('click', function() {
   document.getElementById('logoutConfirmDiv').setAttribute('hidden', '');
+});
+
+//
+// Away icon click to cancel away
+//
+document.getElementById('ircIsAwayIconId').addEventListener('click', function() {
+  if ((ircState.ircConnected) && (ircState.ircIsAway)) {
+    _sendIrcServerMessage('AWAY');
+  }
 });

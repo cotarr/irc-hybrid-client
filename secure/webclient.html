@@ -45,7 +45,7 @@
         <div class="head-flex">
           <div class="head-left">
             <div>
-              IRC is connected!
+              Check IRC status!
             </div>
           </div>
           <div class="head-right">
@@ -57,11 +57,11 @@
         </div>
         <div class="vh10"></div>
         <div>
-          Leaving the web page will not disconnect the server from IRC.
-          Your nickname will remain present on IRC.
-          Otherwise please
-          <button id="quitButton2">/Quit IRC</button>
-          before leaving the web page.
+          You are receiving this message because
+          your nickname is still present on IRC, or the
+          status of your IRC connection is unknown.
+          Your nickname may remain present on IRC.
+          Web page login is independant of IRC login.
         </div>
       </div>
       <div class="aa-section-div">
@@ -71,20 +71,13 @@
             <span>IRC Controls</span>
           </div>
           <div class="head-right">
-            <button id='webLogoutButton'>logout</button>
+            <button id='webLogoutButton'>Web logout</button>
           </div>
         </div>
         <div class="vh10"></div>
         <div class="button-div">
-          <button id="connectButton">Connect IRC</button>
-          <button id="quitButton">/Quit IRC</button>
-        </div>
-        <div class="vh10"></div>
-        <div class="button-div">
           <span class="user-span" id="headerServer">server</span>
-          <span class="user-span"> (</span>
           <span class="user-span" id="headerUser"></span>
-          <span class="user-span">)</span>
         </div>
         <div class="vh10"></div>
         <div id="hideLoginSection">
@@ -116,6 +109,11 @@
           <div class="button-div">
             <input type="text" id = "userModeInputId" size="6" value="">
             <div class="input-label-right">Initial User Mode</div>
+          </div>
+          <div class="vh10"></div>
+          <div class="button-div">
+            <button id="connectButton">Connect IRC</button>
+            <button id="quitButton">/Quit IRC</button>
           </div>
         </div>
       </div>
@@ -248,22 +246,27 @@
                   </pre>
                 </div>
               </div>
-              <div>
-                1, 2, debug backend API routes
-              </div>
               <div class="button-div">
-                <span>Server: </span>
-                <button id="test1Button">Test 1</button>
-                <button id="test2Button">Test 2</button>
-              </div>
-              <div>
-                3-emulate websocket timeout<br>
-                4-force state refresh
-              </div>
-              <div class="button-div">
-                <span>Local: </span>
-                <button id="test3Button">Test 3</button>
-                <button id="test4Button">Test 4</button>
+                <div>
+                  <button id="test1Button">Test-1</button>
+                  <span>Server: </span>
+                  <span id="test1ButtonDesc"></span>
+                </div>
+                <div>
+                  <button id="test2Button">Test-2</button>
+                  <span>Server: </span>
+                  <span id="test2ButtonDesc"></span>
+                </div>
+                <div>
+                  <button id="test3Button">Test-3</button>
+                  <span>Local: </span>
+                  <span id="test3ButtonDesc"></span>
+                </div>
+                <div>
+                  <button id="test4Button">Test-4</button>
+                  <span>Local: </span>
+                  <span id="test4ButtonDesc"></span>
+                </div>
               </div>
               <div class="button-div">
                 <button id="disconnectButton">Force IRC Disconnect</button>
@@ -275,8 +278,6 @@
               <div class='variables-div' id="variablesDivId" hidden><pre id=variablesPreId>
               </pre></div>
             </div>
-
-
 
           </div>
         </div>
