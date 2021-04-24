@@ -289,6 +289,9 @@ function updateDivVisibility() {
       document.getElementById('userModeInputId').setAttribute('disabled', '');
       document.getElementById('connectButton').setAttribute('disabled', '');
       document.getElementById('quitButton').removeAttribute('disabled');
+      document.getElementById('userAwayMessageId').removeAttribute('disabled');
+      document.getElementById('setAwayButton').removeAttribute('disabled');
+      document.getElementById('setBackButton').removeAttribute('disabled');
       document.getElementById('eraseCacheButton').setAttribute('disabled', '');
       document.getElementById('ircDisconnectedHiddenDiv').removeAttribute('hidden');
       if (webState.noticeOpen) {
@@ -324,6 +327,10 @@ function updateDivVisibility() {
       document.getElementById('userModeInputId').removeAttribute('disabled');
       document.getElementById('connectButton').removeAttribute('disabled');
       document.getElementById('quitButton').setAttribute('disabled', '');
+      document.getElementById('userAwayMessageId').setAttribute('disabled', '');
+      document.getElementById('setAwayButton').setAttribute('disabled', '');
+      document.getElementById('setBackButton').setAttribute('disabled', '');
+
       document.getElementById('eraseCacheButton').removeAttribute('disabled');
       document.getElementById('ircDisconnectedHiddenDiv').setAttribute('hidden', '');
       webState.noticeOpen = false;
@@ -354,6 +361,9 @@ function updateDivVisibility() {
     document.getElementById('userModeInputId').setAttribute('disabled', '');
     document.getElementById('connectButton').setAttribute('disabled', '');
     document.getElementById('quitButton').setAttribute('disabled', '');
+    document.getElementById('userAwayMessageId').setAttribute('disabled', '');
+    document.getElementById('setAwayButton').setAttribute('disabled', '');
+    document.getElementById('setBackButton').setAttribute('disabled', '');
   }
 }
 

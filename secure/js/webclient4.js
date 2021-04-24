@@ -198,3 +198,15 @@ document.getElementById('ircIsAwayIconId').addEventListener('click', function() 
     _sendIrcServerMessage('AWAY');
   }
 });
+
+document.getElementById('setAwayButton').addEventListener('click', function() {
+  if ((ircState.ircConnected) &&
+    (document.getElementById('userAwayMessageId').value.length > 0)) {
+    _sendIrcServerMessage('AWAY ' + document.getElementById('userAwayMessageId').value);
+  }
+});
+document.getElementById('setBackButton').addEventListener('click', function() {
+  if ((ircState.ircConnected) && (ircState.ircIsAway)) {
+    _sendIrcServerMessage('AWAY');
+  }
+});

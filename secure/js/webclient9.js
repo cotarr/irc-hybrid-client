@@ -411,7 +411,7 @@ const columnSize =
 //
 // Function called both initially and also no event
 const adjustInputToWidowWidth = function (innerWidth) {
-  let cols = parseInt((window.innerWidth / columnSize) - 4);
+  let cols = parseInt((window.innerWidth / columnSize) - 5);
   // static text area defined in webclient.html
   document.getElementById('userPrivMsgInputId').setAttribute('cols', (cols-8).toString());
   document.getElementById('noticeMessageDisplay').setAttribute('cols', cols.toString());
