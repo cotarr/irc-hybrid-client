@@ -65,6 +65,7 @@
   ircState.ircServerPort = servers.serverArray[0].port;
   ircState.ircTLSEnabled = servers.serverArray[0].tls;
   var ircServerPassword = servers.serverArray[0].password;
+  var nsIdentifyNick = servers.serverArray[0].identifyNick;
   var nsIdentifyCommand = servers.serverArray[0].identifyCommand;
   // index into servers.json file
   ircState.ircServerIndex = 0;
@@ -151,6 +152,16 @@
       if (message.split(' ')[0].toUpperCase() === 'JOIN') {
         if ((message.split(' ').length > 2) && (message.split(' ')[2].length > 0)) {
           filtered = 'JOIN ' + message.split(' ')[1] + ' ********';
+        }
+      }
+
+      // Looking for: 'PRIVMSG NickServ :IDENTIFY <passowrd>'
+      if (message.split(' ')[0].toUpperCase() === 'PRIVMSG') {
+        if ((message.split(' ').length > 3) &&
+          (message.split(' ')[1].toLowerCase() === 'nickserv') &&
+          (message.split(' ')[2].toUpperCase() === ':IDENTIFY')) {
+          filtered = 'PRIVMSG ' +
+            message.split(' ')[1] + ' ' + message.split(' ')[2] + ' ********';
         }
       }
 
@@ -738,6 +749,17 @@
           // console.log(parsedUserhost);
           ircState.userHost = parsedUserhost;
           global.sendToBrowser('UPDATE\n');
+          //
+          // nickserv registration
+          //
+          if ((nsIdentifyNick.length > 0) && (nsIdentifyCommand.length > 0)) {
+            setTimeout(function() {
+              if ((ircState.ircConnected) &&
+                (ircState.nickName === nsIdentifyNick)) {
+                _writeSocket(socket, nsIdentifyCommand);
+              }
+            }.bind(this), 1500);
+          }
         } else {
           global.sendToBrowser(
             'webServer: Registration error, unable to parse nick!user@host from message 001\n');
@@ -1103,6 +1125,7 @@
     ircState.ircServerPort = servers.serverArray[ircState.ircServerIndex].port;
     ircState.ircTLSEnabled = servers.serverArray[ircState.ircServerIndex].tls;
     ircServerPassword = servers.serverArray[ircState.ircServerIndex].password;
+    nsIdentifyNick = servers.serverArray[ircState.ircServerIndex].identifyNick;
     nsIdentifyCommand = servers.serverArray[ircState.ircServerIndex].identifyCommand;
     ircState.channelList = servers.serverArray[ircState.ircServerIndex].channelList;
 
@@ -1547,7 +1570,8 @@
     // -----------------------------------------
     res.json({
       error: false,
-      comment: 'No action assigned to test 1'
+      comment: 'Debug message cache',
+      data: ircMessageCache.cacheInfo()
     });
   };
 

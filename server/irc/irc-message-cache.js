@@ -35,9 +35,30 @@
     return outArray;
   };
 
+  const cacheInfo = function() {
+    let size = 0;
+    let lines = 0;
+    if (cacheArray.length > 0) {
+      for (let i=0; i<cacheArray.length; i++) {
+        if ((cacheArray[i]) && (cacheArray[i].length > 0)) {
+          lines++;
+          size += cacheArray[i].length;
+        }
+      }
+    }
+    info = {};
+    info.sizeCache = cacheSize;
+    info.sizeArray = cacheArray.length;
+    info.inPointer = cacheInPointer;
+    info.usedLines = lines;
+    info.sizeInBytes = size;
+    return info;
+  };
+
   module.exports = {
     eraseCache: eraseCache,
     addMessage: addMessage,
-    allMessages: allMessages
+    allMessages: allMessages,
+    cacheInfo: cacheInfo
   };
 })();

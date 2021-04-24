@@ -335,7 +335,7 @@ document.getElementById('test1Button').addEventListener('click', function() {
       console.log(error);
     });
 });
-document.getElementById('test1ButtonDesc').textContent = 'GET /irc/test1 - (available)';
+document.getElementById('test1ButtonDesc').textContent = 'GET /irc/test1 - cacheInfo() --> console';
 
 // --------------------
 // Test Button #2
@@ -367,7 +367,7 @@ document.getElementById('test2Button').addEventListener('click', function() {
       console.log(error);
     });
 });
-document.getElementById('test2ButtonDesc').textContent = 'GET /irc/test2 - (available)';
+document.getElementById('test2ButtonDesc').textContent = 'GET /irc/test2 - (not in use)';
 
 // --------------------
 // Test Button #3
