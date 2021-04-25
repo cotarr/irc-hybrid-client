@@ -367,7 +367,7 @@ document.getElementById('test2Button').addEventListener('click', function() {
       console.log(error);
     });
 });
-document.getElementById('test2ButtonDesc').textContent = 'GET /irc/test2 memoryUsage();
+document.getElementById('test2ButtonDesc').textContent = 'GET /irc/test2 memoryUsage()';
 
 // --------------------
 // Test Button #3
