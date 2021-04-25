@@ -1581,7 +1581,8 @@
     // -----------------------------------------
     res.json({
       error: false,
-      comment: 'No action assigned to test 2'
+      comment: 'node.js memory',
+      data: process.memoryUsage()
     });
   };
 
