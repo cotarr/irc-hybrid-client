@@ -1100,12 +1100,13 @@
       } else {
         // case of CR or LF as message separator
         if (count > 0) {
-          let message = data.slice(index, index + count);
+          // wrapped in Buffer.from because slice returns a reference
+          let message = Buffer.from(data.slice(index, index + count));
           // 512 btye maximum size from RFC 2812 2.3 Messages
           if ((Buffer.isBuffer(message)) && (message.length <= 512)) {
             _parseBufferMessage(socket, message);
           } else {
-            console.log('Error, extracted message not type Buffer with length <= 512 btyes');
+            console.log('Error, extracted message exceeds max length of 512 btyes');
           }
         }
         index = i + 1;
