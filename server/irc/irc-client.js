@@ -1080,10 +1080,11 @@
   // Pass each message to message parse function as type Buffer
   // If left over characters not terminated in CR-LF, save as next fragment
   // -------------------------------------------------------------------------
-  var previousBufferFragment = Buffer.from('');
+  var previousBufferFragment = Buffer.from('', 'UTF8');
   const parseStreamBuffer = function (socket, inBuffer) {
     if (!inBuffer) return;
     if (!Buffer.isBuffer(inBuffer)) return;
+    // this returns a new Buffer, not a reference to shared memory
     let data = Buffer.concat([previousBufferFragment, inBuffer]);
     previousBufferFragment = Buffer.from('');
     let len = data.length;
@@ -1112,7 +1113,8 @@
       }
     }
     if (count > 0) {
-      previousBufferFragment = data.slice(index, index + count);
+      // slice wrapped in Buffer.from because slice returns a reference to previous buffer
+      previousBufferFragment = Buffer.from(data.slice(index, index + count));
     }
   }; // parseStreamBuffer
 
