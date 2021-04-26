@@ -33,6 +33,7 @@
   const isValidUTF8 = require('utf-8-validate');
   const ircLog = require('./irc-client-log');
   const ircMessageCache = require('./irc-client-cache');
+  const vars = require('./irc-client-vars');
 
   var nodeEnv = process.env.NODE_ENV || 'development';
 
@@ -46,40 +47,31 @@
   //
   // ----------------------------------------------------
 
-  const channelPrefixChars = '@#+!';
-  const channelUserModeChars = 'qaohv';
-  const nicknamePrefixChars = '~&@%+';
-  // Used to differentiate outgoing verses ingoing messages in display
-  const commandMsgPrefix = '--> ';
+  vars.ircState.ircConnected = false;
+  vars.ircState.ircConnecting = false;
+  vars.ircState.ircRegistered = false;
+  vars.ircState.ircIsAway = false;
 
-  var ircState = {};
-
-  ircState.ircConnected = false;
-  ircState.ircConnecting = false;
-  ircState.ircRegistered = false;
-  ircState.ircIsAway = false;
-
-
-  ircState.ircServerName = servers.serverArray[0].name;
-  ircState.ircServerHost = servers.serverArray[0].host;
-  ircState.ircServerPort = servers.serverArray[0].port;
-  ircState.ircTLSEnabled = servers.serverArray[0].tls;
+  vars.ircState.ircServerName = servers.serverArray[0].name;
+  vars.ircState.ircServerHost = servers.serverArray[0].host;
+  vars.ircState.ircServerPort = servers.serverArray[0].port;
+  vars.ircState.ircTLSEnabled = servers.serverArray[0].tls;
   var ircServerPassword = servers.serverArray[0].password;
   var nsIdentifyNick = servers.serverArray[0].identifyNick;
   var nsIdentifyCommand = servers.serverArray[0].identifyCommand;
   // index into servers.json file
-  ircState.ircServerIndex = 0;
+  vars.ircState.ircServerIndex = 0;
   // List of favorite channels
-  ircState.channelList = servers.serverArray[0].channelList;
+  vars.ircState.channelList = servers.serverArray[0].channelList;
 
-  ircState.nickName = servers.serverArray[0].nick;
-  ircState.userName = servers.serverArray[0].user;
-  ircState.realName = servers.serverArray[0].real;
-  ircState.userMode = servers.serverArray[0].modes;
-  ircState.userHost = '';
+  vars.ircState.nickName = servers.serverArray[0].nick;
+  vars.ircState.userName = servers.serverArray[0].user;
+  vars.ircState.realName = servers.serverArray[0].real;
+  vars.ircState.userMode = servers.serverArray[0].modes;
+  vars.ircState.userHost = '';
 
   // ircChannels format ['#channel1', '#channel2']
-  ircState.channels = [];
+  vars.ircState.channels = [];
   // Channel schema
   //
   // channelStates {
@@ -89,26 +81,21 @@
   //   joined: true,
   //   kicked: false
   // }
-  ircState.channelStates = [];
+  vars.ircState.channelStates = [];
 
   // get name and version number from npm package.json
-  ircState.botVersion = require('../../package.json').version;
-  ircState.botName = require('../../package.json').name;
+  vars.ircState.botVersion = require('../../package.json').version;
+  vars.ircState.botName = require('../../package.json').name;
 
-  ircState.times = {programRun: 0, ircConnect: 0};
-  ircState.count = {ircConnect: 0};
-  ircState.websocketCount = 0;
+  vars.ircState.times = {programRun: 0, ircConnect: 0};
+  vars.ircState.count = {ircConnect: 0};
+  vars.ircState.websocketCount = 0;
 
   ircLog.setRawMessageLogEnabled(servers.serverArray[0].rawMessageLog);
 
-  console.log('Starting ' + ircState.botName + ' ' + ircState.botVersion);
+  console.log('Starting ' + vars.ircState.botName + ' ' + vars.ircState.botVersion);
   ircLog.writeIrcLog('-----------------------------------------');
-  ircLog.writeIrcLog('Starting ' + ircState.botName + ' ' + ircState.botVersion);
-
-  const timestamp = function() {
-    let now = new Date;
-    return parseInt(now.valueOf() / 1000).toString();
-  };
+  ircLog.writeIrcLog('Starting ' + vars.ircState.botName + ' ' + vars.ircState.botVersion);
 
   function tellBrowserToRequestState() {
     global.sendToBrowser('UPDATE\r\n');
@@ -142,7 +129,7 @@
       let filterCommand = message.toString().split(' ')[0].toUpperCase();
       let filtered = message.toString();
       if (filterWords.indexOf(filterCommand) >= 0) {
-        if (!ircState.ircTLSEnabled) {
+        if (!vars.ircState.ircTLSEnabled) {
           console.log('WARNING: possible password without TLC encryption to IRC server');
         }
         filtered = filterCommand + ' ***********';
@@ -162,7 +149,7 @@
             message.split(' ')[1] + ' ' + message.split(' ')[2] + ' ********';
         }
       }
-      global.sendToBrowser(commandMsgPrefix + filtered + '\n');
+      global.sendToBrowser(vars.commandMsgPrefix + filtered + '\n');
 
       //
       // Second validate the string before writing to IRC server socket
@@ -208,31 +195,31 @@
     global.sendToBrowser('webServer: Ready\n');
     setTimeout(function() {
       // check state, if error occurred this will be false.
-      if (ircState.ircConnecting) {
+      if (vars.ircState.ircConnecting) {
         if ((ircServerPassword) && (ircServerPassword.length > 0)) {
           _writeSocket(socket, 'PASS ' + ircServerPassword);
         }
-        _writeSocket(socket, 'NICK ' + ircState.nickName);
+        _writeSocket(socket, 'NICK ' + vars.ircState.nickName);
         // Note: mode 8 = i not working on ngirc ?
-        _writeSocket(socket, 'USER ' + ircState.userName + ' 0 * :' + ircState.realName);
-        if (ircState.userMode.length > 0) {
-          _writeSocket(socket, 'MODE ' + ircState.nickName + ' ' + ircState.userMode);
+        _writeSocket(socket, 'USER ' + vars.ircState.userName + ' 0 * :' + vars.ircState.realName);
+        if (vars.ircState.userMode.length > 0) {
+          _writeSocket(socket, 'MODE ' + vars.ircState.nickName + ' ' + vars.ircState.userMode);
         }
-        ircState.ircConnecting = false;
-        ircState.ircConnected = true;
+        vars.ircState.ircConnecting = false;
+        vars.ircState.ircConnected = true;
         tellBrowserToRequestState();
         // Timer for TLS connect delay
       } else {
         // case of error handler reset ircConnecting before timer expired (TLS error probgably)
-        ircState.ircConnecting = false;
-        ircState.ircConnected = false;
-        ircState.ircRegistered = false;
-        ircState.ircIsAway = false;
+        vars.ircState.ircConnecting = false;
+        vars.ircState.ircConnected = false;
+        vars.ircState.ircRegistered = false;
+        vars.ircState.ircIsAway = false;
         tellBrowserToRequestState();
       }
       // reset the state variables
-      ircState.channels = [];
-      ircState.channelStates = [];
+      vars.ircState.channels = [];
+      vars.ircState.channelStates = [];
     }, 500);
   }; // _readyEventHandler
 
@@ -423,15 +410,15 @@
     // ]
     //
     const selectorChars = '+-';
-    const userModeChars = channelUserModeChars; // 'qaohv'
-    const modeChars = nicknamePrefixChars; // '~&@%+'
+    const userModeChars = vars.channelUserModeChars; // 'qaohv'
+    const modeChars = vars.nicknamePrefixChars; // '~&@%+'
     const modeQueue = [];
     const userQueue = [];
     let selector = '';
-    if (ircState.channels.length === 0) return;
-    for (let i=0; i<ircState.channels.length; i++) {
-      if (parsedMessage.params[0].toLowerCase() === ircState.channels[i]) {
-        // index into ircState.channels[]
+    if (vars.ircState.channels.length === 0) return;
+    for (let i=0; i<vars.ircState.channels.length; i++) {
+      if (parsedMessage.params[0].toLowerCase() === vars.ircState.channels[i]) {
+        // index into vars.ircState.channels[]
         let chanIndex = i;
         let modeList = parsedMessage.params[1];
         if (modeList.length > 0) {
@@ -450,8 +437,8 @@
             userQueue.push(parsedMessage.params[j+2]);
           }
           let strippedNicks = [];
-          for (let j=0; j<ircState.channelStates[chanIndex].names.length; j++) {
-            let tempNick = ircState.channelStates[chanIndex].names[j];
+          for (let j=0; j<vars.ircState.channelStates[chanIndex].names.length; j++) {
+            let tempNick = vars.ircState.channelStates[chanIndex].names[j];
             if (modeChars.indexOf(tempNick.charAt(0)) >= 0) {
               tempNick = tempNick.slice(1, tempNick.length);
             }
@@ -465,7 +452,7 @@
             if (modeQueue[j] === '+o') tempNick = '@' + tempNick;
             if (modeQueue[j] === '+a') tempNick = '&' + tempNick;
             if (modeQueue[j] === '+q') tempNick = '~' + tempNick;
-            ircState.channelStates[chanIndex].names[userIndex] = tempNick;
+            vars.ircState.channelStates[chanIndex].names[userIndex] = tempNick;
           }
           tellBrowserToRequestState();
         }
@@ -506,7 +493,7 @@
       let now = new Date;
       let nowSeconds = parseInt(now.valueOf()/1000);
       let outgoingBackToSelf = nowSeconds.toString() +
-        ' :' + ircState.nickName + '!*@* NOTICE ' + ctcpTo + ' ' +
+        ' :' + vars.ircState.nickName + '!*@* NOTICE ' + ctcpTo + ' ' +
         String.fromCharCode(ctcpDelim) + ctcpReply + String.fromCharCode(ctcpDelim);
       if (checkCtcpNotFlood()) {
         global.sendToBrowser(outgoingBackToSelf + '\r\n');
@@ -581,7 +568,7 @@
       //
       case 'VERSION':
         if (true) {
-          let ctcpReply = 'VERSION ' + ircState.botName + '-' + ircState.botVersion;
+          let ctcpReply = 'VERSION ' + vars.ircState.botName + '-' + vars.ircState.botVersion;
           let ircMessage = 'NOTICE ' + parsedMessage.nick + ' :' +
           String.fromCharCode(ctcpDelim) + ctcpReply + String.fromCharCode(ctcpDelim);
           _sendCtcpMessage(socket, ircMessage, ctcpReply, parsedMessage.nick);
@@ -619,17 +606,17 @@
         socket.write(outBuffer, 'utf8');
         if (excludedCommands.indexOf('PING') <0) {
           ircMessageCache.addMessage(Buffer.concat([
-            Buffer.from(timestamp() + ' '),
+            Buffer.from(vars.timestamp() + ' '),
             message
           ]));
           global.sendToBrowser(Buffer.concat([
-            Buffer.from(timestamp() + ' '),
+            Buffer.from(vars.timestamp() + ' '),
             message,
             Buffer.from('\r\n')
           ]));
         }
         if (excludedCommands.indexOf('PONG') < 0) {
-          global.sendToBrowser(commandMsgPrefix + outBuffer.toString('utf8'));
+          global.sendToBrowser(vars.commandMsgPrefix + outBuffer.toString('utf8'));
         }
       } else {
         console.log('Error, send buffer exceeds 512 character limit.');
@@ -647,11 +634,11 @@
     // For display in browser, and cache for browser refresh
     //
     ircMessageCache.addMessage(Buffer.concat([
-      Buffer.from(timestamp() + ' '),
+      Buffer.from(vars.timestamp() + ' '),
       message
     ]));
     global.sendToBrowser(Buffer.concat([
-      Buffer.from(timestamp() + ' '),
+      Buffer.from(vars.timestamp() + ' '),
       message,
       Buffer.from('\r\n')
     ]));
@@ -667,27 +654,27 @@
       if (newNick.length < 1) return;
       if (!oldNick) return;
       if (oldNick.length < 1) return;
-      if (ircState.channels.length === 0) return;
+      if (vars.ircState.channels.length === 0) return;
 
       // There should be no operator characters, but check and strip them if they are there
       let pureOldNick = oldNick;
-      if (nicknamePrefixChars.indexOf(pureOldNick.charAt(0)) >= 0) {
+      if (vars.nicknamePrefixChars.indexOf(pureOldNick.charAt(0)) >= 0) {
         pureOldNick = pureOldNick.slice(1, pureOldNick.length);
       }
       let pureNewNick = newNick;
-      if (nicknamePrefixChars.indexOf(pureNewNick.charAt(0)) >= 0) {
+      if (vars.nicknamePrefixChars.indexOf(pureNewNick.charAt(0)) >= 0) {
         pureNewNick = pureNewNick.slice(1, pureNewNick.length);
       }
       // ci = channel index into channels array
-      for (let ci=0; ci<ircState.channels.length; ci++) {
-        let nickCount = ircState.channelStates[ci].names.length;
+      for (let ci=0; ci<vars.ircState.channels.length; ci++) {
+        let nickCount = vars.ircState.channelStates[ci].names.length;
         if (nickCount > 0) {
           let matchIndex = -1;
           let opChar = '';
           for (let i=0; i<nickCount; i++) {
-            let pureNick = ircState.channelStates[ci].names[i];
+            let pureNick = vars.ircState.channelStates[ci].names[i];
             let tempOpChar = '';
-            if (nicknamePrefixChars.indexOf(pureNick.charAt(0)) >= 0) {
+            if (vars.nicknamePrefixChars.indexOf(pureNick.charAt(0)) >= 0) {
               tempOpChar = pureNick.charAt(0);
               pureNick = pureNick.slice(1, pureNick.length);
             }
@@ -697,7 +684,7 @@
             }
           } // next i
           if (matchIndex >= 0) {
-            ircState.channelStates[ci].names[matchIndex] = opChar + newNick;
+            vars.ircState.channelStates[ci].names[matchIndex] = opChar + newNick;
           }
         }
       } // next ci
@@ -710,19 +697,19 @@
       if (!newNick) return;
       if (newNick.length < 1) return;
       // console.log('Adding ' + newNick + ' to ' + channel);
-      let channelIndex = ircState.channels.indexOf(channel.toLowerCase());
+      let channelIndex = vars.ircState.channels.indexOf(channel.toLowerCase());
       if (channelIndex >= 0) {
-        let nickCount = ircState.channelStates[channelIndex].names.length;
+        let nickCount = vars.ircState.channelStates[channelIndex].names.length;
         if (nickCount > 0) {
           let matchIndex = -1;
           let opChar = '';
           let pureNewNick = newNick;
-          if (nicknamePrefixChars.indexOf(pureNewNick.charAt(0)) >= 0) {
+          if (vars.nicknamePrefixChars.indexOf(pureNewNick.charAt(0)) >= 0) {
             pureNewNick = pureNewNick.slice(1, pureNewNick.length);
           }
           for (let i=0; i<nickCount; i++) {
-            let pureNick = ircState.channelStates[channelIndex].names[i];
-            if (nicknamePrefixChars.indexOf(pureNick.charAt(0)) >= 0) {
+            let pureNick = vars.ircState.channelStates[channelIndex].names[i];
+            if (vars.nicknamePrefixChars.indexOf(pureNick.charAt(0)) >= 0) {
               opChar = pureNick.charAt(0);
               pureNick = pureNick.slice(1, pureNick.length);
             }
@@ -730,16 +717,16 @@
           }
           if (matchIndex >= 0) {
             // case of name exist, if @ or + prefix not match replace entire string
-            if (ircState.channelStates[channelIndex].names[matchIndex] !== newNick) {
-              ircState.channelStates[channelIndex].names[matchIndex] = newNick;
+            if (vars.ircState.channelStates[channelIndex].names[matchIndex] !== newNick) {
+              vars.ircState.channelStates[channelIndex].names[matchIndex] = newNick;
             }
           } else {
             // case of nick not in list, add it
-            ircState.channelStates[channelIndex].names.push(newNick);
+            vars.ircState.channelStates[channelIndex].names.push(newNick);
           }
         } else {
           // case of empty list, add as first nick name
-          ircState.channelStates[channelIndex].names.push(newNick);
+          vars.ircState.channelStates[channelIndex].names.push(newNick);
         }
       }
       return;
@@ -749,25 +736,25 @@
     // Ignore op or voice (@,+) when removing
     function _removeName(oldNick, channel) {
       // console.log('Removing ' + oldNick + ' from ' + channel);
-      let channelIndex = ircState.channels.indexOf(channel.toLowerCase());
+      let channelIndex = vars.ircState.channels.indexOf(channel.toLowerCase());
       if (channelIndex >= 0) {
-        let nickCount = ircState.channelStates[channelIndex].names.length;
+        let nickCount = vars.ircState.channelStates[channelIndex].names.length;
         if (nickCount > 0) {
           let matchIndex = -1;
           let pureOldNick = oldNick;
-          if (nicknamePrefixChars.indexOf(pureOldNick.charAt(0)) >= 0) {
+          if (vars.nicknamePrefixChars.indexOf(pureOldNick.charAt(0)) >= 0) {
             pureOldNick = pureOldNick.slice(1, pureOldNick.length);
           }
           for (let i=0; i<nickCount; i++) {
-            let pureNick = ircState.channelStates[channelIndex].names[i];
-            if (nicknamePrefixChars.indexOf(pureNick.charAt(0)) >= 0) {
+            let pureNick = vars.ircState.channelStates[channelIndex].names[i];
+            if (vars.nicknamePrefixChars.indexOf(pureNick.charAt(0)) >= 0) {
               pureNick = pureNick.slice(1, pureNick.length);
             }
             // console.log('pureOldNick pureNick' + pureOldNick + ' ' + pureNick);
             if (pureOldNick === pureNick) matchIndex = i;
           }
           if (matchIndex >= 0) {
-            ircState.channelStates[channelIndex].names.splice(matchIndex, 1);
+            vars.ircState.channelStates[channelIndex].names.splice(matchIndex, 1);
           }
         }
       }
@@ -780,25 +767,25 @@
     switch(parsedMessage.command) {
       case '001':
         // case of successful register with nickname, set registered state
-        ircState.ircRegistered = true;
-        ircState.times.ircConnect = timestamp();
-        ircState.count.ircConnect++;
+        vars.ircState.ircRegistered = true;
+        vars.ircState.times.ircConnect = vars.timestamp();
+        vars.ircState.count.ircConnect++;
 
         // extract my client info from last argument in 001 message
         let splitparams1 = parsedMessage.params[1].split(' ');
         let parsedNick = splitparams1[splitparams1.length - 1].split('!')[0];
         let parsedUserhost = splitparams1[splitparams1.length - 1].split('!')[1];
-        if (parsedNick === ircState.nickName) {
+        if (parsedNick === vars.ircState.nickName) {
           // console.log(parsedUserhost);
-          ircState.userHost = parsedUserhost;
+          vars.ircState.userHost = parsedUserhost;
           tellBrowserToRequestState();
           //
           // nickserv registration
           //
           if ((nsIdentifyNick.length > 0) && (nsIdentifyCommand.length > 0)) {
             setTimeout(function() {
-              if ((ircState.ircConnected) &&
-                (ircState.nickName === nsIdentifyNick)) {
+              if ((vars.ircState.ircConnected) &&
+                (vars.ircState.nickName === nsIdentifyNick)) {
                 _writeSocket(socket, nsIdentifyCommand);
               }
             }.bind(this), 1500);
@@ -807,18 +794,18 @@
           global.sendToBrowser(
             'webServer: Registration error, unable to parse nick!user@host from message 001\n');
           socket.destroy();
-          ircState.ircConnecting = false;
-          ircState.ircConnected = false;
-          ircState.ircRegistered = false;
-          ircState.ircIsAway = false;
+          vars.ircState.ircConnecting = false;
+          vars.ircState.ircConnected = false;
+          vars.ircState.ircRegistered = false;
+          vars.ircState.ircIsAway = false;
           tellBrowserToRequestState();
         }
         break;
       // 305 RPL_UNAWAY
       case '305':
         if (true) {
-          if (parsedMessage.params[0].toLowerCase() === ircState.nickName.toLowerCase()) {
-            ircState.ircIsAway = false;
+          if (parsedMessage.params[0].toLowerCase() === vars.ircState.nickName.toLowerCase()) {
+            vars.ircState.ircIsAway = false;
             tellBrowserToRequestState();
           }
         }
@@ -826,8 +813,8 @@
       // 305 RPL_NOWAWAY
       case '306':
         if (true) {
-          if (parsedMessage.params[0].toLowerCase() === ircState.nickName.toLowerCase()) {
-            ircState.ircIsAway = true;
+          if (parsedMessage.params[0].toLowerCase() === vars.ircState.nickName.toLowerCase()) {
+            vars.ircState.ircIsAway = true;
             tellBrowserToRequestState();
           }
         }
@@ -838,10 +825,10 @@
       case '332':
         if (true) {
           let channelName = parsedMessage.params[1].toLowerCase();
-          let index = ircState.channels.indexOf(channelName);
+          let index = vars.ircState.channels.indexOf(channelName);
           if (index >= 0) {
             // case of already exist
-            ircState.channelStates[index].topic = parsedMessage.params[2];
+            vars.ircState.channelStates[index].topic = parsedMessage.params[2];
             tellBrowserToRequestState();
           } else {
             console.log('Error message 332 for non-existant channel');
@@ -858,7 +845,7 @@
           if (parsedMessage.params.length > 2) {
             let channelType = parsedMessage.params[1];
             let channelName = parsedMessage.params[2].toLowerCase();
-            let index = ircState.channels.indexOf(channelName);
+            let index = vars.ircState.channels.indexOf(channelName);
             // if names array exist
             if (index >= 0) {
               if (parsedMessage.params[3].length > 0) {
@@ -891,13 +878,13 @@
       case '433':
         if (true) {
           // Connect to IRC has failed, nickname already in use, disconnect to try again
-          if (!ircState.ircRegistered) {
+          if (!vars.ircState.ircRegistered) {
             if (socket) {
               socket.destroy();
-              ircState.ircConnecting = false;
-              ircState.ircConnected = false;
-              ircState.ircRegistered = false;
-              ircState.ircIsAway = false;
+              vars.ircState.ircConnecting = false;
+              vars.ircState.ircConnected = false;
+              vars.ircState.ircRegistered = false;
+              vars.ircState.ircIsAway = false;
               tellBrowserToRequestState();
             }
           }
@@ -909,13 +896,13 @@
       case '451':
         if (true) {
           // Connect to IRC has failed, disconnect to try again
-          if (!ircState.ircRegistered) {
+          if (!vars.ircState.ircRegistered) {
             if (socket) {
               socket.destroy();
-              ircState.ircConnecting = false;
-              ircState.ircConnected = false;
-              ircState.ircRegistered = false;
-              ircState.ircIsAway = false;
+              vars.ircState.ircConnecting = false;
+              vars.ircState.ircConnected = false;
+              vars.ircState.ircRegistered = false;
+              vars.ircState.ircIsAway = false;
               tellBrowserToRequestState();
             }
           }
@@ -930,14 +917,14 @@
       case 'JOIN':
         if (true) {
           let channelName = parsedMessage.params[0].toLowerCase();
-          let index = ircState.channels.indexOf(channelName);
+          let index = vars.ircState.channels.indexOf(channelName);
           if (index >= 0) {
             // case of already exist
-            if (parsedMessage.nick === ircState.nickName) {
-              ircState.channelStates[index].topic = '';
-              ircState.channelStates[index].names = [];
-              ircState.channelStates[index].joined = true;
-              ircState.channelStates[index].kicked = false;
+            if (parsedMessage.nick === vars.ircState.nickName) {
+              vars.ircState.channelStates[index].topic = '';
+              vars.ircState.channelStates[index].names = [];
+              vars.ircState.channelStates[index].joined = true;
+              vars.ircState.channelStates[index].kicked = false;
               tellBrowserToRequestState();
             } else {
               // case of different user for user list
@@ -953,8 +940,8 @@
               joined: true,
               kicked: false
             };
-            ircState.channels.push(channelName);
-            ircState.channelStates.push(chanState);
+            vars.ircState.channels.push(channelName);
+            vars.ircState.channelStates.push(chanState);
             tellBrowserToRequestState();
           }
         }
@@ -963,13 +950,13 @@
       case 'KICK':
         if (true) {
           let channelName = parsedMessage.params[0].toLowerCase();
-          let index = ircState.channels.indexOf(channelName);
-          if (parsedMessage.params[1] === ircState.nickName) {
+          let index = vars.ircState.channels.indexOf(channelName);
+          if (parsedMessage.params[1] === vars.ircState.nickName) {
             // case of me, I was kicked
-            ircState.channelStates[index].topic = '';
-            ircState.channelStates[index].names = [];
-            ircState.channelStates[index].joined = false;
-            ircState.channelStates[index].kicked = true;
+            vars.ircState.channelStates[index].topic = '';
+            vars.ircState.channelStates[index].names = [];
+            vars.ircState.channelStates[index].joined = false;
+            vars.ircState.channelStates[index].kicked = true;
             tellBrowserToRequestState();
           } else {
             // case of someone else was kicked
@@ -981,10 +968,10 @@
       //
       case 'MODE':
         if (true) {
-          if (parsedMessage.params[0] === ircState.nickName) {
+          if (parsedMessage.params[0] === vars.ircState.nickName) {
             // Case of User mode for IRC client has changed
             // console.log('TODO your user mode on server has been changed changed.');
-          } else if (ircState.channels.indexOf(parsedMessage.params[0].toLowerCase() >= 0)) {
+          } else if (vars.ircState.channels.indexOf(parsedMessage.params[0].toLowerCase() >= 0)) {
             // This is case of a #channel mode has changed.
             parseChannelModeChanges(socket, parsedMessage);
           } else {
@@ -995,11 +982,11 @@
 
       case 'NICK':
         if (true) {
-          if ((parsedMessage.nick === ircState.nickName) &&
-            (parsedMessage.host === ircState.userHost)) {
-            ircState.nickName = parsedMessage.params[0];
+          if ((parsedMessage.nick === vars.ircState.nickName) &&
+            (parsedMessage.host === vars.ircState.userHost)) {
+            vars.ircState.nickName = parsedMessage.params[0];
           }
-          if (ircState.channels.length > 0) {
+          if (vars.ircState.channels.length > 0) {
             let previousNick = parsedMessage.nick;
             let nextNick = parsedMessage.params[0];
             _exchangeNames(previousNick, nextNick);
@@ -1011,14 +998,14 @@
       case 'PART':
         if (true) {
           let channelName = parsedMessage.params[0].toLowerCase();
-          let index = ircState.channels.indexOf(channelName);
+          let index = vars.ircState.channels.indexOf(channelName);
           if (index >= 0) {
-            if (parsedMessage.nick === ircState.nickName) {
+            if (parsedMessage.nick === vars.ircState.nickName) {
               // case of me, I have parted the channel
-              ircState.channelStates[index].topic = '';
-              ircState.channelStates[index].names = [];
-              ircState.channelStates[index].joined = false;
-              ircState.channelStates[index].kicked = false;
+              vars.ircState.channelStates[index].topic = '';
+              vars.ircState.channelStates[index].names = [];
+              vars.ircState.channelStates[index].joined = false;
+              vars.ircState.channelStates[index].kicked = false;
               tellBrowserToRequestState();
             } else {
               // case of other user
@@ -1042,12 +1029,12 @@
         break;
       case 'QUIT':
         if (true) {
-          if (parsedMessage.nick !== ircState.nickname) {
+          if (parsedMessage.nick !== vars.ircState.nickname) {
             // case of it is not me who QUIT
-            if (ircState.channels.length > 0) {
-              for (let i = 0; i<ircState.channels.length; i++) {
-                if (ircState.channelStates[i].joined) {
-                  _removeName(parsedMessage.nick, ircState.channels[i]);
+            if (vars.ircState.channels.length > 0) {
+              for (let i = 0; i<vars.ircState.channels.length; i++) {
+                if (vars.ircState.channelStates[i].joined) {
+                  _removeName(parsedMessage.nick, vars.ircState.channels[i]);
                   tellBrowserToRequestState();
                 }
               }
@@ -1060,10 +1047,10 @@
       case 'TOPIC':
         if (true) {
           let channelName = parsedMessage.params[0].toLowerCase();
-          let index = ircState.channels.indexOf(channelName);
+          let index = vars.ircState.channels.indexOf(channelName);
           if (index >= 0) {
             // case of already exist
-            ircState.channelStates[index].topic = parsedMessage.params[1];
+            vars.ircState.channelStates[index].topic = parsedMessage.params[1];
             tellBrowserToRequestState();
           } else {
             console.log('Error message TOPIC for non-existant channel');
@@ -1158,34 +1145,34 @@
         message: 'Only 1 server, can not cycle.'
       });
     }
-    ircState.ircServerIndex++;
-    if (ircState.ircServerIndex >= servers.serverArray.length) {
-      ircState.ircServerIndex = 0;
+    vars.ircState.ircServerIndex++;
+    if (vars.ircState.ircServerIndex >= servers.serverArray.length) {
+      vars.ircState.ircServerIndex = 0;
     }
-    ircState.ircServerName = servers.serverArray[ircState.ircServerIndex].name;
-    ircState.ircServerHost = servers.serverArray[ircState.ircServerIndex].host;
-    ircState.ircServerPort = servers.serverArray[ircState.ircServerIndex].port;
-    ircState.ircTLSEnabled = servers.serverArray[ircState.ircServerIndex].tls;
-    ircServerPassword = servers.serverArray[ircState.ircServerIndex].password;
-    nsIdentifyNick = servers.serverArray[ircState.ircServerIndex].identifyNick;
-    nsIdentifyCommand = servers.serverArray[ircState.ircServerIndex].identifyCommand;
-    ircState.channelList = servers.serverArray[ircState.ircServerIndex].channelList;
+    vars.ircState.ircServerName = servers.serverArray[vars.ircState.ircServerIndex].name;
+    vars.ircState.ircServerHost = servers.serverArray[vars.ircState.ircServerIndex].host;
+    vars.ircState.ircServerPort = servers.serverArray[vars.ircState.ircServerIndex].port;
+    vars.ircState.ircTLSEnabled = servers.serverArray[vars.ircState.ircServerIndex].tls;
+    ircServerPassword = servers.serverArray[vars.ircState.ircServerIndex].password;
+    nsIdentifyNick = servers.serverArray[vars.ircState.ircServerIndex].identifyNick;
+    nsIdentifyCommand = servers.serverArray[vars.ircState.ircServerIndex].identifyCommand;
+    vars.ircState.channelList = servers.serverArray[vars.ircState.ircServerIndex].channelList;
 
-    ircState.nickName = servers.serverArray[ircState.ircServerIndex].nick;
-    ircState.userName = servers.serverArray[ircState.ircServerIndex].user;
-    ircState.realName = servers.serverArray[ircState.ircServerIndex].real;
-    ircState.userMode = servers.serverArray[ircState.ircServerIndex].modes;
-    ircState.userHost = '';
+    vars.ircState.nickName = servers.serverArray[vars.ircState.ircServerIndex].nick;
+    vars.ircState.userName = servers.serverArray[vars.ircState.ircServerIndex].user;
+    vars.ircState.realName = servers.serverArray[vars.ircState.ircServerIndex].real;
+    vars.ircState.userMode = servers.serverArray[vars.ircState.ircServerIndex].modes;
+    vars.ircState.userHost = '';
 
-    ircLog.setRawMessageLogEnabled(servers.serverArray[ircState.ircServerIndex].rawMessageLog);
+    ircLog.setRawMessageLogEnabled(servers.serverArray[vars.ircState.ircServerIndex].rawMessageLog);
 
     tellBrowserToRequestState();
 
     return res.json({
       error: false,
       message: null,
-      index: ircState.ircServerIndex,
-      name: ircState.ircServerName
+      index: vars.ircState.ircServerIndex,
+      name: vars.ircState.ircServerName
     });
   };
 
@@ -1199,7 +1186,7 @@
   const connectHandler = function(req, res, next) {
     // console.log('connect handler called');
     // Abort if already connected.
-    if ((ircState.ircConnected) || (ircState.ircConnecting)) {
+    if ((vars.ircState.ircConnected) || (vars.ircState.ircConnecting)) {
       return res.json({
         error: true,
         message: 'Error: already connected to IRC server.'
@@ -1208,27 +1195,27 @@
 
 
     // TODO add size validation, character allowlist
-    ircState.nickName = req.body.nickName;
-    ircState.userName = req.body.userName;
-    ircState.realName = req.body.realName;
-    ircState.userMode = req.body.userMode;
+    vars.ircState.nickName = req.body.nickName;
+    vars.ircState.userName = req.body.userName;
+    vars.ircState.realName = req.body.realName;
+    vars.ircState.userMode = req.body.userMode;
 
     // channels here on connect, browser on disconnect
-    ircState.channels = [];
-    ircState.channelStates = [];
-    ircState.ircConnected = false;
-    ircState.ircConnecting = true;
-    ircState.ircRegistered = false;
-    ircState.ircIsAway = false;
+    vars.ircState.channels = [];
+    vars.ircState.channelStates = [];
+    vars.ircState.ircConnected = false;
+    vars.ircState.ircConnecting = true;
+    vars.ircState.ircRegistered = false;
+    vars.ircState.ircIsAway = false;
 
-    let connectMessage = 'webServer: Opening socket to ' + ircState.ircServerName + ' ' +
-      ircState.ircServerHost + ':' + ircState.ircServerPort;
-    if (ircState.ircTLSEnabled) {
+    let connectMessage = 'webServer: Opening socket to ' + vars.ircState.ircServerName + ' ' +
+      vars.ircState.ircServerHost + ':' + vars.ircState.ircServerPort;
+    if (vars.ircState.ircTLSEnabled) {
       connectMessage += ' (TLS)';
     }
     global.sendToBrowser('UPDATE\n' + connectMessage + '\n');
 
-    if (ircState.ircTLSEnabled) {
+    if (vars.ircState.ircTLSEnabled) {
       ircSocket = new tls.TLSSocket();
     } else {
       ircSocket = new net.Socket();
@@ -1246,10 +1233,10 @@
       // dummy function to be replaced
       global.sendToBrowser('webServer: IRC Server socket error occurred.\n');
       if (!ircSocket.writable) {
-        ircState.ircConnecting = false;
-        ircState.ircConnected = false;
-        ircState.ircRegistered = false;
-        ircState.ircIsAway = false;
+        vars.ircState.ircConnecting = false;
+        vars.ircState.ircConnected = false;
+        vars.ircState.ircRegistered = false;
+        vars.ircState.ircIsAway = false;
         global.sendToBrowser('UPDATE\nwebServer: Socket not writable, connected flags reset\n');
       }
     };
@@ -1259,14 +1246,14 @@
     // ---------------------------------------------------
     const connectingErrorResponse = function(err) {
       // Response to POST request
-      ircState.ircConnecting = false;
-      ircState.ircConnected = false;
-      ircState.ircRegistered = false;
-      ircState.ircIsAway = false;
+      vars.ircState.ircConnecting = false;
+      vars.ircState.ircConnected = false;
+      vars.ircState.ircRegistered = false;
+      vars.ircState.ircIsAway = false;
       // Send some over over websocket too
       let errMsg = 'UPDATE\nwebServer: Error opening TCP socket to ' +
-        ircState.ircServerName + ' ' +
-        ircState.ircServerHost + ':' + ircState.ircServerPort;
+        vars.ircState.ircServerName + ' ' +
+        vars.ircState.ircServerHost + ':' + vars.ircState.ircServerPort;
       if (err) {
         errMsg += 'webServer: ' + err.toString();
       }
@@ -1323,10 +1310,10 @@
     // -------------------------------------------
     ircSocket.on('close', function(hadError) {
       console.log('Event: close, hadError=' + hadError + ' destroyed=' + ircSocket.destroyed);
-      ircState.ircConnecting = false;
-      ircState.ircConnected = false;
-      ircState.ircRegistered = false;
-      ircState.ircIsAway = false;
+      vars.ircState.ircConnecting = false;
+      vars.ircState.ircConnected = false;
+      vars.ircState.ircRegistered = false;
+      vars.ircState.ircIsAway = false;
       global.sendToBrowser('UPDATE\nwebServer: Socket to IRC server closed, hadError: ' +
         hadError.toString() + '\n');
     });
@@ -1335,13 +1322,13 @@
     // All even listeners are created
     // Go ahead can connect the socket.
     // ----------------------------------
-    ircSocket.connect(ircState.ircServerPort, ircState.ircServerHost, function() {
+    ircSocket.connect(vars.ircState.ircServerPort, vars.ircState.ircServerHost, function() {
       let now = new Date();
       let timeString = now.toISOString() + ' ';
-      // console.log(timeString + 'Connected to IRC server ' + ircState.ircServerName + ' ' +
-      //   ircState.ircServerHost + ':'+ ircState.ircServerPort);
-      ircLog.writeIrcLog('Connected to IRC server ' + ircState.ircServerName + ' ' +
-        ircState.ircServerHost + ':'+ ircState.ircServerPort);
+      // console.log(timeString + 'Connected to IRC server ' + vars.ircState.ircServerName + ' ' +
+      //   vars.ircState.ircServerHost + ':'+ vars.ircState.ircServerPort);
+      ircLog.writeIrcLog('Connected to IRC server ' + vars.ircState.ircServerName + ' ' +
+        vars.ircState.ircServerHost + ':'+ vars.ircState.ircServerPort);
       res.json({error: false});
     });
   }; // connectHandler()
@@ -1412,8 +1399,8 @@
     switch (outboundCommand) {
       case 'JOIN':
         if (true) {
-          let index = ircState.channels.indexOf(outboundArg1.toLowerCase());
-          if ((index >= 0) && (ircState.channelStates[index].joined)) {
+          let index = vars.ircState.channels.indexOf(outboundArg1.toLowerCase());
+          if ((index >= 0) && (vars.ircState.channelStates[index].joined)) {
             // case of already in this channel
             return {
               error: true,
@@ -1429,17 +1416,17 @@
           // Clear names list, a new one will arrive after join
           if (index >= 0) {
             console.log('JOIN clearing nicklist');
-            ircState.channelStates[index].names = [];
+            vars.ircState.channelStates[index].names = [];
           }
         }
         return {error: false};
         break;
       case 'NAMES':
         if (true) {
-          let index = ircState.channels.indexOf(outboundArg1.toLowerCase());
+          let index = vars.ircState.channels.indexOf(outboundArg1.toLowerCase());
           // Clear names list, a new one will arrive after join
           if (index >= 0) {
-            ircState.channelStates[index].names = [];
+            vars.ircState.channelStates[index].names = [];
           }
         }
         return {error: false};
@@ -1450,10 +1437,10 @@
           //
           // case of channel notice
           //
-          let index = ircState.channels.indexOf(outboundArg1.toLowerCase());
-          if ((index >= 0) && (ircState.channelStates[index].joined)) {
-            let fromMessage = timestamp() + ' ' +
-            ':' + ircState.nickName + '!*@* ' + message;
+          let index = vars.ircState.channels.indexOf(outboundArg1.toLowerCase());
+          if ((index >= 0) && (vars.ircState.channelStates[index].joined)) {
+            let fromMessage = vars.timestamp() + ' ' +
+            ':' + vars.ircState.nickName + '!*@* ' + message;
             ircMessageCache.addMessage(fromMessage);
             global.sendToBrowser(fromMessage + '\r\n');
             return {error: false};
@@ -1464,9 +1451,9 @@
         //
         if (true) {
           let firstChar = outboundArg1.charAt(0);
-          if (channelPrefixChars.indexOf(firstChar) < 0) {
-            let fromMessage = timestamp() + ' ' +
-              ':' + ircState.nickName + '!*@* ' + message;
+          if (vars.channelPrefixChars.indexOf(firstChar) < 0) {
+            let fromMessage = vars.timestamp() + ' ' +
+              ':' + vars.ircState.nickName + '!*@* ' + message;
             ircMessageCache.addMessage(fromMessage);
             global.sendToBrowser(fromMessage + '\r\n');
             return {error: false};
@@ -1483,10 +1470,10 @@
           //
           // case of channel message
           //
-          let index = ircState.channels.indexOf(outboundArg1.toLowerCase());
-          if ((index >= 0) && (ircState.channelStates[index].joined)) {
-            let fromMessage = timestamp() + ' ' +
-            ':' + ircState.nickName + '!*@* ' + message;
+          let index = vars.ircState.channels.indexOf(outboundArg1.toLowerCase());
+          if ((index >= 0) && (vars.ircState.channelStates[index].joined)) {
+            let fromMessage = vars.timestamp() + ' ' +
+            ':' + vars.ircState.nickName + '!*@* ' + message;
             ircMessageCache.addMessage(fromMessage);
             global.sendToBrowser(fromMessage + '\r\n');
             return {error: false};
@@ -1497,9 +1484,9 @@
         //
         if (true) {
           let firstChar = outboundArg1.charAt(0);
-          if (channelPrefixChars.indexOf(firstChar) < 0) {
-            let fromMessage = timestamp() + ' ' +
-              ':' + ircState.nickName + '!*@* ' + message;
+          if (vars.channelPrefixChars.indexOf(firstChar) < 0) {
+            let fromMessage = vars.timestamp() + ' ' +
+              ':' + vars.ircState.nickName + '!*@* ' + message;
             ircMessageCache.addMessage(fromMessage);
             global.sendToBrowser(fromMessage + '\r\n');
             return {error: false};
@@ -1585,10 +1572,10 @@
     global.sendToBrowser('webServer: Forcibly closing IRC server TCP socket\n');
     if (ircSocket) {
       ircSocket.destroy();
-      ircState.ircConnecting = false;
-      ircState.ircConnected = false;
-      ircState.ircRegistered = false;
-      ircState.ircIsAway = false;
+      vars.ircState.ircConnecting = false;
+      vars.ircState.ircConnected = false;
+      vars.ircState.ircRegistered = false;
+      vars.ircState.ircIsAway = false;
       tellBrowserToRequestState();
       res.json({error: false});
     } else {
@@ -1602,8 +1589,8 @@
   // Route: /getircstate
   // ---------------------------------------------------
   const getIrcState = function(req, res, next) {
-    ircState.websocketCount = global.getWebsocketCount();
-    res.json(ircState);
+    vars.ircState.websocketCount = global.getWebsocketCount();
+    res.json(vars.ircState);
   };
 
   // -----------------------------------------------
@@ -1677,7 +1664,7 @@
   };
 
   // Program run timestamp
-  ircState.times.programRun = timestamp();
+  vars.ircState.times.programRun = vars.timestamp();
 
   //
   // 1 second utility timer
