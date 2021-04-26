@@ -40,13 +40,14 @@
 
   var rawMessageLogEnabled = false;
 
-  const writeIrcLog = function (logString) {
+  const writeIrcLog = function (inBuffer) {
     //
     // build log text string
     //
     let now = new Date();
     let logEntry = now.toISOString();
-    logEntry += ' ' + logString;
+    // convert buffer to utf8 string
+    logEntry += ' ' + inBuffer.toString('utf8');
     //
     // Append string to file
     //

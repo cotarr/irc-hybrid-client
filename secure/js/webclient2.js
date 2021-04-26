@@ -804,6 +804,19 @@ function updateFromCache () {
         document.getElementById('rawMessageDisplay').textContent = '';
         webState.noticeOpen = false;
         webState.wallopsOpen = false;
+        //
+        // Option 1, receive array of NodeJS Buffer object and convert to utf8 string messages
+        //
+        // let utf8decoder = new TextDecoder('utf8');
+        // for (let i=0; i<responseArray.length; i++) {
+        //   if ((responseArray[i].type === 'Buffer') && (responseArray[i].data.length > 0)) {
+        //     let data = new Uint8Array(responseArray[i].data);
+        //     _parseBufferMessage(utf8decoder.decode(data));
+        //   }
+        // }
+        //
+        // Option 2, recieve array of utf8 string message
+        //
         for (let i=0; i<responseArray.length; i++) {
           if (responseArray[i].length > 0) {
             _parseBufferMessage(responseArray[i]);

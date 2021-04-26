@@ -17,7 +17,11 @@
   };
 
   const addMessage = function(message) {
-    cacheArray[cacheInPointer] = message.toString();
+    if (Buffer.isBuffer(message)) {
+      cacheArray[cacheInPointer] = Buffer.from(message);
+    } else if (typeof message === 'string') {
+      cacheArray[cacheInPointer] = Buffer.from(message, 'utf8');
+    }
     cacheInPointer++;
     if (cacheInPointer >= cacheSize) cacheInPointer = 0;
   };
@@ -27,7 +31,10 @@
     let cacheOutPointer = cacheInPointer;
     for (let i=0; i<cacheSize; i++) {
       if ((cacheArray[cacheOutPointer]) && (cacheArray[cacheOutPointer].length > 0)) {
-        outArray.push(cacheArray[cacheOutPointer]);
+        // Option 1 to send array of utf8 encoded Buffer objects
+        //outArray.push(cacheArray[cacheOutPointer]);
+        // Option 2 to send array of utf8 strings
+        outArray.push(cacheArray[cacheOutPointer].toString('utf8'));
       }
       cacheOutPointer++;
       if (cacheOutPointer >= cacheSize) cacheOutPointer = 0;

@@ -113,25 +113,16 @@
   // ----------------------------------------------------
   // Write data to IRC server socket (Internal function)
   // Includes check of socket status
+  //
+  // Expect Buffer or utf8 encoded string.
+  //
+  // Send utf8 string to browser
+  // Send Buffer encoded utf8 to IRC server socket
   // ----------------------------------------------------
   const _writeSocket = function (socket, message) {
     if ((socket) && (socket.writable)) {
       //
-      // First validate UTF-8
-      //
-      let out = null;
-      if (typeof message === 'string') {
-        out = Buffer.from(message);
-      }
-      if (Buffer.isBuffer(message)) {
-        out = message;
-      }
-      if (!isValidUTF8(out)) {
-        out = null;
-      }
-
-      //
-      // Second, filter passwords, then send to browser and write log file
+      // First, filter passwords, then send to browser and write log file
       //
       let filterWords = [
         'OPER',
@@ -141,8 +132,8 @@
         'CHANSERV',
         'CS'
       ];
-      let filterCommand = message.split(' ')[0].toUpperCase();
-      let filtered = message;
+      let filterCommand = message.toString().split(' ')[0].toUpperCase();
+      let filtered = message.toString();
       if (filterWords.indexOf(filterCommand) >= 0) {
         if (!ircState.ircTLSEnabled) {
           console.log('WARNING: possible password without TLC encryption to IRC server');
@@ -164,13 +155,35 @@
             message.split(' ')[1] + ' ' + message.split(' ')[2] + ' ********';
         }
       }
-
       global.sendToBrowser(commandMsgPrefix + filtered + '\n');
+
+      //
+      // Second validate UTF-8
+      //
+      let out = null;
+      if (typeof message === 'string') {
+        out = Buffer.from(message, 'utf8');
+      }
+      if (Buffer.isBuffer(message)) {
+        out = Buffer.from(message);
+      }
+      if (!isValidUTF8(out)) {
+        out = null;
+      }
+
       //
       // Third, send into socket to IRC server
       //
       if (out) {
-        socket.write(out.toString() + '\r\n', 'utf8');
+        // IRC server expects \r\n end of line characters as message delimiter
+        let outBuffer = Buffer.concat([out, Buffer.from('\r\n', 'utf8')]);
+        // 512 btye maximum size from RFC 2812 2.3 Messages
+        if (outBuffer.length <= 512) {
+          socket.write(Buffer.concat([out, Buffer.from('\r\n', 'utf8')]));
+        } else {
+          console.log('Error, send buffer exceeds 512 character limit.');
+          global.sendToBrowser('webServer: send buffer exceeds 512 character limit.\n');
+        }
       } else {
         console.log('Error, _writeSocket() string failed UTF8 validation.');
         global.sendToBrowser('webServer: _writeSocket() failed UTF8 validation.\n');
@@ -242,7 +255,7 @@
           nextIndex: start
         };
       }
-    }
+    } // _isColonString()
     //
     // 2) Command or param string, but not last param
     //
@@ -261,7 +274,8 @@
         data: outString,
         nextIndex: i + 1
       };
-    };
+    }; // _extractMidString()
+
     // 3) Last param string (start with :)
     //
     // :prefix command param1 param2 .... :lastParam
@@ -279,7 +293,7 @@
         data: outString,
         nextIndex: i + 1
       };
-    };
+    }; // _extractFinalString()
 
     // nick!user@host.domain
     // nick!user@nn:nn:nn:nn: (ipv6)
@@ -296,7 +310,8 @@
       } else {
         return null;
       }
-    }
+    } // _extractNickname()
+
     function _extractHostname(inText) {
       if (inText) {
         if ((inText.indexOf('!') >= 0 ) &&
@@ -310,11 +325,13 @@
       } else {
         return null;
       }
-    }
+    } // _extractHostname()
+
     // ---------------------------------------------------------
     //                   Decode the line
     // --------------------------------------------------------
-    // This accepts a Buffer as input with UTF8 characters
+    // This accepts a Buffer as input with UTF8 encoded characters
+    // Converts internal data to type string for processing
     //
     // Format:  [:prefix] command param1 [param2] .... [:lastParam]
     // --------------------------------------------------------
@@ -447,7 +464,7 @@
         }
       }
     } // next i
-  };
+  }; // parseChannelModeChanges()
 
   // ----------------------------
   // CTCP flood detections
@@ -565,7 +582,7 @@
         break;
       default:
     }
-  };
+  }; // _parseCtcpMessage()
 
   //-----------------------------------------------------------------
   //
@@ -589,10 +606,28 @@
 
     // PING is special case
     if (parsedMessage.command === 'PING') {
-      if (excludedCommands.indexOf('PONG') < 0) {
-        global.sendToBrowser(commandMsgPrefix + 'PONG ' + parsedMessage.params[0]+ '\n');
+      let outBuffer = Buffer.from('PONG ' + parsedMessage.params[0] + '\r\n', 'utf8');
+      // 512 btye maximum size from RFC 2812 2.3 Messages
+      if (outBuffer.length <= 512) {
+        socket.write(outBuffer, 'utf8');
+        if (excludedCommands.indexOf('PING') <0) {
+          ircMessageCache.addMessage(Buffer.concat([
+            Buffer.from(timestamp() + ' '),
+            message
+          ]));
+          global.sendToBrowser(Buffer.concat([
+            Buffer.from(timestamp() + ' '),
+            message,
+            Buffer.from('\r\n')
+          ]));
+        }
+        if (excludedCommands.indexOf('PONG') < 0) {
+          global.sendToBrowser(commandMsgPrefix + outBuffer.toString('utf8'));
+        }
+      } else {
+        console.log('Error, send buffer exceeds 512 character limit.');
       }
-      socket.write('PONG ' + parsedMessage.params[0]+ '\r\n', 'utf8');
+      return;
     }
     //
     // Filter...
@@ -614,10 +649,9 @@
       Buffer.from('\r\n')
     ]));
     //
-    // Send to log file
+    // Send to log file (send message as utf8 Buffer)
     //
     ircLog.writeIrcLog(message);
-
 
     // cycle through all channels and replace
     // the new nickname, preserving op character
@@ -661,7 +695,7 @@
         }
       } // next ci
       return;
-    }
+    } // _exchangeNames()
 
     // Add a nicname to channel array list
     // If op or voice (@,+) not match, then update the existing name
@@ -702,7 +736,8 @@
         }
       }
       return;
-    }
+    } // _addName()
+
     // Remove a nicname to channel array list
     // Ignore op or voice (@,+) when removing
     function _removeName(oldNick, channel) {
@@ -730,7 +765,8 @@
         }
       }
       return;
-    }
+    } // _removeName()
+
     //
     // Decoding complete, Parse commands
     //
@@ -880,7 +916,7 @@
         break;
       //
       case 'ERROR':
-        console.log(message.toString());
+        console.log(message.toString('utf8'));
         global.sendToBrowser('UPDATE\n');
         break;
       //
@@ -1060,7 +1096,12 @@
         // case of CR or LF as message separator
         if (count > 0) {
           let message = data.slice(index, index + count);
-          _parseBufferMessage(socket, message);
+          // 512 btye maximum size from RFC 2812 2.3 Messages
+          if ((Buffer.isBuffer(message)) && (message.length <= 512)) {
+            _parseBufferMessage(socket, message);
+          } else {
+            console.log('Error, extracted message not type Buffer with length <= 512 btyes');
+          }
         }
         index = i + 1;
         count = 0;
@@ -1490,16 +1531,20 @@
     // console.log(req.body);
     let message = req.body.message;
     if (message.length > 0) {
-      // And parse for commands that change state or
-      // that require dummy server messages for cached display.
-      let parseResult = parseBrowserMessageForCommand(message);
-      if (parseResult.error) {
-        console.log(parseResult.message);
-        res.json({error: true, message: parseResult.message});
+      if (message.length <= 512) {
+        // And parse for commands that change state or
+        // that require dummy server messages for cached display.
+        let parseResult = parseBrowserMessageForCommand(message);
+        if (parseResult.error) {
+          console.log(parseResult.message);
+          res.json({error: true, message: parseResult.message});
+        } else {
+          // Send browser message on to web server
+          _writeSocket(ircSocket, message);
+          res.json({error: false});
+        }
       } else {
-        // Send browser message on to web server
-        _writeSocket(ircSocket, message);
-        res.json({error: false});
+        res.json({error: true, message: 'Message exceeds 512 character maximum length'});
       }
     } else {
       res.json({error: true, message: 'Empty message'});
