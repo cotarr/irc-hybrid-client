@@ -31,8 +31,8 @@
   const tls = require('tls');
   const fs = require('fs');
   const isValidUTF8 = require('utf-8-validate');
-  const ircLog = require('./irc-log');
-  const ircMessageCache = require('./irc-message-cache');
+  const ircLog = require('./irc-client-log');
+  const ircMessageCache = require('./irc-client-cache');
 
   var nodeEnv = process.env.NODE_ENV || 'development';
 
