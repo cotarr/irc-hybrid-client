@@ -577,6 +577,8 @@ function getIrcState (callback) {
       if (response.ok) {
         return response.json();
       } else {
+        // Cookie / session is expired, need refreshed login
+        if (response.status === 403) window.location.href = '/login';
         throw new Error('Fetch status ' + response.status + ' ' + response.statusText);
       }
     })
