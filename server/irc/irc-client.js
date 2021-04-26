@@ -110,6 +110,10 @@
     return parseInt(now.valueOf() / 1000).toString();
   };
 
+  function tellBrowserToRequestState() {
+    global.sendToBrowser('UPDATE\r\n');
+  }
+
   // ----------------------------------------------------
   // Write data to IRC server socket (Internal function)
   // Includes check of socket status
@@ -213,7 +217,7 @@
         }
         ircState.ircConnecting = false;
         ircState.ircConnected = true;
-        global.sendToBrowser('UPDATE\n');
+        tellBrowserToRequestState();
         // Timer for TLS connect delay
       } else {
         // case of error handler reset ircConnecting before timer expired (TLS error probgably)
@@ -221,7 +225,7 @@
         ircState.ircConnected = false;
         ircState.ircRegistered = false;
         ircState.ircIsAway = false;
-        global.sendToBrowser('UPDATE\n');
+        tellBrowserToRequestState();
       }
       // reset the state variables
       ircState.channels = [];
@@ -460,7 +464,7 @@
             if (modeQueue[j] === '+q') tempNick = '~' + tempNick;
             ircState.channelStates[chanIndex].names[userIndex] = tempNick;
           }
-          global.sendToBrowser('UPDATE\n');
+          tellBrowserToRequestState();
         }
       }
     } // next i
@@ -784,7 +788,7 @@
         if (parsedNick === ircState.nickName) {
           // console.log(parsedUserhost);
           ircState.userHost = parsedUserhost;
-          global.sendToBrowser('UPDATE\n');
+          tellBrowserToRequestState();
           //
           // nickserv registration
           //
@@ -804,7 +808,7 @@
           ircState.ircConnected = false;
           ircState.ircRegistered = false;
           ircState.ircIsAway = false;
-          global.sendToBrowser('UPDATE\n');
+          tellBrowserToRequestState();
         }
         break;
       // 305 RPL_UNAWAY
@@ -812,7 +816,7 @@
         if (true) {
           if (parsedMessage.params[0].toLowerCase() === ircState.nickName.toLowerCase()) {
             ircState.ircIsAway = false;
-            global.sendToBrowser('UPDATE\n');
+            tellBrowserToRequestState();
           }
         }
         break;
@@ -821,7 +825,7 @@
         if (true) {
           if (parsedMessage.params[0].toLowerCase() === ircState.nickName.toLowerCase()) {
             ircState.ircIsAway = true;
-            global.sendToBrowser('UPDATE\n');
+            tellBrowserToRequestState();
           }
         }
         break;
@@ -835,7 +839,7 @@
           if (index >= 0) {
             // case of already exist
             ircState.channelStates[index].topic = parsedMessage.params[2];
-            global.sendToBrowser('UPDATE\n');
+            tellBrowserToRequestState();
           } else {
             console.log('Error message 332 for non-existant channel');
           }
@@ -875,7 +879,7 @@
       // TODO RFC2812 conflict, channel is params[0] (no nickname)
       case '366':
         if (true) {
-          global.sendToBrowser('UPDATE\n');
+          tellBrowserToRequestState();
         }
         break;
       //
@@ -891,7 +895,7 @@
               ircState.ircConnected = false;
               ircState.ircRegistered = false;
               ircState.ircIsAway = false;
-              global.sendToBrowser('UPDATE\n');
+              tellBrowserToRequestState();
             }
           }
         }
@@ -909,7 +913,7 @@
               ircState.ircConnected = false;
               ircState.ircRegistered = false;
               ircState.ircIsAway = false;
-              global.sendToBrowser('UPDATE\n');
+              tellBrowserToRequestState();
             }
           }
         }
@@ -917,7 +921,7 @@
       //
       case 'ERROR':
         console.log(message.toString('utf8'));
-        global.sendToBrowser('UPDATE\n');
+        tellBrowserToRequestState();
         break;
       //
       case 'JOIN':
@@ -931,11 +935,11 @@
               ircState.channelStates[index].names = [];
               ircState.channelStates[index].joined = true;
               ircState.channelStates[index].kicked = false;
-              global.sendToBrowser('UPDATE\n');
+              tellBrowserToRequestState();
             } else {
               // case of different user for user list
               _addName(parsedMessage.nick, parsedMessage.params[0]);
-              global.sendToBrowser('UPDATE\n');
+              tellBrowserToRequestState();
             }
           } else {
             // case of new channel
@@ -948,7 +952,7 @@
             };
             ircState.channels.push(channelName);
             ircState.channelStates.push(chanState);
-            global.sendToBrowser('UPDATE\n');
+            tellBrowserToRequestState();
           }
         }
         break;
@@ -963,11 +967,11 @@
             ircState.channelStates[index].names = [];
             ircState.channelStates[index].joined = false;
             ircState.channelStates[index].kicked = true;
-            global.sendToBrowser('UPDATE\n');
+            tellBrowserToRequestState();
           } else {
             // case of someone else was kicked
             _removeName(parsedMessage.params[1], parsedMessage.params[0]);
-            global.sendToBrowser('UPDATE\n');
+            tellBrowserToRequestState();
           }
         }
         break;
@@ -997,7 +1001,7 @@
             let nextNick = parsedMessage.params[0];
             _exchangeNames(previousNick, nextNick);
           }
-          global.sendToBrowser('UPDATE\n');
+          tellBrowserToRequestState();
         }
         break;
       //
@@ -1012,11 +1016,11 @@
               ircState.channelStates[index].names = [];
               ircState.channelStates[index].joined = false;
               ircState.channelStates[index].kicked = false;
-              global.sendToBrowser('UPDATE\n');
+              tellBrowserToRequestState();
             } else {
               // case of other user
               _removeName(parsedMessage.nick, parsedMessage.params[0]);
-              global.sendToBrowser('UPDATE\n');
+              tellBrowserToRequestState();
             }
           } else {
             console.log('Error message PART for non-existant channel');
@@ -1041,7 +1045,7 @@
               for (let i = 0; i<ircState.channels.length; i++) {
                 if (ircState.channelStates[i].joined) {
                   _removeName(parsedMessage.nick, ircState.channels[i]);
-                  global.sendToBrowser('UPDATE\n');
+                  tellBrowserToRequestState();
                 }
               }
             }
@@ -1057,7 +1061,7 @@
           if (index >= 0) {
             // case of already exist
             ircState.channelStates[index].topic = parsedMessage.params[1];
-            global.sendToBrowser('UPDATE\n');
+            tellBrowserToRequestState();
           } else {
             console.log('Error message TOPIC for non-existant channel');
           }
@@ -1178,7 +1182,7 @@
 
     ircLog.setRawMessageLogEnabled(servers.serverArray[ircState.ircServerIndex].rawMessageLog);
 
-    global.sendToBrowser('UPDATE\n');
+    tellBrowserToRequestState();
 
     return res.json({
       error: false,
@@ -1565,7 +1569,7 @@
       ircState.ircConnected = false;
       ircState.ircRegistered = false;
       ircState.ircIsAway = false;
-      global.sendToBrowser('UPDATE\n');
+      tellBrowserToRequestState();
       res.json({error: false});
     } else {
       res.json({error: true, message: 'Error Can not destry socket before it is created.'});
