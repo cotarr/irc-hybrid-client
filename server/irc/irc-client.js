@@ -124,9 +124,12 @@
   // Send Buffer encoded utf8 to IRC server socket
   // ----------------------------------------------------
   const _writeSocket = function (socket, message) {
+    if (message.length === 0) return;
     if ((socket) && (socket.writable)) {
       //
       // First, filter passwords, then send to browser and write log file
+      // The filter only applies to log rile and browser.
+      // Messages to IRC server are not filtered.
       //
       let filterWords = [
         'OPER',
@@ -162,39 +165,39 @@
       global.sendToBrowser(commandMsgPrefix + filtered + '\n');
 
       //
-      // Second validate UTF-8
+      // Second validate the string before writing to IRC server socket
       //
       let out = null;
       if (typeof message === 'string') {
-        out = Buffer.from(message, 'utf8');
+        out = Buffer.from(message + '\r\n', 'utf8');
       }
       if (Buffer.isBuffer(message)) {
-        out = Buffer.from(message);
+        out = Buffer.concat([out, Buffer.from('\r\n', 'utf8')]);
       }
       if (!isValidUTF8(out)) {
         out = null;
+        console.log('_writeSocket failed UTF-8 validation');
       }
-
+      // RFC 2812 does not allow zero character
+      if (out.includes(0)) {
+        out = null;
+        console.log('_writeSocket failed zero byte validation');
+      }
+      // 512 btye maximum size from RFC 2812 Section 2.3 Messages
+      // It is assumed here this means 8 bit types not multi-byte characters
+      if (out.length > 512) {
+        out = null;
+        console.log('_writeSocket send buffer exceeds 512 character limit.');
+      }
       //
       // Third, send into socket to IRC server
       //
       if (out) {
-        // IRC server expects \r\n end of line characters as message delimiter
-        let outBuffer = Buffer.concat([out, Buffer.from('\r\n', 'utf8')]);
-        // 512 btye maximum size from RFC 2812 2.3 Messages
-        if (outBuffer.length <= 512) {
-          socket.write(Buffer.concat([out, Buffer.from('\r\n', 'utf8')]));
-        } else {
-          console.log('Error, send buffer exceeds 512 character limit.');
-          global.sendToBrowser('webServer: send buffer exceeds 512 character limit.\n');
-        }
-      } else {
-        console.log('Error, _writeSocket() string failed UTF8 validation.');
-        global.sendToBrowser('webServer: _writeSocket() failed UTF8 validation.\n');
+        socket.write(Buffer.concat([out, Buffer.from('\r\n', 'utf8')]));
       }
     } else {
       // TODO should this disconnect?
-      global.sendToBrowser('webServer: IRC Error: server socket not writable\n');
+      console.log('_writeSocket server socket not writable');
     }
   }; // _writeSocket
 
@@ -596,7 +599,7 @@
   //
   // Single message line from IRC server, parsed for command actions
   //-----------------------------------------------------------------
-  const _parseBufferMessage = function (socket, message) {
+  const _processIrcMessage = function (socket, message) {
     //
     // parse message into: prefix, command, and param array
     //
@@ -1070,7 +1073,7 @@
       //
       default:
     }
-  }; // _parseBufferMessage
+  }; // _processIrcMessage
 
   // -------------------------------------------------------------------------
   // Process Buffer object from socket stream
@@ -1080,10 +1083,18 @@
   // Pass each message to message parse function as type Buffer
   // If left over characters not terminated in CR-LF, save as next fragment
   // -------------------------------------------------------------------------
-  var previousBufferFragment = Buffer.from('', 'UTF8');
-  const parseStreamBuffer = function (socket, inBuffer) {
+  var previousBufferFragment = Buffer.from('', 'utf8');
+  const extractMessagesFromStream = function (socket, inBuffer) {
     if (!inBuffer) return;
     if (!Buffer.isBuffer(inBuffer)) return;
+    if (!isValidUTF8(inBuffer)) {
+      console.log('extractMessagesFromStream() failed UTF-8 validation');
+      return;
+    }
+    if (inBuffer.includes(0)) {
+      console.log('extractMessagesFromStream() failed zero byte validation');
+      return;
+    }
     // this returns a new Buffer, not a reference to shared memory
     let data = Buffer.concat([previousBufferFragment, inBuffer]);
     previousBufferFragment = Buffer.from('');
@@ -1104,7 +1115,7 @@
           let message = Buffer.from(data.slice(index, index + count));
           // 512 btye maximum size from RFC 2812 2.3 Messages
           if ((Buffer.isBuffer(message)) && (message.length <= 512)) {
-            _parseBufferMessage(socket, message);
+            _processIrcMessage(socket, message);
           } else {
             console.log('Error, extracted message exceeds max length of 512 btyes');
           }
@@ -1117,24 +1128,7 @@
       // slice wrapped in Buffer.from because slice returns a reference to previous buffer
       previousBufferFragment = Buffer.from(data.slice(index, index + count));
     }
-  }; // parseStreamBuffer
-
-
-  // -----------------------------------------------------------------------------
-  //   On Data Event handler
-  // -----------------------------------------------------------------------------
-  // UTF8 data coming in over web socket can break input lines
-  // such that message block may not end in a CR-LF or LF.
-  // Therefore it is necessary to parse stream character by character,
-  // remove the CR, split by LF, but if the message data block
-  // does not end in a LF, then wait for next data and merge old and new message.
-  // -----------------------------------------------------------------------------
-
-  // left over string characters from previous message block
-  var lastLineFromStream = '';
-  const _dataEventHandler = function(socket, data) {
-    parseStreamBuffer(socket, data);
-  }; // _dataEventHandler
+  }; // extractMessagesFromStream
 
   // -----------------------------------------------------
   //
@@ -1321,7 +1315,7 @@
     // ON Data
     // -----------
     ircSocket.on('data', function(data) {
-      _dataEventHandler(ircSocket, data);
+      extractMessagesFromStream(ircSocket, data);
     });
 
     // -------------------------------------------
@@ -1536,25 +1530,48 @@
   // ------------------------------------------------------
   const messageHandler = function(req, res, next) {
     // console.log(req.body);
-    let message = req.body.message;
-    if (message.length > 0) {
-      if (message.length <= 512) {
-        // And parse for commands that change state or
-        // that require dummy server messages for cached display.
-        let parseResult = parseBrowserMessageForCommand(message);
-        if (parseResult.error) {
-          console.log(parseResult.message);
-          res.json({error: true, message: parseResult.message});
-        } else {
-          // Send browser message on to web server
-          _writeSocket(ircSocket, message);
-          res.json({error: false});
-        }
-      } else {
-        res.json({error: true, message: 'Message exceeds 512 character maximum length'});
-      }
+    if (!('message' in req.body)) {
+      console.log('messageHandler() IRC message not found in POST body');
+      let err = new Error('BAD REQUEST');
+      err.status = 400;
+      err.message = 'IRC message not found in POST body';
+      next(err);
+    } else if (!(typeof req.body.message === 'string')) {
+      console.log('messageHandler() IRC message expect type string');
+      let err = new Error('BAD REQUEST');
+      err.status = 400;
+      err.message = 'IRC message expect type=string';
+      next(err);
     } else {
-      res.json({error: true, message: 'Empty message'});
+      let messageBuf = Buffer.from(req.body.message, 'utf8');
+      if (!isValidUTF8(messageBuf)) {
+        console.log('messageHandler() IRC message failed UTF-8 validation');
+        res.json({error: true, message: 'IRC message failed UTF-8 validation'});
+      } else if (messageBuf.includes(0)) {
+        console.log('messageHandler() IRC message zero byte validation');
+        res.json({error: true, message: 'IRC message failed zero byte validation'});
+      } else if (messageBuf.length >= 512) {
+        console.log('messageHandler() IRC message exceeds 512 byte maximum length');
+        res.json({error: true, message: 'IRC message exceeds 512 byte maximum length'});
+      } else {
+        if (messageBuf.length === 0) {
+          console.log('messageHandler() Ignoring Empty message');
+          res.json({error: true, message: 'Ignoring Empty message'});
+        } else {
+          // And parse for commands that change state or
+          // that require dummy server messages for cached display.
+          let message = messageBuf.toString('utf8');
+          let parseResult = parseBrowserMessageForCommand(message);
+          if (parseResult.error) {
+            console.log(parseResult.message);
+            res.json({error: true, message: parseResult.message});
+          } else {
+            // Send browser message on to web server
+            _writeSocket(ircSocket, message);
+            res.json({error: false});
+          }
+        }
+      }
     }
   }; // messageHandler
 
@@ -1595,8 +1612,29 @@
   // Route: /cache
   // -----------------------------------------------
   const getCache = function(req, res, next) {
-    let outArray = ircMessageCache.allMessages();
-    res.json(outArray);
+    let cacheArrayOfBuffers = ircMessageCache.allMessages();
+    let outArray = [];
+    let err = false;
+    if (cacheArrayOfBuffers.length > 0) {
+      for (let i=0; i<cacheArrayOfBuffers.length; i++) {
+        if ((Buffer.isBuffer(cacheArrayOfBuffers[i])) &&
+          (isValidUTF8(cacheArrayOfBuffers[i])) &&
+          (!cacheArrayOfBuffers[i].includes(0))) {
+          outArray.push(cacheArrayOfBuffers[i].toString('utf8'));
+        } else {
+          err = true;
+        }
+      }
+    }
+    if (err) {
+      console.log('getCache() 422 Unprocessable Entity, cache contains malformed data');
+      let error = new Error('Unprocessable Entity');
+      error.status = 422;
+      error.message = 'Cache contains malformed data';
+      next(error);
+    } else {
+      res.json(outArray);
+    }
   };
 
   // -----------------------------------------------

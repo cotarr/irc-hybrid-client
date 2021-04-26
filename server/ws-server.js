@@ -39,25 +39,26 @@ wsServer.on('connection', function (socket) {
 // browser. It is global in scope.
 // ---------------------------------------
 global.sendToBrowser = function(message) {
+  if (message.length === 0) return;
   let out = null;
   if (typeof message === 'string') {
-    out = Buffer.from(message);
+    out = Buffer.from(message, 'utf8');
   }
   if (Buffer.isBuffer(message)) {
     out = message;
   }
   if (!isValidUTF8(out)) {
     out = null;
+    console.log('sendToBrowser() failed UTF-8 validtion');
+  }
+  // zero not allowed as avalid character
+  if (out.includes(0)) {
+    out = null;
+    console.log('sendToBrowser() failed zero byte validation');
   }
   if (out) {
-    if (Buffer.isBuffer(out)) out = message.toString();
     wsServer.clients.forEach(function (client) {
-      client.send(out.toString());
-    });
-  } else {
-    console.log('Error, sendToBrowser() failed UTF8 validtion');
-    wsServer.clients.forEach(function (client) {
-      client.send('webServer: sendToBrowser() failed UTF8 validation\n');
+      client.send(out.toString('utf8'));
     });
   }
 };

@@ -191,6 +191,7 @@ function _sendIrcServerMessage (message) {
       }
     })
     .catch( (error) => {
+      showError(error.toString());
       console.log(error);
     });
 } // _sendIrcServerMessage
