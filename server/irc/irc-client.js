@@ -23,6 +23,8 @@
 //
 //     Node/Express IRC Client backend for irc-hybrid-client
 //
+//                       M A I N   M O D U L E
+//
 // -----------------------------------------------------------------------------
 (function() {
   'use strict';
@@ -102,7 +104,7 @@
   ircLog.writeIrcLog('-----------------------------------------');
   ircLog.writeIrcLog('Starting ' + vars.ircState.botName + ' ' + vars.ircState.botVersion);
 
-  tellBrowserToRequestState = function() {
+  const tellBrowserToRequestState = function() {
     global.sendToBrowser('UPDATE\r\n');
   };
 

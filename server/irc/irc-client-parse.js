@@ -1,4 +1,37 @@
+// MIT License
+//
+// Copyright (c) 2021 Dave Bolenbaugh
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// -----------------------------------------------------------------------------
+//
+//              Parse Messages arriving from IRC Server
+//
+//  The primary purpose of this module is to decode server messages
+//  and adjust state variables in response to commands.
+//  Typical example would be JOIN, PART, NICK commands that impact
+//  a channel nicklist that is stored as a state variable.
+//
+// -----------------------------------------------------------------------------
 (function() {
+  'use strict';
+
   const ircCtcp = require('./irc-client-ctcp');
   const ircWrite = require('./irc-client-write');
   const ircLog = require('./irc-client-log');
@@ -6,7 +39,7 @@
   var ircMessageCache = require('./irc-client-cache');
   var vars = require('./irc-client-vars');
 
-  tellBrowserToRequestState = function() {
+  const tellBrowserToRequestState = function() {
     global.sendToBrowser('UPDATE\r\n');
   };
 

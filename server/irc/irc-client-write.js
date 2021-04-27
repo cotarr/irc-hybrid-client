@@ -1,4 +1,38 @@
+// MIT License
+//
+// Copyright (c) 2021 Dave Bolenbaugh
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// -----------------------------------------------------------------------------
+//
+//              Handle transmission of message toward IRC server
+//
+// -----------------------------------------------------------------------------
+//
+//  Some limited password filtering is included to keep credentials
+//  from the log file. Not all possible passwords are included
+//  in the filter.
+//
+// -----------------------------------------------------------------------------
 (function() {
+  'use strict';
+
   // ----------------------------------------------------
   // Write data to IRC server socket (Internal function)
   // Includes check of socket status
@@ -11,7 +45,7 @@
   const isValidUTF8 = require('utf-8-validate');
   var vars = require('./irc-client-vars');
 
-  writeSocket = function (socket, message) {
+  const writeSocket = function (socket, message) {
     if (message.length === 0) return;
     if ((socket) && (socket.writable)) {
       //

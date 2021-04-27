@@ -1,3 +1,29 @@
+// MIT License
+//
+// Copyright (c) 2021 Dave Bolenbaugh
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// -----------------------------------------------------------------------------
+//
+// User authentication and route authroization functions
+//
+// -----------------------------------------------------------------------------
 
 // wrap in function to limit namespace scope
 (function() {
@@ -129,7 +155,7 @@
         delete req.session.sessionAuth.user;
         delete req.session.sessionAuth.name;
         delete req.session.sessionAuth.userid;
-        delete req.session.sessionAuth.scopes;
+        // delete req.session.sessionAuth.scopes;
         delete req.session.sessionAuth.previousFailTimeSec;
         req.session.sessionAuth.authorized = false;
       }
@@ -296,7 +322,7 @@
             req.session.sessionAuth.user = userArray[userIndex].user;
             req.session.sessionAuth.name = userArray[userIndex].name;
             req.session.sessionAuth.userid = userArray[userIndex].userid;
-            req.session.sessionAuth.scopes = userArray[userIndex].scopes;
+            // req.session.sessionAuth.scopes = userArray[userIndex].scopes;
             req.session.sessionAuth.sessionExpireTimeSec = timeNowSeconds + sessionExpireAfterSec;
             _removeLoginNonceFromSession(req);
             //
@@ -428,7 +454,7 @@
       userInfo.user = req.session.sessionAuth.user;
       userInfo.name = req.session.sessionAuth.name;
       userInfo.userid = req.session.sessionAuth.userid;
-      userInfo.scopes = req.session.sessionAuth.scopes;
+      // userInfo.scopes = req.session.sessionAuth.scopes;
       res.json(userInfo);
     } else {
       res.status(404).send('404 Not Found');
