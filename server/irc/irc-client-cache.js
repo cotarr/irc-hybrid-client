@@ -63,7 +63,7 @@
   };
 
   const allMessages = function() {
-    outArray = [];
+    let outArray = [];
     let cacheOutPointer = cacheInPointer;
     for (let i=0; i<cacheSize; i++) {
       if ((cacheArray[cacheOutPointer]) && (cacheArray[cacheOutPointer].length > 0)) {

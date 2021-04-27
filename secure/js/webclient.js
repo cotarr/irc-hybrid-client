@@ -381,7 +381,7 @@ document.addEventListener('show-all-divs', function(event) {
   webState.wallopsOpen = true;
   document.getElementById('noticeSectionDiv').removeAttribute('hidden');
   document.getElementById('wallopsSectionDiv').removeAttribute('hidden');
-  document.getElementById('hiddenInfoDiv').removeAttribute('hidden');
+  // document.getElementById('hiddenInfoDiv').removeAttribute('hidden');
   document.getElementById('infoOpenCloseButton').textContent = '-';
 });
 

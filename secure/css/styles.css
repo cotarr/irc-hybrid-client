@@ -155,6 +155,11 @@ button[disabled] {
   margin-right: 6px;
 }
 
+.connect-section-div {
+  background-color: #b8f5ff;
+}
+
+
 .debug-div-time {
   background-color: white;
   border: 1px solid black;
@@ -248,7 +253,7 @@ button[disabled] {
 }
 
 .notice-section-div {
-  background-color:#ebad57;
+  background-color: #fada9d;
 }
 
 .priv-msg-section-div {
@@ -315,5 +320,5 @@ button[disabled] {
 .vh20 {height: 20px;}
 
 .wallops-section-div {
-  background-color: yellow;
+  background-color: #effcae;
 }
