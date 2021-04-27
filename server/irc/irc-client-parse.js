@@ -10,11 +10,14 @@
     global.sendToBrowser('UPDATE\r\n');
   };
 
-  //
+  // ----------------------------------------------------------------
   // Internal function to parse one line of message from IRC server
-  // Returns jason object with prefix, command and params array
   //
-  const _parseIrcMessage = function (message) {
+  // Input: Accepts a node.js UTF-8 encoded Buffer object
+  //
+  // Returns: jason object with prefix, command and params array
+  // ----------------------------------------------------------------
+  const _parseIrcMessage = function (messageBuffer) {
     // ----------------------------
     //  Internal functions
     // ----------------------------
@@ -24,8 +27,9 @@
     //   :prefix command param1 param2 .... :lastParam
     //  ===                                ===
     //
-    function _isColonString (start, messageString) {
-      if (messageString.charAt(start) === ':') {
+    function _isColonString (start, messageBuffer) {
+      // ASCII 58 is colon character
+      if (messageBuffer.readUInt8(start) === 58) {
         return {
           isColonStr: true,
           nextIndex: start + 1
@@ -43,12 +47,15 @@
     // :prefix command param1 param2 .... :lastParam
     //         ======= ====== ======
     //
-    function _extractMidString(start, end, messageString) {
+    function _extractMidString(start, end, messageBuffer) {
       let i = start;
       let outString = '';
-      while ((messageString.charAt(i) !== ' ') && (i <= end)) {
-        outString += messageString.charAt(i);
+      // ASCII 20 is space character
+      while ((i <= end) && (messageBuffer.readUInt8(i) !== 32)) {
         i++;
+      }
+      if (i > start) {
+        outString = messageBuffer.slice(start, i).toString('utf8');
       }
       if (outString.length === 0) outString = null;
       return {
@@ -62,12 +69,14 @@
     // :prefix command param1 param2 .... :lastParam
     //                                     =========
     //
-    function _extractFinalString(start, end, messageString) {
+    function _extractFinalString(start, end, messageBuffer) {
       let i = start;
       let outString = '';
       while (i <= end) {
-        outString += messageString.charAt(i);
         i++;
+      }
+      if (i > start) {
+        outString = messageBuffer.slice(start, i).toString('utf8');
       }
       if (outString.length === 0) outString = null;
       return {
@@ -126,21 +135,20 @@
     let params = [];
     //
     // Parsing variables
-    let messageString = message.toString();
-    let end = messageString.length - 1;
+    let end = messageBuffer.length - 1;
     let temp = {nextIndex: 0};
 
     // 1) Check if prefix exist, if exit parse value, return nextIndex
-    temp = _isColonString(temp.nextIndex, messageString);
+    temp = _isColonString(temp.nextIndex, messageBuffer);
     if (temp.isColonStr) {
-      temp = _extractMidString(temp.nextIndex, end, messageString);
+      temp = _extractMidString(temp.nextIndex, end, messageBuffer);
       prefix = temp.data;
       extNick = _extractNickname(temp.data);
       extHost = _extractHostname(temp.data);
     }
 
     // 2) extract command string
-    temp = _extractMidString(temp.nextIndex, end, messageString);
+    temp = _extractMidString(temp.nextIndex, end, messageBuffer);
     command = temp.data;
 
     // 3) Extract optional params, in loop, until all params extracted.
@@ -149,15 +157,15 @@
       if (temp.nextIndex > end) {
         done = true;
       } else {
-        temp = _isColonString(temp.nextIndex, messageString);
+        temp = _isColonString(temp.nextIndex, messageBuffer);
         if (temp.isColonStr) {
           // case of colon string, this is last param
-          temp = _extractFinalString(temp.nextIndex, end, messageString);
+          temp = _extractFinalString(temp.nextIndex, end, messageBuffer);
           params.push(temp.data);
           done = true;
         } else {
           // else not colon string, must be middle param string
-          temp = _extractMidString(temp.nextIndex, end, messageString);
+          temp = _extractMidString(temp.nextIndex, end, messageBuffer);
           if ((temp.data) && (temp.data.length > 0)) {
             params.push(temp.data);
           } else {
@@ -248,6 +256,126 @@
     } // next i
   }; // parseChannelModeChanges()
 
+  // -------------------------------------------
+  // cycle through all channels and replace
+  // the new nickname, preserving op character
+  // -------------------------------------------
+  function _exchangeNames(oldNick, newNick) {
+    if (!newNick) return;
+    if (newNick.length < 1) return;
+    if (!oldNick) return;
+    if (oldNick.length < 1) return;
+    if (vars.ircState.channels.length === 0) return;
+
+    // There should be no operator characters, but check and strip them if they are there
+    let pureOldNick = oldNick;
+    if (vars.nicknamePrefixChars.indexOf(pureOldNick.charAt(0)) >= 0) {
+      pureOldNick = pureOldNick.slice(1, pureOldNick.length);
+    }
+    let pureNewNick = newNick;
+    if (vars.nicknamePrefixChars.indexOf(pureNewNick.charAt(0)) >= 0) {
+      pureNewNick = pureNewNick.slice(1, pureNewNick.length);
+    }
+    // ci = channel index into channels array
+    for (let ci=0; ci<vars.ircState.channels.length; ci++) {
+      let nickCount = vars.ircState.channelStates[ci].names.length;
+      if (nickCount > 0) {
+        let matchIndex = -1;
+        let opChar = '';
+        for (let i=0; i<nickCount; i++) {
+          let pureNick = vars.ircState.channelStates[ci].names[i];
+          let tempOpChar = '';
+          if (vars.nicknamePrefixChars.indexOf(pureNick.charAt(0)) >= 0) {
+            tempOpChar = pureNick.charAt(0);
+            pureNick = pureNick.slice(1, pureNick.length);
+          }
+          if (pureOldNick === pureNick) {
+            matchIndex = i;
+            opChar = tempOpChar;
+          }
+        } // next i
+        if (matchIndex >= 0) {
+          vars.ircState.channelStates[ci].names[matchIndex] = opChar + newNick;
+        }
+      }
+    } // next ci
+    return;
+  } // _exchangeNames()
+
+  // --------------------------------------------------------------
+  // Add a nicname to channel array list
+  // If op or voice (@,+) not match, then update the existing name
+  // --------------------------------------------------------------
+  function _addName(newNick, channel) {
+    if (!newNick) return;
+    if (newNick.length < 1) return;
+    // console.log('Adding ' + newNick + ' to ' + channel);
+    let channelIndex = vars.ircState.channels.indexOf(channel.toLowerCase());
+    if (channelIndex >= 0) {
+      let nickCount = vars.ircState.channelStates[channelIndex].names.length;
+      if (nickCount > 0) {
+        let matchIndex = -1;
+        let opChar = '';
+        let pureNewNick = newNick;
+        if (vars.nicknamePrefixChars.indexOf(pureNewNick.charAt(0)) >= 0) {
+          pureNewNick = pureNewNick.slice(1, pureNewNick.length);
+        }
+        for (let i=0; i<nickCount; i++) {
+          let pureNick = vars.ircState.channelStates[channelIndex].names[i];
+          if (vars.nicknamePrefixChars.indexOf(pureNick.charAt(0)) >= 0) {
+            opChar = pureNick.charAt(0);
+            pureNick = pureNick.slice(1, pureNick.length);
+          }
+          if (pureNewNick === pureNick) matchIndex = i;
+        }
+        if (matchIndex >= 0) {
+          // case of name exist, if @ or + prefix not match replace entire string
+          if (vars.ircState.channelStates[channelIndex].names[matchIndex] !== newNick) {
+            vars.ircState.channelStates[channelIndex].names[matchIndex] = newNick;
+          }
+        } else {
+          // case of nick not in list, add it
+          vars.ircState.channelStates[channelIndex].names.push(newNick);
+        }
+      } else {
+        // case of empty list, add as first nick name
+        vars.ircState.channelStates[channelIndex].names.push(newNick);
+      }
+    }
+    return;
+  } // _addName()
+
+  // ---------------------------------------------
+  // Remove a nicname to channel array list
+  // Ignore op or voice (@,+) when removing
+  // ---------------------------------------------
+  function _removeName(oldNick, channel) {
+    // console.log('Removing ' + oldNick + ' from ' + channel);
+    let channelIndex = vars.ircState.channels.indexOf(channel.toLowerCase());
+    if (channelIndex >= 0) {
+      let nickCount = vars.ircState.channelStates[channelIndex].names.length;
+      if (nickCount > 0) {
+        let matchIndex = -1;
+        let pureOldNick = oldNick;
+        if (vars.nicknamePrefixChars.indexOf(pureOldNick.charAt(0)) >= 0) {
+          pureOldNick = pureOldNick.slice(1, pureOldNick.length);
+        }
+        for (let i=0; i<nickCount; i++) {
+          let pureNick = vars.ircState.channelStates[channelIndex].names[i];
+          if (vars.nicknamePrefixChars.indexOf(pureNick.charAt(0)) >= 0) {
+            pureNick = pureNick.slice(1, pureNick.length);
+          }
+          // console.log('pureOldNick pureNick' + pureOldNick + ' ' + pureNick);
+          if (pureOldNick === pureNick) matchIndex = i;
+        }
+        if (matchIndex >= 0) {
+          vars.ircState.channelStates[channelIndex].names.splice(matchIndex, 1);
+        }
+      }
+    }
+    return;
+  } // _removeName()
+
   //-----------------------------------------------------------------
   //
   //  I R C   M E S S A G E   C O M M A N D   P A R S E R
@@ -255,12 +383,14 @@
   //  irc-server --> [THIS PARSER] --> web-serve --> web-browser
   //
   // Single message line from IRC server, parsed for command actions
+  //
+  // Input: Node.js UTF-8 encoded Buffer object
   //-----------------------------------------------------------------
-  const _processIrcMessage = function (socket, message) {
+  const _processIrcMessage = function (socket, messageBuffer) {
     //
     // parse message into: prefix, command, and param array
     //
-    let parsedMessage = _parseIrcMessage(message);
+    let parsedMessage = _parseIrcMessage(messageBuffer);
     // console.log('(IRC-->) parsedMessage ' + JSON.stringify(parsedMessage, null, 2));
 
     // Do not process excluded commands on this list
@@ -277,11 +407,11 @@
         if (excludedCommands.indexOf('PING') <0) {
           ircMessageCache.addMessage(Buffer.concat([
             Buffer.from(vars.timestamp() + ' '),
-            message
+            messageBuffer
           ]));
           global.sendToBrowser(Buffer.concat([
             Buffer.from(vars.timestamp() + ' '),
-            message,
+            messageBuffer,
             Buffer.from('\r\n')
           ]));
         }
@@ -305,135 +435,21 @@
     //
     ircMessageCache.addMessage(Buffer.concat([
       Buffer.from(vars.timestamp() + ' '),
-      message
+      messageBuffer
     ]));
     global.sendToBrowser(Buffer.concat([
       Buffer.from(vars.timestamp() + ' '),
-      message,
+      messageBuffer,
       Buffer.from('\r\n')
     ]));
     //
     // Send to log file (send message as utf8 Buffer)
     //
-    ircLog.writeIrcLog(message);
+    ircLog.writeIrcLog(messageBuffer);
 
-    // cycle through all channels and replace
-    // the new nickname, preserving op character
-    function _exchangeNames(oldNick, newNick) {
-      if (!newNick) return;
-      if (newNick.length < 1) return;
-      if (!oldNick) return;
-      if (oldNick.length < 1) return;
-      if (vars.ircState.channels.length === 0) return;
-
-      // There should be no operator characters, but check and strip them if they are there
-      let pureOldNick = oldNick;
-      if (vars.nicknamePrefixChars.indexOf(pureOldNick.charAt(0)) >= 0) {
-        pureOldNick = pureOldNick.slice(1, pureOldNick.length);
-      }
-      let pureNewNick = newNick;
-      if (vars.nicknamePrefixChars.indexOf(pureNewNick.charAt(0)) >= 0) {
-        pureNewNick = pureNewNick.slice(1, pureNewNick.length);
-      }
-      // ci = channel index into channels array
-      for (let ci=0; ci<vars.ircState.channels.length; ci++) {
-        let nickCount = vars.ircState.channelStates[ci].names.length;
-        if (nickCount > 0) {
-          let matchIndex = -1;
-          let opChar = '';
-          for (let i=0; i<nickCount; i++) {
-            let pureNick = vars.ircState.channelStates[ci].names[i];
-            let tempOpChar = '';
-            if (vars.nicknamePrefixChars.indexOf(pureNick.charAt(0)) >= 0) {
-              tempOpChar = pureNick.charAt(0);
-              pureNick = pureNick.slice(1, pureNick.length);
-            }
-            if (pureOldNick === pureNick) {
-              matchIndex = i;
-              opChar = tempOpChar;
-            }
-          } // next i
-          if (matchIndex >= 0) {
-            vars.ircState.channelStates[ci].names[matchIndex] = opChar + newNick;
-          }
-        }
-      } // next ci
-      return;
-    } // _exchangeNames()
-
-    // Add a nicname to channel array list
-    // If op or voice (@,+) not match, then update the existing name
-    function _addName(newNick, channel) {
-      if (!newNick) return;
-      if (newNick.length < 1) return;
-      // console.log('Adding ' + newNick + ' to ' + channel);
-      let channelIndex = vars.ircState.channels.indexOf(channel.toLowerCase());
-      if (channelIndex >= 0) {
-        let nickCount = vars.ircState.channelStates[channelIndex].names.length;
-        if (nickCount > 0) {
-          let matchIndex = -1;
-          let opChar = '';
-          let pureNewNick = newNick;
-          if (vars.nicknamePrefixChars.indexOf(pureNewNick.charAt(0)) >= 0) {
-            pureNewNick = pureNewNick.slice(1, pureNewNick.length);
-          }
-          for (let i=0; i<nickCount; i++) {
-            let pureNick = vars.ircState.channelStates[channelIndex].names[i];
-            if (vars.nicknamePrefixChars.indexOf(pureNick.charAt(0)) >= 0) {
-              opChar = pureNick.charAt(0);
-              pureNick = pureNick.slice(1, pureNick.length);
-            }
-            if (pureNewNick === pureNick) matchIndex = i;
-          }
-          if (matchIndex >= 0) {
-            // case of name exist, if @ or + prefix not match replace entire string
-            if (vars.ircState.channelStates[channelIndex].names[matchIndex] !== newNick) {
-              vars.ircState.channelStates[channelIndex].names[matchIndex] = newNick;
-            }
-          } else {
-            // case of nick not in list, add it
-            vars.ircState.channelStates[channelIndex].names.push(newNick);
-          }
-        } else {
-          // case of empty list, add as first nick name
-          vars.ircState.channelStates[channelIndex].names.push(newNick);
-        }
-      }
-      return;
-    } // _addName()
-
-    // Remove a nicname to channel array list
-    // Ignore op or voice (@,+) when removing
-    function _removeName(oldNick, channel) {
-      // console.log('Removing ' + oldNick + ' from ' + channel);
-      let channelIndex = vars.ircState.channels.indexOf(channel.toLowerCase());
-      if (channelIndex >= 0) {
-        let nickCount = vars.ircState.channelStates[channelIndex].names.length;
-        if (nickCount > 0) {
-          let matchIndex = -1;
-          let pureOldNick = oldNick;
-          if (vars.nicknamePrefixChars.indexOf(pureOldNick.charAt(0)) >= 0) {
-            pureOldNick = pureOldNick.slice(1, pureOldNick.length);
-          }
-          for (let i=0; i<nickCount; i++) {
-            let pureNick = vars.ircState.channelStates[channelIndex].names[i];
-            if (vars.nicknamePrefixChars.indexOf(pureNick.charAt(0)) >= 0) {
-              pureNick = pureNick.slice(1, pureNick.length);
-            }
-            // console.log('pureOldNick pureNick' + pureOldNick + ' ' + pureNick);
-            if (pureOldNick === pureNick) matchIndex = i;
-          }
-          if (matchIndex >= 0) {
-            vars.ircState.channelStates[channelIndex].names.splice(matchIndex, 1);
-          }
-        }
-      }
-      return;
-    } // _removeName()
-
-    //
-    // Decoding complete, Parse commands
-    //
+    // -------------------------------------------------
+    // Individual ommands from IRC server are parsed here
+    // -------------------------------------------------
     switch(parsedMessage.command) {
       case '001':
         // case of successful register with nickname, set registered state
@@ -580,7 +596,7 @@
         break;
       //
       case 'ERROR':
-        console.log(message.toString('utf8'));
+        console.log(messageBuffer.toString('utf8'));
         tellBrowserToRequestState();
         break;
       //

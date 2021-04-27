@@ -183,7 +183,11 @@
           let message = Buffer.from(data.slice(index, index + count));
           // 512 btye maximum size from RFC 2812 2.3 Messages
           if ((Buffer.isBuffer(message)) && (message.length <= 512)) {
+            //
+            // This is one CR-LF terminated IRC server message
+            //
             ircParse._processIrcMessage(socket, message);
+            //
           } else {
             console.log('Error, extracted message exceeds max length of 512 btyes');
           }
