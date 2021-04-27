@@ -6,6 +6,9 @@
 
   module.exports = {
     ircState: {},
+    ircServerPassword: null,
+    nsIdentifyNick: null,
+    nsIdentifyCommand: null,
     channelPrefixChars: '@#+!',
     channelUserModeChars: 'qaohv',
     nicknamePrefixChars: '~&@%+',

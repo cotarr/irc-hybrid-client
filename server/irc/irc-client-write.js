@@ -16,7 +16,7 @@
     if ((socket) && (socket.writable)) {
       //
       // First, filter passwords, then send to browser and write log file
-      // The filter only applies to log rile and browser.
+      // The filter only applies to log file and browser.
       // Messages to IRC server are not filtered.
       //
       let filterWords = [
@@ -64,18 +64,18 @@
       }
       if (!isValidUTF8(out)) {
         out = null;
-        console.log('_writeSocket failed UTF-8 validation');
+        console.log('_writeSocket() failed UTF-8 validation');
       }
       // RFC 2812 does not allow zero character
       if (out.includes(0)) {
         out = null;
-        console.log('_writeSocket failed zero byte validation');
+        console.log('_writeSocket() failed zero byte validation');
       }
       // 512 btye maximum size from RFC 2812 Section 2.3 Messages
       // It is assumed here this means 8 bit types not multi-byte characters
       if (out.length > 512) {
         out = null;
-        console.log('_writeSocket send buffer exceeds 512 character limit.');
+        console.log('_writeSocket() send buffer exceeds 512 character limit.');
       }
       //
       // Third, send into socket to IRC server
@@ -85,7 +85,7 @@
       }
     } else {
       // TODO should this disconnect?
-      console.log('_writeSocket server socket not writable');
+      console.log('_writeSocket() server socket not writable');
     }
   }; // _writeSocket
 
