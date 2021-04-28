@@ -46,6 +46,8 @@
 const channelPrefixChars = '@#+!';
 const nicknamePrefixChars = '~&@%+';
 const nickChannelSpacer = ' | ';
+// Time during which incoming messages do not trigger activity icon
+const activityIconInhibitTimerValue = 10;
 
 // ----------------------------------------------------------
 // Do not edit ircState, represents state on web server end
@@ -258,6 +260,71 @@ function checkConnect(code) {
   return true;
 }
 
+// ----------------------------------------------
+// Functions to handle activity indicator icons
+// ----------------------------------------------
+function setNotActivityIcon(index) {
+  document.getElementById('notMsgIconId').removeAttribute('hidden');
+}
+// -1 indicates icon is available to be shown
+var lastPmActivityIconIndex = -1;
+function setPmActivityIcon(index) {
+  if (lastPmActivityIconIndex === -1) {
+    lastPmActivityIconIndex = index;
+    document.getElementById('pmMsgIconId').removeAttribute('hidden');
+  }
+  // else ignore request
+}
+// -1 indicates icon is available to be shown
+var lastChanActivityIconIndex = -1;
+function setChanActivityIcon(index) {
+  if (lastChanActivityIconIndex === -1) {
+    lastChanActivityIconIndex = index;
+    document.getElementById('chanMsgIconId').removeAttribute('hidden');
+  }
+  // else ignore request
+}
+function resetNotActivityIcon(index) {
+  document.getElementById('notMsgIconId').setAttribute('hidden', '');
+}
+function resetPmActivityIcon(index) {
+  if (index === -1) {
+    // code -1 match any channel
+    lastPmActivityIconIndex = -1;
+    document.getElementById('pmMsgIconId').setAttribute('hidden', '');
+  } else if (index === lastPmActivityIconIndex) {
+    // Channel can only clear own icon
+    lastPmActivityIconIndex = -1;
+    document.getElementById('pmMsgIconId').setAttribute('hidden', '');
+  }
+  // else ignore request
+}
+function resetChanActivityIcon(index) {
+  if (index === -1) {
+    // code -1 match any channel
+    lastChanActivityIconIndex = -1;
+    document.getElementById('chanMsgIconId').setAttribute('hidden', '');
+  } else if (index === lastChanActivityIconIndex) {
+    // Channel can only clear own icon
+    lastChanActivityIconIndex = -1;
+    document.getElementById('chanMsgIconId').setAttribute('hidden', '');
+  }
+  // else ignore request
+}
+// --------------------------
+// Clear message activity ICONs by tapping icon
+// --------------------------
+document.getElementById('notMsgIconId').addEventListener('click', function() {
+  resetNotActivityIcon();
+}.bind(this));
+document.getElementById('pmMsgIconId').addEventListener('click', function() {
+  resetPmActivityIcon(-1);
+}.bind(this));
+document.getElementById('chanMsgIconId').addEventListener('click', function() {
+  resetChanActivityIcon(-1);
+}.bind(this));
+
+
 // --------------------------------------------------------------
 // Single function to visibility of all display divs on the page
 // --------------------------------------------------------------
@@ -319,6 +386,9 @@ function updateDivVisibility() {
         document.getElementById('ircConnectIconId').removeAttribute('connecting');
         document.getElementById('ircConnectIconId').removeAttribute('connected');
       }
+      resetNotActivityIcon();
+      resetPmActivityIcon(-1);
+      resetChanActivityIcon(-1);
       document.getElementById('ircIsAwayIconId').setAttribute('hidden', '');
       document.getElementById('hideLoginSection').removeAttribute('hidden');
       document.getElementById('hideLoginSectionButton').textContent = '-';
@@ -351,6 +421,9 @@ function updateDivVisibility() {
       document.getElementById('webConnectIconId').removeAttribute('connected');
       document.getElementById('webConnectIconId').removeAttribute('connecting');
     }
+    resetNotActivityIcon();
+    resetPmActivityIcon(-1);
+    resetChanActivityIcon(-1);
     document.getElementById('ircConnectIconId').setAttribute('unavailable', '');
     document.getElementById('ircConnectIconId').removeAttribute('connected');
     document.getElementById('ircConnectIconId').removeAttribute('connecting');

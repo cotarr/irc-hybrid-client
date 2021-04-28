@@ -358,7 +358,7 @@ function displayNoticeMessage(parsedMessage) {
           // If NOT reload from cache in progress (timer not zero)
           // then display incoming message activity icon
           if (webState.cacheInhibitTimer === 0) {
-            document.getElementById('notMsgIconId').removeAttribute('hidden');
+            setNotActivityIcon();
           }
         } else if (ircState.channels.indexOf(parsedMessage.params[0].toLowerCase()) >= 0) {
           // case of notice to #channel
@@ -773,6 +773,10 @@ function updateFromCache () {
   // Timer down counter to disable
   // prase events during reload (beeps and activity icons)
   webState.cacheInhibitTimer = 3;
+  // Clear activity icons
+  resetNotActivityIcon();
+  resetPmActivityIcon(-1);
+  resetChanActivityIcon(-1);
   // Fire event to clear previous contents
   // TODO this is async, could clear after fetch
   document.dispatchEvent(new CustomEvent('erase-before-reload',

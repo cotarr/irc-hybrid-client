@@ -39,8 +39,6 @@ function _sendPrivMessageToUser(targetNickname, textAreaEl) {
       ' :' + text;
     _sendIrcServerMessage(message);
     textAreaEl.value = '';
-    // Clear message activity icon in status bar
-    document.getElementById('pmMsgIconId').setAttribute('hidden', '');
   }
 }; // _sendPrivMessageToUser
 
@@ -174,6 +172,16 @@ function createPrivateMessageEl (name, parsedMessage) {
   privMsgTextAreaEl.scrollTop = privMsgTextAreaEl.scrollHeight;
 
   // --------------------------
+  // PM specific timers
+  // --------------------------
+
+  // inhibit timer to prevent display of activity icon
+  var activityIconInhibitTimer = 0;
+  setInterval(function() {
+    if (activityIconInhibitTimer > 0) activityIconInhibitTimer--;
+  }.bind(this), 1000);
+
+  // --------------------------
   // Private Message Event listeners
   // ---------------------------
 
@@ -264,6 +272,8 @@ function createPrivateMessageEl (name, parsedMessage) {
   // -------------
   privMsgSendButtonEl.addEventListener('click', function() {
     _sendPrivMessageToUser(name, privMsgInputAreaEl);
+    resetPmActivityIcon(privMsgIndex);
+    activityIconInhibitTimer = activityIconInhibitTimerValue;
   }.bind(this));
 
   // ---------------
@@ -273,6 +283,8 @@ function createPrivateMessageEl (name, parsedMessage) {
     if (((event.inputType === 'insertText') && (event.data === null)) ||
       (event.inputType === 'insertLineBreak')) {
       _sendPrivMessageToUser(name, privMsgInputAreaEl);
+      resetPmActivityIcon(privMsgIndex);
+      activityIconInhibitTimer = activityIconInhibitTimerValue;
     }
   }.bind(this));
 
@@ -281,7 +293,8 @@ function createPrivateMessageEl (name, parsedMessage) {
   // dynamically created private message window
   // -------------------------------------------------
   privMsgSectionEl.addEventListener('click', function() {
-    document.getElementById('pmMsgIconId').setAttribute('hidden', '');
+    resetPmActivityIcon(privMsgIndex);
+    activityIconInhibitTimer = activityIconInhibitTimerValue;
   }.bind(this));
 
 
@@ -342,8 +355,9 @@ function createPrivateMessageEl (name, parsedMessage) {
             // then display incoming message activity icon
             if ((document.activeElement !== privMsgInputAreaEl) &&
             (document.activeElement !== privMsgSendButtonEl) &&
-            (webState.cacheInhibitTimer === 0)) {
-              document.getElementById('pmMsgIconId').removeAttribute('hidden');
+            (webState.cacheInhibitTimer === 0) &&
+            (activityIconInhibitTimer === 0)) {
+              setPmActivityIcon(privMsgIndex);
             }
           }
         }
@@ -351,6 +365,11 @@ function createPrivateMessageEl (name, parsedMessage) {
       default:
     }
   });
+
+  // PM to be made visible on opening a new window (except on refresh)
+  if (webState.cacheInhibitTimer === 0) {
+    setPmActivityIcon(privMsgIndex);
+  }
 
   // Do this when creating the PM element for this user.
   // Show control window, so open/close buttons are in sync
@@ -364,21 +383,6 @@ function createPrivateMessageEl (name, parsedMessage) {
   webState.resizableSendButtonPMTextareaIds.push(privMsgInputAreaId);
   document.dispatchEvent(new CustomEvent('element-resize', {bubbles: true}));
 };
-
-// --------------------------
-// Clear message actvity ICON by tapping icon
-// --------------------------
-document.getElementById('pmMsgIconId').addEventListener('click', function() {
-  document.getElementById('pmMsgIconId').setAttribute('hidden', '');
-}.bind(this));
-
-// -------------------------------
-// Clear message activity ICON by clickin gon the main PM
-// control Section
-// -------------------------------
-document.getElementById('privMsgSectionDiv').addEventListener('click', function() {
-  document.getElementById('pmMsgIconId').setAttribute('hidden', '');
-}.bind(this));
 
 // ----------------------------------------------------------
 // Private message handler (create new window if message)
@@ -399,10 +403,6 @@ document.addEventListener('private-message', function(event) {
   //
   if (webState.activePrivateMessageNicks.indexOf(name.toLowerCase()) < 0) {
     createPrivateMessageEl(name, event.detail.parsedMessage);
-    // PM Icon visible, but not during refresh
-    if (webState.cacheInhibitTimer === 0) {
-      document.getElementById('pmMsgIconId').removeAttribute('hidden');
-    }
   }
 });
 

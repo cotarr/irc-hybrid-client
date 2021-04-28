@@ -28,12 +28,12 @@ function connectWebSocket () {
 
   // Counter to avoid duplication of websockets
   webState.websocketCount++;
-  console.log('Creating new websocket, count: ' + webState.websocketCount);
+  // console.log('Creating new websocket, count: ' + webState.websocketCount);
   // -----------------------
   // On Open event handler
   // -----------------------
   wsocket.addEventListener('open', function (event) {
-    console.log('Websocket open, count: ' + webState.websocketCount);
+    // console.log('Websocket open, count: ' + webState.websocketCount);
     webState.webConnected = true;
     webState.webConnecting = false;
     webState.times.webConnect = timestamp();
@@ -59,8 +59,8 @@ function connectWebSocket () {
     // then we are not reconnected, and must set the state to not-connected.
     if (webState.websocketCount > 0) {
       webState.websocketCount--;
-      console.log('Websocket closed, count: ' + webState.websocketCount +
-      ' code: ' + event.code + ' ' + event.reason);
+      // console.log('Websocket closed, count: ' + webState.websocketCount +
+      // ' code: ' + event.code + ' ' + event.reason);
       if (webState.websocketCount === 0) {
         if (webState.webConnected) {
           if (('code' in event) && (event.code === 3001)) {

@@ -40,10 +40,8 @@ function _sendTextToChannel(channelIndex, textAreaEl) {
       ' :' + text;
     _sendIrcServerMessage(message);
     textAreaEl.value = '';
-    // Clear message activity icon in status bar
-    document.getElementById('chanMsgIconId').setAttribute('hidden', '');
   }
-};
+}; // _sendTextToChannel
 
 function createChannelEl (name) {
   // if channel already exist abort
@@ -282,6 +280,16 @@ function createChannelEl (name) {
   channelContainerDivEl.appendChild(channelMainSectionEl);
 
   // --------------------------
+  // Channel specific timers
+  // --------------------------
+
+  // inhibit timer to prevent display of activity icon
+  var activityIconInhibitTimer = 0;
+  setInterval(function() {
+    if (activityIconInhibitTimer > 0) activityIconInhibitTimer--;
+  }.bind(this), 1000);
+
+  // --------------------------
   // Channel Event listeners
   // ---------------------------
 
@@ -307,7 +315,7 @@ function createChannelEl (name) {
     let newRows = parseInt(channelTextAreaEl.getAttribute('rows')) + 10;
     channelTextAreaEl.setAttribute('rows', newRows.toString());
     channelNamesDisplayEl.setAttribute('rows', newRows.toString());
-  });
+  }); // createChannelEl()
 
   // -------------------------
   // Normal button handler
@@ -375,6 +383,8 @@ function createChannelEl (name) {
   // -------------
   channelSendButtonEl.addEventListener('click', function() {
     _sendTextToChannel(channelIndex, channelInputAreaEl);
+    resetChanActivityIcon(channelIndex);
+    activityIconInhibitTimer = activityIconInhibitTimerValue;
   }.bind(this));
 
   // ---------------
@@ -384,6 +394,8 @@ function createChannelEl (name) {
     if (((event.inputType === 'insertText') && (event.data === null)) ||
       (event.inputType === 'insertLineBreak')) {
       _sendTextToChannel(channelIndex, channelInputAreaEl);
+      resetChanActivityIcon(channelIndex);
+      activityIconInhibitTimer = activityIconInhibitTimerValue;
     }
   }.bind(this));
 
@@ -392,7 +404,8 @@ function createChannelEl (name) {
   // dynamically created channel message window
   // -------------------------------------------------
   channelMainSectionEl.addEventListener('click', function() {
-    document.getElementById('chanMsgIconId').setAttribute('hidden', '');
+    resetChanActivityIcon(channelIndex);
+    activityIconInhibitTimer = activityIconInhibitTimerValue;
   }.bind(this));
 
   function updateVisibility() {
@@ -850,8 +863,9 @@ function createChannelEl (name) {
           // then display incoming message activity icon
           if ((document.activeElement !== channelInputAreaEl) &&
           (document.activeElement !== channelSendButtonEl) &&
-          (webState.cacheInhibitTimer === 0)) {
-            document.getElementById('chanMsgIconId').removeAttribute('hidden');
+          (webState.cacheInhibitTimer === 0) &&
+          (activityIconInhibitTimer === 0)) {
+            setChanActivityIcon(channelIndex);
           }
         }
         break;
@@ -899,8 +913,9 @@ function createChannelEl (name) {
           // then display incoming message activity icon
           if ((document.activeElement !== channelInputAreaEl) &&
           (document.activeElement !== channelSendButtonEl) &&
-          (webState.cacheInhibitTimer === 0)) {
-            document.getElementById('chanMsgIconId').removeAttribute('hidden');
+          (webState.cacheInhibitTimer === 0) &&
+          (activityIconInhibitTimer === 0)) {
+            setChanActivityIcon(channelIndex);
           }
         }
         break;
@@ -969,21 +984,6 @@ function createChannelEl (name) {
   webState.resizableChanSplitTextareaIds.push(channelTextAreaId);
   document.dispatchEvent(new CustomEvent('element-resize', {bubbles: true}));
 };
-
-// --------------------------
-// Clear message activity ICON by tapping icon
-// --------------------------
-document.getElementById('chanMsgIconId').addEventListener('click', function() {
-  document.getElementById('chanMsgIconId').setAttribute('hidden', '');
-}.bind(this));
-
-// -------------------------------
-// Clear message actvity ICON by clicking on
-// the main channel menu Section
-// -------------------------------
-document.getElementById('channelMenuDiv').addEventListener('click', function() {
-  document.getElementById('chanMsgIconId').setAttribute('hidden', '');
-}.bind(this));
 
 // ----------------------------------------------------------------------
 // A change in state occurred, check if new channel need to be created.
