@@ -34,6 +34,21 @@ document.getElementById('noticeNormalButton').addEventListener('click', function
   document.getElementById('noticeMessageDisplay').setAttribute('rows', '5');
 }.bind(this));
 
+// --------------------------
+// Clear message actvity ICON by tapping icon
+// --------------------------
+document.getElementById('notMsgIconId').addEventListener('click', function() {
+  document.getElementById('notMsgIconId').setAttribute('hidden', '');
+}.bind(this));
+
+// -------------------------------
+// Clear message activity ICON by clickin gon the main
+// notice window Section
+// -------------------------------
+document.getElementById('noticeSectionDiv').addEventListener('click', function() {
+  document.getElementById('notMsgIconId').setAttribute('hidden', '');
+}.bind(this));
+
 // -------------------------------------
 // Wallops Close Buttons
 // -------------------------------------

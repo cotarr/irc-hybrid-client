@@ -353,6 +353,13 @@ function displayNoticeMessage(parsedMessage) {
            parsedMessage.params[1]);
           webState.noticeOpen = true;
           updateDivVisibility();
+
+          // Message activity Icon
+          // If NOT reload from cache in progress (timer not zero)
+          // then display incoming message activity icon
+          if (webState.cacheInhibitTimer === 0) {
+            document.getElementById('notMsgIconId').removeAttribute('hidden');
+          }
         } else if (ircState.channels.indexOf(parsedMessage.params[0].toLowerCase()) >= 0) {
           // case of notice to #channel
           document.dispatchEvent(new CustomEvent('channel-message',
@@ -763,6 +770,9 @@ function _parseBufferMessage (message) {
 // the message were real time.
 // -------------------------------------------------
 function updateFromCache () {
+  // Timer down counter to disable
+  // prase events during reload (beeps and activity icons)
+  webState.cacheInhibitTimer = 3;
   // Fire event to clear previous contents
   // TODO this is async, could clear after fetch
   document.dispatchEvent(new CustomEvent('erase-before-reload',
@@ -829,7 +839,9 @@ function updateFromCache () {
     });
 }; // updateFromCache;
 window.addEventListener('update-from-cache', function(event) {
-  // inhibit beep for 5 seconds to avoid beeping on reloaded text.
-  inhibitBeep(5);
   updateFromCache();
 }.bind(this));
+
+function cacheInhibitTimerTick () {
+  if (webState.cacheInhibitTimer > 0) webState.cacheInhibitTimer--;
+}

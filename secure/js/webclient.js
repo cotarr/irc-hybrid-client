@@ -123,6 +123,7 @@ webState.resizablePrivMsgTextareaIds = [];
 webState.resizableSendButtonPMTextareaIds = [];
 webState.times = {webConnect: 0};
 webState.count = {webConnect: 0};
+webState.cacheInhibitTimer = 0;
 
 // -------------------------------
 // Build URL from page location

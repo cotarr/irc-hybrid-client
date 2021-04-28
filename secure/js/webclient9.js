@@ -520,6 +520,7 @@ setInterval(function() {
   reconnectTimerTickHandler();
   beepTimerTick();
   updateElapsedTimeDisplay();
+  cacheInhibitTimerTick();
 }.bind(this), 1000);
 
 // -----------------------------

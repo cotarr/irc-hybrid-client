@@ -38,6 +38,9 @@
       <div class="annunciator-connect-icon" id="webConnectIconId">Web</div>
       <div class="annunciator-connect-icon" id="ircConnectIconId">IRC</div>
       <div class="annunciator-away-icon" id="ircIsAwayIconId" hidden>Away</div>
+      <div class="message-icon color-channel" id="chanMsgIconId" hidden>C</div>
+      <div class="message-icon color-pm" id="pmMsgIconId" hidden>P</div>
+      <div class="message-icon color-notice" id="notMsgIconId" hidden>N</div>
     </div>
 
     <div class="aa-start-scrollable">
@@ -140,7 +143,7 @@ a raw command to the IRC server directly.
           Web page login is independant of IRC login.
         </div>
       </div>
-      <div class="aa-section-div connect-section-div">
+      <div class="aa-section-div color-connect">
         <div class='head-flex'>
           <div class="head-left">
             <button id="hideLoginSectionButton">-</button>
@@ -204,7 +207,7 @@ a raw command to the IRC server directly.
 
         <div id="ircDisconnectedHiddenDiv" hidden>
 
-          <div class="aa-section-div wallops-section-div" id="wallopsSectionDiv" hidden>
+          <div class="aa-section-div color-wallops" id="wallopsSectionDiv" hidden>
             <div class='head-flex'>
               <div class="head-left">
                 <button class="notice-button" id="wallopsCloseButton">-</button>
@@ -221,7 +224,7 @@ a raw command to the IRC server directly.
             <textarea id="wallopsMessageDisplay" cols="120" rows="5" spellCheck="false" readonly></textarea>
           </div>
 
-          <div class="aa-section-div notice-section-div" id="noticeSectionDiv" hidden>
+          <div class="aa-section-div color-notice" id="noticeSectionDiv" hidden>
             <div class='head-flex'>
               <div class="head-left">
                 <button class="notice-button" id="closeNoticeButton">-</button>
@@ -238,7 +241,7 @@ a raw command to the IRC server directly.
             <textarea id="noticeMessageDisplay" cols="120" rows="5" spellCheck="false" readonly></textarea>
           </div>
 
-          <div class="aa-section-div priv-msg-section-div" id="privMsgSectionDiv">
+          <div class="aa-section-div color-pm" id="privMsgSectionDiv">
             <div>
               <button id="privMsgMainHiddenButton">+</button>
               <span>Private Messages</span>
@@ -262,7 +265,7 @@ a raw command to the IRC server directly.
           <div id="privateMessageContainerDiv">
           </div>
 
-          <div class="aa-section-div chan-top-section-div" id="channelMenuDiv">
+          <div class="aa-section-div color-channel" id="channelMenuDiv">
             <div class="button-div">
               <textarea class="va-middle" id="newChannelNameInputId" cols="20" rows="1" ></textarea>
                 <button class="va-middle" id="newChannelButton" class="rm20">Join Channel</button>
@@ -277,7 +280,7 @@ a raw command to the IRC server directly.
 
         </div><!-- end irc disconnected div -->
 
-        <div class="aa-section-div raw-section-div" id="rawSectionDiv">
+        <div class="aa-section-div color-raw" id="rawSectionDiv">
           <div class='head-flex'>
             <div class="head-left">
               <button class="notice-button" id="rawHiddenElementsButton">-</button>

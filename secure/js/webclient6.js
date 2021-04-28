@@ -40,6 +40,8 @@ function _sendTextToChannel(channelIndex, textAreaEl) {
       ' :' + text;
     _sendIrcServerMessage(message);
     textAreaEl.value = '';
+    // Clear message activity icon in status bar
+    document.getElementById('chanMsgIconId').setAttribute('hidden', '');
   }
 };
 
@@ -72,7 +74,7 @@ function createChannelEl (name) {
 
   // section-div (main element for each channel)
   let channelMainSectionEl = document.createElement('div');
-  channelMainSectionEl.classList.add('channel-main-section-div');
+  channelMainSectionEl.classList.add('color-channel');
   channelMainSectionEl.classList.add('aa-section-div');
 
   // Top Element (non-hidden element)
@@ -383,6 +385,14 @@ function createChannelEl (name) {
       (event.inputType === 'insertLineBreak')) {
       _sendTextToChannel(channelIndex, channelInputAreaEl);
     }
+  }.bind(this));
+
+  // ------------------------------------------------
+  // Clear message activity ICON by click anywhere on the
+  // dynamically created channel message window
+  // -------------------------------------------------
+  channelMainSectionEl.addEventListener('click', function() {
+    document.getElementById('chanMsgIconId').setAttribute('hidden', '');
   }.bind(this));
 
   function updateVisibility() {
@@ -798,9 +808,13 @@ function createChannelEl (name) {
               '*',
               parsedMessage.nick + ' (' + parsedMessage.host + ') has joined');
           }
-          if (channelMainSectionEl.hasAttribute('beep2-enabled')) {
+          if (channelMainSectionEl.hasAttribute('beep2-enabled') &&
+            (webState.cacheInhibitTimer === 0)) {
             playBeep1Sound();
           }
+          // Upon channel make, make section visible.
+          channelBottomDivEl.removeAttribute('hidden');
+          channelHideButtonEl.textContent = '-';
         }
         break;
       case 'MODE':
@@ -824,9 +838,21 @@ function createChannelEl (name) {
             '*',
             'Notice(' +
             parsedMessage.nick + ' to ' + parsedMessage.params[0] + ') ' + parsedMessage.params[1]);
-          // Upon channel message, make sectino visible.
+
+          // Upon channel notice, make sectino visible.
           channelBottomDivEl.removeAttribute('hidden');
           channelHideButtonEl.textContent = '-';
+
+          // Message activity Icon
+          // If focus not <inputarea> elment,
+          // and focus not message send button
+          // and NOT reload from cache in progress (timer not zero)
+          // then display incoming message activity icon
+          if ((document.activeElement !== channelInputAreaEl) &&
+          (document.activeElement !== channelSendButtonEl) &&
+          (webState.cacheInhibitTimer === 0)) {
+            document.getElementById('chanMsgIconId').removeAttribute('hidden');
+          }
         }
         break;
 
@@ -851,19 +877,31 @@ function createChannelEl (name) {
           _addText(parsedMessage.timestamp,
             parsedMessage.nick,
             parsedMessage.params[1]);
-          if (channelMainSectionEl.hasAttribute('beep1-enabled')) {
+          if (channelMainSectionEl.hasAttribute('beep1-enabled') &&
+            (webState.cacheInhibitTimer === 0)) {
             playBeep1Sound();
           }
           if (channelMainSectionEl.hasAttribute('beep3-enabled')) {
             let checkLine = parsedMessage.params[1].toLowerCase();
-            if (checkLine.indexOf(ircState.nickName.toLowerCase()) >= 0) {
-              // timer to avoid overlap with line sound
+            if ((checkLine.indexOf(ircState.nickName.toLowerCase()) >= 0) &&
+              (webState.cacheInhibitTimer === 0)) {
               setTimeout(playBeep2Sound, 250);
             }
           }
           // Upon channel message, make sectino visible.
           channelBottomDivEl.removeAttribute('hidden');
           channelHideButtonEl.textContent = '-';
+
+          // Message activity Icon
+          // If focus not <inputarea> elment,
+          // and focus not message send button
+          // and NOT reload from cache in progress (timer not zero)
+          // then display incoming message activity icon
+          if ((document.activeElement !== channelInputAreaEl) &&
+          (document.activeElement !== channelSendButtonEl) &&
+          (webState.cacheInhibitTimer === 0)) {
+            document.getElementById('chanMsgIconId').removeAttribute('hidden');
+          }
         }
         break;
       case 'QUIT':
@@ -931,6 +969,21 @@ function createChannelEl (name) {
   webState.resizableChanSplitTextareaIds.push(channelTextAreaId);
   document.dispatchEvent(new CustomEvent('element-resize', {bubbles: true}));
 };
+
+// --------------------------
+// Clear message activity ICON by tapping icon
+// --------------------------
+document.getElementById('chanMsgIconId').addEventListener('click', function() {
+  document.getElementById('chanMsgIconId').setAttribute('hidden', '');
+}.bind(this));
+
+// -------------------------------
+// Clear message actvity ICON by clicking on
+// the main channel menu Section
+// -------------------------------
+document.getElementById('channelMenuDiv').addEventListener('click', function() {
+  document.getElementById('chanMsgIconId').setAttribute('hidden', '');
+}.bind(this));
 
 // ----------------------------------------------------------------------
 // A change in state occurred, check if new channel need to be created.

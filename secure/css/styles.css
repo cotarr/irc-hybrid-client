@@ -116,14 +116,6 @@ button[disabled] {
   margin-bottom: 5px;
 }
 
-.chan-top-section-div {
-  background-color: #bef7bf;
-}
-
-.channel-main-section-div {
-  background-color: #bef7bf;
-}
-
 .chan-name-div {
   display: inline-block;
   font-size: 120%;
@@ -155,10 +147,29 @@ button[disabled] {
   margin-right: 6px;
 }
 
-.connect-section-div {
+.color-channel {
+  background-color: #bef7bf;
+}
+
+.color-connect {
   background-color: #b8f5ff;
 }
 
+.color-notice {
+  background-color: #fada9d;
+}
+
+.color-pm {
+  background-color: #a8cbe3;
+}
+
+.color-raw {
+  background-color: #dbbaff;
+}
+
+.color-wallops {
+  background-color: #effcae;
+}
 
 .debug-div-time {
   background-color: white;
@@ -247,21 +258,23 @@ button[disabled] {
   padding: 10px;
 }
 
+.message-icon {
+  border: 1px solid black;
+  border-radius: 15px;
+  color: #000000;
+  font-weight: bold;
+  display: inline-block;
+  margin-right: 2px;
+  padding: 3px 5px 2px 5px;
+  cursor: pointer;
+}
+.message-icon[hidden] {
+  display: none;
+}
+
 .notice-button {
   margin-right: 4px;
   margin-bottom: 7px;
-}
-
-.notice-section-div {
-  background-color: #fada9d;
-}
-
-.priv-msg-section-div {
-  background-color: #a8cbe3;
-}
-
-.raw-section-div {
-  background-color: #dbbaff;
 }
 
 .raw-cb-cb {
@@ -318,7 +331,3 @@ button[disabled] {
 .vh5 {height: 5px;}
 .vh10 {height: 10px;}
 .vh20 {height: 20px;}
-
-.wallops-section-div {
-  background-color: #effcae;
-}

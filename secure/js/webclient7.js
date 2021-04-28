@@ -39,6 +39,8 @@ function _sendPrivMessageToUser(targetNickname, textAreaEl) {
       ' :' + text;
     _sendIrcServerMessage(message);
     textAreaEl.value = '';
+    // Clear message activity icon in status bar
+    document.getElementById('pmMsgIconId').setAttribute('hidden', '');
   }
 }; // _sendPrivMessageToUser
 
@@ -60,7 +62,7 @@ function createPrivateMessageEl (name, parsedMessage) {
   // section-div
   let privMsgSectionEl = document.createElement('div');
   privMsgSectionEl.classList.add('aa-section-div');
-  privMsgSectionEl.classList.add('priv-msg-section-div');
+  privMsgSectionEl.classList.add('color-pm');
 
   // Top Element (non-hidden element)
   let privMsgTopDivEl = document.createElement('div');
@@ -274,6 +276,14 @@ function createPrivateMessageEl (name, parsedMessage) {
     }
   }.bind(this));
 
+  // ------------------------------------------------
+  // Clear message activity ICON by click anywhere on the
+  // dynamically created private message window
+  // -------------------------------------------------
+  privMsgSectionEl.addEventListener('click', function() {
+    document.getElementById('pmMsgIconId').setAttribute('hidden', '');
+  }.bind(this));
+
 
   // PM window PRIVMSG event handler
   // if window closed,
@@ -314,14 +324,27 @@ function createPrivateMessageEl (name, parsedMessage) {
           if (parsedMessage.nick.toLowerCase() === name.toLowerCase()) {
             _addText(parsedMessage.timestamp + ' ' +
               parsedMessage.nick + ' ' + parsedMessage.params[1]);
+
             // Upon privMsg message, make sectino visible.
             privMsgSectionEl.removeAttribute('hidden');
             privMsgBottomDivEl.removeAttribute('hidden');
             privMsgHideButtonEl.textContent = '-';
             privMsgTopRightHidableDivEl.removeAttribute('hidden');
+
             // also show control section div
             document.getElementById('privMsgMainHiddenDiv').removeAttribute('hidden');
             document.getElementById('privMsgMainHiddenButton').textContent = '-';
+
+            // Message activity Icon
+            // If focus not <inputarea> elment,
+            // and focus not message send button
+            // and NOT reload from cache in progress (timer not zero)
+            // then display incoming message activity icon
+            if ((document.activeElement !== privMsgInputAreaEl) &&
+            (document.activeElement !== privMsgSendButtonEl) &&
+            (webState.cacheInhibitTimer === 0)) {
+              document.getElementById('pmMsgIconId').removeAttribute('hidden');
+            }
           }
         }
         break;
@@ -342,6 +365,25 @@ function createPrivateMessageEl (name, parsedMessage) {
   document.dispatchEvent(new CustomEvent('element-resize', {bubbles: true}));
 };
 
+// --------------------------
+// Clear message actvity ICON by tapping icon
+// --------------------------
+document.getElementById('pmMsgIconId').addEventListener('click', function() {
+  document.getElementById('pmMsgIconId').setAttribute('hidden', '');
+}.bind(this));
+
+// -------------------------------
+// Clear message activity ICON by clickin gon the main PM
+// control Section
+// -------------------------------
+document.getElementById('privMsgSectionDiv').addEventListener('click', function() {
+  document.getElementById('pmMsgIconId').setAttribute('hidden', '');
+}.bind(this));
+
+// ----------------------------------------------------------
+// Private message handler (create new window if message)
+// ----------------------------------------------------------
+
 // Event listener for messages to create new window
 document.addEventListener('private-message', function(event) {
   // console.log('Event: private-message ' + JSON.stringify(event.detail, null, 2));
@@ -357,6 +399,10 @@ document.addEventListener('private-message', function(event) {
   //
   if (webState.activePrivateMessageNicks.indexOf(name.toLowerCase()) < 0) {
     createPrivateMessageEl(name, event.detail.parsedMessage);
+    // PM Icon visible, but not during refresh
+    if (webState.cacheInhibitTimer === 0) {
+      document.getElementById('pmMsgIconId').removeAttribute('hidden');
+    }
   }
 });
 
