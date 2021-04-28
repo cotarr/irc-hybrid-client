@@ -352,7 +352,7 @@ function updateDivVisibility() {
       document.getElementById('hideLoginSection').setAttribute('hidden', '');
       document.getElementById('hideLoginSectionButton').textContent = '+';
       document.getElementById('nickNameInputId').setAttribute('disabled', '');
-      document.getElementById('userNameInputId').setAttribute('disabled', '');
+      // document.getElementById('userNameInputId').setAttribute('disabled', '');
       document.getElementById('realNameInputId').setAttribute('disabled', '');
       document.getElementById('userModeInputId').setAttribute('disabled', '');
       document.getElementById('connectButton').setAttribute('disabled', '');
@@ -393,7 +393,7 @@ function updateDivVisibility() {
       document.getElementById('hideLoginSection').removeAttribute('hidden');
       document.getElementById('hideLoginSectionButton').textContent = '-';
       document.getElementById('nickNameInputId').removeAttribute('disabled');
-      document.getElementById('userNameInputId').removeAttribute('disabled');
+      // document.getElementById('userNameInputId').removeAttribute('disabled');
       document.getElementById('realNameInputId').removeAttribute('disabled');
       document.getElementById('userModeInputId').removeAttribute('disabled');
       document.getElementById('connectButton').removeAttribute('disabled');
@@ -430,7 +430,7 @@ function updateDivVisibility() {
     document.getElementById('ircIsAwayIconId').setAttribute('hidden', '');
     document.getElementById('hideLoginSection').setAttribute('hidden', '');
     document.getElementById('nickNameInputId').setAttribute('disabled', '');
-    document.getElementById('userNameInputId').setAttribute('disabled', '');
+    // document.getElementById('userNameInputId').setAttribute('disabled', '');
     document.getElementById('realNameInputId').setAttribute('disabled', '');
     document.getElementById('userModeInputId').setAttribute('disabled', '');
     document.getElementById('connectButton').setAttribute('disabled', '');

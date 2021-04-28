@@ -282,7 +282,8 @@
 
     // TODO add size validation, character allowlist
     vars.ircState.nickName = req.body.nickName;
-    vars.ircState.userName = req.body.userName;
+    // --- username disabled in browser
+    // vars.ircState.userName = req.body.userName;
     vars.ircState.realName = req.body.realName;
     vars.ircState.userMode = req.body.userMode;
 

@@ -65,7 +65,7 @@ function connectButtonHandler() {
   let connectObject = {};
   connectObject.nickName = document.getElementById('nickNameInputId').value;
   connectObject.userName = document.getElementById('userNameInputId').value;
-  connectObject.realName = document.getElementById('userNameInputId').value;
+  connectObject.realName = document.getElementById('realNameInputId').value;
   connectObject.userMode = document.getElementById('userModeInputId').value;
 
   let fetchURL = webServerUrl + '/irc/connect';
