@@ -330,12 +330,16 @@ document.getElementById('test1Button').addEventListener('click', function() {
     })
     .then( (responseJson) => {
       console.log(JSON.stringify(responseJson, null, 2));
+      if (responseJson.error) {
+        showError(responseJson.message);
+      }
     })
     .catch( (error) => {
       console.log(error);
+      if (error) showError(error.toString());
     });
 });
-document.getElementById('test1ButtonDesc').textContent = 'GET /irc/test1 - cacheInfo()';
+document.getElementById('test1ButtonDesc').textContent = 'GET /irc/test1 global.gc()';
 
 // --------------------
 // Test Button #2
@@ -362,9 +366,13 @@ document.getElementById('test2Button').addEventListener('click', function() {
     })
     .then( (responseJson) => {
       console.log(JSON.stringify(responseJson, null, 2));
+      if (responseJson.error) {
+        showError(responseJson.message);
+      }
     })
     .catch( (error) => {
       console.log(error);
+      if (error) showError(error.toString());
     });
 });
 document.getElementById('test2ButtonDesc').textContent = 'GET /irc/test2 memoryUsage()';

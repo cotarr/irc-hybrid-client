@@ -559,12 +559,27 @@
   const test1Handler = function(req, res, next) {
     console.log('test1 handler called');
     // -------- test code here -----------------
+    if (global.gc) {
+      global.gc();
+      console.log('Debug: Forcing nodejs garbage collection');
+      res.json({
+        error: false,
+        comment: 'Debug: Forcing nodejs garbage collection'
+      });
+    } else {
+      console.log('To debug garbage collection run: node --expose-gc bin/www');
+      res.json({
+        error: true,
+        message: 'To debug garbage collection run: node --expose-gc bin/www'
+      });
+    }
     // -----------------------------------------
-    res.json({
-      error: false,
-      comment: 'Debug message cache',
-      data: ircMessageCache.cacheInfo()
-    });
+    // res.json({
+    //   error: false,
+    //   comment: 'Debug message cache',
+    //   data: ircMessageCache.cacheInfo()
+    // });
+    // -----------------------------------------
   };
 
   const test2Handler = function(req, res, next) {
