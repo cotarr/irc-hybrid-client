@@ -77,26 +77,119 @@ function substituteHmsTime(inMessage) {
 // Else, this is where filtered server message are formatted for display
 // ---------------------------------------------------------------------------
 document.addEventListener('server-message', function(event) {
-  console.log(JSON.stringify(event.detail, null, 2));
+  // This will skip prefix, command, and param[0], printing the rest
+  function _showAfterParamZero (parsedMessage) {
+    let msgString = '';
+    if (parsedMessage.params.length > 1) {
+      for (let i = 1; i< parsedMessage.params.length; i++) {
+        msgString += ' ' + parsedMessage.params[i];
+      }
+    } else {
+      console.log('Error _showAfterParamZero() no parsed field');
+    }
+    displayRawMessage(
+      cleanFormatting(
+        cleanCtcpDelimiter(
+          parsedMessage.timestamp + msgString)));
+  }
+
+  // console.log(JSON.stringify(event.detail, null, 2));
 
   switch(event.detail.parsedMessage.command) {
+    //
+    // Server First connect messages
+    //
+    case '001':
+    case '002':
+    case '003':
+    case '004':
+      _showAfterParamZero(event.detail.parsedMessage);
+      break;
+    case '005':
+      break;
+    case '250':
+    case '251':
+    case '252':
+    case '254':
+    case '255':
+    case '265':
+    case '265':
+      _showAfterParamZero(event.detail.parsedMessage);
+      break;
+
+    // Admin
+    case '256':
+    case '257':
+    case '258':
+    case '259':
+      _showAfterParamZero(event.detail.parsedMessage);
+      break;
+    //
+    // Who response
+    //
+    case '315':
+      break;
+    case '352':
+      _showAfterParamZero(event.detail.parsedMessage);
+      break;
+
+    //
+    // Whois response
+    //
+    case '275':
+    case '301':
+    case '307':
+    case '311':
+    case '312':
+    case '313':
+    case '317':
+    case '318':
+    case '319':
+      _showAfterParamZero(event.detail.parsedMessage);
+      break;
+
+    //
+    // LIST
+    //
+    // case '322': // irc server motd
+    //   _showAfterParamZero(event.detail.parsedMessage);
+    //   break;
+    // case '321': // Start LIST
+    // case '323': // End LIST
+    //   break;
+    //
+    // VERSION TODO
+    //
+    // case '351':
+    //   _showAfterParamZero(event.detail.parsedMessage);
+    //   break;
+    //
+    // MOTD
+    //
     case '372': // irc server motd
-      displayRawMessage(
-        cleanFormatting(
-          cleanCtcpDelimiter(
-            event.detail.parsedMessage.timestamp + ' ' +
-            event.detail.parsedMessage.params[1])));
+      _showAfterParamZero(event.detail.parsedMessage);
       break;
     case '375': // Start MOTD
-      break;
     case '376': // End MOTD
       break;
+
     case 'MODE':
       displayRawMessage(
         cleanFormatting(
           cleanCtcpDelimiter(
             event.detail.parsedMessage.timestamp + ' ' +
             'MODE ' +
+            event.detail.parsedMessage.params[0] + ' ' +
+            event.detail.parsedMessage.params[1])));
+
+      break;
+
+    case 'NOTICE':
+      displayRawMessage(
+        cleanFormatting(
+          cleanCtcpDelimiter(
+            event.detail.parsedMessage.timestamp + ' ' +
+            'NOTICE ' +
             event.detail.parsedMessage.params[0] + ' ' +
             event.detail.parsedMessage.params[1])));
 
