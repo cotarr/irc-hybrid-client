@@ -3,6 +3,94 @@
 //                   screen resize events
 // ------------------------------------------------------------
 
+//
+// -------------------------------------------------
+// This function performs API request to obtain
+// the full IRC server message cache from the web server
+// as an API response. The contents are then parsed as if
+// the message were real time.
+// -------------------------------------------------
+function updateFromCache () {
+  // Timer down counter to disable
+  // prase events during reload (beeps and activity icons)
+  webState.cacheInhibitTimer = 3;
+  // Clear activity icons
+  resetNotActivityIcon();
+  resetPmActivityIcon(-1);
+  resetChanActivityIcon(-1);
+  // Fire event to clear previous contents
+  // TODO this is async, could clear after fetch
+  document.dispatchEvent(new CustomEvent('erase-before-reload',
+    {
+      bubbles: true,
+      detail: {
+      }
+    }));
+
+  let fetchURL = webServerUrl + '/irc/cache';
+  let fetchOptions = {
+    method: 'GET',
+    headers: {
+      'Accept': 'application/json'
+    }
+  };
+  fetch(fetchURL, fetchOptions)
+    .then( (response) => {
+      // console.log(response.status);
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error('Fetch status ' + response.status + ' ' + response.statusText);
+      }
+    })
+    .then( (responseArray) => {
+      if ((Array.isArray(responseArray)) && (responseArray.length > 0)) {
+        // remove dynamically created private message elements to match list
+        let privMsgSessionEl = document.getElementById('privateMessageContainerDiv');
+        while (privMsgSessionEl.firstChild) {
+          privMsgSessionEl.removeChild(privMsgSessionEl.firstChild);
+        }
+        webState.lastPMNick = '';
+        webState.activePrivateMessageNicks = [];
+        webState.resizablePrivMsgTextareaIds = [];
+        webState.resizableSendButtonPMTextareaIds = [];
+        document.getElementById('noticeMessageDisplay').textContent = '';
+        document.getElementById('wallopsMessageDisplay').textContent = '';
+        document.getElementById('rawMessageDisplay').textContent = '';
+        webState.noticeOpen = false;
+        webState.wallopsOpen = false;
+        //
+        // Option 1, receive array of NodeJS Buffer object and convert to utf8 string messages
+        //
+        // let utf8decoder = new TextDecoder('utf8');
+        // for (let i=0; i<responseArray.length; i++) {
+        //   if ((responseArray[i].type === 'Buffer') && (responseArray[i].data.length > 0)) {
+        //     let data = new Uint8Array(responseArray[i].data);
+        //     _parseBufferMessage(utf8decoder.decode(data));
+        //   }
+        // }
+        //
+        // Option 2, recieve array of utf8 string message
+        //
+        for (let i=0; i<responseArray.length; i++) {
+          if (responseArray[i].length > 0) {
+            _parseBufferMessage(responseArray[i]);
+          }
+        }
+      }
+    })
+    .catch( (error) => {
+      console.log(error);
+    });
+}; // updateFromCache;
+window.addEventListener('update-from-cache', function(event) {
+  updateFromCache();
+}.bind(this));
+
+function cacheInhibitTimerTick () {
+  if (webState.cacheInhibitTimer > 0) webState.cacheInhibitTimer--;
+}
+
 // -----------------------
 // Die (Server) button
 // -----------------------

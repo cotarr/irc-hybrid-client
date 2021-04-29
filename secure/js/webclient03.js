@@ -45,7 +45,8 @@ function connectWebSocket () {
     getIrcState(function(err, data) {
       if (!err) {
         // then pull in existing data
-        updateFromCache();
+        // updateFromCache();
+        document.dispatchEvent(new CustomEvent('update-from-cache', {bubbles: true}));
       }
     });
   });

@@ -307,7 +307,12 @@ function _parseIrcMessage (message) {
   };
 }; // _parseIrcMessage()
 
+// -----------------------------------------------------------------------
+// Channel windows are created dynamically and inserted into the DOM
+// Fire this event to send channel message to listener in channel window
+//
 // :nick!~user@host.domain PRIVMSG #channel :This is channel text message.
+// -----------------------------------------------------------------------
 function displayChannelMessage(parsedMessage) {
   document.dispatchEvent(new CustomEvent('channel-message',
     {
@@ -318,7 +323,12 @@ function displayChannelMessage(parsedMessage) {
     }));
 } // displayChannelMessage()
 
+// -----------------------------------------------------------------------
+// Private Mesage windows are created dynamically and inserted into the DOM
+// Fire this event to send channel message to listener in channel window
+//
 // :nick!~user@host.domain PRIVMSG nickname :This is private text message.
+// -----------------------------------------------------------------------
 function displayPrivateMessage(parsedMessage) {
   document.dispatchEvent(new CustomEvent('private-message',
     {
@@ -329,6 +339,12 @@ function displayPrivateMessage(parsedMessage) {
     }));
 } // displayPrivateMessage
 
+// -----------------------------------------------------
+// Notice messages are displayed here
+// This is to allow integration of CTCP responses
+//
+// Note: notice window controls are in another module
+// -----------------------------------------------------
 function displayNoticeMessage(parsedMessage) {
   function _addText (text) {
     document.getElementById('noticeMessageDisplay').textContent +=
@@ -384,6 +400,10 @@ function displayNoticeMessage(parsedMessage) {
   }
 } // displayNoticeMessage()
 
+// -----------------------------------------------------
+// Wallops (+w) messages are displayed here
+// Note: notice window controls are in another module
+// -----------------------------------------------------
 function displayWallopsMessage(parsedMessage) {
   function _addText (text) {
     document.getElementById('wallopsMessageDisplay').textContent += cleanFormatting(text) + '\n';
@@ -403,29 +423,10 @@ function displayWallopsMessage(parsedMessage) {
   }
 } // displayWallopsMessage
 
-// In messages from IRC server, these are NOT displayed in server window
-// unleses raw checkbox is checked. It is assumed they are displayed
-// in other windows.
-const ircMessageCommandDisplayFilter = [
-  '331', // Topic
-  '332', // Topic
-  '333', // Topic
-  '353', // Names
-  '366', // End Names
-  'JOIN',
-  'KICK',
-  'MODE',
-  'NICK',
-  'NOTICE',
-  'PART',
-  'PING',
-  'PRIVMSG',
-  'QUIT',
-  'TOPIC',
-  'WALLOPS'
-];
-
-// This is the server message window view selector
+//--------------------------------------------------
+// Open server message window if it is hidden
+//     (used in multiple modules)
+//--------------------------------------------------
 function showRawMessageWindow() {
   document.getElementById('rawHiddenElements').removeAttribute('hidden');
   document.getElementById('rawHiddenElementsButton').textContent = '-';
@@ -433,21 +434,12 @@ function showRawMessageWindow() {
   // scroll message to most recent
   document.getElementById('rawMessageDisplay').scrollTop =
     document.getElementById('rawMessageDisplay').scrollHeight;
-}
+} // showRawMessageWindow()
 
-// if a server message starts with time in seconds, convert to hour:minute:seconds
-function substituteHmsTime(inMessage) {
-  let timeSeconds = inMessage.split(' ')[0];
-  let restOfMessage = inMessage.slice(timeSeconds.length + 1, inMessage.length);
-  let timeObj = new Date(parseInt(timeSeconds) * 1000);
-  let hmsString = '';
-  hmsString += timeObj.getHours().toString().padStart(2, '0') + ':';
-  hmsString += timeObj.getMinutes().toString().padStart(2, '0') + ':';
-  hmsString += timeObj.getSeconds().toString().padStart(2, '0');
-  return hmsString + ' ' + restOfMessage;
-}
-
-// Add messages to the server window
+// ----------------------------------------------
+// Insert a text string into the server window
+// and scroll to bottom
+// ----------------------------------------------
 function displayRawMessage (inString) {
   document.getElementById('rawMessageDisplay').textContent += inString + '\n';
   // scroll to view new text
@@ -455,6 +447,10 @@ function displayRawMessage (inString) {
     document.getElementById('rawMessageDisplay').scrollHeight;
 };
 
+// ----------------------------------------------------------------
+// Previx raw server message in hexadecimal
+// Note: currently one number per UTF-8 character, (not per byte)
+// ----------------------------------------------------------------
 function displayRawMessageInHex (message) {
   let hexString = '';
   for (let i=0; i<message.length; i++) {
@@ -462,6 +458,21 @@ function displayRawMessageInHex (message) {
   }
   displayRawMessage(hexString);
 };
+
+// -------------------------------------------
+// This is called to apply message formatting
+// to IRC server message for display
+// -------------------------------------------
+function displayFormattedServerMessage(parsedMessage, message) {
+  document.dispatchEvent(new CustomEvent('server-message',
+    {
+      bubbles: true,
+      detail: {
+        parsedMessage: parsedMessage,
+        message: message
+      }
+    }));
+} // displayChannelMessage()
 
 // ---------------------------------------------
 // CTCP message parser
@@ -572,10 +583,45 @@ function _parseCtcpMessage (parsedMessage) {
 }
 
 // -------------------------------------------------------------
+// Server Message filter
+//
+// Messages with specific handlers, such as channel messages
+// Are handled directly by the parser.
+//
+// This filter is to avoid duplication of messages
+// in the server window for case of alternate display
+//
+// Format: simple Array of strings
+// -------------------------------------------------------------
+const ircMessageCommandDisplayFilter = [
+  '331', // Topic
+  '332', // Topic
+  '333', // Topic
+  '353', // Names
+  '366', // End Names
+  'JOIN',
+  'KICK',
+  'MODE',
+  'NICK',
+  'NOTICE',
+  'PART',
+  'PING',
+  'PRIVMSG',
+  'QUIT',
+  'TOPIC',
+  'WALLOPS'
+];
+
+// -------------------------------------------------------------
+//
+//      M A I N   C O M M A N D   P A R S E R
+//
+//    IRC server ---> backend --> Browser (parse here)
+//
 // This function will accept one line of text from IRC server
-// First it will check for "UPDATE" request
+// First it will check for "HEARTBEAT" and "UPDATE" requests
 // else will parse message string into prefix, command, and arugments
-// the parse the command.
+// then parse the command and relevant actions accordingly.
 // -------------------------------------------------------------
 function _parseBufferMessage (message) {
   if (message === 'HEARTBEAT' ) {
@@ -639,21 +685,14 @@ function _parseBufferMessage (message) {
       displayRawMessage(message);
     } else {
       if (ircMessageCommandDisplayFilter.indexOf(parsedMessage.command.toUpperCase()) < 0) {
-        let timeSeconds = message.split(' ')[0];
-        let restOfMessage = message.slice(timeSeconds.length + 1, message.length);
-        let timeObj = new Date(parseInt(timeSeconds) * 1000);
-        let hmsString = '';
-        hmsString += timeObj.getHours().toString().padStart(2, '0') + ':';
-        hmsString += timeObj.getMinutes().toString().padStart(2, '0') + ':';
-        hmsString += timeObj.getSeconds().toString().padStart(2, '0');
-        displayRawMessage(
-          cleanFormatting(
-            cleanCtcpDelimiter(
-              substituteHmsTime(message))));
-        showRawMessageWindow();
-      }
-    }
-
+        // Message from server that are remaining
+        // After command processing
+        // And if not in mode to display server messages in raw format
+        // then....
+        // Send server message to be formatted for display
+        displayFormattedServerMessage(parsedMessage, message);
+      } // if (filtered)
+    } // raw or server messages
     //
     // Check if server is responding with error code
     //
@@ -680,10 +719,7 @@ function _parseBufferMessage (message) {
           if (parsedMessage.params[0] === ircState.nickName) {
             // Case of me, my MODE has changed
             if (!webState.viewRawMessages) {
-              displayRawMessage(
-                cleanFormatting(
-                  cleanCtcpDelimiter(
-                    substituteHmsTime(message))));
+              displayFormattedServerMessage(parsedMessage, message);
             }
           } else if (channelPrefixChars.indexOf(parsedMessage.params[0].charAt(0)) >= 0) {
             // Case of channel name
@@ -704,10 +740,7 @@ function _parseBufferMessage (message) {
           if ((!parsedMessage.nick) || (parsedMessage.nick.length === 0)) {
             // case of server messages, check raw disply to avoid duplication in server window
             if (!webState.viewRawMessages) {
-              displayRawMessage(
-                cleanFormatting(
-                  cleanCtcpDelimiter(
-                    substituteHmsTime(message))));
+              displayFormattedServerMessage(parsedMessage, message);
             }
           } else {
             const ctcpDelim = 1;
@@ -762,90 +795,3 @@ function _parseBufferMessage (message) {
     }
   }
 };
-//
-// -------------------------------------------------
-// This function performs API request to obtain
-// the full IRC server message cache from the web server
-// as an API response. The contents are then parsed as if
-// the message were real time.
-// -------------------------------------------------
-function updateFromCache () {
-  // Timer down counter to disable
-  // prase events during reload (beeps and activity icons)
-  webState.cacheInhibitTimer = 3;
-  // Clear activity icons
-  resetNotActivityIcon();
-  resetPmActivityIcon(-1);
-  resetChanActivityIcon(-1);
-  // Fire event to clear previous contents
-  // TODO this is async, could clear after fetch
-  document.dispatchEvent(new CustomEvent('erase-before-reload',
-    {
-      bubbles: true,
-      detail: {
-      }
-    }));
-
-  let fetchURL = webServerUrl + '/irc/cache';
-  let fetchOptions = {
-    method: 'GET',
-    headers: {
-      'Accept': 'application/json'
-    }
-  };
-  fetch(fetchURL, fetchOptions)
-    .then( (response) => {
-      // console.log(response.status);
-      if (response.ok) {
-        return response.json();
-      } else {
-        throw new Error('Fetch status ' + response.status + ' ' + response.statusText);
-      }
-    })
-    .then( (responseArray) => {
-      if ((Array.isArray(responseArray)) && (responseArray.length > 0)) {
-        // remove dynamically created private message elements to match list
-        let privMsgSessionEl = document.getElementById('privateMessageContainerDiv');
-        while (privMsgSessionEl.firstChild) {
-          privMsgSessionEl.removeChild(privMsgSessionEl.firstChild);
-        }
-        webState.lastPMNick = '';
-        webState.activePrivateMessageNicks = [];
-        webState.resizablePrivMsgTextareaIds = [];
-        webState.resizableSendButtonPMTextareaIds = [];
-        document.getElementById('noticeMessageDisplay').textContent = '';
-        document.getElementById('wallopsMessageDisplay').textContent = '';
-        document.getElementById('rawMessageDisplay').textContent = '';
-        webState.noticeOpen = false;
-        webState.wallopsOpen = false;
-        //
-        // Option 1, receive array of NodeJS Buffer object and convert to utf8 string messages
-        //
-        // let utf8decoder = new TextDecoder('utf8');
-        // for (let i=0; i<responseArray.length; i++) {
-        //   if ((responseArray[i].type === 'Buffer') && (responseArray[i].data.length > 0)) {
-        //     let data = new Uint8Array(responseArray[i].data);
-        //     _parseBufferMessage(utf8decoder.decode(data));
-        //   }
-        // }
-        //
-        // Option 2, recieve array of utf8 string message
-        //
-        for (let i=0; i<responseArray.length; i++) {
-          if (responseArray[i].length > 0) {
-            _parseBufferMessage(responseArray[i]);
-          }
-        }
-      }
-    })
-    .catch( (error) => {
-      console.log(error);
-    });
-}; // updateFromCache;
-window.addEventListener('update-from-cache', function(event) {
-  updateFromCache();
-}.bind(this));
-
-function cacheInhibitTimerTick () {
-  if (webState.cacheInhibitTimer > 0) webState.cacheInhibitTimer--;
-}

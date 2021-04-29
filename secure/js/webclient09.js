@@ -1,8 +1,13 @@
 // ------------------------------------------------------------
-// webclient09.js  - Display raw server messages and program info
-//                  End of javascript load initializations
+// webclient09.js  - Display formatted server messages
+//
+// Note: unformatted raw server messages displayed in webclient02.js
 // ------------------------------------------------------------
 'use strict';
+// -------------------------------------------------------------------------
+// Internaal function to detect IRC slash commands
+// by parsing input on server window user input textarea.
+// -------------------------------------------------------------------------
 function _parseInputForIRCCommands(textAreaEl) {
   if ((textAreaEl.value.length > 0)) {
     let text = textAreaEl.value;
@@ -31,6 +36,82 @@ function _parseInputForIRCCommands(textAreaEl) {
   }
 };
 
+// -----------------------------------------------
+// Send IRC server textarea send button pressed
+// -----------------------------------------------
+document.getElementById('sendRawMessageButton').addEventListener('click', function() {
+  _parseInputForIRCCommands(document.getElementById('rawMessageInputId'));
+}.bind(this));
+// ---------------------------------------
+// Send IRC server textarea Enter pressed
+// ---------------------------------------
+document.getElementById('rawMessageInputId').addEventListener('input', function(event) {
+  if (((event.inputType === 'insertText') && (event.data === null)) ||
+    (event.inputType === 'insertLineBreak')) {
+    _parseInputForIRCCommands(document.getElementById('rawMessageInputId'));
+  }
+}.bind(this));
+
+// -------------------------------------------------
+// In first text field of message
+// Exchange Unix seconds with HH:MM:SS time format
+// -------------------------------------------------
+function substituteHmsTime(inMessage) {
+  let timeSeconds = inMessage.split(' ')[0];
+  let restOfMessage = inMessage.slice(timeSeconds.length + 1, inMessage.length);
+  let timeObj = new Date(parseInt(timeSeconds) * 1000);
+  let hmsString = '';
+  hmsString += timeObj.getHours().toString().padStart(2, '0') + ':';
+  hmsString += timeObj.getMinutes().toString().padStart(2, '0') + ':';
+  hmsString += timeObj.getSeconds().toString().padStart(2, '0');
+  return hmsString + ' ' + restOfMessage;
+}
+
+// ---------------------------------------------------------------------------
+// Global event listener
+//
+// Messages from the IRC server are parsed for commands in another module.
+// If raw server message is selected, that is performed in another module.
+// Non-server messages, i.e. channel PRIVMSG are filtered in another module.
+//
+// Else, this is where filtered server message are formatted for display
+// ---------------------------------------------------------------------------
+document.addEventListener('server-message', function(event) {
+  // console.log(JSON.stringify(event.detail, null, 2));
+
+  switch(event.detail.parsedMessage.command) {
+    case '372': // irc server motd
+      displayRawMessage(
+        cleanFormatting(
+          cleanCtcpDelimiter(
+            event.detail.parsedMessage.timestamp + ' ' +
+            event.detail.parsedMessage.params[1])));
+      break;
+    case '375': // Start MOTD
+      break;
+    case '376': // End MOTD
+      break;
+    case 'MODE':
+      displayRawMessage(
+        cleanFormatting(
+          cleanCtcpDelimiter(
+            event.detail.parsedMessage.timestamp + ' ' +
+            'MODE ' +
+            event.detail.parsedMessage.params[0] + ' ' +
+            event.detail.parsedMessage.params[1])));
+
+      break;
+    default:
+      // this is catch-all, if no formatted case, then display here
+      if (true) {
+        displayRawMessage(
+          cleanFormatting(
+            cleanCtcpDelimiter(
+              substituteHmsTime(event.detail.message))));
+      }
+  } // switch
+  showRawMessageWindow();
+}); // server-message event handler
 
 // -------------------------
 // raw Show/Hide button handler
@@ -66,22 +147,6 @@ document.getElementById('rawTallerButton').addEventListener('click', function() 
 // -------------------------
 document.getElementById('rawNormalButton').addEventListener('click', function() {
   document.getElementById('rawMessageDisplay').setAttribute('rows', '10');
-}.bind(this));
-
-// --------------------------------
-// Send IRC command button pressed
-// --------------------------------
-document.getElementById('sendRawMessageButton').addEventListener('click', function() {
-  _parseInputForIRCCommands(document.getElementById('rawMessageInputId'));
-}.bind(this));
-// --------------------------------
-// Send IRC command Enter pressed
-// --------------------------------
-document.getElementById('rawMessageInputId').addEventListener('input', function(event) {
-  if (((event.inputType === 'insertText') && (event.data === null)) ||
-    (event.inputType === 'insertLineBreak')) {
-    _parseInputForIRCCommands(document.getElementById('rawMessageInputId'));
-  }
 }.bind(this));
 
 // -----------------------------
