@@ -1,5 +1,5 @@
 // ------------------------------------------------------------
-// webclient9.js  - Display raw server messages and program info
+// webclient09.js  - Display raw server messages and program info
 //                  End of javascript load initializations
 // ------------------------------------------------------------
 'use strict';

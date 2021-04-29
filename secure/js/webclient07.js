@@ -1,5 +1,5 @@
 // --------------------------------------------
-// webclient7.js - Private Message Functions
+// webclient07.js - Private Message Functions
 // --------------------------------------------
 'use strict';
 // --------------------------------------------

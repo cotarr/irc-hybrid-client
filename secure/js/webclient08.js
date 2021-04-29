@@ -1,5 +1,5 @@
 // ---------------------------------------------
-// webclient8.js - Notice and WallOps functions
+// webclient08.js - Notice and WallOps functions
 // ---------------------------------------------
 'use strict';
 // -------------------------------------

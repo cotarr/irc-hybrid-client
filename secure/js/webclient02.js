@@ -1,5 +1,5 @@
 // -------------------------------------------------------------
-// webclient2.js - Parse IRC messages from backend/IRC server
+// webclient02.js - Parse IRC messages from backend/IRC server
 // -------------------------------------------------------------
 //
 'use strict';

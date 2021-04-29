@@ -27,14 +27,14 @@
 // These are all bundled to webclient.js for deployment
 //
 // webclient.js - Global state variables, update API, rendering
-// webclient2.js - Parse IRC messages from backend/IRC server
-// webclient3.js - Websocket Management
-// webclient4.js - API requests
-// webclient5.js - User Input Text Command Parser
-// webclient6.js - IRC Channel Functions
-// webclient7.js - Private Message Functions
-// webclient8.js - Notice and WallOps functions
-// webclient9.js - Display raw server messages and program info
+// webclient02.js - Parse IRC messages from backend/IRC server
+// webclient03.js - Websocket Management
+// webclient04.js - API requests
+// webclient05.js - User Input Text Command Parser
+// webclient06.js - IRC Channel Functions
+// webclient07.js - Private Message Functions
+// webclient08.js - Notice and WallOps functions
+// webclient09.js - Display raw server messages and program info
 // ----------------------------------------------------------------
 //
 'use strict';

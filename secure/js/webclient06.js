@@ -1,5 +1,5 @@
 // ---------------------------------------
-// webclient6.js - IRC Channel Functions
+// webclient06.js - IRC Channel Functions
 // ---------------------------------------
 'use strict';
 // ------------------------------------------

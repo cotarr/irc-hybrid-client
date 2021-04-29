@@ -1,5 +1,5 @@
 // --------------------------------------------------------------------------------
-// webclient3.js - Websocket Management
+// webclient03.js - Websocket Management
 // --------------------------------------------------------------------------------
 //                     Web Server Authentication notes
 //

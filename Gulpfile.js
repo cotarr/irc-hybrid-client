@@ -56,14 +56,14 @@ const clean = function() {
 const htmlMinify = function() {
   return src('secure/webclient.html')
     // these files have been bundled into one file, so they are being removed
-    .pipe(replace('<script src="./js/webclient2.js" defer></script>', ''))
-    .pipe(replace('<script src="./js/webclient3.js" defer></script>', ''))
-    .pipe(replace('<script src="./js/webclient4.js" defer></script>', ''))
-    .pipe(replace('<script src="./js/webclient5.js" defer></script>', ''))
-    .pipe(replace('<script src="./js/webclient6.js" defer></script>', ''))
-    .pipe(replace('<script src="./js/webclient7.js" defer></script>', ''))
-    .pipe(replace('<script src="./js/webclient8.js" defer></script>', ''))
-    .pipe(replace('<script src="./js/webclient9.js" defer></script>', ''))
+    .pipe(replace('<script src="./js/webclient02.js" defer></script>', ''))
+    .pipe(replace('<script src="./js/webclient03.js" defer></script>', ''))
+    .pipe(replace('<script src="./js/webclient04.js" defer></script>', ''))
+    .pipe(replace('<script src="./js/webclient05.js" defer></script>', ''))
+    .pipe(replace('<script src="./js/webclient06.js" defer></script>', ''))
+    .pipe(replace('<script src="./js/webclient07.js" defer></script>', ''))
+    .pipe(replace('<script src="./js/webclient08.js" defer></script>', ''))
+    .pipe(replace('<script src="./js/webclient09.js" defer></script>', ''))
     // .pipe(htmlmin(htmlMinifyOptions))
     .pipe(dest('build/secure'));
 };
@@ -74,14 +74,14 @@ const jsMinify = function () {
   return src(
     [
       'secure/js/webclient.js',
-      'secure/js/webclient2.js',
-      'secure/js/webclient3.js',
-      'secure/js/webclient4.js',
-      'secure/js/webclient5.js',
-      'secure/js/webclient6.js',
-      'secure/js/webclient7.js',
-      'secure/js/webclient8.js',
-      'secure/js/webclient9.js'
+      'secure/js/webclient02.js',
+      'secure/js/webclient03.js',
+      'secure/js/webclient04.js',
+      'secure/js/webclient05.js',
+      'secure/js/webclient06.js',
+      'secure/js/webclient07.js',
+      'secure/js/webclient08.js',
+      'secure/js/webclient09.js'
     ])
     .pipe(concat('webclient.js'))
     // .pipe(minify(jsMinifyOptions))
