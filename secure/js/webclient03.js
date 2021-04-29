@@ -18,6 +18,47 @@
 //
 // --------------------------------------------------------------------------------
 'use strict';
+
+// -------------------------------------------------
+//  Notify web server to expect connection request
+//  within the next 10 seconds. The request
+//  will have a valid session cookie.
+// -------------------------------------------------
+function initWebSocketAuth (callback) {
+  let fetchURL = webServerUrl + '/irc/wsauth';
+  let fetchOptions = {
+    method: 'POST',
+    headers: {
+      'Content-type': 'application/json',
+      'Accept': 'application/json'
+    },
+    body: JSON.stringify({purpose: 'websocket-auth'})
+  };
+  fetch(fetchURL, fetchOptions)
+    .then( (response) => {
+      // console.log(response.status);
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error('Fetch status ' + response.status + ' ' + response.statusText);
+      }
+    })
+    .then( (responseJson) => {
+      if (callback) {
+        callback(null, ircState);
+      }
+    })
+    .catch( (error) => {
+      console.log(error);
+      webState.webConnected = false;
+      webState.webConnecting = false;
+      updateDivVisibility();
+      if (callback) {
+        callback(error, {});
+      }
+    });
+} // initWebSocketAuth
+
 // ---------------------------------------------
 // Function to connect web socket to web server.
 // ---------------------------------------------

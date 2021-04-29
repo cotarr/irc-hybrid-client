@@ -3,6 +3,9 @@
 // ----------------------------------------------
 'use strict';
 
+// --------------------------------------------------------
+// This is the command input parser to interpret
+// and execute IRC text commands, such as /JOIN
 //
 // inputObj = {
 //   inputString: '/'+command [arguments...]
@@ -16,7 +19,7 @@
 //   ircMessage: '<command> [<argument1>] [<augument2] ... [:Some output string value]'
 // }
 //
-
+// --------------------------------------------------------
 function textCommandParser (inputObj) {
   // Internal function, detect whitespace character
   function _isWS(inChar) {

@@ -1,5 +1,7 @@
 // -------------------------------------------------------------
 // webclient02.js - Parse IRC messages from backend/IRC server
+//
+//    IRC-Server  -->  backend-webserver -->  Browser (here)
 // -------------------------------------------------------------
 //
 'use strict';
@@ -83,7 +85,6 @@ function cleanFormatting (inString) {
 // console.log('colorTest ' + cleanFormatting(colorTest));
 // ------ end color format removal test -------------
 
-
 // ------------------------------------------
 // Function to strip CTCP delimiter
 // ------------------------------------------
@@ -105,10 +106,13 @@ function cleanCtcpDelimiter (inString) {
   return outString;
 }
 
-//
+// ------------------------------------------------------------------
 // Internal function to parse one line of message from IRC server
 // Returns jason object with prefix, command and params array
 //
+// Input: UTF-8 string as input (one message from IRC server)
+// Return: Structured JSON object
+// ------------------------------------------------------------------
 function _parseIrcMessage (message) {
   // ------------------------
   // internal functions
@@ -480,7 +484,7 @@ function displayFormattedServerMessage(parsedMessage, message) {
 // Note: CTCP replies to other users are handled
 // in the backend web server. This parser is
 // for user interactive CTCP requests,
-// primarily ACTIION from /ME commands.
+// primarily ACTION from /ME commands.
 // ---------------------------------------------
 function _parseCtcpMessage (parsedMessage) {
   // console.log('_parseCtcpMessage ' + JSON.stringify(parsedMessage, null, 2));

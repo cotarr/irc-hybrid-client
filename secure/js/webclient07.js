@@ -2,6 +2,11 @@
 // webclient07.js - Private Message Functions
 // --------------------------------------------
 'use strict';
+// ------------------------------------------------------
+// THis module dynamically creates private message
+// windows and adds them to the DOM
+// ------------------------------------------------------
+
 // --------------------------------------------
 // Send text as private message to other user
 //     (internal function)
@@ -42,6 +47,18 @@ function _sendPrivMessageToUser(targetNickname, textAreaEl) {
   }
 }; // _sendPrivMessageToUser
 
+
+// --------------------------------------------------------
+// This creates a new PM window and adds it to the DOM
+//
+// Input:  nickname,
+//         (Initial) parsedMessage
+//
+// The initial message is recieved before event listeners
+// for private messages are created. It is treated
+// as a special case becoming the first message
+// in the PM dispaly textarea element
+// -------------------------------------------------------
 function createPrivateMessageEl (name, parsedMessage) {
   // if already exists, return
   if (webState.activePrivateMessageNicks.indexOf(name.toLowerCase()) >= 0) {

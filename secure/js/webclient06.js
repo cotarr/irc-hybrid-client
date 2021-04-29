@@ -2,6 +2,11 @@
 // webclient06.js - IRC Channel Functions
 // ---------------------------------------
 'use strict';
+// ------------------------------------------------------
+// THis module dynamically creates channel windows and
+// adds them to the DOM
+// ------------------------------------------------------
+
 // ------------------------------------------
 // Send text to channel (internal function)
 //     (internal function)
@@ -43,6 +48,11 @@ function _sendTextToChannel(channelIndex, textAreaEl) {
   }
 }; // _sendTextToChannel
 
+// --------------------------------------------------------
+// This creates a new channel window and adds it to the DOM
+//
+// Input:  Channel name with prefix character (#mychannel)
+// --------------------------------------------------------
 function createChannelEl (name) {
   // if channel already exist abort
   if (webState.channels.indexOf(name.toLowerCase()) >= 0) {

@@ -20,7 +20,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-
 // ----------------------------------------------------------------
 //    Source Files
 //
@@ -29,12 +28,14 @@
 // webclient.js - Global state variables, update API, rendering
 // webclient02.js - Parse IRC messages from backend/IRC server
 // webclient03.js - Websocket Management
-// webclient04.js - API requests
+// webclient04.js - Connect/Disconnect API requests
 // webclient05.js - User Input Text Command Parser
 // webclient06.js - IRC Channel Functions
 // webclient07.js - Private Message Functions
 // webclient08.js - Notice and WallOps functions
-// webclient09.js - Display raw server messages and program info
+// webclient09.js - Display formatted server messages and program info
+// webclient10.js - Fetch handlers and screen resize events
+//
 // ----------------------------------------------------------------
 //
 'use strict';
@@ -48,6 +49,7 @@ const nicknamePrefixChars = '~&@%+';
 const nickChannelSpacer = ' | ';
 // Time during which incoming messages do not trigger activity icon
 const activityIconInhibitTimerValue = 10;
+
 
 // ----------------------------------------------------------
 // Do not edit ircState, represents state on web server end
@@ -90,6 +92,7 @@ var ircState = {
 
   websocketCount: 0
 };
+// -------------------------------------------------------------
 
 document.getElementById('webConnectIconId').removeAttribute('connected');
 document.getElementById('ircConnectIconId').removeAttribute('connected');
@@ -111,6 +114,7 @@ webState.wallopsOpen = false;
 webState.viewRawMessages = false;
 webState.showRawInHex = false;
 webState.showCommsMessages = false;
+webState.lastIrcServerIndex = -1;
 
 // Some IRC channel local variables (most in ircState)
 webState.channels = [];
@@ -218,7 +222,7 @@ document.getElementById('errorDiv').addEventListener('click', function() {
 });
 
 // ------------------------------------------------
-// This is called 1 / second as part of global timer
+// Error message timer tick handler
 // ------------------------------------------------
 function errorTimerTickHandler () {
   if (errorRemainSeconds > 0) {
@@ -232,7 +236,9 @@ function errorTimerTickHandler () {
   }
 };
 
-// Return UNIX timestamp in seconds
+// -----------------------------------------
+// Return current UNIX timestamp in seconds
+// -----------------------------------------
 function timestamp () {
   let now = new Date;
   return parseInt(now.valueOf() / 1000).toString();
@@ -323,7 +329,6 @@ document.getElementById('pmMsgIconId').addEventListener('click', function() {
 document.getElementById('chanMsgIconId').addEventListener('click', function() {
   resetChanActivityIcon(-1);
 }.bind(this));
-
 
 // --------------------------------------------------------------
 // Single function to visibility of all display divs on the page
@@ -441,7 +446,9 @@ function updateDivVisibility() {
   }
 }
 
-// Event to show all divs
+// -------------------------------------------------
+// Global event to make all hidden divs visible
+// -------------------------------------------------
 document.addEventListener('show-all-divs', function(event) {
   // document.getElementById('errorDiv').removeAttribute('hidden');
   document.getElementById('hideLoginSection').removeAttribute('hidden');
@@ -459,7 +466,9 @@ document.addEventListener('show-all-divs', function(event) {
   document.getElementById('infoOpenCloseButton').textContent = '-';
 });
 
-// Event to hide all divs
+// -----------------------------------
+// Global event to hide all divs
+// -----------------------------------
 document.addEventListener('hide-all-divs', function(event) {
   // document.getElementById('errorDiv').setAttribute('hidden', '');
   document.getElementById('hideLoginSection').setAttribute('hidden', '');
@@ -549,7 +558,11 @@ function heartbeatTimerTickHandler () {
   }
 };
 
+// -----------------------------------
+// Update elapsed time display
+// and connect counter
 // called 1/second by timer tick
+// -----------------------------------
 function updateElapsedTimeDisplay () {
   function toTimeString(seconds) {
     let remainSec = seconds;
@@ -592,50 +605,12 @@ function updateElapsedTimeDisplay () {
   timePreEl.textContent = timeStr;
 }
 
-// -------------------------------------------------
-//  Notify web server to expect connection request
-//  within the next 10 seconds. The request
-//  will have a valid session cookie.
-// -------------------------------------------------
-function initWebSocketAuth (callback) {
-  let fetchURL = webServerUrl + '/irc/wsauth';
-  let fetchOptions = {
-    method: 'POST',
-    headers: {
-      'Content-type': 'application/json',
-      'Accept': 'application/json'
-    },
-    body: JSON.stringify({purpose: 'websocket-auth'})
-  };
-  fetch(fetchURL, fetchOptions)
-    .then( (response) => {
-      // console.log(response.status);
-      if (response.ok) {
-        return response.json();
-      } else {
-        throw new Error('Fetch status ' + response.status + ' ' + response.statusText);
-      }
-    })
-    .then( (responseJson) => {
-      if (callback) {
-        callback(null, ircState);
-      }
-    })
-    .catch( (error) => {
-      console.log(error);
-      webState.webConnected = false;
-      webState.webConnecting = false;
-      updateDivVisibility();
-      if (callback) {
-        callback(error, {});
-      }
-    });
-} // initWebSocketAuth
-
-var lastServerIndex = -1;
 // --------------------------------------
 // Contact web server and get state of
 // the connection to the IRC server
+//
+// ircState is main object shared in backend
+// as well as browser (read only here)
 // --------------------------------------
 function getIrcState (callback) {
   let fetchURL = webServerUrl + '/irc/getircstate';
@@ -666,8 +641,8 @@ function getIrcState (callback) {
       // update display as necessary
       // ---------------------------------------------------------------
       // only update user info if server is changed from previous.
-      if ((!ircState.ircConnected) && (lastServerIndex !== ircState.ircServerIndex)) {
-        lastServerIndex = ircState.ircServerIndex;
+      if ((!ircState.ircConnected) && (webState.lastIrcServerIndex !== ircState.ircServerIndex)) {
+        webState.lastIrcServerIndex = ircState.ircServerIndex;
         document.getElementById('ircServerNameInputId').value = ircState.ircServerName;
         document.getElementById('ircServerAddrInputId').value = ircState.ircServerHost;
         document.getElementById('ircServerPortInputId').value = ircState.ircServerPort;

@@ -1,5 +1,5 @@
 // ---------------------------------------------
-// webclient04.js - API requests
+// webclient04.js - Connect/Disconnect API requests
 // ---------------------------------------------
 'use strict';
 // ------------------------

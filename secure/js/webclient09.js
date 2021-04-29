@@ -5,7 +5,7 @@
 // ------------------------------------------------------------
 'use strict';
 // -------------------------------------------------------------------------
-// Internaal function to detect IRC slash commands
+// Internal function to detect IRC slash commands
 // by parsing input on server window user input textarea.
 // -------------------------------------------------------------------------
 function _parseInputForIRCCommands(textAreaEl) {
@@ -77,7 +77,7 @@ function substituteHmsTime(inMessage) {
 // Else, this is where filtered server message are formatted for display
 // ---------------------------------------------------------------------------
 document.addEventListener('server-message', function(event) {
-  // console.log(JSON.stringify(event.detail, null, 2));
+  console.log(JSON.stringify(event.detail, null, 2));
 
   switch(event.detail.parsedMessage.command) {
     case '372': // irc server motd
