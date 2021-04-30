@@ -12,40 +12,44 @@
 //     (internal function)
 // ------------------------------------------
 function _sendTextToChannel(channelIndex, textAreaEl) {
-  if ((textAreaEl.value.length > 0)) {
-    let text = textAreaEl.value;
-    text = text.replace('\r', '').replace('\n', '');
-
-    // Check slash character to see if it is an IRC command
-    if (text.charAt(0) === '/') {
-      // yes, it is command
-      let commandAction = textCommandParser(
-        {
-          inputString: text,
-          originType: 'channel',
-          originName: ircState.channelStates[channelIndex].name
-        }
-      );
-      // clear input element
-      textAreaEl.value = '';
-      if (commandAction.error) {
-        showError(commandAction.message);
-        return;
-      } else {
-        if ((commandAction.ircMessage) && (commandAction.ircMessage.length > 0)) {
-          _sendIrcServerMessage(commandAction.ircMessage);
-        }
-        return;
-      }
-    }
-
-    // Else not slash / command, assume is input intended to send to channel.
-    let message = 'PRIVMSG ' +
-      ircState.channelStates[channelIndex].name +
-      ' :' + text;
-    _sendIrcServerMessage(message);
+  let text = stripTrailingCrLf(textAreaEl.value);
+  if (detectMultiLineString(text)) {
     textAreaEl.value = '';
+    showError('Multi-line input is not supported.');
+  } else {
+    if (text.length > 0) {
+      // Check slash character to see if it is an IRC command
+      if (text.charAt(0) === '/') {
+        // yes, it is command
+        let commandAction = textCommandParser(
+          {
+            inputString: text,
+            originType: 'channel',
+            originName: ircState.channelStates[channelIndex].name
+          }
+        );
+        // clear input element
+        textAreaEl.value = '';
+        if (commandAction.error) {
+          showError(commandAction.message);
+          return;
+        } else {
+          if ((commandAction.ircMessage) && (commandAction.ircMessage.length > 0)) {
+            _sendIrcServerMessage(commandAction.ircMessage);
+          }
+          return;
+        }
+      }
+
+      // Else not slash / command, assume is input intended to send to channel.
+      let message = 'PRIVMSG ' +
+        ircState.channelStates[channelIndex].name +
+        ' :' + text;
+      _sendIrcServerMessage(message);
+      textAreaEl.value = '';
+    }
   }
+  textAreaEl.value = '';
 }; // _sendTextToChannel
 
 // --------------------------------------------------------

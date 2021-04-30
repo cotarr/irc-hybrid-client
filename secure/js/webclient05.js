@@ -3,6 +3,46 @@
 // ----------------------------------------------
 'use strict';
 
+//
+// This is to avoid multi-line errors from copy paste or mobile voice dictation
+//
+// Returns true if string is multi-line
+//
+function detectMultiLineString(inString) {
+  let inLength = inString.length;
+  // if last character is newline 0x0A, then reduce by 1
+  if ((inLength > 0) && (inString.charCodeAt(inLength-1) === 10)) inLength--;
+  if (inLength > 0) {
+    let countCR = 0;
+    for (let i=0; i<inLength; i++) {
+      if (inString.charCodeAt(i) === 10) countCR++;
+    }
+    if (countCR === 0) {
+      return false;
+    } else {
+      return true;
+    }
+  } else {
+    return false;
+  }
+}
+
+//
+// remove trailing CR-LF
+//
+// Returns new string
+//
+function stripTrailingCrLf(inString) {
+  let inLength = inString.length;
+  if ((inLength > 0) && (inString.charCodeAt(inLength-1) === 10)) inLength--;
+  if ((inLength > 0) && (inString.charCodeAt(inLength-1) === 13)) inLength--;
+  if (inLength === 0) {
+    return '';
+  } else {
+    return inString.slice(0, inLength);
+  }
+}
+
 // --------------------------------------------------------
 // This is the command input parser to interpret
 // and execute IRC text commands, such as /JOIN

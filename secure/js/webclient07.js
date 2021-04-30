@@ -12,39 +12,43 @@
 //     (internal function)
 // --------------------------------------------
 function _sendPrivMessageToUser(targetNickname, textAreaEl) {
-  if ((textAreaEl.value.length > 0)) {
-    let text = textAreaEl.value;
-    text = text.replace('\r', '').replace('\n', '');
-
-    // Check slash character to see if it is an IRC command
-    if (text.charAt(0) === '/') {
-      // yes, it is command
-      let commandAction = textCommandParser(
-        {
-          inputString: text,
-          originType: 'private',
-          originName: targetNickname
-        }
-      );
-      // clear input element
-      textAreaEl.value = '';
-      if (commandAction.error) {
-        showError(commandAction.message);
-        return;
-      } else {
-        if ((commandAction.ircMessage) && (commandAction.ircMessage.length > 0)) {
-          _sendIrcServerMessage(commandAction.ircMessage);
-        }
-        return;
-      }
-    }
-
-    // Else not slash / command, assume is input intended to send to private message.
-    let message = 'PRIVMSG ' + targetNickname +
-      ' :' + text;
-    _sendIrcServerMessage(message);
+  let text = stripTrailingCrLf(textAreaEl.value);
+  if (detectMultiLineString(text)) {
     textAreaEl.value = '';
+    showError('Multi-line input is not supported.');
+  } else {
+    if (text.length > 0) {
+      // Check slash character to see if it is an IRC command
+      if (text.charAt(0) === '/') {
+        // yes, it is command
+        let commandAction = textCommandParser(
+          {
+            inputString: text,
+            originType: 'private',
+            originName: targetNickname
+          }
+        );
+        // clear input element
+        textAreaEl.value = '';
+        if (commandAction.error) {
+          showError(commandAction.message);
+          return;
+        } else {
+          if ((commandAction.ircMessage) && (commandAction.ircMessage.length > 0)) {
+            _sendIrcServerMessage(commandAction.ircMessage);
+          }
+          return;
+        }
+      }
+
+      // Else not slash / command, assume is input intended to send to private message.
+      let message = 'PRIVMSG ' + targetNickname +
+        ' :' + text;
+      _sendIrcServerMessage(message);
+      textAreaEl.value = '';
+    }
   }
+  textAreaEl.value = '';
 }; // _sendPrivMessageToUser
 
 
@@ -429,38 +433,44 @@ document.addEventListener('private-message', function(event) {
 function _buildPrivateMessageText() {
   if (document.getElementById('userPrivMsgInputId').value.length === 0) return;
   let inputAreaEl = document.getElementById('userPrivMsgInputId');
-  let text = inputAreaEl.value.replace('\r', '').replace('\n', '');
-  if (text.length === 0) return;
-
-  // Check slash character to see if it is an IRC command
-  if (text.charAt(0) === '/') {
-    // yes, it is command
-    let commandAction = textCommandParser(
-      {
-        inputString: text,
-        originType: 'generic',
-        originName: null
-      }
-    );
-    // clear input element
+  let text = stripTrailingCrLf(inputAreaEl.value);
+  if (detectMultiLineString(text)) {
     inputAreaEl.value = '';
-    if (commandAction.error) {
-      showError(commandAction.message);
-      return;
-    } else {
-      if ((commandAction.ircMessage) && (commandAction.ircMessage.length > 0)) {
-        _sendIrcServerMessage(commandAction.ircMessage);
+    showError('Multi-line input is not supported.');
+  } else {
+    if (text.length > 0) {
+      // Check slash character to see if it is an IRC command
+      if (text.charAt(0) === '/') {
+        // yes, it is command
+        let commandAction = textCommandParser(
+          {
+            inputString: text,
+            originType: 'generic',
+            originName: null
+          }
+        );
+        // clear input element
+        inputAreaEl.value = '';
+        if (commandAction.error) {
+          showError(commandAction.message);
+          return;
+        } else {
+          if ((commandAction.ircMessage) && (commandAction.ircMessage.length > 0)) {
+            _sendIrcServerMessage(commandAction.ircMessage);
+          }
+          return;
+        }
+        return;
       }
-      return;
+      console.log('else not command');
+      // Else not slash / command, assume is input intended to send to private message.
+      if (document.getElementById('pmNickNameInputId').value.length === 0) return;
+      let targetNickname = document.getElementById('pmNickNameInputId').value;
+      let message = 'PRIVMSG ' + targetNickname + ' :' + text;
+      _sendIrcServerMessage(message);
+      inputAreaEl.value = '';
     }
-    return;
   }
-  console.log('else not command');
-  // Else not slash / command, assume is input intended to send to private message.
-  if (document.getElementById('pmNickNameInputId').value.length === 0) return;
-  let targetNickname = document.getElementById('pmNickNameInputId').value;
-  let message = 'PRIVMSG ' + targetNickname + ' :' + text;
-  _sendIrcServerMessage(message);
   inputAreaEl.value = '';
 };
 document.getElementById('userPrivMsgInputId').addEventListener('input', function(event) {

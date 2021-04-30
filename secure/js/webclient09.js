@@ -9,31 +9,33 @@
 // by parsing input on server window user input textarea.
 // -------------------------------------------------------------------------
 function _parseInputForIRCCommands(textAreaEl) {
-  if ((textAreaEl.value.length > 0)) {
-    let text = textAreaEl.value;
-    text = text.replace('\r', '').replace('\n', '');
-
-    // TODO copy/paste multiple lines
-
-    let commandAction = textCommandParser(
-      {
-        inputString: text,
-        originType: 'generic',
-        originName: null
-      }
-    );
-    // clear input element
+  let text = stripTrailingCrLf(textAreaEl.value);
+  if (detectMultiLineString(text)) {
     textAreaEl.value = '';
-    if (commandAction.error) {
-      showError(commandAction.message);
-      return;
-    } else {
-      if ((commandAction.ircMessage) && (commandAction.ircMessage.length > 0)) {
-        _sendIrcServerMessage(commandAction.ircMessage);
+    showError('Multi-line input is not supported.');
+  } else {
+    if (text.length > 0) {
+      let commandAction = textCommandParser(
+        {
+          inputString: text,
+          originType: 'generic',
+          originName: null
+        }
+      );
+      // clear input element
+      textAreaEl.value = '';
+      if (commandAction.error) {
+        showError(commandAction.message);
+        return;
+      } else {
+        if ((commandAction.ircMessage) && (commandAction.ircMessage.length > 0)) {
+          _sendIrcServerMessage(commandAction.ircMessage);
+        }
+        return;
       }
-      return;
     }
   }
+  textAreaEl.value = '';
 };
 
 // -----------------------------------------------
