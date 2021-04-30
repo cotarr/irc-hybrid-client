@@ -394,6 +394,7 @@ const adjustInputToWidowWidth = function (innerWidth) {
   // Debug: To watch a variable, put it here.
   if (!webState.watch) webState.watch = {};
   webState.watch.innerWidth = window.innerWidth.toString() + 'px';
+  webState.watch.innerHeight = window.innerHeight.toString() + 'px';
 };
 //
 // Event listener for resize widnow
