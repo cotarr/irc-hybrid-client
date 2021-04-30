@@ -351,7 +351,7 @@ function displayPrivateMessage(parsedMessage) {
 // -----------------------------------------------------
 function displayNoticeMessage(parsedMessage) {
   function _addText (text) {
-    document.getElementById('noticeMessageDisplay').textContent +=
+    document.getElementById('noticeMessageDisplay').value +=
       cleanFormatting(text) + '\n';
     document.getElementById('noticeMessageDisplay').scrollTop =
       document.getElementById('noticeMessageDisplay').scrollHeight;
@@ -410,7 +410,7 @@ function displayNoticeMessage(parsedMessage) {
 // -----------------------------------------------------
 function displayWallopsMessage(parsedMessage) {
   function _addText (text) {
-    document.getElementById('wallopsMessageDisplay').textContent += cleanFormatting(text) + '\n';
+    document.getElementById('wallopsMessageDisplay').value += cleanFormatting(text) + '\n';
     document.getElementById('wallopsMessageDisplay').scrollTop =
       document.getElementById('wallopsMessageDisplay').scrollHeight;
   }
@@ -445,7 +445,7 @@ function showRawMessageWindow() {
 // and scroll to bottom
 // ----------------------------------------------
 function displayRawMessage (inString) {
-  document.getElementById('rawMessageDisplay').textContent += inString + '\n';
+  document.getElementById('rawMessageDisplay').value += inString + '\n';
   // scroll to view new text
   document.getElementById('rawMessageDisplay').scrollTop =
     document.getElementById('rawMessageDisplay').scrollHeight;
@@ -489,7 +489,7 @@ function displayFormattedServerMessage(parsedMessage, message) {
 function _parseCtcpMessage (parsedMessage) {
   // console.log('_parseCtcpMessage ' + JSON.stringify(parsedMessage, null, 2));
   function _addNoticeText (text) {
-    document.getElementById('noticeMessageDisplay').textContent += text + '\n';
+    document.getElementById('noticeMessageDisplay').value += text + '\n';
     document.getElementById('noticeMessageDisplay').scrollTop =
       document.getElementById('noticeMessageDisplay').scrollHeight;
   }

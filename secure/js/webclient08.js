@@ -14,7 +14,7 @@ document.getElementById('closeNoticeButton').addEventListener('click', function(
 // Notice Clear button handler
 // -------------------------
 document.getElementById('noticeClearButton').addEventListener('click', function() {
-  document.getElementById('noticeMessageDisplay').textContent = '';
+  document.getElementById('noticeMessageDisplay').value = '';
   document.getElementById('noticeMessageDisplay').setAttribute('rows', '5');
 });
 
@@ -54,7 +54,7 @@ document.getElementById('wallopsCloseButton').addEventListener('click', function
 // Wallops Clear button handler
 // -------------------------
 document.getElementById('wallopsClearButton').addEventListener('click', function() {
-  document.getElementById('wallopsMessageDisplay').textContent = '';
+  document.getElementById('wallopsMessageDisplay').value = '';
   document.getElementById('wallopsMessageDisplay').setAttribute('rows', '5');
 }.bind(this));
 

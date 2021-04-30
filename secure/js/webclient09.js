@@ -43,6 +43,7 @@ function _parseInputForIRCCommands(textAreaEl) {
 // -----------------------------------------------
 document.getElementById('sendRawMessageButton').addEventListener('click', function() {
   _parseInputForIRCCommands(document.getElementById('rawMessageInputId'));
+  document.getElementById('rawMessageInputId').focus();
 }.bind(this));
 // ---------------------------------------
 // Send IRC server textarea Enter pressed
@@ -225,7 +226,7 @@ document.getElementById('rawHiddenElementsButton').addEventListener('click', fun
 // raw Clear button handler
 // -------------------------
 document.getElementById('rawClearButton').addEventListener('click', function() {
-  document.getElementById('rawMessageDisplay').textContent = '';
+  document.getElementById('rawMessageDisplay').value = '';
   document.getElementById('rawMessageDisplay').setAttribute('rows', '10');
 });
 // -------------------------

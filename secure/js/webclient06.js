@@ -343,7 +343,7 @@ function createChannelEl (name) {
   // Clear button handler
   // -------------------------
   channelClearButtonEl.addEventListener('click', function() {
-    channelTextAreaEl.textContent = '';
+    channelTextAreaEl.value = '';
     channelTextAreaEl.setAttribute('rows', defaultHeightInRows);
     channelNamesDisplayEl.setAttribute('rows', defaultHeightInRows);
   });
@@ -388,7 +388,7 @@ function createChannelEl (name) {
     // this forces a global update which will refreesh text area
     document.dispatchEvent(new CustomEvent('update-from-cache', {bubbles: true}));
     // THis will request a new nickname list from IRC server.
-    channelNamesDisplayEl.textContent = '';
+    channelNamesDisplayEl.value = '';
     _sendIrcServerMessage('NAMES ' + name);
   });
 
@@ -397,6 +397,7 @@ function createChannelEl (name) {
   // -------------
   channelSendButtonEl.addEventListener('click', function() {
     _sendTextToChannel(channelIndex, channelInputAreaEl);
+    channelInputAreaEl.focus();
     resetChanActivityIcon(channelIndex);
     activityIconInhibitTimer = activityIconInhibitTimerValue;
   }.bind(this));
@@ -536,7 +537,7 @@ function createChannelEl (name) {
     document.dispatchEvent(new CustomEvent('update-from-cache', {bubbles: true}));
 
     // THis will request a new nickname list from IRC server.
-    // channelNamesDisplayEl.textContent = '';
+    // channelNamesDisplayEl.value = '';
     // _sendIrcServerMessage('NAMES ' + name);
   });
 
@@ -665,7 +666,7 @@ function createChannelEl (name) {
     if (index >= 0) {
       maxNickLength = 0;
       if (ircState.channelStates[index].names.length > 0) {
-        channelNamesDisplayEl.textContent = '';
+        channelNamesDisplayEl.value = '';
         let opList = [];
         let otherList = [];
         for (let i=0; i<ircState.channelStates[index].names.length; i++) {
@@ -679,7 +680,7 @@ function createChannelEl (name) {
         let sortedOtherList = otherList.sort();
         if (sortedOpList.length > 0) {
           for (let i=0; i<sortedOpList.length; i++) {
-            channelNamesDisplayEl.textContent += sortedOpList[i] + '\n';
+            channelNamesDisplayEl.value += sortedOpList[i] + '\n';
             if (maxNickLength < sortedOpList[i].length) {
               maxNickLength = sortedOpList[i].length;
             }
@@ -687,7 +688,7 @@ function createChannelEl (name) {
         }
         if (sortedOtherList.length > 0) {
           for (let i=0; i<sortedOtherList.length; i++) {
-            channelNamesDisplayEl.textContent += sortedOtherList[i] + '\n';
+            channelNamesDisplayEl.value += sortedOtherList[i] + '\n';
             if (maxNickLength < sortedOtherList[i].length) {
               maxNickLength = sortedOtherList[i].length;
             }
@@ -795,7 +796,7 @@ function createChannelEl (name) {
         cleanFormatting(text) + '\n';
       }
       // append text to textarea
-      channelTextAreaEl.textContent += out;
+      channelTextAreaEl.value += out;
       // move scroll bar so text is scrolled all the way up
       channelTextAreaEl.scrollTop = channelTextAreaEl.scrollHeight;
     }
@@ -985,8 +986,8 @@ function createChannelEl (name) {
 
   document.addEventListener('erase-before-reload', function(event) {
     // console.log('Event erase-before-reload');
-    channelTextAreaEl.textContent = '';
-    channelInputAreaEl.textContent = '';
+    channelTextAreaEl.value = '';
+    channelInputAreaEl.value = '';
   }.bind(this));
 
   // set visibility and divs

@@ -54,9 +54,9 @@ function updateFromCache () {
         webState.activePrivateMessageNicks = [];
         webState.resizablePrivMsgTextareaIds = [];
         webState.resizableSendButtonPMTextareaIds = [];
-        document.getElementById('noticeMessageDisplay').textContent = '';
-        document.getElementById('wallopsMessageDisplay').textContent = '';
-        document.getElementById('rawMessageDisplay').textContent = '';
+        document.getElementById('noticeMessageDisplay').value = '';
+        document.getElementById('wallopsMessageDisplay').value = '';
+        document.getElementById('rawMessageDisplay').value = '';
         webState.noticeOpen = false;
         webState.wallopsOpen = false;
         //
@@ -166,9 +166,9 @@ document.getElementById('eraseCacheButton').addEventListener('click', function()
         while (privMsgSessionEl.firstChild) {
           privMsgSessionEl.removeChild(privMsgSessionEl.firstChild);
         }
-        document.getElementById('noticeMessageDisplay').textContent = '';
-        document.getElementById('wallopsMessageDisplay').textContent = '';
-        document.getElementById('rawMessageDisplay').textContent = '';
+        document.getElementById('noticeMessageDisplay').value = '';
+        document.getElementById('wallopsMessageDisplay').value = '';
+        document.getElementById('rawMessageDisplay').value = '';
         webState.privMsgOpen = false;
         webState.noticeOpen = false;
         webState.wallopsOpen = false;

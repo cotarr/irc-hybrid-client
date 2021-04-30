@@ -187,7 +187,7 @@ function createPrivateMessageEl (name, parsedMessage) {
   // Add initial message, special case of opening new window
   // we must add the message that generated the window open request.
   // -------------------------------------------
-  privMsgTextAreaEl.textContent += parsedMessage.timestamp + ' ' +
+  privMsgTextAreaEl.value += parsedMessage.timestamp + ' ' +
     parsedMessage.nick + ' ' + cleanFormatting(parsedMessage.params[1]) + '\n';
   // move scroll bar so text is scrolled all the way up
   privMsgTextAreaEl.scrollTop = privMsgTextAreaEl.scrollHeight;
@@ -212,8 +212,8 @@ function createPrivateMessageEl (name, parsedMessage) {
   // like this one are removed by the erase and reload process.
   document.addEventListener('erase-before-reload', function(event) {
     // console.log('Event erase-before-reload');
-    privMsgTextAreaEl.textContent = '';
-    privMsgInputAreaEl.textContent = '';
+    privMsgTextAreaEl.value = '';
+    privMsgInputAreaEl.value = '';
   }.bind(this));
 
   // Hide PM window, Hide PM data section, Hide buttons
@@ -266,7 +266,7 @@ function createPrivateMessageEl (name, parsedMessage) {
   // Clear button handler
   // -------------------------
   privMsgClearButtonEl.addEventListener('click', function() {
-    privMsgTextAreaEl.textContent = '';
+    privMsgTextAreaEl.value = '';
     privMsgTextAreaEl.setAttribute('rows', '6');
   });
 
@@ -293,6 +293,7 @@ function createPrivateMessageEl (name, parsedMessage) {
   // -------------
   privMsgSendButtonEl.addEventListener('click', function() {
     _sendPrivMessageToUser(name, privMsgInputAreaEl);
+    privMsgInputAreaEl.focus();
     resetPmActivityIcon(privMsgIndex);
     activityIconInhibitTimer = activityIconInhibitTimerValue;
   }.bind(this));
@@ -326,7 +327,7 @@ function createPrivateMessageEl (name, parsedMessage) {
   document.addEventListener('private-message', function(event) {
     function _addText (text) {
       // append text to textarea
-      privMsgTextAreaEl.textContent += cleanFormatting(text) + '\n';
+      privMsgTextAreaEl.value += cleanFormatting(text) + '\n';
       // move scroll bar so text is scrolled all the way up
       privMsgTextAreaEl.scrollTop = privMsgTextAreaEl.scrollHeight;
     }
