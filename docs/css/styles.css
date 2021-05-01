@@ -64,19 +64,6 @@ ul {
 }
 
 
-.command-div {
-  display: inline-block;
-  vertical-align: top;
-  padding-left: 5px;
-  padding-top: 5px;
-  padding-right: 0px;
-  padding-left: 0px;
-
-  margin-right: 5px;
-  margin-bottom: 5px;
-  margin-left: 0px;
-
-}
 table {
   background-color: #ffffff;
   width: 550px;
@@ -104,73 +91,22 @@ th, td {
   font-size: 140%;
   padding-left: 10px;
 }
-p {
-  padding-left: 30px;
-}
-.image-text {
-  margin-top: 30px;
-  padding-left: 70px;
-  font-size: 115%
-}
-.image-div {
-  margin-top: 5px;
-  margin-left: 40px;
-}
-/* types of pre-formatted text */
-.pre-example {
-  padding-top: 10px;
-  padding-bottom: 10px;
-  margin-left: 30px;
-  padding-left: 15px;
-  border: 1px solid black;
-  border-radius: 7px;
-  background-color: #ffffcc;
-}
-.pre-command {
-  padding-top: 10px;
-  padding-right: 10px;
-  padding-bottom: 10px;
-  padding-left: 15px;
-  margin-left: 30px;
-  border: 1px solid black;
-  border-radius: 7px;
-}
-.pre-tutorial {
-  padding-top: 5px;
-  padding-bottom: 5px;
-  margin-left: 30px;
-  padding-left: 15px;
-  border: 1px solid black;
-  border-radius: 7px;
-}
-.pre-faq {
-  padding-top: 5px;
-  padding-bottom: 5px;
-  padding-left: 5px;
-  padding-right: 20px;
-  margin-left: 5px;
-  margin-right: 10px;
-  border: 1px solid black;
-  border-radius: 7px;
-}
-/* tutorial input and output */
-in, out {
-  border: 1px solid #aaaaaa;
-  border-radius: 3px;
-  padding-bottom: 2px;
-  padding-top: 2px;
-  font-size: 110%
-}
-in {
-  background-color: #b0e9ff;
-}
-out {
-  background-color: #f4f400;
-}
-/* tutorial output multi-line */
-out-ml {
-  background-color: #f4f400;
-}
+
+
 .faq-spacer {
   height: 25px;
+}
+
+.home-detail {
+  margin-bottom: 15px;
+  padding: 10px;
+}
+
+.image-text {
+  display: inline-block;
+  max-width: 350px;
+  vertical-align: top;
+}
+.image-photo {
+  display: inline-block;
 }
