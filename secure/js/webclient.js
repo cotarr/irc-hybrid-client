@@ -47,6 +47,7 @@
 const channelPrefixChars = '@#+!';
 const nicknamePrefixChars = '~&@%+';
 const nickChannelSpacer = ' | ';
+const pmNameSpacer = ' - ';
 // Time during which incoming messages do not trigger activity icon
 const activityIconInhibitTimerValue = 10;
 

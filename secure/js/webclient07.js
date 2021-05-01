@@ -188,7 +188,7 @@ function createPrivateMessageEl (name, parsedMessage) {
   // we must add the message that generated the window open request.
   // -------------------------------------------
   privMsgTextAreaEl.value += parsedMessage.timestamp + ' ' +
-    parsedMessage.nick + ' ' + cleanFormatting(parsedMessage.params[1]) + '\n';
+    parsedMessage.nick + pmNameSpacer + cleanFormatting(parsedMessage.params[1]) + '\n';
   // move scroll bar so text is scrolled all the way up
   privMsgTextAreaEl.scrollTop = privMsgTextAreaEl.scrollHeight;
 
@@ -332,7 +332,7 @@ function createPrivateMessageEl (name, parsedMessage) {
       privMsgTextAreaEl.scrollTop = privMsgTextAreaEl.scrollHeight;
     }
     let parsedMessage = event.detail.parsedMessage;
-    // console.log('Event private-message: ' + JSON.stringify(parsedMessage, null, 2));
+    console.log('Event private-message: ' + JSON.stringify(parsedMessage, null, 2));
     switch(parsedMessage.command) {
       //
       // TODO cases for user left IRC or other error
@@ -343,8 +343,13 @@ function createPrivateMessageEl (name, parsedMessage) {
         if (parsedMessage.nick === ircState.nickName) {
           // case of this is outgoing message from me
           if (parsedMessage.params[0].toLowerCase() === name.toLowerCase()) {
-            _addText(parsedMessage.timestamp + ' ' +
+            if ('isPmCtcpAction' in parsedMessage) {
+              _addText(parsedMessage.timestamp + pmNameSpacer +
               parsedMessage.nick + ' ' + parsedMessage.params[1]);
+            } else {
+              _addText(parsedMessage.timestamp + ' ' +
+              parsedMessage.nick + pmNameSpacer + parsedMessage.params[1]);
+            }
             // Upon privMsg message, make sectino visible.
             privMsgSectionEl.removeAttribute('hidden');
             privMsgBottomDivEl.removeAttribute('hidden');
@@ -357,9 +362,13 @@ function createPrivateMessageEl (name, parsedMessage) {
         } else {
           // case of incoming message from others.
           if (parsedMessage.nick.toLowerCase() === name.toLowerCase()) {
-            _addText(parsedMessage.timestamp + ' ' +
+            if ('isPmCtcpAction' in parsedMessage) {
+              _addText(parsedMessage.timestamp + pmNameSpacer +
               parsedMessage.nick + ' ' + parsedMessage.params[1]);
-
+            } else {
+              _addText(parsedMessage.timestamp + ' ' +
+              parsedMessage.nick + pmNameSpacer + parsedMessage.params[1]);
+            }
             // Upon privMsg message, make sectino visible.
             privMsgSectionEl.removeAttribute('hidden');
             privMsgBottomDivEl.removeAttribute('hidden');

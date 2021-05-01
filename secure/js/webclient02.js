@@ -531,6 +531,7 @@ function _parseCtcpMessage (parsedMessage) {
     } else {
       // TODO actino sent as regular PM for now
       parsedMessage.params[1] = ctcpRest;
+      parsedMessage.isPmCtcpAction = true;
       displayPrivateMessage(parsedMessage);
     }
   } else {
