@@ -30,7 +30,7 @@ Single user hybrid IRC client using JavaScript front end and Node/Express backen
 # Installation
 
 ```bash
-git clone git@github.com:cotarr/irc-hybrid-client.git
+git clone https://github.com/cotarr/irc-hybrid-client.git
 cd irc-hybrid-client
 
 # make log directory

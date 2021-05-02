@@ -49,7 +49,7 @@ body {
   color: white;
 }
 
-ul {
+.menu-div ul {
   list-style-type: none;
   margin: 0;
   padding: 0;
@@ -63,6 +63,26 @@ ul {
   border-bottom: 1px solid black;
 }
 
+
+.install-section-title {
+  font-size: 130%;
+  margin-top: 15px;
+}
+ul.install-list {
+  margin-top: 5px;
+  margin-left: 0;
+  padding-left: 15px;
+}
+
+.pre-div {
+  background-color: #e8e8e8;
+  border: 1px solid black;
+  border-radius: 5px;
+  padding-top: 0px;
+  padding-right: 10px;
+  padding-bottom: 0px;
+  padding-left: 15px;
+}
 
 table {
   background-color: #ffffff;
@@ -88,8 +108,15 @@ th, td {
   margin-bottom: 5px;
 }
 .desc-title {
+  border: 1px solid black;
+  border-radius: 7px;
+  background-color: #baf8ff;
   font-size: 140%;
-  padding-left: 10px;
+  margin-top: 10px;
+  margin-left: 20px;
+  margin-right: 20px;
+  padding: 10px;
+  text-align: center;
 }
 
 
