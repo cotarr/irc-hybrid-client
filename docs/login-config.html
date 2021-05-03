@@ -46,7 +46,7 @@
         <p>
           This is intended for future use. It provides a method to
           issue a startup message when attempting to use a configuration
-          file that may be impacted by breaking changes. It remain at 1
+          file that may be impacted by breaking changes. It will remain at 1
           until there is a breaking change.
         </p>
 <div class="pre-div"><pre>
@@ -185,13 +185,21 @@
           it until a new password were set using the ssh termianl.
         </p>
         <p>
-          The credentials.json file includes a loginUsers entry. This is an Array
-          of JavaScript objects, with each object representing one user with 5 key/value pairs.
-          In fact, there is only 1 user, so only the first Array object at
+          A brief note about syntax. The credentials.json file represents a JSON structured data object.
+          JSON syntax must be exact, with matching curley braces and proper use of commas.
+          The credentials.json file includes a loginUsers property.
+          The square brackets [ ] define a javascript Array.
+          Each of the curley braces { } within the Array is a javascript object
+          used to define an individual user.
+          The user object contains 5 properties listed as key/value pairs.
+          Note the use of double quotes and commas between key/value pairs except the last has no comma.
+          In fact, there is only 1 user. Only the first Array object at
           index 0 (userid 1) is relevant.
         </p>
         <p>
-          A small javascript file can be executed by node from the command line to
+          A small javascript program has been included to create a user password hash
+          and automatically update the credentials.json file.
+          The program can be executed from the command line to
           assign the username and password for the primary user at Array index 0, (userid 1).
           To run this program, change directory to the tools folder, and execute the
           ./updateAuthForUser_1.js program as in the following example.
@@ -203,8 +211,8 @@ cd tools
 </pre></div>
         <p>
           This will start an interactive session.
-          In this example, the user was set to <blue-example>user1</blue-example>.
-          The name was allowed to default to the
+          In this example, the &quotuser&quot was set to <blue-example>user1</blue-example>.
+          The &quotname&quot was allowed to default to the
           same value as the user.
           In this example, the password was set to
           <blue-example>zuwa79xoJxLJ</blue-example>.
