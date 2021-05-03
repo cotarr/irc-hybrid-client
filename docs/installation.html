@@ -190,7 +190,7 @@ npm install
           recognized certificate authority. I use the LetsEncrypt certbot.
           Debian includes certbot as an apt package. Assuming you have a domain
           name, the following command would generate a set of certificates
-          good for 90 days.
+          good for 90 days. Be sure to switch example.com with your domain name.
         </p>
 <div class="pre-div"><pre>
 # Make sure no other programs are listening on ports 80, 443
@@ -249,7 +249,7 @@ sudo certbot certonly --standalone -d abcd.example.com
           asynchronous communications with the IRC server.
           Your firewall should allow outgoing connection
           to the TCP port listed in the IRC server configuration.
-          In most cases, outbound connections are allowed,
+          In most cases, outbound connections are not restricted,
           so this may not require any special filter rules.
         </p>
         <p>

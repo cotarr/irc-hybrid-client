@@ -137,3 +137,9 @@ th, td {
 .image-photo {
   display: inline-block;
 }
+blue-example {
+  background-color: #40e6ff;
+}
+yellow-example {
+  background-color: yellow;
+}
