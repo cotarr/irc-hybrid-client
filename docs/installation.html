@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+	<head>
+		<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+		<title>Installation</title>
+    <link rel="stylesheet" href="css/styles.css">
+	</head>
+	<body>
+    <div class="header-div">
+      Documentation for
+      <a href="https://github.com/cotarr/irc-hybrid-client">irc-hybrid-client</a>
+    </div>
+    <div class="outer-div">
+      <div class="menu-div">
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a class="active" href="installation.html">Installation</a></li>
+          <li><a href="login-config.html">Login Config</a></li>
+          <li><a href="server-config.html">IRC Config</a></li>
+          <li><a href="text-commands.html">Text Commands</a></li>
+          <li><a href="faq.html">FAQ</a></li>
+          <li><a href="history.html">Change Log</a></li>
+          <li><a href="license.html">License</a></li>
+        </ul>
+      </div> <!-- /menu-div-->
+
+      <div class="text-div">
+        <div class="desc-title">
+          Installation
+        </div>
+        <p>
+          If you are familiar with the process of cloning a Node.js/Exress
+          web server, you can use abbreviated instructions in the README.md
+          file in the github repository.
+        </p>
+
+        <div class="install-section-title">Prerequisite Knowledge</div>
+        <p>
+          In order to you this software it is necessary to install
+          and run a Node.js web server on a Linux system.
+          In general, this will involve the following prerequisite knowledge.
+        </p>
+        <ul class="install-list">
+          <li>Comfortable using ssh and command line interface (CLI)</li>
+          <li>Use of git to clone a git repository using CLI</li>
+          <li>Use of Node.js package manager npm to install dependencies</li>
+          <li>Use of text editor to modify raw JSON configuration files</li>
+          <li>Experience opening firewall ports to expose a server</li>
+          <li>Experience generating web server TLS certificates</li>
+          <li>Familiar with IRC and with configuration of IRC clients</li>
+        </ul>
+
+        <div class="install-section-title">System Requriements (Server)</div>
+        <p>
+          This program was written for personal use of the author.
+          No formal security evaluation has been performed.
+          As a security consideration, it is recommended to run the web
+          server in a non-privliged shell without root access.
+          It does not require a privledged port less than 1024,
+          however you must choose a port not blocked by your browser.
+        </p>
+        <p>
+          If the server is internet facing, it is recommended to configure
+          the server to use TLS certificates to protect passwords using
+          SSL/TLS encryption.
+        </p>
+        <p>
+          The application was developed in a virtual machine running
+          Debian-10. The author deploys it for personal use in a
+          cloud VPS single-core droplet with 500MB RAM running Debian 10.
+          It has also run during debugging on a RaspberryPi 3 and 4
+          behind a NAT router.
+        </p>
+        <p>
+          The program has run without errors under Node.js versions 12 and 14.
+          Other versions of Node.js have not been tried.
+        </p>
+        <div class="install-section-title">System Requriements (Browser)</div>
+        <p>
+          This HTML, CSS and browser JavaScript was written and debugged
+          using the Chrome web browser running under Linux, and using
+          the mobile Chrome browser on an Apple iPhone 8 Plus.
+          No other browsers besides Chrome have been tested.
+        </p>
+        <div class="install-section-title">Other Requriements (IRC network)</div>
+        <p>
+          The IRC interface was primarily developed and tested using the DALnet
+          IRC network. Local testing was performed using ngirc-25 from the
+          Debian apt package. Other IRC servers have not been tested.
+          RFC-2812 "Internet Relay Chat: Client Protocol" was the primary
+          specification reference. Considering this is a limited functionality
+          mobile phone client, not all IRC features have been implemented.
+        </p>
+        <div class="install-section-title">1 - Install Node.js</div>
+        <p>
+          Node.js is a JavaScript interpreter that can execute JavaScript programs
+          from a Linux terminal.
+          It is similar to using python, and it includes a package manager, npm,
+          similar to using pip in python.
+          Some web developers prefer node, becasue their JavaScript programming
+          knowledge can be used for coding both browser and backend web server JavaScript.
+          You can check if nodejs is installed by typing
+          &quotnode -v&quot
+          in your terminal. If installed, the version will be displayed.
+          If node is not installed, there are several options:
+        </p>
+        <p>
+          To install Node.js, one option is to visit the Node.js website at
+          <a href="https://nodejs.org/en/">https://nodejs.org/en/</a>
+          where you can download a tar file and compile node from source.
+          The second alternatvie is to use pre-compiled binaries
+          for Linux that are available from
+          <a href="https://github.com/nodesource/distributions">https://github.com/nodesource/distributions</a>.
+          Both of these include installation instructions.
+          Depending on your version of Linux, &quotnodejs&quot and &quotnpm&quot may be available
+          as system packages in your Linux distribution, but these may be older versions.
+        </p>
+        <div class="install-section-title">2 - Clone github repository</div>
+        <p>
+          The next step is to clone the github repository. Typing the following
+          command will install the repository as a folder in the current working directory.
+          Change directory to that folder.
+        </p>
+
+<div class="pre-div"><pre>
+git clone https://github.com/cotarr/irc-hybrid-client.git
+cd irc-hybrid-client
+</pre></div>
+        <p>
+          Create a folder to hold server log files by typing:
+        </p>
+<div class="pre-div"><pre>
+mkdir logs
+</pre></div>
+
+        <div class="install-section-title">3 - Install package dependencies</div>
+        <p>
+          This program uses the Express web server framework.
+          The Express web site is located at
+          <a href="https://expressjs.com/">https://expressjs.com/</a>.
+          Express framework and various JavaScript dependency libraries
+          will be installed using the npm package manager.
+        </p>
+        <p>
+          JavaScript library dependencies are listed in the file &quotpackage.json&quot.
+          The dependencies will managed by npm and placed in a folder named &quotnode_modules&quot.
+          Prior to installing dependencies, the environment variable &quotNODE_ENV&QUOT
+          should be set to determine if development dependencies should be included.
+          If you are loading the program locally to try it out, you would probably
+          use the development enviornment.
+        </p>
+<div class="pre-div"><pre>
+# Choose one... comment the other
+export NODE_ENV=development
+export NODE_ENV=production
+</pre></div>
+        <p>
+          Next you can install the npm package depencies by typing:
+        </p>
+<div class="pre-div"><pre>
+npm install
+</pre></div>
+
+        <div class="install-section-title">4 - TLS Certificates</div>
+        <p>
+          It is a good practice to use TLS for both the IRC server
+          connection and the browser. The certificates will provide
+          some verification that you are connecting to the intended
+          server, avoiding a man in the middle interception.
+        </p>
+        <p>
+          Managing TLS certificates is a complex task, mostly beyond
+          the scope of these instructions. However some simple guidance may
+          point your in the right direction.
+        </p>
+        <p>
+          For the IRC server connection, typically port 6697 for TLS,
+          node uses the openssl and certificates
+          in the Linux operating system, and no special configuration
+          should be requrired to support TLS, provided that nodejs and your system
+          was compiled with the current version of openssl.
+        </p>
+        <p>
+          For the browser to connect, as with any webserver,
+          use of TLS requires a registered domain name
+          and server TLS certificates that have been signed by a
+          recognized certificate authority. I use the LetsEncrypt certbot.
+          Debian includes certbot as an apt package. Assuming you have a domain
+          name, the following command would generate a set of certificates
+          good for 90 days. Be sure to switch example.com with your domain name.
+        </p>
+<div class="pre-div"><pre>
+# Make sure no other programs are listening on ports 80, 443
+# Temporarily open firewall ports 80, 443
+sudo certbot certonly --standalone -d abcd.example.com
+</pre></div>
+        <p>
+          Since it is recommended to run this program in a non-privledged
+          account using non-privledged ports, it may be necessary to make
+          a copy of privkey.pem and fullchain.pem to a local folder
+          where the web server will have read access. It is NOT recommended
+          to run the IRC client as root, simply for certificate access.
+        </p>
+        <p>
+          If you are a more experienced user and prefer to generate self
+          signed certificates and install your self signed CA into the browser,
+          that approach would work, but it is beyond the scope of these instructions.
+          However, if your intention is to use a smartphone IRC client,
+          a valid domain name with server certificates generally what
+          a smartphone operating system and browser would expect.
+        </p>
+
+        <div class="install-section-title">5 - Configuration Files</div>
+        <p>
+          There are two example configuration files that need to be
+          copied to new filenames. They require editing before use.
+          The web server reads configuration from these files when the server starts.
+          Two other sections of this web page contain detail instructions describing
+          how to edit the configuration, so it will not be repeated here.
+        </p>
+        <p>
+          4A Edit: credentials.json (<a href="login-config.html">Login Config Instructions</a>),
+          <br>
+          4B Edit: servers.json (<a href="server-config.html">IRC Config Instructions</a>)
+        </p>
+
+
+        <div class="install-section-title">6 - Firewall configuration</div>
+        <p>
+          It is assumed you are generally familiar with configuration
+          of firewall ports. There are two connections that must
+          cross the firewall, one to the IRC server, and one
+          to the browser.
+        </p>
+<pre>
+             Firewall               Firewall
+                 |                      |
+   Browser ------|----- webserver ------|------IRC-server
+                 |                      |
+</pre>
+        <p>
+          For the IRC server, the backend web server will
+          establish an outgoing connection request to the IRC server,
+          such as port 6667 non-encrypted or 6697 for TLS encrypted.
+          Once established, this socket is kept open continuously for
+          asynchronous communications with the IRC server.
+          Your firewall should allow outgoing connection
+          to the TCP port listed in the IRC server configuration.
+          In most cases, outbound connections are not restricted,
+          so this may not require any special filter rules.
+        </p>
+        <p>
+          If your server is running an identd daemon to listen on port 113, this
+          would be outside the scope of these instructions. This is really
+          separate from the IRC client.
+        </p>
+        <p>
+          The firewall must configure one TCP port for incoming connections
+          from the web browser.
+          This incoming port is used two ways.
+          It is used for standard http GET or POST requests from the browser
+          used to download the web page files and make API requests.
+          The port is also used to establish and maintain a websocket connection
+          so the browser can pass IRC messages asyncrhonously.
+          One single TCP port is used for both.
+        </p>
+        <p>
+          If you prefer to use restricted port 443 for your webserver, it would be recommended
+          to place the IRC client on an alternate non-privledged port, then use
+          iptables rules to exchange port numbers to 443 as packets cross the firewall.
+          This will improve security by keeping the IRC client in a non-privledged account.
+          It would be necessary to temporarily remove these iptables rules to
+          use certbot to renew the TLS certificates.
+        </p>
+        <p>
+          In summary, one inbound TCP connection and one outbound TCP connection are
+          required to pass the firewall.
+          There should be no other other network connections to this IRC client.
+        </p>
+
+        <div class="install-section-title">7 - Starting the server</div>
+        <p>
+          This assumes the configurations in the previous steps have been completed.
+        </p>
+        <p>
+          The web server will be started from the command line.
+          It will remain in the foreground.
+          If NODE_ENV is set to &quotdevelopment&quot, the
+          log file output will be send to the terminal.
+          If NODE_ENV is set to production, log file output will be
+          sent to files located in the logs folder.
+          All console.log output that will still go to the terminal.
+        </p>
+        <p>
+          While running in the foreground, the server can be stopped by
+          typing ctrl-C in the terminal. There are several ways to
+          run the server unattended in the background. One way is to
+          append an &quot&amp&quot symbol to the end of the command line.
+          An alternative method is to load the &quotscreen&quot
+          program which allows Linux to run a detached command shell
+          that can be reattached at a later time as a console terminal.
+        </p>
+        <p>
+          While in the project directory, start the web server by typing:
+        </p>
+<div class="pre-div"><pre>
+  node bin/www
+</pre></div>
+
+<div class="install-section-title">8 - Minify and bundle (Optional)</div>
+        <p>
+          The steps in this section are optional is not required.
+          The repository can be cloned and deployed &quotas-is&quot,
+          requiring only editing of the configurations files.
+        </p>
+        <p>
+          However, running the gulp script will concatenate 10 of the JavaScript
+          files into 1 bundled/minified JavaScript file.
+          It will remove comments and whitespace from the javascript code.
+          This will significantly reduce the download size of the files
+          and reduce bandwidth used by smartphones.
+        </p>
+          The minification process uses a development library called &quotgulp&quot.
+          Their website is <a href="https://gulpjs.com/">https://gulpjs.com/</a>.
+          The library files are listed in the package.json as development depencies.
+        <p>
+          After running &quotgulp dist&quot, a build folder will be created in the main project folder.
+          The build folder will contain the same folder structure as the base repository.
+          The gulp script will modify the individual script tags in webclient.html to
+          replace multiple script tags with a single javascript script tag.
+        </p>
+        <p>
+          Configuration for the minify and bundle process is stored in &quotGulpfile.js&quot
+        </p>
+        <p>
+          The configuration JSON files and the /docs folder are not included in the bundle.
+          The build folder is erased during the build process.
+          This would remove any configuration if it were added manually.
+          Typically, the contents of the build folder would be copied to the
+          eventual server by some type of deployment script, which is beyond the scope of
+          these instructions. I use a bash script using the secure copy &quotscp&quot
+          command to push the build image to the server.
+        </p>
+        <p>
+          It is necessary to install gulp-cli globally, as gulp-cli
+          is used by gulp to manage multiple gulp versions. gulp-cli is not
+          listed in the pacakge.json. It is not necessary to install gulp-cli
+          unless you plan to minify and bundle the files.
+        </p>
+        <p>
+          Some of this would vary depending on the specific deployment environments.
+          The following commands should be able to produce a minified version.
+          The deployment itself is left to you.
+        </p>
+<div class="pre-div"><pre>
+# Install the gulp command line client globally using npm
+npm install -g gulp-cli
+
+# bundle and minify to /build folder
+gulp dist
+
+# You can deploy by any method
+
+# Configuration requires copy and edit of credentials.json and servers.json
+
+# Commands similar to these are needed
+mkdir logs
+export NODE_ENV=production
+
+# Install node packages by running:
+npm ci
+
+# To run
+node bin/www
+</pre></div>
+
+      </div> <!-- /text-div -->
+
+    </div> <!-- outer-div -->
+
+    <div class="footer-div">
+      Repository:
+      <a href="https://github.com/cotarr/irc-hybrid-client">
+        https://github.com/cotarr/irc-hybrid-client</a>
+    </div> <!-- /footer-div -->
+	</body>
+</html>

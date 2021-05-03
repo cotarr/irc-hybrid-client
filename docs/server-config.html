@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+	<head>
+		<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+		<title>IRC Config</title>
+    <link rel="stylesheet" href="css/styles.css">
+	</head>
+	<body>
+    <div class="header-div">
+      Documentation for
+      <a href="https://github.com/cotarr/irc-hybrid-client">irc-hybrid-client</a>
+    </div>
+    <div class="outer-div">
+      <div class="menu-div">
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="installation.html">Installation</a></li>
+          <li><a href="login-config.html">Login Config</a></li>
+          <li><a class="active" href="server-config.html">IRC Config</a></li>
+          <li><a href="text-commands.html">Text Commands</a></li>
+          <li><a href="faq.html">FAQ</a></li>
+          <li><a href="history.html">Change Log</a></li>
+          <li><a href="license.html">License</a></li>
+        </ul>
+      </div> <!-- /menu-div-->
+
+      <div class="text-div">
+        <div class="desc-title">
+          IRC Configuration
+        </div>
+
+        <div class="install-section-title">Assumed Knowledge</div>
+        <p>
+          For purposes of this help file, it is assumed the person installing this
+          IRC client is familiar with standard IRC server connection parameters, including
+          hostname or IP address, port number, TLS flag, IRC nickname, IRC user, and real name.
+          If you are not familiar with these concepts, it is recommended to consult
+          some general IRC help web pages.
+        </p>
+        <div class="install-section-title">No Remote Config</div>
+        <p>
+          In this program, the list of IRC servers must be configured in this configuration file
+          using a standard text editor such as nano. The list of servers is
+          read when the server is started. If the list is updated, the server must be
+          restarted to read the new list.
+        </p>
+        <p>
+          At this time, there is no provision to edit the IRC server list remotely from the web page.
+          Considering this was primarily concieved to be a smartphone IRC client, complex
+          HTML forms presence certain challenges on a smartphone.
+          There was no reason to unnecessarily increase security risk by adding
+          an API capable of writing server configuration. Should someone
+          gain unauthorized access, such as a forged cookie or cross-site script, it would
+          not be possible to remotely modify any of the server configuration.
+        </p>
+
+        <div class="install-section-title">JSON Format</div>
+        <p>
+          A brief note about syntax. The servers.json file represents a JSON structured data object.
+          JSON syntax must be exact.
+          The servers.json file includes a &quotserverArray&quot property.
+          The square brackets [ ] define a javascript array.
+        </p>
+<pre><yellow-example>
+  "serverArray": [
+  ]
+</yellow-example></pre>
+        <p>
+          Each of the curley braces { } within the array is a javascript object
+          with one object for each server definition.
+          Note the server objects are separated by commas, except the last
+        </p>
+<pre><yellow-example>
+  "serverArray": [
+    {
+      ...the first server...
+    },
+    {
+      ...the second server...
+    },
+    {
+      ...the third server...
+    }
+  ]
+</yellow-example></pre>
+        <div class="install-section-title">1 - IRC Server configuration</div>
+        <p>
+          There are 5 properties to define a server entry.
+          The &quotname&quot property can be set to any value.
+          It is used to display the name of your selection.
+          If you are using a phone, keep &quotname&quot short.
+        </p>
+        <p>
+          At this time there are no provisions to configure a server to
+          auto-connect on startup, or auto-reconnect after disconnect.
+          I do plan to add auto-reconnect soon. However, I need to
+          identify the different disconnect errors, how to trap them,
+          and capture state information as it exists at the time of disconnection.
+          In the mean time, if you are disconnected from IRC, the [IRC]
+          icon will turn red. Just tap the red [IRC] icon and it will
+          immediately try to reconnect to the IRC server.
+        </p>
+        <p>
+          In this example, an IRC server is configured without TLS encryption.
+        </p>
+<div class="pre-div"><pre>
+  "name": "DALnet",
+  "host": "lion.dal.net",
+  "port": 6667,
+  "tls": false,
+  "password": "",
+</pre></div>
+<p>
+  To configure for TLS encryption the &quotport&quot was changed to 6697 and
+  &quottls&quot was set to true
+</p>
+
+<div class="pre-div"><pre>
+  "name": "DALnet",
+  "host": "lion.dal.net",
+  "port": 6697,
+  "tls": true,
+  "password": "",
+</pre></div>
+        <div class="install-section-title">2 - NickServ IDENTIFY</div>
+        <p>
+          There is a provision to automatically dispatch a NickServ
+          IDENTIFY message when the IRC server connection is made and
+          when the current IRC nickname matches the property &quotidentifyNick&quot.
+        </p>
+        <p>
+          To disable this feature, set the following properties
+          to be zero length strings.
+        </p>
+<div class="pre-div"><pre>
+  "identifyNick": "",
+  "identifyCommand": "",
+</pre></div>
+      <p>
+        Please read this section carefully. This &quotidentifyCommand&quot property
+        represents a <yellow-example>raw IRC command, not a private message</yellow-example>.
+        This allows identification with IRC servers where
+        &quotNICKSERV&quot and &quotNS&quot are valid IRC server commands and
+        understood by NickServ network services.
+        IN cases where the identification must be sent by private message (/msg), then
+        the proper private message raw command must be constructed with valid syntax.
+      </p>
+      <p>
+        If NickServ services requires a simple private message then the PRIVMSG
+        raw server command would be used. The format of the entire messsage starts
+        with the command &quotPRIVMSG&quot, followed by a space, followed by
+        the IRC nickname of the recipient, followed by a space. The the
+        message delimiter is a colon character &quot:&quot which is then followed
+        with the private message contents. To identify in this manner using
+        the password xxxxxxxx to identify your nickname MyNickname,
+        the configuration would be set as shown in the next example.
+        Note the colon character prefixing :IDENTIFY
+
+      </p>
+<div class="pre-div"><pre>
+  "identifyNick": "MyNickname",
+  "identifyCommand": "PRIVMSG NickServ :IDENTIFY xxxxxxxx",
+</pre></div>
+      <p>
+        In the case where services have non-spoofable nicknames, the recipient
+        of the private message would be modified as shown in the next example.
+        Note the colon character prefixing :IDENTIFY
+      </p>
+<div class="pre-div"><pre>
+  "identifyNick": "MyNickname",
+  "identifyCommand": "PRIVMSG NickServ@services.dal.net :IDENTIFY xxxxxxxx",
+</pre></div>
+      <p>
+        In the case where an IRC network has reserved &quotNICKSERV&quot as
+        a custom IRC command you can use the next method. It reduces the
+        risk of sending your IDENTIFY password to another user pretending
+        to be Nickserv. In this case, IDENTIFY and the password are sent as
+        command parameters, so the colon is not required.
+      </p>
+<div class="pre-div"><pre>
+  "identifyNick": "MyNickname",
+  "identifyCommand": "NICKSERV IDENTIFY xxxxxxxx",
+</pre></div>
+
+
+<div class="install-section-title">3 - IRC User Information</div>
+      <p>
+        This section should be obvious to anyone using IRC.
+      </p>
+      <p>
+        Please note that different type of IRC servers have different
+        requirements for the number of characters allowed in a Nickname,
+        user or real hame. These are often displayed in a server message
+        when you first connect to IRC. At the present time, the maximum
+        length of these values is not checked by this program, so exceeding the limit
+        set by the server would generate an IRC server error.
+      </p>
+<div class="pre-div"><pre>
+  "nick": "MyNickname",
+  "user": "user",
+  "real": "John Doe",
+  "modes": "+i",
+</pre></div>
+<div class="install-section-title">4 - Favorite channels</div>
+      <p>
+        At this time, the program does not auto-join of IRC #channels on startup.
+        This may be added in the future.
+      </p>
+      <p>
+        The &quotchannelList&quot property is used to designate a javascript array
+        of string entries, where each array value is the name of an IRC channel.
+        After connection to an IRC server, the favorite channels are
+        displayed as buttons to allow easy /JOIN capability when using a
+        smart phone.
+        The array may be empty, but it must exist.
+      </p>
+
+<div class="pre-div"><pre>
+  "channelList": ["#myChannel", "#otherChannel"],
+</pre></div>
+
+<div class="install-section-title">5 - Raw Message Log</div>
+      <p>
+        The last value is a flag to enable logging IRC message to
+        the &quotlogs/irc.log&quot file located with the backend web server.
+        There are no provisions for logging on the local machine running
+        the client web browser.
+        All messages from the IRC server are logged in raw message format.
+        The program does not include log file pruning,
+        so please watch the size of your log files as they can become quite large.
+        Note there is no comma after this property because it is the last property
+        in the javascript object.
+      </p>
+
+<div class="pre-div"><pre>
+  "channelList": ["#myChannel", "#otherChannel"],
+</pre></div>
+
+      <div class="install-section-title">Example server.json</div>
+      <p>
+        The server.json file should look something like this.
+      </p>
+
+<div class="pre-div"><pre>
+{
+  "configVersion": 1,
+  "serverArray": [
+    {
+      "name": "DALnet",
+      "host": "lion.dal.net",
+      "port": 6697,
+      "tls": true,
+      "password": "",
+      "identifyNick": "MyNickname",
+      "identifyCommand": "PRIVMSG NickServ@services.dal.net :IDENTIFY xxxxxxxx",
+      "nick": "MyNickname",
+      "user": "user",
+      "real": "John Doe",
+      "modes": "+i",
+      "channelList": ["#myChannel", "#otherChannel"],
+      "rawMessageLog": true
+    }
+  ]
+}
+</pre></div>
+<p>
+  The property &quotconfigVersion&quot is intended for future use.
+  It provides a method to issue a startup message when attempting
+  to use a configuration   file that may be impacted by breaking changes.
+  It will remain at 1 until there is a breaking change.
+</p>
+
+      </div> <!-- /text-div -->
+
+    </div> <!-- outer-div -->
+
+    <div class="footer-div">
+      Repository:
+      <a href="https://github.com/cotarr/irc-hybrid-client">
+        https://github.com/cotarr/irc-hybrid-client</a>
+    </div> <!-- /footer-div -->
+	</body>
+</html>

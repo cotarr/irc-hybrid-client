@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+	<head>
+		<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+		<title>Text Commands</title>
+    <link rel="stylesheet" href="css/styles.css">
+	</head>
+	<body>
+    <div class="header-div">
+      Documentation for
+      <a href="https://github.com/cotarr/irc-hybrid-client">irc-hybrid-client</a>
+    </div>
+    <div class="outer-div">
+      <div class="menu-div">
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="installation.html">Installation</a></li>
+          <li><a href="login-config.html">Login Config</a></li>
+          <li><a href="server-config.html">IRC Config</a></li>
+          <li><a class="active" href="text-commands.html">Text Commands</a></li>
+          <li><a href="faq.html">FAQ</a></li>
+          <li><a href="history.html">Change Log</a></li>
+          <li><a href="license.html">License</a></li>
+        </ul>
+      </div> <!-- /menu-div-->
+
+      <div class="text-div">
+        <div class="desc-title">
+          Text Commands
+        </div>
+        <div class="image-text">
+          <p>
+            The following IRC text commands are supported as described.
+            Additional text command will be added in the future.
+          </p>
+        </div>
+        <table>
+        <tr><td>ADMIN</td><td>
+          /ADMIN [server]
+        </td></tr>
+        <tr><td>AWAY</td><td>
+          /AWAY [away-message]
+        </td></tr>
+        <tr><td>CTCP</td><td>
+          /CTCP &ltnickname&gt &ltctcp-command&gt
+        </td></tr>
+
+        <tr><td>JOIN</td><td>
+          /JOIN &lt#channel&gt
+        </td></tr>
+
+        <tr><td>LIST</td><td>
+          /LIST [#channel-mask]
+        </td></tr>
+
+        <tr><td>ME</td><td>
+          /ME &ltaction-message&gt
+        </td></tr>
+
+        <tr><td>MODE</td><td>
+          /MODE &lt#channel&gt [channel-mode(s)]
+        </td></tr>
+
+        <tr><td>MODE</td><td>
+          /MODE &ltnickname&gt [user-mode(s)]
+        </td></tr>
+
+        <tr><td>MOTD</td><td>
+          /MOTD [server]
+        </td></tr>
+
+        <tr><td>MSG</td><td>
+          /MSG &ltnickname&gt &ltprivate-message&gt
+        </td></tr>
+
+        <tr><td>NICK</td><td>
+          /NICK &ltnew-nickname&gt
+        </td></tr>
+
+        <tr><td>NOP</td><td>
+          /NOP ...inert testing command...
+        </td></tr>
+
+        <tr><td>NOTICE</td><td>
+          /NOTICE &ltnickname&gt &ltnotice-message&gt
+        </td></tr>
+
+        <tr><td>PART</td><td>
+          /PART &lt#channel&gt [Optional part message]
+        </td></tr>
+
+        <tr><td>QUERY</td><td>
+          /QUERY &ltnickname&gt &ltprivate-message&gt
+        </td></tr>
+
+        <tr><td>QUIT</td><td>
+          /QUIT [optional quit message]
+        </td></tr>
+
+        <tr><td>QUOTE</td><td>
+          /QUOTE &ltIRC server raw command&gt
+        </td></tr>
+
+        <tr><td>TOPIC</td><td>
+          /TOPIC &lt#channel&gt &ltnew-topic&gt
+        </td></tr>
+
+        <tr><td>VERSION</td><td>
+          /VERSION [server]
+        </td></tr>
+
+        <tr><td>WHOIS</td><td>
+          /WHOIS &ltnickname&gt
+        </td></tr>
+
+      </table>
+
+      </div> <!-- /text-div -->
+
+    </div> <!-- outer-div -->
+
+    <div class="footer-div">
+      Repository:
+      <a href="https://github.com/cotarr/irc-hybrid-client">
+        https://github.com/cotarr/irc-hybrid-client</a>
+    </div> <!-- /footer-div -->
+	</body>
+</html>

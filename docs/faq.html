@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+	<head>
+		<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+		<title>FAQ</title>
+    <link rel="stylesheet" href="css/styles.css">
+	</head>
+	<body>
+    <div class="header-div">
+      Documentation for
+      <a href="https://github.com/cotarr/irc-hybrid-client">irc-hybrid-client</a>
+    </div>
+    <div class="outer-div">
+      <div class="menu-div">
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="installation.html">Installation</a></li>
+          <li><a href="login-config.html">Login Config</a></li>
+          <li><a href="server-config.html">IRC Config</a></li>
+          <li><a href="text-commands.html">Text Commands</a></li>
+          <li><a class="active" href="faq.html">FAQ</a></li>
+          <li><a href="history.html">Change Log</a></li>
+          <li><a href="license.html">License</a></li>
+        </ul>
+      </div> <!-- /menu-div-->
+
+      <div class="text-div">
+        <div class="desc-title">
+          F.A.Q.
+        </div>
+        <div class="faq-spacer"></div>
+        <a href="#faq-purpose">Why did you write this program?</a><br>
+        <a href="#challenges">What difficult challenges did you face?</a><br>
+        <a href="#multiuser">Are multiple users supported?</a><br>
+        <a href="#multinet">Are multiple IRC networks supported?</a><br>
+        <a href="#concurrent">Are concurrent connections supported?</a><br>
+        <a href="#tracking">Are there any tracking beacons in the code?</a><br>
+        <a href="#cookies">Does the program use cookies?</a><br>
+        <div class="faq-spacer"></div>
+        <table>
+
+          <tr><td><a name="faq-purpose">
+            <p>
+              Q: Why did you write this program?<br>
+            </p>
+            A: That's a good question. There are already many excellent IRC clients to choose
+            from. Why write my own? Actually, I ran across a youtube video where a simple telnet
+            client was easily able to emulate an IRC client. I loaded an
+            ngircd IRC server into a Raspberry Pi, and I started to explore
+            while reading the RFC-2812 client protocol. I soon found
+            telnet very repetitious, so I opened nodejs and with a little
+            Googling, I had a socket connecting to IRC and exchanging
+            messages with the server.
+            <br><br>
+            Previously I have tried several options to use IRC on my iPhone.
+            I really didn't like any of them. Given the Covid-19 pandemic lockdown,
+            I've been primarily stuck at home with nothing to do. Over the
+            period of about a month, this slowly evolved into hybrid IRC web client
+            paired up with a nodejs backend. Despite the limited functionality
+            compared to a full IRC client, I found that I enjoyed the way it worked
+            on my mobile phone. From there, it slowly began to evolve as I used it.
+          </a></td></tr>
+
+          <tr><td><a name="challenges">
+            <p>
+              Q: What difficult challenges did you face?<br>
+            </p>
+            A: I found it challenging to work with sockets. I used the npm package "ws"
+            as a websocket server for the browser connection, and nodejs API net.Socket or tls.TLSSocket
+            to connect to IRC.
+            Addressing tasks like wrapping the websocket in TLS,
+            security authorization of the browser's websocket connection,
+            detecting desconnects, and dealing with legacy disconnected sockets
+            was an interesting learning experience.
+            <br><br>
+            I also found it tricky to encode and decode buffers of multi-byte international
+            characters where a string byte length is different from the string character length.
+            Then, from a stream/message standpoint, multiple messages from the server can
+            concatenate into a single socket data packet, or
+            one individual IRC message can split between two differnt data packets, requiring
+            re-assembly into a single string.
+          </a></td></tr>
+
+          <tr><td><a name="multiuser">
+            <p>
+              Q: Are multiple users supported?<br>
+            </p>
+            A: No. This operates as a single user personal server.
+            One person per webserver instance.
+          </a></td></tr>
+
+          <tr><td><a name="multinet">
+            <p>
+              Q: Are multiple IRC networks supported?<br>
+            </p>
+            A: No. The application is limited to one IRC network connection at a time.
+            You can sign out of IRC and switch between different IRC networks using the [Next] button.
+          </a></td></tr>
+
+          <tr><td><a name="concurrent">
+            <p>
+              Q: Are concurrent connections supported?<br>
+            </p>
+            A: Yes. A desktop, tablet, and smartphone can be open at the same time.
+            Each device will remain in sync, showing the same content in all devices concurrently.
+          </a></td></tr>
+
+          <tr><td><a name="tracking">
+            <p>
+              Q: Are there any tracking beacons in teh code?<br>
+            </p>
+            A: No.
+          </a></td></tr>
+
+          <tr><td><a name="cookies">
+            <p>
+              Q: Does the program use cookies?<br>
+            </p>
+            A: Yes. During normal use web browser http requests are
+            authroized using session cookies for purposes of access control.
+            This is disclosed on the login form. No additional persistent
+            identifiers are used.
+          </a></td></tr>
+
+        </table>
+
+      </div> <!-- /text-div -->
+
+    </div> <!-- outer-div -->
+
+    <div class="footer-div">
+      Repository:
+      <a href="https://github.com/cotarr/irc-hybrid-client">
+        https://github.com/cotarr/irc-hybrid-client</a>
+    </div> <!-- /footer-div -->
+	</body>
+</html>

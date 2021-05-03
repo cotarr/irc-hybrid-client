@@ -1,0 +1,145 @@
+body {
+    background-color: #e0e0e0;
+}
+.header-div {
+  text-align: center;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 40px;
+  font-size: 140%;
+  background-color: #54c9ff;
+}
+.footer-div {
+  text-align: center;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 40px;
+  font-size: 80%;
+  background-color: #54c9ff;
+}
+.outer-div {
+  display: flex;
+  flex-direction: row;
+/*  align-items: flex-start;
+  vertical-align: top; */
+}
+.menu-div {
+  align-self: flex-start;
+  display: inline-block;
+  width: 170px;
+  margin-top: 5px;
+  margin-right: 5px;
+  margin-bottom: 5px;
+  min-width: 170px;
+}
+.menu-div a {
+  background-color: #c0c0c0;
+  color: black;
+  display: block;
+  padding: 4px;
+  text-decoration: none; /* Remove underline */
+}
+
+.menu-div a:hover {
+  background-color: #a0a0a0;
+}
+.menu-div a.active {
+  background-color: #707070;
+  font-size: 115%;
+  color: white;
+}
+
+.menu-div ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+.menu-div li {
+  border-left: 1px solid black;
+  border-right: 1px solid black;
+  border-top: 1px solid black;
+}
+.menu-div li:last-of-type {
+  border-bottom: 1px solid black;
+}
+
+
+.install-section-title {
+  font-size: 130%;
+  margin-top: 15px;
+}
+ul.install-list {
+  margin-top: 5px;
+  margin-left: 0;
+  padding-left: 15px;
+}
+
+.pre-div {
+  background-color: #e8e8e8;
+  border: 1px solid black;
+  border-radius: 5px;
+  padding-top: 0px;
+  padding-right: 10px;
+  padding-bottom: 0px;
+  padding-left: 15px;
+}
+
+table {
+  background-color: #ffffff;
+  width: 550px;
+  /* min-width: 500px; */
+}
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding-left: 5px;
+}
+.text-div {
+  background-color: #ffffff;
+  border: 1px solid black;
+  display: inline-block;
+  padding-left: 5px;
+  padding-top: 0px;
+  padding-right: 10px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+.desc-title {
+  border: 1px solid black;
+  border-radius: 7px;
+  background-color: #baf8ff;
+  font-size: 140%;
+  margin-top: 10px;
+  margin-left: 20px;
+  margin-right: 20px;
+  padding: 10px;
+  text-align: center;
+}
+
+
+.faq-spacer {
+  height: 25px;
+}
+
+.home-detail {
+  margin-bottom: 15px;
+  padding: 10px;
+}
+
+.image-text {
+  display: inline-block;
+  max-width: 350px;
+  vertical-align: top;
+}
+.image-photo {
+  display: inline-block;
+}
+blue-example {
+  background-color: #40e6ff;
+}
+yellow-example {
+  background-color: yellow;
+}

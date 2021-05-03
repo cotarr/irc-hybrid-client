@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+	<head>
+		<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+		<title>Login Config</title>
+    <link rel="stylesheet" href="css/styles.css">
+	</head>
+	<body>
+    <div class="header-div">
+      Documentation for
+      <a href="https://github.com/cotarr/irc-hybrid-client">irc-hybrid-client</a>
+    </div>
+    <div class="outer-div">
+      <div class="menu-div">
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="installation.html">Installation</a></li>
+          <li><a class="active" href="login-config.html">Login Config</a></li>
+          <li><a href="server-config.html">IRC Config</a></li>
+          <li><a href="text-commands.html">Text Commands</a></li>
+          <li><a href="faq.html">FAQ</a></li>
+          <li><a href="history.html">Change Log</a></li>
+          <li><a href="license.html">License</a></li>
+        </ul>
+      </div> <!-- /menu-div-->
+
+      <div class="text-div">
+        <div class="desc-title">
+          Login Config
+        </div>
+        <div class="install-section-title">Copy example configuration</div>
+        <p>
+          The git repository includes an example configuration file
+          named &quotexample-credentials.json&quot. The first step
+          is to make a copy of this file to &quotcredentials.json&quot.
+        </p>
+
+<div class="pre-div"><pre>
+  cp example-credentials.json credentials.json
+</pre></div>
+
+        <div class="install-section-title">Configuration File version</div>
+        <p>
+          This is intended for future use. It provides a method to
+          issue a startup message when attempting to use a configuration
+          file that may be impacted by breaking changes. It will remain at 1
+          until there is a breaking change.
+        </p>
+<div class="pre-div"><pre>
+  "configVersion": 1,
+</pre></div>
+
+        <div class="install-section-title">Certificates</div>
+        <p>
+          Next, 3 lines are used to specify the path
+          and filenames for TLS certificates. Certificates are
+          discussed in more detail in the
+          <a href="installation.html">installation</a> section.
+        </p>
+        <p>
+          Since it is recommended to run this program in a non-privledged
+          account, it may be necessary to make
+          a copy of the certificate files in a local folder
+          where the web server will have read access. It is NOT recommended
+          to run the IRC client as root, simply for certificate access.
+        </p>
+        <p>
+          The path location would depend on your specific Linux system.
+          To configure the web server to listen for HTTPS
+          encrypted connetions, this section would look something like this:
+        </p>
+<div class="pre-div"><pre>
+  "serverTlsKey": "/home/user1/tls/privkey.pem",
+  "serverTlsCert": "/home/user1/tls/fullchain.pem",
+  "tls": true,
+</pre></div>
+        <p>
+          If on the other hand you are using the program in a development
+          environment without TLS certificates, set these lines as follows:
+        </p>
+<div class="pre-div"><pre>
+  "serverTlsKey": "",
+  "serverTlsCert": "",
+  "tls": false,
+</pre></div>
+
+        <div class="install-section-title">Listen Port</div>
+        <p>
+          Set the web server listen port to the desired port number for the web server.
+          For security reasons, this program should be run as a
+          non-preiledged user using a non-privledged ports 1024 or greater.
+        </p>
+        <p>
+          If you prefer to use restricted port 443 for your webserver, it would be recommended
+          to place the IRC client on an alternate non-privledged port, then use
+          iptables rules to exchange port numbers to 443 as packets cross the firewall.
+        </p>
+<div class="pre-div"><pre>
+  "port": 3003,
+</pre></div>
+
+        <div class="install-section-title">Session Credentials</div>
+        <p>
+          The cookie secret is used to place digital signatures on session cookies.
+          These cookies are used to authorize http web requests.
+          The value shown here is only an example, and you should generate your own uniquie
+          randomly generated string of characters.
+        </p>
+        <p>
+          The expire after time represents the time in seconds after
+          which the session credentials will expire.
+          A value of 86400 seconds will set the login expiration at 24 hours, or once per day.
+          Based on the ease of use of browser password managers, 24 hours has worked out
+          to a convienent duration.
+        </p>
+        <p>
+          If your session expires in the middle of a conversation, a user login page will load.
+          The backend web server will mantain a cache of messages to occur during while disconnected.
+          You should be able to continue your conversation after reauthenticating without
+          any indication to people in the conversation.
+        </p>
+        <p>
+          As as note, the login session information is stored by the web server in RAM memory,
+          so each time the web server is restarted, the session information is discarded,
+          and the web page will require password entry.
+        </p>
+<div class="pre-div"><pre>
+  "cookieSecret": "Lg9HLgCEmtag4Ff7",
+  "sessionExpireAfterSec": 86400,
+</pre></div>
+
+        <div class="install-section-title">Security Contact</div>
+        <p>
+          The security contact is optional. For all web servers, a
+          standardized URL route may been defined which would
+          include security contact information located in a flat
+          text file at: &quot/.well-known/security.txt&quot.
+          Should a security issue be detected on your server by a third
+          party, this provides a method to contact the server owner
+          and notify them of the security issue.
+          This URL is publically readable without requiring login or session cookie.
+          To enable this feature, set a valid security email address.
+          The expiration date is typically 1 year out and must be entered using this date format.
+        </p>
+<div class="pre-div"><pre>
+  "securityContact": "mailto:security@example.com",
+  "securityExpires": "Fri, 1 Apr 2022 08:00:00 -0600",
+</pre></div>
+        <p>
+          To disable the security contact, modify these lines as follows:
+        </p>
+<div class="pre-div"><pre>
+  "securityContact": "",
+  "securityExpires": "",
+</pre></div>
+
+
+<div class="install-section-title">PID file</div>
+<p>
+  A valid file path must be defined to a folder capable of
+  write access to the web server. When the server starts,
+  the process id (PID) number is written to this file.
+  This is intended for use by external scripts for purposes
+  like restarting the application for various purposes such as after log file rotation.
+</p>
+
+<div class="pre-div"><pre>
+  "pidFilename": "/home/user1/tmp/ircHybridClient.PID",
+</pre></div>
+
+        <div class="install-section-title">Assign Login Password</div>
+        <p>
+          In the current version of the program, the username an password
+          that are used to gain access to the web page must be configured using the ssh terminal
+          during the initial configuration of the web server. There is no provision to
+          change the password from within the web page.
+        </p>
+        <p>
+          As writtin, this program was intended to be a single user,
+          private web server. This will limit to password database to 1 authorized user.
+          This user would be the owner of the private web server.
+          Therefore, there was no reason to unnecessarily increase security risk by adding
+          an API capable of writing password credentials. Should someone
+          gain unauthorized access, such as a forged cookie or cross-site script, it would
+          not be possible to remotely modify the password file, or any of
+          the server configuration. Should the account password become compromised,
+          the web interface allows remote shutdown of the server. This would protect
+          it until a new password were set using the ssh termianl.
+        </p>
+        <p>
+          A brief note about syntax. The credentials.json file represents a JSON structured data object.
+          JSON syntax must be exact, with matching curley braces and proper use of commas.
+          The credentials.json file includes a loginUsers property.
+          The square brackets [ ] define a javascript array.
+          Each of the curley braces { } within the array is a javascript object
+          used to define an individual user.
+          The user object contains 5 properties listed as key/value pairs.
+          Note the use of double quotes and commas between key/value pairs except the last has no comma.
+          In fact, there is only 1 user. Only the first array object at
+          index 0 (userid 1) is relevant.
+        </p>
+        <p>
+          A small javascript program has been included to create a user password hash
+          and automatically update the credentials.json file.
+          The program can be executed from the command line to
+          assign the username and password for the primary user at array index 0, (userid 1).
+          To run this program, change directory to the tools folder, and execute the
+          ./updateAuthForUser_1.js program as in the following example.
+        </p>
+
+<div class="pre-div"><pre>
+cd tools
+./updateAuthForUser_1.js
+</pre></div>
+        <p>
+          This will start an interactive session.
+          In this example, the &quotuser&quot was set to <blue-example>user1</blue-example>.
+          The &quotname&quot was allowed to default to the
+          same value as the user.
+          In this example, the password was set to
+          <blue-example>zuwa79xoJxLJ</blue-example>.
+          A random user specific salt was generated and the salt was combined with the
+          password to generate a sha256 hash.
+          The data was written to the credentials.json file, and
+          a copy of the credentials.json was displayed for your review.
+        </p>
+<div class="pre-div"><pre>
+Caution, you are editing the password file
+
+This will set a new login user/password for userid=1 at array index=0
+This is a static password not editable online
+It is intended there is only one user for the program
+This must be run from the tools folder to find credentials.json
+
+Enter new user:<blue-example>user1</blue-example>
+Enter new name (user1):
+Enter new password:<blue-example>zuwa79xoJxLJ</blue-example>
+{
+  "configVersion": 1,
+  "serverTlsKey": "/home/user1/tls/privkey.pem",
+  "serverTlsCert": "/home/user1/tls/fullchain.pem",
+  "tls": true,
+  "port": 3003,
+  "cookieSecret": "xxxxxxxxxxxxxxxx",
+  "sessionExpireAfterSec": 86400,
+  "securityContact": "mailto:security@example.com",
+  "securityExpires": "Fri, 1 Apr 2022 08:00:00 -0600",
+  "pidFilename": "/home/user1/tmp/ircHybridClient.PID",
+  "loginUsers": [<yellow-example>
+    {
+      "userid": 1,
+      "user": "user1",
+      "name": "user1",
+      "salt": "42c69b57c63150ea17b81c5244ec7ce0",
+      "hash": "e861dbcd61d5af53fdcef2ddac2f0658782259d1bc3fc25210e7d33167c839d6"
+    }</yellow-example>
+  ]
+}
+</pre></div>
+        <p>
+          Then return from the tools folder to the repository folder.
+        </p>
+<div class="pre-div"><pre>
+cd ..
+</pre></div>
+        <p>
+          If you really feel you need to create a second username/password entry,
+          such as one for your phone and one for your desktop,
+          you can create one at index 0 using the above script, then
+          copy/paste the entire javascript object as an additional javascript object in the array.
+          Use care to maintain valid JSON format with commas and braces.
+        </p>
+      </div> <!-- /text-div -->
+
+    </div> <!-- outer-div -->
+
+    <div class="footer-div">
+      Repository:
+      <a href="https://github.com/cotarr/irc-hybrid-client">
+        https://github.com/cotarr/irc-hybrid-client</a>
+    </div> <!-- /footer-div -->
+	</body>
+</html>
