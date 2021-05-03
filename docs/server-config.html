@@ -19,7 +19,6 @@
           <li><a href="installation.html">Installation</a></li>
           <li><a href="login-config.html">Login Config</a></li>
           <li><a class="active" href="server-config.html">IRC Config</a></li>
-          <li><a href="screen-navigation.html">Screen Nav</a></li>
           <li><a href="text-commands.html">Text Commands</a></li>
           <li><a href="faq.html">FAQ</a></li>
           <li><a href="history.html">Change Log</a></li>
@@ -62,14 +61,14 @@
           A brief note about syntax. The servers.json file represents a JSON structured data object.
           JSON syntax must be exact.
           The servers.json file includes a &quotserverArray&quot property.
-          The square brackets [ ] define a javascript Array.
+          The square brackets [ ] define a javascript array.
         </p>
 <pre><yellow-example>
   "serverArray": [
   ]
 </yellow-example></pre>
         <p>
-          Each of the curley braces { } within the Array is a javascript object
+          Each of the curley braces { } within the array is a javascript object
           with one object for each server definition.
           Note the server objects are separated by commas, except the last
         </p>
@@ -141,11 +140,11 @@
 </pre></div>
       <p>
         Please read this section carefully. This &quotidentifyCommand&quot property
-        represents a raw IRC command, not a private message.
+        represents a <yellow-example>raw IRC command, not a private message</yellow-example>.
         This allows identification with IRC servers where
         &quotNICKSERV&quot and &quotNS&quot are valid IRC server commands and
         understood by NickServ network services.
-        If the identification method is to be sent by private message (/msg), then
+        IN cases where the identification must be sent by private message (/msg), then
         the proper private message raw command must be constructed with valid syntax.
       </p>
       <p>
@@ -156,7 +155,7 @@
         message delimiter is a colon character &quot:&quot which is then followed
         with the private message contents. To identify in this manner using
         the password xxxxxxxx to identify your nickname MyNickname,
-        the configuration would be set as the next example.
+        the configuration would be set as shown in the next example.
         Note the colon character prefixing :IDENTIFY
 
       </p>
@@ -166,7 +165,7 @@
 </pre></div>
       <p>
         In the case where services have non-spoofable nicknames, the recipient
-        of the private message would be modified like the next example.
+        of the private message would be modified as shown in the next example.
         Note the colon character prefixing :IDENTIFY
       </p>
 <div class="pre-div"><pre>
@@ -210,12 +209,12 @@
         This may be added in the future.
       </p>
       <p>
-        The &quotchannelList&quot property is used to designate a javascript Array
+        The &quotchannelList&quot property is used to designate a javascript array
         of string entries, where each array value is the name of an IRC channel.
         After connection to an IRC server, the favorite channels are
         displayed as buttons to allow easy /JOIN capability when using a
         smart phone.
-        The Array may be empty, but it must exist.
+        The array may be empty, but it must exist.
       </p>
 
 <div class="pre-div"><pre>

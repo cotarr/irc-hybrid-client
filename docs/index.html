@@ -19,7 +19,6 @@
           <li><a href="installation.html">Installation</a></li>
           <li><a href="login-config.html">Login Config</a></li>
           <li><a href="server-config.html">IRC Config</a></li>
-          <li><a href="screen-navigation.html">Screen Nav</a></li>
           <li><a href="text-commands.html">Text Commands</a></li>
           <li><a href="faq.html">FAQ</a></li>
           <li><a href="history.html">Change Log</a></li>
@@ -32,10 +31,10 @@
           Home
         </div>
         <p>
-          This is a work in progress...
+          Single user hybrid IRC client using JavaScript frontend and Node.js/Express backend.
         </p>
         <p>
-          Single user hybrid IRC client using JavaScript frontend and Node/Express backend.
+          This project is still under development and changes frequently.
         </p>
 
         <div class="home-detail">
@@ -47,7 +46,7 @@
               a single user web server can be deployed in a Linux shell.
             </p><p>
               Using an smartphone, you can enter your web server
-              login credentials to gain access to your private web server.
+              login credentials to gain access to your private IRC client web server.
             </p>
           </div>
           <div class="image-photo">
@@ -64,7 +63,7 @@
               where you can enter your preferred Nickname.
             </p><p>
               In this application, the backend web server manages
-              the IRC server connection, independantly of the
+              the IRC server connection independantly of the
               web browser. In this type of hybrid client, if
               you are temporarily disconnected, such as the phone
               screen lock, your nickname will remain present on IRC.
@@ -77,8 +76,8 @@
               that are defined in the configuration file.
             </p>
             <p>
-              Next, a quick tap on the connect button should log
-              your nickname into IRC.
+              Next, you can connect to IRC with your nickname using either
+              the [Connect-IRC] button or youcan tap on the red [IRC] status icon at the top.
             </p>
           </div>
           <div class="image-photo">
@@ -92,13 +91,21 @@
             <p>
               The green [IRC] icon now indicates that the backend web
               server is logged into the IRC network.
-            </p><p>
+            </p>
+            <p>
               The user interface for this program is divided into
               collapasble sections that can be expanded with the [+]
               buttons located on the left. The interface can be returned
               to this configuration with all sections collapsed by tapping the [-all]
               button in the status bar at the top.
-            </p><p>
+            </p>
+            <p>
+              At any time you can disconnect from the IRC server by tapping the
+              green [IRC] status indicator at the top.  You can also disconnect
+              from the web page, leaving your nickname present on IRC by
+              tapping the green [Web] icon at the top.
+            </p>
+            <p>
               If you defined some favorite IRC channel names in the configuration
               file, buttons will be added to allow easy navigation
               to join channels while using a smartphone. In this example
@@ -122,7 +129,7 @@
             </p><p>
               Text messages can be entered using a keyboard, smartphone popup text editor
               or using smartphone voice dictation. The send button is useful during
-              voice dictation, but pressing [Enter] will also send messages.
+              voice dictation, but pressing [Enter] or [Return] will also send messages.
             </p><p>
               A primitive auto-complete function has been added to the channel window that will
               include channel name and nicknames pressent on the channel list.
@@ -184,7 +191,7 @@
         <div class="home-detail">
           <div class="image-text">
             <p>
-              The applicatin is also capable of exchanging private messages with
+              The application is also capable of exchanging private messages with
               other users.
               A separate window is used for each separate nickname.
             </p>
