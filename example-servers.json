@@ -1,19 +1,19 @@
 {
-  "serverCount": 1,
+  "configVersion": 1,
   "serverArray": [
     {
-      "name": "server1",
-      "host": "192.168.0.80",
-      "port": 6667,
-      "tls": false,
+      "name": "DALnet",
+      "host": "lion.dal.net",
+      "port": 6697,
+      "tls": true,
       "password": "",
-      "identifyNick": "mynick",
-      "identifyCommand": "PRIVMSG NickServ :IDENTIFY mypassword",
-      "nick": "mynick",
-      "user": "myuser",
-      "real": "My Name",
+      "identifyNick": "",
+      "identifyCommand": "",
+      "nick": "MyNickname",
+      "user": "user",
+      "real": "John Doe",
       "modes": "+i",
-      "channelList": ["#test1", "#test2"],
+      "channelList": ["#myChannel", "#otherChannel"],
       "rawMessageLog": true
     }
   ]

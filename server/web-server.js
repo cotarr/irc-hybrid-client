@@ -55,6 +55,10 @@ const ircClient = require('./irc/irc-client');
 // TLS certificate filenames
 // Web username, password credentials
 const credentials = JSON.parse(fs.readFileSync('./credentials.json', 'utf8'));
+if ((!('configVersion' in credentials)) || (credentials.configVersion !== 1)) {
+  console.log('Error, credentials.js wrong configVersion');
+  process.exit(1);
+}
 
 // For session cookie
 const cookieSecret = credentials.cookieSecret;

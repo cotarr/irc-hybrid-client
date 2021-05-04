@@ -47,6 +47,10 @@
   const credentials = JSON.parse(fs.readFileSync('./credentials.json', 'utf8'));
 
   var servers = JSON.parse(fs.readFileSync('./servers.json', 'utf8'));
+  if ((!('configVersion' in servers)) || (servers.configVersion !== 1)) {
+    console.log('Error, servers.js wrong configVersion');
+    process.exit(1);
+  }
 
   // ----------------------------------------------------
   //
