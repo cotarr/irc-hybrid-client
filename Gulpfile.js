@@ -65,7 +65,7 @@ const htmlMinify = function() {
     .pipe(replace('<script src="./js/webclient08.js" defer></script>', ''))
     .pipe(replace('<script src="./js/webclient09.js" defer></script>', ''))
     .pipe(replace('<script src="./js/webclient10.js" defer></script>', ''))
-    // .pipe(htmlmin(htmlMinifyOptions))
+    .pipe(htmlmin(htmlMinifyOptions))
     .pipe(dest('build/secure'));
 };
 const jsMinify = function () {
@@ -86,8 +86,8 @@ const jsMinify = function () {
       'secure/js/webclient10.js'
     ])
     .pipe(concat('webclient.js'))
-    // .pipe(minify(jsMinifyOptions))
-    // .pipe(insert.prepend(license))
+    .pipe(minify(jsMinifyOptions))
+    .pipe(insert.prepend(license))
     .pipe(dest('build/secure/js'));
 };
 
@@ -100,7 +100,7 @@ const cssMinify = function() {
       'secure/css/styles.css'
     ])
     .pipe(concat('styles.css'))
-    // .pipe(cleancss(minifyCssOptions))
+    .pipe(cleancss(minifyCssOptions))
     .pipe(dest('build/secure/css'));
 };
 
