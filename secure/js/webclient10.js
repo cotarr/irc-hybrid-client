@@ -19,11 +19,12 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+// -------------------------------------------------------------------------------
+//
 // ------------------------------------------------------------
 // webclient10.js  - Event fetch requests
 //                   screen resize events
 // ------------------------------------------------------------
-
 //
 // -------------------------------------------------
 // This function performs API request to obtain
@@ -39,6 +40,7 @@ function updateFromCache () {
   resetNotActivityIcon();
   resetPmActivityIcon(-1);
   resetChanActivityIcon(-1);
+
   // Fire event to clear previous contents
   // TODO this is async, could clear after fetch
   document.dispatchEvent(new CustomEvent('erase-before-reload',

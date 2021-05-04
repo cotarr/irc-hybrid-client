@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 // ---------------------------------------------
-// webclient04.js - Connect/Disconnect API requests
+// webclient04.js - IRC Connect/Disconnect API requests
 // ---------------------------------------------
 'use strict';
 // ------------------------
@@ -190,6 +190,9 @@ document.getElementById('quitButton').addEventListener('click', function() {
   _sendIrcServerMessage('QUIT');
 });
 
+// ---------------------------------------------
+// Toggle visibility of IRC connect section
+// ---------------------------------------------
 document.getElementById('hideLoginSectionButton').addEventListener('click', function() {
   if (document.getElementById('hideLoginSection').hasAttribute('hidden')) {
     document.getElementById('hideLoginSection').removeAttribute('hidden');
@@ -200,6 +203,9 @@ document.getElementById('hideLoginSectionButton').addEventListener('click', func
   }
 });
 
+// ---------------------------------
+// Web page logout button handler
+// ---------------------------------
 document.getElementById('webLogoutButton').addEventListener('click', function() {
   if (((ircState.ircConnected) && (webState.webConnected)) || (!webState.webConnected)) {
     document.getElementById('logoutConfirmDiv').removeAttribute('hidden');
@@ -207,19 +213,22 @@ document.getElementById('webLogoutButton').addEventListener('click', function() 
     window.location.href='/logout';
   }
 });
+
+// -----------------------------------------------------
+// If web logout while IRC connect, confirm the logout
+// -----------------------------------------------------
 document.getElementById('cancelLogoutConfirmButton').addEventListener('click', function() {
   document.getElementById('logoutConfirmDiv').setAttribute('hidden', '');
 });
 
-//
-// Away icon click to cancel away
-//
+// ---------------------------------
+// Away icon and buttons
+// ---------------------------------
 document.getElementById('ircIsAwayIconId').addEventListener('click', function() {
   if ((ircState.ircConnected) && (ircState.ircIsAway)) {
     _sendIrcServerMessage('AWAY');
   }
 });
-
 document.getElementById('setAwayButton').addEventListener('click', function() {
   if ((ircState.ircConnected) &&
     (document.getElementById('userAwayMessageId').value.length > 0)) {

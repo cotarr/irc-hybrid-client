@@ -28,7 +28,7 @@
 // webclient.js - Global state variables, update API, rendering
 // webclient02.js - Parse IRC messages from backend/IRC server
 // webclient03.js - Websocket Management
-// webclient04.js - Connect/Disconnect API requests
+// webclient04.js - IRC Connect/Disconnect API requests
 // webclient05.js - User Input Text Command Parser
 // webclient06.js - IRC Channel Functions
 // webclient07.js - Private Message Functions
@@ -53,7 +53,8 @@ const activityIconInhibitTimerValue = 10;
 
 
 // ----------------------------------------------------------
-// Do not edit ircState, represents state on web server end
+// Do not edit ircState contents from within browser.
+//
 // Object updated from getIrcState() fetch request
 //
 // ircState represents the state of the IRC connection
@@ -61,6 +62,7 @@ const activityIconInhibitTimerValue = 10;
 //
 //   R E A D   O N L Y
 //
+// ----------------------------------------------------------
 var ircState = {
   ircConnected: false,
   ircConnecting: false,
@@ -100,9 +102,9 @@ document.getElementById('ircConnectIconId').removeAttribute('connected');
 document.getElementById('webConnectIconId').removeAttribute('connecting');
 document.getElementById('ircConnectIconId').removeAttribute('connecting');
 
-//
+// ---------------------------------------------------
 // webState represents state of web page in browser
-//
+// ---------------------------------------------------
 var webState = {};
 webState.loginUser = {};
 webState.webConnectOn = true;

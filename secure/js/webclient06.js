@@ -19,6 +19,8 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+// -----------------------------------------------------------------------------
+//
 // ---------------------------------------
 // webclient06.js - IRC Channel Functions
 // ---------------------------------------
@@ -30,7 +32,7 @@
 
 // ------------------------------------------
 // Send text to channel (internal function)
-//     (internal function)
+// Intercept IRC text command if detected
 // ------------------------------------------
 function _sendTextToChannel(channelIndex, textAreaEl) {
   let text = stripTrailingCrLf(textAreaEl.value);
@@ -264,7 +266,6 @@ function createChannelEl (name) {
   let channelBeep3CBTitleEl = document.createElement('span');
   channelBeep3CBTitleEl.classList.add('channel-cb-span');
   channelBeep3CBTitleEl.textContent = 'Name-beep';
-
 
   // --------------------------------
   // Append child element to DOM

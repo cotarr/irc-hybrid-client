@@ -20,8 +20,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 // --------------------------------------------------------------------------------
+
+// --------------------------------------------------------------------------------
 // webclient03.js - Websocket Management
 // --------------------------------------------------------------------------------
+//
 //                     Web Server Authentication notes
 //
 // These HTML pages are authenticated by session cookies.

@@ -19,16 +19,17 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+//
 // ----------------------------------------------
 // webclient05.js - User Input Text Command Parser
 // ----------------------------------------------
 'use strict';
 
-//
+// -------------------------------------------------
 // This is to avoid multi-line errors from copy paste or mobile voice dictation
 //
 // Returns true if string is multi-line
-//
+// -------------------------------------------------
 function detectMultiLineString(inString) {
   let inLength = inString.length;
   // if last character is newline 0x0A, then reduce by 1
@@ -48,11 +49,11 @@ function detectMultiLineString(inString) {
   }
 }
 
-//
+// -------------------------
 // remove trailing CR-LF
 //
 // Returns new string
-//
+// -------------------------
 function stripTrailingCrLf(inString) {
   let inLength = inString.length;
   if ((inLength > 0) && (inString.charCodeAt(inLength-1) === 10)) inLength--;

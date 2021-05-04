@@ -20,6 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 // -------------------------------------------------------------
+
+// -------------------------------------------------------------
 // webclient02.js - Parse IRC messages from backend/IRC server
 //
 //    IRC-Server  -->  backend-webserver -->  Browser (here)
@@ -336,6 +338,7 @@ function _parseIrcMessage (message) {
 // Channel windows are created dynamically and inserted into the DOM
 // Fire this event to send channel message to listener in channel window
 //
+// -----------------------------------------------------------------------
 // :nick!~user@host.domain PRIVMSG #channel :This is channel text message.
 // -----------------------------------------------------------------------
 function displayChannelMessage(parsedMessage) {
@@ -352,6 +355,7 @@ function displayChannelMessage(parsedMessage) {
 // Private Mesage windows are created dynamically and inserted into the DOM
 // Fire this event to send channel message to listener in channel window
 //
+// -----------------------------------------------------------------------
 // :nick!~user@host.domain PRIVMSG nickname :This is private text message.
 // -----------------------------------------------------------------------
 function displayPrivateMessage(parsedMessage) {
@@ -473,13 +477,15 @@ function displayRawMessage (inString) {
 };
 
 // ----------------------------------------------------------------
-// Previx raw server message in hexadecimal
-// Note: currently one number per UTF-8 character, (not per byte)
+// Prefix raw server message in hexadecimal
+// multi-byte UTF-8 characters are converted to 8 bit
+// bytes using TextEncoder.
 // ----------------------------------------------------------------
 function displayRawMessageInHex (message) {
+  let uint8String = new TextEncoder('utf8').encode(message);
   let hexString = '';
-  for (let i=0; i<message.length; i++) {
-    hexString += message.charCodeAt(i).toString(16).padStart(2, '0') + ' ';
+  for (let i=0; i<uint8String.length; i++) {
+    hexString += uint8String[i].toString(16).padStart(2, '0') + ' ';
   }
   displayRawMessage(hexString);
 };
