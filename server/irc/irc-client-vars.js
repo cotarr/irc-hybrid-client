@@ -27,6 +27,16 @@
 (function() {
   'use strict';
 
+  var ircServerPassword = null;
+  var nsIdentifyNick = null;
+  var nsIdentifyCommand = null;
+
+  // IRC server reconnect when timer matches
+  const ircServerReconnectIntervals = [10, 60, 120, 180, 300, 600, 900];
+  var ircServerReconnectTimerSeconds = 0;
+  var ircServerReconnectChannelString = '';
+  var ircServerReconnectAwayString = '';
+
   const timestamp = function() {
     let now = new Date;
     return parseInt(now.valueOf() / 1000).toString();
@@ -34,13 +44,17 @@
 
   module.exports = {
     ircState: {},
-    ircServerPassword: null,
-    nsIdentifyNick: null,
-    nsIdentifyCommand: null,
+    ircServerPassword: ircServerPassword,
+    nsIdentifyNick: nsIdentifyNick,
+    nsIdentifyCommand: nsIdentifyCommand,
     channelPrefixChars: '@#+!',
     channelUserModeChars: 'qaohv',
     nicknamePrefixChars: '~&@%+',
     commandMsgPrefix: '--> ',
+    ircServerReconnectTimerSeconds: ircServerReconnectTimerSeconds,
+    ircServerReconnectIntervals: ircServerReconnectIntervals,
+    ircServerReconnectChannelString: ircServerReconnectChannelString,
+    ircServerReconnectAwayString: ircServerReconnectAwayString,
     timestamp: timestamp
   };
 })();

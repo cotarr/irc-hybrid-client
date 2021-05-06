@@ -1,5 +1,6 @@
 {
   "configVersion": 1,
+  "ircAutoReconnect": true,
   "serverArray": [
     {
       "name": "DALnet",

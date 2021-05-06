@@ -64,10 +64,12 @@ const activityIconInhibitTimerValue = 10;
 //
 // ----------------------------------------------------------
 var ircState = {
+  ircConnectOn: false,
   ircConnected: false,
   ircConnecting: false,
   ircRegistered: false,
   ircIsAway: false,
+  ircAutoReconnect: false,
 
   ircServerName: '',
   ircServerHost: '',
@@ -92,7 +94,10 @@ var ircState = {
     programRun: 0,
     ircConnect: 0
   },
-
+  count: {
+    ircConnect: 0,
+    ircConnectError: 0
+  },
   websocketCount: 0
 };
 // -------------------------------------------------------------
@@ -385,7 +390,7 @@ function updateDivVisibility() {
       // IRC Server Disconnected
       //
       document.getElementById('cycleNextServerButton').removeAttribute('disabled');
-      if (webState.ircConnecting) {
+      if ((webState.ircConnecting) || (ircState.ircConnecting)) {
         document.getElementById('ircConnectIconId').removeAttribute('unavailable');
         document.getElementById('ircConnectIconId').setAttribute('connecting', '');
         document.getElementById('ircConnectIconId').removeAttribute('connected');
@@ -404,8 +409,13 @@ function updateDivVisibility() {
       // document.getElementById('userNameInputId').removeAttribute('disabled');
       document.getElementById('realNameInputId').removeAttribute('disabled');
       document.getElementById('userModeInputId').removeAttribute('disabled');
-      document.getElementById('connectButton').removeAttribute('disabled');
-      document.getElementById('quitButton').setAttribute('disabled', '');
+      if (ircState.ircConnecting) {
+        document.getElementById('connectButton').setAttribute('disabled', '');
+        document.getElementById('quitButton').removeAttribute('disabled');
+      } else {
+        document.getElementById('connectButton').removeAttribute('disabled');
+        document.getElementById('quitButton').setAttribute('disabled', '');
+      }
       document.getElementById('userAwayMessageId').setAttribute('disabled', '');
       document.getElementById('setAwayButton').setAttribute('disabled', '');
       document.getElementById('setBackButton').setAttribute('disabled', '');
@@ -608,6 +618,7 @@ function updateElapsedTimeDisplay () {
   timePreEl.textContent = timeStr;
 }
 
+var lastConnectErrorCount = 0;
 // --------------------------------------
 // Contact web server and get state of
 // the connection to the IRC server
@@ -682,6 +693,14 @@ function getIrcState (callback) {
       if (!ircState.ircConnected) {
         setVariablesShowingIRCDisconnected();
       }
+      if (lastConnectErrorCount !== ircState.count.ircConnectError) {
+        lastConnectErrorCount = ircState.count.ircConnectError;
+        if (ircState.count.ircConnectError > 0) {
+          showError('An IRC Server connection error occurred');
+        }
+        // clear browser side connecting flag
+        webState.ircConnecting = false;
+      }
 
       // Fire custom event
       document.dispatchEvent(new CustomEvent('irc-state-changed',
@@ -713,7 +732,3 @@ function getIrcState (callback) {
       }
     });
 } // getIrcState
-
-// document.addEventListener('irc-state-changed', function(event) {
-//   console.log('Event: irc-state-changed, detail:' + JSON.stringify(event.detail));
-// });

@@ -58,10 +58,13 @@
   //
   // ----------------------------------------------------
 
+  vars.ircConnectOn = false;
   vars.ircState.ircConnected = false;
   vars.ircState.ircConnecting = false;
   vars.ircState.ircRegistered = false;
   vars.ircState.ircIsAway = false;
+
+  vars.ircState.ircAutoReconnect = servers.ircAutoReconnect;
 
   vars.ircState.ircServerName = servers.serverArray[0].name;
   vars.ircState.ircServerHost = servers.serverArray[0].host;
@@ -99,7 +102,10 @@
   vars.ircState.botName = require('../../package.json').name;
 
   vars.ircState.times = {programRun: 0, ircConnect: 0};
-  vars.ircState.count = {ircConnect: 0};
+  vars.ircState.count = {
+    ircConnect: 0,
+    ircConnectError: 0
+  };
   vars.ircState.websocketCount = 0;
 
   ircLog.setRawMessageLogEnabled(servers.serverArray[0].rawMessageLog);
@@ -110,6 +116,30 @@
 
   const tellBrowserToRequestState = function() {
     global.sendToBrowser('UPDATE\r\n');
+  };
+
+  // -----------------------------------------------------
+  // Called for IRC server socket error, or close socket
+  // to capture items like current channels used to
+  // auto-reconnect.
+  //
+  // NOTE: does not support channel passwords
+  // -----------------------------------------------------
+  const onDisconnectGrabState = function() {
+    vars.ircServerReconnectChannelString = '';
+    vars.ircServerReconnectAwayString = '';
+    let channelCount = 0;
+    if (vars.ircState.channels.length > 0) {
+      for (let i=0; i<vars.ircState.channels.length; i++) {
+        if (vars.ircState.channelStates[i].joined) {
+          if (i < 5) {
+            if (i > 0) vars.ircServerReconnectChannelString += ',';
+            vars.ircServerReconnectChannelString += vars.ircState.channels[i];
+          }
+        }
+      } // next i
+    }
+    console.log('ircServerReconnectChannelString ' + vars.ircServerReconnectChannelString);
   };
 
   // -------------------------------------------
@@ -208,6 +238,180 @@
     }
   }; // extractMessagesFromStream
 
+  // -------------------------------------------------------
+  //
+  //       I R C    S e r v e r   C o n n e c t i o n
+  //
+  // Called by connect route handler, called by reconnect timer
+  //
+  // This function will create the TCP socket,
+  //   setup socket event handlers, and connect the socket.
+  // -------------------------------------------------------
+  //
+  // Placeholder variable to hold socket
+  var ircSocket = null;
+  //
+  // creates socket to IRC server
+  const connectIRC = function (callback) {
+    let connectMessage = 'webServer: Opening socket to ' + vars.ircState.ircServerName + ' ' +
+      vars.ircState.ircServerHost + ':' + vars.ircState.ircServerPort;
+    if (vars.ircState.ircTLSEnabled) {
+      connectMessage += ' (TLS)';
+    }
+    global.sendToBrowser('UPDATE\n' + connectMessage + '\n');
+
+    if (vars.ircState.ircTLSEnabled) {
+      ircSocket = new tls.TLSSocket();
+    } else {
+      ircSocket = new net.Socket();
+    }
+
+    // --------------------------------------------------
+    //   On Connect   (IRC client socket connected)
+    // --------------------------------------------------
+    ircSocket.on('connect', function() {
+      console.log('Event: connect');
+      global.sendToBrowser('webServer: Connected\n');
+    });
+
+    // -----------
+    //  On Ready
+    // -----------
+    ircSocket.on('ready', function() {
+      console.log('Event: ready');
+      _readyEventHandler(ircSocket);
+    }); // ircSocket.on('ready'
+
+    // -----------
+    // ON Data
+    // -----------
+    ircSocket.on('data', function(data) {
+      extractMessagesFromStream(ircSocket, data);
+    });
+
+    // -------------------------------------------
+    //   On Close    (IRC client socket closed)
+    // -------------------------------------------
+    ircSocket.on('close', function(hadError) {
+      console.log('Event: socket.close, hadError=' + hadError +
+        ' destroyed=' + ircSocket.destroyed);
+      if (((vars.ircState.ircConnectOn) && (vars.ircState.ircConnected)) ||
+        (vars.ircState.ircConnecting)) {
+        // signal browser to show an error
+        vars.ircState.count.ircConnectError++;
+      }
+      vars.ircState.ircConnecting = false;
+      vars.ircState.ircConnected = false;
+      vars.ircState.ircRegistered = false;
+      vars.ircState.ircIsAway = false;
+      // is auto enabled?
+      if (vars.ircState.ircAutoReconnect) {
+        // and client requested a connection, and has achieved at least 1 previously
+        if ((vars.ircState.ircConnectOn) && (vars.ircState.count.ircConnect > 0)) {
+          if (vars.ircServerReconnectTimerSeconds === 0) vars.ircServerReconnectTimerSeconds = 1;
+          onDisconnectGrabState();
+        }
+      }
+      global.sendToBrowser('UPDATE\nwebServer: Socket to IRC server closed, hadError: ' +
+        hadError.toString() + '\n');
+    });
+
+    // --------------------------
+    //   On Error   (IRC client socket)
+    // --------------------------
+    ircSocket.on('error', function(err) {
+      console.log('Event: socket.error ' + err.toString());
+      // console.log(err);
+      if ((vars.ircState.ircConnected) || (vars.ircState.ircConnecting)) {
+        // signal browser to show an error
+        vars.ircState.count.ircConnectError++;
+      }
+      vars.ircState.ircConnecting = false;
+      vars.ircState.ircConnected = false;
+      vars.ircState.ircRegistered = false;
+      vars.ircState.ircIsAway = false;
+      // is auto enabled?
+      if (vars.ircState.ircAutoReconnect) {
+        // and client requested a connection, and has achieved at least 1 previously
+        if ((vars.ircState.ircConnectOn) && (vars.ircState.count.ircConnect > 0)) {
+          onDisconnectGrabState();
+          if (vars.ircServerReconnectTimerSeconds === 0) vars.ircServerReconnectTimerSeconds = 1;
+        }
+      }
+      global.sendToBrowser('UPDATE\nwebServer: IRC server socket error, connected flags reset\n');
+    });
+
+    // ----------------------------------
+    // All even listeners are created
+    // Go ahead can connect the socket.
+    // ----------------------------------
+    ircSocket.connect(vars.ircState.ircServerPort, vars.ircState.ircServerHost, function() {
+      let now = new Date();
+      let timeString = now.toISOString() + ' ';
+      // console.log(timeString + 'Connected to IRC server ' + vars.ircState.ircServerName + ' ' +
+      //   vars.ircState.ircServerHost + ':'+ vars.ircState.ircServerPort);
+      ircLog.writeIrcLog('Connected to IRC server ' + vars.ircState.ircServerName + ' ' +
+        vars.ircState.ircServerHost + ':'+ vars.ircState.ircServerPort);
+      // if (callback) {
+      //   callback(null);
+      // }
+    });
+  }; // connectIRC()
+
+  // ------------------------------------------------------
+  //
+  //     I R C   R e c o n n e c t   H a n d l e r
+  //
+  // In order to restart, a selected IRC server must have
+  // previously achieved a successful connection.
+  // Successful connections will increment a counter
+  // ------------------------------------------------------
+  const ircServerReconnectTimerTick = function () {
+    // timer not active, abort
+    if (vars.ircServerReconnectTimerSeconds === 0) return;
+
+    // Connected already abort
+    if (vars.ircState.ircConnected) {
+      vars.ircServerReconnectTimerSeconds = 0;
+      return;
+    }
+    // connect not requested, or auto-reconnect not requested
+    if ((!vars.ircState.ircConnectOn) || (!vars.ircState.ircAutoReconnect)) {
+      vars.ircServerReconnectTimerSeconds = 0;
+      return;
+    }
+
+    // not previously connected, abort auto
+    if (vars.ircState.count.ircConnect === 0) {
+      vars.ircServerReconnectTimerSeconds = 0;
+      return;
+    }
+
+    // Increment the counter (timer in seconds)
+    vars.ircServerReconnectTimerSeconds++;
+
+    console.log('tick ' + vars.ircServerReconnectTimerSeconds + ' ' +
+      vars.ircState.count.ircConnect + ' ' + vars.ircState.count.ircConnectError);
+
+    // Array of integers representing reconnect times in seconds
+    if (vars.ircServerReconnectIntervals.indexOf(vars.ircServerReconnectTimerSeconds) >= 0) {
+      console.log('Attempting to restart');
+
+      // channels here on connect, browser on disconnect
+      vars.ircState.channels = [];
+      vars.ircState.channelStates = [];
+      vars.ircState.ircConnected = false;
+      vars.ircState.ircConnecting = true;
+      vars.ircState.ircRegistered = false;
+      vars.ircState.ircIsAway = false;
+
+      //
+      // This will create the socket and connect it.
+      //
+      connectIRC();
+    }
+  };
+
   // -----------------------------------------------------
   //
   //          R O U T E   H A N D L E R S
@@ -224,6 +428,14 @@
   // Route: /server
   //----------------------------------------
   const serverHandler = function(req, res, next) {
+    if ((vars.ircState.connected) || (vars.ircState.connecting)) {
+      if ((!('serverArray' in servers)) || (servers.serverArray.length < 1)) {
+        return res.json({
+          error: true,
+          message: 'Can not change servers wile connected or connecting'
+        });
+      }
+    }
     if ((!('serverArray' in servers)) || (servers.serverArray.length < 1)) {
       return res.json({
         error: true,
@@ -236,6 +448,10 @@
         message: 'Only 1 server, can not cycle.'
       });
     }
+    // clear these to reinitialize restart logic
+    vars.ircState.count.ircConnect = 0;
+    vars.ircState.count.ircConnectError = 0;
+
     vars.ircState.ircServerIndex++;
     if (vars.ircState.ircServerIndex >= servers.serverArray.length) {
       vars.ircState.ircServerIndex = 0;
@@ -267,8 +483,6 @@
     });
   };
 
-  // placeholder
-  var ircSocket = null;
   // -----------------------------------------------------
   // API connect request handler (Called by browser)
   //
@@ -299,134 +513,49 @@
     vars.ircState.ircRegistered = false;
     vars.ircState.ircIsAway = false;
 
-    let connectMessage = 'webServer: Opening socket to ' + vars.ircState.ircServerName + ' ' +
-      vars.ircState.ircServerHost + ':' + vars.ircState.ircServerPort;
-    if (vars.ircState.ircTLSEnabled) {
-      connectMessage += ' (TLS)';
-    }
-    global.sendToBrowser('UPDATE\n' + connectMessage + '\n');
+    // Set flag, used in automatic restart
+    vars.ircState.ircConnectOn = true;
+    vars.ircServerReconnectTimerSeconds = 0;
+    vars.ircServerReconnectChannelString = '';
+    vars.ircServerReconnectAwayString = '';
+    //
+    // This will create the socket and connect it.
+    //
+    connectIRC(null);
+    //
+    // This response indicates a connect request has been made
+    // asynchronous errors occur later and will not show here
+    //
+    res.json({
+      error: false
+    });
+  }; // connectHandler();
 
-    if (vars.ircState.ircTLSEnabled) {
-      ircSocket = new tls.TLSSocket();
-    } else {
-      ircSocket = new net.Socket();
-    }
-
-    // ----------------------------------------------------------------
-    // THis function will be replaced at the time of connect request
-    // so that any connect errors can be returned to web browser via
-    // the response object.
-    // This will deep the node response object within scope of the
-    // customErrorResponse function.
-    // I will be restored to his generic version after connect.
-    // ----------------------------------------------------------------
-    const genericErrorResponse = function(err) {
-      // dummy function to be replaced
-      global.sendToBrowser('webServer: IRC Server socket error occurred.\n');
-      if (!ircSocket.writable) {
-        vars.ircState.ircConnecting = false;
-        vars.ircState.ircConnected = false;
-        vars.ircState.ircRegistered = false;
-        vars.ircState.ircIsAway = false;
-        global.sendToBrowser('UPDATE\nwebServer: Socket not writable, connected flags reset\n');
-      }
-    };
-
-    // ---------------------------------------------------
-    // This error function is only used during connecting
-    // ---------------------------------------------------
-    const connectingErrorResponse = function(err) {
-      // Response to POST request
+  // ------------------------------------
+  //  API handler for forced disconnect
+  //
+  //  Route: /disconnect
+  // ------------------------------------
+  const disconnectHandler = function(req, res, next) {
+    console.log('disconnect handler called');
+    // cancel reconnect timer
+    vars.ircState.ircConnectOn = false;
+    ircServerReconnectTimerSeconds = 0;
+    vars.ircServerReconnectChannelString = '';
+    vars.ircServerReconnectAwayString = '';
+    global.sendToBrowser('webServer: Forcibly closing IRC server TCP socket\n');
+    if (ircSocket) {
+      ircSocket.destroy();
       vars.ircState.ircConnecting = false;
       vars.ircState.ircConnected = false;
       vars.ircState.ircRegistered = false;
       vars.ircState.ircIsAway = false;
-      // Send some over over websocket too
-      let errMsg = 'UPDATE\nwebServer: Error opening TCP socket to ' +
-        vars.ircState.ircServerName + ' ' +
-        vars.ircState.ircServerHost + ':' + vars.ircState.ircServerPort;
-      if (err) {
-        errMsg += 'webServer: ' + err.toString();
-      }
-      global.sendToBrowser(errMsg + '\n');
-      res.json({
-        error: true,
-        message: 'Error occurred attempting to open IRC server TCP socket'
-      });
-    };
-
-    // ---------------------------------------
-    // variable to hold transient error handler
-    // ---------------------------------------
-    var customErrorResponse = connectingErrorResponse;
-
-    // --------------------------
-    //   On Error   (IRC client socket)
-    // --------------------------
-    ircSocket.on('error', function(err) {
-      console.log('IRC Server socket error occurred.');
-      console.log(err);
-
-      // This does not return if res.json(...)
-      customErrorResponse(err);
-    });
-
-    // --------------------------------------------------
-    //   On Connect   (IRC client socket connected)
-    // --------------------------------------------------
-    ircSocket.on('connect', function() {
-      // console.log('Event: connect');
-      global.sendToBrowser('webServer: Connected\n');
-      // replace connect error handler
-      customErrorResponse = genericErrorResponse;
-    });
-
-    // -----------
-    //  On Ready
-    // -----------
-    ircSocket.on('ready', function() {
-      // console.log('Event: ready');
-      _readyEventHandler(ircSocket);
-    }); // ircSocket.on('ready'
-
-    // -----------
-    // ON Data
-    // -----------
-    ircSocket.on('data', function(data) {
-      extractMessagesFromStream(ircSocket, data);
-    });
-
-    // -------------------------------------------
-    //   On Close    (IRC client socket closed)
-    // -------------------------------------------
-    ircSocket.on('close', function(hadError) {
-      console.log('Event: close, hadError=' + hadError + ' destroyed=' + ircSocket.destroyed);
-      vars.ircState.ircConnecting = false;
-      vars.ircState.ircConnected = false;
-      vars.ircState.ircRegistered = false;
-      vars.ircState.ircIsAway = false;
-      global.sendToBrowser('UPDATE\nwebServer: Socket to IRC server closed, hadError: ' +
-        hadError.toString() + '\n');
-    });
-
-    // ----------------------------------
-    // All even listeners are created
-    // Go ahead can connect the socket.
-    // ----------------------------------
-    ircSocket.connect(vars.ircState.ircServerPort, vars.ircState.ircServerHost, function() {
-      let now = new Date();
-      let timeString = now.toISOString() + ' ';
-      // console.log(timeString + 'Connected to IRC server ' + vars.ircState.ircServerName + ' ' +
-      //   vars.ircState.ircServerHost + ':'+ vars.ircState.ircServerPort);
-      ircLog.writeIrcLog('Connected to IRC server ' + vars.ircState.ircServerName + ' ' +
-        vars.ircState.ircServerHost + ':'+ vars.ircState.ircServerPort);
+      tellBrowserToRequestState();
       res.json({error: false});
-    });
-  }; // connectHandler()
-
-  // ------------------------------------------------------
-  // Node/Express (req, res, next) routes
-  // ------------------------------------------------------
+    } else {
+      res.json({error: true, message: 'Error Can not destry socket before it is created.'});
+    }
+  };
 
   // ------------------------------------------------------
   // IRC commands from browser for send to IRC server
@@ -480,27 +609,6 @@
       }
     }
   }; // messageHandler
-
-  // ------------------------------------
-  //  API handler for forced disconnect
-  //
-  //  Route: /disconnect
-  // ------------------------------------
-  const disconnectHandler = function(req, res, next) {
-    // console.log('disconnect handler called');
-    global.sendToBrowser('webServer: Forcibly closing IRC server TCP socket\n');
-    if (ircSocket) {
-      ircSocket.destroy();
-      vars.ircState.ircConnecting = false;
-      vars.ircState.ircConnected = false;
-      vars.ircState.ircRegistered = false;
-      vars.ircState.ircIsAway = false;
-      tellBrowserToRequestState();
-      res.json({error: false});
-    } else {
-      res.json({error: true, message: 'Error Can not destry socket before it is created.'});
-    }
-  };
 
   // ---------------------------------------------------
   // Get status of Browser to web server connection
@@ -590,12 +698,31 @@
     console.log('test2 handler called');
     // -------- test code here -----------------
     // -----------------------------------------
-    res.json({
-      error: false,
-      comment: 'node.js memory',
-      data: process.memoryUsage()
-    });
+    // res.json({
+    //   error: false,
+    //   comment: 'node.js memory',
+    //   data: process.memoryUsage()
+    // });
+    if (ircSocket) {
+      ircWrite.writeSocket(ircSocket, 'QUIT');
+      res.json({
+        error: false,
+        comment: 'Emulate IRC disconnect'
+      });
+    } else {
+      res.json({
+        error: false,
+        comment: 'Socket not connected'
+      });
+    }
   };
+
+  //
+  // 1 second timer
+  //
+  setInterval(function() {
+    ircServerReconnectTimerTick();
+  }.bind(this), 1000);
 
   // Program run timestamp
   vars.ircState.times.programRun = vars.timestamp();

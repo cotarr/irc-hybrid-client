@@ -509,6 +509,22 @@
               }
             }.bind(this), 1500);
           }
+          //
+          // Upon reconnect, auto-JOIN previous irc channels
+          //
+          if ((vars.ircState.ircAutoReconnect) &&
+            (vars.ircState.ircConnectOn) &&
+            (vars.ircState.count.ircConnect > 0)) {
+            setTimeout(function() {
+              if ((vars.ircState.ircAutoReconnect) &&
+                (vars.ircState.ircConnectOn) &&
+                (vars.ircState.count.ircConnect > 0)) {
+                if (vars.ircServerReconnectChannelString.length > 0) {
+                  ircWrite.writeSocket(socket, 'JOIN ' + vars.ircServerReconnectChannelString);
+                }
+              }
+            }.bind(this), 3000);
+          }
         } else {
           global.sendToBrowser(
             'webServer: Registration error, unable to parse nick!user@host from message 001\n');

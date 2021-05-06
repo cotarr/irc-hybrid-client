@@ -301,7 +301,8 @@ document.getElementById('test2Button').addEventListener('click', function() {
       if (error) showError(error.toString());
     });
 });
-document.getElementById('test2ButtonDesc').textContent = 'GET /irc/test2 memoryUsage()';
+// document.getElementById('test2ButtonDesc').textContent = 'GET /irc/test2 memoryUsage()';
+document.getElementById('test2ButtonDesc').textContent = 'Emulate IRC server disconnect';
 
 // --------------------
 // Test Button #3

@@ -204,6 +204,14 @@
           };
         }
         break;
+      case 'QUIT':
+        if (true) {
+          vars.ircState.ircConnectOn = false;
+          vars.ircServerReconnectTimerSeconds = 0;
+          vars.ircServerReconnectChannelString = '';
+          vars.ircServerReconnectAwayString = '';
+        }
+        break;
       //
       default:
     }

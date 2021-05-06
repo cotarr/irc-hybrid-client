@@ -68,12 +68,10 @@ document.getElementById('cycleNextServerButton').addEventListener('click', funct
 // Connect Button Handler
 // -------------------------
 function connectButtonHandler() {
-  // change color of icon
-  webState.ircConnecting = true;
   // Are we connected to web server?
   if (!checkConnect(1)) return;
   // Is web server already connected to IRC?
-  if (ircState.ircConnected) {
+  if ((ircState.ircConnected) || (ircState.ircConnecting) || (webState.ircConnecting)) {
     showError('Error: Already connected to IRC server');
     return;
   }
@@ -82,6 +80,9 @@ function connectButtonHandler() {
     showError('Invalid nick name.');
     return;
   }
+
+  // change color of icon
+  webState.ircConnecting = true;
 
   let connectObject = {};
   connectObject.nickName = document.getElementById('nickNameInputId').value;
@@ -120,39 +121,12 @@ function connectButtonHandler() {
     });
 }; // connectButtonHandler
 
-document.getElementById('connectButton').addEventListener('click', function() {
-  connectButtonHandler();
-}.bind(this));
-
-// ------------------------------------------------
-// Tap "Web" status icon to connect/disconnect
-// ------------------------------------------------
-var ircStatusIconTouchDebounce = false;
-document.getElementById('ircConnectIconId').addEventListener('click', function() {
-  if (!webState.webConnected) return;
-  // debounce button
-  if (ircStatusIconTouchDebounce) return;
-  ircStatusIconTouchDebounce = true;
-  setTimeout(function() {
-    ircStatusIconTouchDebounce = false;
-  }, 1000);
-  if (ircState.ircConnected) {
-    //
-    // disconnect
-    _sendIrcServerMessage('QUIT');
-  } else {
-    //
-    // Connect
-    connectButtonHandler();
-  }
-});
-
 // ----------------------------------
 // Force Disconnect Button Handler
 //
 // Route /disconnect
 // ----------------------------------
-document.getElementById('disconnectButton').addEventListener('click', function() {
+function forceDisconnectHandler() {
   console.log('Disconnect button pressed.');
   let fetchURL = webServerUrl + '/irc/disconnect';
   let fetchOptions = {
@@ -181,13 +155,59 @@ document.getElementById('disconnectButton').addEventListener('click', function()
     .catch( (error) => {
       console.log(error);
     });
-}); // disconnectButton
+} // forceDisconnectHandler()
+
+document.getElementById('connectButton').addEventListener('click', function() {
+  connectButtonHandler();
+}.bind(this));
+
+document.getElementById('disconnectButton').addEventListener('click', function() {
+  forceDisconnectHandler();
+}.bind(this));
+
+// ------------------------------------------------
+// Tap "Web" status icon to connect/disconnect
+// ------------------------------------------------
+var ircStatusIconTouchDebounce = false;
+document.getElementById('ircConnectIconId').addEventListener('click', function() {
+  // debounce button
+  if (ircStatusIconTouchDebounce) return;
+  ircStatusIconTouchDebounce = true;
+  setTimeout(function() {
+    ircStatusIconTouchDebounce = false;
+  }, 1000);
+  if ((ircState.ircConnected) || (ircState.ircConnecting) || (webState.ircConnecting)) {
+    //
+    // disconnect
+    if ((webState.ircConnecting) || (ircState.webConnecting)) {
+      // with this false, icon depend only on backend state
+      webState.ircConnecting = false;
+      // stuck trying to connect, just request server to destroy socket
+      forceDisconnectHandler();
+    } else {
+      // else, connected to server, exit gracefully by command.
+      _sendIrcServerMessage('QUIT');
+    }
+  } else {
+    //
+    // Connect
+    connectButtonHandler();
+  }
+}.bind(this));
 
 // ------------------------------------------------------
 // Quit Button handler (Send QUIT message to IRC server)
 // ------------------------------------------------------
 document.getElementById('quitButton').addEventListener('click', function() {
-  _sendIrcServerMessage('QUIT');
+  if ((webState.ircConnecting) || (ircState.webConnecting)) {
+    // with this false, icon depend only on backend state
+    webState.ircConnecting = false;
+    // stuck trying to connect, just request server to destroy socket
+    forceDisconnectHandler();
+  } else {
+    // else, connected to server, exit gracefully by command.
+    _sendIrcServerMessage('QUIT');
+  }
 });
 
 // ---------------------------------------------
