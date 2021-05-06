@@ -238,6 +238,17 @@
   "channelList": ["#myChannel", "#otherChannel"],
 </pre></div>
 
+      <div class="install-section-title">Auto Re-Connect (Global)</div>
+      <p>
+        There is a global flag &quotircAutoReconnect&quot.
+        If this flag is set to true, the backend web server will
+        attempt to reconnect to the IRC server after it has been disconnected.
+        It will attempt to re-join up to 5 channels at the time of disconnection.
+        Each time the IRC server connects, a new message cache is started,
+        so previous messages will not show. This feature does not supprot
+        channel passwords.
+      </p>
+
       <div class="install-section-title">Example server.json</div>
       <p>
         The server.json file should look something like this.
@@ -246,6 +257,7 @@
 <div class="pre-div"><pre>
 {
   "configVersion": 1,
+  "ircAutoReconnect": true,
   "serverArray": [
     {
       "name": "DALnet",
