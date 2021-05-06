@@ -583,7 +583,10 @@
             let index = vars.ircState.channels.indexOf(channelName);
             // if names array exist
             if (index >= 0) {
-              if (parsedMessage.params[3].length > 0) {
+              // this crash with .params[3] value of null, not sure why it was null
+              // check for null is a patch over
+              if ((parsedMessage.params) && (parsedMessage.params[3]) &&
+                (parsedMessage.params[3].length > 0)) {
                 let nameArray = parsedMessage.params[3].split(' ');
                 if (nameArray.length > 0) {
                   for (let i=0; i<nameArray.length; i++) {
