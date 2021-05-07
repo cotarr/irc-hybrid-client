@@ -226,7 +226,7 @@ function connectWebSocket () {
 // Route /message
 // --------------------------------------------------
 function _sendIrcServerMessage (message) {
-  if (!checkConnect(2)) return;
+  if (!checkConnect(3)) return;
 
   let body = {
     message: message

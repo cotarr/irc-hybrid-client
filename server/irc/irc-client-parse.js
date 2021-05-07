@@ -28,6 +28,8 @@
 //  Typical example would be JOIN, PART, NICK commands that impact
 //  a channel nicklist that is stored as a state variable.
 //
+//        Browser  <--   Web Server (here)  <--   IRC server
+//
 // -----------------------------------------------------------------------------
 (function() {
   'use strict';
@@ -485,64 +487,68 @@
     // -------------------------------------------------
     switch(parsedMessage.command) {
       case '001':
-        // case of successful register with nickname, set registered state
-        vars.ircState.ircRegistered = true;
-        vars.ircState.times.ircConnect = vars.timestamp();
-        vars.ircState.count.ircConnect++;
-
-        // extract my client info from last argument in 001 message
-        let splitparams1 = parsedMessage.params[1].split(' ');
-        let parsedNick = splitparams1[splitparams1.length - 1].split('!')[0];
-        let parsedUserhost = splitparams1[splitparams1.length - 1].split('!')[1];
-        if (parsedNick === vars.ircState.nickName) {
-          // console.log(parsedUserhost);
-          vars.ircState.userHost = parsedUserhost;
-          tellBrowserToRequestState();
-          //
-          // set user mode
-          //
-          if (vars.ircState.userMode.length > 0) {
-            setTimeout(function() {
-              ircWrite.writeSocket(socket, 'MODE ' + vars.ircState.nickName +
-                ' ' + vars.ircState.userMode);
-            }.bind(this), 500);
-          }
-          //
-          // nickserv registration
-          //
-          if ((vars.nsIdentifyNick.length > 0) && (vars.nsIdentifyCommand.length > 0)) {
-            setTimeout(function() {
-              if ((vars.ircState.ircConnected) &&
-                (vars.ircState.nickName === vars.nsIdentifyNick)) {
-                ircWrite.writeSocket(socket, vars.nsIdentifyCommand);
-              }
-            }.bind(this), 1500);
-          }
-          //
-          // Upon reconnect, auto-JOIN previous irc channels
-          //
-          if ((vars.ircState.ircAutoReconnect) &&
-            (vars.ircState.ircConnectOn) &&
-            (vars.ircState.count.ircConnect > 0)) {
-            setTimeout(function() {
-              if ((vars.ircState.ircAutoReconnect) &&
-                (vars.ircState.ircConnectOn) &&
-                (vars.ircState.count.ircConnect > 0)) {
-                if (vars.ircServerReconnectChannelString.length > 0) {
-                  ircWrite.writeSocket(socket, 'JOIN ' + vars.ircServerReconnectChannelString);
+        if (!vars.ircState.ircRegistered) {
+          // extract my client info from last argument in 001 message
+          let splitparams1 = parsedMessage.params[1].split(' ');
+          let parsedNick = splitparams1[splitparams1.length - 1].split('!')[0];
+          let parsedUserhost = splitparams1[splitparams1.length - 1].split('!')[1];
+          if (parsedNick === vars.ircState.nickName) {
+            // case of successful register with nickname, set registered state
+            //vars.ircState.ircRegistered = true;
+            vars.ircState.times.ircConnect = vars.timestamp();
+            vars.ircState.count.ircConnect++;
+            vars.ircState.ircServerPrefix = parsedMessage.prefix;
+            vars.ircState.userHost = parsedUserhost;
+            tellBrowserToRequestState();
+            //
+            // set user mode
+            //
+            if (vars.ircState.userMode.length > 0) {
+              setTimeout(function() {
+                ircWrite.writeSocket(socket, 'MODE ' + vars.ircState.nickName +
+                  ' ' + vars.ircState.userMode);
+              }.bind(this), 500);
+            }
+            //
+            // nickserv registration
+            //
+            if ((vars.nsIdentifyNick.length > 0) && (vars.nsIdentifyCommand.length > 0)) {
+              setTimeout(function() {
+                if ((vars.ircState.ircConnected) &&
+                  (vars.ircState.nickName === vars.nsIdentifyNick)) {
+                  ircWrite.writeSocket(socket, vars.nsIdentifyCommand);
                 }
-              }
-            }.bind(this), 2500);
+              }.bind(this), 1500);
+            }
+            //
+            // Upon reconnect, auto-JOIN previous irc channels
+            //
+            if ((vars.ircState.ircAutoReconnect) &&
+              (vars.ircState.ircConnectOn) &&
+              (vars.ircState.count.ircConnect > 0)) {
+              setTimeout(function() {
+                if ((vars.ircState.ircAutoReconnect) &&
+                  (vars.ircState.ircConnectOn) &&
+                  (vars.ircState.count.ircConnect > 0)) {
+                  if (vars.ircServerReconnectChannelString.length > 0) {
+                    ircWrite.writeSocket(socket, 'JOIN ' + vars.ircServerReconnectChannelString);
+                  }
+                }
+              }.bind(this), 2500);
+            }
+          } else {
+            global.sendToBrowser(
+              'webServer: Registration error, unable to parse nick!user@host from message 001\n');
+            socket.destroy();
+            vars.ircState.ircConnecting = false;
+            vars.ircState.ircConnected = false;
+            vars.ircState.ircRegistered = false;
+            vars.ircState.ircIsAway = false;
+            tellBrowserToRequestState();
           }
         } else {
-          global.sendToBrowser(
-            'webServer: Registration error, unable to parse nick!user@host from message 001\n');
-          socket.destroy();
-          vars.ircState.ircConnecting = false;
-          vars.ircState.ircConnected = false;
-          vars.ircState.ircRegistered = false;
-          vars.ircState.ircIsAway = false;
-          tellBrowserToRequestState();
+          // case of receive 001 message when already registered
+          console.log('Error, received 001 message from server when already registered');
         }
         break;
       // 305 RPL_UNAWAY
@@ -628,12 +634,18 @@
           if (!vars.ircState.ircRegistered) {
             if (socket) {
               socket.destroy();
-              vars.ircState.ircConnecting = false;
-              vars.ircState.ircConnected = false;
-              vars.ircState.ircRegistered = false;
-              vars.ircState.ircIsAway = false;
-              tellBrowserToRequestState();
             }
+            // signal browser to show an error
+            vars.ircState.count.ircConnectError++;
+
+            vars.ircState.ircServerPrefix = '';
+            // Do not reconnect
+            vars.ircState.ircConnectOn = false;
+            vars.ircState.ircConnecting = false;
+            vars.ircState.ircConnected = false;
+            vars.ircState.ircRegistered = false;
+            vars.ircState.ircIsAway = false;
+            tellBrowserToRequestState();
           }
         }
         break;
@@ -646,12 +658,18 @@
           if (!vars.ircState.ircRegistered) {
             if (socket) {
               socket.destroy();
-              vars.ircState.ircConnecting = false;
-              vars.ircState.ircConnected = false;
-              vars.ircState.ircRegistered = false;
-              vars.ircState.ircIsAway = false;
-              tellBrowserToRequestState();
             }
+            // signal browser to show an error
+            vars.ircState.count.ircConnectError++;
+
+            vars.ircState.ircServerPrefix = '';
+            // Do not reconnect
+            vars.ircState.ircConnectOn = false;
+            vars.ircState.ircConnecting = false;
+            vars.ircState.ircConnected = false;
+            vars.ircState.ircRegistered = false;
+            vars.ircState.ircIsAway = false;
+            tellBrowserToRequestState();
           }
         }
         break;

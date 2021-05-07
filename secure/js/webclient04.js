@@ -179,7 +179,8 @@ document.getElementById('ircConnectIconId').addEventListener('click', function()
   if ((ircState.ircConnected) || (ircState.ircConnecting) || (webState.ircConnecting)) {
     //
     // disconnect
-    if ((webState.ircConnecting) || (ircState.webConnecting)) {
+    if ((webState.ircConnecting) || (ircState.webConnecting) ||
+      ((ircState.ircConnected) && (!ircState.ircRegistered))) {
       // with this false, icon depend only on backend state
       webState.ircConnecting = false;
       // stuck trying to connect, just request server to destroy socket
@@ -199,7 +200,8 @@ document.getElementById('ircConnectIconId').addEventListener('click', function()
 // Quit Button handler (Send QUIT message to IRC server)
 // ------------------------------------------------------
 document.getElementById('quitButton').addEventListener('click', function() {
-  if ((webState.ircConnecting) || (ircState.webConnecting)) {
+  if ((webState.ircConnecting) || (ircState.webConnecting) ||
+    ((ircState.ircConnected) && (!ircState.ircRegistered))) {
     // with this false, icon depend only on backend state
     webState.ircConnecting = false;
     // stuck trying to connect, just request server to destroy socket

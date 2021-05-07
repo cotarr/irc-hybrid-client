@@ -114,6 +114,9 @@ function cacheInhibitTimerTick () {
   if (webState.cacheInhibitTimer > 0) webState.cacheInhibitTimer--;
 }
 
+// On initial load or reload of page, inhibit timers
+webState.cacheInhibitTimer = 3;
+
 // -----------------------
 // Die (Server) button
 // -----------------------

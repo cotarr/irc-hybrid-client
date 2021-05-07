@@ -37,6 +37,15 @@
   var ircServerReconnectChannelString = '';
   var ircServerReconnectAwayString = '';
 
+  const ircSocketConnectingTimeout = 10;
+  const ircRegistrationTimeout = 30;
+
+  var activityWatchdogTimerSeconds = 0;
+  const activityWatchdogTimerLimit = 300;
+
+  var clientToServerPingTimer = 0;
+  const clientToServerPingInterval = 60;
+
   const timestamp = function() {
     let now = new Date;
     return parseInt(now.valueOf() / 1000).toString();
@@ -55,6 +64,12 @@
     ircServerReconnectIntervals: ircServerReconnectIntervals,
     ircServerReconnectChannelString: ircServerReconnectChannelString,
     ircServerReconnectAwayString: ircServerReconnectAwayString,
+    ircSocketConnectingTimeout: ircSocketConnectingTimeout,
+    ircRegistrationTimeout: ircRegistrationTimeout,
+    activityWatchdogTimerSeconds: activityWatchdogTimerSeconds,
+    activityWatchdogTimerLimit: activityWatchdogTimerLimit,
+    clientToServerPingTimer: clientToServerPingTimer,
+    clientToServerPingInterval: clientToServerPingInterval,
     timestamp: timestamp
   };
 })();

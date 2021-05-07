@@ -58,9 +58,9 @@
   //
   // ----------------------------------------------------
 
-  vars.ircConnectOn = false;
-  vars.ircState.ircConnected = false;
+  vars.ircState.ircConnectOn = false;
   vars.ircState.ircConnecting = false;
+  vars.ircState.ircConnected = false;
   vars.ircState.ircRegistered = false;
   vars.ircState.ircIsAway = false;
 
@@ -75,6 +75,7 @@
   vars.nsIdentifyCommand = servers.serverArray[0].identifyCommand;
   // index into servers.json file
   vars.ircState.ircServerIndex = 0;
+  vars.ircState.ircServerPrefix = '';
   // List of favorite channels
   vars.ircState.channelList = servers.serverArray[0].channelList;
 
@@ -144,6 +145,9 @@
 
   // -------------------------------------------
   //  On Ready Event Handler (Internal function)
+  //
+  //      R e g i s t e r   w i t h   I R C
+  //
   // -------------------------------------------
   const _readyEventHandler = function(socket) {
     global.sendToBrowser('webServer: Ready\n');
@@ -163,6 +167,7 @@
         // Timer for TLS connect delay
       } else {
         // case of error handler reset ircConnecting before timer expired (TLS error probgably)
+        vars.ircState.ircServerPrefix = '';
         vars.ircState.ircConnecting = false;
         vars.ircState.ircConnected = false;
         vars.ircState.ircRegistered = false;
@@ -248,7 +253,31 @@
   var ircSocket = null;
   //
   // creates socket to IRC server
-  const connectIRC = function (callback) {
+  const connectIRC = function () {
+    //
+    // Connecting watchdog timer
+    //
+    // Note: Timer does not detect failure to register with IRC server
+    //       Timer is cleared where possible in case multiple manual connects in a row.
+    //
+    let watchdogTimer = setTimeout(function() {
+      if (vars.ircState.ircConnecting) {
+        // console.log('Connecting watchdog detect timeout error');
+        if (ircSocket) {
+          ircSocket.destroy();
+        }
+        // signal browser to show an error
+        vars.ircState.count.ircConnectError++;
+
+        vars.ircState.ircServerPrefix = '';
+        vars.ircState.ircConnecting = false;
+        vars.ircState.ircConnected = false;
+        vars.ircState.ircRegistered = false;
+        vars.ircState.ircIsAway = false;
+        global.sendToBrowser('UPDATE\nwebServer: IRC server timeout while connecting\n');
+      }
+    }.bind(this), vars.ircSocketConnectingTimeout * 1000);
+
     let connectMessage = 'webServer: Opening socket to ' + vars.ircState.ircServerName + ' ' +
       vars.ircState.ircServerHost + ':' + vars.ircState.ircServerPort;
     if (vars.ircState.ircTLSEnabled) {
@@ -267,6 +296,8 @@
     // --------------------------------------------------
     ircSocket.on('connect', function() {
       console.log('Event: connect');
+      // clear watchdog timer
+      if (watchdogTimer) clearTimeout(watchdogTimer);
       global.sendToBrowser('webServer: Connected\n');
     });
 
@@ -282,6 +313,7 @@
     // ON Data
     // -----------
     ircSocket.on('data', function(data) {
+      vars.activityWatchdogTimerSeconds = 0;
       extractMessagesFromStream(ircSocket, data);
     });
 
@@ -296,6 +328,7 @@
         // signal browser to show an error
         vars.ircState.count.ircConnectError++;
       }
+      vars.ircState.ircServerPrefix = '';
       vars.ircState.ircConnecting = false;
       vars.ircState.ircConnected = false;
       vars.ircState.ircRegistered = false;
@@ -308,6 +341,8 @@
           onDisconnectGrabState();
         }
       }
+      // clear watchdog timer
+      if (watchdogTimer) clearTimeout(watchdogTimer);
       global.sendToBrowser('UPDATE\nwebServer: Socket to IRC server closed, hadError: ' +
         hadError.toString() + '\n');
     });
@@ -322,6 +357,7 @@
         // signal browser to show an error
         vars.ircState.count.ircConnectError++;
       }
+      vars.ircState.ircServerPrefix = '';
       vars.ircState.ircConnecting = false;
       vars.ircState.ircConnected = false;
       vars.ircState.ircRegistered = false;
@@ -334,6 +370,8 @@
           if (vars.ircServerReconnectTimerSeconds === 0) vars.ircServerReconnectTimerSeconds = 1;
         }
       }
+      // clear watchdog timer
+      if (watchdogTimer) clearTimeout(watchdogTimer);
       global.sendToBrowser('UPDATE\nwebServer: IRC server socket error, connected flags reset\n');
     });
 
@@ -348,11 +386,37 @@
       //   vars.ircState.ircServerHost + ':'+ vars.ircState.ircServerPort);
       ircLog.writeIrcLog('Connected to IRC server ' + vars.ircState.ircServerName + ' ' +
         vars.ircState.ircServerHost + ':'+ vars.ircState.ircServerPort);
-      // if (callback) {
-      //   callback(null);
-      // }
     });
   }; // connectIRC()
+
+  // --------------------------------------------------------------------------
+  // Nickname Registration Watchdog
+  //
+  // This assumed TCP socket is already connected, that is a different watchdog
+  // --------------------------------------------------------------------------
+  var registrationWatchdogSeconds = 0;
+  const registrationWatchdogTimerTick = function() {
+    if ((vars.ircState.ircConnected) && (!vars.ircState.ircRegistered)) {
+      registrationWatchdogSeconds++;
+    } else {
+      registrationWatchdogSeconds = 0;
+    }
+    if (registrationWatchdogSeconds > vars.ircRegistrationTimeout) {
+      // console.log('Connecting nicname registration timeout');
+      if (ircSocket) {
+        ircSocket.destroy();
+      }
+      // signal browser to show an error
+      vars.ircState.count.ircConnectError++;
+
+      vars.ircState.ircServerPrefix = '';
+      vars.ircState.ircConnecting = false;
+      vars.ircState.ircConnected = false;
+      vars.ircState.ircRegistered = false;
+      vars.ircState.ircIsAway = false;
+      global.sendToBrowser('UPDATE\nwebServer: IRC server Nickname registration timeout\n');
+    }
+  }; // registrationWatchdogTimerTick()
 
   // ------------------------------------------------------
   //
@@ -367,7 +431,7 @@
     if (vars.ircServerReconnectTimerSeconds === 0) return;
 
     // Connected already abort
-    if (vars.ircState.ircConnected) {
+    if ((vars.ircState.ircConnected) && (vars.ircState.ircRegistered)) {
       vars.ircServerReconnectTimerSeconds = 0;
       return;
     }
@@ -386,18 +450,20 @@
     // Increment the counter (timer in seconds)
     vars.ircServerReconnectTimerSeconds++;
 
-    console.log('tick ' + vars.ircServerReconnectTimerSeconds + ' ' +
-      vars.ircState.count.ircConnect + ' ' + vars.ircState.count.ircConnectError);
+    // console.log('tick ' + vars.ircServerReconnectTimerSeconds + ' ' +
+    //   vars.ircState.count.ircConnect + ' ' + vars.ircState.count.ircConnectError);
 
     // Array of integers representing reconnect times in seconds
     if (vars.ircServerReconnectIntervals.indexOf(vars.ircServerReconnectTimerSeconds) >= 0) {
       console.log('Attempting to restart');
 
       // channels here on connect, browser on disconnect
+      vars.ircState.ircServerPrefix = '';
       vars.ircState.channels = [];
       vars.ircState.channelStates = [];
-      vars.ircState.ircConnected = false;
+      vars.ircState.ircServerPrefix = '';
       vars.ircState.ircConnecting = true;
+      vars.ircState.ircConnected = false;
       vars.ircState.ircRegistered = false;
       vars.ircState.ircIsAway = false;
 
@@ -406,7 +472,54 @@
       //
       connectIRC();
     }
-  };
+  }; // ircServerReconnectTimerTick()
+
+  // ---------------------------------------------------------------
+  // This is an activity watchdog timer
+  // Default activity comes from client PING and server PONG response
+  // each time socket receives data the timer is reset to zero
+  // If it reaches the limit, the connection is considered timed out.
+  // ---------------------------------------------------------------
+  const activityWatchdogTimerTick = function () {
+    if ((vars.ircState.ircConnected) && (vars.ircState.ircRegistered)) {
+      vars.activityWatchdogTimerSeconds++;
+    } else {
+      vars.activityWatchdogTimerSeconds = 0;
+    }
+    if ((vars.ircState.ircConnected) && (vars.ircState.ircRegistered) &&
+      (vars.activityWatchdogTimerSeconds >= vars.activityWatchdogTimerLimit)) {
+      if (ircSocket) {
+        ircSocket.destroy();
+      }
+      // signal browser to show an error
+      vars.ircState.count.ircConnectError++;
+
+      vars.ircState.ircServerPrefix = '';
+      vars.ircState.ircConnecting = false;
+      vars.ircState.ircConnected = false;
+      vars.ircState.ircRegistered = false;
+      vars.ircState.ircIsAway = false;
+      global.sendToBrowser('UPDATE\nwebServer: IRC server activity watchdog expired\n');
+    }
+  }; // activityWatchdogTimerTick()
+
+  // ----------------------------------
+  // Client sends PING to server
+  // ----------------------------------
+  const clientToServerPingTimerTick = function () {
+    if ((vars.ircState.ircConnected) && (vars.ircState.ircRegistered)) {
+      vars.clientToServerPingTimerSeconds++;
+    } else {
+      vars.clientToServerPingTimerSeconds = 0;
+    }
+    if ((vars.ircState.ircConnected) && (vars.ircState.ircRegistered) &&
+      (vars.ircState.ircServerPrefix.length > 0) &&
+      (vars.clientToServerPingTimerSeconds >= vars.clientToServerPingInterval)) {
+      vars.clientToServerPingTimerSeconds = 0;
+      ircWrite.writeSocket(ircSocket, 'PING ' + vars.ircState.ircServerPrefix);
+    }
+  }; // clientToServerPingTimerTick()
+
 
   // -----------------------------------------------------
   //
@@ -477,7 +590,7 @@
       index: vars.ircState.ircServerIndex,
       name: vars.ircState.ircServerName
     });
-  };
+  }; // serverHandler()
 
   // -----------------------------------------------------
   // API connect request handler (Called by browser)
@@ -504,8 +617,9 @@
     // channels here on connect, browser on disconnect
     vars.ircState.channels = [];
     vars.ircState.channelStates = [];
-    vars.ircState.ircConnected = false;
+    vars.ircState.ircServerPrefix = '';
     vars.ircState.ircConnecting = true;
+    vars.ircState.ircConnected = false;
     vars.ircState.ircRegistered = false;
     vars.ircState.ircIsAway = false;
 
@@ -536,12 +650,13 @@
     console.log('disconnect handler called');
     // cancel reconnect timer
     vars.ircState.ircConnectOn = false;
-    ircServerReconnectTimerSeconds = 0;
+    vars.ircServerReconnectTimerSeconds = 0;
     vars.ircServerReconnectChannelString = '';
     vars.ircServerReconnectAwayString = '';
     global.sendToBrowser('webServer: Forcibly closing IRC server TCP socket\n');
     if (ircSocket) {
       ircSocket.destroy();
+      vars.ircState.ircServerPrefix = '';
       vars.ircState.ircConnecting = false;
       vars.ircState.ircConnected = false;
       vars.ircState.ircRegistered = false;
@@ -551,7 +666,7 @@
     } else {
       res.json({error: true, message: 'Error Can not destry socket before it is created.'});
     }
-  };
+  }; //disconnectHandler()
 
   // ------------------------------------------------------
   // IRC commands from browser for send to IRC server
@@ -718,6 +833,9 @@
   //
   setInterval(function() {
     ircServerReconnectTimerTick();
+    registrationWatchdogTimerTick();
+    activityWatchdogTimerTick();
+    clientToServerPingTimerTick();
   }.bind(this), 1000);
 
   // Program run timestamp

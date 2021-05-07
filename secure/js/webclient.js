@@ -65,8 +65,8 @@ const activityIconInhibitTimerValue = 10;
 // ----------------------------------------------------------
 var ircState = {
   ircConnectOn: false,
-  ircConnected: false,
   ircConnecting: false,
+  ircConnected: false,
   ircRegistered: false,
   ircIsAway: false,
   ircAutoReconnect: false,
@@ -76,6 +76,7 @@ var ircState = {
   ircServerPort: 6667,
   ircTLSEnabled: false,
   ircServerIndex: 0,
+  ircServerPrefix: '',
   channelList: [],
 
   nickName: '',
@@ -355,8 +356,13 @@ function updateDivVisibility() {
     if (ircState.ircConnected) {
       document.getElementById('cycleNextServerButton').setAttribute('disabled', '');
       document.getElementById('ircConnectIconId').removeAttribute('unavailable');
-      document.getElementById('ircConnectIconId').removeAttribute('connecting');
-      document.getElementById('ircConnectIconId').setAttribute('connected', '');
+      if (ircState.ircRegistered) {
+        document.getElementById('ircConnectIconId').removeAttribute('connecting');
+        document.getElementById('ircConnectIconId').setAttribute('connected', '');
+      } else {
+        document.getElementById('ircConnectIconId').setAttribute('connecting', '');
+        document.getElementById('ircConnectIconId').removeAttribute('connected');
+      }
       if (ircState.ircIsAway) {
         document.getElementById('ircIsAwayIconId').removeAttribute('hidden');
       } else {
@@ -696,7 +702,9 @@ function getIrcState (callback) {
       if (lastConnectErrorCount !== ircState.count.ircConnectError) {
         lastConnectErrorCount = ircState.count.ircConnectError;
         if (ircState.count.ircConnectError > 0) {
-          showError('An IRC Server connection error occurred');
+          if (webState.cacheInhibitTimer === 0) {
+            showError('An IRC Server connection error occurred');
+          }
         }
         // clear browser side connecting flag
         webState.ircConnecting = false;
