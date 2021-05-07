@@ -268,7 +268,8 @@ document.getElementById('test1Button').addEventListener('click', function() {
       if (error) showError(error.toString());
     });
 });
-document.getElementById('test1ButtonDesc').textContent = 'GET /irc/test1 global.gc()';
+//document.getElementById('test1ButtonDesc').textContent = 'GET /irc/test1 global.gc()';
+document.getElementById('test1ButtonDesc').textContent = 'Emulate IRC server ping timeout';
 
 // --------------------
 // Test Button #2

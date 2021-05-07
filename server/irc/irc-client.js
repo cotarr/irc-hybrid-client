@@ -48,7 +48,7 @@
 
   var servers = JSON.parse(fs.readFileSync('./servers.json', 'utf8'));
   if ((!('configVersion' in servers)) || (servers.configVersion !== 1)) {
-    console.log('Error, servers.js wrong configVersion');
+    webError:('Error, servers.js wrong configVersion');
     process.exit(1);
   }
 
@@ -140,7 +140,6 @@
         }
       } // next i
     }
-    console.log('ircServerReconnectChannelString ' + vars.ircServerReconnectChannelString);
   };
 
   // -------------------------------------------
@@ -274,7 +273,7 @@
         vars.ircState.ircConnected = false;
         vars.ircState.ircRegistered = false;
         vars.ircState.ircIsAway = false;
-        global.sendToBrowser('UPDATE\nwebServer: IRC server timeout while connecting\n');
+        global.sendToBrowser('UPDATE\nwebError: IRC server timeout while connecting\n');
       }
     }.bind(this), vars.ircSocketConnectingTimeout * 1000);
 
@@ -295,7 +294,7 @@
     //   On Connect   (IRC client socket connected)
     // --------------------------------------------------
     ircSocket.on('connect', function() {
-      console.log('Event: connect');
+      // console.log('Event: connect');
       // clear watchdog timer
       if (watchdogTimer) clearTimeout(watchdogTimer);
       global.sendToBrowser('webServer: Connected\n');
@@ -305,7 +304,7 @@
     //  On Ready
     // -----------
     ircSocket.on('ready', function() {
-      console.log('Event: ready');
+      // console.log('Event: ready');
       _readyEventHandler(ircSocket);
     }); // ircSocket.on('ready'
 
@@ -321,8 +320,8 @@
     //   On Close    (IRC client socket closed)
     // -------------------------------------------
     ircSocket.on('close', function(hadError) {
-      console.log('Event: socket.close, hadError=' + hadError +
-        ' destroyed=' + ircSocket.destroyed);
+      // console.log('Event: socket.close, hadError=' + hadError +
+      //   ' destroyed=' + ircSocket.destroyed);
       if (((vars.ircState.ircConnectOn) && (vars.ircState.ircConnected)) ||
         (vars.ircState.ircConnecting)) {
         // signal browser to show an error
@@ -343,15 +342,20 @@
       }
       // clear watchdog timer
       if (watchdogTimer) clearTimeout(watchdogTimer);
-      global.sendToBrowser('UPDATE\nwebServer: Socket to IRC server closed, hadError: ' +
-        hadError.toString() + '\n');
+      if (hadError) {
+        global.sendToBrowser('UPDATE\nwebError: Socket to IRC server closed, hadError: ' +
+          hadError.toString() + '\n');
+      } else {
+        global.sendToBrowser('UPDATE\nwebServer: Socket to IRC server closed, hadError: ' +
+          hadError.toString() + '\n');
+      }
     });
 
     // --------------------------
     //   On Error   (IRC client socket)
     // --------------------------
     ircSocket.on('error', function(err) {
-      console.log('Event: socket.error ' + err.toString());
+      // console.log('Event: socket.error ' + err.toString());
       // console.log(err);
       if ((vars.ircState.ircConnected) || (vars.ircState.ircConnecting)) {
         // signal browser to show an error
@@ -372,7 +376,7 @@
       }
       // clear watchdog timer
       if (watchdogTimer) clearTimeout(watchdogTimer);
-      global.sendToBrowser('UPDATE\nwebServer: IRC server socket error, connected flags reset\n');
+      global.sendToBrowser('UPDATE\nwebError: IRC server socket error, connected flags reset\n');
     });
 
     // ----------------------------------
@@ -414,7 +418,7 @@
       vars.ircState.ircConnected = false;
       vars.ircState.ircRegistered = false;
       vars.ircState.ircIsAway = false;
-      global.sendToBrowser('UPDATE\nwebServer: IRC server Nickname registration timeout\n');
+      global.sendToBrowser('UPDATE\nwebError: IRC server Nickname registration timeout\n');
     }
   }; // registrationWatchdogTimerTick()
 
@@ -455,8 +459,6 @@
 
     // Array of integers representing reconnect times in seconds
     if (vars.ircServerReconnectIntervals.indexOf(vars.ircServerReconnectTimerSeconds) >= 0) {
-      console.log('Attempting to restart');
-
       // channels here on connect, browser on disconnect
       vars.ircState.ircServerPrefix = '';
       vars.ircState.channels = [];
@@ -499,7 +501,7 @@
       vars.ircState.ircConnected = false;
       vars.ircState.ircRegistered = false;
       vars.ircState.ircIsAway = false;
-      global.sendToBrowser('UPDATE\nwebServer: IRC server activity watchdog expired\n');
+      global.sendToBrowser('UPDATE\nwebError: IRC server activity watchdog expired\n');
     }
   }; // activityWatchdogTimerTick()
 
@@ -598,7 +600,6 @@
   // Route: /connect
   // -----------------------------------------------------
   const connectHandler = function(req, res, next) {
-    // console.log('connect handler called');
     // Abort if already connected.
     if ((vars.ircState.ircConnected) || (vars.ircState.ircConnecting)) {
       return res.json({
@@ -647,7 +648,7 @@
   //  Route: /disconnect
   // ------------------------------------
   const disconnectHandler = function(req, res, next) {
-    console.log('disconnect handler called');
+    // console.log('disconnect handler called');
     // cancel reconnect timer
     vars.ircState.ircConnectOn = false;
     vars.ircServerReconnectTimerSeconds = 0;
@@ -677,13 +678,13 @@
   const messageHandler = function(req, res, next) {
     // console.log(req.body);
     if (!('message' in req.body)) {
-      console.log('messageHandler() IRC message not found in POST body');
+      webError:('messageHandler() IRC message not found in POST body');
       let err = new Error('BAD REQUEST');
       err.status = 400;
       err.message = 'IRC message not found in POST body';
       next(err);
     } else if (!(typeof req.body.message === 'string')) {
-      console.log('messageHandler() IRC message expect type string');
+      webError:('messageHandler() IRC message expect type string');
       let err = new Error('BAD REQUEST');
       err.status = 400;
       err.message = 'IRC message expect type=string';
@@ -691,17 +692,17 @@
     } else {
       let messageBuf = Buffer.from(req.body.message, 'utf8');
       if (!isValidUTF8(messageBuf)) {
-        console.log('messageHandler() IRC message failed UTF-8 validation');
+        webError:('messageHandler() IRC message failed UTF-8 validation');
         res.json({error: true, message: 'IRC message failed UTF-8 validation'});
       } else if (messageBuf.includes(0)) {
-        console.log('messageHandler() IRC message zero byte validation');
+        webError:('messageHandler() IRC message zero byte validation');
         res.json({error: true, message: 'IRC message failed zero byte validation'});
       } else if (messageBuf.length >= 512) {
-        console.log('messageHandler() IRC message exceeds 512 byte maximum length');
+        webError:('messageHandler() IRC message exceeds 512 byte maximum length');
         res.json({error: true, message: 'IRC message exceeds 512 byte maximum length'});
       } else {
         if (messageBuf.length === 0) {
-          console.log('messageHandler() Ignoring Empty message');
+          webError:('messageHandler() Ignoring Empty message');
           res.json({error: true, message: 'Ignoring Empty message'});
         } else {
           // And parse for commands that change state or
@@ -709,7 +710,7 @@
           let message = messageBuf.toString('utf8');
           let parseResult = ircCommand.parseBrowserMessageForCommand(message);
           if (parseResult.error) {
-            console.log(parseResult.message);
+            webError:(parseResult.message);
             res.json({error: true, message: parseResult.message});
           } else {
             // Send browser message on to web server
@@ -752,7 +753,7 @@
       }
     }
     if (err) {
-      console.log('getCache() 422 Unprocessable Entity, cache contains malformed data');
+      webError:('getCache() 422 Unprocessable Entity, cache contains malformed data');
       let error = new Error('Unprocessable Entity');
       error.status = 422;
       error.message = 'Cache contains malformed data';
@@ -768,7 +769,7 @@
   // Route: /erase
   // -----------------------------------------------
   const eraseCache = function(req, res, next) {
-    // console.log(JSON.stringify(req.body));
+    // webError:(JSON.stringify(req.body));
     if (('erase' in req.body) && (req.body.erase === 'YES')) {
       ircMessageCache.eraseCache();
       res.json({error: false});
@@ -780,22 +781,22 @@
   };
 
   const test1Handler = function(req, res, next) {
-    console.log('test1 handler called');
+    webError:('test1 handler called');
     // -------- test code here -----------------
-    if (global.gc) {
-      global.gc();
-      console.log('Debug: Forcing nodejs garbage collection');
-      res.json({
-        error: false,
-        comment: 'Debug: Forcing nodejs garbage collection'
-      });
-    } else {
-      console.log('To debug garbage collection run: node --expose-gc bin/www');
-      res.json({
-        error: true,
-        message: 'To debug garbage collection run: node --expose-gc bin/www'
-      });
-    }
+    // if (global.gc) {
+    //   global.gc();
+    //   webError:('Debug: Forcing nodejs garbage collection');
+    //   res.json({
+    //     error: false,
+    //     comment: 'Debug: Forcing nodejs garbage collection'
+    //   });
+    // } else {
+    //   webError:('To debug garbage collection run: node --expose-gc bin/www');
+    //   res.json({
+    //     error: true,
+    //     message: 'To debug garbage collection run: node --expose-gc bin/www'
+    //   });
+    // }
     // -----------------------------------------
     // res.json({
     //   error: false,
@@ -803,10 +804,17 @@
     //   data: ircMessageCache.cacheInfo()
     // });
     // -----------------------------------------
+    webError:('Emulating IRC server ping timeout');
+    vars.activityWatchdogTimerSeconds = 1000;
+    res.json({
+      error: false,
+      message: 'Emulating IRC server ping timeout'
+    });
+    // -----------------------------------------
   };
 
   const test2Handler = function(req, res, next) {
-    console.log('test2 handler called');
+    webError:('test2 handler called');
     // -------- test code here -----------------
     // -----------------------------------------
     // res.json({

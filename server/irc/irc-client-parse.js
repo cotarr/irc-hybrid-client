@@ -494,7 +494,7 @@
           let parsedUserhost = splitparams1[splitparams1.length - 1].split('!')[1];
           if (parsedNick === vars.ircState.nickName) {
             // case of successful register with nickname, set registered state
-            //vars.ircState.ircRegistered = true;
+            vars.ircState.ircRegistered = true;
             vars.ircState.times.ircConnect = vars.timestamp();
             vars.ircState.count.ircConnect++;
             vars.ircState.ircServerPrefix = parsedMessage.prefix;
@@ -675,7 +675,7 @@
         break;
       //
       case 'ERROR':
-        console.log(messageBuffer.toString('utf8'));
+        // console.log(messageBuffer.toString('utf8'));
         tellBrowserToRequestState();
         break;
       //

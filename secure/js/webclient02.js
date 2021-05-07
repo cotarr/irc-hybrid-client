@@ -699,6 +699,12 @@ function _parseBufferMessage (message) {
       if (webState.showCommsMessages) displayRawMessage(message);
       return;
     }
+    // Misc server messages prefixed with 'Webserver: ' should not be exposed to parser
+    if (message.split(' ')[0] === 'webError:') {
+      if (webState.showCommsMessages) displayRawMessage(message);
+      if (message.length > 10) showError(message.slice(10));
+      return;
+    }
 
     //
     // Main Parser
@@ -735,11 +741,18 @@ function _parseBufferMessage (message) {
       _showNotExpiredError(message.slice(12, message.length));
     }
 
+
     // Decoding complete, Parse commands
     //
     switch(parsedMessage.command) {
       case 'ERROR':
         // console.log(message.toString());
+        // This is to popup error before registration, Bad server Password error
+        if ((!ircState.ircRegistered) && (parsedMessage.params.length === 1)) {
+          if (webState.cacheInhibitTimer === 0) {
+            showError('ERROR ' + parsedMessage.params[0]);
+          }
+        }
         break;
       case 'KICK':
         displayChannelMessage(parsedMessage);
