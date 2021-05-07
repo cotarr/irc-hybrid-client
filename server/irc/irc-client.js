@@ -157,10 +157,6 @@
         // Note: mode 8 = i not working on ngirc ?
         ircWrite.writeSocket(socket, 'USER ' + vars.ircState.userName +
           ' 0 * :' + vars.ircState.realName);
-        if (vars.ircState.userMode.length > 0) {
-          ircWrite.writeSocket(socket, 'MODE ' + vars.ircState.nickName +
-            ' ' + vars.ircState.userMode);
-        }
         vars.ircState.ircConnecting = false;
         vars.ircState.ircConnected = true;
         tellBrowserToRequestState();

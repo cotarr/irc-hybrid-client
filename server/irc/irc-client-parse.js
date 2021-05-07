@@ -499,6 +499,15 @@
           vars.ircState.userHost = parsedUserhost;
           tellBrowserToRequestState();
           //
+          // set user mode
+          //
+          if (vars.ircState.userMode.length > 0) {
+            setTimeout(function() {
+              ircWrite.writeSocket(socket, 'MODE ' + vars.ircState.nickName +
+                ' ' + vars.ircState.userMode);
+            }.bind(this), 500);
+          }
+          //
           // nickserv registration
           //
           if ((vars.nsIdentifyNick.length > 0) && (vars.nsIdentifyCommand.length > 0)) {
@@ -523,7 +532,7 @@
                   ircWrite.writeSocket(socket, 'JOIN ' + vars.ircServerReconnectChannelString);
                 }
               }
-            }.bind(this), 3000);
+            }.bind(this), 2500);
           }
         } else {
           global.sendToBrowser(
