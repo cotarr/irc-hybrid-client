@@ -94,6 +94,8 @@ cp example-servers.json servers.json
 
 # To start the app
 node bin/www
+
+# route on your server: /irc/webclient.html
 ```
 
 # Minify and bundle for deployment
@@ -152,4 +154,6 @@ npm ci
 
 # To run
 node bin/www
+
+# route on your server: /irc/webclient.html
 ```

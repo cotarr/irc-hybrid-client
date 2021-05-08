@@ -322,10 +322,19 @@ app.get('/irc/test1', authorizeOrFail, ircClient.test1Handler);
 app.get('/irc/test2', authorizeOrFail, ircClient.test2Handler);
 
 // -------------------------------
+// Login redirect for main html file
+// all other static files return 403
+// if unauthorized
+// -------------------------------
+app.get('/irc/webclient.html', authorizeOrLogin, function(req, res, next) {
+  next();
+});
+
+// -------------------------------
 // Web server for static files
 // -------------------------------
 let secureDir = path.join(__dirname, '../secure');
-app.use('/irc', authorizeOrLogin, express.static(secureDir));
+app.use('/irc', authorizeOrFail, express.static(secureDir));
 
 // ---------------------------------
 //    E R R O R   H A N D L E R S
