@@ -499,7 +499,6 @@
             vars.ircState.count.ircConnect++;
             vars.ircState.ircServerPrefix = parsedMessage.prefix;
             vars.ircState.userHost = parsedUserhost;
-            tellBrowserToRequestState();
             //
             // set user mode
             //
@@ -536,6 +535,14 @@
                 }
               }.bind(this), 2500);
             }
+            //
+            // Wait 2 second for async stuff, then ask browser to update connected status
+            // THis is duplicate request, some networks miss the first one.
+            setTimeout(function() {
+              tellBrowserToRequestState();
+            }.bind(this), 2000);
+            // tell browser to update itself
+            tellBrowserToRequestState();
           } else {
             global.sendToBrowser(
               'webServer: Registration error, unable to parse nick!user@host from message 001\n');

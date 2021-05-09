@@ -99,8 +99,8 @@
   vars.ircState.channelStates = [];
 
   // get name and version number from npm package.json
-  vars.ircState.botVersion = require('../../package.json').version;
-  vars.ircState.botName = require('../../package.json').name;
+  vars.ircState.progVersion = require('../../package.json').version;
+  vars.ircState.progName = require('../../package.json').name;
 
   vars.ircState.times = {programRun: 0, ircConnect: 0};
   vars.ircState.count = {
@@ -111,9 +111,9 @@
 
   ircLog.setRawMessageLogEnabled(servers.serverArray[0].rawMessageLog);
 
-  console.log('Starting ' + vars.ircState.botName + ' ' + vars.ircState.botVersion);
+  console.log('Starting ' + vars.ircState.progName + ' ' + vars.ircState.progVersion);
   ircLog.writeIrcLog('-----------------------------------------');
-  ircLog.writeIrcLog('Starting ' + vars.ircState.botName + ' ' + vars.ircState.botVersion);
+  ircLog.writeIrcLog('Starting ' + vars.ircState.progName + ' ' + vars.ircState.progVersion);
 
   const tellBrowserToRequestState = function() {
     global.sendToBrowser('UPDATE\r\n');

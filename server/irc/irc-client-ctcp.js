@@ -148,7 +148,7 @@
       //
       case 'VERSION':
         if (true) {
-          let ctcpReply = 'VERSION ' + vars.ircState.botName + '-' + vars.ircState.botVersion;
+          let ctcpReply = 'VERSION ' + vars.ircState.progName + '-' + vars.ircState.progVersion;
           let ircMessage = 'NOTICE ' + parsedMessage.nick + ' :' +
           String.fromCharCode(ctcpDelim) + ctcpReply + String.fromCharCode(ctcpDelim);
           _sendCtcpMessage(socket, ircMessage, ctcpReply, parsedMessage.nick);

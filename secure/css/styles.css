@@ -110,6 +110,20 @@ button[disabled] {
   display: none;
 }
 
+.annunciator-wait-icon {
+  background-color: #ae45b0;
+  border: 1px solid black;
+  border-radius: 12px;
+  color: white;
+  font-weight: bold;
+  display: inline-block;
+  margin-right: 2px;
+  padding: 3px 10px 2px 10px;
+}
+.annunciator-wait-icon[hidden] {
+  display: none;
+}
+
 .bm10 {margin-bottom: 10px;}
 
 .button-div {
@@ -275,6 +289,12 @@ button[disabled] {
 .notice-button {
   margin-right: 4px;
   margin-bottom: 7px;
+}
+
+.program-version-div {
+  font-size: 80%;
+  text-align: right;
+  padding-right: 15px;
 }
 
 .raw-cb-cb {

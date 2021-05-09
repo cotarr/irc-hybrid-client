@@ -88,8 +88,8 @@ var ircState = {
   channels: [],
   channelStates: [],
 
-  botVersion: '0.0.0',
-  botName: '',
+  progVersion: '0.0.0',
+  progName: '',
 
   times: {
     programRun: 0,
@@ -355,6 +355,7 @@ function updateDivVisibility() {
     if (ircState.ircConnected) {
       document.getElementById('cycleNextServerButton').setAttribute('disabled', '');
       document.getElementById('ircConnectIconId').removeAttribute('unavailable');
+      document.getElementById('waitConnectIconId').setAttribute('hidden', '');
       if (ircState.ircRegistered) {
         document.getElementById('ircConnectIconId').removeAttribute('connecting');
         document.getElementById('ircConnectIconId').setAttribute('connected', '');
@@ -404,6 +405,12 @@ function updateDivVisibility() {
         document.getElementById('ircConnectIconId').removeAttribute('connecting');
         document.getElementById('ircConnectIconId').removeAttribute('connected');
       }
+      if ((ircState.ircAutoReconnect) && (ircState.ircConnectOn) &&
+        (!ircState.ircConnected) && (!ircState.ircConnecting)) {
+        document.getElementById('waitConnectIconId').removeAttribute('hidden');
+      } else {
+        document.getElementById('waitConnectIconId').setAttribute('hidden', '');
+      }
       resetNotActivityIcon();
       resetPmActivityIcon(-1);
       resetChanActivityIcon(-1);
@@ -436,6 +443,7 @@ function updateDivVisibility() {
     // Else, WEb server disconnected
     document.getElementById('webDisconnectedVisibleDiv').removeAttribute('hidden');
     document.getElementById('webDisconnectedHiddenDiv').setAttribute('hidden', '');
+    document.getElementById('waitConnectIconId').setAttribute('hidden', '');
     document.getElementById('cycleNextServerButton').setAttribute('disabled', '');
     if (webState.webConnecting) {
       document.getElementById('webConnectIconId').removeAttribute('connected');
@@ -726,6 +734,8 @@ function getIrcState (callback) {
         'ircState = ' + JSON.stringify(ircState, null, 2) + '\n\n' +
         'webState = ' + JSON.stringify(webState, null, 2);
       }
+      document.getElementById('programVersionDiv').textContent =
+        ' version-' + ircState.progVersion;
 
       if (callback) {
         callback(null, ircState);
