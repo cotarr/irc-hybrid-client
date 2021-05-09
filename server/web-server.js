@@ -85,14 +85,14 @@ app.use(cookieParser(cookieSecret));
 const logStuff = function(req, res, next) {
   // console.log('req.headers' + JSON.stringify(req.headers, null, 2));
   // console.log('req.rawHeaders ' + req.rawHeaders);
-  // console.log('req.body' + JSON.stringify(req.body, null, 2));
+  console.log('req.body' + JSON.stringify(req.body, null, 2));
   // console.log('isVhostMatch ' + checkVhost.isVhostMatch(req));
   // console.log('notVhostMatch ' + checkVhost.notVhostMatch(req));
   // console.log('cookie ' + req.headers.cookie);
   // console.log('signedCookies ' + JSON.stringify(req.signedCookies));
   next();
 };
-// app.use(logStuff);
+app.use(logStuff);
 
 if (nodeEnv === 'production') {
   app.use(compression());
@@ -227,24 +227,39 @@ app.get('/blocked', userAuth.blockedCookies);
 //
 // To Terminate remote server
 //
+// Method: POST
+// Route:  /terminate
+//
+// Input: confirmation message
+//
+//  req.body {
+//    "terminate": "YES"
+//  }
+//
 app.post('/terminate', authorizeOrFail, function(req, res, next) {
-  let now = new Date();
-  let dieMessage = now.toISOString() + ' Terminate reqeust ';
-  try {
-    dieMessage += ' user=' + req.session.sessionAuth.user;
-  } catch (err) {
-    // ignore
+  if (('terminate' in req.body) && (req.body.terminate === 'YES')) {
+    let now = new Date();
+    let dieMessage = now.toISOString() + ' Terminate reqeust ';
+    try {
+      dieMessage += ' user=' + req.session.sessionAuth.user;
+    } catch (err) {
+      // ignore
+    }
+    try {
+      dieMessage += ' at ' + req._remoteAddress;
+    } catch (err) {
+      // ignore
+    }
+    console.log(dieMessage);
+    setTimeout(function() {
+      process.exit(1);
+    }, 1000);
+    res.json({message: 'Terminate received'});
+  } else {
+    let error = new Error('Bad Reqeust');
+    error.status = 400;
+    next(error);
   }
-  try {
-    dieMessage += ' at ' + req._remoteAddress;
-  } catch (err) {
-    // ignore
-  }
-  console.log(dieMessage);
-  setTimeout(function() {
-    process.exit(1);
-  }, 1000);
-  res.json({message: 'Terminate received'});
 });
 
 // Route used to verify cookie not expired before reconnecting
@@ -304,6 +319,10 @@ app.post('/irc/wsauth', authorizeOrFail, function(req, res, next) {
 
 // ----------------
 // User info API
+//
+// Method: GET
+// Route:  /userinfo
+//
 // ----------------
 app.get('/userinfo', authorizeOrFail, userAuth.getUserInfo);
 

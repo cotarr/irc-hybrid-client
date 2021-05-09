@@ -6,7 +6,7 @@ Documentation: https://cotarr.github.io/irc-hybrid-client
 
 Screen capture images are available in the [documentation](https://cotarr.github.io/irc-hybrid-client)
 
-### Project Status
+### Project Status (Work in Progress)
 
 This project is still under development and changes frequently.
 At this time, no formal release has been issued.

@@ -536,7 +536,13 @@
   //----------------------------------------
   // Cycle server from available server list
   //
-  // Route: /server
+  // Method: POST
+  // Route:  /irc/server
+  //
+  // Input: none (body not used)
+  //
+  // req.body{}
+  //
   //----------------------------------------
   const serverHandler = function(req, res, next) {
     if ((vars.ircState.connected) || (vars.ircState.connecting)) {
@@ -597,7 +603,19 @@
   // -----------------------------------------------------
   // API connect request handler (Called by browser)
   //
-  // Route: /connect
+  // Method: POST
+  // Route:  /irc/connect
+  //
+  // Input:  nickname, realname, initial user mode
+  // Not used:   userName (config file only)
+  //
+  // req.body {
+  //   "nickName": "myNickName",
+  //   "userName": "user1",         <-- not used (config file only)
+  //   "realName": "John Doe",
+  //   "userMode": "+i"
+  // }
+
   // -----------------------------------------------------
   const connectHandler = function(req, res, next) {
     // Abort if already connected.
@@ -645,7 +663,13 @@
   // ------------------------------------
   //  API handler for forced disconnect
   //
-  //  Route: /disconnect
+  // Method: POST
+  // Route:  /irc/disconnect
+  //
+  // Input: none (body not used)
+  //
+  //  req.body{}
+  //
   // ------------------------------------
   const disconnectHandler = function(req, res, next) {
     // console.log('disconnect handler called');
@@ -672,7 +696,14 @@
   // ------------------------------------------------------
   // IRC commands from browser for send to IRC server
   //
-  // Route:  /message
+  // Method: POST
+  // Route:  /irc/message
+  //
+  // Input: IRC server message for forward to IRC server
+  //
+  //  req.body{
+  //    "message": "JOIN #test"
+  //  }
   //
   // ------------------------------------------------------
   const messageHandler = function(req, res, next) {
@@ -725,7 +756,9 @@
   // ---------------------------------------------------
   // Get status of Browser to web server connection
   //
-  // Route: /getircstate
+  // Method: GET
+  // Route:  /irc/getircstate
+  //
   // ---------------------------------------------------
   const getIrcState = function(req, res, next) {
     vars.ircState.websocketCount = global.getWebsocketCount();
@@ -735,7 +768,8 @@
   // -----------------------------------------------
   // Request backend to return all of cache to browser
   //
-  // Route: /cache
+  // Method: GET
+  // Route:  /ircCommand/cache
   // -----------------------------------------------
   const getCache = function(req, res, next) {
     let cacheArrayOfBuffers = ircMessageCache.allMessages();
@@ -766,7 +800,15 @@
   // -----------------------------------------------
   // Request backend erase cache
   //
-  // Route: /erase
+  // Method: POST
+  // Route:  /erase
+  //
+  // Input: confirmation of command
+  //
+  //  req.body{
+  //    "erase": "YES"
+  //  }
+  //
   // -----------------------------------------------
   const eraseCache = function(req, res, next) {
     // webError:(JSON.stringify(req.body));
@@ -780,6 +822,15 @@
     }
   };
 
+  // --------------------------------------------------------------
+  // Test route for Debug use
+  //
+  // Method: GET
+  // Route:  /irc/test1
+  //
+  // You can place a function here called by /irc/test1 route.
+  //
+  // --------------------------------------------------------------
   const test1Handler = function(req, res, next) {
     webError:('test1 handler called');
     // -------- test code here -----------------
@@ -812,6 +863,16 @@
     });
     // -----------------------------------------
   };
+
+  // --------------------------------------------------------------
+  // Test route for Debug use
+  //
+  // Method: GET
+  // Route:  /irc/test2
+  //
+  // You can place a function here called by /irc/test2 route.
+  //
+  // --------------------------------------------------------------
 
   const test2Handler = function(req, res, next) {
     webError:('test2 handler called');
