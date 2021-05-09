@@ -358,18 +358,6 @@ const adjustInputToWidowWidth = function (innerWidth) {
   document.getElementById('rawMessageDisplay').setAttribute('cols', cols.toString());
   document.getElementById('rawMessageInputId').setAttribute('cols', (cols-8).toString());
 
-  // This is for dynamically generated elements
-  // IRC Channel <textarea> element for auto-resize
-  if (webState.resizableChannelTextareaIds.length > 0) {
-    webState.resizableChannelTextareaIds.forEach(function(id) {
-      if (document.getElementById(id)) {
-        document.getElementById(id).setAttribute('cols', cols.toString());
-      } else {
-        console.log('Error: ' + id);
-      }
-    });
-  }
-
   // In the IRC channel area, this is to handle main
   //     text area when it is split with nickname list.
   if (webState.resizableChanSplitTextareaIds.length > 0) {

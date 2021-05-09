@@ -539,10 +539,11 @@
   // Method: POST
   // Route:  /irc/server
   //
-  // Input: none (body not used)
+  // Input: Index of server starting from 0, -1 for next in sequence
   //
-  // req.body{}
-  //
+  //  req.body{
+  //    "index": -1
+  //  }
   //----------------------------------------
   const serverHandler = function(req, res, next) {
     if ((vars.ircState.connected) || (vars.ircState.connecting)) {
@@ -798,10 +799,54 @@
   };
 
   // -----------------------------------------------
+  // Prune a channel from channel array
+  //
+  // Method: POST
+  // Route:  /irc/prune
+  //
+  // Input: channel name as string
+  //
+  //  req.body{
+  //    channel: '#test'
+  //  }
+  //
+  // -----------------------------------------------
+  const pruneChannel = function(req, res, next) {
+    if (('channel' in req.body) && (req.body.channel.length > 0)) {
+      let index = vars.ircState.channels.indexOf(req.body.channel.toLowerCase());
+      if (index >= 0) {
+        if (!vars.ircState.channelStates[index].joined) {
+          // prune the channel from arrays
+          vars.ircState.channels.splice(index, 1);
+          vars.ircState.channelStates.splice(index, 1);
+          tellBrowserToRequestState();
+          res.json({
+            error: false
+          });
+        } else {
+          res.json({
+            error: true,
+            message: 'Prune requires you leave channel'
+          });
+        }
+      } else {
+        res.json({
+          error: true,
+          message: 'Channel not found'
+        });
+      }
+    } else {
+      let error = new Error('Bad Reqeust');
+      error.status = 400;
+      next(error);
+    }
+  };
+
+  // -----------------------------------------------
   // Request backend erase cache
   //
   // Method: POST
-  // Route:  /erase
+  // Route:  /irc/erase
   //
   // Input: confirmation of command
   //
@@ -917,6 +962,7 @@
     disconnectHandler: disconnectHandler,
     getIrcState: getIrcState,
     getCache: getCache,
+    pruneChannel: pruneChannel,
     eraseCache: eraseCache,
     test1Handler: test1Handler,
     test2Handler: test2Handler

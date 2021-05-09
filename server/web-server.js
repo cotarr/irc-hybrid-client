@@ -85,14 +85,14 @@ app.use(cookieParser(cookieSecret));
 const logStuff = function(req, res, next) {
   // console.log('req.headers' + JSON.stringify(req.headers, null, 2));
   // console.log('req.rawHeaders ' + req.rawHeaders);
-  console.log('req.body' + JSON.stringify(req.body, null, 2));
+  // console.log('req.body' + JSON.stringify(req.body, null, 2));
   // console.log('isVhostMatch ' + checkVhost.isVhostMatch(req));
   // console.log('notVhostMatch ' + checkVhost.notVhostMatch(req));
   // console.log('cookie ' + req.headers.cookie);
   // console.log('signedCookies ' + JSON.stringify(req.signedCookies));
   next();
 };
-app.use(logStuff);
+// app.use(logStuff);
 
 if (nodeEnv === 'production') {
   app.use(compression());
@@ -335,8 +335,8 @@ app.post('/irc/disconnect', authorizeOrFail, ircClient.disconnectHandler);
 app.post('/irc/message', authorizeOrFail, ircClient.messageHandler);
 app.get('/irc/getircstate', authorizeOrFail, ircClient.getIrcState);
 app.get('/irc/cache', authorizeOrFail, ircClient.getCache);
+app.post('/irc/prune', authorizeOrFail, ircClient.pruneChannel);
 app.post('/irc/erase', authorizeOrFail, ircClient.eraseCache);
-
 app.get('/irc/test1', authorizeOrFail, ircClient.test1Handler);
 app.get('/irc/test2', authorizeOrFail, ircClient.test2Handler);
 

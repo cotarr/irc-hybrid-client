@@ -122,7 +122,7 @@
           }
           // Clear names list, a new one will arrive after join
           if (index >= 0) {
-            console.log('JOIN clearing nicklist');
+            // console.log('JOIN clearing nicklist');
             vars.ircState.channelStates[index].names = [];
           }
         }

@@ -214,6 +214,11 @@ function createChannelEl (name) {
   channelPartButtonEl.textContent = 'Leave';
   channelPartButtonEl.classList.add('channel-button');
 
+  // prune button
+  let channelPruneButtonEl = document.createElement('button');
+  channelPruneButtonEl.textContent = 'Prune';
+  channelPruneButtonEl.classList.add('channel-button');
+
   // refresh button
   let channelRefreshButtonEl = document.createElement('button');
   channelRefreshButtonEl.textContent = 'Refresh';
@@ -275,6 +280,7 @@ function createChannelEl (name) {
   channelTopLeftDivEl.appendChild(channelNameDivEl);
 
   channelTopRightHidableDivEl.appendChild(channelJoinButtonEl);
+  channelTopRightHidableDivEl.appendChild(channelPruneButtonEl);
   channelTopRightHidableDivEl.appendChild(channelPartButtonEl);
 
   channelTopRightDivEl.appendChild(channelTopRightHidableDivEl);
@@ -404,6 +410,64 @@ function createChannelEl (name) {
   });
 
   // -------------------------
+  // Prune button handler
+  // -------------------------
+  channelPruneButtonEl.addEventListener('click', function() {
+    let index = ircState.channels.indexOf(name.toLowerCase());
+    if (index >= 0) {
+      if (!ircState.channelStates[index].joined) {
+        let fetchURL = webServerUrl + '/irc/prune';
+        let fetchOptions = {
+          method: 'POST',
+          headers: {
+            'Content-type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({channel: name})
+        };
+        fetch(fetchURL, fetchOptions)
+          .then( (response) => {
+            // console.log(response.status);
+            if (response.ok) {
+              return response.json();
+            } else {
+              throw new Error('Fetch status ' + response.status + ' ' + response.statusText);
+            }
+          })
+          .then( (responseJson) => {
+            if (responseJson.error) {
+              showError(responseJson.message);
+            } else {
+              // remove the channel element from DOM
+              channelContainerDivEl.removeChild(channelMainSectionEl);
+
+              // remove frontend browser state info for this channel
+              let webStateChannelsIndex = webState.channels.indexOf(name.toLowerCase());
+              if (webStateChannelsIndex >= 0) {
+                webState.channels.splice(webStateChannelsIndex, 1);
+                webState.channelStates.splice(webStateChannelsIndex, 1);
+              }
+              console.log(JSON.stringify(webState.channels));
+
+              // remove resizeable screenwidth references
+              let tempIndex1 = webState.resizableSendButtonTextareaIds.indexOf(channelInputAreaId);
+              if (tempIndex1 >= 0) {
+                webState.resizableSendButtonTextareaIds.splice(tempIndex1, 1);
+              }
+              let tempIndex2 = webState.resizableChanSplitTextareaIds.indexOf(channelTextAreaId);
+              if (tempIndex2 >= 0) {
+                webState.resizableChanSplitTextareaIds.splice(tempIndex2, 1);
+              }
+            }
+          })
+          .catch( (error) => {
+            console.log(error);
+          });
+      }
+    }
+  });
+
+  // -------------------------
   // Refresh button handler
   // -------------------------
   channelRefreshButtonEl.addEventListener('click', function() {
@@ -457,6 +521,7 @@ function createChannelEl (name) {
         channelSendButtonEl.removeAttribute('disabled');
 
         channelJoinButtonEl.setAttribute('hidden', '');
+        channelPruneButtonEl.setAttribute('hidden', '');
         channelPartButtonEl.removeAttribute('hidden');
       } else {
         channelNamesDisplayEl.setAttribute('disabled', '');
@@ -465,6 +530,7 @@ function createChannelEl (name) {
         channelSendButtonEl.setAttribute('disabled', '');
 
         channelJoinButtonEl.removeAttribute('hidden');
+        channelPruneButtonEl.removeAttribute('hidden');
         channelPartButtonEl.setAttribute('hidden', '');
       }
 
@@ -575,7 +641,7 @@ function createChannelEl (name) {
   updateVisibility();
 
   // -------------------------
-  // AutoCoplete checkbox handler
+  // AutoComplete checkbox handler
   // -------------------------
   channelAutoCompCBInputEl.addEventListener('click', function() {
     if (channelMainSectionEl.hasAttribute('auto-comp-enabled')) {
