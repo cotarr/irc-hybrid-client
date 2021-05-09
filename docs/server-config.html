@@ -31,7 +31,7 @@
           IRC Configuration
         </div>
 
-        <div class="install-section-title">Assumed Knowledge</div>
+        <div class="install-section-title">Previous IRC Experience</div>
         <p>
           For purposes of this help file, it is assumed the person installing this
           IRC client is familiar with standard IRC server connection parameters, including
@@ -94,13 +94,9 @@
         </p>
         <p>
           At this time there are no provisions to configure a server to
-          auto-connect on startup, or auto-reconnect after disconnect.
-          I do plan to add auto-reconnect soon. However, I need to
-          identify the different disconnect errors, how to trap them,
-          and capture state information as it exists at the time of disconnection.
-          In the mean time, if you are disconnected from IRC, the [IRC]
-          icon will turn red. Just tap the red [IRC] icon and it will
-          immediately try to reconnect to the IRC server.
+          auto-connect to IRC on startup. There is no provision to auto-join channels.
+          Reconnecting after a disconnect is available as a global setting and
+          reconnection will be discussed below.
         </p>
         <p>
           In this example, an IRC server is configured without TLS encryption.
@@ -213,7 +209,7 @@
         of string entries, where each array value is the name of an IRC channel.
         After connection to an IRC server, the favorite channels are
         displayed as buttons to allow easy /JOIN capability when using a
-        smart phone.
+        smartphone.
         The array may be empty, but it must exist.
       </p>
 

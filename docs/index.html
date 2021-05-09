@@ -31,7 +31,7 @@
           Home
         </div>
         <p>
-          Single user hybrid IRC client using JavaScript frontend and Node.js/Express backend.
+          Irc-hybrid-client is an IRC web client that uses a JavaScript frontend and Node.js/Express backend.
         </p>
         <p>
           This project is still under development and changes frequently.
@@ -65,19 +65,19 @@
               In this application, the backend web server manages
               the IRC server connection independantly of the
               web browser. In this type of hybrid client, if
-              you are temporarily disconnected, such as the phone
+              you are temporarily disconnected, such as the smartphone
               screen lock, your nickname will remain present on IRC.
             </p><p>
               At this time, the IRC server address and port
-              information are defined in text editable configuration files
-              for the web server. The IRC server and port should
+              information are defined in editable configuration text files
+              located on the web server. The IRC server and port should
               be set before starting the server. The [Next Server]
               button can be used to select between multiple servers
               that are defined in the configuration file.
             </p>
             <p>
               Next, you can connect to IRC with your nickname using either
-              the [Connect-IRC] button or youcan tap on the red [IRC] status icon at the top.
+              the [Connect-IRC] button or you can tap on the red [IRC] status icon at the top.
             </p>
           </div>
           <div class="image-photo">
@@ -89,7 +89,7 @@
         <div class="home-detail">
           <div class="image-text">
             <p>
-              The green [IRC] icon now indicates that the backend web
+              The green [IRC] icon indicates that the backend web
               server is logged into the IRC network.
             </p>
             <p>
@@ -179,7 +179,12 @@
               Buttons marked [Refresh] are located on serveral windows.
               The refresh feature will refresh all windows from a
               message buffer stored in the web server. The cache is
-              currently 100 server messages.
+              currently 100 server messages. The message buffer is
+              primarily intended to refresh after short disconnects,
+              such as smartphone screen lock. Refreshing after
+              a longer period of time may cause the cache buffer
+              to exceed 100 messages and the oldest messages, possible
+              in other windows, may be discarded.
             </p>
           </div>
           <div class="image-photo">
