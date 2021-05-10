@@ -67,7 +67,14 @@
   var clientToServerPingTimer = 0;
   const clientToServerPingInterval = 60;
 
+  // Reference: https://ircv3.net/specs/extensions/server-time
+  // @time=2011-10-19T16:40:51.620Z :Angel!angel@example.org PRIVMSG Wiz :Hello
   const timestamp = function() {
+    let now = new Date;
+    // return parseInt(now.valueOf() / 1000).toString();
+    return '@time=' + now.toISOString();
+  };
+  const unixTimestamp = function() {
     let now = new Date;
     return parseInt(now.valueOf() / 1000).toString();
   };
@@ -92,6 +99,7 @@
     activityWatchdogTimerLimit: activityWatchdogTimerLimit,
     clientToServerPingTimer: clientToServerPingTimer,
     clientToServerPingInterval: clientToServerPingInterval,
-    timestamp: timestamp
+    timestamp: timestamp,
+    unixTimestamp: unixTimestamp
   };
 })();

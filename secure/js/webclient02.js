@@ -157,10 +157,16 @@ function _parseIrcMessage (message) {
     if (timeString.length === 0) {
       outString = null;
     } else {
-      let timeObj = new Date(parseInt(timeString) * 1000);
-      outString += timeObj.getHours().toString().padStart(2, '0') + ':';
-      outString += timeObj.getMinutes().toString().padStart(2, '0') + ':';
-      outString += timeObj.getSeconds().toString().padStart(2, '0');
+      // Reference: https://ircv3.net/specs/extensions/server-time
+      // @time=2011-10-19T16:40:51.620Z :Angel!angel@example.org PRIVMSG Wiz :Hello
+      if (timeString.indexOf('@time=') === 0) {
+        let timeObj = new Date(parseInt(timeString.slice(6, timeString.length)) * 1000);
+        outString += timeObj.getHours().toString().padStart(2, '0') + ':';
+        outString += timeObj.getMinutes().toString().padStart(2, '0') + ':';
+        outString += timeObj.getSeconds().toString().padStart(2, '0');
+      } else {
+        outString = null;
+      }
     }
     return {
       data: outString,

@@ -70,9 +70,7 @@
     function _sendCtcpMessage (socket, ircMessage, ctcpReply, ctcpTo) {
       // It is necessary to fake out a message back to self to show the reply
       let ctcpDelim = 1;
-      let now = new Date;
-      let nowSeconds = parseInt(now.valueOf()/1000);
-      let outgoingBackToSelf = nowSeconds.toString() +
+      let outgoingBackToSelf = vars.timestamp() +
         ' :' + vars.ircState.nickName + '!*@* NOTICE ' + ctcpTo + ' ' +
         String.fromCharCode(ctcpDelim) + ctcpReply + String.fromCharCode(ctcpDelim);
       if (checkCtcpNotFlood()) {
@@ -128,7 +126,6 @@
 
       case 'PING':
         if (true) {
-          let d = new Date;
           let ctcpReply = 'PING ' + ctcpRest;
           let ircMessage = 'NOTICE ' + parsedMessage.nick + ' :' +
           String.fromCharCode(ctcpDelim) + ctcpReply + String.fromCharCode(ctcpDelim);

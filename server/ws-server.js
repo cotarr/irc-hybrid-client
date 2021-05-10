@@ -117,8 +117,6 @@ setInterval(function() {
 // 3) Connect the webscket
 // ----------------------------------------
 const wsOnUpgrade = function (request, socket, head) {
-  let now = new Date();
-  let timeString = now.toISOString() + ' ';
   const pathname = url.parse(request.url).pathname;
   if (pathname === '/irc/ws') {
     if (authorizeWebSocket(request)) {

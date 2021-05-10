@@ -355,7 +355,7 @@ function createPrivateMessageEl (name, parsedMessage) {
       privMsgTextAreaEl.scrollTop = privMsgTextAreaEl.scrollHeight;
     }
     let parsedMessage = event.detail.parsedMessage;
-    console.log('Event private-message: ' + JSON.stringify(parsedMessage, null, 2));
+    // console.log('Event private-message: ' + JSON.stringify(parsedMessage, null, 2));
     switch(parsedMessage.command) {
       //
       // TODO cases for user left IRC or other error

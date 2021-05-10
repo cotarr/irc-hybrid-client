@@ -493,7 +493,7 @@
           if (parsedNick === vars.ircState.nickName) {
             // case of successful register with nickname, set registered state
             vars.ircState.ircRegistered = true;
-            vars.ircState.times.ircConnect = vars.timestamp();
+            vars.ircState.times.ircConnect = vars.unixTimestamp();
             vars.ircState.count.ircConnect++;
             vars.ircState.ircServerPrefix = parsedMessage.prefix;
             vars.ircState.userHost = parsedUserhost;

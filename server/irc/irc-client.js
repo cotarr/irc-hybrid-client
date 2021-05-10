@@ -384,10 +384,6 @@
     // Go ahead can connect the socket.
     // ----------------------------------
     ircSocket.connect(vars.ircState.ircServerPort, vars.ircState.ircServerHost, function() {
-      let now = new Date();
-      let timeString = now.toISOString() + ' ';
-      // console.log(timeString + 'Connected to IRC server ' + vars.ircState.ircServerName + ' ' +
-      //   vars.ircState.ircServerHost + ':'+ vars.ircState.ircServerPort);
       ircLog.writeIrcLog('Connected to IRC server ' + vars.ircState.ircServerName + ' ' +
         vars.ircState.ircServerHost + ':'+ vars.ircState.ircServerPort);
     });
@@ -965,7 +961,7 @@
   }.bind(this), 1000);
 
   // Program run timestamp
-  vars.ircState.times.programRun = vars.timestamp();
+  vars.ircState.times.programRun = vars.unixTimestamp();
 
   module.exports = {
     serverHandler: serverHandler,
