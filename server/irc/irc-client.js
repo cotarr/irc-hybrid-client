@@ -34,8 +34,10 @@
   const fs = require('fs');
   const isValidUTF8 = require('utf-8-validate');
 
-  const ircWrite = require('./irc-client-write');
+  // log module loaded first to create /logs folder if needed.
   const ircLog = require('./irc-client-log');
+
+  const ircWrite = require('./irc-client-write');
   const ircParse = require('./irc-client-parse');
   const ircCommand = require('./irc-client-command');
 

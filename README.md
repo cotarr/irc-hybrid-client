@@ -52,9 +52,6 @@ It is recommended to follow the documentation installation instructions instead.
 git clone https://github.com/cotarr/irc-hybrid-client.git
 cd irc-hybrid-client
 
-# make log directory
-mkdir logs
-
 # Choose one...development or production, development redirects logging to console.
 export NODE_ENV=development
 export NODE_ENV=production

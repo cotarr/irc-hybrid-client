@@ -31,6 +31,19 @@
   const path = require('path');
   const fs = require('fs');
 
+  const logFolder = path.join(__dirname, '../../logs');
+
+  try {
+    if (!fs.existsSync(logFolder)) {
+      console.log('Log folder not found, creating folder...');
+      fs.mkdirSync(logFolder);
+    }
+  } catch (err) {
+    console.log('Unable to create log folder');
+    console.error(err);
+    process.exit(1);
+  }
+
   const accessLogFilename = path.join(__dirname, '../../logs/access.log');
   const ircLogFilename = path.join(__dirname, '../../logs/irc.log');
 

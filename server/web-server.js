@@ -113,10 +113,11 @@ if (nodeEnv === 'development') {
       encoding: 'utf8',
       mode: 0o644,
       flags: 'a'
-    })
-    // skip: function (req, res) {
-    //   return (res.statusCode < 400);
-    // }
+    }),
+    // Log only errors, comment out this next part to see all traffic
+    skip: function (req, res) {
+      return (res.statusCode < 400);
+    }
   }));
 }
 
