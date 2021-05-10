@@ -268,8 +268,7 @@ document.getElementById('test1Button').addEventListener('click', function() {
       if (error) showError(error.toString());
     });
 });
-//document.getElementById('test1ButtonDesc').textContent = 'GET /irc/test1 global.gc()';
-document.getElementById('test1ButtonDesc').textContent = 'Emulate IRC server ping timeout';
+document.getElementById('test1ButtonDesc').textContent = 'Force garbage collect';
 
 // --------------------
 // Test Button #2
@@ -305,8 +304,7 @@ document.getElementById('test2Button').addEventListener('click', function() {
       if (error) showError(error.toString());
     });
 });
-// document.getElementById('test2ButtonDesc').textContent = 'GET /irc/test2 memoryUsage()';
-document.getElementById('test2ButtonDesc').textContent = 'Emulate IRC server disconnect';
+document.getElementById('test2ButtonDesc').textContent = 'Emulate IRC ping timeout';
 
 // --------------------
 // Test Button #3

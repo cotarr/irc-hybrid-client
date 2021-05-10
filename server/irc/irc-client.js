@@ -901,33 +901,37 @@
   const test1Handler = function(req, res, next) {
     webError:('test1 handler called');
     // -------- test code here -----------------
-    // if (global.gc) {
-    //   global.gc();
-    //   webError:('Debug: Forcing nodejs garbage collection');
-    //   res.json({
-    //     error: false,
-    //     comment: 'Debug: Forcing nodejs garbage collection'
-    //   });
-    // } else {
-    //   webError:('To debug garbage collection run: node --expose-gc bin/www');
-    //   res.json({
-    //     error: true,
-    //     message: 'To debug garbage collection run: node --expose-gc bin/www'
-    //   });
-    // }
+    //
+    // Check allocated memory, garbage collect, check memory again.
+    if (global.gc) {
+      let before = process.memoryUsage();
+      global.gc();
+      webError:('Debug: Forcing nodejs garbage collection');
+      setTimeout(function() {
+        let after = process.memoryUsage();
+        res.json({
+          error: false,
+          comment: 'Debug: Forcing nodejs garbage collection',
+          data: {
+            before: before,
+            after: after
+          }
+        });
+      }.bind(this), 1000);
+    } else {
+      webError:('To debug garbage collection run: node --expose-gc bin/www');
+      res.json({
+        error: true,
+        message: 'To debug garbage collection run: node --expose-gc bin/www'
+      });
+    }
     // -----------------------------------------
+    // // Report Cache info to browser console log
     // res.json({
     //   error: false,
     //   comment: 'Debug message cache',
     //   data: ircMessageCache.cacheInfo()
     // });
-    // -----------------------------------------
-    webError:('Emulating IRC server ping timeout');
-    vars.activityWatchdogTimerSeconds = 1000;
-    res.json({
-      error: false,
-      message: 'Emulating IRC server ping timeout'
-    });
     // -----------------------------------------
   };
 
@@ -944,24 +948,13 @@
   const test2Handler = function(req, res, next) {
     webError:('test2 handler called');
     // -------- test code here -----------------
+    // emulate ping timeout of IRC server (for test auto reconnect)
+    vars.activityWatchdogTimerSeconds = 1000;
+    res.json({
+      error: false,
+      message: 'Emulating IRC server ping timeout'
+    });
     // -----------------------------------------
-    // res.json({
-    //   error: false,
-    //   comment: 'node.js memory',
-    //   data: process.memoryUsage()
-    // });
-    if (ircSocket) {
-      ircWrite.writeSocket(ircSocket, 'QUIT');
-      res.json({
-        error: false,
-        comment: 'Emulate IRC disconnect'
-      });
-    } else {
-      res.json({
-        error: false,
-        comment: 'Socket not connected'
-      });
-    }
   };
 
   //
