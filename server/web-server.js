@@ -201,7 +201,7 @@ let sessionOptions = {
   cookie: {
     path: '/',
     maxAge: sessionExpireAfterMs,
-    secure: (nodeEnv !== 'development') // production --> true, TLS required
+    secure: (credentials.tls) // When TLS enabled, require secure cookies
   },
   proxy: false,
   resave: false, // set to false because memorystore has touch method
@@ -352,7 +352,14 @@ app.get('/irc/webclient.html', authorizeOrLogin, function(req, res, next) {
 // -------------------------------
 // Web server for static files
 // -------------------------------
+
+// If not production, serve HTML file from development folders
 let secureDir = path.join(__dirname, '../secure');
+
+// Else, if production, server the minified, bundled version
+if (nodeEnv === 'production') secureDir = path.join(__dirname, '../build/secure');
+
+console.log('Serving files from: ' + secureDir);
 app.use('/irc', authorizeOrFail, express.static(secureDir));
 
 // ---------------------------------

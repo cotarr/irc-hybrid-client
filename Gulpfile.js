@@ -105,35 +105,6 @@ const cssMinify = function() {
 };
 
 // ------------------------------
-// Node/Express Server Files
-// ------------------------------
-
-const serverCopy = function() {
-  return src('server/**')
-    .pipe(dest('build/server'));
-};
-const binCopy = function() {
-  return src('bin/www')
-    .pipe(dest('build/bin'));
-};
-
-// -----------------
-// Package files
-// -----------------
-const packageCopy = function() {
-  return src('package*')
-    .pipe(dest('build/'));
-};
-
-// ------------------------------
-// tools - used to set password
-// ------------------------------
-const toolsCopy = function() {
-  return src('tools/*')
-    .pipe(dest('build/tools'));
-};
-
-// ------------------------------
 // copy sound files
 // ------------------------------
 const soundsCopy = function() {
@@ -153,14 +124,10 @@ const defaultTask = function (cb) {
 // Process Production build folder
 //
 const buildProd = series(
-  packageCopy,
   htmlMinify,
   jsMinify,
   cssMinify,
-  serverCopy,
-  binCopy,
-  soundsCopy,
-  toolsCopy
+  soundsCopy
 );
 
 exports.default = defaultTask;
