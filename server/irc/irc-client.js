@@ -518,7 +518,19 @@
       (vars.ircState.ircServerPrefix.length > 0) &&
       (vars.clientToServerPingTimerSeconds >= vars.clientToServerPingInterval)) {
       vars.clientToServerPingTimerSeconds = 0;
-      ircWrite.writeSocket(ircSocket, 'PING ' + vars.ircState.ircServerPrefix);
+      //
+      // PING and PONG are special cases.
+      // To avoid overflow of the message cache, the PING, PONG are sent to raw socket
+      // Unless for debug when PING, PONG removed from excludedCommands array
+      // which makes PING and PONG visible to browser and inserted into message cache
+      //
+      let outBuffer = Buffer.from('PING ' + vars.ircState.ircServerPrefix + '\r\n', 'utf8');
+      // console.log(outBuffer.toString());
+      // 512 btye maximum size from RFC 2812 2.3 Messages
+      if (outBuffer.length <= 512) {
+        ircSocket.write(outBuffer, 'utf8');
+        global.sendToBrowser(vars.commandMsgPrefix + outBuffer.toString('utf8'));
+      }
     }
   }; // clientToServerPingTimerTick()
 

@@ -428,18 +428,18 @@
     let parsedMessage = _parseIrcMessage(messageBuffer);
     // console.log('(IRC-->) parsedMessage ' + JSON.stringify(parsedMessage, null, 2));
 
-    // Do not process excluded commands on this list
-    let excludedCommands = [];
-    // excludedCommands.push('PING');
-    // excludedCommands.push('PONG');
-
-    // PING is special case
+    //
+    // PING and PONG are special cases.
+    // To avoid overflow of the message cache, the PING, PONG are sent to raw socket
+    // Unless for debug when PING, PONG removed from excludedCommands array
+    // which makes PING and PONG visible to browser and inserted into message cache
+    //
     if (parsedMessage.command === 'PING') {
       let outBuffer = Buffer.from('PONG ' + parsedMessage.params[0] + '\r\n', 'utf8');
       // 512 btye maximum size from RFC 2812 2.3 Messages
       if (outBuffer.length <= 512) {
         socket.write(outBuffer, 'utf8');
-        if (excludedCommands.indexOf('PING') <0) {
+        if (vars.excludedCommands.indexOf('PING') <0) {
           ircMessageCache.addMessage(Buffer.concat([
             Buffer.from(vars.timestamp() + ' '),
             messageBuffer
@@ -450,9 +450,7 @@
             Buffer.from('\r\n')
           ]));
         }
-        if (excludedCommands.indexOf('PONG') < 0) {
-          global.sendToBrowser(vars.commandMsgPrefix + outBuffer.toString('utf8'));
-        }
+        global.sendToBrowser(vars.commandMsgPrefix + outBuffer.toString('utf8'));
       } else {
         console.log('Error, send buffer exceeds 512 character limit.');
       }
@@ -463,7 +461,7 @@
     //
     // Do not parse or act on commands that are listed in this array
     //
-    if (excludedCommands.indexOf(parsedMessage.command) >= 0) return;
+    if (vars.excludedCommands.indexOf(parsedMessage.command) >= 0) return;
 
     //
     // For display in browser, and cache for browser refresh

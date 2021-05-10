@@ -27,22 +27,43 @@
 (function() {
   'use strict';
 
+  // Excluded command list.
+  // The purpose is to avoid filling the message cache up with PING, PONG
+  // traffic which would cause unseen messages to scroll out of the buffer.
+  //
+  // These are still processed by the backend, but invisible to cache and browser.
+  //
+  const excludedCommands = [
+    'PING',
+    'PONG'
+  ];
+
+  // ircState hold main IRC state variables visible to browser and backend
+  var ircState = {};
   var ircServerPassword = null;
   var nsIdentifyNick = null;
   var nsIdentifyCommand = null;
 
-  // IRC server reconnect when timer matches
+  const channelPrefixChars = '@#+!';
+  const channelUserModeChars = 'qaohv';
+  const nicknamePrefixChars = '~&@%+';
+  const commandMsgPrefix = '--> ';
+
+  // IRC server reconnect when timer matches (time in seconds)
   const ircServerReconnectIntervals = [10, 60, 120, 180, 300, 600, 900];
   var ircServerReconnectTimerSeconds = 0;
   var ircServerReconnectChannelString = '';
   var ircServerReconnectAwayString = '';
 
+  // Time inseconds
   const ircSocketConnectingTimeout = 10;
   const ircRegistrationTimeout = 30;
 
+  // Time in seconds
   var activityWatchdogTimerSeconds = 0;
   const activityWatchdogTimerLimit = 300;
 
+  // Time in seconds
   var clientToServerPingTimer = 0;
   const clientToServerPingInterval = 60;
 
@@ -52,14 +73,15 @@
   };
 
   module.exports = {
-    ircState: {},
+    excludedCommands: excludedCommands,
+    ircState: ircState,
     ircServerPassword: ircServerPassword,
     nsIdentifyNick: nsIdentifyNick,
     nsIdentifyCommand: nsIdentifyCommand,
-    channelPrefixChars: '@#+!',
-    channelUserModeChars: 'qaohv',
-    nicknamePrefixChars: '~&@%+',
-    commandMsgPrefix: '--> ',
+    channelPrefixChars: channelPrefixChars,
+    channelUserModeChars: channelUserModeChars,
+    nicknamePrefixChars: nicknamePrefixChars,
+    commandMsgPrefix: commandMsgPrefix,
     ircServerReconnectTimerSeconds: ircServerReconnectTimerSeconds,
     ircServerReconnectIntervals: ircServerReconnectIntervals,
     ircServerReconnectChannelString: ircServerReconnectChannelString,
