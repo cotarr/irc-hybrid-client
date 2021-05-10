@@ -93,8 +93,8 @@
     //
     // Append string to file
     //
-    if (rawMessageLogEnabled) {
-      if (nodeEnv === 'production') {
+    if (nodeEnv === 'production') {
+      if (rawMessageLogEnabled) {
         fs.writeFile(
           ircLogFilename,
           logEntry + '\n',
@@ -110,9 +110,9 @@
             }
           }
         );
-      } else {
-        console.log(logEntry);
-      }
+      };
+    } else {
+      console.log(logEntry);
     }
   };
 
@@ -124,6 +124,8 @@
   module.exports = {
     writeAccessLog: writeAccessLog,
     writeIrcLog: writeIrcLog,
-    setRawMessageLogEnabled: setRawMessageLogEnabled
+    setRawMessageLogEnabled: setRawMessageLogEnabled,
+    accessLogFilename: accessLogFilename,
+    ircLogFilename: ircLogFilename
   };
 })();

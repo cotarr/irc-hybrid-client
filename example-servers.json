@@ -1,6 +1,7 @@
 {
   "configVersion": 1,
   "ircAutoReconnect": false,
+  "rawMessageLog": false,
   "serverArray": [
     {
       "name": "DALnet",
@@ -14,8 +15,7 @@
       "user": "user",
       "real": "John Doe",
       "modes": "+i",
-      "channelList": ["#myChannel", "#otherChannel"],
-      "rawMessageLog": true
+      "channelList": ["#myChannel", "#otherChannel"]
     }
   ]
 }

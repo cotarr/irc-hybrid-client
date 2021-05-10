@@ -44,13 +44,13 @@ const helmet = require('helmet');
 const compression = require('compression');
 const app = express();
 
+// Irc Client Module
+const ircClient = require('./irc/irc-client');
+
 // Session and User login routes
 const userAuth = require('./middlewares/user-authenticate');
 const authorizeOrLogin = userAuth.authorizeOrLogin;
 const authorizeOrFail = userAuth.authorizeOrFail;
-
-// Irc Client Module
-const ircClient = require('./irc/irc-client');
 
 // TLS certificate filenames
 // Web username, password credentials
@@ -107,7 +107,7 @@ if (nodeEnv === 'development') {
   app.use(logger(':date[iso] :remote-addr :status :method :http-version :req[host]:url', {
   }));
 } else {
-  console.log('Access log: ' + accessLogFilename);
+  console.log('Access log: ' + accessLogFilename + ' (Errors only)');
   app.use(logger(':date[iso] :remote-addr :status :method :http-version :req[host]:url', {
     stream: fs.createWriteStream(accessLogFilename, {
       encoding: 'utf8',

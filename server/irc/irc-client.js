@@ -111,11 +111,25 @@
   };
   vars.ircState.websocketCount = 0;
 
-  ircLog.setRawMessageLogEnabled(servers.serverArray[0].rawMessageLog);
 
-  console.log('Starting ' + vars.ircState.progName + ' ' + vars.ircState.progVersion);
-  ircLog.writeIrcLog('-----------------------------------------');
-  ircLog.writeIrcLog('Starting ' + vars.ircState.progName + ' ' + vars.ircState.progVersion);
+  ircLog.setRawMessageLogEnabled(servers.rawMessageLog);
+
+  console.log('Starting web server: ' + vars.ircState.progName + ' version-' + vars.ircState.progVersion);
+  console.log('Point web browser to <your-http-domain-name> + \"/irc/webclient.html\"');
+
+  // report log file status
+  if (nodeEnv === 'production') {
+    if (servers.rawMessageLog) {
+      ircLog.writeIrcLog('-----------------------------------------');
+      ircLog.writeIrcLog('Starting ' + vars.ircState.progName + ' ' + vars.ircState.progVersion);
+      console.log('IRC raw message log enabled: ' + ircLog.ircLogFilename);
+      console.log('Caution: IRC raw message log not pruned for size, monitor your file size.');
+    } else {
+      console.log('IRC raw message log disabled.');
+    }
+  } else {
+    console.log('IRC raw message log enabled: (console)');
+  }
 
   const tellBrowserToRequestState = function() {
     global.sendToBrowser('UPDATE\r\n');
@@ -598,8 +612,6 @@
     vars.ircState.realName = servers.serverArray[vars.ircState.ircServerIndex].real;
     vars.ircState.userMode = servers.serverArray[vars.ircState.ircServerIndex].modes;
     vars.ircState.userHost = '';
-
-    ircLog.setRawMessageLogEnabled(servers.serverArray[vars.ircState.ircServerIndex].rawMessageLog);
 
     tellBrowserToRequestState();
 
