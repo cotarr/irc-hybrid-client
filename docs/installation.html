@@ -59,12 +59,12 @@
           <li>Familiar with IRC and with configuration of IRC clients</li>
         </ul>
 
-        <div class="install-section-title">System Requriements (Server)</div>
+        <div class="install-section-title">System Requirements (Server)</div>
         <p>
           No formal security evaluation has been performed.
           As a security consideration, it is recommended to run the web
-          server in a non-privliged shell without root access.
-          It does not require a privledged port less than 1024,
+          server in a non-privileged shell without root access.
+          It does not require a privileged port less than 1024,
           however you must choose a port not blocked by your browser.
         </p>
         <p>
@@ -83,7 +83,7 @@
           The program has run without errors under Node.js versions 12 and 14.
           Other versions of Node.js have not been tried.
         </p>
-        <div class="install-section-title">System Requriements (Browser)</div>
+        <div class="install-section-title">System Requirements (Browser)</div>
         <p>
           This HTML, CSS and browser JavaScript was written and debugged
           using the Chrome web browser running under Linux, and using
@@ -185,7 +185,7 @@ npm install
           For the IRC server connection, typically port 6697 for TLS,
           node uses the openssl and certificates
           in the Linux operating system, and no special configuration
-          should be requrired to support TLS, provided that nodejs and your system
+          should be required to support TLS, provided that nodejs and your system
           was compiled with the current version of openssl.
         </p>
         <p>
@@ -269,12 +269,12 @@ sudo certbot certonly --standalone -d abcd.example.com
           It is used for standard http GET or POST requests from the browser
           used to download the web page files and make API requests.
           The port is also used to establish and maintain a websocket connection
-          so the browser can pass IRC messages asyncrhonously.
+          so the browser can pass IRC messages asynchronously.
           One single TCP port is used for both.
         </p>
         <p>
           If you prefer to use restricted port 443 for your webserver, it would be recommended
-          to place the IRC client on an alternate non-privledged port, then use
+          to place the IRC client on an alternate non-privileged port, then use
           iptables rules to exchange port numbers to 443 as packets cross the firewall.
           This will improve security by keeping the IRC client in a non-privledged account.
           It would be necessary to temporarily remove these iptables rules to

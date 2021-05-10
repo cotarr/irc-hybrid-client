@@ -46,21 +46,22 @@
               Q: Why did you write this program?<br>
             </p>
             A: That's a good question. There are already many excellent IRC clients to choose
-            from. Why write my own? Actually, I ran across a youtube video where a simple telnet
+            from. WeeChat is my favorite. Why write my own?
+            Actually, I ran across a youtube video where a simple telnet
             client was easily able to emulate an IRC client. I loaded an
-            ngircd IRC server into a Raspberry Pi, and I started to explore
+            ngircd IRC server into a Raspberry Pi, and I started to explore my telnet client
             while reading the RFC-2812 client protocol. I soon found
             telnet very repetitious, so I opened nodejs and with a little
-            Googling, I had a socket connecting to IRC and exchanging
-            messages with the server.
+            Googling, I had a TCP socket connecting to IRC and exchanging
+            messages with the server. It was really fun.
             <br><br>
-            Previously I have tried several options to use IRC on my iPhone.
+            As a second inspiration, I have tried several options to use IRC on my iPhone.
             I really didn't like any of them. Given the Covid-19 pandemic lockdown,
             I've been primarily stuck at home with nothing to do. Over the
-            period of about a month, this slowly evolved into hybrid IRC web client
-            paired up with a nodejs backend. Despite the limited functionality
-            compared to a full IRC client, I found that I enjoyed the way it worked
-            on my mobile phone. From there, it slowly began to evolve as I used it.
+            period of about a month, this slowly evolved into an IRC client. I started to use it
+            as my regular IRC smartphone client. This started the endless process of
+            adjusting IRC client user interface to adapt to smartphone capabilities.
+            I guess I'm still in the process of finding a better UI.
           </a></td></tr>
 
           <tr><td><a name="challenges">
@@ -72,14 +73,14 @@
             to connect to IRC.
             Addressing tasks like wrapping the websocket in TLS,
             security authorization of the browser's websocket connection,
-            detecting desconnects, and dealing with legacy disconnected sockets
+            detecting disconnects, and dealing with legacy disconnected sockets
             was an interesting learning experience.
             <br><br>
             I also found it tricky to encode and decode buffers of multi-byte international
             characters where a string byte length is different from the string character length.
             Then, from a stream/message standpoint, multiple messages from the server can
             concatenate into a single socket data packet, or
-            one individual IRC message can split between two differnt data packets, requiring
+            one individual IRC message can split between two different data packets, requiring
             re-assembly into a single string.
           </a></td></tr>
 
@@ -119,7 +120,7 @@
               Q: Does the program use cookies?<br>
             </p>
             A: Yes. During normal use web browser http requests are
-            authroized using session cookies for purposes of access control.
+            authorized using session cookies for purposes of access control.
             This is disclosed on the login form. No additional persistent
             identifiers are used.
           </a></td></tr>

@@ -69,7 +69,7 @@
         <p>
           The path location would depend on your specific Linux system.
           To configure the web server to listen for HTTPS
-          encrypted connetions, this section would look something like this:
+          encrypted connections, this section would look something like this:
         </p>
 <div class="pre-div"><pre>
   "serverTlsKey": "/home/user1/tls/privkey.pem",
@@ -90,11 +90,11 @@
         <p>
           Set the web server listen port to the desired port number for the web server.
           For security reasons, this program should be run as a
-          non-preiledged user using a non-privledged ports 1024 or greater.
+          non-preiledged user using a non-privileged ports 1024 or greater.
         </p>
         <p>
           If you prefer to use restricted port 443 for your webserver, it would be recommended
-          to place the IRC client on an alternate non-privledged port, then use
+          to place the IRC client on an alternate non-privileged port, then use
           iptables rules to exchange port numbers to 443 as packets cross the firewall.
         </p>
 <div class="pre-div"><pre>
@@ -113,12 +113,12 @@
           which the session credentials will expire.
           A value of 86400 seconds will set the login expiration at 24 hours, or once per day.
           Based on the ease of use of browser password managers, 24 hours has worked out
-          to a convienent duration.
+          to a convenient duration.
         </p>
         <p>
           If your session expires in the middle of a conversation, a user login page will load.
           The backend web server will mantain a cache of messages to occur during while disconnected.
-          You should be able to continue your conversation after reauthenticating without
+          You should be able to continue your conversation after re-authenticating without
           any indication to people in the conversation.
         </p>
         <p>
@@ -140,7 +140,7 @@
           Should a security issue be detected on your server by a third
           party, this provides a method to contact the server owner
           and notify them of the security issue.
-          This URL is publically readable without requiring login or session cookie.
+          This URL is publicly readable without requiring login or session cookie.
           To enable this feature, set a valid security email address.
           The expiration date is typically 1 year out and must be entered using this date format.
         </p>
@@ -178,7 +178,7 @@
           change the password from within the web page.
         </p>
         <p>
-          As writtin, this program was intended to be a single user,
+          As written, this program was intended to be a single user,
           private web server. This will limit to password database to 1 authorized user.
           This user would be the owner of the private web server.
           Therefore, there was no reason to unnecessarily increase security risk by adding
