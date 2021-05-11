@@ -890,7 +890,7 @@ function createChannelEl (name) {
     }
 
     let parsedMessage = event.detail.parsedMessage;
-    // console.log('Event channel-message: ' + JSON.stringify(parsedMessage, null, 2));
+    console.log('Event channel-message: ' + JSON.stringify(parsedMessage, null, 2));
 
 
     switch(parsedMessage.command) {
@@ -936,9 +936,17 @@ function createChannelEl (name) {
       case 'MODE':
         if (parsedMessage.params[0].toLowerCase() === name.toLowerCase()) {
           // this could be more elegant than stringify.
-          _addText(parsedMessage.timestamp,
-            '*',
-            'Mode ' + JSON.stringify(parsedMessage.params) + ' by ' + parsedMessage.nick);
+          if (parsedMessage.nick) {
+            // case of mode by user
+            _addText(parsedMessage.timestamp,
+              '*',
+              'Mode ' + JSON.stringify(parsedMessage.params) + ' by ' + parsedMessage.nick);
+          } else {
+            // case of mode by netsplit
+            _addText(parsedMessage.timestamp,
+              '*',
+              'Mode ' + JSON.stringify(parsedMessage.params) + ' by ' + parsedMessage.prefix);
+          }
         }
         break;
       case 'NICK':

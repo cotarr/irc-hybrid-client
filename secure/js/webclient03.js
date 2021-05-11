@@ -101,7 +101,7 @@ function connectWebSocket () {
     // console.log('Websocket open, count: ' + webState.websocketCount);
     webState.webConnected = true;
     webState.webConnecting = false;
-    webState.times.webConnect = timestamp();
+    webState.times.webConnect = unixTimestamp();
     webState.count.webConnect++;
     resetHeartbeatTimer();
     updateDivVisibility();

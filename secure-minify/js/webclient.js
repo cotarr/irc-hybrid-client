@@ -41,7 +41,7 @@ errorContentDivEl.removeChild(errorContentDivEl.firstChild)}errorRemainSeconds=0
 ;let errorContentDivEl=document.getElementById("errorContentDiv");let errorMessageEl=document.createElement("div");errorMessageEl.textContent=errorString||"Error: unknown error (2993)"
 ;errorContentDivEl.appendChild(errorMessageEl);errorRemainSeconds=errorExpireSeconds}document.addEventListener("show-error-message",function(event){showError(event.detail.message)})
 ;document.getElementById("errorDiv").addEventListener("click",function(){clearError()});function errorTimerTickHandler(){if(errorRemainSeconds>0){errorRemainSeconds--;if(errorRemainSeconds===0){
-clearError()}else{document.getElementById("errorTitle").textContent="Tap to Close ("+errorRemainSeconds.toString()+")"}}}function timestamp(){let now=new Date
+clearError()}else{document.getElementById("errorTitle").textContent="Tap to Close ("+errorRemainSeconds.toString()+")"}}}function unixTimestamp(){let now=new Date
 ;return parseInt(now.valueOf()/1e3).toString()}function checkConnect(code){if(code>=1&&!webState.webConnected){showError("Error: not connected to web server");return false}
 if(code>=2&&!ircState.ircConnected){showError("Error: Not connected to IRC server.");return false}if(code>=3&&!ircState.ircRegistered){showError("Error: Not connected to IRC server.");return false}
 return true}function setNotActivityIcon(index){document.getElementById("notMsgIconId").removeAttribute("hidden")}var lastPmActivityIconIndex=-1;function setPmActivityIcon(index){
@@ -116,7 +116,7 @@ if(heartbeatUpCounter>heartbeatExpirationTimeSeconds+1){console.log("HEARTBEAT t
 function updateElapsedTimeDisplay(){function toTimeString(seconds){let remainSec=seconds;let day=0;let hour=0;let min=0;let sec=0;day=parseInt(remainSec/86400);remainSec-=day*86400
 ;hour=parseInt(remainSec/3600);remainSec-=hour*3600;min=parseInt(remainSec/60);sec=remainSec-min*60
 ;return day.toString().padStart(3," ")+" D "+hour.toString().padStart(2,"0")+":"+min.toString().padStart(2,"0")+":"+sec.toString().padStart(2,"0")}
-let timePreEl=document.getElementById("elapsedTimeDiv");let now=timestamp();let timeStr="";if(webState.webConnected){
+let timePreEl=document.getElementById("elapsedTimeDiv");let now=unixTimestamp();let timeStr="";if(webState.webConnected){
 timeStr+="Web Connected: "+toTimeString(now-webState.times.webConnect)+" ("+webState.count.webConnect.toString()+")\n"}else{timeStr+="Web Connected: N/A\n"}if(ircState.ircConnected){
 timeStr+="IRC Connected: "+toTimeString(now-ircState.times.ircConnect)+" ("+ircState.count.ircConnect.toString()+")\n"}else{timeStr+="IRC Connected: N/A\n"}if(webState.webConnected){
 timeStr+="Backend Start: "+toTimeString(now-ircState.times.programRun)}else{timeStr+="Backend Start: N/A"}timePreEl.textContent=timeStr}var lastConnectErrorCount=0;function getIrcState(callback){
@@ -143,14 +143,16 @@ if(i<l&&formattingChars.indexOf(inString.charCodeAt(i))>=0)i++;if(i<l&&inString.
 ;if(i<l&&inString.charAt(i)>="0"&&inString.charAt(i)<="9")i++;if(i<l&&inString.charAt(i)===","){i++;if(i<l&&inString.charAt(i)>="0"&&inString.charAt(i)<="9")i++
 ;if(i<l&&inString.charAt(i)>="0"&&inString.charAt(i)<="9")i++}}if(i<l&&inString.charCodeAt(i)===4){i++;for(let j=0;j<6;j++){if(i<l)i++}if(i<l&&inString.charAt(i)===","){i++;for(let j=0;j<6;j++){
 if(i<l)i++}}}if(i<l)outString+=inString.charAt(i);i++}return outString}function cleanCtcpDelimiter(inString){let ctcpDelim=1;let outString="";let l=inString.length;if(l===0)return outString;let i=0
-;while(i<l){if(i<l&&inString.charCodeAt(i)===ctcpDelim){i++}else{if(i<l)outString+=inString.charAt(i);i++}}return outString}function _parseIrcMessage(message){
-function _extractTimeString(start,end,messageString){let i=start;let timeString="";while(messageString.charAt(i)!==" "&&i<=end){timeString+=messageString.charAt(i);i++}let outString=""
-;if(timeString.length===0){outString=null}else{if(timeString.indexOf("@time=")===0){console.log();let timeObj=new Date(timeString.slice(6,timeString.length))
+;while(i<l){if(i<l&&inString.charCodeAt(i)===ctcpDelim){i++}else{if(i<l)outString+=inString.charAt(i);i++}}return outString}const timestampToHMS=function(timeString){let outString=""
+;if(timeString.length===0){outString=null}else{if(timeString.indexOf("@time=")===0){let timeObj=new Date(timeString.slice(6,timeString.length))
 ;outString+=timeObj.getHours().toString().padStart(2,"0")+":";outString+=timeObj.getMinutes().toString().padStart(2,"0")+":";outString+=timeObj.getSeconds().toString().padStart(2,"0")}else{
-outString=null}}return{data:outString,nextIndex:i+1}}function _isColonString(start,messageString){if(messageString.charAt(start)===":"){return{isColonStr:true,nextIndex:start+1}}else{return{
-isColonStr:false,nextIndex:start}}}function _extractMidString(start,end,messageString){let i=start;let outString="";while(messageString.charAt(i)!==" "&&i<=end){outString+=messageString.charAt(i);i++}
-if(outString.length===0)outString=null;return{data:outString,nextIndex:i+1}}function _extractFinalString(start,end,messageString){let i=start;let outString="";while(i<=end){
-outString+=messageString.charAt(i);i++}if(outString.length===0)outString=null;return{data:outString,nextIndex:i+1}}function _extractNickname(inText){if(inText){
+outString=null}}return outString};const timestampToUnixSeconds=function(timeString){let outSeconds=null;if(timeString.length===0){outSeconds=null}else{if(timeString.indexOf("@time=")===0){
+let timeObj=new Date(timeString.slice(6,timeString.length));outSeconds=parseInt(timeObj.valueOf()/1e3)}else{outSeconds=null}}return outSeconds};function _parseIrcMessage(message){
+function _extractTimeString(start,end,messageString){let i=start;let timeString="";while(messageString.charAt(i)!==" "&&i<=end){timeString+=messageString.charAt(i);i++}
+let outString=timestampToHMS(timeString);return{data:outString,nextIndex:i+1}}function _isColonString(start,messageString){if(messageString.charAt(start)===":"){return{isColonStr:true,
+nextIndex:start+1}}else{return{isColonStr:false,nextIndex:start}}}function _extractMidString(start,end,messageString){let i=start;let outString="";while(messageString.charAt(i)!==" "&&i<=end){
+outString+=messageString.charAt(i);i++}if(outString.length===0)outString=null;return{data:outString,nextIndex:i+1}}function _extractFinalString(start,end,messageString){let i=start;let outString=""
+;while(i<=end){outString+=messageString.charAt(i);i++}if(outString.length===0)outString=null;return{data:outString,nextIndex:i+1}}function _extractNickname(inText){if(inText){
 if(inText.indexOf("!")>=0&&inText.indexOf("@")>=0&&inText.indexOf("!")<inText.indexOf("@")){let nick=inText.split("!")[0];return nick}else{return null}}else{return null}}
 function _extractHostname(inText){if(inText){if(inText.indexOf("!")>=0&&inText.indexOf("@")>=0&&inText.indexOf("!")<inText.indexOf("@")){let host=inText.split("!")[1];return host}else{return null}
 }else{return null}}let timestamp=null;let prefix=null;let extNick=null;let extHost=null;let hostname=null;let command=null;let params=[];let messageString=message.toString()
@@ -192,11 +194,12 @@ if(parsedMessage.command.toUpperCase()==="PRIVMSG"){_addNoticeText(parsedMessage
 _addNoticeText(parsedMessage.timestamp+" "+"CTCP 4 Reply from "+parsedMessage.nick+": "+ctcpCommand+" "+ctcpRest);webState.noticeOpen=true}}updateDivVisibility()}}
 const ircMessageCommandDisplayFilter=["331","332","333","353","366","JOIN","KICK","MODE","NICK","NOTICE","PART","PING","PONG","PRIVMSG","QUIT","TOPIC","WALLOPS"];function _parseBufferMessage(message){
 if(message==="HEARTBEAT"){onHeartbeatReceived();if(webState.showCommsMessages){displayRawMessage("HEARTBEAT")}}else if(message==="UPDATE"){getIrcState();if(webState.showCommsMessages){
-displayRawMessage("UPDATE")}}else{function _showNotExpiredError(errStr){let timeNow=new Date;let timeNowSeconds=parseInt(timeNow/1e3);if(timeNowSeconds-message.split(" ")[0]<errorExpireSeconds){
-showError(errStr)}}if(message.split(" ")[0]==="--\x3e"){if(webState.showCommsMessages)displayRawMessage(message);return}if(message.split(" ")[0]==="webServer:"){
-if(webState.showCommsMessages)displayRawMessage(message);return}if(message.split(" ")[0]==="webError:"){if(webState.showCommsMessages)displayRawMessage(message)
-;if(message.length>10)showError(message.slice(10));return}let parsedMessage=_parseIrcMessage(message);if(webState.viewRawMessages){if(webState.showRawInHex)displayRawMessageInHex(message)
-;displayRawMessage(message)}else{if(ircMessageCommandDisplayFilter.indexOf(parsedMessage.command.toUpperCase())<0){displayFormattedServerMessage(parsedMessage,message)}}
+displayRawMessage("UPDATE")}}else{function _showNotExpiredError(errStr){let timeNow=new Date;let timeNowSeconds=parseInt(timeNow/1e3)
+;let timeMessageSeconds=timestampToUnixSeconds(message.split(" ")[0]);if(timeNowSeconds-timeMessageSeconds<errorExpireSeconds){showError(errStr)}}if(message.split(" ")[0]==="--\x3e"){
+if(webState.showCommsMessages)displayRawMessage(message);return}if(message.split(" ")[0]==="webServer:"){if(webState.showCommsMessages)displayRawMessage(message);return}
+if(message.split(" ")[0]==="webError:"){if(webState.showCommsMessages)displayRawMessage(message);if(message.length>10)showError(message.slice(10));return}let parsedMessage=_parseIrcMessage(message)
+;if(webState.viewRawMessages){if(webState.showRawInHex)displayRawMessageInHex(message);displayRawMessage(message)}else{
+if(ircMessageCommandDisplayFilter.indexOf(parsedMessage.command.toUpperCase())<0){displayFormattedServerMessage(parsedMessage,message)}}
 if(parseInt(parsedMessage.command)>=400&&parseInt(parsedMessage.command)<500){_showNotExpiredError(message.slice(12,message.length))}switch(parsedMessage.command){case"ERROR":
 if(!ircState.ircRegistered&&parsedMessage.params.length===1){if(webState.cacheInhibitTimer===0){showError("ERROR "+parsedMessage.params[0])}}break;case"KICK":displayChannelMessage(parsedMessage);break
 ;case"JOIN":displayChannelMessage(parsedMessage);break;case"MODE":if(true){if(parsedMessage.params[0]===ircState.nickName){if(!webState.viewRawMessages){
@@ -212,7 +215,7 @@ let fetchURL=webServerUrl+"/irc/wsauth";let fetchOptions={method:"POST",headers:
 ;fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()}else{throw new Error("Fetch status "+response.status+" "+response.statusText)}}).then(responseJson=>{if(callback){
 callback(null,ircState)}}).catch(error=>{console.log(error);webState.webConnected=false;webState.webConnecting=false;updateDivVisibility();if(callback){callback(error,{})}})}
 function connectWebSocket(){wsocket=new WebSocket(webSocketUrl+"/irc/ws");webState.websocketCount++;wsocket.addEventListener("open",function(event){webState.webConnected=true
-;webState.webConnecting=false;webState.times.webConnect=timestamp();webState.count.webConnect++;resetHeartbeatTimer();updateDivVisibility();getIrcState(function(err,data){if(!err){
+;webState.webConnecting=false;webState.times.webConnect=unixTimestamp();webState.count.webConnect++;resetHeartbeatTimer();updateDivVisibility();getIrcState(function(err,data){if(!err){
 document.dispatchEvent(new CustomEvent("update-from-cache",{bubbles:true}))}})});wsocket.addEventListener("close",function(event){if(webState.websocketCount>0){webState.websocketCount--
 ;if(webState.websocketCount===0){if(webState.webConnected){if("code"in event&&event.code===3001){document.getElementById("reconnectStatusDiv").textContent+="Web page disconnected at user request\n"
 }else{document.getElementById("reconnectStatusDiv").textContent+="Web socket connection closed, count: "+webState.websocketCount+"\n"+"Code: "+event.code+" "+event.reason+"\n"
@@ -579,11 +582,10 @@ originName:null});textAreaEl.value="";if(commandAction.error){showError(commandA
 _sendIrcServerMessage(commandAction.ircMessage)}return}}}textAreaEl.value=""}document.getElementById("sendRawMessageButton").addEventListener("click",function(){
 _parseInputForIRCCommands(document.getElementById("rawMessageInputId"));document.getElementById("rawMessageInputId").focus()}.bind(this))
 ;document.getElementById("rawMessageInputId").addEventListener("input",function(event){if(event.inputType==="insertText"&&event.data===null||event.inputType==="insertLineBreak"){
-_parseInputForIRCCommands(document.getElementById("rawMessageInputId"))}}.bind(this));function substituteHmsTime(inMessage){let timeSeconds=inMessage.split(" ")[0]
-;let restOfMessage=inMessage.slice(timeSeconds.length+1,inMessage.length);let timeObj=new Date(parseInt(timeSeconds)*1e3);let hmsString="";hmsString+=timeObj.getHours().toString().padStart(2,"0")+":"
-;hmsString+=timeObj.getMinutes().toString().padStart(2,"0")+":";hmsString+=timeObj.getSeconds().toString().padStart(2,"0");return hmsString+" "+restOfMessage}
-document.addEventListener("server-message",function(event){function _showAfterParamZero(parsedMessage){let msgString="";if(parsedMessage.params.length>1){
-for(let i=1;i<parsedMessage.params.length;i++){msgString+=" "+parsedMessage.params[i]}}else{console.log("Error _showAfterParamZero() no parsed field")}
+_parseInputForIRCCommands(document.getElementById("rawMessageInputId"))}}.bind(this));function substituteHmsTime(inMessage){let timeString=inMessage.split(" ")[0]
+;let restOfMessage=inMessage.slice(timeString.length+1,inMessage.length);let hmsString=timestampToHMS(timeString);return hmsString+" "+restOfMessage}
+document.addEventListener("server-message",function(event){console.log(JSON.stringify(event.detail,null,2));function _showAfterParamZero(parsedMessage){let msgString=""
+;if(parsedMessage.params.length>1){for(let i=1;i<parsedMessage.params.length;i++){msgString+=" "+parsedMessage.params[i]}}else{console.log("Error _showAfterParamZero() no parsed field")}
 displayRawMessage(cleanFormatting(cleanCtcpDelimiter(parsedMessage.timestamp+msgString)))}switch(event.detail.parsedMessage.command){case"001":case"002":case"003":case"004":
 _showAfterParamZero(event.detail.parsedMessage);break;case"005":break;case"250":case"251":case"252":case"254":case"255":case"265":case"265":_showAfterParamZero(event.detail.parsedMessage);break
 ;case"256":case"257":case"258":case"259":_showAfterParamZero(event.detail.parsedMessage);break;case"315":break;case"352":_showAfterParamZero(event.detail.parsedMessage);break;case"275":case"301":

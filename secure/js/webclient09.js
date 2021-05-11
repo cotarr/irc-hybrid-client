@@ -81,13 +81,9 @@ document.getElementById('rawMessageInputId').addEventListener('input', function(
 // Exchange Unix seconds with HH:MM:SS time format
 // -------------------------------------------------
 function substituteHmsTime(inMessage) {
-  let timeSeconds = inMessage.split(' ')[0];
-  let restOfMessage = inMessage.slice(timeSeconds.length + 1, inMessage.length);
-  let timeObj = new Date(parseInt(timeSeconds) * 1000);
-  let hmsString = '';
-  hmsString += timeObj.getHours().toString().padStart(2, '0') + ':';
-  hmsString += timeObj.getMinutes().toString().padStart(2, '0') + ':';
-  hmsString += timeObj.getSeconds().toString().padStart(2, '0');
+  let timeString = inMessage.split(' ')[0];
+  let restOfMessage = inMessage.slice(timeString.length + 1, inMessage.length);
+  let hmsString = timestampToHMS(timeString);
   return hmsString + ' ' + restOfMessage;
 }
 
@@ -101,6 +97,8 @@ function substituteHmsTime(inMessage) {
 // Else, this is where filtered server message are formatted for display
 // ---------------------------------------------------------------------------
 document.addEventListener('server-message', function(event) {
+  // console.log(JSON.stringify(event.detail, null, 2));
+
   // This will skip prefix, command, and param[0], printing the rest
   function _showAfterParamZero (parsedMessage) {
     let msgString = '';
@@ -117,7 +115,6 @@ document.addEventListener('server-message', function(event) {
           parsedMessage.timestamp + msgString)));
   }
 
-  // console.log(JSON.stringify(event.detail, null, 2));
 
   switch(event.detail.parsedMessage.command) {
     //

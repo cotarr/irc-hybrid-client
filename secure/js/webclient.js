@@ -247,7 +247,7 @@ function errorTimerTickHandler () {
 // -----------------------------------------
 // Return current UNIX timestamp in seconds
 // -----------------------------------------
-function timestamp () {
+function unixTimestamp () {
   let now = new Date;
   return parseInt(now.valueOf() / 1000).toString();
 };
@@ -608,7 +608,7 @@ function updateElapsedTimeDisplay () {
   }
 
   let timePreEl = document.getElementById('elapsedTimeDiv');
-  let now = timestamp();
+  let now = unixTimestamp();
   let timeStr = '';
   if (webState.webConnected) {
     timeStr += 'Web Connected: ' + toTimeString(now - webState.times.webConnect) +

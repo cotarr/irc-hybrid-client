@@ -128,6 +128,48 @@ function cleanCtcpDelimiter (inString) {
   }
   return outString;
 }
+// --------------------------------------------------------
+// Convert string with IRCv3 timestamp to HH:MM:SS string
+// --------------------------------------------------------
+const timestampToHMS = function (timeString) {
+  // console.log('timeString ' + timeString);
+  // Reference: https://ircv3.net/specs/extensions/server-time
+  // @time=2011-10-19T16:40:51.620Z :Angel!angel@example.org PRIVMSG Wiz :Hello
+  let outString = '';
+  if (timeString.length === 0) {
+    outString = null;
+  } else {
+    if (timeString.indexOf('@time=') === 0) {
+      let timeObj = new Date(timeString.slice(6, timeString.length));
+      outString += timeObj.getHours().toString().padStart(2, '0') + ':';
+      outString += timeObj.getMinutes().toString().padStart(2, '0') + ':';
+      outString += timeObj.getSeconds().toString().padStart(2, '0');
+    } else {
+      outString = null;
+    }
+  }
+  return outString;
+};
+
+// --------------------------------------------------------
+// Convert string with IRCv3 timestamp to Unix Seconds
+// --------------------------------------------------------
+const timestampToUnixSeconds = function (timeString) {
+  // Reference: https://ircv3.net/specs/extensions/server-time
+  // @time=2011-10-19T16:40:51.620Z :Angel!angel@example.org PRIVMSG Wiz :Hello
+  let outSeconds = null;
+  if (timeString.length === 0) {
+    outSeconds = null;
+  } else {
+    if (timeString.indexOf('@time=') === 0) {
+      let timeObj = new Date(timeString.slice(6, timeString.length));
+      outSeconds = parseInt(timeObj.valueOf() / 1000);
+    } else {
+      outSeconds = null;
+    }
+  }
+  return outSeconds;
+};
 
 // ------------------------------------------------------------------
 // Internal function to parse one line of message from IRC server
@@ -153,22 +195,7 @@ function _parseIrcMessage (message) {
       timeString += messageString.charAt(i);
       i++;
     }
-    let outString = '';
-    if (timeString.length === 0) {
-      outString = null;
-    } else {
-      // Reference: https://ircv3.net/specs/extensions/server-time
-      // @time=2011-10-19T16:40:51.620Z :Angel!angel@example.org PRIVMSG Wiz :Hello
-      if (timeString.indexOf('@time=') === 0) {
-        console.log();
-        let timeObj = new Date(timeString.slice(6, timeString.length));
-        outString += timeObj.getHours().toString().padStart(2, '0') + ':';
-        outString += timeObj.getMinutes().toString().padStart(2, '0') + ':';
-        outString += timeObj.getSeconds().toString().padStart(2, '0');
-      } else {
-        outString = null;
-      }
-    }
+    let outString = timestampToHMS(timeString);
     return {
       data: outString,
       nextIndex: i + 1
@@ -688,9 +715,10 @@ function _parseBufferMessage (message) {
       // current UNIX time in seconds
       let timeNow = new Date();
       let timeNowSeconds = parseInt(timeNow/1000);
+      let timeMessageSeconds = timestampToUnixSeconds(message.split(' ')[0]);
       // subtract timestamp from (possibly chached) server messages
       // and show error only if condition not expired
-      if (timeNowSeconds - message.split(' ')[0] < errorExpireSeconds) {
+      if (timeNowSeconds - timeMessageSeconds < errorExpireSeconds) {
         showError(errStr);
       }
     }
