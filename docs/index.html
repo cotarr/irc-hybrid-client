@@ -19,6 +19,7 @@
           <li><a href="installation.html">Installation</a></li>
           <li><a href="login-config.html">Login Config</a></li>
           <li><a href="server-config.html">IRC Config</a></li>
+          <li><a href="coding.html">Coding Notes</a></li>
           <li><a href="text-commands.html">Text Commands</a></li>
           <li><a href="faq.html">FAQ</a></li>
           <li><a href="history.html">Change Log</a></li>
@@ -43,7 +44,7 @@
               After cloning the git repository, installing npm dependencies, and
               editing the configuration files as described in the
               <a href="installation.html">installation</a> section,
-              a single user web server can be deployed in a Linux shell.
+              a single user private web server can be deployed in a Linux shell.
             </p><p>
               Using an smartphone, you can enter your web server
               login credentials to gain access to your private IRC client web server.
@@ -57,7 +58,7 @@
         <div class="home-detail">
           <div class="image-text">
             <p>
-              The green [web] icon at the top indicates that your browser is
+              The green [Web] icon at the top indicates that your browser is
               successfully connected to the backend web server.
               You should see a familiar IRC configuration form
               where you can enter your preferred Nickname.
@@ -76,7 +77,7 @@
               that are defined in the configuration file.
             </p>
             <p>
-              Next, you can connect to IRC with your nickname using either
+              The next step is to connect to IRC with your nickname using either
               the [Connect-IRC] button or you can tap on the red [IRC] status icon at the top.
             </p>
           </div>
@@ -121,7 +122,7 @@
         <div class="home-detail">
           <div class="image-text">
             <p>
-              This interface should be expected to evolve in the future.
+              This IRC channel interface should be expected to evolve in the future.
             </p><p>
               The channel name and topic are displayed at the top of the channel window.
               Below the title is a list of nicknames for users present in the channel,
@@ -156,7 +157,7 @@
             <p>
               There are two different text format schemes that are selected
               automatically when the page loads. These can be toggled at any
-              by selecting the [X] Brief checkbox.
+              time by selecting the checkbox marked: [X] Brief.
             </p>
           </div>
           <div class="image-photo">
@@ -183,8 +184,7 @@
               primarily intended to refresh after short disconnects,
               such as smartphone screen lock. Refreshing after
               a longer period of time may cause the cache buffer
-              to exceed 100 messages and the oldest messages, possible
-              in other windows, may be discarded.
+              to exceed 100 messages and some older messages may be discarded.
             </p>
           </div>
           <div class="image-photo">
@@ -226,7 +226,7 @@
           <div class="image-text">
             <p>
               The status bar at the top will display various status icons
-              to show the status of the program. In this case the green [Web] icon
+              to show the status of the program. In this case, the green [Web] icon
               indicates the web server is connected. The [Web] icon can be tapped
               as an alternate way to connect and disconnect the browser.
               The green [IRC] icon indicates the IRC server is also connected.
@@ -263,9 +263,9 @@
         <div class="home-detail">
           <div class="image-text">
             <p>
-              The pink [Wait] icon indicates that auto-reconnect is active
-              and when the timer reaches the limit, the IRC server
-              connect will retry.
+              The pink [Wait] icon indicates that auto-reconnect is active.
+              When the timer reaches the limit, the IRC server will attempt to
+              reconnect to IRC.
             </p>
           </div>
           <div class="image-photo">
@@ -275,10 +275,10 @@
         <div class="home-detail">
           <div class="image-text">
             <p>
-              Icons for C P and N will appear to indicate
-              recent activity in a C=Channel P=Private and N=Notice windows.
+              Icons for C, P, and N will appear to indicate
+              recent activity in a C=Channel P=Private message and N=Notice windows.
               The activity icons can be cleared by tapping the activity
-              icon or sending a message from the associated window.
+              icon or typing a message from the associated window.
             </p>
           </div>
           <div class="image-photo">

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+	<head>
+		<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+		<title>Change Log</title>
+    <link rel="stylesheet" href="css/styles.css">
+	</head>
+	<body>
+    <div class="header-div">
+      Documentation for
+      <a href="https://github.com/cotarr/irc-hybrid-client">irc-hybrid-client</a>
+    </div>
+    <div class="outer-div">
+      <div class="menu-div">
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="installation.html">Installation</a></li>
+          <li><a href="login-config.html">Login Config</a></li>
+          <li><a href="server-config.html">IRC Config</a></li>
+          <li><a class="active" href="coding.html">Coding Notes</a></li>
+          <li><a href="text-commands.html">Text Commands</a></li>
+          <li><a href="faq.html">FAQ</a></li>
+          <li><a href="history.html">Change Log</a></li>
+          <li><a href="license.html">License</a></li>
+        </ul>
+      </div> <!-- /menu-div-->
+
+      <div class="text-div">
+        <div class="desc-title">
+          Coding Notes
+        </div>
+
+        <img src="images/network.png" height="267" width="882" alt="Network Diagram">
+
+        <h3>Project Goals</h3>
+        <ul>
+          <li>Stuck at home during Covid-19 lockdown. Find an interesting project.
+          <li>Web IRC client for iPhone plus with 375 pixel screen and Chrome IOS browser.</li>
+        </ul>
+        <h3>Coding Goals</h3>
+        <ul>
+          <li>Single HTML page</li>
+          <li>Concurrent logins (mobile/desktop/tablet) with synchronized displays.</li>
+          <li>Hybrid: browser frontend javascript --> integrated to --> backend web server.</li>
+          <li>Backend: IRC connections, IRC channel membership, and IRC message cache.</li>
+          <li>Backend: HTTP Username/password login and session cookies.</li>
+          <li>Frontend: Displays IRC messages, touch controls, and IRC text commands.</li>
+          <li>Frontend: Compatible with voice dictation on smartphone (IOS).</li>
+          <li>Frontend is native JavaScript using only browser API</li>
+          <li>Browser Content Security Policy (CSP) enforced</li>
+          <li>TLS support for both Web Server and IRC server. Works with Lets Encrypt certificates.</li>
+          <li>Reference RFC 2812 However, not all features are implemented.</li>
+        </ul>
+        <h3>Program Limitations</h3>
+        <ul>
+          <li>Color text not supported within chat (Color codes filtered to clean text) </li>
+          <li>Message cache limited to 100 lines (enough to ride out a smartphone screen lock)</li>
+          <li>Limited to one IRC user per nodejs/express instance. (i.e. Personal web server).</li>
+          <li>This is a chat application, not a channel protection bot (no kick/ban enforcement)</li>
+          <li>IRC configuration JSON files are not remotely configurable from the web interface.</li>
+          <li>Development done in Chrome for Linux, and Chrome for IOS. Other browsers not tested.</li>
+          <li>Development performed on DALnet, other IRC networks not tested.</li>
+          <li>No automated tests are included.</li>
+        </ul>
+      </div> <!-- /text-div -->
+
+    </div> <!-- outer-div -->
+
+    <div class="footer-div">
+      Repository:
+      <a href="https://github.com/cotarr/irc-hybrid-client">
+        https://github.com/cotarr/irc-hybrid-client</a>
+    </div> <!-- /footer-div -->
+	</body>
+</html>

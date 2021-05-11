@@ -1,0 +1,84 @@
+<!DOCTYPE html><html lang="en" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"><link rel="stylesheet" href="css/styles.css">
+<script src="./js/webclient.js" defer="defer"></script><title>irc-hybrid-client</title></head><body><div class="error-div" id="errorDiv" hidden><div id="errorContentDiv"></div><div 
+class="error-title" id="errorTitle">Tap to Close</div></div><div class="annunciator-background"><div class="head-flex"><div class="head-left"></div><div class="head-right"><button 
+id="showAllDivsButton">+ all</button> <button id="hideAllDivsButton">- all</button></div></div></div><div class="annunciator-div"><div class="annunciator-connect-icon" id="webConnectIconId">Web</div>
+<div class="annunciator-connect-icon" id="ircConnectIconId">IRC</div><div class="annunciator-wait-icon" id="waitConnectIconId" hidden>Wait...</div><div class="annunciator-away-icon" 
+id="ircIsAwayIconId" hidden>Away</div><div class="message-icon color-channel" id="chanMsgIconId" hidden>C</div><div class="message-icon color-pm" id="pmMsgIconId" hidden>P</div><div 
+class="message-icon color-notice" id="notMsgIconId" hidden>N</div></div><div class="aa-start-scrollable"><div class="aa-section-div info-section-div" id="infoSectionDiv"><div class="head-flex"><div 
+class="head-left"><button class="notice-button" id="infoOpenCloseButton">+</button> <span>Info / License</span></div><div class="head-center"></div><div class="head-right"></div></div><div 
+id="hiddenInfoDiv" hidden><div class="info-license-div"><p>MIT License</p><p>Copyright (c) 2021 Dave Bolenbaugh</p><p></p>
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+<p></p><p></p>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.<p></p><p></p>
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+<p></p></div><div class="info-license-div"><pre .class="info-pre-help">
+In channel window, auto-complete
+triggered by double space,
+to expand channel or nickname.
+
+Available IRC Text Commands
+
+/ADMIN [server]
+/AWAY [away-message]
+/CTCP &ltnickname&gt &ltctcp-command&gt
+/JOIN &lt#channel&gt
+/LIST [#channel-mask]
+/ME &ltaction-message&gt
+/MODE &lt#channel&gt [channel-mode(s)]
+/MODE &ltnickname&gt [user-mode(s)]
+/MOTD [server]
+/MSG &ltnickname&gt &ltprivate-message&gt
+/NICK &ltnew-nickname&gt
+/NOP ...inert testing command...
+/NOTICE &ltnickname&gt &ltnotice-message&gt
+/PART &lt#channel&gt [Optional part message]
+/QUERY &ltnickname&gt &ltprivate-message&gt
+/QUIT [optional quit message]
+/QUOTE &ltIRC server raw command&gt
+/TOPIC &lt#channel&gt &ltnew-topic&gt
+/VERSION [server]
+/WHOIS &ltnickname&gt
+
+If the command you are looking for is not
+available, please use the /QUOTE to send
+a raw command to the IRC server directly.
+</pre></div></div></div><div class="logout-confirm-div" id="logoutConfirmDiv" hidden><div class="head-flex"><div class="head-left"><div>Check IRC status!</div></div><div class="head-right"><div>
+<button id="cancelLogoutConfirmButton">Cancel</button> <a href="/logout"><button>Web Logout</button></a></div></div></div><div class="vh10"></div><div>
+You are receiving this message because your nickname is still present on IRC, or the status of your IRC connection is unknown. Your nickname may remain present on IRC. Web page login is independant of IRC login.
+</div></div><div class="aa-section-div color-connect"><div class="head-flex"><div class="head-left"><button id="hideLoginSectionButton">-</button> <span>IRC Controls</span></div><div 
+class="head-right"><button id="webLogoutButton">Web logout</button></div></div><div class="vh10"></div><div class="button-div"><span class="user-span" id="headerServer">server</span> <span 
+class="user-span" id="headerUser"></span></div><div class="vh10"></div><div id="hideLoginSection"><div class="vh10"></div><div class="button-div"><input type="text" id="ircServerNameInputId" 
+size="10" value="" disabled="disabled"> <input type="checkbox" id="ircServerTlsCheck" disabled="disabled"> <span>TLS</span> <button id="cycleNextServerButton">Next Server</button></div><div 
+class="button-div"><input type="text" id="ircServerAddrInputId" size="26" value="" disabled="disabled"> <span>:</span> <input type="text" id="ircServerPortInputId" size="4" value="" 
+disabled="disabled"></div><div class="vh10"></div><div class="button-div"><input type="text" id="nickNameInputId" value=""><div class="input-label-right">Nickname</div></div><div class="button-div">
+<input type="text" id="userNameInputId" value="" disabled="disabled"><div class="input-label-right">Username</div></div><div class="button-div"><input type="text" id="realNameInputId" value=""><div 
+class="input-label-right">Real Name</div></div><div class="button-div"><input type="text" id="userModeInputId" size="6" value=""><div class="input-label-right">Initial User Mode</div></div><div 
+class="button-div"><input type="text" id="userAwayMessageId" size="20" value="AFK"> <button id="setAwayButton">Away</button> <button id="setBackButton">Back</button></div><div class="vh10"></div><div 
+class="button-div"><button id="connectButton">Connect IRC</button> <button id="quitButton">Disconnect IRC</button></div></div></div><div id="webDisconnectedHiddenDiv"><div 
+id="ircDisconnectedHiddenDiv" hidden><div class="aa-section-div color-wallops" id="wallopsSectionDiv" hidden><div class="head-flex"><div class="head-left"><button class="notice-button" 
+id="wallopsCloseButton">-</button> <span>Wallops</span></div><div class="head-center"></div><div class="head-right"><button id="wallopsTallerButton">Taller</button> <button id="wallopsNormalButton">
+Normal</button> <button id="wallopsClearButton">Clear</button></div></div><textarea id="wallopsMessageDisplay" cols="120" rows="5" spellcheck="false" readonly="readonly"></textarea></div><div 
+class="aa-section-div color-notice" id="noticeSectionDiv" hidden><div class="head-flex"><div class="head-left"><button class="notice-button" id="closeNoticeButton">-</button> <span>Notice</span></div>
+<div class="head-center"></div><div class="head-right"><button id="noticeTallerButton">Taller</button> <button id="noticeNormalButton">Normal</button> <button id="noticeClearButton">Clear</button>
+</div></div><textarea id="noticeMessageDisplay" cols="120" rows="5" spellcheck="false" readonly="readonly"></textarea></div><div class="aa-section-div color-pm" id="privMsgSectionDiv"><div><button 
+id="privMsgMainHiddenButton">+</button> <span>Private Messages</span></div><div id="privMsgMainHiddenDiv" hidden><div class="vh10"></div><div class="button-div"><div class="input-label-left">
+Private Msg to</div><input type="text" id="pmNickNameInputId" size="12" value=""> <button id="whoisButton">Whois</button></div><div class="vh10"></div><div class="button-div"><textarea 
+class="va-middle" id="userPrivMsgInputId" cols="83" rows="1"></textarea> <button class="va-middle" id="UserPrivMsgSendButton">Send</button></div></div></div><div id="privateMessageContainerDiv"></div>
+<div class="aa-section-div color-channel" id="channelMenuDiv"><div class="button-div"><textarea class="va-middle" id="newChannelNameInputId" cols="20" rows="1"></textarea> <button class="va-middle" 
+id="newChannelButton" class="rm20">Join Channel</button></div><div class="button-div" id="channelJoinButtonContainer"></div></div><div id="channelContainerDiv"></div></div><div 
+class="aa-section-div color-raw" id="rawSectionDiv"><div class="head-flex"><div class="head-left"><button class="notice-button" id="rawHiddenElementsButton">-</button> <span>Server</span></div><div 
+class="head-center"></div><div class="head-right"><div id="rawHeadRightButtons"><button id="rawTallerButton">Taller</button> <button id="rawNormalButton">Normal</button> <button id="rawClearButton">
+Clear</button></div></div></div><div id="rawHiddenElements"><div><textarea id="rawMessageDisplay" cols="120" rows="10" spellcheck="false" readonly="readonly"></textarea></div><div id="hideRawButtons">
+<div class="button-div"><textarea class="va-middle" spellcheck="false" id="rawMessageInputId" cols="83" rows="1"></textarea> <button class="va-middle" id="sendRawMessageButton">Send</button></div><div
+ class="button-div"><button id="loadFromCacheButton">Refresh</button> <button id="eraseCacheButton">Erase Cache</button> <button id="showDebugButton">Tools...</button></div><div id="hiddenDebugDiv" 
+hidden><div class="button-div"><input class="raw-cb-cb" type="checkbox" id="viewRawMessagesCheckbox"> <span class="raw-cb-span">View-Raw</span> <input class="raw-cb-cb" type="checkbox" 
+id="showCommsCheckbox" disabled="disabled"> <span class="raw-cb-span">Add-Comms</span> <input class="raw-cb-cb" type="checkbox" id="showRawInHexCheckbox" disabled="disabled"> <span 
+class="raw-cb-span">Add-Hex</span></div><div class="debug-div-time"><div><pre id="elapsedTimeDiv">
+                    </pre></div></div><div class="button-div"><button id="test1Button">Test-1</button> <span>Server: </span><span id="test1ButtonDesc"></span></div><div class="button-div"><button 
+id="test2Button">Test-2</button> <span>Server: </span><span id="test2ButtonDesc"></span></div><div class="button-div"><button id="test3Button">Test-3</button> <span>Local: </span><span 
+id="test3ButtonDesc"></span></div><div class="button-div"><button id="test4Button">Test-4</button> <span>Local: </span><span id="test4ButtonDesc"></span></div><div class="button-div"><button 
+id="disconnectButton">Force IRC Disconnect</button> <button id="serverTerminateButton">Die Web Server</button></div><div class="button-div"><button id="variablesButtonId">Show Variables</button></div>
+<div class="variables-div" id="variablesDivId" hidden><pre id="variablesPreId">
+                </pre></div></div></div><div class="program-version-div"><span><a href="https://cotarr.github.io/irc-hybrid-client">irc-hybrid-client</a></span> <span id="programVersionDiv"></span>
+</div></div></div></div><div id="webDisconnectedVisibleDiv" hidden><div class="reconnect-div" id="reconnectDivId"><h2>Disconnected from Web Server</h2><div class="button-div"><button 
+id="manualWebSocketReconnectButton">Reconnect to Web Site</button> <button id="stopWebSocketReconnectButton">Stop</button></div><pre class="reconnect-status-div" id="reconnectStatusDiv"></pre></div>
+</div></div></body></html>

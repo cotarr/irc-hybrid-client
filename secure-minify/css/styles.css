@@ -1,0 +1,22 @@
+html{margin:0;padding:0}body{margin:0;padding:0;background-color:#f8f8f8}textarea{resize:none;font-family:monospace;font-size:90%}button{background-color:#f4f4f4;border-top:1px solid #777;border-right
+:2px solid #444;border-bottom:2px solid #444;border-left:1px solid #777;border-radius:5px;box-shadow:2px 2px 3px grey;color:#000;padding-top:3px;padding-bottom:3px;cursor:pointer}button:hover{
+background-color:#e2e2e2}button[disabled]{background-color:#b8b8b8;color:#444}.aa-section-div{background-color:#aaa;border:1px solid #000;border-radius:6px;padding-top:8px;padding-bottom:6px;
+padding-left:10px;margin-bottom:8px}.aa-start-scrollable{margin-top:50px}.annunciator-background{background-color:#707070;border:1px solid #000;border-radius:6px;padding-top:7px;padding-bottom:7px;
+position:fixed;top:0;left:0;width:100%;z-index:4}.annunciator-div{position:fixed;top:8px;left:10px;width:auto;z-index:5}.annunciator-connect-icon{background-color:#e00000;border:1px solid #000;
+border-radius:12px;color:#fff;font-weight:700;display:inline-block;margin-right:2px;padding:3px 10px 2px 10px;cursor:pointer}.annunciator-connect-icon[unavailable]{background-color:#000;color:#bbb}
+.annunciator-connect-icon[connecting]{background-color:#ff0;color:#000}.annunciator-connect-icon[connected]{background-color:#00b800}.annunciator-away-icon{background-color:#00f;border:1px solid #000;
+border-radius:12px;color:#fff;font-weight:700;display:inline-block;margin-right:2px;padding:3px 10px 2px 10px;cursor:pointer}.annunciator-away-icon[hidden]{display:none}.annunciator-wait-icon{
+background-color:#ae45b0;border:1px solid #000;border-radius:12px;color:#fff;font-weight:700;display:inline-block;margin-right:2px;padding:3px 10px 2px 10px}.annunciator-wait-icon[hidden]{display:none
+}.bm10{margin-bottom:10px}.button-div{margin-bottom:5px}.chan-name-div{display:inline-block;font-size:120%;margin-bottom:5px}.chan-topic-div{margin-bottom:5px}.channel-cb-cb{vertical-align:middle}
+.channel-cb-span{margin-right:10px;font-size:80%;vertical-align:middle}.channel-button{margin-right:7px}.channel-names-display{margin-right:6px}.color-channel{background-color:#bef7bf}.color-connect{
+background-color:#b8f5ff}.color-notice{background-color:#fada9d}.color-pm{background-color:#a8cbe3}.color-raw{background-color:#dbbaff}.color-wallops{background-color:#effcae}.debug-div-time{
+background-color:#fff;border:1px solid #000;border-radius:5px;padding-left:10px;margin-right:10px;margin-bottom:10px}.error-div{position:fixed;top:0;left:0;width:auto;color:#fff;background-color:red;
+padding-left:15px;padding-top:5px;padding-bottom:5px;z-index:10}.error-title{text-align:center;font-size:120%}.head-flex{display:flex;justify-content:space-between}.head-left{display:inline}
+.head-center{display:inline}.head-right{display:inline;padding-right:10px}.info-license-div{background-color:#fff;border:1px solid #000;border-radius:5px;margin-right:10px;margin-bottom:10px;padding:
+10px}.info-pre-help{font-size:80%}.inline-block{display:inline-block}.input-label-left{display:inline-block}.input-label-right{display:inline-block}.input-label-top{display:block;margin-bottom:4px}
+.lm10{margin-left:10px}.logout-confirm-div{border:1px solid #000;border-radius:6px;background-color:#ff0;padding:10px}.message-icon{border:1px solid #000;border-radius:15px;color:#000;font-weight:700;
+display:inline-block;margin-right:2px;padding:3px 5px 2px 5px;cursor:pointer}.message-icon[hidden]{display:none}.notice-button{margin-right:4px;margin-bottom:7px}.program-version-div{font-size:80%;
+text-align:right;padding-right:15px}.raw-cb-cb{vertical-align:middle;margin-right:0;box-shadow:2px 2px 3px #777}.raw-cb-span{margin-right:5px;font-size:80%;vertical-align:middle}.reconnect-div{
+background-color:#1234ff;color:#fff;border:1px solid #000;border-radius:6px;padding-top:0;padding-bottom:6px;padding-left:10px;margin-bottom:10px;margin-left:0}.reconnect-status-div{background-color:
+#fff;color:#000;padding:10px;border:1px solid #000;border-radius:5px;margin-right:10px}.rm10{margin-right:10px}.rm20{margin-right:20px}.user-span{font-size:120%;font-weight:700}.variables-div{
+background-color:#dbc8b6;border:1px solid #000;margin-right:10px;padding:6px}.va-middle{vertical-align:middle}.vh5{height:5px}.vh10{height:10px}.vh20{height:20px}

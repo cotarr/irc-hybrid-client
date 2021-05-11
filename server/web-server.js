@@ -358,7 +358,7 @@ app.get('/irc/webclient.html', authorizeOrLogin, function(req, res, next) {
 let secureDir = path.join(__dirname, '../secure');
 
 // Else, if production, server the minified, bundled version
-if (nodeEnv === 'production') secureDir = path.join(__dirname, '../build/secure');
+if (nodeEnv === 'production') secureDir = path.join(__dirname, '../secure-minify');
 
 console.log('Serving files from: ' + secureDir);
 app.use('/irc', authorizeOrFail, express.static(secureDir));

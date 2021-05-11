@@ -19,6 +19,7 @@
           <li><a href="installation.html">Installation</a></li>
           <li><a href="login-config.html">Login Config</a></li>
           <li><a class="active" href="server-config.html">IRC Config</a></li>
+          <li><a href="coding.html">Coding Notes</a></li>
           <li><a href="text-commands.html">Text Commands</a></li>
           <li><a href="faq.html">FAQ</a></li>
           <li><a href="history.html">Change Log</a></li>
@@ -212,22 +213,27 @@
         smartphone.
         The array may be empty, but it must exist.
       </p>
+      <p>
+        If the IRC server auto-reconnect is enabled as discussed below, then upon
+        a successful re-connect to the irc server, up to 5 irc channels
+        will be automatically rejoined.
+      </p>
 
 <div class="pre-div"><pre>
   "channelList": ["#myChannel", "#otherChannel"],
 </pre></div>
 
-<div class="install-section-title">5 - Raw Message Log</div>
+<div class="install-section-title">Raw Message Log (global)</div>
       <p>
-        The last value is a flag to enable logging IRC message to
+        There is a global flag to enable logging IRC messages to
         the &quotlogs/irc.log&quot file located with the backend web server.
-        There are no provisions for logging on the local machine running
-        the client web browser.
+        There are no provisions for logging on the local machine where
+        the web browser is open.
         All messages from the IRC server are logged in raw message format.
         The program does not include log file pruning,
         so please watch the size of your log files as they can become quite large.
-        Note there is no comma after this property because it is the last property
-        in the javascript object.
+        This is really intended for debugging. It is recommended to leave
+        this set to false.
       </p>
 
 <div class="pre-div"><pre>

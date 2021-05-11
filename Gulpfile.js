@@ -43,12 +43,12 @@ const minifyCssOptions = {
 };
 
 //
-// Clean build folder
+// Clean secure-minify folder
 //
 const clean = function() {
   return del(
     [
-      'build'
+      'secure-minify'
     ],
     {dryRun: false});
 };
@@ -66,7 +66,7 @@ const htmlMinify = function() {
     .pipe(replace('<script src="./js/webclient09.js" defer></script>', ''))
     .pipe(replace('<script src="./js/webclient10.js" defer></script>', ''))
     .pipe(htmlmin(htmlMinifyOptions))
-    .pipe(dest('build/secure'));
+    .pipe(dest('secure-minify'));
 };
 const jsMinify = function () {
   const license = '/*\n' +
@@ -88,7 +88,7 @@ const jsMinify = function () {
     .pipe(concat('webclient.js'))
     .pipe(minify(jsMinifyOptions))
     .pipe(insert.prepend(license))
-    .pipe(dest('build/secure/js'));
+    .pipe(dest('secure-minify/js'));
 };
 
 // -----------
@@ -101,7 +101,7 @@ const cssMinify = function() {
     ])
     .pipe(concat('styles.css'))
     .pipe(cleancss(minifyCssOptions))
-    .pipe(dest('build/secure/css'));
+    .pipe(dest('secure-minify/css'));
 };
 
 // ------------------------------
@@ -109,21 +109,21 @@ const cssMinify = function() {
 // ------------------------------
 const soundsCopy = function() {
   return src('secure/sounds/*')
-    .pipe(dest('build/secure/sounds'));
+    .pipe(dest('secure-minify/sounds'));
 };
 
 //
 // default using 'gulp' command
 //
 const defaultTask = function (cb) {
-  console.log('\n\nTo build use: gulp dist\n\n');
+  console.log('\n\nTo Minify HTML file use: gulp minify\n\n');
   cb();
 };
 
 //
-// Process Production build folder
+// Process Production secure-minify folder
 //
-const buildProd = series(
+const minifyProd = series(
   htmlMinify,
   jsMinify,
   cssMinify,
@@ -132,4 +132,4 @@ const buildProd = series(
 
 exports.default = defaultTask;
 exports.clean = clean;
-exports.dist = series(clean, buildProd);
+exports.minify = series(clean, minifyProd);

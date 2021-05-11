@@ -160,7 +160,8 @@ function _parseIrcMessage (message) {
       // Reference: https://ircv3.net/specs/extensions/server-time
       // @time=2011-10-19T16:40:51.620Z :Angel!angel@example.org PRIVMSG Wiz :Hello
       if (timeString.indexOf('@time=') === 0) {
-        let timeObj = new Date(parseInt(timeString.slice(6, timeString.length)) * 1000);
+        console.log();
+        let timeObj = new Date(timeString.slice(6, timeString.length));
         outString += timeObj.getHours().toString().padStart(2, '0') + ':';
         outString += timeObj.getMinutes().toString().padStart(2, '0') + ':';
         outString += timeObj.getSeconds().toString().padStart(2, '0');

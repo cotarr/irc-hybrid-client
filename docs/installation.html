@@ -19,6 +19,7 @@
           <li><a class="active" href="installation.html">Installation</a></li>
           <li><a href="login-config.html">Login Config</a></li>
           <li><a href="server-config.html">IRC Config</a></li>
+          <li><a href="coding.html">Coding Notes</a></li>
           <li><a href="text-commands.html">Text Commands</a></li>
           <li><a href="faq.html">FAQ</a></li>
           <li><a href="history.html">Change Log</a></li>
@@ -32,7 +33,7 @@
         </div>
         <p>
           If you are familiar with the process of cloning a Node.js/Exress
-          web server, you can use abbreviated instructions in the README.md
+          git repository, you can use abbreviated instructions in the README.md
           file in the github repository.
         </p>
 
@@ -106,7 +107,8 @@
           It is similar to using python, and it includes a package manager, npm,
           similar to using pip in python.
           Some web developers prefer node, becasue their JavaScript programming
-          knowledge can be used for coding both browser and backend web server JavaScript.
+          knowledge can be used for coding both browser and backend web server
+          using the JavaScript language.
           You can check if nodejs is installed by typing
           &quotnode -v&quot
           in your terminal. If installed, the version will be displayed.
@@ -144,23 +146,33 @@ cd irc-hybrid-client
           will be installed using the npm package manager.
         </p>
         <p>
-          JavaScript library dependencies are listed in the file &quotpackage.json&quot.
+          Optional development dependencies are used to produce a minified and bundled
+          version of the program. Development dependencies are not needed
+          unless you plan to edit the software (see section 8 below).
+        </p>
+        <p>
+          The npm package manager library dependencies are specified in the file &quotpackage.json&quot.
           The dependencies will managed by npm and placed in a folder named &quotnode_modules&quot.
           Prior to installing dependencies, the environment variable &quotNODE_ENV&QUOT
-          should be set to determine if development dependencies should be included.
-          If you are loading the program locally to try it out, you would probably
-          use the development enviornment.
+          should be set to select which dependencies should be included and how
+          program output should be logged.
         </p>
-<div class="pre-div"><pre>
-# Choose one... comment the other
-export NODE_ENV=development
-export NODE_ENV=production
-</pre></div>
         <p>
-          Next you can install the npm package depencies by typing:
+          Select only 1 of the following 3 options.
         </p>
 <div class="pre-div"><pre>
+# Option 1 Run local to try it out. (development --> log to console)
+export NODE_ENV=development
+npm install --only=prod
+
+# Option 2 Run local development environment with development dependencies
+export NODE_ENV=development
 npm install
+
+# Option 3 Typical for server installation, log output to files.
+export NODE_ENV=production
+# ci = clean install
+npm ci
 </pre></div>
 
         <div class="install-section-title">4 - TLS Certificates</div>
@@ -180,7 +192,7 @@ npm install
           node uses the openssl and certificates
           in the Linux operating system, and no special configuration
           should be required to support TLS, provided that nodejs and your system
-          was compiled with the current version of openssl.
+          were compiled with the current version of openssl.
         </p>
         <p>
           For the browser to connect, as with any webserver,
@@ -287,11 +299,11 @@ sudo certbot certonly --standalone -d abcd.example.com
         <p>
           The web server will be started from the command line.
           It will remain in the foreground.
-          If NODE_ENV is set to &quotdevelopment&quot, the
-          log file output will be sent to the terminal.
+          If NODE_ENV is set to &quotdevelopment&quot, all of the
+          log file output will be sent to the console terminal.
           If NODE_ENV is set to production, log file output will be
           sent to files located in the logs folder.
-          All console.log output that will still go to the terminal.
+          Any javascript console.log output that will still go to the console terminal.
         </p>
         <p>
           While running in the foreground, the server can be stopped by
@@ -318,14 +330,19 @@ sudo certbot certonly --standalone -d abcd.example.com
 
 <div class="install-section-title">8 - Minify and bundle (Optional)</div>
         <p>
-          The steps in this section are optional is not required.
+          The steps in this section are optional. They are not required unless
+          you plan to edit software and regenerate
+          the minified bundled files.
           The repository can be cloned and deployed &quotas-is&quot,
           requiring only editing of the configurations files.
         </p>
         <p>
-          However, running the gulp script will concatenate 10 of the JavaScript
+          Running the gulp script will concatenate 10 of the JavaScript
           files into 1 bundled/minified JavaScript file.
           It will remove comments and whitespace from the javascript code.
+          The browser download is about 31 kB for minify-bundled version
+          with server compression, compared to about 240 kB serving
+          from development folders without compression.
           This will significantly reduce the download size of the files
           and reduce bandwidth used by smartphones.
         </p>
@@ -333,8 +350,10 @@ sudo certbot certonly --standalone -d abcd.example.com
           Their website is <a href="https://gulpjs.com/">https://gulpjs.com/</a>.
           The library files are listed in the package.json as development depencies.
         <p>
-          After running &quotgulp dist&quot, a build folder will be created in the main project folder.
-          The build folder will contain the same folder structure as the base repository.
+          Running &quotgulp minify&quot will source files from the &quotsecure/&quot folder
+          and place output files in the &quotsecure-minify/&quot
+          folder that are located within the main project folder.
+          The secure-minify folder will contain the same folder structure as the base repository.
           The gulp script will modify the individual script tags in webclient.html to
           replace multiple script tags with a single javascript script tag.
         </p>
@@ -342,13 +361,8 @@ sudo certbot certonly --standalone -d abcd.example.com
           Configuration for the minify and bundle process is stored in &quotGulpfile.js&quot
         </p>
         <p>
-          The configuration JSON files and the /docs folder are not included in the bundle.
+          The package.json files, configuration JSON files, and the /docs folder are not included in the bundle.
           The build folder is erased during the build process.
-          This would remove any configuration if it were added manually.
-          Typically, the contents of the build folder would be copied to the
-          eventual server by some type of deployment script, which is beyond the scope of
-          these instructions. I use a bash script using the secure copy &quotscp&quot
-          command to push the build image to the server.
         </p>
         <p>
           It is necessary to install gulp-cli globally, as gulp-cli
@@ -363,25 +377,15 @@ sudo certbot certonly --standalone -d abcd.example.com
         </p>
 <div class="pre-div"><pre>
 # Install the gulp command line client globally using npm
+
+export NODE_ENV=development
+npm install
+
+# may require sudo for -g
 npm install -g gulp-cli
 
 # bundle and minify to /build folder
-gulp dist
-
-# You can deploy by any method
-
-# Configuration requires copy and edit of credentials.json and servers.json
-
-# Commands similar to these are needed
-export NODE_ENV=production
-
-# Install node packages by running:
-npm ci
-
-# To run
-node bin/www
-
-# route on your server: /irc/webclient.html
+gulp minify
 </pre></div>
 
       </div> <!-- /text-div -->
