@@ -461,14 +461,16 @@ channelBottomDivEl.removeAttribute("hidden");channelHideButtonEl.textContent="-"
 webState.channelStates[webStateIndex].lastJoined=ircState.channelStates[ircStateIndex].joined}}_updateNickList();_updateChannelTitle();updateVisibility()}.bind(this))
 ;document.addEventListener("channel-message",function(event){function _addText(timestamp,nick,text){let out="";if(channelMainSectionEl.hasAttribute("brief-enabled")){out=timestamp+" ";if(nick==="*"){
 out+=nick+nickChannelSpacer}else{out+=nick+nickChannelSpacer+"\n"}out+=cleanFormatting(text)+"\n\n"}else{out=timestamp+" "+nick.padStart(maxNickLength," ")+nickChannelSpacer+cleanFormatting(text)+"\n"
-}channelTextAreaEl.value+=out;channelTextAreaEl.scrollTop=channelTextAreaEl.scrollHeight}let parsedMessage=event.detail.parsedMessage;switch(parsedMessage.command){case"KICK":
-if(parsedMessage.params[0].toLowerCase()===name.toLowerCase()){let reason=" ";if(parsedMessage.params[2])reason=parsedMessage.params[2];if(channelMainSectionEl.hasAttribute("brief-enabled")){
+}channelTextAreaEl.value+=out;channelTextAreaEl.scrollTop=channelTextAreaEl.scrollHeight}let parsedMessage=event.detail.parsedMessage
+;console.log("Event channel-message: "+JSON.stringify(parsedMessage,null,2));switch(parsedMessage.command){case"KICK":if(parsedMessage.params[0].toLowerCase()===name.toLowerCase()){let reason=" "
+;if(parsedMessage.params[2])reason=parsedMessage.params[2];if(channelMainSectionEl.hasAttribute("brief-enabled")){
 _addText(parsedMessage.timestamp,"*",parsedMessage.nick+" has kicked "+parsedMessage.params[1])}else{
 _addText(parsedMessage.timestamp,"*",parsedMessage.nick+" has kicked "+parsedMessage.params[1]+" ("+reason+")")}}break;case"JOIN":if(parsedMessage.params[0].toLowerCase()===name.toLowerCase()){
 if(channelMainSectionEl.hasAttribute("brief-enabled")){_addText(parsedMessage.timestamp,"*",parsedMessage.nick+" has joined")}else{
 _addText(parsedMessage.timestamp,"*",parsedMessage.nick+" ("+parsedMessage.host+") has joined")}if(channelMainSectionEl.hasAttribute("beep2-enabled")&&webState.cacheInhibitTimer===0){playBeep1Sound()}
-channelBottomDivEl.removeAttribute("hidden");channelHideButtonEl.textContent="-"}break;case"MODE":if(parsedMessage.params[0].toLowerCase()===name.toLowerCase()){
-_addText(parsedMessage.timestamp,"*","Mode "+JSON.stringify(parsedMessage.params)+" by "+parsedMessage.nick)}break;case"NICK":if(true){
+channelBottomDivEl.removeAttribute("hidden");channelHideButtonEl.textContent="-"}break;case"MODE":if(parsedMessage.params[0].toLowerCase()===name.toLowerCase()){if(parsedMessage.nick){
+_addText(parsedMessage.timestamp,"*","Mode "+JSON.stringify(parsedMessage.params)+" by "+parsedMessage.nick)}else{
+_addText(parsedMessage.timestamp,"*","Mode "+JSON.stringify(parsedMessage.params)+" by "+parsedMessage.prefix)}}break;case"NICK":if(true){
 _addText(parsedMessage.timestamp,"*",parsedMessage.nick+" is now known as "+parsedMessage.params[0])}break;case"NOTICE":if(parsedMessage.params[0].toLowerCase()===name.toLowerCase()){
 _addText(parsedMessage.timestamp,"*","Notice("+parsedMessage.nick+" to "+parsedMessage.params[0]+") "+parsedMessage.params[1]);channelBottomDivEl.removeAttribute("hidden")
 ;channelHideButtonEl.textContent="-";if(document.activeElement!==channelInputAreaEl&&document.activeElement!==channelSendButtonEl&&webState.cacheInhibitTimer===0&&activityIconInhibitTimer===0){
@@ -584,8 +586,8 @@ _parseInputForIRCCommands(document.getElementById("rawMessageInputId"));document
 ;document.getElementById("rawMessageInputId").addEventListener("input",function(event){if(event.inputType==="insertText"&&event.data===null||event.inputType==="insertLineBreak"){
 _parseInputForIRCCommands(document.getElementById("rawMessageInputId"))}}.bind(this));function substituteHmsTime(inMessage){let timeString=inMessage.split(" ")[0]
 ;let restOfMessage=inMessage.slice(timeString.length+1,inMessage.length);let hmsString=timestampToHMS(timeString);return hmsString+" "+restOfMessage}
-document.addEventListener("server-message",function(event){console.log(JSON.stringify(event.detail,null,2));function _showAfterParamZero(parsedMessage){let msgString=""
-;if(parsedMessage.params.length>1){for(let i=1;i<parsedMessage.params.length;i++){msgString+=" "+parsedMessage.params[i]}}else{console.log("Error _showAfterParamZero() no parsed field")}
+document.addEventListener("server-message",function(event){function _showAfterParamZero(parsedMessage){let msgString="";if(parsedMessage.params.length>1){
+for(let i=1;i<parsedMessage.params.length;i++){msgString+=" "+parsedMessage.params[i]}}else{console.log("Error _showAfterParamZero() no parsed field")}
 displayRawMessage(cleanFormatting(cleanCtcpDelimiter(parsedMessage.timestamp+msgString)))}switch(event.detail.parsedMessage.command){case"001":case"002":case"003":case"004":
 _showAfterParamZero(event.detail.parsedMessage);break;case"005":break;case"250":case"251":case"252":case"254":case"255":case"265":case"265":_showAfterParamZero(event.detail.parsedMessage);break
 ;case"256":case"257":case"258":case"259":_showAfterParamZero(event.detail.parsedMessage);break;case"315":break;case"352":_showAfterParamZero(event.detail.parsedMessage);break;case"275":case"301":
