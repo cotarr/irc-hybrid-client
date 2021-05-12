@@ -53,7 +53,7 @@ npm install
 export NODE_ENV=production
 npm ci
 
-# copy example credentials and edit
+# copy example-credentials.json and edit
 cp example-credentials.json credentials.json
 # If multi user system optionally change permission
 chmod 600 credentials.json
@@ -64,8 +64,8 @@ chmod 600 credentials.json
 # 4) Set writable file path for PID file
 
 # It is necessary to assign one web page username and password.
-# This must be done after copying the
-# example-credentials.json into the project folder
+# This must be done after copying the example-credentials.json into the project folder
+# There is a detailed example in the [documentation](https://cotarr.github.io/irc-hybrid-client)
 
 cd tools
 
@@ -76,7 +76,7 @@ node updateAuthForUser_1.js
 
 cd ..
 
-# Copy example server file
+# Copy example-servers.json file
 cp example-servers.json servers.json
 # If multi user system optionally change permissions
 chmod 600 servers.json
@@ -92,7 +92,7 @@ chmod 600 servers.json
 # To start the app
 node bin/www
 
-# route on your server: /irc/webclient.html
+# route on web page: /irc/webclient.html
 ```
 
 ### Minify and bundle for deployment
