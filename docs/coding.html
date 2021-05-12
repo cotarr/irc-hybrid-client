@@ -32,13 +32,55 @@
           Coding Notes
         </div>
 
-        <img src="images/network.png" height="267" width="882" alt="Network Diagram">
 
         <h3>Project Goals</h3>
         <ul>
-          <li>Stuck at home during Covid-19 lockdown. Find an interesting project.
-          <li>Web IRC client for iPhone plus with 375 pixel screen and Chrome IOS browser.</li>
+          <li>Stuck at home during Covid-19 lockdown. Find an interesting project.</li>
+          <li>Web IRC client for iPhone Plus (375 px) using Chrome IOS browser.</li>
         </ul>
+        <h3>Program Structure</h3>
+        <p>
+          The overall architecture consists of a web server located in the middle between
+          an IRC server and a web browser
+        </p>
+        <p>
+          The connection to the IRC server is a simple TCP socket wrapped in TLS to pass conventional RFC 2812 messages.
+        </p>
+        <p>
+          The connection to the web browser is more complex. The primary challenge was addressing
+          disconnect of any socket connections during smartphone screen lock. It is assumed
+          that smartphone is doing this to place radios into power-save idle state to conserve battery.
+        </p>
+        <p>
+          This has been addressed by utilizing two independent routes for IRC messages to reach the browser.
+          The browser will establish a websocket connection to the web server, wrapped in TLS.
+          The websocket is used to asynchronously pass messages from the IRC server,
+          having been forwarded by the web server,
+          onward toward the browser. The websocket, when connected, is a real time 1 for 1 pass-through
+          of IRC server messages. Therefore, if a smartphone screen lock causes the websocket to
+          disconnect, some messages are potentially lost.
+        </p>
+        <p>
+          The intermittent websocket issue has been addressed by providing a standard web API,
+          wrapped in TLS,
+          capable of using a POST request to retrieve the contents of a message cache
+          located on the web server. This allows the browser to clear the contents of any open
+          windows and re-populate the display from data in the API response.
+        </p>
+        <p>
+          Websocket traffic to the browser passes only in one direction, from IRC server to IRC Client.
+          The return side of the websocket is not used. All outgoing IRC message from the IRC client
+          toward the IRC server are sent using a POST request to a message API on the web server.
+        </p>
+        <p>
+          This this configuration, windows on the web browser display real time messages as they arrive.
+          Scroll features allow backwards review of messages. However, if the websocket disconnects
+          from the web server, only messages in the message cache are restored. The current message
+          cache is 100 IRC server messages. This seems to be a reasonable size for general
+          smartphone use. This is not intended to be a long term offline IRC client.
+        </p>
+
+        <img src="images/network.png" height="267" width="882" alt="Network Diagram">
         <h3>Coding Goals</h3>
         <ul>
           <li>Single HTML page</li>
@@ -48,7 +90,7 @@
           <li>Backend: HTTP Username/password login and session cookies.</li>
           <li>Frontend: Displays IRC messages, touch controls, and IRC text commands.</li>
           <li>Frontend: Compatible with voice dictation on smartphone (IOS).</li>
-          <li>Frontend is native JavaScript using only browser API</li>
+          <li>Frontend is native JavaScript using only browser APIs</li>
           <li>Browser Content Security Policy (CSP) enforced</li>
           <li>TLS support for both Web Server and IRC server. Works with Lets Encrypt certificates.</li>
           <li>Reference RFC 2812 However, not all features are implemented.</li>
