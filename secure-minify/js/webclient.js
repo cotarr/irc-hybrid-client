@@ -461,9 +461,8 @@ channelBottomDivEl.removeAttribute("hidden");channelHideButtonEl.textContent="-"
 webState.channelStates[webStateIndex].lastJoined=ircState.channelStates[ircStateIndex].joined}}_updateNickList();_updateChannelTitle();updateVisibility()}.bind(this))
 ;document.addEventListener("channel-message",function(event){function _addText(timestamp,nick,text){let out="";if(channelMainSectionEl.hasAttribute("brief-enabled")){out=timestamp+" ";if(nick==="*"){
 out+=nick+nickChannelSpacer}else{out+=nick+nickChannelSpacer+"\n"}out+=cleanFormatting(text)+"\n\n"}else{out=timestamp+" "+nick.padStart(maxNickLength," ")+nickChannelSpacer+cleanFormatting(text)+"\n"
-}channelTextAreaEl.value+=out;channelTextAreaEl.scrollTop=channelTextAreaEl.scrollHeight}let parsedMessage=event.detail.parsedMessage
-;console.log("Event channel-message: "+JSON.stringify(parsedMessage,null,2));switch(parsedMessage.command){case"KICK":if(parsedMessage.params[0].toLowerCase()===name.toLowerCase()){let reason=" "
-;if(parsedMessage.params[2])reason=parsedMessage.params[2];if(channelMainSectionEl.hasAttribute("brief-enabled")){
+}channelTextAreaEl.value+=out;channelTextAreaEl.scrollTop=channelTextAreaEl.scrollHeight}let parsedMessage=event.detail.parsedMessage;switch(parsedMessage.command){case"KICK":
+if(parsedMessage.params[0].toLowerCase()===name.toLowerCase()){let reason=" ";if(parsedMessage.params[2])reason=parsedMessage.params[2];if(channelMainSectionEl.hasAttribute("brief-enabled")){
 _addText(parsedMessage.timestamp,"*",parsedMessage.nick+" has kicked "+parsedMessage.params[1])}else{
 _addText(parsedMessage.timestamp,"*",parsedMessage.nick+" has kicked "+parsedMessage.params[1]+" ("+reason+")")}}break;case"JOIN":if(parsedMessage.params[0].toLowerCase()===name.toLowerCase()){
 if(channelMainSectionEl.hasAttribute("brief-enabled")){_addText(parsedMessage.timestamp,"*",parsedMessage.nick+" has joined")}else{

@@ -890,7 +890,7 @@ function createChannelEl (name) {
     }
 
     let parsedMessage = event.detail.parsedMessage;
-    console.log('Event channel-message: ' + JSON.stringify(parsedMessage, null, 2));
+    // console.log('Event channel-message: ' + JSON.stringify(parsedMessage, null, 2));
 
 
     switch(parsedMessage.command) {
