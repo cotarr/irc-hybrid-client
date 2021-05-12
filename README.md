@@ -65,7 +65,7 @@ chmod 600 credentials.json
 
 # It is necessary to assign one web page username and password.
 # This must be done after copying the example-credentials.json into the project folder
-# There is a detailed example in the [documentation](https://cotarr.github.io/irc-hybrid-client)
+# There is a detailed example in the documentation.
 
 cd tools
 
