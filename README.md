@@ -55,6 +55,8 @@ npm ci
 
 # copy example credentials and edit
 cp example-credentials.json credentials.json
+# If multi user system optionally change permission
+chmod 600 credentials.json
 
 # 1) Set file path for TLS certs and tls:true ...or.. set tls=false
 # 2) Set a unique cookie secret
@@ -76,6 +78,8 @@ cd ..
 
 # Copy example server file
 cp example-servers.json servers.json
+# If multi user system optionally change permissions
+chmod 600 servers.json
 
 # 1) Edit a short name for the server
 # 2) host/port and TLS true/false

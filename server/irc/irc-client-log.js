@@ -37,6 +37,7 @@
     if (!fs.existsSync(logFolder)) {
       console.log('Log folder not found, creating folder...');
       fs.mkdirSync(logFolder);
+      fs.chmodSync(logFolder, 0o700);
     }
   } catch (err) {
     console.log('Unable to create log folder');

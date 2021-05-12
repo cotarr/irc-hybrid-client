@@ -148,7 +148,7 @@ cd irc-hybrid-client
         <p>
           Optional development dependencies are used to produce a minified and bundled
           version of the program. Development dependencies are not needed
-          unless you plan to edit the software (see section 8 below).
+          unless you plan to edit the software (see section 11 below).
         </p>
         <p>
           The npm package manager library dependencies are specified in the file &quotpackage.json&quot.
@@ -292,7 +292,41 @@ sudo certbot certonly --standalone -d abcd.example.com
           There should be no other other network connections to this IRC client.
         </p>
 
-        <div class="install-section-title">7 - Starting the server</div>
+        <div class="install-section-title">8 - File Permissions</div>
+        <p>
+          When running on a multi-user system, review directory or file permissions
+          to properly protect configuration passwords and log files.
+          When the program first starts, if not existing, it will create a
+          &quotlogs&quot folder with 0o700 (drwx------) permissions.
+          The &quotcredentials.json&quot and &quotservers.json&quot files
+          are recommended to be 0o600 (drw-------).
+        </p>
+
+        <div class="install-section-title">9 - Log Files</div>
+        <p>
+          The current program does not manage, limit or prune log file size.
+          If you use logging, monitor file size as necessary.
+        </p>
+        <p>
+          When the program first starts, if not existing, it will create a
+          &quotlogs&quot folder. If you have enabled logging,
+          the log files will be written to this folder in the current working directory.
+          Configuration of a custom directory location is not supported in this version.
+        </p>
+        <ul>
+          <li>auth.log - Web page user authentication.</li>
+
+          <li>access.log - HTTP access requests.
+          By default, the log is filtered to show only errors (http status code>= 400)
+          This is configured in the morgan options.</li>
+
+          <li>irc.log - This is a log of all IRC server messages in raw format.
+          This can become quite large.
+          It is primarily indended for debugging, and should probably be left disabled.</li>
+        </ul>
+        </p>
+
+        <div class="install-section-title">10 - Starting the server</div>
         <p>
           This assumes the initial setup configuration in the step 5 has been completed.
         </p>
@@ -307,7 +341,22 @@ sudo certbot certonly --standalone -d abcd.example.com
         </p>
         <p>
           While running in the foreground, the server can be stopped by
-          typing ctrl-C in the terminal. There are several ways to
+          typing ctrl-C in the terminal.
+        </p>
+        <p>
+          While in the project directory, start the web server by typing:
+        </p>
+<div class="pre-div"><pre>
+  node bin/www
+</pre></div>
+        <p>
+          To access the IRC client from your web browser, append the path
+          <yellow-example>/irc/webclient.html</yellow-example> to the web server domain or IP address.
+          You will be redirected to a login form for entry of the user and password
+          created above.
+        </p>
+        <p>
+          There are several ways to
           run the server unattended in the background. One way is to
           append an &quot&amp&quot symbol to the end of the command line.
           An alternative method is to load the &quotscreen&quot
@@ -315,20 +364,15 @@ sudo certbot certonly --standalone -d abcd.example.com
           that can be reattached at a later time as a console terminal.
         </p>
         <p>
-          While in the project directory, start the web server by typing:
-        </p>
-<div class="pre-div"><pre>
-  node bin/www
-
-  # Path on server:  /irc/webclient.html
-</pre></div>
-        <p>
-          To access the IRC client, access the path &quot/irc/webclient.html&quot.
-          You will be redirected to a login form to enter the user and password
-          created above.
+          If you are running bash want to capture any console standard or error output while running in the background,
+          you may redirect terminal output to a log file and
+          launch to the program into the background by appending an &quot&amp&quot.
+          Attempting this from a script or from cron may require full file pathnames.
+          Systems may vary, but it would look something like this:
+          &quotnode bin/www &amp>> logs/node.log &&quot
         </p>
 
-<div class="install-section-title">8 - Minify and bundle (Optional)</div>
+<div class="install-section-title">11 - Minify and bundle (Optional)</div>
         <p>
           The steps in this section are optional. They are not required unless
           you plan to edit software and regenerate

@@ -64,11 +64,14 @@ crypto.randomBytes(16, function(err, buffer) {
           credentials.loginUsers[0].name = name;
           credentials.loginUsers[0].salt = salt;
           credentials.loginUsers[0].hash = hash.digest('hex');
-          fs.writeFileSync('../credentials.json', JSON.stringify(credentials, null, 2) + '\n', {
+          let filename = '../credentials.json';
+          fs.writeFileSync(filename, JSON.stringify(credentials, null, 2) + '\n', {
             encoding: 'utf8',
             mode: 0o600,
             flag: 'w'
           });
+          // If file pre-exists, change permissions
+          fs.chmodSync(filename, 0o600);
           getPass.close();
           console.log(JSON.stringify(credentials, null, 2));
         });
