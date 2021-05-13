@@ -114,7 +114,8 @@
 
   ircLog.setRawMessageLogEnabled(servers.rawMessageLog);
 
-  console.log('Starting web server: ' + vars.ircState.progName + ' version-' + vars.ircState.progVersion);
+  console.log('Starting web server: ' + vars.ircState.progName +
+    ' version-' + vars.ircState.progVersion);
   console.log('Point web browser to <your-http-domain-name> + \"/irc/webclient.html\"');
 
   // report log file status
@@ -156,7 +157,7 @@
         }
       } // next i
     }
-  };
+  }; // onDisconnectGrabState()
 
   // -------------------------------------------
   //  On Ready Event Handler (Internal function)
@@ -566,7 +567,7 @@
   // Input: Index of server starting from 0, -1 for next in sequence
   //
   //  req.body{
-  //    "index": -1
+  //    "index": -1  (Future not used)
   //  }
   //----------------------------------------
   const serverHandler = function(req, res, next) {
@@ -574,7 +575,7 @@
       if ((!('serverArray' in servers)) || (servers.serverArray.length < 1)) {
         return res.json({
           error: true,
-          message: 'Can not change servers wile connected or connecting'
+          message: 'Can not change servers while connected or connecting'
         });
       }
     }
