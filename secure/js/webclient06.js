@@ -319,7 +319,12 @@ function createChannelEl (name) {
   channelMainSectionEl.appendChild(channelTopDivEl);
   channelMainSectionEl.appendChild(channelBottomDivEl);
 
-  channelContainerDivEl.appendChild(channelMainSectionEl);
+  if (channelContainerDivEl.firstChild) {
+    channelContainerDivEl.insertBefore(
+      channelMainSectionEl, channelContainerDivEl.firstChild);
+  } else {
+    channelContainerDivEl.appendChild(channelMainSectionEl);
+  }
 
   // --------------------------
   // Channel specific timers
@@ -1107,12 +1112,13 @@ document.addEventListener('irc-state-changed', function(event) {
 
   // Check list of server's channels and create new if missing.
   if (ircState.channels.length > 0) {
-    ircState.channels.forEach(function(name) {
+    for (let i=0; i<ircState.channels.length; i++) {
+      let name = ircState.channels[i];
       if (webState.channels.indexOf(name.toLowerCase()) === -1) {
         // console.log('Creating new channel ' + name);
         createChannelEl(name);
       }
-    });
+    };
   }
 
   // Check if a new channel was added, or old one /PARTed

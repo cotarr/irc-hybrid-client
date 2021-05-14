@@ -384,17 +384,17 @@ if(webState.channels.indexOf(name.toLowerCase())>=0){console.log("createChannelE
 ;channelBottomDiv4El.appendChild(channelBeep3CBTitleEl);channelBottomDivEl.appendChild(channelTopicDivEl);channelBottomDivEl.appendChild(channelNamesDisplayEl)
 ;channelBottomDivEl.appendChild(channelTextAreaEl);channelBottomDivEl.appendChild(channelBottomDiv1El);channelBottomDivEl.appendChild(channelBottomDiv2El)
 ;channelBottomDivEl.appendChild(channelBottomDiv3El);channelBottomDivEl.appendChild(channelBottomDiv4El);channelMainSectionEl.appendChild(channelTopDivEl)
-;channelMainSectionEl.appendChild(channelBottomDivEl);channelContainerDivEl.appendChild(channelMainSectionEl);var activityIconInhibitTimer=0;setInterval(function(){
-if(activityIconInhibitTimer>0)activityIconInhibitTimer--}.bind(this),1e3);channelHideButtonEl.addEventListener("click",function(){if(channelBottomDivEl.hasAttribute("hidden")){
-channelBottomDivEl.removeAttribute("hidden");channelHideButtonEl.textContent="-";channelTopRightHidableDivEl.removeAttribute("hidden")}else{channelBottomDivEl.setAttribute("hidden","")
-;channelHideButtonEl.textContent="+";channelTopRightHidableDivEl.setAttribute("hidden","")}});channelTallerButtonEl.addEventListener("click",function(){
-let newRows=parseInt(channelTextAreaEl.getAttribute("rows"))+10;channelTextAreaEl.setAttribute("rows",newRows.toString());channelNamesDisplayEl.setAttribute("rows",newRows.toString())})
-;channelNormalButtonEl.addEventListener("click",function(){channelTextAreaEl.setAttribute("rows",defaultHeightInRows);channelNamesDisplayEl.setAttribute("rows",defaultHeightInRows)})
-;channelClearButtonEl.addEventListener("click",function(){channelTextAreaEl.value="";channelTextAreaEl.setAttribute("rows",defaultHeightInRows)
-;channelNamesDisplayEl.setAttribute("rows",defaultHeightInRows)});document.addEventListener("show-all-divs",function(event){channelBottomDivEl.removeAttribute("hidden")
-;channelHideButtonEl.textContent="-";channelTopRightHidableDivEl.removeAttribute("hidden")});document.addEventListener("hide-all-divs",function(event){channelBottomDivEl.setAttribute("hidden","")
-;channelHideButtonEl.textContent="+";channelTopRightHidableDivEl.setAttribute("hidden","")});channelJoinButtonEl.addEventListener("click",function(){let message="JOIN "+name
-;_sendIrcServerMessage(message)});channelPartButtonEl.addEventListener("click",function(){let message="PART "+name;_sendIrcServerMessage(message)})
+;channelMainSectionEl.appendChild(channelBottomDivEl);if(channelContainerDivEl.firstChild){channelContainerDivEl.insertBefore(channelMainSectionEl,channelContainerDivEl.firstChild)}else{
+channelContainerDivEl.appendChild(channelMainSectionEl)}var activityIconInhibitTimer=0;setInterval(function(){if(activityIconInhibitTimer>0)activityIconInhibitTimer--}.bind(this),1e3)
+;channelHideButtonEl.addEventListener("click",function(){if(channelBottomDivEl.hasAttribute("hidden")){channelBottomDivEl.removeAttribute("hidden");channelHideButtonEl.textContent="-"
+;channelTopRightHidableDivEl.removeAttribute("hidden")}else{channelBottomDivEl.setAttribute("hidden","");channelHideButtonEl.textContent="+";channelTopRightHidableDivEl.setAttribute("hidden","")}})
+;channelTallerButtonEl.addEventListener("click",function(){let newRows=parseInt(channelTextAreaEl.getAttribute("rows"))+10;channelTextAreaEl.setAttribute("rows",newRows.toString())
+;channelNamesDisplayEl.setAttribute("rows",newRows.toString())});channelNormalButtonEl.addEventListener("click",function(){channelTextAreaEl.setAttribute("rows",defaultHeightInRows)
+;channelNamesDisplayEl.setAttribute("rows",defaultHeightInRows)});channelClearButtonEl.addEventListener("click",function(){channelTextAreaEl.value=""
+;channelTextAreaEl.setAttribute("rows",defaultHeightInRows);channelNamesDisplayEl.setAttribute("rows",defaultHeightInRows)});document.addEventListener("show-all-divs",function(event){
+channelBottomDivEl.removeAttribute("hidden");channelHideButtonEl.textContent="-";channelTopRightHidableDivEl.removeAttribute("hidden")});document.addEventListener("hide-all-divs",function(event){
+channelBottomDivEl.setAttribute("hidden","");channelHideButtonEl.textContent="+";channelTopRightHidableDivEl.setAttribute("hidden","")});channelJoinButtonEl.addEventListener("click",function(){
+let message="JOIN "+name;_sendIrcServerMessage(message)});channelPartButtonEl.addEventListener("click",function(){let message="PART "+name;_sendIrcServerMessage(message)})
 ;channelPruneButtonEl.addEventListener("click",function(){let index=ircState.channels.indexOf(name.toLowerCase());if(index>=0){if(!ircState.channelStates[index].joined){
 let fetchURL=webServerUrl+"/irc/prune";let fetchOptions={method:"POST",headers:{"Content-type":"application/json",Accept:"application/json"},body:JSON.stringify({channel:name})}
 ;fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()}else{throw new Error("Fetch status "+response.status+" "+response.statusText)}}).then(responseJson=>{
@@ -486,8 +486,8 @@ _addText(parsedMessage.timestamp,"*",parsedMessage.nick+" has quit")}else{_addTe
 _addText(parsedMessage.timestamp,"*","Topic for "+parsedMessage.params[0]+' changed to "'+parsedMessage.params[1]+'" by '+parsedMessage.nick)}break;default:}})
 ;document.addEventListener("erase-before-reload",function(event){channelTextAreaEl.value="";channelInputAreaEl.value=""}.bind(this));updateVisibility()
 ;webState.resizableSendButtonTextareaIds.push(channelInputAreaId);webState.resizableChanSplitTextareaIds.push(channelTextAreaId);document.dispatchEvent(new CustomEvent("element-resize",{bubbles:true
-}))}var lastJoinedChannelCount=-1;var lastIrcServerIndex=-1;document.addEventListener("irc-state-changed",function(event){if(ircState.channels.length>0){ircState.channels.forEach(function(name){
-if(webState.channels.indexOf(name.toLowerCase())===-1){createChannelEl(name)}})}let needButtonUpdate=false;let joinedChannelCount=0;if(ircState.channels.length>0){
+}))}var lastJoinedChannelCount=-1;var lastIrcServerIndex=-1;document.addEventListener("irc-state-changed",function(event){if(ircState.channels.length>0){for(let i=0;i<ircState.channels.length;i++){
+let name=ircState.channels[i];if(webState.channels.indexOf(name.toLowerCase())===-1){createChannelEl(name)}}}let needButtonUpdate=false;let joinedChannelCount=0;if(ircState.channels.length>0){
 for(let i=0;i<ircState.channels.length;i++){if(ircState.channelStates[i].joined)joinedChannelCount++}}if(joinedChannelCount!==lastJoinedChannelCount){needButtonUpdate=true
 ;lastJoinedChannelCount=joinedChannelCount}if(ircState.ircServerIndex!==lastIrcServerIndex){needButtonUpdate=true;lastIrcServerIndex=ircState.ircServerIndex}if(needButtonUpdate){
 let channelJoinButtonContainerEl=document.getElementById("channelJoinButtonContainer");while(channelJoinButtonContainerEl.firstChild){
