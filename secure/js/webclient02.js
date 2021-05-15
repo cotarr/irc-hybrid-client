@@ -856,7 +856,31 @@ function _parseBufferMessage (message) {
         break;
       //
       case 'QUIT':
-        displayChannelMessage(parsedMessage);
+        // Normally QUIT messages are displayed in the channel window
+        // In the case of loading messages from cache, the list of
+        // channel membership names may not contain the nickname that quit.
+        // So, as a special case, QUIT message on refresh or load from cache
+        // will be displayed in the server window when the channel is unknown.
+        // There are 3 places in the code, search: 'QUIT':
+        //
+        if (true) {
+          let nick = parsedMessage.nick;
+          let inChannel = false;
+          if (ircState.channels.length > 0) {
+            for (let i=0; i<ircState.channels.length; i++) {
+              if (ircState.channelStates[i].names.indexOf(nick) >= 0) {
+                inChannel = true;
+              }
+            }
+          }
+          if (inChannel) {
+            displayChannelMessage(parsedMessage);
+          } else {
+            // Note, this will duplicate message when raw server messages
+            // are enabled having one formatted and one unformatted.
+            displayFormattedServerMessage(parsedMessage, message);
+          }
+        }
         break;
       case 'TOPIC':
         if (true) {
@@ -864,7 +888,7 @@ function _parseBufferMessage (message) {
             // Case of channel name
             displayChannelMessage(parsedMessage);
           } else {
-            console.log('Error message MODE to unknown recipient');
+            console.log('Error message TOPIC to unknown channel');
           }
         }
         break;

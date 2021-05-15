@@ -1036,29 +1036,14 @@ function createChannelEl (name) {
         }
         break;
       case 'QUIT':
-        // this assumes:
-        // First: The "QUIT" message arrives through websocket
-        // The quit message is shown in the channel
-        // Second: The "UPDATE" comm is received
-        // In response to UPDATE request, getIrcState() is called
-        // and nickname list is updated when ircState changes
+        // Normally QUIT messages are displayed in the channel window
+        // In the case of loading messages from cache, the list of
+        // channel membership names may not contain the nickname that quit.
+        // So, as a special case, QUIT message on refresh or load from cache
+        // will be displayed in the server window when the channel is unknown.
+        // There are 3 places in the code, search: 'QUIT':
         //
-        // However, if UPDATE is recieved first, the QUIT message would
-        // not be shown int he channel (This should not be the case)
-        //
-        // Issue:
-        //
-        // Case of reload page or refresh data
-        // QUIT messages for a nick will only be shown
-        // if the nick is in the channel when refreshed.
-        //
-        // TODO, new function _wasNickInChannel(), it would use a
-        // cache array of JOIN/NICK nicknames for QUIT/NICK processing on reload
-        //
-        // ---------
-        // Set true, quit messages will show in all channels.
-        if (true) {
-        // if (_isNickInChannel(parsedMessage.nick, name)) {
+        if (_isNickInChannel(parsedMessage.nick, name)) {
           let reason = ' ';
           if (parsedMessage.params[0]) reason = parsedMessage.params[0];
           if (channelMainSectionEl.hasAttribute('brief-enabled')) {

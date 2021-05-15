@@ -215,6 +215,27 @@ document.addEventListener('server-message', function(event) {
             event.detail.parsedMessage.params[1])));
 
       break;
+    case 'QUIT':
+      // Normally QUIT messages are displayed in the channel window
+      // In the case of loading messages from cache, the list of
+      // channel membership names may not contain the nickname that quit.
+      // So, as a special case, QUIT message on refresh or load from cache
+      // will be displayed in the server window when the channel is unknown.
+      // There are 3 places in the code, search: 'QUIT':
+      //
+      if (true) {
+        let reason = ' ';
+        if (event.detail.parsedMessage.params[0]) {
+          reason = event.detail.parsedMessage.params[0];
+          displayRawMessage(
+            cleanFormatting(
+              cleanCtcpDelimiter(
+                event.detail.parsedMessage.timestamp + ' ' +
+                '(No channel) ' +
+                event.detail.parsedMessage.nick + ' has quit (' + reason + ')')));
+        }
+      }
+      break;
     default:
       // this is catch-all, if no formatted case, then display here
       if (true) {
