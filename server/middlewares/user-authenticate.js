@@ -265,11 +265,14 @@
         if (
           ('query' in req) &&
           ('nonce' in req.query) &&
+          (typeof req.query.nonce === 'string') &&
           (req.query.nonce.length > 1) &&
           ('body' in req) &&
           ('user' in req.body) &&
+          (typeof req.body.user === 'string') &&
           (req.body.user.length > 0) &&
           ('password' in req.body) &&
+          (typeof req.body.user === 'string') &&
           (req.body.password.length > 0)) {
           //
           // Query user array to find index to matching user.
