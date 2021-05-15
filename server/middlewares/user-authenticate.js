@@ -267,15 +267,15 @@
         let inputPassword = '';
         if (('query' in req) && ('nonce' in req.query) &&
           (typeof req.query.nonce === 'string')) {
-          inputNonce = req.query.nonce;
+          inputNonce = req.query.nonce.toString('utf8');
         }
         if (('body' in req) && ('user' in req.body) &&
           (typeof req.body.user === 'string')) {
-          inputUser = req.body.user;
+          inputUser = req.body.user.toString('utf8');
         }
         if (('body' in req) && ('password' in req.body) &&
           (typeof req.body.password === 'string')) {
-          inputPassword = req.body.password;
+          inputPassword = req.body.password.toString('utf8');
         }
         if ((inputNonce.length > 1) &&
           (inputUser.length > 0) &&
