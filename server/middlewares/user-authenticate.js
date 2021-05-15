@@ -262,22 +262,28 @@
         _removeAuthorizationFromSession(req);
         let timeNowSeconds = Math.floor(Date.now() / 1000);
         // make sure all expected data has been supplied, else bad request error
-        if (
-          ('query' in req) &&
-          ('nonce' in req.query) &&
-          (typeof req.query.nonce === 'string') &&
-          (req.query.nonce.length > 1) &&
-          ('body' in req) &&
-          ('user' in req.body) &&
-          (typeof req.body.user === 'string') &&
-          (req.body.user.length > 0) &&
-          ('password' in req.body) &&
-          (typeof req.body.user === 'string') &&
-          (req.body.password.length > 0)) {
+        let inputNonce = '';
+        let inputUser = '';
+        let inputPassword = '';
+        if (('query' in req) && ('nonce' in req.query) &&
+          (typeof req.query.nonce === 'string')) {
+          inputNonce = req.query.nonce;
+        }
+        if (('body' in req) && ('user' in req.body) &&
+          (typeof req.body.user === 'string')) {
+          inputUser = req.body.user;
+        }
+        if (('body' in req) && ('password' in req.body) &&
+          (typeof req.body.password === 'string')) {
+          inputPassword = req.body.password;
+        }
+        if ((inputNonce.length > 1) &&
+          (inputUser.length > 0) &&
+          (inputPassword.length > 0)) {
           //
           // Query user array to find index to matching user.
           //
-          let postedUser = sanatizeString(req.body.user);
+          let postedUser = sanatizeString(inputUser);
           let userIndex = -1;
           for (let i=0; i<userArray.length; i++) {
             if (userArray[i].user === postedUser) {
@@ -293,7 +299,7 @@
           }
 
           if ((!(req.session.sessionAuth.loginNonce)) ||
-            (!(safeCompare(req.query.nonce, req.session.sessionAuth.loginNonce)))) {
+            (!(safeCompare(inputNonce, req.session.sessionAuth.loginNonce)))) {
             customLog(req, 'Bad login nonce invalid');
             _removeLoginNonceFromSession(req);
             // failTime used to append error message of past login fail attempt
@@ -314,7 +320,7 @@
           // Add salt to provided password and generate hash, check match.
           //
           let hash = crypto.createHash('sha256');
-          let hashedPassword = hash.update('' + req.body.password +
+          let hashedPassword = hash.update(inputPassword +
             userArray[userIndex].salt).digest('hex');
           if (safeCompare(hashedPassword, userArray[userIndex].hash)) {
             // ------------------------
