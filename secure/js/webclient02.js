@@ -864,16 +864,31 @@ function _parseBufferMessage (message) {
         // There are 3 places in the code, search: 'QUIT':
         //
         if (true) {
-          let nick = parsedMessage.nick;
-          let inChannel = false;
+          // ------------
+          // Is nick in ANY active channel?
+          // -----------
+          let pureNick = parsedMessage.nick.toLowerCase();
+          // if check nickname starts with an op character, remove it
+          if (nicknamePrefixChars.indexOf(pureNick.charAt(0)) >= 0) {
+            pureNick = pureNick.slice(1, pureNick.length);
+          }
+          let present = false;
           if (ircState.channels.length > 0) {
             for (let i=0; i<ircState.channels.length; i++) {
-              if (ircState.channelStates[i].names.indexOf(nick) >= 0) {
-                inChannel = true;
+              if ((ircState.channelStates[i].joined) &&
+                (ircState.channelStates[i].names.length > 0)) {
+                for (let j=0; j<ircState.channelStates[i].names.length; j++) {
+                  let checkNick = ircState.channelStates[i].names[j].toLowerCase();
+                  // if channel nickname start with an OP character remove it
+                  if (nicknamePrefixChars.indexOf(checkNick.charAt(0)) >= 0) {
+                    checkNick = checkNick.slice(1, checkNick.length);
+                  }
+                  if (checkNick === pureNick) present = true;
+                } // next j
               }
-            }
+            } // next i
           }
-          if (inChannel) {
+          if (present) {
             displayChannelMessage(parsedMessage);
           } else {
             // Note, this will duplicate message when raw server messages
