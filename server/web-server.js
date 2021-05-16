@@ -242,7 +242,7 @@ app.get('/blocked', userAuth.blockedCookies);
 //  }
 //
 app.post('/terminate', authorizeOrFail, function(req, res, next) {
-  if (('terminate' in req.body) && (req.body.terminate === 'YES')) {
+  if (('terminate' in req.body) && (req.body.terminate.toString() === 'YES')) {
     let now = new Date();
     let dieMessage = now.toISOString() + ' Terminate reqeust ';
     try {

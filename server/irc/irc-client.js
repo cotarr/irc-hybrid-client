@@ -650,12 +650,36 @@
       });
     }
 
-    // TODO add size validation, character allowlist
-    vars.ircState.nickName = req.body.nickName;
-    // --- username disabled in browser
-    // vars.ircState.userName = req.body.userName;
-    vars.ircState.realName = req.body.realName;
-    vars.ircState.userMode = req.body.userMode;
+    let inputNickName = '';
+    if (('nickName' in req.body) &&
+      (typeof req.body.nickName === 'string')) {
+      inputNickName = req.body.nickName;
+    }
+    //
+    // Special case, leave userName as default from config file
+    //
+    let inputRealName = '';
+    if (('realName' in req.body) &&
+      (typeof req.body.realName === 'string')) {
+      inputRealName = req.body.realName;
+    }
+    let inputUserMode = '';
+    if (('userMode' in req.body) &&
+      (typeof req.body.userMode === 'string')) {
+      inputUserMode = req.body.userMode;
+    }
+
+    if ((inputNickName.lenth === 0) || (inputRealName.length === 0)) {
+      return res.json({
+        error: true,
+        message: 'Error: invalid IRC signon parameters'
+      });
+    }
+
+    vars.ircState.nickName = inputNickName;
+    // userName is special case, leave as in config file
+    vars.ircState.realName = inputRealName;
+    vars.ircState.userMode = inputUserMode;
 
     // channels here on connect, browser on disconnect
     vars.ircState.channels = [];
