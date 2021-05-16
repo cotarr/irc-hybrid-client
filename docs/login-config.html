@@ -49,12 +49,12 @@
         <p>
           This is intended for future use. It provides a method to
           issue a startup message when attempting to use a configuration
-          file that may be impacted by breaking changes. It will remain at 2
+          file that may be impacted by breaking changes. It will remain at 1
           until there is a breaking change.
         </p>
         <p>
-          This was increased from 1 to 2 when the password hash function was
-          upgraded to bcrypt in Version 0.1.0 as a breaking change.
+          This was increased from 1 to 2 when hash function was
+          upgraded to bcrypt in Version 0.1.0.
         </p>
 <div class="pre-div"><pre>
   "configVersion": 2,
@@ -221,7 +221,7 @@
 
 <div class="pre-div"><pre>
 cd tools
-node updateAuthForUser_1.js
+./updateAuthForUser_1.js
 </pre></div>
         <p>
           This will start an interactive session.
@@ -265,7 +265,7 @@ Enter new password:<blue-example>zuwa79xoJxLJ</blue-example>
       "userid": 1,
       "user": "user1",
       "name": "user1",
-      "hash": "----- actual hash omitted -------"
+      "hash": "$2a$10$kvW6dwBpWKkZzcMBuKLI4OlEVoI6guWu.yewp8AHK4DGS3OjMWcPq"
     }</yellow-example>
   ]
 }
