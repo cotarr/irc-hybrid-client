@@ -32,6 +32,7 @@
   const fs = require('fs');
   const path = require('path');
   const crypto = require('crypto');
+  const bcrypt = require('bcryptjs');
 
   const credentials = JSON.parse(fs.readFileSync('./credentials.json', 'utf8'));
 
@@ -277,8 +278,14 @@
           (typeof req.body.password === 'string')) {
           inputPassword = req.body.password.toString('utf8');
         }
+        // Unicode characters can be up to 4 bytes, bcrypt has maximum input 72 characters.
+        let uint8PasswordArray = new TextEncoder('utf8').encode(inputPassword);
         if ((inputNonce.length > 1) &&
+          (inputNonce.length <= 16) &&
           (inputUser.length > 0) &&
+          (inputUser.length <= 16) &&
+          // 72 bytes, not unicode characters
+          (uint8PasswordArray.length <= 72) &&
           (inputPassword.length > 0)) {
           //
           // Query user array to find index to matching user.
@@ -317,12 +324,9 @@
           }
 
           //
-          // Add salt to provided password and generate hash, check match.
+          // Check bcrypt salted hash to see if it matches
           //
-          let hash = crypto.createHash('sha256');
-          let hashedPassword = hash.update(inputPassword +
-            userArray[userIndex].salt).digest('hex');
-          if (safeCompare(hashedPassword, userArray[userIndex].hash)) {
+          if (bcrypt.compareSync(inputPassword, userArray[userIndex].hash)) {
             // ------------------------
             // Authorize the user
             // ------------------------
@@ -371,7 +375,7 @@
       }
       next(err);
     }
-  };
+  }; // loginAuthorize()
 
   const loginFormFragment1 =
     '<div>\n' +

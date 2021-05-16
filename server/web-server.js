@@ -55,7 +55,11 @@ const authorizeOrFail = userAuth.authorizeOrFail;
 // TLS certificate filenames
 // Web username, password credentials
 const credentials = JSON.parse(fs.readFileSync('./credentials.json', 'utf8'));
-if ((!('configVersion' in credentials)) || (credentials.configVersion !== 1)) {
+if (credentials.configVersion === 1) {
+  console.log('\nPassword hash requires regeneration due to upgrade of hash function to bcrypt.\n');
+  process.exit(1);
+}
+if ((!('configVersion' in credentials)) || (credentials.configVersion !== 2)) {
   console.log('Error, credentials.js wrong configVersion');
   process.exit(1);
 }

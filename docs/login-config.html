@@ -52,8 +52,12 @@
           file that may be impacted by breaking changes. It will remain at 1
           until there is a breaking change.
         </p>
+        <p>
+          This was increased from 1 to 2 when hash function was
+          upgraded to bcrypt in Version 0.1.0.
+        </p>
 <div class="pre-div"><pre>
-  "configVersion": 1,
+  "configVersion": 2,
 </pre></div>
 
         <div class="install-section-title">Certificates</div>
@@ -201,7 +205,7 @@
           The square brackets [ ] define a javascript array.
           Each of the curley braces { } within the array is a javascript object
           used to define an individual user.
-          The user object contains 5 properties listed as key/value pairs.
+          The user object contains 4 properties listed as key/value pairs.
           Note the use of double quotes and commas between key/value pairs except the last has no comma.
           In fact, there is only 1 user. Only the first array object at
           index 0 (userid 1) is relevant.
@@ -226,8 +230,7 @@ cd tools
           same value as the user.
           In this example, the password was set to
           <blue-example>zuwa79xoJxLJ</blue-example>.
-          A random user specific salt was generated and the salt was combined with the
-          password to generate a sha256 hash.
+          A bcrypt function was used to generate a salted hash.
           The data was written to the credentials.json file, and
           a copy of the credentials.json was displayed for your review.
         </p>
@@ -239,11 +242,15 @@ This is a static password not editable online
 It is intended there is only one user for the program
 This must be run from the tools folder to find credentials.json
 
+User up to 16 characters a-z,A-Z,0-9
 Enter new user:<blue-example>user1</blue-example>
+
+Name up to 32 characters a-z,A-Z,0-9
 Enter new name (user1):
+
 Enter new password:<blue-example>zuwa79xoJxLJ</blue-example>
 {
-  "configVersion": 1,
+  "configVersion": 2,
   "serverTlsKey": "/home/user1/tls/privkey.pem",
   "serverTlsCert": "/home/user1/tls/fullchain.pem",
   "tls": true,
@@ -258,8 +265,7 @@ Enter new password:<blue-example>zuwa79xoJxLJ</blue-example>
       "userid": 1,
       "user": "user1",
       "name": "user1",
-      "salt": "42c69b57c63150ea17b81c5244ec7ce0",
-      "hash": "e861dbcd61d5af53fdcef2ddac2f0658782259d1bc3fc25210e7d33167c839d6"
+      "hash": "$2a$10$kvW6dwBpWKkZzcMBuKLI4OlEVoI6guWu.yewp8AHK4DGS3OjMWcPq"
     }</yellow-example>
   ]
 }

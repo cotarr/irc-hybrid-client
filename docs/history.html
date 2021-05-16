@@ -32,6 +32,14 @@
           Change Log
         </div>
         <p>
+          2021-05-16 (0.1.0) (Breaking change)
+          Web user password hash function was updated from sha256 to bcrypt
+          For version 0.0.2 users, it will be necessary to regenerate your password hash.
+          (See <a href="/login-config.html">login Config</a>)
+          This change was necessary to clear github CodeQL Warning that was visible after
+          making repository public.
+        </p>
+        <p>
           2021-05-12 (0.0.2) Git repository status changed from private to public.
           This is not considered a release. The project is still a work in progress.
         </p>
