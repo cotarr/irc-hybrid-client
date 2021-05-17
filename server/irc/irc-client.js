@@ -773,7 +773,10 @@
   // ------------------------------------------------------
   const messageHandler = function(req, res, next) {
     // console.log(req.body);
-    if (!('message' in req.body)) {
+    if (!vars.ircState.ircConnected) {
+      webError:('messageHandler() IRC server not connected');
+      res.json({error: true, message: 'Can not send server message when IRC server not connected'});
+    } else if (!('message' in req.body)) {
       webError:('messageHandler() IRC message not found in POST body');
       let err = new Error('BAD REQUEST');
       err.status = 400;
