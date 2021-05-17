@@ -204,29 +204,33 @@ if(parseInt(parsedMessage.command)>=400&&parseInt(parsedMessage.command)<500){_s
 if(!ircState.ircRegistered&&parsedMessage.params.length===1){if(webState.cacheInhibitTimer===0){showError("ERROR "+parsedMessage.params[0])}}break;case"KICK":displayChannelMessage(parsedMessage);break
 ;case"JOIN":displayChannelMessage(parsedMessage);break;case"MODE":if(true){if(parsedMessage.params[0]===ircState.nickName){if(!webState.viewRawMessages){
 displayFormattedServerMessage(parsedMessage,message)}}else if(channelPrefixChars.indexOf(parsedMessage.params[0].charAt(0))>=0){displayChannelMessage(parsedMessage)}else{
-console.log("Error message MODE to unknown recipient")}}break;case"NICK":displayChannelMessage(parsedMessage);break;case"PART":displayChannelMessage(parsedMessage);break;case"NOTICE":if(true){
-if(!parsedMessage.nick||parsedMessage.nick.length===0){if(!webState.viewRawMessages){displayFormattedServerMessage(parsedMessage,message)}}else{const ctcpDelim=1
-;if(parsedMessage.params[1]===null)parsedMessage.params[1]="";if(parsedMessage.params[1].charCodeAt(0)===ctcpDelim){_parseCtcpMessage(parsedMessage)}else{displayNoticeMessage(parsedMessage)}}}break
-;case"PRIVMSG":if(true){const ctcpDelim=1;if(parsedMessage.params[1].charCodeAt(0)===ctcpDelim){_parseCtcpMessage(parsedMessage)}else{
-let index=ircState.channels.indexOf(parsedMessage.params[0].toLowerCase());if(index>=0){displayChannelMessage(parsedMessage)}else{displayPrivateMessage(parsedMessage)}}}break;case"QUIT":if(true){
-let pureNick=parsedMessage.nick.toLowerCase();if(nicknamePrefixChars.indexOf(pureNick.charAt(0))>=0){pureNick=pureNick.slice(1,pureNick.length)}let present=false;if(ircState.channels.length>0){
-for(let i=0;i<ircState.channels.length;i++){if(ircState.channelStates[i].joined&&ircState.channelStates[i].names.length>0){for(let j=0;j<ircState.channelStates[i].names.length;j++){
-let checkNick=ircState.channelStates[i].names[j].toLowerCase();if(nicknamePrefixChars.indexOf(checkNick.charAt(0))>=0){checkNick=checkNick.slice(1,checkNick.length)}
-if(checkNick===pureNick)present=true}}}}if(present){displayChannelMessage(parsedMessage)}else{displayFormattedServerMessage(parsedMessage,message)}}break;case"TOPIC":if(true){
-if(channelPrefixChars.indexOf(parsedMessage.params[0].charAt(0))>=0){displayChannelMessage(parsedMessage)}else{console.log("Error message TOPIC to unknown channel")}}break;case"WALLOPS":
-displayWallopsMessage(parsedMessage);break;default:}}}"use strict";function initWebSocketAuth(callback){let fetchURL=webServerUrl+"/irc/wsauth";let fetchOptions={method:"POST",headers:{
-"Content-type":"application/json",Accept:"application/json"},body:JSON.stringify({purpose:"websocket-auth"})};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()}else{
-throw new Error("Fetch status "+response.status+" "+response.statusText)}}).then(responseJson=>{if(callback){callback(null,ircState)}}).catch(error=>{console.log(error);webState.webConnected=false
-;webState.webConnecting=false;updateDivVisibility();if(callback){callback(error,{})}})}function connectWebSocket(){wsocket=new WebSocket(webSocketUrl+"/irc/ws");webState.websocketCount++
-;wsocket.addEventListener("open",function(event){webState.webConnected=true;webState.webConnecting=false;webState.times.webConnect=unixTimestamp();webState.count.webConnect++;resetHeartbeatTimer()
-;updateDivVisibility();getIrcState(function(err,data){if(!err){document.dispatchEvent(new CustomEvent("update-from-cache",{bubbles:true}))}})});wsocket.addEventListener("close",function(event){
-if(webState.websocketCount>0){webState.websocketCount--;if(webState.websocketCount===0){if(webState.webConnected){if("code"in event&&event.code===3001){
-document.getElementById("reconnectStatusDiv").textContent+="Web page disconnected at user request\n"}else{
-document.getElementById("reconnectStatusDiv").textContent+="Web socket connection closed, count: "+webState.websocketCount+"\n"+"Code: "+event.code+" "+event.reason+"\n";if(!webState.webConnectOn){
-document.getElementById("reconnectStatusDiv").textContent+="Automatic web reconnect is disabled. \nPlease reconnect manually.\n"}}}webState.webConnected=false;webState.webConnecting=false
-;setVariablesShowingIRCDisconnected();updateDivVisibility()}}});wsocket.addEventListener("error",function(error){console.log("Websocket error");webState.webConnected=false;webState.webConnecting=false
-});var previousBufferFragment="";function parseStreamBuffer(inBuffer){if(!inBuffer)return;let data=previousBufferFragment.concat(inBuffer);previousBufferFragment="";let len=data.length
-;if(len===0)return;let index=0;let count=0;for(let i=0;i<len;i++){let charCode=data.charCodeAt(i);if(charCode!==10&&charCode!==13){count=count+1}else{if(count>0){
+console.log("Error message MODE to unknown recipient")}}break;case"NICK":if(true){let pureNick1=parsedMessage.nick.toLowerCase();if(nicknamePrefixChars.indexOf(pureNick1.charAt(0))>=0){
+pureNick1=pureNick1.slice(1,pureNick1.length)}let pureNick2=parsedMessage.params[0].toLowerCase();if(nicknamePrefixChars.indexOf(pureNick2.charAt(0))>=0){pureNick2=pureNick2.slice(1,pureNick2.length)}
+let present=false;if(ircState.channels.length>0){for(let i=0;i<ircState.channels.length;i++){if(ircState.channelStates[i].joined&&ircState.channelStates[i].names.length>0){
+for(let j=0;j<ircState.channelStates[i].names.length;j++){let checkNick=ircState.channelStates[i].names[j].toLowerCase();if(nicknamePrefixChars.indexOf(checkNick.charAt(0))>=0){
+checkNick=checkNick.slice(1,checkNick.length)}if(checkNick===pureNick1)present=true;if(checkNick===pureNick2)present=true}}}}if(present){displayChannelMessage(parsedMessage)}else{
+displayFormattedServerMessage(parsedMessage,message)}}break;case"PART":displayChannelMessage(parsedMessage);break;case"NOTICE":if(true){if(!parsedMessage.nick||parsedMessage.nick.length===0){
+if(!webState.viewRawMessages){displayFormattedServerMessage(parsedMessage,message)}}else{const ctcpDelim=1;if(parsedMessage.params[1]===null)parsedMessage.params[1]=""
+;if(parsedMessage.params[1].charCodeAt(0)===ctcpDelim){_parseCtcpMessage(parsedMessage)}else{displayNoticeMessage(parsedMessage)}}}break;case"PRIVMSG":if(true){const ctcpDelim=1
+;if(parsedMessage.params[1].charCodeAt(0)===ctcpDelim){_parseCtcpMessage(parsedMessage)}else{let index=ircState.channels.indexOf(parsedMessage.params[0].toLowerCase());if(index>=0){
+displayChannelMessage(parsedMessage)}else{displayPrivateMessage(parsedMessage)}}}break;case"QUIT":if(true){let pureNick=parsedMessage.nick.toLowerCase()
+;if(nicknamePrefixChars.indexOf(pureNick.charAt(0))>=0){pureNick=pureNick.slice(1,pureNick.length)}let present=false;if(ircState.channels.length>0){for(let i=0;i<ircState.channels.length;i++){
+if(ircState.channelStates[i].joined&&ircState.channelStates[i].names.length>0){for(let j=0;j<ircState.channelStates[i].names.length;j++){let checkNick=ircState.channelStates[i].names[j].toLowerCase()
+;if(nicknamePrefixChars.indexOf(checkNick.charAt(0))>=0){checkNick=checkNick.slice(1,checkNick.length)}if(checkNick===pureNick)present=true}}}}if(present){displayChannelMessage(parsedMessage)}else{
+displayFormattedServerMessage(parsedMessage,message)}}break;case"TOPIC":if(true){if(channelPrefixChars.indexOf(parsedMessage.params[0].charAt(0))>=0){displayChannelMessage(parsedMessage)}else{
+console.log("Error message TOPIC to unknown channel")}}break;case"WALLOPS":displayWallopsMessage(parsedMessage);break;default:}}}"use strict";function initWebSocketAuth(callback){
+let fetchURL=webServerUrl+"/irc/wsauth";let fetchOptions={method:"POST",headers:{"Content-type":"application/json",Accept:"application/json"},body:JSON.stringify({purpose:"websocket-auth"})}
+;fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()}else{throw new Error("Fetch status "+response.status+" "+response.statusText)}}).then(responseJson=>{if(callback){
+callback(null,ircState)}}).catch(error=>{console.log(error);webState.webConnected=false;webState.webConnecting=false;updateDivVisibility();if(callback){callback(error,{})}})}
+function connectWebSocket(){wsocket=new WebSocket(webSocketUrl+"/irc/ws");webState.websocketCount++;wsocket.addEventListener("open",function(event){webState.webConnected=true
+;webState.webConnecting=false;webState.times.webConnect=unixTimestamp();webState.count.webConnect++;resetHeartbeatTimer();updateDivVisibility();getIrcState(function(err,data){if(!err){
+document.dispatchEvent(new CustomEvent("update-from-cache",{bubbles:true}))}})});wsocket.addEventListener("close",function(event){if(webState.websocketCount>0){webState.websocketCount--
+;if(webState.websocketCount===0){if(webState.webConnected){if("code"in event&&event.code===3001){document.getElementById("reconnectStatusDiv").textContent+="Web page disconnected at user request\n"
+}else{document.getElementById("reconnectStatusDiv").textContent+="Web socket connection closed, count: "+webState.websocketCount+"\n"+"Code: "+event.code+" "+event.reason+"\n"
+;if(!webState.webConnectOn){document.getElementById("reconnectStatusDiv").textContent+="Automatic web reconnect is disabled. \nPlease reconnect manually.\n"}}}webState.webConnected=false
+;webState.webConnecting=false;setVariablesShowingIRCDisconnected();updateDivVisibility()}}});wsocket.addEventListener("error",function(error){console.log("Websocket error");webState.webConnected=false
+;webState.webConnecting=false});var previousBufferFragment="";function parseStreamBuffer(inBuffer){if(!inBuffer)return;let data=previousBufferFragment.concat(inBuffer);previousBufferFragment=""
+;let len=data.length;if(len===0)return;let index=0;let count=0;for(let i=0;i<len;i++){let charCode=data.charCodeAt(i);if(charCode!==10&&charCode!==13){count=count+1}else{if(count>0){
 let message=data.slice(index,index+count);_parseBufferMessage(message)}index=i+1;count=0}}if(count>0){previousBufferFragment=data.slice(index,index+count)}}
 wsocket.addEventListener("message",function(event){parseStreamBuffer(event.data)})}function _sendIrcServerMessage(message){if(!checkConnect(3))return;let body={message:message}
 ;let fetchURL=webServerUrl+"/irc/message";let fetchOptions={method:"POST",headers:{"Content-type":"application/json",Accept:"application/json"},body:JSON.stringify(body)}
@@ -473,8 +477,9 @@ if(channelMainSectionEl.hasAttribute("brief-enabled")){_addText(parsedMessage.ti
 _addText(parsedMessage.timestamp,"*",parsedMessage.nick+" ("+parsedMessage.host+") has joined")}if(channelMainSectionEl.hasAttribute("beep2-enabled")&&webState.cacheInhibitTimer===0){playBeep1Sound()}
 channelBottomDivEl.removeAttribute("hidden");channelHideButtonEl.textContent="-"}break;case"MODE":if(parsedMessage.params[0].toLowerCase()===name.toLowerCase()){if(parsedMessage.nick){
 _addText(parsedMessage.timestamp,"*","Mode "+JSON.stringify(parsedMessage.params)+" by "+parsedMessage.nick)}else{
-_addText(parsedMessage.timestamp,"*","Mode "+JSON.stringify(parsedMessage.params)+" by "+parsedMessage.prefix)}}break;case"NICK":if(true){
-_addText(parsedMessage.timestamp,"*",parsedMessage.nick+" is now known as "+parsedMessage.params[0])}break;case"NOTICE":if(parsedMessage.params[0].toLowerCase()===name.toLowerCase()){
+_addText(parsedMessage.timestamp,"*","Mode "+JSON.stringify(parsedMessage.params)+" by "+parsedMessage.prefix)}}break;case"NICK":if(true){let present=false
+;if(_isNickInChannel(parsedMessage.nick,name))present=true;if(_isNickInChannel(parsedMessage.params[0],name))present=true;if(present){
+_addText(parsedMessage.timestamp,"*",parsedMessage.nick+" is now known as "+parsedMessage.params[0])}}break;case"NOTICE":if(parsedMessage.params[0].toLowerCase()===name.toLowerCase()){
 _addText(parsedMessage.timestamp,"*","Notice("+parsedMessage.nick+" to "+parsedMessage.params[0]+") "+parsedMessage.params[1]);channelBottomDivEl.removeAttribute("hidden")
 ;channelHideButtonEl.textContent="-";if(document.activeElement!==channelInputAreaEl&&document.activeElement!==channelSendButtonEl&&webState.cacheInhibitTimer===0&&activityIconInhibitTimer===0){
 setChanActivityIcon(channelIndex)}}break;case"PART":if(parsedMessage.params[0].toLowerCase()===name.toLowerCase()){let reason=" ";if(parsedMessage.params[1])reason=parsedMessage.params[1]
@@ -596,9 +601,11 @@ _showAfterParamZero(event.detail.parsedMessage);break;case"005":break;case"250":
 ;case"256":case"257":case"258":case"259":_showAfterParamZero(event.detail.parsedMessage);break;case"315":break;case"352":_showAfterParamZero(event.detail.parsedMessage);break;case"275":case"301":
 case"307":case"311":case"312":case"313":case"317":case"318":case"319":_showAfterParamZero(event.detail.parsedMessage);break;case"372":_showAfterParamZero(event.detail.parsedMessage);break;case"375":
 case"376":break;case"MODE":
-displayRawMessage(cleanFormatting(cleanCtcpDelimiter(event.detail.parsedMessage.timestamp+" "+"MODE "+event.detail.parsedMessage.params[0]+" "+event.detail.parsedMessage.params[1])));break
-;case"NOTICE":displayRawMessage(cleanFormatting(cleanCtcpDelimiter(event.detail.parsedMessage.timestamp+" "+"NOTICE "+event.detail.parsedMessage.params[0]+" "+event.detail.parsedMessage.params[1])))
-;break;case"QUIT":if(true){let reason=" ";if(event.detail.parsedMessage.params[0]){reason=event.detail.parsedMessage.params[0]
+displayRawMessage(cleanFormatting(cleanCtcpDelimiter(event.detail.parsedMessage.timestamp+" "+"MODE "+event.detail.parsedMessage.params[0]+" "+event.detail.parsedMessage.params[1])));break;case"NICK":
+displayRawMessage(cleanFormatting(cleanCtcpDelimiter(event.detail.parsedMessage.timestamp+" "+"(No channel) "+event.detail.parsedMessage.nick+" is now known as "+event.detail.parsedMessage.params[0])))
+;break;case"NOTICE":
+displayRawMessage(cleanFormatting(cleanCtcpDelimiter(event.detail.parsedMessage.timestamp+" "+"NOTICE "+event.detail.parsedMessage.params[0]+" "+event.detail.parsedMessage.params[1])));break
+;case"QUIT":if(true){let reason=" ";if(event.detail.parsedMessage.params[0]){reason=event.detail.parsedMessage.params[0]
 ;displayRawMessage(cleanFormatting(cleanCtcpDelimiter(event.detail.parsedMessage.timestamp+" "+"(No channel) "+event.detail.parsedMessage.nick+" has quit ("+reason+")")))}}break;default:if(true){
 displayRawMessage(cleanFormatting(cleanCtcpDelimiter(substituteHmsTime(event.detail.message))))}}showRawMessageWindow()})
 ;document.getElementById("rawHiddenElementsButton").addEventListener("click",function(){if(document.getElementById("rawHiddenElements").hasAttribute("hidden")){showRawMessageWindow()}else{
