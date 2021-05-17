@@ -811,7 +811,45 @@ function _parseBufferMessage (message) {
         }
         break;
       case 'NICK':
-        displayChannelMessage(parsedMessage);
+        if (true) {
+          // ------------
+          // Is previous nick or new nick in ANY active channel?
+          // -----------
+          let pureNick1 = parsedMessage.nick.toLowerCase();
+          // if check nickname starts with an op character, remove it
+          if (nicknamePrefixChars.indexOf(pureNick1.charAt(0)) >= 0) {
+            pureNick1 = pureNick1.slice(1, pureNick1.length);
+          }
+          let pureNick2 = parsedMessage.params[0].toLowerCase();
+          // if check nickname starts with an op character, remove it
+          if (nicknamePrefixChars.indexOf(pureNick2.charAt(0)) >= 0) {
+            pureNick2 = pureNick2.slice(1, pureNick2.length);
+          }
+          let present = false;
+          if (ircState.channels.length > 0) {
+            for (let i=0; i<ircState.channels.length; i++) {
+              if ((ircState.channelStates[i].joined) &&
+                (ircState.channelStates[i].names.length > 0)) {
+                for (let j=0; j<ircState.channelStates[i].names.length; j++) {
+                  let checkNick = ircState.channelStates[i].names[j].toLowerCase();
+                  // if channel nickname start with an OP character remove it
+                  if (nicknamePrefixChars.indexOf(checkNick.charAt(0)) >= 0) {
+                    checkNick = checkNick.slice(1, checkNick.length);
+                  }
+                  if (checkNick === pureNick1) present = true;
+                  if (checkNick === pureNick2) present = true;
+                } // next j
+              }
+            } // next i
+          }
+          if (present) {
+            displayChannelMessage(parsedMessage);
+          } else {
+            // Note, this will duplicate message when raw server messages
+            // are enabled having one formatted and one unformatted.
+            displayFormattedServerMessage(parsedMessage, message);
+          }
+        }
         break;
       case 'PART':
         displayChannelMessage(parsedMessage);

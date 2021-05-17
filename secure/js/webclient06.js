@@ -971,9 +971,19 @@ function createChannelEl (name) {
         break;
       case 'NICK':
         if (true) {
-          _addText(parsedMessage.timestamp,
-            '*',
-            parsedMessage.nick + ' is now known as ' + parsedMessage.params[0]);
+          // ------------
+          // Is previous nick or new nick in ANY active channel?
+          // -----------
+          let present = false;
+          // previous nick
+          if (_isNickInChannel(parsedMessage.nick, name)) present = true;
+          // new nick
+          if (_isNickInChannel(parsedMessage.params[0], name)) present = true;
+          if (present) {
+            _addText(parsedMessage.timestamp,
+              '*',
+              parsedMessage.nick + ' is now known as ' + parsedMessage.params[0]);
+          }
         }
         break;
       case 'NOTICE':

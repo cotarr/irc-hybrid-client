@@ -202,7 +202,15 @@ document.addEventListener('server-message', function(event) {
             'MODE ' +
             event.detail.parsedMessage.params[0] + ' ' +
             event.detail.parsedMessage.params[1])));
-
+      break;
+    case 'NICK':
+      displayRawMessage(
+        cleanFormatting(
+          cleanCtcpDelimiter(
+            event.detail.parsedMessage.timestamp + ' ' +
+            '(No channel) ' +
+            event.detail.parsedMessage.nick + ' is now known as ' +
+            event.detail.parsedMessage.params[0])));
       break;
 
     case 'NOTICE':
