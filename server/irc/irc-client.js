@@ -564,20 +564,19 @@
   // Method: POST
   // Route:  /irc/server
   //
-  // Input: Index of server starting from 0, -1 for next in sequence
+  // Input: Index of server starting from 0
+  //        Set to -1 for next in sequence (cycle)
   //
   //  req.body{
-  //    "index": -1  (Future not used)
+  //    "index": -1
   //  }
   //----------------------------------------
   const serverHandler = function(req, res, next) {
-    if ((vars.ircState.connected) || (vars.ircState.connecting)) {
-      if ((!('serverArray' in servers)) || (servers.serverArray.length < 1)) {
-        return res.json({
-          error: true,
-          message: 'Can not change servers while connected or connecting'
-        });
-      }
+    if ((vars.ircState.ircConnected) || (vars.ircState.ircConnecting)) {
+      return res.json({
+        error: true,
+        message: 'Can not change servers while connected or connecting'
+      });
     }
     if ((!('serverArray' in servers)) || (servers.serverArray.length < 1)) {
       return res.json({
@@ -585,20 +584,39 @@
         message: 'Server list empty.'
       });
     }
-    if (servers.serverArray.length === 1) {
+    // input type validation
+    if ((!('index' in req.body)) ||
+      (typeof req.body.index !== 'number') ||
+      (!Number.isInteger(req.body.index))) {
+      let error = new Error('Bad Reqeust');
+      error.status = 400;
+      return next(error);
+    }
+    // input range validaton
+    let inputIndex = req.body.index;
+    if ((inputIndex < -1) || (inputIndex >= servers.serverArray.length)) {
       return res.json({
         error: true,
-        message: 'Only 1 server, can not cycle.'
+        message: 'Requested server index number out of range.'
       });
     }
+
     // clear these to reinitialize restart logic
     vars.ircState.count.ircConnect = 0;
     vars.ircState.count.ircConnectError = 0;
 
-    vars.ircState.ircServerIndex++;
-    if (vars.ircState.ircServerIndex >= servers.serverArray.length) {
-      vars.ircState.ircServerIndex = 0;
+    // if index === -1, then cycle through servers, else use index value
+    if (inputIndex === -1) {
+      vars.ircState.ircServerIndex++;
+      if (vars.ircState.ircServerIndex >= servers.serverArray.length) {
+        vars.ircState.ircServerIndex = 0;
+      }
+    } else {
+      vars.ircState.ircServerIndex = inputIndex;
     }
+    //
+    // Update IRC parameters
+    //
     vars.ircState.ircServerName = servers.serverArray[vars.ircState.ircServerIndex].name;
     vars.ircState.ircServerHost = servers.serverArray[vars.ircState.ircServerIndex].host;
     vars.ircState.ircServerPort = servers.serverArray[vars.ircState.ircServerIndex].port;
@@ -618,7 +636,6 @@
 
     return res.json({
       error: false,
-      message: null,
       index: vars.ircState.ircServerIndex,
       name: vars.ircState.ircServerName
     });

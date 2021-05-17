@@ -33,6 +33,10 @@ document.getElementById('cycleNextServerButton').addEventListener('click', funct
     return;
   }
 
+  // The value of index is set to -1 to cycle through all
+  // servers one at a time. For the future, an index can
+  // be specified for a specific server
+  //
   let fetchURL = webServerUrl + '/irc/server';
   let fetchOptions = {
     method: 'POST',
@@ -56,6 +60,10 @@ document.getElementById('cycleNextServerButton').addEventListener('click', funct
       // console.log(JSON.stringify(responseJson, null, 2));
       if (responseJson.error) {
         showError(responseJson.message);
+      } else {
+        // this will cause nickname, username and realname to update
+        // in the login form upon receiving the next getUpdateState() response
+        webState.lastIrcServerIndex = -1;
       }
     })
     .catch( (error) => {

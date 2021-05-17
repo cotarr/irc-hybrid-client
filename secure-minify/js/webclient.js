@@ -260,8 +260,8 @@ webState.webConnecting=true;updateDivVisibility();wsReconnectTimer=0;wsReconnect
 ;reconnectWebSocketAfterDisconnect()}return}return}"use strict";document.getElementById("cycleNextServerButton").addEventListener("click",function(){if(ircState.ircConnected){
 showError("Can not change servers while connected");return}let fetchURL=webServerUrl+"/irc/server";let fetchOptions={method:"POST",headers:{"Content-type":"application/json",Accept:"application/json"
 },body:JSON.stringify({index:-1})};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()}else{throw new Error("Fetch status "+response.status+" "+response.statusText)}
-}).then(responseJson=>{if(responseJson.error){showError(responseJson.message)}}).catch(error=>{console.log(error);showError(error.toString())})});function connectButtonHandler(){
-if(!checkConnect(1))return;if(ircState.ircConnected||ircState.ircConnecting||webState.ircConnecting){showError("Error: Already connected to IRC server");return}
+}).then(responseJson=>{if(responseJson.error){showError(responseJson.message)}else{webState.lastIrcServerIndex=-1}}).catch(error=>{console.log(error);showError(error.toString())})})
+;function connectButtonHandler(){if(!checkConnect(1))return;if(ircState.ircConnected||ircState.ircConnecting||webState.ircConnecting){showError("Error: Already connected to IRC server");return}
 if(document.getElementById("nickNameInputId").value.length<1){showError("Invalid nick name.");return}webState.ircConnecting=true;let connectObject={}
 ;connectObject.nickName=document.getElementById("nickNameInputId").value;connectObject.userName=document.getElementById("userNameInputId").value
 ;connectObject.realName=document.getElementById("realNameInputId").value;connectObject.userMode=document.getElementById("userModeInputId").value;let fetchURL=webServerUrl+"/irc/connect"
