@@ -242,7 +242,11 @@ app.get('/blocked', userAuth.blockedCookies);
 //  }
 //
 app.post('/terminate', authorizeOrFail, function(req, res, next) {
-  if (('terminate' in req.body) && (req.body.terminate.toString() === 'YES')) {
+  let inputVerifyString = '';
+  if (('terminate' in req.body) && (typeof req.body.terminate === 'string')) {
+    inputVerifyString = req.body.terminate;
+  }
+  if (inputVerifyString === 'YES') {
     let now = new Date();
     let dieMessage = now.toISOString() + ' Terminate reqeust ';
     try {
@@ -259,7 +263,7 @@ app.post('/terminate', authorizeOrFail, function(req, res, next) {
     setTimeout(function() {
       process.exit(1);
     }, 1000);
-    res.json({message: 'Terminate received'});
+    res.json({error: false, message: 'Terminate received'});
   } else {
     let error = new Error('Bad Reqeust');
     error.status = 400;
