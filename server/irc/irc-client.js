@@ -879,8 +879,12 @@
   //
   // -----------------------------------------------
   const pruneChannel = function(req, res, next) {
-    if (('channel' in req.body) && (req.body.channel.length > 0)) {
-      let index = vars.ircState.channels.indexOf(req.body.channel.toLowerCase());
+    let inputChannel = '';
+    if (('channel' in req.body) && (typeof req.body.channel === 'string')) {
+      inputChannel = req.body.channel;
+    }
+    if (inputChannel.length > 0) {
+      let index = vars.ircState.channels.indexOf(inputChannel.toLowerCase());
       if (index >= 0) {
         if (!vars.ircState.channelStates[index].joined) {
           // prune the channel from arrays

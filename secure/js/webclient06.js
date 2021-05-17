@@ -418,8 +418,35 @@ function createChannelEl (name) {
   // Prune button handler
   // -------------------------
   channelPruneButtonEl.addEventListener('click', function() {
+    // Internal function to remove channel window from DOM
+    // Some variabes are within variable namespace of parent function.
+    function _removeChannelFromDom () {
+      // remove frontend browser state info for this channel
+      let webStateChannelsIndex = webState.channels.indexOf(name.toLowerCase());
+      if (webStateChannelsIndex >= 0) {
+        webState.channels.splice(webStateChannelsIndex, 1);
+        webState.channelStates.splice(webStateChannelsIndex, 1);
+      }
+
+      // remove resizeable screenwidth references
+      let tempIndex1 = webState.resizableSendButtonTextareaIds.indexOf(channelInputAreaId);
+      if (tempIndex1 >= 0) {
+        webState.resizableSendButtonTextareaIds.splice(tempIndex1, 1);
+      }
+      let tempIndex2 = webState.resizableChanSplitTextareaIds.indexOf(channelTextAreaId);
+      if (tempIndex2 >= 0) {
+        webState.resizableChanSplitTextareaIds.splice(tempIndex2, 1);
+      }
+
+      // This removes self (own element)
+      // remove the channel element from DOM
+      channelContainerDivEl.removeChild(channelMainSectionEl);
+    }
+
+    // Fetch API to remove channel from backend server
     let index = ircState.channels.indexOf(name.toLowerCase());
     if (index >= 0) {
+      // if not joined, this is quietly ignored without error
       if (!ircState.channelStates[index].joined) {
         let fetchURL = webServerUrl + '/irc/prune';
         let fetchOptions = {
@@ -440,35 +467,23 @@ function createChannelEl (name) {
             }
           })
           .then( (responseJson) => {
+            // console.log(JSON.stringify(responseJson, null, 2));
             if (responseJson.error) {
               showError(responseJson.message);
             } else {
-              // remove the channel element from DOM
-              channelContainerDivEl.removeChild(channelMainSectionEl);
-
-              // remove frontend browser state info for this channel
-              let webStateChannelsIndex = webState.channels.indexOf(name.toLowerCase());
-              if (webStateChannelsIndex >= 0) {
-                webState.channels.splice(webStateChannelsIndex, 1);
-                webState.channelStates.splice(webStateChannelsIndex, 1);
-              }
-              console.log(JSON.stringify(webState.channels));
-
-              // remove resizeable screenwidth references
-              let tempIndex1 = webState.resizableSendButtonTextareaIds.indexOf(channelInputAreaId);
-              if (tempIndex1 >= 0) {
-                webState.resizableSendButtonTextareaIds.splice(tempIndex1, 1);
-              }
-              let tempIndex2 = webState.resizableChanSplitTextareaIds.indexOf(channelTextAreaId);
-              if (tempIndex2 >= 0) {
-                webState.resizableChanSplitTextareaIds.splice(tempIndex2, 1);
-              }
+              // channel successfully removed from server, remove it from client also
+              _removeChannelFromDom();
             }
           })
           .catch( (error) => {
             console.log(error);
           });
       }
+    } else {
+      // Special case - channel removed from outsdie this web page.
+      // Most likely you are logged into two devices.
+      // Channel is gone, remove from DOM using prune button
+      _removeChannelFromDom();
     }
   });
 

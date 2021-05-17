@@ -399,14 +399,14 @@ channelContainerDivEl.appendChild(channelMainSectionEl)}var activityIconInhibitT
 channelBottomDivEl.removeAttribute("hidden");channelHideButtonEl.textContent="-";channelTopRightHidableDivEl.removeAttribute("hidden")});document.addEventListener("hide-all-divs",function(event){
 channelBottomDivEl.setAttribute("hidden","");channelHideButtonEl.textContent="+";channelTopRightHidableDivEl.setAttribute("hidden","")});channelJoinButtonEl.addEventListener("click",function(){
 let message="JOIN "+name;_sendIrcServerMessage(message)});channelPartButtonEl.addEventListener("click",function(){let message="PART "+name;_sendIrcServerMessage(message)})
-;channelPruneButtonEl.addEventListener("click",function(){let index=ircState.channels.indexOf(name.toLowerCase());if(index>=0){if(!ircState.channelStates[index].joined){
-let fetchURL=webServerUrl+"/irc/prune";let fetchOptions={method:"POST",headers:{"Content-type":"application/json",Accept:"application/json"},body:JSON.stringify({channel:name})}
-;fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()}else{throw new Error("Fetch status "+response.status+" "+response.statusText)}}).then(responseJson=>{
-if(responseJson.error){showError(responseJson.message)}else{channelContainerDivEl.removeChild(channelMainSectionEl);let webStateChannelsIndex=webState.channels.indexOf(name.toLowerCase())
-;if(webStateChannelsIndex>=0){webState.channels.splice(webStateChannelsIndex,1);webState.channelStates.splice(webStateChannelsIndex,1)}console.log(JSON.stringify(webState.channels))
-;let tempIndex1=webState.resizableSendButtonTextareaIds.indexOf(channelInputAreaId);if(tempIndex1>=0){webState.resizableSendButtonTextareaIds.splice(tempIndex1,1)}
-let tempIndex2=webState.resizableChanSplitTextareaIds.indexOf(channelTextAreaId);if(tempIndex2>=0){webState.resizableChanSplitTextareaIds.splice(tempIndex2,1)}}}).catch(error=>{console.log(error)})}}
-});channelRefreshButtonEl.addEventListener("click",function(){document.dispatchEvent(new CustomEvent("update-from-cache",{bubbles:true}));channelNamesDisplayEl.value=""
+;channelPruneButtonEl.addEventListener("click",function(){function _removeChannelFromDom(){let webStateChannelsIndex=webState.channels.indexOf(name.toLowerCase());if(webStateChannelsIndex>=0){
+webState.channels.splice(webStateChannelsIndex,1);webState.channelStates.splice(webStateChannelsIndex,1)}let tempIndex1=webState.resizableSendButtonTextareaIds.indexOf(channelInputAreaId)
+;if(tempIndex1>=0){webState.resizableSendButtonTextareaIds.splice(tempIndex1,1)}let tempIndex2=webState.resizableChanSplitTextareaIds.indexOf(channelTextAreaId);if(tempIndex2>=0){
+webState.resizableChanSplitTextareaIds.splice(tempIndex2,1)}channelContainerDivEl.removeChild(channelMainSectionEl)}let index=ircState.channels.indexOf(name.toLowerCase());if(index>=0){
+if(!ircState.channelStates[index].joined){let fetchURL=webServerUrl+"/irc/prune";let fetchOptions={method:"POST",headers:{"Content-type":"application/json",Accept:"application/json"},
+body:JSON.stringify({channel:name})};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()}else{throw new Error("Fetch status "+response.status+" "+response.statusText)}
+}).then(responseJson=>{if(responseJson.error){showError(responseJson.message)}else{_removeChannelFromDom()}}).catch(error=>{console.log(error)})}}else{_removeChannelFromDom()}})
+;channelRefreshButtonEl.addEventListener("click",function(){document.dispatchEvent(new CustomEvent("update-from-cache",{bubbles:true}));channelNamesDisplayEl.value=""
 ;_sendIrcServerMessage("NAMES "+name)});channelSendButtonEl.addEventListener("click",function(){_sendTextToChannel(channelIndex,channelInputAreaEl);channelInputAreaEl.focus()
 ;resetChanActivityIcon(channelIndex);activityIconInhibitTimer=activityIconInhibitTimerValue}.bind(this));channelInputAreaEl.addEventListener("input",function(event){
 if(event.inputType==="insertText"&&event.data===null||event.inputType==="insertLineBreak"){_sendTextToChannel(channelIndex,channelInputAreaEl);resetChanActivityIcon(channelIndex)
