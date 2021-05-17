@@ -30,7 +30,7 @@
 const path = require('path');
 const ws = require('ws');
 const url = require('url');
-const isUtf8 = require('is-utf8');
+const isValidUTF8 = require('utf-8-validate');
 
 const authorizeWebSocket = require('./middlewares/ws-authorize').authorizeWebSocket;
 const customLog = require('./middlewares/ws-authorize').customLog;
@@ -74,11 +74,9 @@ global.sendToBrowser = function(message) {
   if (Buffer.isBuffer(message)) {
     out = message;
   }
-  if (out.length > 3) {
-    if (!isUtf8(out)) {
-      out = null;
-      console.log('sendToBrowser() failed UTF-8 validtion');
-    }
+  if (!isValidUTF8(out)) {
+    out = null;
+    console.log('sendToBrowser() failed UTF-8 validtion');
   }
   // zero not allowed as avalid character
   if (out.includes(0)) {

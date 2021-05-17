@@ -42,7 +42,7 @@
   // Send utf8 string to browser
   // Send Buffer encoded utf8 to IRC server socket
   // ----------------------------------------------------
-  const isUtf8 = require('is-utf8');
+  const isValidUTF8 = require('utf-8-validate');
   var vars = require('./irc-client-vars');
 
   const writeSocket = function (socket, message) {
@@ -96,11 +96,9 @@
       if (Buffer.isBuffer(message)) {
         out = Buffer.concat([out, Buffer.from('\r\n', 'utf8')]);
       }
-      if (out.length > 3) {
-        if (!isUtf8(out)) {
-          out = null;
-          console.log('_writeSocket() failed UTF-8 validation');
-        }
+      if (!isValidUTF8(out)) {
+        out = null;
+        console.log('_writeSocket() failed UTF-8 validation');
       }
       // RFC 2812 does not allow zero character
       if (out.includes(0)) {
