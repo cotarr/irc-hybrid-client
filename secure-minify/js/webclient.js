@@ -138,18 +138,19 @@ if(webState.cacheInhibitTimer===0){showError("An IRC Server connection error occ
 }));updateDivVisibility();if(!document.getElementById("variablesDivId").hasAttribute("hidden")){
 document.getElementById("variablesPreId").textContent="ircState = "+JSON.stringify(ircState,null,2)+"\n\n"+"webState = "+JSON.stringify(webState,null,2)}
 document.getElementById("programVersionDiv").textContent=" version-"+ircState.progVersion;if(callback){callback(null,ircState)}}).catch(error=>{console.log(error);if(callback){callback(error,{})}})}
-"use strict";function cleanFormatting(inString){let formattingChars=[2,7,15,17,22,29,30,31];let outString="";let l=inString.length;if(l===0)return outString;let i=0;while(i<l){
-if(i<l&&formattingChars.indexOf(inString.charCodeAt(i))>=0)i++;if(i<l&&inString.charCodeAt(i)===3){i++;if(i<l&&inString.charAt(i)>="0"&&inString.charAt(i)<="9")i++
-;if(i<l&&inString.charAt(i)>="0"&&inString.charAt(i)<="9")i++;if(i<l&&inString.charAt(i)===","){i++;if(i<l&&inString.charAt(i)>="0"&&inString.charAt(i)<="9")i++
-;if(i<l&&inString.charAt(i)>="0"&&inString.charAt(i)<="9")i++}}if(i<l&&inString.charCodeAt(i)===4){i++;for(let j=0;j<6;j++){if(i<l)i++}if(i<l&&inString.charAt(i)===","){i++;for(let j=0;j<6;j++){
-if(i<l)i++}}}if(i<l)outString+=inString.charAt(i);i++}return outString}function cleanCtcpDelimiter(inString){let ctcpDelim=1;let outString="";let l=inString.length;if(l===0)return outString;let i=0
-;while(i<l){if(i<l&&inString.charCodeAt(i)===ctcpDelim){i++}else{if(i<l)outString+=inString.charAt(i);i++}}return outString}const timestampToHMS=function(timeString){let outString=""
-;if(timeString.length===0){outString=null}else{if(timeString.indexOf("@time=")===0){let timeObj=new Date(timeString.slice(6,timeString.length))
-;outString+=timeObj.getHours().toString().padStart(2,"0")+":";outString+=timeObj.getMinutes().toString().padStart(2,"0")+":";outString+=timeObj.getSeconds().toString().padStart(2,"0")}else{
-outString=null}}return outString};const timestampToUnixSeconds=function(timeString){let outSeconds=null;if(timeString.length===0){outSeconds=null}else{if(timeString.indexOf("@time=")===0){
-let timeObj=new Date(timeString.slice(6,timeString.length));outSeconds=parseInt(timeObj.valueOf()/1e3)}else{outSeconds=null}}return outSeconds};function _parseIrcMessage(message){
-function _extractTimeString(start,end,messageString){let i=start;let timeString="";while(messageString.charAt(i)!==" "&&i<=end){timeString+=messageString.charAt(i);i++}
-let outString=timestampToHMS(timeString);return{data:outString,nextIndex:i+1}}function _isColonString(start,messageString){if(messageString.charAt(start)===":"){return{isColonStr:true,
+"use strict";function cleanFormatting(inString){let formattingChars=[2,7,15,17,22,29,30,31];let outString="";let l=inString.length;if(l===0)return outString;let i=0;let active=true;while(i<l){
+active=true;if(active&&i<l&&formattingChars.indexOf(inString.charCodeAt(i))>=0){active=false;i++}if(active&&i<l&&inString.charCodeAt(i)===3){active=false;i++
+;if(i<l&&inString.charAt(i)>="0"&&inString.charAt(i)<="9")i++;if(i<l&&inString.charAt(i)>="0"&&inString.charAt(i)<="9")i++;if(i<l&&inString.charAt(i)===","){i++
+;if(i<l&&inString.charAt(i)>="0"&&inString.charAt(i)<="9")i++;if(i<l&&inString.charAt(i)>="0"&&inString.charAt(i)<="9")i++}}if(active&&i<l&&inString.charCodeAt(i)===4){active=false;i++
+;if(inString.charAt(i)>="0"&&inString.charAt(i)<="9"||inString.toUpperCase().charAt(i)>="A"&&inString.toUpperCase().charAt(i)<="F"){for(let j=0;j<6;j++){if(i<l)i++}if(i<l&&inString.charAt(i)===","){
+i++;for(let j=0;j<6;j++){if(i<l)i++}}}}if(active&&i<l){active=false;outString+=inString.charAt(i);i++}}return outString}function cleanCtcpDelimiter(inString){let ctcpDelim=1;let outString=""
+;let l=inString.length;if(l===0)return outString;let i=0;while(i<l){if(i<l&&inString.charCodeAt(i)===ctcpDelim){i++}else{if(i<l)outString+=inString.charAt(i);i++}}return outString}
+const timestampToHMS=function(timeString){let outString="";if(timeString.length===0){outString=null}else{if(timeString.indexOf("@time=")===0){
+let timeObj=new Date(timeString.slice(6,timeString.length));outString+=timeObj.getHours().toString().padStart(2,"0")+":";outString+=timeObj.getMinutes().toString().padStart(2,"0")+":"
+;outString+=timeObj.getSeconds().toString().padStart(2,"0")}else{outString=null}}return outString};const timestampToUnixSeconds=function(timeString){let outSeconds=null;if(timeString.length===0){
+outSeconds=null}else{if(timeString.indexOf("@time=")===0){let timeObj=new Date(timeString.slice(6,timeString.length));outSeconds=parseInt(timeObj.valueOf()/1e3)}else{outSeconds=null}}return outSeconds
+};function _parseIrcMessage(message){function _extractTimeString(start,end,messageString){let i=start;let timeString="";while(messageString.charAt(i)!==" "&&i<=end){timeString+=messageString.charAt(i)
+;i++}let outString=timestampToHMS(timeString);return{data:outString,nextIndex:i+1}}function _isColonString(start,messageString){if(messageString.charAt(start)===":"){return{isColonStr:true,
 nextIndex:start+1}}else{return{isColonStr:false,nextIndex:start}}}function _extractMidString(start,end,messageString){let i=start;let outString="";while(messageString.charAt(i)!==" "&&i<=end){
 outString+=messageString.charAt(i);i++}if(outString.length===0)outString=null;return{data:outString,nextIndex:i+1}}function _extractFinalString(start,end,messageString){let i=start;let outString=""
 ;while(i<=end){outString+=messageString.charAt(i);i++}if(outString.length===0)outString=null;return{data:outString,nextIndex:i+1}}function _extractNickname(inText){if(inText){

@@ -55,9 +55,14 @@ function cleanFormatting (inString) {
   let i = 0;
 
   // Loop through all characters in input string
+  let active = true;
   while (i<l) {
+    active = true;
     // Filter format characters capable of toggle on/off
-    if ((i<l) && (formattingChars.indexOf(inString.charCodeAt(i)) >= 0)) i++;
+    if ((active) && (i<l) && (formattingChars.indexOf(inString.charCodeAt(i)) >= 0)) {
+      active = false;
+      i++;
+    }
     // Removal of color codes 0x03 + (1 or 2 digit) in range ('0' to '9')
     // followed by optional comma and background color.
     // Examples
@@ -65,7 +70,8 @@ function cleanFormatting (inString) {
     //     0x03 + '03'
     //     0x03 + '3,4'
     //     0x03 + '03,04'
-    if ((i<l) && (inString.charCodeAt(i) === 3)) {
+    if ((active) && (i<l) && (inString.charCodeAt(i) === 3)) {
+      active = false;
       i++;
       if ((i<l) && (inString.charAt(i) >= '0') && (inString.charAt(i) <= '9')) i++;
       if ((i<l) && (inString.charAt(i) >= '0') && (inString.charAt(i) <= '9')) i++;
@@ -78,21 +84,30 @@ function cleanFormatting (inString) {
     // Hexadecimal colors 0x04 + 6 hexadecimal digits
     // followed by optional comma and 6 hexadeciaml digits for background color
     // In this case, 6 characters are removed regardless if 0-9, A-F
-    if ((i<l) && (inString.charCodeAt(i) === 4)) {
+    if ((active) && (i<l) && (inString.charCodeAt(i) === 4)) {
+      active = false;
       i++;
-      for (let j=0; j<6; j++) {
-        if (i<l) i++;
-      }
-      if ((i<l) && (inString.charAt(i) === ',')) {
-        i++;
+      if (((inString.charAt(i) >= '0') &&
+        (inString.charAt(i) <= '9'))
+        ||
+        ((inString.toUpperCase().charAt(i) >= 'A') &&
+        (inString.toUpperCase().charAt(i) <= 'F'))) {
         for (let j=0; j<6; j++) {
           if (i<l) i++;
         }
+        if ((i<l) && (inString.charAt(i) === ',')) {
+          i++;
+          for (let j=0; j<6; j++) {
+            if (i<l) i++;
+          }
+        }
       }
     }
-
-    if (i<l) outString += inString.charAt(i);
-    i++;
+    if ((active) && (i<l)) {
+      active = false;
+      outString += inString.charAt(i);
+      i++;
+    }
   }
   return outString;
 }
@@ -101,8 +116,8 @@ function cleanFormatting (inString) {
 // let colorTest = 'This is ' +
 //   String.fromCharCode(3) + '04' + 'Red' + String.fromCharCode(3) + ' color ' +
 //   String.fromCharCode(3) + '04,12' + 'Red/Gray' + String.fromCharCode(3) + ' color ' +
-//   String.fromCharCode(4) + '0Fd7ff' + 'Hex-color' + String.fromCharCode(3) + ' color ' +
-//   String.fromCharCode(4) + '0Fd7ff,17a400' + 'Hex-color,hexcolor' +String.fromCharCode(4) +
+//   String.fromCharCode(4) + '0Fd7ff' + 'Hex-color' + String.fromCharCode(4) + ' color ' +
+//   String.fromCharCode(4) + '0Fd7ff,17a400' + 'Hex-color,hexcolor' + String.fromCharCode(4) +
 //   ' color ' +
 //   String.fromCharCode(2) + 'Bold' + String.fromCharCode(2) + ' text ';
 // console.log('colorTest ' + cleanFormatting(colorTest));
