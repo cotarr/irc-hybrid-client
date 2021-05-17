@@ -30,7 +30,7 @@
 const path = require('path');
 const ws = require('ws');
 const url = require('url');
-const isValidUTF8 = require('utf-8-validate');
+const isUtf8 = require('is-utf8');
 
 const authorizeWebSocket = require('./middlewares/ws-authorize').authorizeWebSocket;
 const customLog = require('./middlewares/ws-authorize').customLog;
@@ -74,7 +74,7 @@ global.sendToBrowser = function(message) {
   if (Buffer.isBuffer(message)) {
     out = message;
   }
-  if (!isValidUTF8(out)) {
+  if (!isUtf8(out)) {
     out = null;
     console.log('sendToBrowser() failed UTF-8 validtion');
   }

@@ -32,7 +32,7 @@
   const net = require('net');
   const tls = require('tls');
   const fs = require('fs');
-  const isValidUTF8 = require('utf-8-validate');
+  const isUtf8 = require('is-utf8');
 
   // log module loaded first to create /logs folder if needed.
   const ircLog = require('./irc-client-log');
@@ -208,7 +208,7 @@
   const extractMessagesFromStream = function (socket, inBuffer) {
     if (!inBuffer) return;
     if (!Buffer.isBuffer(inBuffer)) return;
-    if (!isValidUTF8(inBuffer)) {
+    if (!isUtf8(inBuffer)) {
       console.log('extractMessagesFromStream() failed UTF-8 validation');
       return;
     }
@@ -790,7 +790,7 @@
       next(err);
     } else {
       let messageBuf = Buffer.from(req.body.message, 'utf8');
-      if (!isValidUTF8(messageBuf)) {
+      if (!isUtf8(messageBuf)) {
         webError:('messageHandler() IRC message failed UTF-8 validation');
         res.json({error: true, message: 'IRC message failed UTF-8 validation'});
       } else if (messageBuf.includes(0)) {
@@ -846,7 +846,7 @@
     if (cacheArrayOfBuffers.length > 0) {
       for (let i=0; i<cacheArrayOfBuffers.length; i++) {
         if ((Buffer.isBuffer(cacheArrayOfBuffers[i])) &&
-          (isValidUTF8(cacheArrayOfBuffers[i])) &&
+          (isUtf8(cacheArrayOfBuffers[i])) &&
           (!cacheArrayOfBuffers[i].includes(0))) {
           outArray.push(cacheArrayOfBuffers[i].toString('utf8'));
         } else {

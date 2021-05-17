@@ -42,7 +42,7 @@
   // Send utf8 string to browser
   // Send Buffer encoded utf8 to IRC server socket
   // ----------------------------------------------------
-  const isValidUTF8 = require('utf-8-validate');
+  const isUtf8 = require('is-utf8');
   var vars = require('./irc-client-vars');
 
   const writeSocket = function (socket, message) {
@@ -96,7 +96,7 @@
       if (Buffer.isBuffer(message)) {
         out = Buffer.concat([out, Buffer.from('\r\n', 'utf8')]);
       }
-      if (!isValidUTF8(out)) {
+      if (!isUtf8(out)) {
         out = null;
         console.log('_writeSocket() failed UTF-8 validation');
       }
