@@ -928,7 +928,11 @@
   // -----------------------------------------------
   const eraseCache = function(req, res, next) {
     // webError:(JSON.stringify(req.body));
-    if (('erase' in req.body) && (req.body.erase === 'YES')) {
+    let inputVerifyString = '';
+    if (('erase' in req.body) && (typeof req.body.erase === 'string')) {
+      inputVerifyString = req.body.erase;
+    }
+    if (inputVerifyString === 'YES') {
       ircMessageCache.eraseCache();
       res.json({error: false});
     } else {
