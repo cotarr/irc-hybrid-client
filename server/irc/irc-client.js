@@ -669,7 +669,7 @@
       inputUserMode = req.body.userMode;
     }
 
-    if ((inputNickName.lenth === 0) || (inputRealName.length === 0)) {
+    if ((inputNickName.length === 0) || (inputRealName.length === 0)) {
       return res.json({
         error: true,
         message: 'Error: invalid IRC signon parameters'
