@@ -207,13 +207,8 @@
   var previousBufferFragment = Buffer.from('', 'utf8');
   const extractMessagesFromStream = function (socket, inBuffer) {
     if (!inBuffer) return;
-    if (!Buffer.isBuffer(inBuffer)) return;
-    if (!isUtf8(inBuffer)) {
-      console.log('extractMessagesFromStream() failed UTF-8 validation');
-      return;
-    }
-    if (inBuffer.includes(0)) {
-      console.log('extractMessagesFromStream() failed zero byte validation');
+    if (!Buffer.isBuffer(inBuffer)) {
+      console.log('previousBufferFragment() data type not Buffer');
       return;
     }
     // this returns a new Buffer, not a reference to shared memory
@@ -234,21 +229,28 @@
         if (count > 0) {
           // wrapped in Buffer.from because slice returns a reference
           let message = Buffer.from(data.slice(index, index + count));
+          //
+          // This is one CR-LF terminated IRC server message
+          //
           // 512 btye maximum size from RFC 2812 2.3 Messages
-          if ((Buffer.isBuffer(message)) && (message.length <= 512)) {
-            //
-            // This is one CR-LF terminated IRC server message
-            //
-            ircParse._processIrcMessage(socket, message);
-            //
-          } else {
+          if (message.length > 512) {
             console.log('Error, extracted message exceeds max length of 512 btyes');
+          } else if ((message.length > 3) && (!isUtf8(message))) {
+            // is-utf8 library need minimum 4 bytes
+            console.log('extractMessagesFromStream() failed UTF-8 validation');
+            // message ignored
+          } else if (message.includes(0)) {
+            console.log('extractMessagesFromStream() failed zero byte validation');
+            // message ignore
+          } else {
+            // else message processed
+            ircParse._processIrcMessage(socket, message);
           }
         }
         index = i + 1;
         count = 0;
       }
-    }
+    } // next i
     if (count > 0) {
       // slice wrapped in Buffer.from because slice returns a reference to previous buffer
       previousBufferFragment = Buffer.from(data.slice(index, index + count));
@@ -790,7 +792,7 @@
       next(err);
     } else {
       let messageBuf = Buffer.from(req.body.message, 'utf8');
-      if (!isUtf8(messageBuf)) {
+      if ((messageBuf.length > 3) && (!isUtf8(messageBuf))) {
         webError:('messageHandler() IRC message failed UTF-8 validation');
         res.json({error: true, message: 'IRC message failed UTF-8 validation'});
       } else if (messageBuf.includes(0)) {
@@ -843,9 +845,11 @@
     let cacheArrayOfBuffers = ircMessageCache.allMessages();
     let outArray = [];
     let err = false;
+    // minimum length of 3 is for is-utf8 check
     if (cacheArrayOfBuffers.length > 0) {
       for (let i=0; i<cacheArrayOfBuffers.length; i++) {
         if ((Buffer.isBuffer(cacheArrayOfBuffers[i])) &&
+          (cacheArrayOfBuffers[i].length > 3) &&
           (isUtf8(cacheArrayOfBuffers[i])) &&
           (!cacheArrayOfBuffers[i].includes(0))) {
           outArray.push(cacheArrayOfBuffers[i].toString('utf8'));

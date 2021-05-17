@@ -96,9 +96,11 @@
       if (Buffer.isBuffer(message)) {
         out = Buffer.concat([out, Buffer.from('\r\n', 'utf8')]);
       }
-      if (!isUtf8(out)) {
-        out = null;
-        console.log('_writeSocket() failed UTF-8 validation');
+      if (out.length > 3) {
+        if (!isUtf8(out)) {
+          out = null;
+          console.log('_writeSocket() failed UTF-8 validation');
+        }
       }
       // RFC 2812 does not allow zero character
       if (out.includes(0)) {

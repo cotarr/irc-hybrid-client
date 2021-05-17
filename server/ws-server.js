@@ -74,9 +74,11 @@ global.sendToBrowser = function(message) {
   if (Buffer.isBuffer(message)) {
     out = message;
   }
-  if (!isUtf8(out)) {
-    out = null;
-    console.log('sendToBrowser() failed UTF-8 validtion');
+  if (out.length > 3) {
+    if (!isUtf8(out)) {
+      out = null;
+      console.log('sendToBrowser() failed UTF-8 validtion');
+    }
   }
   // zero not allowed as avalid character
   if (out.includes(0)) {
