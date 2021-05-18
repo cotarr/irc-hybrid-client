@@ -339,14 +339,15 @@ return{error:true,message:"Expect: /QUOTE RAWCOMMAND [arguments]",ircMessage:nul
 if(parsedCommand.params.length>1&&ircState.channels.indexOf(parsedCommand.params[1].toLowerCase())>=0){ircMessage="TOPIC "+parsedCommand.params[1]+" :"+parsedCommand.restOf[1]
 }else if(parsedCommand.params.length>0&&channelPrefixChars.indexOf(parsedCommand.restOf[0].charAt(0))<0&&inputObj.originType==="channel"){
 ircMessage="TOPIC "+inputObj.originName+" :"+parsedCommand.restOf[0]}else{return{error:true,message:"Expect: /TOPIC <#channel> <New-channel-topic-message>",ircMessage:null}}break;case"VERSION":
-showRawMessageWindow();ircMessage="VERSION";if(parsedCommand.restOf.length===1){ircMessage="VERSION "+parsedCommand.restOf[0]}break;case"WHOIS":if(parsedCommand.params.length<1){return{error:true,
-message:"Expect: /WHOIS <nickname>",ircMessage:null}}showRawMessageWindow();ircMessage="WHOIS "+parsedCommand.restOf[0];break;default:}if(ircMessage){return{error:false,message:null,
-ircMessage:ircMessage}}return{error:true,message:'Command "/'+parsedCommand.command+'" unknown command.',ircMessage:null}}"use strict";function _sendTextToChannel(channelIndex,textAreaEl){
-let text=stripTrailingCrLf(textAreaEl.value);if(detectMultiLineString(text)){textAreaEl.value="";showError("Multi-line input is not supported.")}else{if(text.length>0){if(text.charAt(0)==="/"){
-let commandAction=textCommandParser({inputString:text,originType:"channel",originName:ircState.channelStates[channelIndex].name});textAreaEl.value="";if(commandAction.error){
-showError(commandAction.message);return}else{if(commandAction.ircMessage&&commandAction.ircMessage.length>0){_sendIrcServerMessage(commandAction.ircMessage)}return}}
-let message="PRIVMSG "+ircState.channelStates[channelIndex].name+" :"+text;_sendIrcServerMessage(message);textAreaEl.value=""}}textAreaEl.value=""}function createChannelEl(name){
-if(webState.channels.indexOf(name.toLowerCase())>=0){console.log("createChannelEl: channel already exist");return}const defaultHeightInRows="17";webState.channels.push(name.toLowerCase())
+showRawMessageWindow();ircMessage="VERSION";if(parsedCommand.restOf.length===1){ircMessage="VERSION "+parsedCommand.restOf[0]}break;case"WHO":if(parsedCommand.params.length===0){showRawMessageWindow()
+;ircMessage="WHO"}else{showRawMessageWindow();ircMessage="WHO "+parsedCommand.restOf[0]}break;case"WHOIS":if(parsedCommand.params.length<1){return{error:true,message:"Expect: /WHOIS <nickname>",
+ircMessage:null}}showRawMessageWindow();ircMessage="WHOIS "+parsedCommand.restOf[0];break;default:}if(ircMessage){return{error:false,message:null,ircMessage:ircMessage}}return{error:true,
+message:'Command "/'+parsedCommand.command+'" unknown command.',ircMessage:null}}"use strict";function _sendTextToChannel(channelIndex,textAreaEl){let text=stripTrailingCrLf(textAreaEl.value)
+;if(detectMultiLineString(text)){textAreaEl.value="";showError("Multi-line input is not supported.")}else{if(text.length>0){if(text.charAt(0)==="/"){let commandAction=textCommandParser({
+inputString:text,originType:"channel",originName:ircState.channelStates[channelIndex].name});textAreaEl.value="";if(commandAction.error){showError(commandAction.message);return}else{
+if(commandAction.ircMessage&&commandAction.ircMessage.length>0){_sendIrcServerMessage(commandAction.ircMessage)}return}}let message="PRIVMSG "+ircState.channelStates[channelIndex].name+" :"+text
+;_sendIrcServerMessage(message);textAreaEl.value=""}}textAreaEl.value=""}function createChannelEl(name){if(webState.channels.indexOf(name.toLowerCase())>=0){
+console.log("createChannelEl: channel already exist");return}const defaultHeightInRows="17";webState.channels.push(name.toLowerCase())
 ;let initIrcStateIndex=ircState.channels.indexOf(name.toLowerCase());webState.channelStates.push({lastJoined:ircState.channelStates[initIrcStateIndex].joined});var maxNickLength=0
 ;let channelIndex=ircState.channels.indexOf(name.toLowerCase());let channelContainerDivEl=document.getElementById("channelContainerDiv");let channelMainSectionEl=document.createElement("div")
 ;channelMainSectionEl.classList.add("color-channel");channelMainSectionEl.classList.add("aa-section-div");let channelTopDivEl=document.createElement("div")
@@ -595,16 +596,16 @@ _parseInputForIRCCommands(document.getElementById("rawMessageInputId"));document
 ;document.getElementById("rawMessageInputId").addEventListener("input",function(event){if(event.inputType==="insertText"&&event.data===null||event.inputType==="insertLineBreak"){
 _parseInputForIRCCommands(document.getElementById("rawMessageInputId"))}}.bind(this));function substituteHmsTime(inMessage){let timeString=inMessage.split(" ")[0]
 ;let restOfMessage=inMessage.slice(timeString.length+1,inMessage.length);let hmsString=timestampToHMS(timeString);return hmsString+" "+restOfMessage}
-document.addEventListener("server-message",function(event){console.log(JSON.stringify(event.detail,null,2));function _showAfterParamZero(parsedMessage,title){let msgString=""
-;if(parsedMessage.params.length>1){for(let i=1;i<parsedMessage.params.length;i++){msgString+=" "+parsedMessage.params[i]}}else{console.log("Error _showAfterParamZero() no parsed field")}
-let outMessage=parsedMessage.timestamp+msgString;if(title){outMessage=title+msgString}displayRawMessage(cleanFormatting(cleanCtcpDelimiter(outMessage)))}switch(event.detail.parsedMessage.command){
-case"001":case"002":case"003":case"004":_showAfterParamZero(event.detail.parsedMessage,null);break;case"005":break;case"250":case"251":case"252":case"254":case"255":case"265":case"265":
-_showAfterParamZero(event.detail.parsedMessage,null);break;case"256":case"257":case"258":case"259":_showAfterParamZero(event.detail.parsedMessage,null);break;case"315":break;case"352":
-_showAfterParamZero(event.detail.parsedMessage,null);break;case"275":case"301":case"307":case"311":case"312":case"313":case"317":case"318":case"319":
+document.addEventListener("server-message",function(event){function _showAfterParamZero(parsedMessage,title){let msgString="";if(parsedMessage.params.length>1){
+for(let i=1;i<parsedMessage.params.length;i++){msgString+=" "+parsedMessage.params[i]}}else{console.log("Error _showAfterParamZero() no parsed field")}let outMessage=parsedMessage.timestamp+msgString
+;if(title){outMessage=title+msgString}displayRawMessage(cleanFormatting(cleanCtcpDelimiter(outMessage)))}switch(event.detail.parsedMessage.command){case"001":case"002":case"003":case"004":
+_showAfterParamZero(event.detail.parsedMessage,null);break;case"005":break;case"250":case"251":case"252":case"254":case"255":case"265":case"265":_showAfterParamZero(event.detail.parsedMessage,null)
+;break;case"256":case"257":case"258":case"259":_showAfterParamZero(event.detail.parsedMessage,null);break;case"315":displayRawMessage("WHO --End--");break;case"352":
+_showAfterParamZero(event.detail.parsedMessage,"WHO");break;case"275":case"301":case"307":case"311":case"312":case"313":case"317":break;case"318":displayRawMessage("WHOIS --End--");break;case"319":
 _showAfterParamZero(event.detail.parsedMessage,"WHOIS");break;case"322":if(event.detail.parsedMessage.params.length===4){
 let outMessage="LIST "+event.detail.parsedMessage.params[1]+" "+event.detail.parsedMessage.params[2];if(event.detail.parsedMessage.params[3]){outMessage+=" "+event.detail.parsedMessage.params[3]}
-displayRawMessage(cleanFormatting(cleanCtcpDelimiter(outMessage)))}else{console.log("Error Msg 322 not have 4 parsed parameters")}break;case"321":displayRawMessage("LIST --Start--");break;case"323":
-displayRawMessage("LIST --End--");break;case"372":_showAfterParamZero(event.detail.parsedMessage,null);break;case"375":case"376":break;case"MODE":
+displayRawMessage(cleanFormatting(cleanCtcpDelimiter(outMessage)))}else{console.log("Error Msg 322 not have 4 parsed parameters")}break;case"321":break;case"323":displayRawMessage("LIST --End--")
+;break;case"372":_showAfterParamZero(event.detail.parsedMessage,null);break;case"375":case"376":break;case"MODE":
 displayRawMessage(cleanFormatting(cleanCtcpDelimiter(event.detail.parsedMessage.timestamp+" "+"MODE "+event.detail.parsedMessage.params[0]+" "+event.detail.parsedMessage.params[1])));break;case"NICK":
 displayRawMessage(cleanFormatting(cleanCtcpDelimiter(event.detail.parsedMessage.timestamp+" "+"(No channel) "+event.detail.parsedMessage.nick+" is now known as "+event.detail.parsedMessage.params[0])))
 ;break;case"NOTICE":

@@ -97,7 +97,7 @@ function substituteHmsTime(inMessage) {
 // Else, this is where filtered server message are formatted for display
 // ---------------------------------------------------------------------------
 document.addEventListener('server-message', function(event) {
-  console.log(JSON.stringify(event.detail, null, 2));
+  // console.log(JSON.stringify(event.detail, null, 2));
 
   // This will skip prefix, command, and param[0], printing the rest
   // If title provided, it will replace timestamp
@@ -152,9 +152,10 @@ document.addEventListener('server-message', function(event) {
     // Who response
     //
     case '315':
+      displayRawMessage('WHO --End--');
       break;
     case '352':
-      _showAfterParamZero(event.detail.parsedMessage, null);
+      _showAfterParamZero(event.detail.parsedMessage, 'WHO');
       break;
 
     //
@@ -167,7 +168,10 @@ document.addEventListener('server-message', function(event) {
     case '312':
     case '313':
     case '317':
+      break;
     case '318':
+      displayRawMessage('WHOIS --End--');
+      break;
     case '319':
       _showAfterParamZero(event.detail.parsedMessage, 'WHOIS');
       break;
@@ -191,7 +195,7 @@ document.addEventListener('server-message', function(event) {
       }
       break;
     case '321': // Start LIST
-      displayRawMessage('LIST --Start--');
+      // displayRawMessage('LIST --Start--');
       break;
     case '323': // End LIST
       displayRawMessage('LIST --End--');

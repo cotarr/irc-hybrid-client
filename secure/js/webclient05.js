@@ -552,6 +552,15 @@ function textCommandParser (inputObj) {
         ircMessage = 'VERSION ' + parsedCommand.restOf[0];
       }
       break;
+    case 'WHO':
+      if (parsedCommand.params.length === 0) {
+        showRawMessageWindow();
+        ircMessage = 'WHO';
+      } else {
+        showRawMessageWindow();
+        ircMessage = 'WHO ' + parsedCommand.restOf[0];
+      }
+      break;
     case 'WHOIS':
       if (parsedCommand.params.length < 1) {
         return {
