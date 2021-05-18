@@ -97,10 +97,11 @@ function substituteHmsTime(inMessage) {
 // Else, this is where filtered server message are formatted for display
 // ---------------------------------------------------------------------------
 document.addEventListener('server-message', function(event) {
-  // console.log(JSON.stringify(event.detail, null, 2));
+  console.log(JSON.stringify(event.detail, null, 2));
 
   // This will skip prefix, command, and param[0], printing the rest
-  function _showAfterParamZero (parsedMessage) {
+  // If title provided, it will replace timestamp
+  function _showAfterParamZero (parsedMessage, title) {
     let msgString = '';
     if (parsedMessage.params.length > 1) {
       for (let i = 1; i< parsedMessage.params.length; i++) {
@@ -109,12 +110,14 @@ document.addEventListener('server-message', function(event) {
     } else {
       console.log('Error _showAfterParamZero() no parsed field');
     }
+    let outMessage = parsedMessage.timestamp + msgString;
+    if (title) {
+      outMessage = title + msgString;
+    }
     displayRawMessage(
       cleanFormatting(
-        cleanCtcpDelimiter(
-          parsedMessage.timestamp + msgString)));
+        cleanCtcpDelimiter(outMessage)));
   }
-
 
   switch(event.detail.parsedMessage.command) {
     //
@@ -124,7 +127,7 @@ document.addEventListener('server-message', function(event) {
     case '002':
     case '003':
     case '004':
-      _showAfterParamZero(event.detail.parsedMessage);
+      _showAfterParamZero(event.detail.parsedMessage, null);
       break;
     case '005':
       break;
@@ -135,7 +138,7 @@ document.addEventListener('server-message', function(event) {
     case '255':
     case '265':
     case '265':
-      _showAfterParamZero(event.detail.parsedMessage);
+      _showAfterParamZero(event.detail.parsedMessage, null);
       break;
 
     // Admin
@@ -143,7 +146,7 @@ document.addEventListener('server-message', function(event) {
     case '257':
     case '258':
     case '259':
-      _showAfterParamZero(event.detail.parsedMessage);
+      _showAfterParamZero(event.detail.parsedMessage, null);
       break;
     //
     // Who response
@@ -151,7 +154,7 @@ document.addEventListener('server-message', function(event) {
     case '315':
       break;
     case '352':
-      _showAfterParamZero(event.detail.parsedMessage);
+      _showAfterParamZero(event.detail.parsedMessage, null);
       break;
 
     //
@@ -166,29 +169,44 @@ document.addEventListener('server-message', function(event) {
     case '317':
     case '318':
     case '319':
-      _showAfterParamZero(event.detail.parsedMessage);
+      _showAfterParamZero(event.detail.parsedMessage, 'WHOIS');
       break;
 
     //
     // LIST
     //
-    // case '322': // irc server motd
-    //   _showAfterParamZero(event.detail.parsedMessage);
-    //   break;
-    // case '321': // Start LIST
-    // case '323': // End LIST
-    //   break;
+    case '322': // irc server motd
+      if (event.detail.parsedMessage.params.length === 4) {
+        let outMessage = 'LIST ' +
+          event.detail.parsedMessage.params[1] + ' ' +
+          event.detail.parsedMessage.params[2];
+        if (event.detail.parsedMessage.params[3]) {
+          outMessage += ' ' + event.detail.parsedMessage.params[3];
+        };
+        displayRawMessage(
+          cleanFormatting(
+            cleanCtcpDelimiter(outMessage)));
+      } else {
+        console.log('Error Msg 322 not have 4 parsed parameters');
+      }
+      break;
+    case '321': // Start LIST
+      displayRawMessage('LIST --Start--');
+      break;
+    case '323': // End LIST
+      displayRawMessage('LIST --End--');
+      break;
     //
     // VERSION TODO
     //
     // case '351':
-    //   _showAfterParamZero(event.detail.parsedMessage);
+    //   _showAfterParamZero(event.detail.parsedMessage, null);
     //   break;
     //
     // MOTD
     //
     case '372': // irc server motd
-      _showAfterParamZero(event.detail.parsedMessage);
+      _showAfterParamZero(event.detail.parsedMessage, null);
       break;
     case '375': // Start MOTD
     case '376': // End MOTD

@@ -595,13 +595,16 @@ _parseInputForIRCCommands(document.getElementById("rawMessageInputId"));document
 ;document.getElementById("rawMessageInputId").addEventListener("input",function(event){if(event.inputType==="insertText"&&event.data===null||event.inputType==="insertLineBreak"){
 _parseInputForIRCCommands(document.getElementById("rawMessageInputId"))}}.bind(this));function substituteHmsTime(inMessage){let timeString=inMessage.split(" ")[0]
 ;let restOfMessage=inMessage.slice(timeString.length+1,inMessage.length);let hmsString=timestampToHMS(timeString);return hmsString+" "+restOfMessage}
-document.addEventListener("server-message",function(event){function _showAfterParamZero(parsedMessage){let msgString="";if(parsedMessage.params.length>1){
-for(let i=1;i<parsedMessage.params.length;i++){msgString+=" "+parsedMessage.params[i]}}else{console.log("Error _showAfterParamZero() no parsed field")}
-displayRawMessage(cleanFormatting(cleanCtcpDelimiter(parsedMessage.timestamp+msgString)))}switch(event.detail.parsedMessage.command){case"001":case"002":case"003":case"004":
-_showAfterParamZero(event.detail.parsedMessage);break;case"005":break;case"250":case"251":case"252":case"254":case"255":case"265":case"265":_showAfterParamZero(event.detail.parsedMessage);break
-;case"256":case"257":case"258":case"259":_showAfterParamZero(event.detail.parsedMessage);break;case"315":break;case"352":_showAfterParamZero(event.detail.parsedMessage);break;case"275":case"301":
-case"307":case"311":case"312":case"313":case"317":case"318":case"319":_showAfterParamZero(event.detail.parsedMessage);break;case"372":_showAfterParamZero(event.detail.parsedMessage);break;case"375":
-case"376":break;case"MODE":
+document.addEventListener("server-message",function(event){console.log(JSON.stringify(event.detail,null,2));function _showAfterParamZero(parsedMessage,title){let msgString=""
+;if(parsedMessage.params.length>1){for(let i=1;i<parsedMessage.params.length;i++){msgString+=" "+parsedMessage.params[i]}}else{console.log("Error _showAfterParamZero() no parsed field")}
+let outMessage=parsedMessage.timestamp+msgString;if(title){outMessage=title+msgString}displayRawMessage(cleanFormatting(cleanCtcpDelimiter(outMessage)))}switch(event.detail.parsedMessage.command){
+case"001":case"002":case"003":case"004":_showAfterParamZero(event.detail.parsedMessage,null);break;case"005":break;case"250":case"251":case"252":case"254":case"255":case"265":case"265":
+_showAfterParamZero(event.detail.parsedMessage,null);break;case"256":case"257":case"258":case"259":_showAfterParamZero(event.detail.parsedMessage,null);break;case"315":break;case"352":
+_showAfterParamZero(event.detail.parsedMessage,null);break;case"275":case"301":case"307":case"311":case"312":case"313":case"317":case"318":case"319":
+_showAfterParamZero(event.detail.parsedMessage,"WHOIS");break;case"322":if(event.detail.parsedMessage.params.length===4){
+let outMessage="LIST "+event.detail.parsedMessage.params[1]+" "+event.detail.parsedMessage.params[2];if(event.detail.parsedMessage.params[3]){outMessage+=" "+event.detail.parsedMessage.params[3]}
+displayRawMessage(cleanFormatting(cleanCtcpDelimiter(outMessage)))}else{console.log("Error Msg 322 not have 4 parsed parameters")}break;case"321":displayRawMessage("LIST --Start--");break;case"323":
+displayRawMessage("LIST --End--");break;case"372":_showAfterParamZero(event.detail.parsedMessage,null);break;case"375":case"376":break;case"MODE":
 displayRawMessage(cleanFormatting(cleanCtcpDelimiter(event.detail.parsedMessage.timestamp+" "+"MODE "+event.detail.parsedMessage.params[0]+" "+event.detail.parsedMessage.params[1])));break;case"NICK":
 displayRawMessage(cleanFormatting(cleanCtcpDelimiter(event.detail.parsedMessage.timestamp+" "+"(No channel) "+event.detail.parsedMessage.nick+" is now known as "+event.detail.parsedMessage.params[0])))
 ;break;case"NOTICE":
