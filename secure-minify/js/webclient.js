@@ -167,13 +167,15 @@ function displayPrivateMessage(parsedMessage){document.dispatchEvent(new CustomE
 function displayNoticeMessage(parsedMessage){function _addText(text){document.getElementById("noticeMessageDisplay").value+=cleanFormatting(text)+"\n"
 ;document.getElementById("noticeMessageDisplay").scrollTop=document.getElementById("noticeMessageDisplay").scrollHeight}switch(parsedMessage.command){case"NOTICE":const ctcpDelim=1
 ;if(parsedMessage.params.length===2&&parsedMessage.params[1].charCodeAt(0)===ctcpDelim||parsedMessage.params.length===3&&parsedMessage.params[2].charCodeAt(0)===ctcpDelim){}else{
-if(parsedMessage.params[0]===ircState.nickName){_addText(parsedMessage.timestamp+" Notice("+parsedMessage.nick+" to "+parsedMessage.params[0]+") "+parsedMessage.params[1]);webState.noticeOpen=true
-;updateDivVisibility();if(webState.cacheInhibitTimer===0){setNotActivityIcon()}}else if(ircState.channels.indexOf(parsedMessage.params[0].toLowerCase())>=0){
-document.dispatchEvent(new CustomEvent("channel-message",{bubbles:true,detail:{parsedMessage:parsedMessage}}))}else if(parsedMessage.nick===ircState.nickName){
-_addText(parsedMessage.timestamp+" Notice("+parsedMessage.nick+" to "+parsedMessage.params[0]+") "+parsedMessage.params[1]);webState.noticeOpen=true;updateDivVisibility()}}break;default:}}
-function displayWallopsMessage(parsedMessage){function _addText(text){document.getElementById("wallopsMessageDisplay").value+=cleanFormatting(text)+"\n"
-;document.getElementById("wallopsMessageDisplay").scrollTop=document.getElementById("wallopsMessageDisplay").scrollHeight}switch(parsedMessage.command){case"WALLOPS":
-_addText(parsedMessage.timestamp+" "+parsedMessage.nick+"/Wallops "+parsedMessage.params[0]);webState.wallopsOpen=true;updateDivVisibility();break;default:}}function showRawMessageWindow(){
+if(parsedMessage.params[0]===ircState.nickName){if(parsedMessage.nick){_addText(parsedMessage.timestamp+" "+parsedMessage.nick+nickChannelSpacer+parsedMessage.params[1])}else{
+_addText(parsedMessage.timestamp+" "+parsedMessage.prefix+nickChannelSpacer+parsedMessage.params[1])}webState.noticeOpen=true;updateDivVisibility();if(webState.cacheInhibitTimer===0){
+setNotActivityIcon()}}else if(ircState.channels.indexOf(parsedMessage.params[0].toLowerCase())>=0){document.dispatchEvent(new CustomEvent("channel-message",{bubbles:true,detail:{
+parsedMessage:parsedMessage}}))}else if(parsedMessage.nick===ircState.nickName){_addText(parsedMessage.timestamp+" [to] "+parsedMessage.params[0]+nickChannelSpacer+parsedMessage.params[1])
+;webState.noticeOpen=true;updateDivVisibility()}}break;default:}}function displayWallopsMessage(parsedMessage){function _addText(text){
+document.getElementById("wallopsMessageDisplay").value+=cleanFormatting(text)+"\n"
+;document.getElementById("wallopsMessageDisplay").scrollTop=document.getElementById("wallopsMessageDisplay").scrollHeight}switch(parsedMessage.command){case"WALLOPS":if(parsedMessage.nick){
+_addText(parsedMessage.timestamp+" "+parsedMessage.nick+nickChannelSpacer+parsedMessage.params[0]);webState.wallopsOpen=true}else{
+_addText(parsedMessage.timestamp+" "+parsedMessage.prefix+nickChannelSpacer+parsedMessage.params[0]);webState.wallopsOpen=true}updateDivVisibility();break;default:}}function showRawMessageWindow(){
 document.getElementById("rawHiddenElements").removeAttribute("hidden");document.getElementById("rawHiddenElementsButton").textContent="-"
 ;document.getElementById("rawHeadRightButtons").removeAttribute("hidden");document.getElementById("rawMessageDisplay").scrollTop=document.getElementById("rawMessageDisplay").scrollHeight}
 function displayRawMessage(inString){document.getElementById("rawMessageDisplay").value+=inString+"\n"

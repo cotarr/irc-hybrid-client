@@ -439,12 +439,21 @@ function displayNoticeMessage(parsedMessage) {
         ((parsedMessage.params.length === 3) &&
         (parsedMessage.params[2].charCodeAt(0) === ctcpDelim))) {
         // case of CTCP notice
+        // ignore, handle else
       } else {
         if (parsedMessage.params[0] === ircState.nickName) {
-          // Case of regular notice, not CTCP reply
-          _addText(parsedMessage.timestamp + ' Notice(' +
-          parsedMessage.nick + ' to ' + parsedMessage.params[0] + ') ' +
-           parsedMessage.params[1]);
+          // Case of regular notice address to my nickname, not CTCP reply
+          if (parsedMessage.nick) {
+            // case of valid user nickname parse
+            _addText(parsedMessage.timestamp + ' ' +
+            parsedMessage.nick + nickChannelSpacer +
+              parsedMessage.params[1]);
+          } else {
+            // else must be a services server message, use prefix
+            _addText(parsedMessage.timestamp + ' ' +
+            parsedMessage.prefix + nickChannelSpacer +
+              parsedMessage.params[1]);
+          }
           webState.noticeOpen = true;
           updateDivVisibility();
 
@@ -465,8 +474,8 @@ function displayNoticeMessage(parsedMessage) {
             }));
         } else if (parsedMessage.nick === ircState.nickName) {
           // Case of regular notice, not CTCP reply
-          _addText(parsedMessage.timestamp + ' Notice(' +
-          parsedMessage.nick + ' to ' + parsedMessage.params[0] + ') ' +
+          _addText(parsedMessage.timestamp + ' [to] ' +
+          parsedMessage.params[0] + nickChannelSpacer +
            parsedMessage.params[1]);
           webState.noticeOpen = true;
           updateDivVisibility();
@@ -491,9 +500,15 @@ function displayWallopsMessage(parsedMessage) {
   // console.log('Priv Msg: ' + JSON.stringify(parsedMessage, null, 2));
   switch(parsedMessage.command) {
     case 'WALLOPS':
-      _addText(parsedMessage.timestamp + ' ' +
-        parsedMessage.nick + '/Wallops ' + parsedMessage.params[0]);
-      webState.wallopsOpen = true;
+      if (parsedMessage.nick) {
+        _addText(parsedMessage.timestamp + ' ' +
+          parsedMessage.nick + nickChannelSpacer + parsedMessage.params[0]);
+        webState.wallopsOpen = true;
+      } else {
+        _addText(parsedMessage.timestamp + ' ' +
+          parsedMessage.prefix + nickChannelSpacer + parsedMessage.params[0]);
+        webState.wallopsOpen = true;
+      }
       updateDivVisibility();
       break;
     //
