@@ -35,7 +35,7 @@
         <p>
           The git repository includes an example configuration file
           named &quotexample-credentials.json&quot. The first step
-          is to make a copy of this file to &quotcredentials.json&quot. 
+          is to make a copy of this file to &quotcredentials.json&quot.
           If you are on a multi user system you may optionally
           change permissions.
         </p>
@@ -165,14 +165,17 @@
 </pre></div>
 
 
-        <div class="install-section-title">PID file</div>
+        <div class="install-section-title">PID file path</div>
         <p>
-          A valid file path must be defined to a folder capable of
+          A valid file path may be defined to a folder capable of
           write access to the web server. When the server starts,
           the process id (PID) number is written to this file.
           This is intended for use by external scripts for purposes
           like restarting the application for various purposes
           such as restart after log file rotation.
+        </p>
+        <p>
+          Set the PID file path to an empty string to disable the PDF file.
         </p>
 
 <div class="pre-div"><pre>

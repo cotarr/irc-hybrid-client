@@ -61,7 +61,7 @@ chmod 600 credentials.json
 # 1) Set file path for TLS certs and tls:true ...or.. set tls=false
 # 2) Set a unique cookie secret
 # 3) Set .well-known/security.txt data, or empty string.
-# 4) Set writable file path for PID file
+# 4) Set writable file path for PID file, or empty string to disable PDF file.
 
 # It is necessary to assign one web page username and password.
 # This must be done after copying the example-credentials.json into the project folder
