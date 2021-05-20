@@ -76,7 +76,7 @@ server.on('listening', function() {
   try {
     let pidFilename = credentials.pidFilename;
     if ((pidFilename) && (pidFilename.length > 0)) {
-      fs.writeFileSync('../../tmp/testIrcClient.PID', '' + process.pid + '\n');
+      fs.writeFileSync(pidFilename, '' + process.pid + '\n');
     }
   } catch (err) {
     console.log(err);
