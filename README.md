@@ -97,4 +97,14 @@ node bin/www
 
 ### Minify and bundle for deployment
 
-See [documentation](https://cotarr.github.io/irc-hybrid-client)
+This section is optional. This repository contains both minified and
+original un-minified files.
+The repository can be cloned and deployed as-is,
+requiring only editing of the configurations files.
+
+In the case where the web page files have been edited, you may want
+to regenrate a new folder containing replacement minified files for the web page.
+The there is a separate repository for this called
+[irc-hybrid-client-dev-tools](https://github.com/cotarr/irc-hybrid-client-dev-tools).
+There are complete instructions for use of this utility in the
+[irc-hybrid-client-dev-tools](https://github.com/cotarr/irc-hybrid-client-dev-tools) repository.

@@ -81,7 +81,8 @@
           behind a NAT router.
         </p>
         <p>
-          The program has run without errors under Node.js versions 12 and 14.
+          The program has run without errors under Node.js versions 12 and 14
+          and npm version 7.
           Other versions of Node.js have not been tried.
         </p>
         <div class="install-section-title">System Requirements (Browser)</div>
@@ -146,11 +147,6 @@ cd irc-hybrid-client
           will be installed using the npm package manager.
         </p>
         <p>
-          Optional development dependencies are used to produce a minified and bundled
-          version of the program. Development dependencies are not needed
-          unless you plan to edit the software (see section 11 below).
-        </p>
-        <p>
           The npm package manager library dependencies are specified in the file &quotpackage.json&quot.
           The dependencies will managed by npm and placed in a folder named &quotnode_modules&quot.
           Prior to installing dependencies, the environment variable &quotNODE_ENV&QUOT
@@ -158,18 +154,14 @@ cd irc-hybrid-client
           program output should be logged.
         </p>
         <p>
-          Select only 1 of the following 3 options.
+          Select only 1 of the following 2 options.
         </p>
 <div class="pre-div"><pre>
 # Option 1 Run local to try it out. (development --> log to console)
 export NODE_ENV=development
-npm install --only=prod
-
-# Option 2 Run local development environment with development dependencies
-export NODE_ENV=development
 npm install
 
-# Option 3 Typical for server installation, log output to files.
+# Option 2 Typical for server installation, log output to files.
 export NODE_ENV=production
 # ci = clean install
 npm ci
@@ -375,64 +367,27 @@ sudo certbot certonly --standalone -d abcd.example.com
 
 <div class="install-section-title">11 - Minify and bundle (Optional)</div>
         <p>
-          The steps in this section are optional. They are not required unless
-          you plan to edit software and regenerate
-          the minified bundled files.
+          This section is optional. This repository contains both minified and
+          original un-minified files.
           The repository can be cloned and deployed &quotas-is&quot,
           requiring only editing of the configurations files.
         </p>
         <p>
-          Running the gulp script will concatenate 10 of the JavaScript
-          files into 1 bundled/minified JavaScript file.
-          It will remove comments and whitespace from the javascript code.
-          The browser download is about 31 kB for minify-bundled version
-          with server compression, compared to about 240 kB serving
-          from development folders without compression.
+          Running minify development tools will concatenate multiple web page
+          files into one HTML, one JavaScript, and one CSS file.
+          It will remove comments and whitespace from the javascript, html and css code.
           This will significantly reduce the download size of the files
           and reduce bandwidth used by smartphones.
         </p>
-          The minification process uses a development library called &quotgulp&quot.
-          Their website is <a href="https://gulpjs.com/">https://gulpjs.com/</a>.
-          The library files are listed in the package.json as development depencies.
         <p>
-          Running &quotgulp minify&quot will source files from the &quotsecure/&quot folder
-          and place output files in the &quotsecure-minify/&quot
-          folder that are located within the main project folder.
-          The secure-minify folder will contain the same folder structure as the base repository.
-          The gulp script will modify the individual script tags in webclient.html to
-          replace multiple script tags with a single javascript script tag.
+          In the case where the web page files have been edited, you may want
+          to regenrate a new folder containing replacement minified files for the web page.
+          The there is a separate repository for this called
+          <a href="https://github.com/cotarr/irc-hybrid-client-dev-tools">irc-hybrid-client-dev-tools</a>.
+          There are complete instructions for use of this utility in the
+          <a href="https://github.com/cotarr/irc-hybrid-client-dev-tools">irc-hybrid-client-dev-tools</a>
+          repository.
         </p>
-        <p>
-          Configuration for the minify and bundle process is stored in &quotGulpfile.js&quot
-        </p>
-        <p>
-          The package.json files, configuration JSON files, and the /docs folder are not included in the bundle.
-          The build folder is erased during the build process.
-        </p>
-        <p>
-          It is necessary to install gulp-cli globally, as gulp-cli
-          is used by gulp to manage multiple gulp versions. gulp-cli is not
-          listed in the pacakge.json. It is not necessary to install gulp-cli
-          unless you plan to minify and bundle the files.
-        </p>
-        <p>
-          Some of this would vary depending on the specific deployment environments.
-          The following commands should be able to produce a minified version.
-          The deployment itself is left to you.
-        </p>
-<div class="pre-div"><pre>
-# Install the gulp command line client globally using npm
-
-export NODE_ENV=development
-npm install
-
-# may require sudo for -g
-npm install -g gulp-cli
-
-# bundle and minify to /build folder
-gulp minify
-</pre></div>
-
       </div> <!-- /text-div -->
 
     </div> <!-- outer-div -->
