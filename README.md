@@ -39,22 +39,18 @@ It is recommended to follow the documentation installation instructions instead.
 git clone https://github.com/cotarr/irc-hybrid-client.git
 cd irc-hybrid-client
 
-# Choose 1 of the following 3 options
+# Choose 1 of the following 2 options
 
 # Option 1 Run local to try it out. (development --> log to console)
 export NODE_ENV=development
-npm install --only=prod
-
-# Option 2 Run local development environment with development dependencies
-export NODE_ENV=development
 npm install
 
-# Option 3 Typical for server installation, log output to files.
+# Option 2 Typical for server installation, use minified files, log output to files.
 export NODE_ENV=production
 npm ci
 
 # copy example-credentials.json and edit
-cp example-credentials.json credentials.json
+cp -v example-credentials.json credentials.json
 # If multi user system optionally change permission
 chmod 600 credentials.json
 
@@ -77,7 +73,7 @@ node updateAuthForUser_1.js
 cd ..
 
 # Copy example-servers.json file
-cp example-servers.json servers.json
+cp -v example-servers.json servers.json
 # If multi user system optionally change permissions
 chmod 600 servers.json
 
