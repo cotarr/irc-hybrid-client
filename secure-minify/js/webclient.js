@@ -573,15 +573,16 @@ if(commandAction.ircMessage&&commandAction.ircMessage.length>0){_sendIrcServerMe
 ;if(document.getElementById("pmNickNameInputId").value.length===0)return;let targetNickname=document.getElementById("pmNickNameInputId").value;let message="PRIVMSG "+targetNickname+" :"+text
 ;_sendIrcServerMessage(message);inputAreaEl.value=""}}inputAreaEl.value=""}document.getElementById("userPrivMsgInputId").addEventListener("input",function(event){
 if(event.inputType==="insertText"&&event.data===null){_buildPrivateMessageText()}if(event.inputType==="insertLineBreak"){_buildPrivateMessageText()}}.bind(this))
-;document.getElementById("UserPrivMsgSendButton").addEventListener("click",function(){_buildPrivateMessageText()}.bind(this))
-;document.getElementById("whoisButton").addEventListener("click",function(){if(document.getElementById("pmNickNameInputId").value.length>0){showRawMessageWindow()
-;let message="WHOIS "+document.getElementById("pmNickNameInputId").value;_sendIrcServerMessage(message);document.getElementById("rawHiddenElements").removeAttribute("hidden")
-;document.getElementById("rawHiddenElementsButton").textContent="-"}else{showError("Input required")}});document.getElementById("privMsgMainHiddenButton").addEventListener("click",function(){
-if(document.getElementById("privMsgMainHiddenDiv").hasAttribute("hidden")){document.getElementById("privMsgMainHiddenDiv").removeAttribute("hidden")
-;document.getElementById("privMsgMainHiddenButton").textContent="-";document.dispatchEvent(new CustomEvent("priv-msg-show-all",{bubbles:true}))}else{
-document.getElementById("privMsgMainHiddenDiv").setAttribute("hidden","");document.getElementById("privMsgMainHiddenButton").textContent="+"
-;document.dispatchEvent(new CustomEvent("priv-msg-hide-all",{bubbles:true}))}}.bind(this));"use strict";document.getElementById("closeNoticeButton").addEventListener("click",function(){
-webState.noticeOpen=false;updateDivVisibility()}.bind(this));document.getElementById("noticeClearButton").addEventListener("click",function(){document.getElementById("noticeMessageDisplay").value=""
+;document.getElementById("UserPrivMsgSendButton").addEventListener("click",function(){_buildPrivateMessageText()}.bind(this));document.addEventListener("erase-before-reload",function(event){
+document.getElementById("pmNickNameInputId").value="";document.getElementById("userPrivMsgInputId").value=""}.bind(this));document.getElementById("whoisButton").addEventListener("click",function(){
+if(document.getElementById("pmNickNameInputId").value.length>0){showRawMessageWindow();let message="WHOIS "+document.getElementById("pmNickNameInputId").value;_sendIrcServerMessage(message)
+;document.getElementById("rawHiddenElements").removeAttribute("hidden");document.getElementById("rawHiddenElementsButton").textContent="-"}else{showError("Input required")}})
+;document.getElementById("privMsgMainHiddenButton").addEventListener("click",function(){if(document.getElementById("privMsgMainHiddenDiv").hasAttribute("hidden")){
+document.getElementById("privMsgMainHiddenDiv").removeAttribute("hidden");document.getElementById("privMsgMainHiddenButton").textContent="-"
+;document.dispatchEvent(new CustomEvent("priv-msg-show-all",{bubbles:true}))}else{document.getElementById("privMsgMainHiddenDiv").setAttribute("hidden","")
+;document.getElementById("privMsgMainHiddenButton").textContent="+";document.dispatchEvent(new CustomEvent("priv-msg-hide-all",{bubbles:true}))}}.bind(this));"use strict"
+;document.getElementById("closeNoticeButton").addEventListener("click",function(){webState.noticeOpen=false;updateDivVisibility()}.bind(this))
+;document.getElementById("noticeClearButton").addEventListener("click",function(){document.getElementById("noticeMessageDisplay").value=""
 ;document.getElementById("noticeMessageDisplay").setAttribute("rows","5")});document.getElementById("noticeTallerButton").addEventListener("click",function(){
 let newRows=parseInt(document.getElementById("noticeMessageDisplay").getAttribute("rows"))+5;document.getElementById("noticeMessageDisplay").setAttribute("rows",newRows.toString())}.bind(this))
 ;document.getElementById("noticeNormalButton").addEventListener("click",function(){document.getElementById("noticeMessageDisplay").setAttribute("rows","5")}.bind(this))
@@ -618,7 +619,7 @@ displayRawMessage(cleanFormatting(cleanCtcpDelimiter(substituteHmsTime(event.det
 ;document.getElementById("rawHiddenElementsButton").addEventListener("click",function(){if(document.getElementById("rawHiddenElements").hasAttribute("hidden")){showRawMessageWindow()}else{
 document.getElementById("rawHiddenElements").setAttribute("hidden","");document.getElementById("rawHiddenElementsButton").textContent="+"
 ;document.getElementById("rawHeadRightButtons").setAttribute("hidden","")}});document.getElementById("rawClearButton").addEventListener("click",function(){
-document.getElementById("rawMessageDisplay").value="";document.getElementById("rawMessageDisplay").setAttribute("rows","10")})
+document.getElementById("rawMessageDisplay").value="";document.getElementById("rawMessageDisplay").setAttribute("rows","10");document.getElementById("rawMessageInputId").value=""})
 ;document.getElementById("rawTallerButton").addEventListener("click",function(){let newRows=parseInt(document.getElementById("rawMessageDisplay").getAttribute("rows"))+10
 ;document.getElementById("rawMessageDisplay").setAttribute("rows",newRows.toString())}.bind(this));document.getElementById("rawNormalButton").addEventListener("click",function(){
 document.getElementById("rawMessageDisplay").setAttribute("rows","10")}.bind(this));document.getElementById("showDebugButton").addEventListener("click",function(){
@@ -646,8 +647,8 @@ if(document.getElementById("hiddenInfoDiv").hasAttribute("hidden")){document.get
 throw new Error("Fetch status "+response.status+" "+response.statusText)}}).then(responseArray=>{if(Array.isArray(responseArray)&&responseArray.length>0){
 let privMsgSessionEl=document.getElementById("privateMessageContainerDiv");while(privMsgSessionEl.firstChild){privMsgSessionEl.removeChild(privMsgSessionEl.firstChild)}webState.lastPMNick=""
 ;webState.activePrivateMessageNicks=[];webState.resizablePrivMsgTextareaIds=[];webState.resizableSendButtonPMTextareaIds=[];document.getElementById("noticeMessageDisplay").value=""
-;document.getElementById("wallopsMessageDisplay").value="";document.getElementById("rawMessageDisplay").value="";webState.noticeOpen=false;webState.wallopsOpen=false
-;for(let i=0;i<responseArray.length;i++){if(responseArray[i].length>0){_parseBufferMessage(responseArray[i])}}}}).catch(error=>{console.log(error)})}
+;document.getElementById("wallopsMessageDisplay").value="";document.getElementById("rawMessageDisplay").value="";document.getElementById("rawMessageInputId").value="";webState.noticeOpen=false
+;webState.wallopsOpen=false;for(let i=0;i<responseArray.length;i++){if(responseArray[i].length>0){_parseBufferMessage(responseArray[i])}}}}).catch(error=>{console.log(error)})}
 window.addEventListener("update-from-cache",function(event){updateFromCache()}.bind(this));function cacheInhibitTimerTick(){if(webState.cacheInhibitTimer>0)webState.cacheInhibitTimer--}
 webState.cacheInhibitTimer=3;document.getElementById("serverTerminateButton").addEventListener("click",function(){console.log("Requesting backend server to terminate")
 ;let fetchURL=webServerUrl+"/terminate";let fetchOptions={method:"POST",headers:{"Content-type":"application/json",Accept:"application/json"},body:JSON.stringify({terminate:"YES"})}
@@ -658,12 +659,12 @@ document.dispatchEvent(new CustomEvent("erase-before-reload",{bubbles:true,detai
 "Content-type":"application/json",Accept:"application/json"},body:JSON.stringify({erase:"YES"})};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()}else{
 throw new Error("Fetch status "+response.status+" "+response.statusText)}}).then(responseJson=>{if(responseJson.error){showError(responseJson.message)}else{
 let privMsgSessionEl=document.getElementById("privateMessageContainerDiv");while(privMsgSessionEl.firstChild){privMsgSessionEl.removeChild(privMsgSessionEl.firstChild)}
-document.getElementById("noticeMessageDisplay").value="";document.getElementById("wallopsMessageDisplay").value="";document.getElementById("rawMessageDisplay").value="";webState.privMsgOpen=false
-;webState.noticeOpen=false;webState.wallopsOpen=false;updateDivVisibility()}}).catch(error=>{console.log(error)})});function updateUsername(){let fetchURL=webServerUrl+"/userinfo";let fetchOptions={
-method:"GET",headers:{Accept:"application/json"}};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()}else{
-throw new Error("Fetch status "+response.status+" "+response.statusText)}}).then(responseJson=>{webState.loginUser=responseJson}).catch(error=>{console.log(error)})}updateUsername()
-;document.getElementById("test1Button").addEventListener("click",function(){console.log("Test1 button pressed.");let fetchURL=webServerUrl+"/irc/test1";let fetchOptions={method:"GET",headers:{
-Accept:"application/json"}};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()}else{throw new Error("Fetch status "+response.status+" "+response.statusText)}
+document.getElementById("noticeMessageDisplay").value="";document.getElementById("wallopsMessageDisplay").value="";document.getElementById("rawMessageDisplay").value=""
+;document.getElementById("rawMessageInputId").value="";webState.privMsgOpen=false;webState.noticeOpen=false;webState.wallopsOpen=false;updateDivVisibility()}}).catch(error=>{console.log(error)})})
+;function updateUsername(){let fetchURL=webServerUrl+"/userinfo";let fetchOptions={method:"GET",headers:{Accept:"application/json"}};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){
+return response.json()}else{throw new Error("Fetch status "+response.status+" "+response.statusText)}}).then(responseJson=>{webState.loginUser=responseJson}).catch(error=>{console.log(error)})}
+updateUsername();document.getElementById("test1Button").addEventListener("click",function(){console.log("Test1 button pressed.");let fetchURL=webServerUrl+"/irc/test1";let fetchOptions={method:"GET",
+headers:{Accept:"application/json"}};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()}else{throw new Error("Fetch status "+response.status+" "+response.statusText)}
 }).then(responseJson=>{console.log(JSON.stringify(responseJson,null,2));if(responseJson.error){showError(responseJson.message)}}).catch(error=>{console.log(error);if(error)showError(error.toString())
 })});document.getElementById("test1ButtonDesc").textContent="Force garbage collect";document.getElementById("test2Button").addEventListener("click",function(){console.log("Test2 button pressed.")
 ;let fetchURL=webServerUrl+"/irc/test2";let fetchOptions={method:"GET",headers:{Accept:"application/json"}};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()}else{
