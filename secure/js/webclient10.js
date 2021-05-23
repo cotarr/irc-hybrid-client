@@ -80,6 +80,7 @@ function updateFromCache () {
         document.getElementById('noticeMessageDisplay').value = '';
         document.getElementById('wallopsMessageDisplay').value = '';
         document.getElementById('rawMessageDisplay').value = '';
+        document.getElementById('rawMessageInputId').value = '';
         webState.noticeOpen = false;
         webState.wallopsOpen = false;
         //
@@ -195,6 +196,7 @@ document.getElementById('eraseCacheButton').addEventListener('click', function()
         document.getElementById('noticeMessageDisplay').value = '';
         document.getElementById('wallopsMessageDisplay').value = '';
         document.getElementById('rawMessageDisplay').value = '';
+        document.getElementById('rawMessageInputId').value = '';
         webState.privMsgOpen = false;
         webState.noticeOpen = false;
         webState.wallopsOpen = false;

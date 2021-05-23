@@ -297,6 +297,7 @@ document.getElementById('rawHiddenElementsButton').addEventListener('click', fun
 document.getElementById('rawClearButton').addEventListener('click', function() {
   document.getElementById('rawMessageDisplay').value = '';
   document.getElementById('rawMessageDisplay').setAttribute('rows', '10');
+  document.getElementById('rawMessageInputId').value = '';
 });
 // -------------------------
 // raw Taller button handler

@@ -518,6 +518,12 @@ document.getElementById('UserPrivMsgSendButton').addEventListener('click', funct
   _buildPrivateMessageText();
 }.bind(this));
 
+// Initialize all input elements on reload
+document.addEventListener('erase-before-reload', function(event) {
+  document.getElementById('pmNickNameInputId').value = '';
+  document.getElementById('userPrivMsgInputId').value = '';
+}.bind(this));
+
 // -------------------------
 // Whois button handler
 // -------------------------
