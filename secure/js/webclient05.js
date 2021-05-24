@@ -58,6 +58,9 @@ function stripTrailingCrLf(inString) {
   let inLength = inString.length;
   if ((inLength > 0) && (inString.charCodeAt(inLength-1) === 10)) inLength--;
   if ((inLength > 0) && (inString.charCodeAt(inLength-1) === 13)) inLength--;
+  // remove trailing ascii space (left from auto-complete)
+  if ((inLength > 0) && (inString.charCodeAt(inLength-1) === 32)) inLength--;
+  if ((inLength > 0) && (inString.charCodeAt(inLength-1) === 32)) inLength--;
   if (inLength === 0) {
     return '';
   } else {
