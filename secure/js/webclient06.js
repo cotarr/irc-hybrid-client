@@ -326,6 +326,12 @@ function createChannelEl (name) {
     channelContainerDivEl.appendChild(channelMainSectionEl);
   }
 
+  // This is to make room for seeing the display.
+  // If state of channel is joined, then hide raw servermessage window.
+  if (ircState.channelStates[initIrcStateIndex].joined) {
+    hideRawMessageWindow();
+  }
+
   // --------------------------
   // Channel specific timers
   // --------------------------
@@ -1168,6 +1174,7 @@ document.addEventListener('irc-state-changed', function(event) {
           channelJoinButtonContainerEl.appendChild(joinButtonEl);
           joinButtonEl.addEventListener('click', function() {
             _sendIrcServerMessage('JOIN ' + ircState.channelList[i]);
+            hideRawMessageWindow();
           });
         }
       } // next i
@@ -1186,6 +1193,7 @@ function _newChannel() {
     (chanPrefixChars.indexOf(newChannel.charAt(0)) >= 0)) {
     let message = 'JOIN ' + newChannel;
     _sendIrcServerMessage(message);
+    hideRawMessageWindow();
   } else {
     showError('Invalid Channel Name');
   }

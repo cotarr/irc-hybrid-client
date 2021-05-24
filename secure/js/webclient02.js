@@ -516,19 +516,6 @@ function displayWallopsMessage(parsedMessage) {
   }
 } // displayWallopsMessage
 
-//--------------------------------------------------
-// Open server message window if it is hidden
-//     (used in multiple modules)
-//--------------------------------------------------
-function showRawMessageWindow() {
-  document.getElementById('rawHiddenElements').removeAttribute('hidden');
-  document.getElementById('rawHiddenElementsButton').textContent = '-';
-  document.getElementById('rawHeadRightButtons').removeAttribute('hidden');
-  // scroll message to most recent
-  document.getElementById('rawMessageDisplay').scrollTop =
-    document.getElementById('rawMessageDisplay').scrollHeight;
-} // showRawMessageWindow()
-
 // ----------------------------------------------
 // Insert a text string into the server window
 // and scroll to bottom

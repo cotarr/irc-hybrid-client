@@ -533,8 +533,7 @@ document.getElementById('whoisButton').addEventListener('click', function() {
     let message = 'WHOIS ' + document.getElementById('pmNickNameInputId').value;
     _sendIrcServerMessage(message);
     // open up server messages to show
-    document.getElementById('rawHiddenElements').removeAttribute('hidden');
-    document.getElementById('rawHiddenElementsButton').textContent = '-';
+    showRawMessageWindow();
   } else {
     showError('Input required');
   }

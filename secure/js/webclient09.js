@@ -275,7 +275,9 @@ document.addEventListener('server-message', function(event) {
               substituteHmsTime(event.detail.message))));
       }
   } // switch
-  showRawMessageWindow();
+  if (webState.cacheInhibitTimer === 0) {
+    showRawMessageWindow();
+  }
 }); // server-message event handler
 
 // -------------------------
@@ -285,9 +287,7 @@ document.getElementById('rawHiddenElementsButton').addEventListener('click', fun
   if (document.getElementById('rawHiddenElements').hasAttribute('hidden')) {
     showRawMessageWindow();
   } else {
-    document.getElementById('rawHiddenElements').setAttribute('hidden', '');
-    document.getElementById('rawHiddenElementsButton').textContent = '+';
-    document.getElementById('rawHeadRightButtons').setAttribute('hidden', '');
+    hideRawMessageWindow();
   }
 });
 

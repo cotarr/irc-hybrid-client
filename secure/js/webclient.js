@@ -274,6 +274,27 @@ function checkConnect(code) {
   return true;
 }
 
+//--------------------------------------------------
+// Open server message window if it is hidden
+//     (used in multiple modules)
+//--------------------------------------------------
+function showRawMessageWindow() {
+  document.getElementById('rawHiddenElements').removeAttribute('hidden');
+  document.getElementById('rawHiddenElementsButton').textContent = '-';
+  document.getElementById('rawHeadRightButtons').removeAttribute('hidden');
+  // scroll message to most recent
+  document.getElementById('rawMessageDisplay').scrollTop =
+    document.getElementById('rawMessageDisplay').scrollHeight;
+} // showRawMessageWindow()
+//--------------------------------------------------
+// Hide server message window if it is hidden
+//--------------------------------------------------
+function hideRawMessageWindow() {
+  document.getElementById('rawHiddenElements').setAttribute('hidden', '');
+  document.getElementById('rawHiddenElementsButton').textContent = '+';
+  document.getElementById('rawHeadRightButtons').setAttribute('hidden', '');
+} // hideRawMessageWindow()
+
 // ----------------------------------------------
 // Functions to handle activity indicator icons
 // ----------------------------------------------
@@ -481,9 +502,7 @@ document.addEventListener('show-all-divs', function(event) {
   document.getElementById('hideLoginSectionButton').textContent = '-';
   document.getElementById('privMsgMainHiddenDiv').removeAttribute('hidden');
   document.getElementById('privMsgMainHiddenButton').textContent = '-';
-  document.getElementById('rawHiddenElements').removeAttribute('hidden');
-  document.getElementById('rawHiddenElementsButton').textContent = '-';
-  document.getElementById('rawHeadRightButtons').removeAttribute('hidden');
+  showRawMessageWindow();
   webState.noticeOpen = true;
   webState.wallopsOpen = true;
   document.getElementById('noticeSectionDiv').removeAttribute('hidden');
@@ -501,9 +520,7 @@ document.addEventListener('hide-all-divs', function(event) {
   document.getElementById('hideLoginSectionButton').textContent = '+';
   document.getElementById('privMsgMainHiddenDiv').setAttribute('hidden', '');
   document.getElementById('privMsgMainHiddenButton').textContent = '+';
-  document.getElementById('rawHiddenElements').setAttribute('hidden', '');
-  document.getElementById('rawHiddenElementsButton').textContent = '+';
-  document.getElementById('rawHeadRightButtons').setAttribute('hidden', '');
+  hideRawMessageWindow();
   webState.noticeOpen = false;
   document.getElementById('noticeSectionDiv').setAttribute('hidden', '');
   webState.wallopsOpen = false;
