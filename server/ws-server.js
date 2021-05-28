@@ -124,13 +124,18 @@ const wsOnUpgrade = function (request, socket, head) {
       wsServer.handleUpgrade(request, socket, head, function (socket) {
         wsServer.emit('connection', socket, request);
       });
+      return;
     } else {
       customLog(request, 'websocket-auth-fail');
+      socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
       socket.destroy();
+      return;
     }
   } else {
     customLog(request, 'websocket-path-not-found');
+    socket.write('HTTP/1.1 404 Not Found\r\n\r\n');
     socket.destroy();
+    return;
   }
 };
 

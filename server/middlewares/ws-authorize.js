@@ -151,7 +151,9 @@
             // and that 10 second expiration time is not exceeded.
             //
             let timeNow = parseInt(Date.now() / 1000); // seconds
-            if ((safeCompare(result, global.webSocketAuth.cookie)) &&
+            if (('webSocketAuth' in global) &&
+              ('cookie' in global.webSocketAuth) &&
+              (safeCompare(result, global.webSocketAuth.cookie)) &&
               (timeNow < global.webSocketAuth.expire)) {
               // console.log('websocket verified by cookie auth');
               return true;
