@@ -227,8 +227,28 @@
       } else {
         // case of CR or LF as message separator
         if (count > 0) {
-          // wrapped in Buffer.from because slice returns a reference
-          let message = Buffer.from(data.slice(index, index + count));
+          //
+          // Option 1, take buffer direct from IRC stream (no cleaning)
+          // (Disabled...)
+          // let message = Buffer.from(data.slice(index, index + count));
+          //
+          // Option 2, attempt to clean characters to avoid UTF-8 validation failure
+          //
+          // 1) Extract sub-string as Buffer
+          // 2) Decode Buffer into UTF-8 string to convert non UTF-8 Characters to
+          //    the UTF-8 replacement character 0xEF 0xBF 0xBD (question mark in diamond)
+          // 3) Then re-encode back to Buffer (non UTF-8 have been cleaned)
+          //
+          let message =
+            Buffer.from(
+              // wrapped in Buffer.from because slice returns a reference
+              Buffer.from(data.slice(index, index + count))
+                // to remove non UTF-8 characters
+                .toString('utf8'),
+              // encoded back to a Buffer
+              'utf8'
+            );
+
           //
           // This is one CR-LF terminated IRC server message
           //
@@ -237,7 +257,7 @@
             console.log('Error, extracted message exceeds max length of 512 btyes');
           } else if (!isValidUTF8(message)) {
             console.log('extractMessagesFromStream() failed UTF-8 validation');
-            // message ignored
+            // message ignored (else if block)
           } else if (message.includes(0)) {
             console.log('extractMessagesFromStream() failed zero byte validation');
             // message ignore

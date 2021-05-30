@@ -32,7 +32,11 @@
           Change Log
         </div>
         <p>
-          2021-05-28 (0.1.5) Fixed server crash in websocket upgrade request. 
+          (next) Fixed issue where server messages with non UTF-8 characters
+          were discarded. Some channels did not show in /LIST.
+        </p>
+        <p>
+          2021-05-28 (0.1.5) Fixed server crash in websocket upgrade request.
           Fixed uninitialized textarea after browser back arrow.
           Remove extraneous trailing spacein text command parser.
           Auto-close server message window on page reload when in channel.
