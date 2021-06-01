@@ -168,12 +168,13 @@ document.addEventListener('server-message', function(event) {
     case '312':
     case '313':
     case '317':
+    case '319':
+    case '378':
+    case '379':
+      _showAfterParamZero(event.detail.parsedMessage, 'WHOIS');
       break;
     case '318':
       displayRawMessage('WHOIS --End--');
-      break;
-    case '319':
-      _showAfterParamZero(event.detail.parsedMessage, 'WHOIS');
       break;
 
     //
