@@ -25,6 +25,29 @@
 // ----------------------------------------------
 'use strict';
 
+const autoCompleteCommandList = [
+  '/ADMIN',
+  '/AWAY',
+  '/CTCP',
+  '/JOIN',
+  '/LIST',
+  '/ME',
+  '/MODE',
+  '/MOTD',
+  '/MSG',
+  '/NICK',
+  '/NOP',
+  '/NOTICE',
+  '/PART',
+  '/QUERY',
+  '/QUIT',
+  '/QUOTE',
+  '/TOPIC',
+  '/VERSION',
+  '/WHO',
+  '/WHOIS'
+];
+
 // -------------------------------------------------
 // This is to avoid multi-line errors from copy paste or mobile voice dictation
 //

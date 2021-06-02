@@ -292,16 +292,17 @@ document.getElementById("logoutConfirmDiv").removeAttribute("hidden")}else{windo
 document.getElementById("logoutConfirmDiv").setAttribute("hidden","")});document.getElementById("ircIsAwayIconId").addEventListener("click",function(){if(ircState.ircConnected&&ircState.ircIsAway){
 _sendIrcServerMessage("AWAY")}});document.getElementById("setAwayButton").addEventListener("click",function(){if(ircState.ircConnected&&document.getElementById("userAwayMessageId").value.length>0){
 _sendIrcServerMessage("AWAY "+document.getElementById("userAwayMessageId").value)}});document.getElementById("setBackButton").addEventListener("click",function(){
-if(ircState.ircConnected&&ircState.ircIsAway){_sendIrcServerMessage("AWAY")}});"use strict";function detectMultiLineString(inString){let inLength=inString.length
-;if(inLength>0&&inString.charCodeAt(inLength-1)===10)inLength--;if(inLength>0){let countCR=0;for(let i=0;i<inLength;i++){if(inString.charCodeAt(i)===10)countCR++}if(countCR===0){return false}else{
-return true}}else{return false}}function stripTrailingCrLf(inString){let inLength=inString.length;if(inLength>0&&inString.charCodeAt(inLength-1)===10)inLength--
-;if(inLength>0&&inString.charCodeAt(inLength-1)===13)inLength--;if(inLength>0&&inString.charCodeAt(inLength-1)===32)inLength--;if(inLength>0&&inString.charCodeAt(inLength-1)===32)inLength--
-;if(inLength===0){return""}else{return inString.slice(0,inLength)}}function textCommandParser(inputObj){function _isWS(inChar){if(inChar.charAt(0)===" ")return true
-;if(inChar.charCodeAt(0)===9)return true;return false}function _isEOL(inChar){if(inChar.charAt(0)==="\n")return true;if(inChar.charAt(0)==="\r")return true;return false}let inStr=inputObj.inputString
-;if(inStr.length>0&&_isEOL(inStr.charAt(inStr.length-1))){inStr=inStr.slice(0,inStr.length-1)}if(inStr.length>0&&_isEOL(inStr.charAt(inStr.length-1))){inStr=inStr.slice(0,inStr.length-1)}
-let inStrLen=inStr.length;let parsedCommand={command:"",params:[],restOf:[]};if(inStr.length<2){return{error:true,message:"Error no command not found",ircMessage:null}}if(inStr.charAt(0)!=="/"){
-return{error:true,message:"Error missing / before command",ircMessage:null}}if(_isWS(inStr.charAt(1))){return{error:true,message:"Error space after slash",ircMessage:null}}var idx=1
-;while(!_isWS(inStr.charAt(idx))&&idx<inStrLen){parsedCommand.command+=inStr.charAt(idx);idx++}while(_isWS(inStr.charAt(idx))&&idx<inStrLen){idx++}
+if(ircState.ircConnected&&ircState.ircIsAway){_sendIrcServerMessage("AWAY")}});"use strict"
+;const autoCompleteCommandList=["/ADMIN","/AWAY","/CTCP","/JOIN","/LIST","/ME","/MODE","/MOTD","/MSG","/NICK","/NOP","/NOTICE","/PART","/QUERY","/QUIT","/QUOTE","/TOPIC","/VERSION","/WHO","/WHOIS"]
+;function detectMultiLineString(inString){let inLength=inString.length;if(inLength>0&&inString.charCodeAt(inLength-1)===10)inLength--;if(inLength>0){let countCR=0;for(let i=0;i<inLength;i++){
+if(inString.charCodeAt(i)===10)countCR++}if(countCR===0){return false}else{return true}}else{return false}}function stripTrailingCrLf(inString){let inLength=inString.length
+;if(inLength>0&&inString.charCodeAt(inLength-1)===10)inLength--;if(inLength>0&&inString.charCodeAt(inLength-1)===13)inLength--;if(inLength>0&&inString.charCodeAt(inLength-1)===32)inLength--
+;if(inLength>0&&inString.charCodeAt(inLength-1)===32)inLength--;if(inLength===0){return""}else{return inString.slice(0,inLength)}}function textCommandParser(inputObj){function _isWS(inChar){
+if(inChar.charAt(0)===" ")return true;if(inChar.charCodeAt(0)===9)return true;return false}function _isEOL(inChar){if(inChar.charAt(0)==="\n")return true;if(inChar.charAt(0)==="\r")return true
+;return false}let inStr=inputObj.inputString;if(inStr.length>0&&_isEOL(inStr.charAt(inStr.length-1))){inStr=inStr.slice(0,inStr.length-1)}if(inStr.length>0&&_isEOL(inStr.charAt(inStr.length-1))){
+inStr=inStr.slice(0,inStr.length-1)}let inStrLen=inStr.length;let parsedCommand={command:"",params:[],restOf:[]};if(inStr.length<2){return{error:true,message:"Error no command not found",
+ircMessage:null}}if(inStr.charAt(0)!=="/"){return{error:true,message:"Error missing / before command",ircMessage:null}}if(_isWS(inStr.charAt(1))){return{error:true,message:"Error space after slash",
+ircMessage:null}}var idx=1;while(!_isWS(inStr.charAt(idx))&&idx<inStrLen){parsedCommand.command+=inStr.charAt(idx);idx++}while(_isWS(inStr.charAt(idx))&&idx<inStrLen){idx++}
 parsedCommand.command=parsedCommand.command.toUpperCase();if(inStr.slice(idx,inStrLen).length>0){parsedCommand.params.push(null);parsedCommand.restOf.push(inStr.slice(idx,inStrLen));let chars1=""
 ;while(!_isWS(inStr.charAt(idx))&&idx<inStrLen){chars1+=inStr.charAt(idx);idx++}while(_isWS(inStr.charAt(idx))&&idx<inStrLen){idx++}if(inStr.slice(idx,inStrLen).length>0){
 parsedCommand.params.push(chars1);parsedCommand.restOf.push(inStr.slice(idx,inStrLen));let chars2="";while(!_isWS(inStr.charAt(idx))&&idx<inStrLen){chars2+=inStr.charAt(idx);idx++}
@@ -379,7 +380,7 @@ console.log("createChannelEl: channel already exist");return}const defaultHeight
 ;channelFormatCBInputEl.classList.add("channel-cb-cb");channelFormatCBInputEl.setAttribute("type","checkbox");let channelFormatCBTitleEl=document.createElement("span")
 ;channelFormatCBTitleEl.classList.add("channel-cb-span");channelFormatCBTitleEl.textContent="Brief";let channelAutoCompCBInputEl=document.createElement("input")
 ;channelAutoCompCBInputEl.classList.add("channel-cb-cb");channelAutoCompCBInputEl.setAttribute("type","checkbox");let channelAutoCompCBTitleEl=document.createElement("span")
-;channelAutoCompCBTitleEl.classList.add("channel-cb-span");channelAutoCompCBTitleEl.textContent="Auto-complete (space-space)";let channelBottomDiv4El=document.createElement("div")
+;channelAutoCompCBTitleEl.classList.add("channel-cb-span");channelAutoCompCBTitleEl.textContent="Auto-complete (tab, space-space)";let channelBottomDiv4El=document.createElement("div")
 ;channelBottomDiv4El.classList.add("button-div");let channelBeep1CBInputEl=document.createElement("input");channelBeep1CBInputEl.classList.add("channel-cb-cb")
 ;channelBeep1CBInputEl.setAttribute("type","checkbox");let channelBeep1CBTitleEl=document.createElement("span");channelBeep1CBTitleEl.classList.add("channel-cb-span")
 ;channelBeep1CBTitleEl.textContent="Line-beep";let channelBeep2CBInputEl=document.createElement("input");channelBeep2CBInputEl.classList.add("channel-cb-cb")
@@ -442,20 +443,30 @@ channelMainSectionEl.setAttribute("brief-enabled","");channelFormatCBInputEl.che
 updateVisibility();channelAutoCompCBInputEl.addEventListener("click",function(){if(channelMainSectionEl.hasAttribute("auto-comp-enabled")){channelMainSectionEl.removeAttribute("auto-comp-enabled")
 }else{channelMainSectionEl.setAttribute("auto-comp-enabled","")}updateVisibility()});if(window.InputEvent&&typeof InputEvent.prototype.getTargetRanges==="function"){
 channelMainSectionEl.setAttribute("auto-comp-enabled","");updateVisibility()}else{channelMainSectionEl.setAttribute("auto-comp-enabled","");updateVisibility()
-;channelAutoCompCBInputEl.setAttribute("disabled","")}const channelAutoComplete=function(e){if(channelAutoCompCBInputEl.hasAttribute("disabled"))return
-;if(!channelMainSectionEl.hasAttribute("auto-comp-enabled"))return;if(!e.data)return;if(channelInputAreaEl.value.length<2)return;let autoCompleteKey=32
-;if(e.data&&e.data.charCodeAt(0)===autoCompleteKey&&channelInputAreaEl.value.charCodeAt(channelInputAreaEl.value.length-1)===autoCompleteKey){
-channelInputAreaEl.value=channelInputAreaEl.value.slice(0,channelInputAreaEl.value.length-1);if(channelInputAreaEl.value.charCodeAt(channelInputAreaEl.value.length-1)===autoCompleteKey){
-channelInputAreaEl.value+=String.fromCharCode(autoCompleteKey)+String.fromCharCode(autoCompleteKey);e.preventDefault();return}let snippet="";let snippetArray=channelInputAreaEl.value.split(" ")
-;if(snippetArray.length>0){snippet=snippetArray[snippetArray.length-1]}if(name.toLowerCase().indexOf(snippet.toLowerCase())===0){
-channelInputAreaEl.value=channelInputAreaEl.value.slice(0,channelInputAreaEl.value.length-snippet.length);channelInputAreaEl.value+=name;channelInputAreaEl.value+=String.fromCharCode(autoCompleteKey)
-}else if(ircState.nickName.toLowerCase().indexOf(snippet.toLowerCase())===0){channelInputAreaEl.value=channelInputAreaEl.value.slice(0,channelInputAreaEl.value.length-snippet.length)
-;channelInputAreaEl.value+=ircState.nickName;channelInputAreaEl.value+=String.fromCharCode(autoCompleteKey)}else{let completeNick="";let chanIndex=ircState.channels.indexOf(name.toLowerCase())
-;if(chanIndex>=0){if(ircState.channelStates[chanIndex].names.length>0){for(let i=0;i<ircState.channelStates[chanIndex].names.length;i++){let matchNick=ircState.channelStates[chanIndex].names[i]
-;if(nicknamePrefixChars.indexOf(matchNick.charAt(0))>=0){matchNick=matchNick.slice(1,matchNick.length)}if(matchNick.toLowerCase().indexOf(snippet.toLowerCase())===0){completeNick=matchNick}}}}
-if(completeNick.length>0){channelInputAreaEl.value=channelInputAreaEl.value.slice(0,channelInputAreaEl.value.length-snippet.length);channelInputAreaEl.value+=completeNick
-;channelInputAreaEl.value+=String.fromCharCode(autoCompleteKey)}else{channelInputAreaEl.value+=String.fromCharCode(autoCompleteKey)+String.fromCharCode(autoCompleteKey)}}e.preventDefault()}
-}.bind(this);channelInputAreaEl.addEventListener("beforeinput",channelAutoComplete);function _updateNickList(){let index=ircState.channels.indexOf(name.toLowerCase());if(index>=0){maxNickLength=0
+;channelAutoCompCBInputEl.setAttribute("disabled","")}const _autoCompleteInputElement=function(snippet){let last="";const trailingSpaceKey=32;let matchedCommand=""
+;if(autoCompleteCommandList.length>0){for(let i=0;i<autoCompleteCommandList.length;i++){if(autoCompleteCommandList[i].indexOf(snippet.toUpperCase())===0){matchedCommand=autoCompleteCommandList[i]}}}
+if(matchedCommand.length>0){channelInputAreaEl.value=channelInputAreaEl.value.slice(0,channelInputAreaEl.value.length-snippet.length);channelInputAreaEl.value+=matchedCommand
+;channelInputAreaEl.value+=String.fromCharCode(trailingSpaceKey);last=name}else if(name.toLowerCase().indexOf(snippet.toLowerCase())===0){
+channelInputAreaEl.value=channelInputAreaEl.value.slice(0,channelInputAreaEl.value.length-snippet.length);channelInputAreaEl.value+=name;channelInputAreaEl.value+=String.fromCharCode(trailingSpaceKey)
+;last=name}else if(ircState.nickName.toLowerCase().indexOf(snippet.toLowerCase())===0){channelInputAreaEl.value=channelInputAreaEl.value.slice(0,channelInputAreaEl.value.length-snippet.length)
+;channelInputAreaEl.value+=ircState.nickName;channelInputAreaEl.value+=String.fromCharCode(trailingSpaceKey);last=ircState.nickName}else{let completeNick=""
+;let chanIndex=ircState.channels.indexOf(name.toLowerCase());if(chanIndex>=0){if(ircState.channelStates[chanIndex].names.length>0){for(let i=0;i<ircState.channelStates[chanIndex].names.length;i++){
+let matchNick=ircState.channelStates[chanIndex].names[i];if(nicknamePrefixChars.indexOf(matchNick.charAt(0))>=0){matchNick=matchNick.slice(1,matchNick.length)}
+if(matchNick.toLowerCase().indexOf(snippet.toLowerCase())===0){completeNick=matchNick}}}}if(completeNick.length>0){
+channelInputAreaEl.value=channelInputAreaEl.value.slice(0,channelInputAreaEl.value.length-snippet.length);channelInputAreaEl.value+=completeNick
+;channelInputAreaEl.value+=String.fromCharCode(trailingSpaceKey);last=completeNick}else{channelInputAreaEl.value+=String.fromCharCode(trailingSpaceKey)}}return last};var lastAutoCompleteMatch=""
+;const channelAutoComplete=function(e){const autoCompleteTabKey=9;const autoCompleteSpaceKey=32;const trailingSpaceKey=32;if(channelAutoCompCBInputEl.hasAttribute("disabled"))return
+;if(!channelMainSectionEl.hasAttribute("auto-comp-enabled"))return;if(!e.keyCode)return;if(e.keyCode&&e.keyCode===autoCompleteTabKey){if(channelInputAreaEl.value.length<2){e.preventDefault();return}
+let snippet="";let snippetArray=channelInputAreaEl.value.split(" ");if(snippetArray.length>0){snippet=snippetArray[snippetArray.length-1]}if(snippet.length>0){
+if(e.keyCode===autoCompleteTabKey&&snippet.length>0){_autoCompleteInputElement(snippet)}}else{channelInputAreaEl.value+=name;channelInputAreaEl.value+=String.fromCharCode(trailingSpaceKey)}
+e.preventDefault()}if(e.keyCode&&e.keyCode===autoCompleteSpaceKey){if(channelInputAreaEl.value.length>0){
+if(channelInputAreaEl.value.charCodeAt(channelInputAreaEl.value.length-1)===autoCompleteSpaceKey){
+if(channelInputAreaEl.value.length>1&&channelInputAreaEl.value.charCodeAt(channelInputAreaEl.value.length-2)===autoCompleteSpaceKey){
+channelInputAreaEl.value=channelInputAreaEl.value.slice(0,channelInputAreaEl.value.length-1);channelInputAreaEl.value+=name;channelInputAreaEl.value+=String.fromCharCode(trailingSpaceKey)
+;e.preventDefault()}else{channelInputAreaEl.value=channelInputAreaEl.value.slice(0,channelInputAreaEl.value.length-1);let snippet="";let snippetArray=channelInputAreaEl.value.split(" ")
+;if(snippetArray.length>0){snippet=snippetArray[snippetArray.length-1]}if(snippet.length>0){let matchStr=_autoCompleteInputElement(snippet);if(lastAutoCompleteMatch!==matchStr){
+lastAutoCompleteMatch=matchStr;e.preventDefault()}}else{channelInputAreaEl.value+=String.fromCharCode(autoCompleteSpaceKey)}}}}else{}}}.bind(this)
+;channelInputAreaEl.addEventListener("keydown",channelAutoComplete,false);function _updateNickList(){let index=ircState.channels.indexOf(name.toLowerCase());if(index>=0){maxNickLength=0
 ;if(ircState.channelStates[index].names.length>0){channelNamesDisplayEl.value="";let opList=[];let otherList=[];for(let i=0;i<ircState.channelStates[index].names.length;i++){
 if(ircState.channelStates[index].names[i].charAt(0)==="@"){opList.push(ircState.channelStates[index].names[i])}else{otherList.push(ircState.channelStates[index].names[i])}}
 let sortedOpList=opList.sort();let sortedOtherList=otherList.sort();if(sortedOpList.length>0){for(let i=0;i<sortedOpList.length;i++){channelNamesDisplayEl.value+=sortedOpList[i]+"\n"

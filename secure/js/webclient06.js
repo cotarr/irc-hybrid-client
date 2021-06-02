@@ -242,7 +242,7 @@ function createChannelEl (name) {
   channelAutoCompCBInputEl.setAttribute('type', 'checkbox');
   let channelAutoCompCBTitleEl = document.createElement('span');
   channelAutoCompCBTitleEl.classList.add('channel-cb-span');
-  channelAutoCompCBTitleEl.textContent = 'Auto-complete (space-space)';
+  channelAutoCompCBTitleEl.textContent = 'Auto-complete (tab, space-space)';
 
   // button-div
   let channelBottomDiv4El = document.createElement('div');
@@ -689,88 +689,164 @@ function createChannelEl (name) {
   }
 
   // ---------------------------------------
-  // textarea beforeinput event handler
+  // textarea before input event handler
   //
   // Auto complete function
+  //
+  // Keys:  desktop: tab,  mobile phone: space-space
+  // Channel name selected by tab-tab or space-space-space
   // ---------------------------------------
+  const _autoCompleteInputElement = function(snippet) {
+    let last = '';
+    const trailingSpaceKey = 32;
+    // parse last space character delimitered string
+    // console.log('snippet ' + snippet);
+    //
+    // Check snippet in list of IRC text commands
+    let matchedCommand = '';
+    if (autoCompleteCommandList.length > 0) {
+      for (let i=0; i<autoCompleteCommandList.length; i++) {
+        if (autoCompleteCommandList[i].indexOf(snippet.toUpperCase()) === 0) {
+          matchedCommand = autoCompleteCommandList[i];
+        }
+      }
+    }
+    if (matchedCommand.length > 0) {
+      // #1 check if IRC text command?
+      channelInputAreaEl.value =
+        channelInputAreaEl.value.slice(0, channelInputAreaEl.value.length - snippet.length);
+      channelInputAreaEl.value += matchedCommand;
+      channelInputAreaEl.value += String.fromCharCode(trailingSpaceKey);
+      last = name;
+    } else if (name.toLowerCase().indexOf(snippet.toLowerCase()) === 0) {
+      // #2 Check if # for channel name
+      // This also matches empty snipped, defaulting to channel name
+      channelInputAreaEl.value =
+        channelInputAreaEl.value.slice(0, channelInputAreaEl.value.length - snippet.length);
+      channelInputAreaEl.value += name;
+      channelInputAreaEl.value += String.fromCharCode(trailingSpaceKey);
+      last = name;
+    } else if (ircState.nickName.toLowerCase().indexOf(snippet.toLowerCase()) === 0) {
+      // #3 check if my nickname
+      channelInputAreaEl.value =
+        channelInputAreaEl.value.slice(0, channelInputAreaEl.value.length - snippet.length);
+      channelInputAreaEl.value += ircState.nickName;
+      channelInputAreaEl.value += String.fromCharCode(trailingSpaceKey);
+      last = ircState.nickName;
+      // #4 channel name replace space
+    } else {
+      // #5 check channel nickname list
+      let completeNick = '';
+      let chanIndex = ircState.channels.indexOf(name.toLowerCase());
+      if (chanIndex >= 0) {
+        if (ircState.channelStates[chanIndex].names.length > 0) {
+          for (let i=0; i<ircState.channelStates[chanIndex].names.length; i++) {
+            let matchNick = ircState.channelStates[chanIndex].names[i];
+            // if nick starts with op character, remove first character
+            if (nicknamePrefixChars.indexOf(matchNick.charAt(0)) >= 0) {
+              matchNick = matchNick.slice(1, matchNick.length);
+            }
+            if (matchNick.toLowerCase().indexOf(snippet.toLowerCase()) === 0) {
+              completeNick = matchNick;
+            }
+          }
+        }
+      }
+      if (completeNick.length > 0) {
+        channelInputAreaEl.value =
+          channelInputAreaEl.value.slice(0, channelInputAreaEl.value.length - snippet.length);
+        channelInputAreaEl.value += completeNick;
+        channelInputAreaEl.value += String.fromCharCode(trailingSpaceKey);
+        last = completeNick;
+      } else {
+        // #4 not match other, abort, add trailing space
+        channelInputAreaEl.value += String.fromCharCode(trailingSpaceKey);
+      }
+    }
+    return last;
+  };
+  var lastAutoCompleteMatch = '';
   const channelAutoComplete = function(e) {
+    const autoCompleteTabKey = 9;
+    const autoCompleteSpaceKey = 32;
+    const trailingSpaceKey = 32;
     if (channelAutoCompCBInputEl.hasAttribute('disabled')) return;
     if (!channelMainSectionEl.hasAttribute('auto-comp-enabled')) return;
-    if (!e.data) return;
-    if(channelInputAreaEl.value.length < 2) return;
+    if (!e.keyCode) return;
 
-    // Tab character not possible due to higher navigation binding
-    // Auto-complete on space
-    let autoCompleteKey = 32;
-    // console.log('key code ' + e.data.charCodeAt(0));
-    if (((e.data) && (e.data.charCodeAt(0) === autoCompleteKey)) &&
-      // and if previous character is also the auto-complete autoCompleteKey
-      (channelInputAreaEl.value.charCodeAt(channelInputAreaEl.value.length -1) ===
-        autoCompleteKey)) {
-      // strip previous occurrence of autoCompleteKey
-      channelInputAreaEl.value =
-        channelInputAreaEl.value.slice(0, channelInputAreaEl.value.length - 1);
-      // check one more character, if a third auto-compelte code, abort
-      if (channelInputAreaEl.value.charCodeAt(channelInputAreaEl.value.length - 1) ===
-        autoCompleteKey) {
-        // abort auto-complete
-        channelInputAreaEl.value += String.fromCharCode(autoCompleteKey) +
-          String.fromCharCode(autoCompleteKey);
+    if ((e.keyCode) && (e.keyCode === autoCompleteTabKey)) {
+      if(channelInputAreaEl.value.length < 2) {
         e.preventDefault();
         return;
       }
-      // parse last space character delimitered string
       let snippet = '';
       let snippetArray = channelInputAreaEl.value.split(' ');
       if (snippetArray.length > 0) {
         snippet = snippetArray[snippetArray.length - 1];
       }
-      // console.log('snippet ' + snippet);
-      if (name.toLowerCase().indexOf(snippet.toLowerCase()) === 0) {
-        // #1 Check if # for channel name
-        channelInputAreaEl.value =
-          channelInputAreaEl.value.slice(0, channelInputAreaEl.value.length - snippet.length);
-        channelInputAreaEl.value += name;
-        channelInputAreaEl.value += String.fromCharCode(autoCompleteKey);
-      } else if (ircState.nickName.toLowerCase().indexOf(snippet.toLowerCase()) === 0) {
-        // #2 check if my nickname
-        channelInputAreaEl.value =
-          channelInputAreaEl.value.slice(0, channelInputAreaEl.value.length - snippet.length);
-        channelInputAreaEl.value += ircState.nickName;
-        channelInputAreaEl.value += String.fromCharCode(autoCompleteKey);
+      if (snippet.length > 0) {
+        if ((e.keyCode === autoCompleteTabKey) && (snippet.length > 0)) {
+          _autoCompleteInputElement(snippet);
+        }
       } else {
-        // #3 check channel nickname list
-        let completeNick = '';
-        let chanIndex = ircState.channels.indexOf(name.toLowerCase());
-        if (chanIndex >= 0) {
-          if (ircState.channelStates[chanIndex].names.length > 0) {
-            for (let i=0; i<ircState.channelStates[chanIndex].names.length; i++) {
-              let matchNick = ircState.channelStates[chanIndex].names[i];
-              // if nick starts with op character, remove first character
-              if (nicknamePrefixChars.indexOf(matchNick.charAt(0)) >= 0) {
-                matchNick = matchNick.slice(1, matchNick.length);
+        // following space character, default to channel name
+        channelInputAreaEl.value += name;
+        channelInputAreaEl.value += String.fromCharCode(trailingSpaceKey);
+      }
+      e.preventDefault();
+    } // case of tab key
+    //
+    // Case of space key to autocomplete on space-space
+    if ((e.keyCode) && (e.keyCode === autoCompleteSpaceKey)) {
+      if(channelInputAreaEl.value.length > 0) {
+        // if previous characters is space (and this key is space too)
+        if (channelInputAreaEl.value.charCodeAt(channelInputAreaEl.value.length-1) ===
+        autoCompleteSpaceKey) {
+          if ((channelInputAreaEl.value.length > 1) &&
+            (channelInputAreaEl.value.charCodeAt(channelInputAreaEl.value.length-2) ===
+            autoCompleteSpaceKey)) {
+            //
+            // auto complete from:  space-space-space
+            //
+            // Remove one of the space characters
+            channelInputAreaEl.value =
+              channelInputAreaEl.value.slice(0, channelInputAreaEl.value.length - 1);
+            // Following double space, (plus this key makes it triple space) default channel name
+            channelInputAreaEl.value += name;
+            channelInputAreaEl.value += String.fromCharCode(trailingSpaceKey);
+            e.preventDefault();
+          } else {
+            //
+            // auto complete from:  space-space-space
+            //
+            // remove trailing space to get snippet from split()
+            channelInputAreaEl.value =
+              channelInputAreaEl.value.slice(0, channelInputAreaEl.value.length - 1);
+            let snippet = '';
+            let snippetArray = channelInputAreaEl.value.split(' ');
+            if (snippetArray.length > 0) {
+              snippet = snippetArray[snippetArray.length - 1];
+            }
+            if (snippet.length > 0) {
+              let matchStr = _autoCompleteInputElement(snippet);
+              if (lastAutoCompleteMatch !== matchStr) {
+                lastAutoCompleteMatch = matchStr;
+                e.preventDefault();
               }
-              if (matchNick.toLowerCase().indexOf(snippet.toLowerCase()) === 0) {
-                completeNick = matchNick;
-              }
+              // channelInputAreaEl.value += String.fromCharCode(autoCompleteSpaceKey);
+            } else {
+              // else, put it back again, snippet was zero length
+              channelInputAreaEl.value += String.fromCharCode(autoCompleteSpaceKey);
             }
           }
         }
-        if (completeNick.length > 0) {
-          channelInputAreaEl.value =
-            channelInputAreaEl.value.slice(0, channelInputAreaEl.value.length - snippet.length);
-          channelInputAreaEl.value += completeNick;
-          channelInputAreaEl.value += String.fromCharCode(autoCompleteKey);
-        } else {
-          // #4 not match other, abort
-          channelInputAreaEl.value += String.fromCharCode(autoCompleteKey) +
-            String.fromCharCode(autoCompleteKey);
-        }
+      } else {
+        // do nothing, allow space to be appended
       }
-      e.preventDefault();
-    }
+    } // case of tab key
   }.bind(this);
-  channelInputAreaEl.addEventListener('beforeinput', channelAutoComplete);
+  // channelInputAreaEl.addEventListener('beforeinput', channelAutoComplete);
+  channelInputAreaEl.addEventListener('keydown', channelAutoComplete, false);
 
   //----------------
   // Nickname list
