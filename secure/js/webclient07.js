@@ -210,15 +210,15 @@ function createPrivateMessageEl (name, parsedMessage) {
   privMsgButtonDiv1El.appendChild(privMsgInputAreaEl);
   privMsgButtonDiv1El.appendChild(privMsgSendButtonEl);
 
-  privMsgBottomDivEl.appendChild(privMsgTextAreaEl);
-  privMsgBottomDivEl.appendChild(privMsgButtonDiv1El);
-
   privMsgBottomDiv4El.appendChild(privMsgBeep1CBInputEl);
   privMsgBottomDiv4El.appendChild(privMsgBeep1CBTitleEl);
 
+  privMsgBottomDivEl.appendChild(privMsgTextAreaEl);
+  privMsgBottomDivEl.appendChild(privMsgButtonDiv1El);
+  privMsgBottomDivEl.appendChild(privMsgBottomDiv4El);
+
   privMsgSectionEl.appendChild(privMsgTopDivEl);
   privMsgSectionEl.appendChild(privMsgBottomDivEl);
-  privMsgSectionEl.appendChild(privMsgBottomDiv4El);
 
   privMsgContainerDivEl.appendChild(privMsgSectionEl);
 

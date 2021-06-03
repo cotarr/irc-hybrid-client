@@ -550,9 +550,9 @@ function createPrivateMessageEl(name,parsedMessage){if(webState.activePrivateMes
 ;privMsgBeep1CBTitleEl.classList.add("pm-cb-span");privMsgBeep1CBTitleEl.textContent="Line-beep";privMsgTopLeftDivEl.appendChild(privMsgHideButtonEl);privMsgTopLeftDivEl.appendChild(privMsgNameDivEl)
 ;privMsgTopRightHidableDivEl.appendChild(privMsgTallerButtonEl);privMsgTopRightHidableDivEl.appendChild(privMsgNormalButtonEl);privMsgTopRightHidableDivEl.appendChild(privMsgClearButtonEl)
 ;privMsgTopRightDivEl.appendChild(privMsgTopRightHidableDivEl);privMsgTopDivEl.appendChild(privMsgTopLeftDivEl);privMsgTopDivEl.appendChild(privMsgTopRightDivEl)
-;privMsgButtonDiv1El.appendChild(privMsgInputAreaEl);privMsgButtonDiv1El.appendChild(privMsgSendButtonEl);privMsgBottomDivEl.appendChild(privMsgTextAreaEl)
-;privMsgBottomDivEl.appendChild(privMsgButtonDiv1El);privMsgBottomDiv4El.appendChild(privMsgBeep1CBInputEl);privMsgBottomDiv4El.appendChild(privMsgBeep1CBTitleEl)
-;privMsgSectionEl.appendChild(privMsgTopDivEl);privMsgSectionEl.appendChild(privMsgBottomDivEl);privMsgSectionEl.appendChild(privMsgBottomDiv4El);privMsgContainerDivEl.appendChild(privMsgSectionEl)
+;privMsgButtonDiv1El.appendChild(privMsgInputAreaEl);privMsgButtonDiv1El.appendChild(privMsgSendButtonEl);privMsgBottomDiv4El.appendChild(privMsgBeep1CBInputEl)
+;privMsgBottomDiv4El.appendChild(privMsgBeep1CBTitleEl);privMsgBottomDivEl.appendChild(privMsgTextAreaEl);privMsgBottomDivEl.appendChild(privMsgButtonDiv1El)
+;privMsgBottomDivEl.appendChild(privMsgBottomDiv4El);privMsgSectionEl.appendChild(privMsgTopDivEl);privMsgSectionEl.appendChild(privMsgBottomDivEl);privMsgContainerDivEl.appendChild(privMsgSectionEl)
 ;privMsgTextAreaEl.value+=parsedMessage.timestamp+" "+parsedMessage.nick+pmNameSpacer+cleanFormatting(parsedMessage.params[1])+"\n";privMsgTextAreaEl.scrollTop=privMsgTextAreaEl.scrollHeight
 ;var activityIconInhibitTimer=0;setInterval(function(){if(activityIconInhibitTimer>0)activityIconInhibitTimer--}.bind(this),1e3);document.addEventListener("erase-before-reload",function(event){
 privMsgTextAreaEl.value="";privMsgInputAreaEl.value=""}.bind(this));document.addEventListener("priv-msg-hide-all",function(event){privMsgBottomDivEl.setAttribute("hidden","")
