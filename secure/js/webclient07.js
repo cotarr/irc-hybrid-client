@@ -179,6 +179,18 @@ function createPrivateMessageEl (name, parsedMessage) {
   privMsgSendButtonEl.textContent = 'Send';
   privMsgSendButtonEl.classList.add('va-middle');
 
+  // button-div
+  let privMsgBottomDiv4El = document.createElement('div');
+  privMsgBottomDiv4El.classList.add('button-div');
+
+  // beep on message checkbox
+  let privMsgBeep1CBInputEl = document.createElement('input');
+  privMsgBeep1CBInputEl.classList.add('pm-cb-cb');
+  privMsgBeep1CBInputEl.setAttribute('type', 'checkbox');
+  let privMsgBeep1CBTitleEl = document.createElement('span');
+  privMsgBeep1CBTitleEl.classList.add('pm-cb-span');
+  privMsgBeep1CBTitleEl.textContent = 'Line-beep';
+
   // --------------------------------
   // Append child element to DOM
   // --------------------------------
@@ -201,8 +213,12 @@ function createPrivateMessageEl (name, parsedMessage) {
   privMsgBottomDivEl.appendChild(privMsgTextAreaEl);
   privMsgBottomDivEl.appendChild(privMsgButtonDiv1El);
 
+  privMsgBottomDiv4El.appendChild(privMsgBeep1CBInputEl);
+  privMsgBottomDiv4El.appendChild(privMsgBeep1CBTitleEl);
+
   privMsgSectionEl.appendChild(privMsgTopDivEl);
   privMsgSectionEl.appendChild(privMsgBottomDivEl);
+  privMsgSectionEl.appendChild(privMsgBottomDiv4El);
 
   privMsgContainerDivEl.appendChild(privMsgSectionEl);
 
@@ -342,6 +358,33 @@ function createPrivateMessageEl (name, parsedMessage) {
     activityIconInhibitTimer = activityIconInhibitTimerValue;
   }.bind(this));
 
+  function updateVisibility() {
+    if (privMsgSectionEl.hasAttribute('beep1-enabled')) {
+      privMsgBeep1CBInputEl.checked = true;
+    } else {
+      privMsgBeep1CBInputEl.checked = false;
+    }
+  }
+
+  // -------------------------
+  // Beep On Message checkbox handler
+  // -------------------------
+  privMsgBeep1CBInputEl.addEventListener('click', function(e) {
+    if (privMsgSectionEl.hasAttribute('beep1-enabled')) {
+      privMsgSectionEl.removeAttribute('beep1-enabled');
+    } else {
+      privMsgSectionEl.setAttribute('beep1-enabled', '');
+      playBeep3Sound();
+    }
+    updateVisibility();
+  });
+
+  // -----------------------
+  // Cancel all beep sounds
+  // -----------------------
+  document.addEventListener('cancel-beep-sounds', function(event) {
+    privMsgSectionEl.removeAttribute('beep1-enabled');
+  }.bind(this));
 
   // PM window PRIVMSG event handler
   // if window closed,
@@ -373,6 +416,10 @@ function createPrivateMessageEl (name, parsedMessage) {
               _addText(parsedMessage.timestamp + ' ' +
               parsedMessage.nick + pmNameSpacer + parsedMessage.params[1]);
             }
+            if (privMsgSectionEl.hasAttribute('beep1-enabled') &&
+              (webState.cacheInhibitTimer === 0)) {
+              playBeep3Sound();
+            }
             // Upon privMsg message, make sectino visible.
             privMsgSectionEl.removeAttribute('hidden');
             privMsgBottomDivEl.removeAttribute('hidden');
@@ -391,6 +438,10 @@ function createPrivateMessageEl (name, parsedMessage) {
             } else {
               _addText(parsedMessage.timestamp + ' ' +
               parsedMessage.nick + pmNameSpacer + parsedMessage.params[1]);
+            }
+            if (privMsgSectionEl.hasAttribute('beep1-enabled') &&
+              (webState.cacheInhibitTimer === 0)) {
+              playBeep3Sound();
             }
             // Upon privMsg message, make sectino visible.
             privMsgSectionEl.removeAttribute('hidden');

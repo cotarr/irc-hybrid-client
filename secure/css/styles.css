@@ -297,6 +297,15 @@ button[disabled] {
   padding-right: 15px;
 }
 
+.pm-cb-cb {
+  vertical-align: middle;
+}
+.pm-cb-span {
+  margin-right: 10px;
+  font-size: 80%;
+  vertical-align: middle;
+}
+
 .raw-cb-cb {
   vertical-align: middle;
   margin-right: 0px;

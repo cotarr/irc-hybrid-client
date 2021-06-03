@@ -163,19 +163,24 @@ var wsocket = null;
 const beep1 = new Audio('sounds/short-beep1.mp3');
 // 850 Hz 0.75 Amplitude 0.400 Sec
 const beep2 = new Audio('sounds/short-beep2.mp3');
+// 1175 Hz 0.75 Amplitude 0.250 Sec
+const beep3 = new Audio('sounds/short-beep3.mp3');
 
 var beep1InhibitTimer = 0;
 var beep2InhibitTimer = 0;
+var beep3InhibitTimer = 0;
 
 function beepTimerTick() {
   if (beep1InhibitTimer > 0) beep1InhibitTimer--;
   if (beep2InhibitTimer > 0) beep2InhibitTimer--;
+  if (beep3InhibitTimer > 0) beep3InhibitTimer--;
 }
 
 function inhibitBeep(seconds) {
   // used for reload/update
   beep1InhibitTimer = seconds;
   beep2InhibitTimer = seconds;
+  beep3InhibitTimer = seconds;
 }
 
 function playBeep1Sound () {
@@ -189,6 +194,12 @@ function playBeep2Sound () {
   if (beep2InhibitTimer === 0) {
     beep2.play();
     beep2InhibitTimer = 5;
+  }
+}
+function playBeep3Sound () {
+  if (beep3InhibitTimer === 0) {
+    beep3.play();
+    beep3InhibitTimer = 5;
   }
 }
 // --------------------------
