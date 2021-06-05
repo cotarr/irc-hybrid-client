@@ -295,6 +295,7 @@ _sendIrcServerMessage("AWAY")}});document.getElementById("setAwayButton").addEve
 _sendIrcServerMessage("AWAY "+document.getElementById("userAwayMessageId").value)}});document.getElementById("setBackButton").addEventListener("click",function(){
 if(ircState.ircConnected&&ircState.ircIsAway){_sendIrcServerMessage("AWAY")}});"use strict"
 ;const autoCompleteCommandList=["/ADMIN","/AWAY","/CTCP","/JOIN","/LIST","/ME","/MODE","/MOTD","/MSG","/NICK","/NOP","/NOTICE","/PART","/QUERY","/QUIT","/QUOTE","/TOPIC","/VERSION","/WHO","/WHOIS"]
+;const autoCompleteRawCommandList=["ADMIN","AWAY","CAP","CONNECT","DIE","DISCONNECT","ERROR","GLINE","HELP","INFO","INVITE","ISON","JOIN","KICK","KILL","KLINE","LINKS","LIST","LUSERS","MODE","MOTD","NAMES","NICK","NOTICE","OPER","PART","PASS","PING","PONG","PRIVMSG","QUIT","REHASH","RESTART","SERVLIST","SQUERY","SQUIT","STATS","SUMMON","TIME","TOPIC","TRACE","USER","USERHOST","USERS","VERSION","WALLOPS","WHO","WHOIS","WHOWAS"]
 ;function detectMultiLineString(inString){let inLength=inString.length;if(inLength>0&&inString.charCodeAt(inLength-1)===10)inLength--;if(inLength>0){let countCR=0;for(let i=0;i<inLength;i++){
 if(inString.charCodeAt(i)===10)countCR++}if(countCR===0){return false}else{return true}}else{return false}}function stripTrailingCrLf(inString){let inLength=inString.length
 ;if(inLength>0&&inString.charCodeAt(inLength-1)===10)inLength--;if(inLength>0&&inString.charCodeAt(inLength-1)===13)inLength--;if(inLength>0&&inString.charCodeAt(inLength-1)===32)inLength--
@@ -446,7 +447,11 @@ updateVisibility();channelAutoCompCBInputEl.addEventListener("click",function(){
 channelMainSectionEl.setAttribute("auto-comp-enabled","");updateVisibility()}else{channelMainSectionEl.setAttribute("auto-comp-enabled","");updateVisibility()
 ;channelAutoCompCBInputEl.setAttribute("disabled","")}const _autoCompleteInputElement=function(snippet){let last="";const trailingSpaceKey=32;let matchedCommand=""
 ;if(autoCompleteCommandList.length>0){for(let i=0;i<autoCompleteCommandList.length;i++){if(autoCompleteCommandList[i].indexOf(snippet.toUpperCase())===0){matchedCommand=autoCompleteCommandList[i]}}}
-if(matchedCommand.length>0){channelInputAreaEl.value=channelInputAreaEl.value.slice(0,channelInputAreaEl.value.length-snippet.length);channelInputAreaEl.value+=matchedCommand
+let matchedRawCommand="";if(autoCompleteRawCommandList.length>0){for(let i=0;i<autoCompleteRawCommandList.length;i++){if(autoCompleteRawCommandList[i].indexOf(snippet.toUpperCase())===0){
+matchedRawCommand=autoCompleteRawCommandList[i]}}}if(matchedCommand.length>0&&channelInputAreaEl.value===snippet){
+channelInputAreaEl.value=channelInputAreaEl.value.slice(0,channelInputAreaEl.value.length-snippet.length);channelInputAreaEl.value+=matchedCommand
+;channelInputAreaEl.value+=String.fromCharCode(trailingSpaceKey);last=name}else if(matchedRawCommand.length>0&&channelInputAreaEl.value.slice(0,7).toUpperCase()==="/QUOTE "){
+channelInputAreaEl.value=channelInputAreaEl.value.slice(0,channelInputAreaEl.value.length-snippet.length);channelInputAreaEl.value+=matchedRawCommand
 ;channelInputAreaEl.value+=String.fromCharCode(trailingSpaceKey);last=name}else if(name.toLowerCase().indexOf(snippet.toLowerCase())===0){
 channelInputAreaEl.value=channelInputAreaEl.value.slice(0,channelInputAreaEl.value.length-snippet.length);channelInputAreaEl.value+=name;channelInputAreaEl.value+=String.fromCharCode(trailingSpaceKey)
 ;last=name}else if(ircState.nickName.toLowerCase().indexOf(snippet.toLowerCase())===0){channelInputAreaEl.value=channelInputAreaEl.value.slice(0,channelInputAreaEl.value.length-snippet.length)

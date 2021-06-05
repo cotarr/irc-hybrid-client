@@ -711,15 +711,33 @@ function createChannelEl (name) {
         }
       }
     }
-    if (matchedCommand.length > 0) {
+    // Check snippet in list of IRC text commands
+    let matchedRawCommand = '';
+    if (autoCompleteRawCommandList.length > 0) {
+      for (let i=0; i<autoCompleteRawCommandList.length; i++) {
+        if (autoCompleteRawCommandList[i].indexOf(snippet.toUpperCase()) === 0) {
+          matchedRawCommand = autoCompleteRawCommandList[i];
+        }
+      }
+    }
+    // If valid irc command and if beginning of line where snippet = input.value
+    if ((matchedCommand.length > 0) && (channelInputAreaEl.value === snippet)) {
       // #1 check if IRC text command?
       channelInputAreaEl.value =
         channelInputAreaEl.value.slice(0, channelInputAreaEl.value.length - snippet.length);
       channelInputAreaEl.value += matchedCommand;
       channelInputAreaEl.value += String.fromCharCode(trailingSpaceKey);
       last = name;
+    } else if ((matchedRawCommand.length > 0) &&
+      (channelInputAreaEl.value.slice(0, 7).toUpperCase() === '/QUOTE ')) {
+      // #2 Line starts with /QUOTE and rest is a valid raw irc command
+      channelInputAreaEl.value =
+        channelInputAreaEl.value.slice(0, channelInputAreaEl.value.length - snippet.length);
+      channelInputAreaEl.value += matchedRawCommand;
+      channelInputAreaEl.value += String.fromCharCode(trailingSpaceKey);
+      last = name;
     } else if (name.toLowerCase().indexOf(snippet.toLowerCase()) === 0) {
-      // #2 Check if # for channel name
+      // #3 Check if # for channel name
       // This also matches empty snipped, defaulting to channel name
       channelInputAreaEl.value =
         channelInputAreaEl.value.slice(0, channelInputAreaEl.value.length - snippet.length);
@@ -727,15 +745,15 @@ function createChannelEl (name) {
       channelInputAreaEl.value += String.fromCharCode(trailingSpaceKey);
       last = name;
     } else if (ircState.nickName.toLowerCase().indexOf(snippet.toLowerCase()) === 0) {
-      // #3 check if my nickname
+      // #4 check if my nickname
       channelInputAreaEl.value =
         channelInputAreaEl.value.slice(0, channelInputAreaEl.value.length - snippet.length);
       channelInputAreaEl.value += ircState.nickName;
       channelInputAreaEl.value += String.fromCharCode(trailingSpaceKey);
       last = ircState.nickName;
-      // #4 channel name replace space
+      // #5 channel name replace space
     } else {
-      // #5 check channel nickname list
+      // #6 check channel nickname list
       let completeNick = '';
       let chanIndex = ircState.channels.indexOf(name.toLowerCase());
       if (chanIndex >= 0) {
@@ -759,7 +777,7 @@ function createChannelEl (name) {
         channelInputAreaEl.value += String.fromCharCode(trailingSpaceKey);
         last = completeNick;
       } else {
-        // #4 not match other, abort, add trailing space
+        // #7 not match other, abort, add trailing space
         channelInputAreaEl.value += String.fromCharCode(trailingSpaceKey);
       }
     }
