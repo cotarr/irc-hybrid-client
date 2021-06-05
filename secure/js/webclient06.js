@@ -727,7 +727,7 @@ function createChannelEl (name) {
         channelInputAreaEl.value.slice(0, channelInputAreaEl.value.length - snippet.length);
       channelInputAreaEl.value += matchedCommand;
       channelInputAreaEl.value += String.fromCharCode(trailingSpaceKey);
-      last = name;
+      last = matchedCommand;
     } else if ((matchedRawCommand.length > 0) &&
       (channelInputAreaEl.value.slice(0, 7).toUpperCase() === '/QUOTE ')) {
       // #2 Line starts with /QUOTE and rest is a valid raw irc command
@@ -735,7 +735,7 @@ function createChannelEl (name) {
         channelInputAreaEl.value.slice(0, channelInputAreaEl.value.length - snippet.length);
       channelInputAreaEl.value += matchedRawCommand;
       channelInputAreaEl.value += String.fromCharCode(trailingSpaceKey);
-      last = name;
+      last = matchedRawCommand;
     } else if (name.toLowerCase().indexOf(snippet.toLowerCase()) === 0) {
       // #3 Check if # for channel name
       // This also matches empty snipped, defaulting to channel name

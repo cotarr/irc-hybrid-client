@@ -450,9 +450,9 @@ channelMainSectionEl.setAttribute("auto-comp-enabled","");updateVisibility()}els
 let matchedRawCommand="";if(autoCompleteRawCommandList.length>0){for(let i=0;i<autoCompleteRawCommandList.length;i++){if(autoCompleteRawCommandList[i].indexOf(snippet.toUpperCase())===0){
 matchedRawCommand=autoCompleteRawCommandList[i]}}}if(matchedCommand.length>0&&channelInputAreaEl.value===snippet){
 channelInputAreaEl.value=channelInputAreaEl.value.slice(0,channelInputAreaEl.value.length-snippet.length);channelInputAreaEl.value+=matchedCommand
-;channelInputAreaEl.value+=String.fromCharCode(trailingSpaceKey);last=name}else if(matchedRawCommand.length>0&&channelInputAreaEl.value.slice(0,7).toUpperCase()==="/QUOTE "){
+;channelInputAreaEl.value+=String.fromCharCode(trailingSpaceKey);last=matchedCommand}else if(matchedRawCommand.length>0&&channelInputAreaEl.value.slice(0,7).toUpperCase()==="/QUOTE "){
 channelInputAreaEl.value=channelInputAreaEl.value.slice(0,channelInputAreaEl.value.length-snippet.length);channelInputAreaEl.value+=matchedRawCommand
-;channelInputAreaEl.value+=String.fromCharCode(trailingSpaceKey);last=name}else if(name.toLowerCase().indexOf(snippet.toLowerCase())===0){
+;channelInputAreaEl.value+=String.fromCharCode(trailingSpaceKey);last=matchedRawCommand}else if(name.toLowerCase().indexOf(snippet.toLowerCase())===0){
 channelInputAreaEl.value=channelInputAreaEl.value.slice(0,channelInputAreaEl.value.length-snippet.length);channelInputAreaEl.value+=name;channelInputAreaEl.value+=String.fromCharCode(trailingSpaceKey)
 ;last=name}else if(ircState.nickName.toLowerCase().indexOf(snippet.toLowerCase())===0){channelInputAreaEl.value=channelInputAreaEl.value.slice(0,channelInputAreaEl.value.length-snippet.length)
 ;channelInputAreaEl.value+=ircState.nickName;channelInputAreaEl.value+=String.fromCharCode(trailingSpaceKey);last=ircState.nickName}else{let completeNick=""
@@ -621,7 +621,28 @@ originName:null});textAreaEl.value="";if(commandAction.error){showError(commandA
 _sendIrcServerMessage(commandAction.ircMessage)}return}}}textAreaEl.value=""}document.getElementById("sendRawMessageButton").addEventListener("click",function(){
 _parseInputForIRCCommands(document.getElementById("rawMessageInputId"));document.getElementById("rawMessageInputId").focus()}.bind(this))
 ;document.getElementById("rawMessageInputId").addEventListener("input",function(event){if(event.inputType==="insertText"&&event.data===null||event.inputType==="insertLineBreak"){
-_parseInputForIRCCommands(document.getElementById("rawMessageInputId"))}}.bind(this));function substituteHmsTime(inMessage){let timeString=inMessage.split(" ")[0]
+_parseInputForIRCCommands(document.getElementById("rawMessageInputId"))}}.bind(this));const _autoCompleteServInputElement=function(snippet){
+var serverInputAreaEl=document.getElementById("rawMessageInputId");let last="";const trailingSpaceKey=32;let matchedCommand="";if(autoCompleteCommandList.length>0){
+for(let i=0;i<autoCompleteCommandList.length;i++){if(autoCompleteCommandList[i].indexOf(snippet.toUpperCase())===0){matchedCommand=autoCompleteCommandList[i]}}}let matchedRawCommand=""
+;if(autoCompleteRawCommandList.length>0){for(let i=0;i<autoCompleteRawCommandList.length;i++){if(autoCompleteRawCommandList[i].indexOf(snippet.toUpperCase())===0){
+matchedRawCommand=autoCompleteRawCommandList[i]}}}if(matchedCommand.length>0&&serverInputAreaEl.value===snippet){
+serverInputAreaEl.value=serverInputAreaEl.value.slice(0,serverInputAreaEl.value.length-snippet.length);serverInputAreaEl.value+=matchedCommand
+;serverInputAreaEl.value+=String.fromCharCode(trailingSpaceKey);last=matchedCommand}else if(matchedRawCommand.length>0&&serverInputAreaEl.value.slice(0,7).toUpperCase()==="/QUOTE "){
+serverInputAreaEl.value=serverInputAreaEl.value.slice(0,serverInputAreaEl.value.length-snippet.length);serverInputAreaEl.value+=matchedRawCommand
+;serverInputAreaEl.value+=String.fromCharCode(trailingSpaceKey);last=matchedRawCommand}else if(ircState.nickName.toLowerCase().indexOf(snippet.toLowerCase())===0){
+serverInputAreaEl.value=serverInputAreaEl.value.slice(0,serverInputAreaEl.value.length-snippet.length);serverInputAreaEl.value+=ircState.nickName
+;serverInputAreaEl.value+=String.fromCharCode(trailingSpaceKey);last=ircState.nickName}else{serverInputAreaEl.value+=String.fromCharCode(trailingSpaceKey)}return last};var lastServAutoCompleteMatch=""
+;const serverAutoComplete=function(e){var serverInputAreaEl=document.getElementById("rawMessageInputId");const autoCompleteTabKey=9;const autoCompleteSpaceKey=32;const trailingSpaceKey=32
+;if(!e.keyCode)return;if(e.keyCode&&e.keyCode===autoCompleteTabKey){if(serverInputAreaEl.value.length<2){e.preventDefault();return}let snippet="";let snippetArray=serverInputAreaEl.value.split(" ")
+;if(snippetArray.length>0){snippet=snippetArray[snippetArray.length-1]}if(snippet.length>0){if(e.keyCode===autoCompleteTabKey&&snippet.length>0){_autoCompleteServInputElement(snippet)}}else{
+serverInputAreaEl.value+=ircState.nickName;serverInputAreaEl.value+=String.fromCharCode(trailingSpaceKey)}e.preventDefault()}if(e.keyCode&&e.keyCode===autoCompleteSpaceKey){
+if(serverInputAreaEl.value.length>0){if(serverInputAreaEl.value.charCodeAt(serverInputAreaEl.value.length-1)===autoCompleteSpaceKey){
+if(serverInputAreaEl.value.length>1&&serverInputAreaEl.value.charCodeAt(serverInputAreaEl.value.length-2)===autoCompleteSpaceKey){
+serverInputAreaEl.value=serverInputAreaEl.value.slice(0,serverInputAreaEl.value.length-1);serverInputAreaEl.value+=ircState.nickName;serverInputAreaEl.value+=String.fromCharCode(trailingSpaceKey)
+;e.preventDefault()}else{serverInputAreaEl.value=serverInputAreaEl.value.slice(0,serverInputAreaEl.value.length-1);let snippet="";let snippetArray=serverInputAreaEl.value.split(" ")
+;if(snippetArray.length>0){snippet=snippetArray[snippetArray.length-1]}if(snippet.length>0){let matchStr=_autoCompleteServInputElement(snippet);if(lastServAutoCompleteMatch!==matchStr){
+lastServAutoCompleteMatch=matchStr;e.preventDefault()}}else{serverInputAreaEl.value+=String.fromCharCode(autoCompleteSpaceKey)}}}}else{}}}.bind(this)
+;document.getElementById("rawMessageInputId").addEventListener("keydown",serverAutoComplete,false);function substituteHmsTime(inMessage){let timeString=inMessage.split(" ")[0]
 ;let restOfMessage=inMessage.slice(timeString.length+1,inMessage.length);let hmsString=timestampToHMS(timeString);return hmsString+" "+restOfMessage}
 document.addEventListener("server-message",function(event){function _showAfterParamZero(parsedMessage,title){let msgString="";if(parsedMessage.params.length>1){
 for(let i=1;i<parsedMessage.params.length;i++){msgString+=" "+parsedMessage.params[i]}}else{console.log("Error _showAfterParamZero() no parsed field")}let outMessage=parsedMessage.timestamp+msgString

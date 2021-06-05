@@ -76,6 +76,151 @@ document.getElementById('rawMessageInputId').addEventListener('input', function(
   }
 }.bind(this));
 
+// ---------------------------------------
+// textarea before input event handler
+//
+// Auto complete function
+//
+// Keys:  desktop: tab,  mobile phone: space-space
+// Channel name selected by tab-tab or space-space-space
+// ---------------------------------------
+const _autoCompleteServInputElement = function(snippet) {
+  var serverInputAreaEl = document.getElementById('rawMessageInputId');
+  let last = '';
+  const trailingSpaceKey = 32;
+  // parse last space character delimitered string
+  // console.log('snippet ' + snippet);
+  //
+  // Check snippet in list of IRC text commands
+  let matchedCommand = '';
+  if (autoCompleteCommandList.length > 0) {
+    for (let i=0; i<autoCompleteCommandList.length; i++) {
+      if (autoCompleteCommandList[i].indexOf(snippet.toUpperCase()) === 0) {
+        matchedCommand = autoCompleteCommandList[i];
+      }
+    }
+  }
+  // Check snippet in list of IRC text commands
+  let matchedRawCommand = '';
+  if (autoCompleteRawCommandList.length > 0) {
+    for (let i=0; i<autoCompleteRawCommandList.length; i++) {
+      if (autoCompleteRawCommandList[i].indexOf(snippet.toUpperCase()) === 0) {
+        matchedRawCommand = autoCompleteRawCommandList[i];
+      }
+    }
+  }
+  // If valid irc command and if beginning of line where snippet = input.value
+  if ((matchedCommand.length > 0) && (serverInputAreaEl.value === snippet)) {
+    // #1 check if IRC text command?
+    serverInputAreaEl.value =
+      serverInputAreaEl.value.slice(0, serverInputAreaEl.value.length - snippet.length);
+    serverInputAreaEl.value += matchedCommand;
+    serverInputAreaEl.value += String.fromCharCode(trailingSpaceKey);
+    last = matchedCommand;
+  } else if ((matchedRawCommand.length > 0) &&
+    (serverInputAreaEl.value.slice(0, 7).toUpperCase() === '/QUOTE ')) {
+    // #2 Line starts with /QUOTE and rest is a valid raw irc command
+    serverInputAreaEl.value =
+      serverInputAreaEl.value.slice(0, serverInputAreaEl.value.length - snippet.length);
+    serverInputAreaEl.value += matchedRawCommand;
+    serverInputAreaEl.value += String.fromCharCode(trailingSpaceKey);
+    last = matchedRawCommand;
+  } else if (ircState.nickName.toLowerCase().indexOf(snippet.toLowerCase()) === 0) {
+    // #3 check if my nickname
+    // This also matches empty snipped, defaulting to nickname
+    serverInputAreaEl.value =
+      serverInputAreaEl.value.slice(0, serverInputAreaEl.value.length - snippet.length);
+    serverInputAreaEl.value += ircState.nickName;
+    serverInputAreaEl.value += String.fromCharCode(trailingSpaceKey);
+    last = ircState.nickName;
+    // #5 channel name replace space
+  } else {
+    // #7 not match other, abort, add trailing space
+    serverInputAreaEl.value += String.fromCharCode(trailingSpaceKey);
+  }
+  return last;
+};
+var lastServAutoCompleteMatch = '';
+const serverAutoComplete = function(e) {
+  var serverInputAreaEl = document.getElementById('rawMessageInputId');
+  const autoCompleteTabKey = 9;
+  const autoCompleteSpaceKey = 32;
+  const trailingSpaceKey = 32;
+  if (!e.keyCode) return;
+
+  if ((e.keyCode) && (e.keyCode === autoCompleteTabKey)) {
+    if(serverInputAreaEl.value.length < 2) {
+      e.preventDefault();
+      return;
+    }
+    let snippet = '';
+    let snippetArray = serverInputAreaEl.value.split(' ');
+    if (snippetArray.length > 0) {
+      snippet = snippetArray[snippetArray.length - 1];
+    }
+    if (snippet.length > 0) {
+      if ((e.keyCode === autoCompleteTabKey) && (snippet.length > 0)) {
+        _autoCompleteServInputElement(snippet);
+      }
+    } else {
+      // following space character, default to nickname
+      serverInputAreaEl.value += ircState.nickName;
+      serverInputAreaEl.value += String.fromCharCode(trailingSpaceKey);
+    }
+    e.preventDefault();
+  } // case of tab key
+  //
+  // Case of space key to autocomplete on space-space
+  if ((e.keyCode) && (e.keyCode === autoCompleteSpaceKey)) {
+    if(serverInputAreaEl.value.length > 0) {
+      // if previous characters is space (and this key is space too)
+      if (serverInputAreaEl.value.charCodeAt(serverInputAreaEl.value.length-1) ===
+      autoCompleteSpaceKey) {
+        if ((serverInputAreaEl.value.length > 1) &&
+          (serverInputAreaEl.value.charCodeAt(serverInputAreaEl.value.length-2) ===
+          autoCompleteSpaceKey)) {
+          //
+          // auto complete from:  space-space-space
+          //
+          // Remove one of the space characters
+          serverInputAreaEl.value =
+            serverInputAreaEl.value.slice(0, serverInputAreaEl.value.length - 1);
+          // Following double space, (plus this key makes it triple space) default nickname
+          serverInputAreaEl.value += ircState.nickName;
+          serverInputAreaEl.value += String.fromCharCode(trailingSpaceKey);
+          e.preventDefault();
+        } else {
+          //
+          // auto complete from:  space-space-space
+          //
+          // remove trailing space to get snippet from split()
+          serverInputAreaEl.value =
+            serverInputAreaEl.value.slice(0, serverInputAreaEl.value.length - 1);
+          let snippet = '';
+          let snippetArray = serverInputAreaEl.value.split(' ');
+          if (snippetArray.length > 0) {
+            snippet = snippetArray[snippetArray.length - 1];
+          }
+          if (snippet.length > 0) {
+            let matchStr = _autoCompleteServInputElement(snippet);
+            if (lastServAutoCompleteMatch !== matchStr) {
+              lastServAutoCompleteMatch = matchStr;
+              e.preventDefault();
+            }
+            // serverInputAreaEl.value += String.fromCharCode(autoCompleteSpaceKey);
+          } else {
+            // else, put it back again, snippet was zero length
+            serverInputAreaEl.value += String.fromCharCode(autoCompleteSpaceKey);
+          }
+        }
+      }
+    } else {
+      // do nothing, allow space to be appended
+    }
+  } // case of tab key
+}.bind(this);
+document.getElementById('rawMessageInputId').addEventListener('keydown', serverAutoComplete, false);
+
 // -------------------------------------------------
 // In first text field of message
 // Exchange Unix seconds with HH:MM:SS time format
