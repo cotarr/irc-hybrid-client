@@ -67,6 +67,9 @@
   var clientToServerPingTimer = 0;
   const clientToServerPingInterval = 60;
 
+  // used by JavaScript built in toLocaleString(locales, options.timeZone)
+  var ctcpTimeLocale = ['en-US', 'UTC'];
+
   // Reference: https://ircv3.net/specs/extensions/server-time
   // @time=2011-10-19T16:40:51.620Z :Angel!angel@example.org PRIVMSG Wiz :Hello
   const timestamp = function() {
@@ -99,6 +102,7 @@
     activityWatchdogTimerLimit: activityWatchdogTimerLimit,
     clientToServerPingTimer: clientToServerPingTimer,
     clientToServerPingInterval: clientToServerPingInterval,
+    ctcpTimeLocale: ctcpTimeLocale,
     timestamp: timestamp,
     unixTimestamp: unixTimestamp
   };

@@ -100,6 +100,9 @@
     }
   ]
 </yellow-example></pre>
+
+        <h2>Server Configuration (each IRC server)</h2>
+
         <div class="install-section-title">1 - IRC Server configuration</div>
         <p>
           There are 5 properties to define a server entry.
@@ -237,6 +240,8 @@
   "channelList": ["#myChannel", "#otherChannel"],
 </pre></div>
 
+<h2>Global Configuration</h2>
+
 <div class="install-section-title">Raw Message Log (global)</div>
       <p>
         There is a global flag to enable logging IRC messages to
@@ -250,9 +255,21 @@
         this set to false.
       </p>
 
-<div class="pre-div"><pre>
-  "channelList": ["#myChannel", "#otherChannel"],
-</pre></div>
+      <div class="install-section-title">CTCP Time Locale (global)</div>
+        <p>
+          The &quotctcpTimeLocale&quot property is optional. It may be used
+          to specify a CTCP TIME reply format.
+          It may be used in the case where a client time zone when different
+          from the server.
+          This is used by native JavaScript toLocaleString() function.
+          Caution, the toLocaleString() is implementation dependant, and
+          this was written using Debian 10.
+          The value is an array. The first element is the toLocaleString() locales string.
+          The default locales string is &quoten.US&quot. The second element
+          is used by the timeZone property of toLocaleString options parameter. The
+          default value is &quotUTC&QUOT. It may be set to a different
+          locale value such as "America/Chicago".
+        </p>
 
       <div class="install-section-title">Auto Re-Connect (Global)</div>
       <p>
@@ -265,7 +282,15 @@
         channel passwords.
       </p>
 
-      <div class="install-section-title">Example server.json</div>
+      <div class="install-section-title">configVersion (Global)</div>
+      <p>
+        The property &quotconfigVersion&quot is intended for future use.
+        It provides a method to issue a startup message when attempting
+        to use a configuration   file that may be impacted by breaking changes.
+        It will remain at 1 until there is a breaking change.
+      </p>
+
+      <h2>Example server.json</h2>
       <p>
         The server.json file should look something like this.
       </p>
@@ -274,6 +299,7 @@
 {
   "configVersion": 1,
   "ircAutoReconnect": true,
+  "ctcpTimeLocale": ["en-US", "UTC"],
   "rawMessageLog": false,
   "serverArray": [
     {

@@ -136,7 +136,46 @@
       case 'TIME':
         if (true) {
           let d = new Date;
-          let ctcpReply = 'TIME ' + d.toString().split('(')[0];
+
+          // This returns Fri Jun 11 2021 12:50:57 GMT+0000
+          // let ctcpReply = 'TIME ' + d.toString().split('(')[0];
+          //
+          // ---------------------
+          //
+          // This alternately constructs an RFC5322 Section 3.3 date/time string
+          //
+          // CAUTION: JavaScript toLocaleString() is implementation dependant
+          // This was written using Debian 10
+          //
+          // CTCP reply: "TIME Fri, 11 Jun 2021 10:20:35 UTC"
+          //
+          let ctcpReply = 'TIME ' +
+            // "Mon, "
+            d.toLocaleDateString(vars.ctcpTimeLocale[0], {
+              timeZone: vars.ctcpTimeLocale[1],
+              weekday: 'short'
+            }) + ', ' +
+            // "11 "
+            d.toLocaleDateString(vars.ctcpTimeLocale[0], {
+              timeZone: vars.ctcpTimeLocale[1],
+              day: '2-digit'
+            }) + ' ' +
+            // "Jun "
+            d.toLocaleDateString(vars.ctcpTimeLocale[0], {
+              timeZone: vars.ctcpTimeLocale[1],
+              month: 'short'
+            }) + ' ' +
+            // "2021 "
+            d.toLocaleDateString(vars.ctcpTimeLocale[0], {
+              timeZone: vars.ctcpTimeLocale[1],
+              year: 'numeric'
+            }) + ' ' +
+            // '14:33:22 UTC'
+            d.toLocaleTimeString(vars.ctcpTimeLocale[0], {
+              timeZone: vars.ctcpTimeLocale[1],
+              hour12: false,
+              timeZoneName: 'short'
+            });
           let ircMessage = 'NOTICE ' + parsedMessage.nick + ' :' +
           String.fromCharCode(ctcpDelim) + ctcpReply + String.fromCharCode(ctcpDelim);
           _sendCtcpMessage(socket, ircMessage, ctcpReply, parsedMessage.nick);

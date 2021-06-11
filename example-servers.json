@@ -1,6 +1,7 @@
 {
   "configVersion": 1,
   "ircAutoReconnect": false,
+  "ctcpTimeLocale": ["en-US", "UTC"],
   "rawMessageLog": false,
   "serverArray": [
     {

@@ -87,6 +87,10 @@
   vars.ircState.userMode = servers.serverArray[0].modes;
   vars.ircState.userHost = '';
 
+  if ('ctcpTimeLocale' in servers) {
+    vars.ctcpTimeLocale = servers.ctcpTimeLocale;
+  }
+
   // ircChannels format ['#channel1', '#channel2']
   vars.ircState.channels = [];
   // Channel schema
