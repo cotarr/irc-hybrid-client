@@ -691,8 +691,9 @@ if(document.getElementById("hiddenInfoDiv").hasAttribute("hidden")){document.get
 throw new Error("Fetch status "+response.status+" "+response.statusText)}}).then(responseArray=>{if(Array.isArray(responseArray)&&responseArray.length>0){
 let privMsgSessionEl=document.getElementById("privateMessageContainerDiv");while(privMsgSessionEl.firstChild){privMsgSessionEl.removeChild(privMsgSessionEl.firstChild)}webState.lastPMNick=""
 ;webState.activePrivateMessageNicks=[];webState.resizablePrivMsgTextareaIds=[];webState.resizableSendButtonPMTextareaIds=[];document.getElementById("noticeMessageDisplay").value=""
-;document.getElementById("wallopsMessageDisplay").value="";document.getElementById("rawMessageDisplay").value="";document.getElementById("rawMessageInputId").value="";webState.noticeOpen=false
-;webState.wallopsOpen=false;for(let i=0;i<responseArray.length;i++){if(responseArray[i].length>0){_parseBufferMessage(responseArray[i])}}}}).catch(error=>{console.log(error)})}
+;document.getElementById("wallopsMessageDisplay").value="";document.getElementById("pmNickNameInputId").value="";document.getElementById("newChannelNameInputId").value=""
+;document.getElementById("rawMessageDisplay").value="";document.getElementById("rawMessageInputId").value="";webState.noticeOpen=false;webState.wallopsOpen=false
+;for(let i=0;i<responseArray.length;i++){if(responseArray[i].length>0){_parseBufferMessage(responseArray[i])}}}}).catch(error=>{console.log(error)})}
 window.addEventListener("update-from-cache",function(event){updateFromCache()}.bind(this));function cacheInhibitTimerTick(){if(webState.cacheInhibitTimer>0)webState.cacheInhibitTimer--}
 webState.cacheInhibitTimer=3;document.getElementById("serverTerminateButton").addEventListener("click",function(){console.log("Requesting backend server to terminate")
 ;let fetchURL=webServerUrl+"/terminate";let fetchOptions={method:"POST",headers:{"Content-type":"application/json",Accept:"application/json"},body:JSON.stringify({terminate:"YES"})}
@@ -703,12 +704,13 @@ document.dispatchEvent(new CustomEvent("erase-before-reload",{bubbles:true,detai
 "Content-type":"application/json",Accept:"application/json"},body:JSON.stringify({erase:"YES"})};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()}else{
 throw new Error("Fetch status "+response.status+" "+response.statusText)}}).then(responseJson=>{if(responseJson.error){showError(responseJson.message)}else{
 let privMsgSessionEl=document.getElementById("privateMessageContainerDiv");while(privMsgSessionEl.firstChild){privMsgSessionEl.removeChild(privMsgSessionEl.firstChild)}
-document.getElementById("noticeMessageDisplay").value="";document.getElementById("wallopsMessageDisplay").value="";document.getElementById("rawMessageDisplay").value=""
-;document.getElementById("rawMessageInputId").value="";webState.privMsgOpen=false;webState.noticeOpen=false;webState.wallopsOpen=false;updateDivVisibility()}}).catch(error=>{console.log(error)})})
-;function updateUsername(){let fetchURL=webServerUrl+"/userinfo";let fetchOptions={method:"GET",headers:{Accept:"application/json"}};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){
-return response.json()}else{throw new Error("Fetch status "+response.status+" "+response.statusText)}}).then(responseJson=>{webState.loginUser=responseJson}).catch(error=>{console.log(error)})}
-updateUsername();document.getElementById("test1Button").addEventListener("click",function(){console.log("Test1 button pressed.");let fetchURL=webServerUrl+"/irc/test1";let fetchOptions={method:"GET",
-headers:{Accept:"application/json"}};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()}else{throw new Error("Fetch status "+response.status+" "+response.statusText)}
+document.getElementById("noticeMessageDisplay").value="";document.getElementById("wallopsMessageDisplay").value="";document.getElementById("pmNickNameInputId").value=""
+;document.getElementById("newChannelNameInputId").value="";document.getElementById("rawMessageDisplay").value="";document.getElementById("rawMessageInputId").value="";webState.privMsgOpen=false
+;webState.noticeOpen=false;webState.wallopsOpen=false;updateDivVisibility()}}).catch(error=>{console.log(error)})});function updateUsername(){let fetchURL=webServerUrl+"/userinfo";let fetchOptions={
+method:"GET",headers:{Accept:"application/json"}};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()}else{
+throw new Error("Fetch status "+response.status+" "+response.statusText)}}).then(responseJson=>{webState.loginUser=responseJson}).catch(error=>{console.log(error)})}updateUsername()
+;document.getElementById("test1Button").addEventListener("click",function(){console.log("Test1 button pressed.");let fetchURL=webServerUrl+"/irc/test1";let fetchOptions={method:"GET",headers:{
+Accept:"application/json"}};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()}else{throw new Error("Fetch status "+response.status+" "+response.statusText)}
 }).then(responseJson=>{console.log(JSON.stringify(responseJson,null,2));if(responseJson.error){showError(responseJson.message)}}).catch(error=>{console.log(error);if(error)showError(error.toString())
 })});document.getElementById("test1ButtonDesc").textContent="Force garbage collect";document.getElementById("test2Button").addEventListener("click",function(){console.log("Test2 button pressed.")
 ;let fetchURL=webServerUrl+"/irc/test2";let fetchOptions={method:"GET",headers:{Accept:"application/json"}};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()}else{

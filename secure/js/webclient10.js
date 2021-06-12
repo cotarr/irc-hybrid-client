@@ -79,6 +79,8 @@ function updateFromCache () {
         webState.resizableSendButtonPMTextareaIds = [];
         document.getElementById('noticeMessageDisplay').value = '';
         document.getElementById('wallopsMessageDisplay').value = '';
+        document.getElementById('pmNickNameInputId').value = '';
+        document.getElementById('newChannelNameInputId').value = '';
         document.getElementById('rawMessageDisplay').value = '';
         document.getElementById('rawMessageInputId').value = '';
         webState.noticeOpen = false;
@@ -195,6 +197,8 @@ document.getElementById('eraseCacheButton').addEventListener('click', function()
         }
         document.getElementById('noticeMessageDisplay').value = '';
         document.getElementById('wallopsMessageDisplay').value = '';
+        document.getElementById('pmNickNameInputId').value = '';
+        document.getElementById('newChannelNameInputId').value = '';
         document.getElementById('rawMessageDisplay').value = '';
         document.getElementById('rawMessageInputId').value = '';
         webState.privMsgOpen = false;
