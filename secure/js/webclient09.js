@@ -163,8 +163,13 @@ const serverAutoComplete = function(e) {
         _autoCompleteServInputElement(snippet);
       }
     } else {
-      // following space character, default to nickname
-      serverInputAreaEl.value += ircState.nickName;
+      if (serverInputAreaEl.value.toUpperCase() === '/QUIT ') {
+        // scase of autocomplete /QUIT shows version
+        serverInputAreaEl.value += ircState.progName + ' ' + ircState.progVersion;
+      } else {
+        // following space character, default to nickname
+        serverInputAreaEl.value += ircState.nickName;
+      }
       serverInputAreaEl.value += String.fromCharCode(trailingSpaceKey);
     }
     e.preventDefault();
@@ -185,8 +190,14 @@ const serverAutoComplete = function(e) {
           // Remove one of the space characters
           serverInputAreaEl.value =
             serverInputAreaEl.value.slice(0, serverInputAreaEl.value.length - 1);
-          // Following double space, (plus this key makes it triple space) default nickname
-          serverInputAreaEl.value += ircState.nickName;
+
+          if (serverInputAreaEl.value.toUpperCase() === '/QUIT ') {
+            // scase of autocomplete /QUIT shows version
+            serverInputAreaEl.value += ircState.progName + ' ' + ircState.progVersion;
+          } else {
+            // following space character, default to nickname
+            serverInputAreaEl.value += ircState.nickName;
+          }
           serverInputAreaEl.value += String.fromCharCode(trailingSpaceKey);
           e.preventDefault();
         } else {

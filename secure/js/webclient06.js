@@ -808,7 +808,13 @@ function createChannelEl (name) {
         }
       } else {
         // following space character, default to channel name
-        channelInputAreaEl.value += name;
+        if (channelInputAreaEl.value.toUpperCase() === '/PART ' + name.toUpperCase() + ' ') {
+          channelInputAreaEl.value += ircState.progName + ' ' + ircState.progVersion;
+        } else if (channelInputAreaEl.value.toUpperCase() === '/QUIT ') {
+          channelInputAreaEl.value += ircState.progName + ' ' + ircState.progVersion;
+        } else {
+          channelInputAreaEl.value += name;
+        }
         channelInputAreaEl.value += String.fromCharCode(trailingSpaceKey);
       }
       e.preventDefault();
@@ -829,8 +835,13 @@ function createChannelEl (name) {
             // Remove one of the space characters
             channelInputAreaEl.value =
               channelInputAreaEl.value.slice(0, channelInputAreaEl.value.length - 1);
-            // Following double space, (plus this key makes it triple space) default channel name
-            channelInputAreaEl.value += name;
+            if (channelInputAreaEl.value.toUpperCase() === '/PART ' + name.toUpperCase() + ' ') {
+              channelInputAreaEl.value += ircState.progName + ' ' + ircState.progVersion;
+            } else if (channelInputAreaEl.value.toUpperCase() === '/QUIT ') {
+              channelInputAreaEl.value += ircState.progName + ' ' + ircState.progVersion;
+            } else {
+              channelInputAreaEl.value += name;
+            }
             channelInputAreaEl.value += String.fromCharCode(trailingSpaceKey);
             e.preventDefault();
           } else {

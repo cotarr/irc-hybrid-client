@@ -464,21 +464,23 @@ channelInputAreaEl.value=channelInputAreaEl.value.slice(0,channelInputAreaEl.val
 ;const channelAutoComplete=function(e){const autoCompleteTabKey=9;const autoCompleteSpaceKey=32;const trailingSpaceKey=32;if(channelAutoCompCBInputEl.hasAttribute("disabled"))return
 ;if(!channelMainSectionEl.hasAttribute("auto-comp-enabled"))return;if(!e.keyCode)return;if(e.keyCode&&e.keyCode===autoCompleteTabKey){if(channelInputAreaEl.value.length<2){e.preventDefault();return}
 let snippet="";let snippetArray=channelInputAreaEl.value.split(" ");if(snippetArray.length>0){snippet=snippetArray[snippetArray.length-1]}if(snippet.length>0){
-if(e.keyCode===autoCompleteTabKey&&snippet.length>0){_autoCompleteInputElement(snippet)}}else{channelInputAreaEl.value+=name;channelInputAreaEl.value+=String.fromCharCode(trailingSpaceKey)}
-e.preventDefault()}if(e.keyCode&&e.keyCode===autoCompleteSpaceKey){if(channelInputAreaEl.value.length>0){
-if(channelInputAreaEl.value.charCodeAt(channelInputAreaEl.value.length-1)===autoCompleteSpaceKey){
+if(e.keyCode===autoCompleteTabKey&&snippet.length>0){_autoCompleteInputElement(snippet)}}else{if(channelInputAreaEl.value.toUpperCase()==="/PART "+name.toUpperCase()+" "){
+channelInputAreaEl.value+=ircState.progName+" "+ircState.progVersion}else if(channelInputAreaEl.value.toUpperCase()==="/QUIT "){channelInputAreaEl.value+=ircState.progName+" "+ircState.progVersion
+}else{channelInputAreaEl.value+=name}channelInputAreaEl.value+=String.fromCharCode(trailingSpaceKey)}e.preventDefault()}if(e.keyCode&&e.keyCode===autoCompleteSpaceKey){
+if(channelInputAreaEl.value.length>0){if(channelInputAreaEl.value.charCodeAt(channelInputAreaEl.value.length-1)===autoCompleteSpaceKey){
 if(channelInputAreaEl.value.length>1&&channelInputAreaEl.value.charCodeAt(channelInputAreaEl.value.length-2)===autoCompleteSpaceKey){
-channelInputAreaEl.value=channelInputAreaEl.value.slice(0,channelInputAreaEl.value.length-1);channelInputAreaEl.value+=name;channelInputAreaEl.value+=String.fromCharCode(trailingSpaceKey)
-;e.preventDefault()}else{channelInputAreaEl.value=channelInputAreaEl.value.slice(0,channelInputAreaEl.value.length-1);let snippet="";let snippetArray=channelInputAreaEl.value.split(" ")
-;if(snippetArray.length>0){snippet=snippetArray[snippetArray.length-1]}if(snippet.length>0){let matchStr=_autoCompleteInputElement(snippet);if(lastAutoCompleteMatch!==matchStr){
-lastAutoCompleteMatch=matchStr;e.preventDefault()}}else{channelInputAreaEl.value+=String.fromCharCode(autoCompleteSpaceKey)}}}}else{}}}.bind(this)
-;channelInputAreaEl.addEventListener("keydown",channelAutoComplete,false);function _updateNickList(){let index=ircState.channels.indexOf(name.toLowerCase());if(index>=0){maxNickLength=0
-;if(ircState.channelStates[index].names.length>0){channelNamesDisplayEl.value="";let opList=[];let otherList=[];for(let i=0;i<ircState.channelStates[index].names.length;i++){
-if(ircState.channelStates[index].names[i].charAt(0)==="@"){opList.push(ircState.channelStates[index].names[i])}else{otherList.push(ircState.channelStates[index].names[i])}}
-let sortedOpList=opList.sort();let sortedOtherList=otherList.sort();if(sortedOpList.length>0){for(let i=0;i<sortedOpList.length;i++){channelNamesDisplayEl.value+=sortedOpList[i]+"\n"
-;if(maxNickLength<sortedOpList[i].length){maxNickLength=sortedOpList[i].length}}}if(sortedOtherList.length>0){for(let i=0;i<sortedOtherList.length;i++){
-channelNamesDisplayEl.value+=sortedOtherList[i]+"\n";if(maxNickLength<sortedOtherList[i].length){maxNickLength=sortedOtherList[i].length}}}}}}_updateNickList();function _updateChannelTitle(){
-let titleStr=name+" (";let index=ircState.channels.indexOf(name.toLowerCase());if(index>=0){if(ircState.channelStates[index].joined){
+channelInputAreaEl.value=channelInputAreaEl.value.slice(0,channelInputAreaEl.value.length-1);if(channelInputAreaEl.value.toUpperCase()==="/PART "+name.toUpperCase()+" "){
+channelInputAreaEl.value+=ircState.progName+" "+ircState.progVersion}else if(channelInputAreaEl.value.toUpperCase()==="/QUIT "){channelInputAreaEl.value+=ircState.progName+" "+ircState.progVersion
+}else{channelInputAreaEl.value+=name}channelInputAreaEl.value+=String.fromCharCode(trailingSpaceKey);e.preventDefault()}else{
+channelInputAreaEl.value=channelInputAreaEl.value.slice(0,channelInputAreaEl.value.length-1);let snippet="";let snippetArray=channelInputAreaEl.value.split(" ");if(snippetArray.length>0){
+snippet=snippetArray[snippetArray.length-1]}if(snippet.length>0){let matchStr=_autoCompleteInputElement(snippet);if(lastAutoCompleteMatch!==matchStr){lastAutoCompleteMatch=matchStr;e.preventDefault()}
+}else{channelInputAreaEl.value+=String.fromCharCode(autoCompleteSpaceKey)}}}}else{}}}.bind(this);channelInputAreaEl.addEventListener("keydown",channelAutoComplete,false);function _updateNickList(){
+let index=ircState.channels.indexOf(name.toLowerCase());if(index>=0){maxNickLength=0;if(ircState.channelStates[index].names.length>0){channelNamesDisplayEl.value="";let opList=[];let otherList=[]
+;for(let i=0;i<ircState.channelStates[index].names.length;i++){if(ircState.channelStates[index].names[i].charAt(0)==="@"){opList.push(ircState.channelStates[index].names[i])}else{
+otherList.push(ircState.channelStates[index].names[i])}}let sortedOpList=opList.sort();let sortedOtherList=otherList.sort();if(sortedOpList.length>0){for(let i=0;i<sortedOpList.length;i++){
+channelNamesDisplayEl.value+=sortedOpList[i]+"\n";if(maxNickLength<sortedOpList[i].length){maxNickLength=sortedOpList[i].length}}}if(sortedOtherList.length>0){
+for(let i=0;i<sortedOtherList.length;i++){channelNamesDisplayEl.value+=sortedOtherList[i]+"\n";if(maxNickLength<sortedOtherList[i].length){maxNickLength=sortedOtherList[i].length}}}}}}
+_updateNickList();function _updateChannelTitle(){let titleStr=name+" (";let index=ircState.channels.indexOf(name.toLowerCase());if(index>=0){if(ircState.channelStates[index].joined){
 titleStr+=parseInt(ircState.channelStates[index].names.length).toString()}else{if(ircState.channelStates[index].kicked){titleStr+="Kicked"}else{titleStr+="0"}}}
 channelNameDivEl.textContent=titleStr+")"}_updateChannelTitle();function _isNickInChannel(nickString,channelString){if(!nickString||nickString.length===0)return false
 ;if(ircState.channels.length===0)return false;let channelIndex=-1;for(let i=0;i<ircState.channels.length;i++){if(channelString.toLowerCase()===ircState.channels[i].toLowerCase())channelIndex=i}
@@ -635,13 +637,15 @@ serverInputAreaEl.value=serverInputAreaEl.value.slice(0,serverInputAreaEl.value.
 ;const serverAutoComplete=function(e){var serverInputAreaEl=document.getElementById("rawMessageInputId");const autoCompleteTabKey=9;const autoCompleteSpaceKey=32;const trailingSpaceKey=32
 ;if(!e.keyCode)return;if(e.keyCode&&e.keyCode===autoCompleteTabKey){if(serverInputAreaEl.value.length<2){e.preventDefault();return}let snippet="";let snippetArray=serverInputAreaEl.value.split(" ")
 ;if(snippetArray.length>0){snippet=snippetArray[snippetArray.length-1]}if(snippet.length>0){if(e.keyCode===autoCompleteTabKey&&snippet.length>0){_autoCompleteServInputElement(snippet)}}else{
-serverInputAreaEl.value+=ircState.nickName;serverInputAreaEl.value+=String.fromCharCode(trailingSpaceKey)}e.preventDefault()}if(e.keyCode&&e.keyCode===autoCompleteSpaceKey){
-if(serverInputAreaEl.value.length>0){if(serverInputAreaEl.value.charCodeAt(serverInputAreaEl.value.length-1)===autoCompleteSpaceKey){
+if(serverInputAreaEl.value.toUpperCase()==="/QUIT "){serverInputAreaEl.value+=ircState.progName+" "+ircState.progVersion}else{serverInputAreaEl.value+=ircState.nickName}
+serverInputAreaEl.value+=String.fromCharCode(trailingSpaceKey)}e.preventDefault()}if(e.keyCode&&e.keyCode===autoCompleteSpaceKey){if(serverInputAreaEl.value.length>0){
+if(serverInputAreaEl.value.charCodeAt(serverInputAreaEl.value.length-1)===autoCompleteSpaceKey){
 if(serverInputAreaEl.value.length>1&&serverInputAreaEl.value.charCodeAt(serverInputAreaEl.value.length-2)===autoCompleteSpaceKey){
-serverInputAreaEl.value=serverInputAreaEl.value.slice(0,serverInputAreaEl.value.length-1);serverInputAreaEl.value+=ircState.nickName;serverInputAreaEl.value+=String.fromCharCode(trailingSpaceKey)
-;e.preventDefault()}else{serverInputAreaEl.value=serverInputAreaEl.value.slice(0,serverInputAreaEl.value.length-1);let snippet="";let snippetArray=serverInputAreaEl.value.split(" ")
-;if(snippetArray.length>0){snippet=snippetArray[snippetArray.length-1]}if(snippet.length>0){let matchStr=_autoCompleteServInputElement(snippet);if(lastServAutoCompleteMatch!==matchStr){
-lastServAutoCompleteMatch=matchStr;e.preventDefault()}}else{serverInputAreaEl.value+=String.fromCharCode(autoCompleteSpaceKey)}}}}else{}}}.bind(this)
+serverInputAreaEl.value=serverInputAreaEl.value.slice(0,serverInputAreaEl.value.length-1);if(serverInputAreaEl.value.toUpperCase()==="/QUIT "){
+serverInputAreaEl.value+=ircState.progName+" "+ircState.progVersion}else{serverInputAreaEl.value+=ircState.nickName}serverInputAreaEl.value+=String.fromCharCode(trailingSpaceKey);e.preventDefault()
+}else{serverInputAreaEl.value=serverInputAreaEl.value.slice(0,serverInputAreaEl.value.length-1);let snippet="";let snippetArray=serverInputAreaEl.value.split(" ");if(snippetArray.length>0){
+snippet=snippetArray[snippetArray.length-1]}if(snippet.length>0){let matchStr=_autoCompleteServInputElement(snippet);if(lastServAutoCompleteMatch!==matchStr){lastServAutoCompleteMatch=matchStr
+;e.preventDefault()}}else{serverInputAreaEl.value+=String.fromCharCode(autoCompleteSpaceKey)}}}}else{}}}.bind(this)
 ;document.getElementById("rawMessageInputId").addEventListener("keydown",serverAutoComplete,false);function substituteHmsTime(inMessage){let timeString=inMessage.split(" ")[0]
 ;let restOfMessage=inMessage.slice(timeString.length+1,inMessage.length);let hmsString=timestampToHMS(timeString);return hmsString+" "+restOfMessage}
 document.addEventListener("server-message",function(event){function _showAfterParamZero(parsedMessage,title){let msgString="";if(parsedMessage.params.length>1){
