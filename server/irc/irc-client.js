@@ -50,7 +50,7 @@
 
   var servers = JSON.parse(fs.readFileSync('./servers.json', 'utf8'));
   if ((!('configVersion' in servers)) || (servers.configVersion !== 1)) {
-    webError:('Error, servers.js wrong configVersion');
+    log('Error, servers.js wrong configVersion');
     process.exit(1);
   }
 
@@ -320,7 +320,7 @@
     }.bind(this), vars.ircSocketConnectingTimeout * 1000);
 
     let connectMessage = 'webServer: Opening socket to ' + vars.ircState.ircServerName + ' ' +
-      vars.ircState.ircServerHost + ':' + vars.ircState.ircServerPort;
+      vars.ircState.ircServerHost + ':' + vars.ircState.ircServerPort + '\n';
     if (vars.ircState.ircTLSEnabled) {
       connectMessage += ' (TLS)';
     }
@@ -799,16 +799,14 @@
   const messageHandler = function(req, res, next) {
     // console.log(req.body);
     if (!vars.ircState.ircConnected) {
-      webError:('messageHandler() IRC server not connected');
+      global.sendToBrowser('webError: messageHandler() IRC server not connected\n');
       res.json({error: true, message: 'Can not send server message when IRC server not connected'});
     } else if (!('message' in req.body)) {
-      webError:('messageHandler() IRC message not found in POST body');
       let err = new Error('BAD REQUEST');
       err.status = 400;
       err.message = 'IRC message not found in POST body';
       next(err);
     } else if (!(typeof req.body.message === 'string')) {
-      webError:('messageHandler() IRC message expect type string');
       let err = new Error('BAD REQUEST');
       err.status = 400;
       err.message = 'IRC message expect type=string';
@@ -816,17 +814,13 @@
     } else {
       let messageBuf = Buffer.from(req.body.message, 'utf8');
       if (!isValidUTF8(messageBuf)) {
-        webError:('messageHandler() IRC message failed UTF-8 validation');
         res.json({error: true, message: 'IRC message failed UTF-8 validation'});
       } else if (messageBuf.includes(0)) {
-        webError:('messageHandler() IRC message zero byte validation');
         res.json({error: true, message: 'IRC message failed zero byte validation'});
       } else if (messageBuf.length >= 512) {
-        webError:('messageHandler() IRC message exceeds 512 byte maximum length');
         res.json({error: true, message: 'IRC message exceeds 512 byte maximum length'});
       } else {
         if (messageBuf.length === 0) {
-          webError:('messageHandler() Ignoring Empty message');
           res.json({error: true, message: 'Ignoring Empty message'});
         } else {
           // And parse for commands that change state or
@@ -834,7 +828,6 @@
           let message = messageBuf.toString('utf8');
           let parseResult = ircCommand.parseBrowserMessageForCommand(message);
           if (parseResult.error) {
-            webError:(parseResult.message);
             res.json({error: true, message: parseResult.message});
           } else {
             // Send browser message on to web server
@@ -880,7 +873,6 @@
       }
     }
     if (err) {
-      webError:('getCache() 422 Unprocessable Entity, cache contains malformed data');
       let error = new Error('Unprocessable Entity');
       error.status = 422;
       error.message = 'Cache contains malformed data';
@@ -952,7 +944,6 @@
   //
   // -----------------------------------------------
   const eraseCache = function(req, res, next) {
-    // webError:(JSON.stringify(req.body));
     let inputVerifyString = '';
     if (('erase' in req.body) && (typeof req.body.erase === 'string')) {
       inputVerifyString = req.body.erase;
@@ -977,14 +968,12 @@
   //
   // --------------------------------------------------------------
   const test1Handler = function(req, res, next) {
-    webError:('test1 handler called');
     // -------- test code here -----------------
     //
     // Check allocated memory, garbage collect, check memory again.
     if (global.gc) {
       let before = process.memoryUsage();
       global.gc();
-      webError:('Debug: Forcing nodejs garbage collection');
       setTimeout(function() {
         let after = process.memoryUsage();
         res.json({
@@ -997,7 +986,6 @@
         });
       }.bind(this), 1000);
     } else {
-      webError:('To debug garbage collection run: node --expose-gc bin/www');
       res.json({
         error: true,
         message: 'To debug garbage collection run: node --expose-gc bin/www'
@@ -1024,7 +1012,6 @@
   // --------------------------------------------------------------
 
   const test2Handler = function(req, res, next) {
-    webError:('test2 handler called');
     // -------- test code here -----------------
     // emulate ping timeout of IRC server (for test auto reconnect)
     vars.activityWatchdogTimerSeconds = 1000;
