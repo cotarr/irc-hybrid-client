@@ -826,13 +826,25 @@
           // And parse for commands that change state or
           // that require dummy server messages for cached display.
           let message = messageBuf.toString('utf8');
-          let parseResult = ircCommand.parseBrowserMessageForCommand(message);
-          if (parseResult.error) {
-            res.json({error: true, message: parseResult.message});
+          // If present, remove tailing new line character
+          if (message.charAt(message.length-1) === '\n') {
+            message = message.slice(0, message.length-1);
+          }
+          // If present, remove tailing new return character
+          if (message.charAt(message.length-1) === '\r') {
+            message = message.slice(0, message.length-1);
+          }
+          if ((message.indexOf('\n') >= 0) || (message.indexOf('\r') >= 0)) {
+            res.json({error: true, message: 'Invalid multiple line message'});
           } else {
-            // Send browser message on to web server
-            ircWrite.writeSocket(ircSocket, message);
-            res.json({error: false});
+            let parseResult = ircCommand.parseBrowserMessageForCommand(message);
+            if (parseResult.error) {
+              res.json({error: true, message: parseResult.message});
+            } else {
+              // Send browser message on to web server
+              ircWrite.writeSocket(ircSocket, message);
+              res.json({error: false});
+            }
           }
         }
       }
