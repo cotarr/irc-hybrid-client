@@ -44,6 +44,10 @@
   var nsIdentifyNick = null;
   var nsIdentifyCommand = null;
 
+  var nickNameLength = 32;
+  var userNameLength = 32;
+  var realNameLength = 64;
+
   const channelPrefixChars = '@#+!';
   const channelUserModeChars = 'qaohv';
   const nicknamePrefixChars = '~&@%+';
@@ -88,6 +92,9 @@
     ircServerPassword: ircServerPassword,
     nsIdentifyNick: nsIdentifyNick,
     nsIdentifyCommand: nsIdentifyCommand,
+    nickNameLength: nickNameLength,
+    userNameLength: userNameLength,
+    realNameLength: realNameLength,
     channelPrefixChars: channelPrefixChars,
     channelUserModeChars: channelUserModeChars,
     nicknamePrefixChars: nicknamePrefixChars,

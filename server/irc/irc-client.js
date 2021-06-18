@@ -50,7 +50,11 @@
 
   var servers = JSON.parse(fs.readFileSync('./servers.json', 'utf8'));
   if ((!('configVersion' in servers)) || (servers.configVersion !== 1)) {
-    log('Error, servers.js wrong configVersion');
+    console.log('Error, servers.js wrong configVersion');
+    process.exit(1);
+  }
+  if ((!('serverArray' in servers)) || (servers.serverArray.length < 1)) {
+    console.log('Error, no server configuration in servers.json');
     process.exit(1);
   }
 
@@ -320,7 +324,7 @@
     }.bind(this), vars.ircSocketConnectingTimeout * 1000);
 
     let connectMessage = 'webServer: Opening socket to ' + vars.ircState.ircServerName + ' ' +
-      vars.ircState.ircServerHost + ':' + vars.ircState.ircServerPort + '\n';
+      vars.ircState.ircServerHost + ':' + vars.ircState.ircServerPort;
     if (vars.ircState.ircTLSEnabled) {
       connectMessage += ' (TLS)';
     }
@@ -603,18 +607,23 @@
         message: 'Can not change servers while connected or connecting'
       });
     }
-    if ((!('serverArray' in servers)) || (servers.serverArray.length < 1)) {
-      return res.json({
-        error: true,
-        message: 'Server list empty.'
-      });
-    }
+    // Check for presence of extraneous keys
+    let validKeys = ['index'];
+    Object.keys(req.body).forEach(function(key) {
+      if (validKeys.indexOf(key) < 0) {
+        let err = new Error('BAD REQUEST');
+        err.status = 400;
+        err.message = 'Extraneous property in server request';
+        return next(err);
+      }
+    });
     // input type validation
     if ((!('index' in req.body)) ||
       (typeof req.body.index !== 'number') ||
       (!Number.isInteger(req.body.index))) {
       let error = new Error('Bad Reqeust');
       error.status = 400;
+      error.message = 'index is required property of type integer';
       return next(error);
     }
     // input range validaton
@@ -659,7 +668,7 @@
 
     tellBrowserToRequestState();
 
-    return res.json({
+    res.json({
       error: false,
       index: vars.ircState.ircServerIndex,
       name: vars.ircState.ircServerName
@@ -691,35 +700,106 @@
         message: 'Error: already connected to IRC server.'
       });
     }
+    if ('userName' in req.body) {
+      let err = new Error('BAD REQUEST');
+      err.status = 400;
+      err.message = 'IRC user name (userName) set only in config file.';
+      return next(err);
+    }
+    let validKeys = ['nickName', 'realName', 'userMode'];
+    Object.keys(req.body).forEach(function(key) {
+      if (validKeys.indexOf(key) < 0) {
+        let err = new Error('BAD REQUEST');
+        err.status = 400;
+        err.message = 'Extraneous property in connect request';
+        return next(err);
+      }
+    });
 
     let inputNickName = '';
-    if (('nickName' in req.body) &&
-      (typeof req.body.nickName === 'string')) {
-      inputNickName = req.body.nickName;
+    if ('nickName' in req.body) {
+      if ((typeof req.body.nickName === 'string') &&
+        (req.body.nickName.length > 0) &&
+        (req.body.nickName.length <= vars.nickNameLength)) {
+        inputNickName = req.body.nickName;
+      } else {
+        let err = new Error('BAD REQUEST');
+        err.status = 400;
+        err.message = 'Invalid nick name in connect request';
+        return next(err);
+      }
     }
     //
     // Special case, leave userName as default from config file
     //
+    // let inputUserName = '';
+    // if ('userName' in req.body) {
+    //   if ((typeof req.body.userName === 'string') &&
+    //     (req.body.userName.length > 0) &&
+    //     (req.body.userName.length <= vars.userNameLength)) {
+    //     inputUserName = req.body.userName;
+    //   } else {
+    //     let err = new Error('BAD REQUEST');
+    //     err.status = 400;
+    //     err.message = 'Invalid user name in connect request';
+    //     return next(err);
+    //   }
+    // }
     let inputRealName = '';
-    if (('realName' in req.body) &&
-      (typeof req.body.realName === 'string')) {
-      inputRealName = req.body.realName;
+    if ('realName' in req.body) {
+      if ((typeof req.body.realName === 'string') &&
+        (req.body.realName.length > 0) &&
+        (req.body.realName.length <= vars.realNameLength)) {
+        inputRealName = req.body.realName;
+      } else {
+        let err = new Error('BAD REQUEST');
+        err.status = 400;
+        err.message = 'Invalid real name in connect request';
+        return next(err);
+      }
     }
+    const selectorChars = '+-';
     let inputUserMode = '';
-    if (('userMode' in req.body) &&
-      (typeof req.body.userMode === 'string')) {
-      inputUserMode = req.body.userMode;
+    if ('userMode' in req.body) {
+      if ((typeof req.body.userMode === 'string') &&
+        (req.body.userMode.length <= 16)) {
+        if ((req.body.userMode.length > 0) &&
+          (selectorChars.indexOf(req.body.userMode.charAt(0)) < 0)) {
+          let err = new Error('BAD REQUEST');
+          err.status = 400;
+          err.message = 'Invalid user mode syntax';
+          return next(err);
+        }
+        inputUserMode = req.body.userMode;
+      } else {
+        let err = new Error('BAD REQUEST');
+        err.status = 400;
+        err.message = 'Invalid initial user mode in connect request';
+        return next(err);
+      }
     }
 
-    if ((inputNickName.length === 0) || (inputRealName.length === 0)) {
-      return res.json({
-        error: true,
-        message: 'Error: invalid IRC signon parameters'
-      });
+    if (inputNickName.length === 0) {
+      let err = new Error('BAD REQUEST');
+      err.status = 400;
+      err.message = 'Error: nickName is a required property in connect request';
+      return next(err);
     }
-
+    // if (inputUserName.length === 0) {
+    //   let err = new Error('BAD REQUEST');
+    //   err.status = 400;
+    //   err.message = 'Error: userName is a required property in connect request';
+    //   return next(err);
+    // }
+    if (inputRealName.length === 0) {
+      let err = new Error('BAD REQUEST');
+      err.status = 400;
+      err.message = 'Error: realName is a required property in connect request';
+      return next(err);
+    }
     vars.ircState.nickName = inputNickName;
     // userName is special case, leave as in config file
+    // vars.ircState.userName = inputUserName;
     vars.ircState.realName = inputRealName;
     vars.ircState.userMode = inputUserMode;
 
@@ -753,6 +833,9 @@
   // ------------------------------------
   //  API handler for forced disconnect
   //
+  // Note: This is to force socket to hard disconnect
+  // In routine operation, use "QUIT" server command
+  //
   // Method: POST
   // Route:  /irc/disconnect
   //
@@ -763,6 +846,13 @@
   // ------------------------------------
   const disconnectHandler = function(req, res, next) {
     // console.log('disconnect handler called');
+    // console.log(JSON.stringify(req.body));
+    if (Object.keys(req.body).length > 0) {
+      let err = new Error('BAD REQUEST');
+      err.status = 400;
+      err.message = 'Extraneous property in disconnect request';
+      return next(err);
+    }
     // cancel reconnect timer
     vars.ircState.ircConnectOn = false;
     vars.ircServerReconnectTimerSeconds = 0;
@@ -779,7 +869,8 @@
       tellBrowserToRequestState();
       res.json({error: false});
     } else {
-      res.json({error: true, message: 'Error Can not destry socket before it is created.'});
+      global.sendToBrowser('webServer: Can not destry socket before it is created\n');
+      res.json({error: true, message: 'Can not destry socket before it is created.'});
     }
   }; //disconnectHandler()
 
@@ -800,52 +891,71 @@
     // console.log(req.body);
     if (!vars.ircState.ircConnected) {
       global.sendToBrowser('webError: messageHandler() IRC server not connected\n');
-      res.json({error: true, message: 'Can not send server message when IRC server not connected'});
-    } else if (!('message' in req.body)) {
+      return res.json({
+        error: true,
+        message: 'Can not send server message when IRC server not connected'
+      });
+    }
+    // Check for presence of extraneous keys
+    let validKeys = ['message'];
+    Object.keys(req.body).forEach(function(key) {
+      if (validKeys.indexOf(key) < 0) {
+        let err = new Error('BAD REQUEST');
+        err.status = 400;
+        err.message = 'Extraneous property in message request';
+        return next(err);
+      }
+    });
+    if (!('message' in req.body)) {
       let err = new Error('BAD REQUEST');
       err.status = 400;
-      err.message = 'IRC message not found in POST body';
-      next(err);
-    } else if (!(typeof req.body.message === 'string')) {
+      err.message = 'message is a required property';
+      return next(err);
+    }
+    if (!(typeof req.body.message === 'string')) {
       let err = new Error('BAD REQUEST');
       err.status = 400;
       err.message = 'IRC message expect type=string';
-      next(err);
+      return next(err);
+    }
+    // This is to address multi-byte characters, IRC limit is in bytes, not characters
+    let uint8BtyeArray = new TextEncoder('utf8').encode(req.body.message);
+    if (uint8BtyeArray.length > 512) {
+      let err = new Error('BAD REQUEST');
+      err.status = 400;
+      err.message = 'IRC message exceeds 512 byte maximum length';
+      return next(err);
+    }
+    let messageBuf = Buffer.from(req.body.message, 'utf8');
+    if (!isValidUTF8(messageBuf)) {
+      return res.json({error: true, message: 'IRC message failed UTF-8 validation'});
+    }
+    if (messageBuf.includes(0)) {
+      return res.json({error: true, message: 'IRC message failed zero byte validation'});
+    }
+    if (messageBuf.length === 0) {
+      return res.json({error: true, message: 'Ignoring Empty message'});
     } else {
-      let messageBuf = Buffer.from(req.body.message, 'utf8');
-      if (!isValidUTF8(messageBuf)) {
-        res.json({error: true, message: 'IRC message failed UTF-8 validation'});
-      } else if (messageBuf.includes(0)) {
-        res.json({error: true, message: 'IRC message failed zero byte validation'});
-      } else if (messageBuf.length >= 512) {
-        res.json({error: true, message: 'IRC message exceeds 512 byte maximum length'});
+      let message = messageBuf.toString('utf8');
+      // If present, remove tailing new line character
+      if (message.charAt(message.length-1) === '\n') {
+        message = message.slice(0, message.length-1);
+      }
+      // If present, remove tailing new return character
+      if (message.charAt(message.length-1) === '\r') {
+        message = message.slice(0, message.length-1);
+      }
+      // Multiple line strings are not allowed.
+      if ((message.indexOf('\n') >= 0) || (message.indexOf('\r') >= 0)) {
+        return res.json({error: true, message: 'Invalid multiple line message'});
       } else {
-        if (messageBuf.length === 0) {
-          res.json({error: true, message: 'Ignoring Empty message'});
+        let parseResult = ircCommand.parseBrowserMessageForCommand(message);
+        if (parseResult.error) {
+          return res.json({error: true, message: parseResult.message});
         } else {
-          // And parse for commands that change state or
-          // that require dummy server messages for cached display.
-          let message = messageBuf.toString('utf8');
-          // If present, remove tailing new line character
-          if (message.charAt(message.length-1) === '\n') {
-            message = message.slice(0, message.length-1);
-          }
-          // If present, remove tailing new return character
-          if (message.charAt(message.length-1) === '\r') {
-            message = message.slice(0, message.length-1);
-          }
-          if ((message.indexOf('\n') >= 0) || (message.indexOf('\r') >= 0)) {
-            res.json({error: true, message: 'Invalid multiple line message'});
-          } else {
-            let parseResult = ircCommand.parseBrowserMessageForCommand(message);
-            if (parseResult.error) {
-              res.json({error: true, message: parseResult.message});
-            } else {
-              // Send browser message on to web server
-              ircWrite.writeSocket(ircSocket, message);
-              res.json({error: false});
-            }
-          }
+          // Send browser message on to web server
+          ircWrite.writeSocket(ircSocket, message);
+          res.json({error: false});
         }
       }
     }
@@ -867,9 +977,15 @@
   // Request backend to return all of cache to browser
   //
   // Method: GET
-  // Route:  /ircCommand/cache
+  // Route:  /irc/cache
   // -----------------------------------------------
   const getCache = function(req, res, next) {
+    if (Object.keys(req.body).length > 0) {
+      let err = new Error('BAD REQUEST');
+      err.status = 400;
+      err.message = 'Extraneous property in cache request';
+      return next(err);
+    }
     let cacheArrayOfBuffers = ircMessageCache.allMessages();
     let outArray = [];
     let err = false;
@@ -909,9 +1025,45 @@
   // -----------------------------------------------
   const pruneChannel = function(req, res, next) {
     let inputChannel = '';
-    if (('channel' in req.body) && (typeof req.body.channel === 'string')) {
-      inputChannel = req.body.channel;
+    //
+    // Validate request
+    //
+    if (!vars.ircState.ircConnected) {
+      return res.json({
+        error: true,
+        message: 'IRC server not connected'
+      });
     }
+    if ('channel' in req.body) {
+      if ((typeof req.body.channel === 'string') &&
+        (req.body.channel.length > 1) &&
+        (vars.channelPrefixChars.indexOf(req.body.channel.charAt(0)) >= 0)) {
+        inputChannel = req.body.channel;
+      } else {
+        let err = new Error('BAD REQUEST');
+        err.status = 400;
+        err.message = 'Invalid channel name in prune request';
+        return next(err);
+      }
+    } else {
+      let err = new Error('BAD REQUEST');
+      err.status = 400;
+      err.message = 'channel is a required property';
+      return next(err);
+    }
+    // Check for presence of extraneous keys
+    let validKeys = ['channel'];
+    Object.keys(req.body).forEach(function(key) {
+      if (validKeys.indexOf(key) < 0) {
+        let err = new Error('BAD REQUEST');
+        err.status = 400;
+        err.message = 'Extraneous property in prune request';
+        return next(err);
+      }
+    });
+    //
+    // Remove the channel
+    //
     if (inputChannel.length > 0) {
       let index = vars.ircState.channels.indexOf(inputChannel.toLowerCase());
       if (index >= 0) {
@@ -923,23 +1075,24 @@
           res.json({
             error: false
           });
+          return;
         } else {
-          res.json({
+          return res.json({
             error: true,
-            message: 'Prune requires you leave channel'
+            message: 'Leave channel before prune'
           });
         }
       } else {
-        res.json({
+        return res.json({
           error: true,
           message: 'Channel not found'
         });
       }
-    } else {
-      let error = new Error('Bad Reqeust');
-      error.status = 400;
-      next(error);
     }
+    let err = new Error('INTERNAL SERVER ERROR');
+    err.status = 500;
+    err.message = 'Error in prune request';
+    next(err);
   };
 
   // -----------------------------------------------
@@ -956,8 +1109,28 @@
   //
   // -----------------------------------------------
   const eraseCache = function(req, res, next) {
+    // Abort if connected.
+    if ((vars.ircState.ircConnected) || (vars.ircState.ircConnecting)) {
+      return res.json({
+        error: true,
+        message: 'Disconnect from IRC before clearing cache'
+      });
+    }
+    // Check for presence of extraneous keys
+    let validKeys = ['erase'];
+    Object.keys(req.body).forEach(function(key) {
+      if (validKeys.indexOf(key) < 0) {
+        let err = new Error('BAD REQUEST');
+        err.status = 400;
+        err.message = 'Extraneous property in erase request';
+        next(err);
+        return;
+      }
+    });
     let inputVerifyString = '';
-    if (('erase' in req.body) && (typeof req.body.erase === 'string')) {
+    if (('erase' in req.body) &&
+      (typeof req.body.erase === 'string') &&
+      (req.body.erase.length < 16)) {
       inputVerifyString = req.body.erase;
     }
     if (inputVerifyString === 'YES') {
@@ -966,7 +1139,8 @@
     } else {
       let error = new Error('Bad Reqeust');
       error.status = 400;
-      next(error);
+      error.message = 'Error parsing confirmation property';
+      return next(error);
     }
   };
 

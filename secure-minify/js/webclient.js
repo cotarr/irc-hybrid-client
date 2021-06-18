@@ -271,17 +271,17 @@ showError("Can not change servers while connected");return}let fetchURL=webServe
 }).then(responseJson=>{if(responseJson.error){showError(responseJson.message)}else{webState.lastIrcServerIndex=-1}}).catch(error=>{console.log(error);showError(error.toString())})})
 ;function connectButtonHandler(){if(!checkConnect(1))return;if(ircState.ircConnected||ircState.ircConnecting||webState.ircConnecting){showError("Error: Already connected to IRC server");return}
 if(document.getElementById("nickNameInputId").value.length<1){showError("Invalid nick name.");return}webState.ircConnecting=true;let connectObject={}
-;connectObject.nickName=document.getElementById("nickNameInputId").value;connectObject.userName=document.getElementById("userNameInputId").value
-;connectObject.realName=document.getElementById("realNameInputId").value;connectObject.userMode=document.getElementById("userModeInputId").value;let fetchURL=webServerUrl+"/irc/connect"
-;let fetchOptions={method:"POST",headers:{"Content-type":"application/json",Accept:"application/json"},body:JSON.stringify(connectObject)};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){
-return response.json()}else{if(response.status===403)window.location.href="/login";throw new Error("Fetch status "+response.status+" "+response.statusText)}}).then(responseJson=>{
-if(responseJson.error){showError(responseJson.message)}}).catch(error=>{console.log(error)})}function forceDisconnectHandler(){console.log("Disconnect button pressed.")
-;let fetchURL=webServerUrl+"/irc/disconnect";let fetchOptions={method:"POST",headers:{"Content-type":"application/json",Accept:"application/json"},body:JSON.stringify({})}
-;fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()}else{throw new Error("Fetch status "+response.status+" "+response.statusText)}}).then(responseJson=>{
-console.log(JSON.stringify(responseJson,null,2));if(responseJson.error){showError(responseJson.message)}}).catch(error=>{console.log(error)})}
-document.getElementById("connectButton").addEventListener("click",function(){connectButtonHandler()}.bind(this));document.getElementById("disconnectButton").addEventListener("click",function(){
-forceDisconnectHandler()}.bind(this));var ircStatusIconTouchDebounce=false;document.getElementById("ircConnectIconId").addEventListener("click",function(){if(ircStatusIconTouchDebounce)return
-;ircStatusIconTouchDebounce=true;setTimeout(function(){ircStatusIconTouchDebounce=false},1e3);if(ircState.ircConnected||ircState.ircConnecting||webState.ircConnecting){
+;connectObject.nickName=document.getElementById("nickNameInputId").value;connectObject.realName=document.getElementById("realNameInputId").value
+;connectObject.userMode=document.getElementById("userModeInputId").value;let fetchURL=webServerUrl+"/irc/connect";let fetchOptions={method:"POST",headers:{"Content-type":"application/json",
+Accept:"application/json"},body:JSON.stringify(connectObject)};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()}else{
+if(response.status===403)window.location.href="/login";throw new Error("Fetch status "+response.status+" "+response.statusText)}}).then(responseJson=>{if(responseJson.error){
+showError(responseJson.message)}}).catch(error=>{console.log(error)})}function forceDisconnectHandler(){console.log("Disconnect button pressed.");let fetchURL=webServerUrl+"/irc/disconnect"
+;let fetchOptions={method:"POST",headers:{"Content-type":"application/json",Accept:"application/json"},body:JSON.stringify({})};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){
+return response.json()}else{throw new Error("Fetch status "+response.status+" "+response.statusText)}}).then(responseJson=>{console.log(JSON.stringify(responseJson,null,2));if(responseJson.error){
+showError(responseJson.message)}}).catch(error=>{console.log(error)})}document.getElementById("connectButton").addEventListener("click",function(){connectButtonHandler()}.bind(this))
+;document.getElementById("disconnectButton").addEventListener("click",function(){forceDisconnectHandler()}.bind(this));var ircStatusIconTouchDebounce=false
+;document.getElementById("ircConnectIconId").addEventListener("click",function(){if(ircStatusIconTouchDebounce)return;ircStatusIconTouchDebounce=true;setTimeout(function(){
+ircStatusIconTouchDebounce=false},1e3);if(ircState.ircConnected||ircState.ircConnecting||webState.ircConnecting){
 if(webState.ircConnecting||ircState.webConnecting||ircState.ircConnected&&!ircState.ircRegistered){webState.ircConnecting=false;forceDisconnectHandler()}else{_sendIrcServerMessage("QUIT")}}else{
 connectButtonHandler()}}.bind(this));document.getElementById("quitButton").addEventListener("click",function(){
 if(webState.ircConnecting||ircState.webConnecting||ircState.ircConnected&&!ircState.ircRegistered){webState.ircConnecting=false;forceDisconnectHandler()}else{_sendIrcServerMessage("QUIT")}})
