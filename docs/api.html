@@ -79,7 +79,6 @@
           descriptive string.
         </p>
 
-
         <p>
           Example (generic) API Responses for successful API request:
         </p>
@@ -97,6 +96,19 @@
   "error": true,
   "message": "IRC server not connected"
 }
+</pre></div>
+        <p>
+          Websocket IRC server messages are formed by prepending a timestamp in front of
+          of verbatum RFC 2812 IRC server message delimited by end-of-line characters.
+          Due to the nature of a text stream buffered I/O, it is possible that
+          the one buffer of stream data could contain multiple IRC messages or that a single
+          IRC message could be split, half arriving in one buffer and half in the next buffer.
+          For reference, RFC 2812 can be viewed at
+          <a href="https://datatracker.ietf.org/doc/html/rfc2812">
+            https://datatracker.ietf.org/doc/html/rfc2812</a>.
+        </p>
+<div class="pre-div"><pre>
+@time=2021-06-18T21:13:06.949Z :myNickName!*@* PRIVMSG #mychannel :Hi, i'm typing a IRC channel message
 </pre></div>
 
         <p>
