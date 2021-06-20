@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+	<head>
+		<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+		<title>API Examples</title>
+    <link rel="stylesheet" href="css/styles.css">
+	</head>
+	<body>
+    <div class="header-div">
+      Documentation for
+      <a href="https://github.com/cotarr/irc-hybrid-client">irc-hybrid-client</a>
+    </div>
+    <div class="outer-div">
+      <div class="menu-div">
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="installation.html">Installation</a></li>
+          <li><a href="login-config.html">Login Config</a></li>
+          <li><a href="server-config.html">IRC Config</a></li>
+          <li><a href="text-commands.html">Text Commands</a></li>
+          <li><a href="faq.html">FAQ</a></li>
+          <li><a href="coding.html">Coding Notes</a></li>
+          <li><a class="active" href="api.html">API Examples</a></li>
+          <li><a href="history.html">Change Log</a></li>
+          <li><a href="license.html">License</a></li>
+        </ul>
+      </div> <!-- /menu-div-->
+
+      <div class="text-div">
+        <div class="desc-title">
+          API Examples
+        </div>
+
+        <img src="images/network.png" height="267" width="882" alt="Network Diagram">
+
+        <p>
+          Generally, the browser communication is split. Messages from the web server to browser
+          are passed over the websocket as RFC 2812 IRC server messages.
+          In the reverse direction, no messages are passed from the browser to web server over the websocket.
+          All messages from browser to web server are passed over web API using POST and GET requests.
+          More specifically, IRC server messages (such as PRIVMSG) are passed over
+          the /irc/message route as UTF-8 strings as a POST web API request.
+          Information related to the state of the IRC connection and channel membership
+          are retrieved as needed by issuing a GET request to the web API.
+        </p>
+
+        <p>
+          The web browser IRC client operates on IRC messages received from the backend
+          NodeJs web server. These are RFC 2812 standard IRC messages.
+          Some non-standard (outside RFC 2812) messages are passed over the websocket
+          as described below.
+        </p>
+
+        <p>
+          In most cases, the API requests return a web response showing
+          the asynchronous request was either accepted or caused an error.
+          The API response body contains an error boolean flag within a JSON object.
+        </p>
+
+        <p>
+          General state errors, such as &quotIRC Server not connected&quot are returned
+          within API response body with status 200 and description of the error as a JSON object.
+        </p>
+
+        <p>
+          Data validation or parsing errors are returned as status 400 Bad Request.
+        </p>
+
+        <p>
+          Network connection errors occurring with the IRC server connection between NodeJs backend and IRC server
+          are returned in the websocket stream prefixed with the string value &quotwebError: &quot.
+        </p>
+
+        <p>
+          Errors occurring over IRC network are returned within the websocket stream
+          as standard IRC RFC 2812 messages containing 3 digit numeric code and
+          descriptive string.
+        </p>
+
+
+        <p>
+          Example (generic) API Responses for successful API request:
+        </p>
+<div class="pre-div"><pre>
+{
+  "error": false
+}
+</pre></div>
+
+        <p>
+          Example (generic) API Responses for a miscellaneous state error:
+        </p>
+<div class="pre-div"><pre>
+{
+  "error": true,
+  "message": "IRC server not connected"
+}
+</pre></div>
+
+        <p>
+          Example Websocket Message (generic) for a network connection error being
+          returned asychronously over websocket stream:
+        </p>
+<div class="pre-div"><pre>
+"webError: IRC server timeout while connecting"
+</pre></div>
+
+        <p>
+          Example Websocket Message (generic) for general info messages over the websocket:
+        </p>
+<div class="pre-div"><pre>
+"webServer: Opening socket to test-server 192.168.1.127:6667"
+</pre></div>
+
+        <h1>IRC Client API Routes</h1>
+
+        <h3>POST /irc/server</h3>
+
+        <p>
+          The backend NodeJs web server maintains a list of available IRC servers.
+          This list is loaded from a configuration file and is not editable from the browser.
+          Calls to /irc/server shall include an &quotindex&quot property of type integer
+          that is used to select a specific server.
+          A value of -1 is used to rotate to the next server in the configuration.
+        </p>
+
+        <p>
+          When the web server configuration changes to a different server,
+          an "UPDATE" command is sent to the browser over the websocket stream.
+          Upon receipt of the UPDATE request, the browser should perform a GET request /irc/getircstate.
+          The getircstate response contains updated server configuration in JSON format.
+          (see getircstate below)
+        </p>
+
+<p>POST Request Body:</p>
+<div class="pre-div"><pre>
+{
+  "index": -1
+}
+</pre></div>
+
+<p>Success Response:</p>
+<div class="pre-div"><pre>
+{
+    "error": false
+}
+</pre></div>
+
+<p>Error Response:</p>
+<div class="pre-div"><pre>
+{
+    "error": true,
+    "message": "Can not change servers while connected or connecting"
+}
+</pre></div>
+
+        <h3>POST /irc/connect</h3>
+
+        <p>
+          Calls to the connect API are used to request the backend NodeJs web server
+          to initiate an IRC server client connection.
+          The nickName and realName are required properties of type UTF-8 string.
+          The IRC user name (identd alternate user) is not editable from the browser and
+          therefore excluded from this schema.
+          The initial userMode property is optional.
+        </p>
+
+        <p>
+          Connection to an IRC server involves several steps, such as opening a TCP socket,
+          sending commands to set nickname, and other IRC formation. As the connection is
+          established, the irc state object located in the web server is updated.
+          Each time the state changes, an "UPDATE" command is sent to the browser
+          over the web socket stream.
+          Upon receipt of the UPDATE request, the browser should perform a GET request /irc/getircstate
+          and update the user interface from information returned in the state object.
+          (see getircstate below)
+        </p>
+
+<p>POST Request Body</p>
+<div class="pre-div"><pre>
+{
+  "nickName": "myNickName",
+  "realName": "John Doe",
+  "userMode": ""
+}
+</pre></div>
+
+<p>Success Response:</p>
+<div class="pre-div"><pre>
+{
+    "error": false
+}
+</pre></div>
+
+<p>Error Response:</p>
+<div class="pre-div"><pre>
+{
+    "error": true,
+    "message": "Error: already connected to IRC server."
+}
+</pre></div>
+
+        <h3>POST /irc/message</h3>
+
+        <p>
+          Calls to this API are used to send RFC 2812 IRC messages from web browser
+          to the NodeJs backend server for re-transmission to the IRC server.
+        </p>
+        <p>
+          The request body should contain a &quotmessage&quot property of type UTF-8 string
+          containing the RFC 2812 IRC message.
+          Multiple messages are not allowed. The end-of-line characters should not be included.
+        </p>
+
+        <p>
+          Assuming the IRC command is accepted by the IRC server, the IRC response is
+          sent to the browser via the websocket stream as a standard RFC 2812 IRC message.
+          These messages are UTF-8 text and delimited by return and end-of-line
+          characters 0x10 and 0x13 (&quot&#92;r&#92;n&quot). See RFC 2812 for specification of these messages.
+        </p>
+
+        <p>
+          Issuing some commands to the IRC server may result in a state change of the IRC client.
+          One example would be a command to JOIN an IRC channel.
+          Some commands, such as PRIVMSG may not cause a state change.
+          Each time the state changes, an "UPDATE" command is sent to the browser
+          over the web socket stream.
+          Upon receipt of the UPDATE request, the browser should perform a GET request /irc/getircstate
+          and update the user interface from information returned in the state object.
+          (see getircstate below)
+        </p>
+
+<p>POST Request Body:</p>
+<div class="pre-div"><pre>
+{
+  "message": "PRIVMSG #mychannel :Hello World"
+}
+</pre></div>
+
+<p>Success Response:</p>
+<div class="pre-div"><pre>
+{
+    "error": false
+}
+</pre></div>
+
+<p>Error Response:</p>
+<div class="pre-div"><pre>
+{
+    "error": true,
+    "message": "Can not send server message when IRC server not connected"
+}
+</pre></div>
+
+<p>Websocket Respose (IRC server PRIVMSG message in stream)</p>
+<div class="pre-div"><pre>
+@time=2021-06-18T20:09:38.944Z :myNickName!*@* PRIVMSG #test :hello, how are you
+</pre></div>
+
+<p>Example Request causing IRC server to issue an error as IRC message
+by sending invalid server name with TIME request.</p>
+<div class="pre-div"><pre>
+{
+  "message": "TIME invalid.server.name"
+}
+</pre></div>
+
+<p>Websocket Error Response (IRC server 402 error message in stream)</p>
+<div class="pre-div"><pre>
+@time=2021-06-18T20:05:26.538Z :irc.example.com 402 myNickName invalid.server.name :No such server
+</pre></div>
+
+        <h3>GET /irc/getircstate</h3>
+
+        <p>
+          The actual IRC client is located within the NodeJs backend web server.
+          Calls to /irc/getircstate will retrieve a JSON object containing
+          all relevant state information for the IRC client connection and IRC channel membership.
+        </p>
+
+        <p>
+          The web browser should listen for websocket stream message containing a string matching &quotUPDATE&quot.
+          When an UPDATE is received as a single line message delimited by 0x10,0x13, (...&#92;r&#92;nUPDATE&#92;r&#92;n...)
+          the browser javascript should fetch a GET request to the /irc/getircstate route.
+          The browser should then parse the state object for change and update the user interface as needed.
+        </p>
+
+        <p>
+          This example shows the websocket stream during a conversation between two
+          people, while a third new person joins the channel. The IRC server sends a JOIN
+          message which is passed through to the browser. In the backend NodeJs web server,
+          the new user nickname is added to the list of channel members.
+          The UPDATE command is sent to the browser in the websocket stream.
+        </p>
+
+
+<p>Websocket stream showing JOIN to channel and UPDATE command.</p>
+<div class="pre-div"><pre>
+@time=2021-06-18T21:13:06.949Z :myNickName!*@* PRIVMSG #test :Hello, how are you doing
+@time=2021-06-18T21:14:16.322Z :otherName!*@* PRIVMSG #test :I am doing fine, how are you
+@time=2021-06-18T21:15:26.412Z :myNickName!*@* PRIVMSG #test :I am fine also, I have to run
+@time=2021-06-18T21:16:03.212Z :otherName!*@* PRIVMSG #test :OK, bye for now
+@time=2021-06-18T21:21:11.393Z :Mary!newuser@1.2.3.4.example.net JOIN :#mychannel
+UPDATE
+@time=2021-06-18T21:22:20.433Z :myNickName!*@* PRIVMSG #test :Hello Mary, how are you doing?
+</pre></div>
+
+        <p>
+          The browser should act on the UPDATE command by obtaining a new state object
+          which contains an updated array containing channel member nickanmes.
+        </p>
+
+<p>API response to GET /irc/getircstate</p>
+<div class="pre-div"><pre>
+{
+    "ircConnectOn": true,
+    "ircConnecting": false,
+    "ircConnected": true,
+    "ircRegistered": true,
+    "ircIsAway": false,
+    "ircAutoReconnect": true,
+    "ircServerName": "freenode",
+    "ircServerHost": "chat.freenode.net",
+    "ircServerPort": 7000,
+    "ircTLSEnabled": true,
+    "ircServerIndex": 3,
+    "ircServerPrefix": "tildes.freenode.net",
+    "channelList": [],
+    "nickName": "myNickName",
+    "userName": "myNickName",
+    "realName": "myNickName",
+    "userMode": "+i",
+    "userHost": "~someuser@somehose.example.net",
+    "channels": [
+      ""#mychannel"
+    ],
+    "channelStates": [
+      {
+        "name": "#mychannel",
+        "topic": "Welcome to #mychannel cool topic message",
+        "names": [
+          "@myNickName",
+          "@otherName",
+          "Mary"
+        ],
+        "joined": true,
+        "kicked": false
+      }
+    ],
+    "progVersion": "0.1.7",
+    "progName": "irc-hybrid-client",
+    "times": {
+        "programRun": "1624047717",
+        "ircConnect": "1624047739"
+    },
+    "count": {
+        "ircConnect": 1,
+        "ircConnectError": 0
+    },
+    "websocketCount": 1
+}
+</pre></div>
+
+        <h3>POST /irc/prune</h3>
+
+        <p>
+          This is used to remove a non-joined IRC channel from the active channel list.
+          Trying to prune a channel while present in the channel will cause an error.
+          The request body shall contain the property &quotchannel&quot of type string
+          containing the channel name.
+        </p>
+
+<p>POST Request Body</p>
+<div class="pre-div"><pre>
+{
+  "channel": "#test"
+}
+</pre></div>
+
+        <h3>GET /irc/cache</h3>
+
+        <p>
+          The web server maintains a cache of the last 100 IRC server
+          messages (lines of text) in RFC 2812 format.
+          Performing a GET request to /irc/cache will return a response containing
+          and array of up to 100 elements of type string. Each array string element represents
+          a previous cached IRC server message.
+        </p>
+
+        <p>
+          When using this IRC client on an iPhone, there are issues where the websocket
+          is disconnected when the screen lock is enabled. Before using this API, the browser
+          will clear all previous channel messages, private messages and server messages.
+          From the API response, each string in the cache array can be parsed one by one
+          as if they had just arrived from the IRC server. This will restore the
+          user interface to show messages that may have arrived while the websocket was disconnected.
+        </p>
+
+        <p>
+          The size of the cache at 100 messages is intended to ride out a screen lock.
+          it is not meant to be an offline client. Over time messages will cycle out of the
+          cache after 100 messages are received.
+        </p>
+
+<p>Example API response:</p>
+<div class="pre-div"><pre>
+[
+  "@time=2021-06-18T21:13:06.949Z :myNickName!*@* PRIVMSG #test :Hello, how are you doing",
+  "@time=2021-06-18T21:14:16.949Z :otherName!*@* PRIVMSG #test :I am doing fine, how are you",
+  "@time=2021-06-18T21:15:26.949Z :myNickName!*@* PRIVMSG #test :I am fine also, I have to run",
+  "@time=2021-06-18T21:16:03.949Z :otherName!*@* PRIVMSG #test :OK, bye for now"
+]
+</pre></div>
+
+        <h3>POST /irc/erase</h3>
+
+        <p>
+          This API is used to delete the contents of the message cache.
+          The web server client must be disconnected from IRC to clear the cache.
+          A confirmation flag of type boolen is required in an &quoterase&quot property
+          in the POST body.
+        </p>
+
+<p>POST Request Body:</p>
+<div class="pre-div"><pre>
+{
+  "erase": "YES"
+}
+</pre></div>
+
+
+        <h3>POST /irc/disconnect</h3>
+
+        <p>
+          This is an emergency function used to forcibly close the socket to the IRC server.
+          In routine operation, IRC connections should be closed by sending
+          an RFC 2812 &quotQUIT&quot command to the web server for
+          re-transmission to the IRC server as a normal IRC command.
+          The body of the request should contain an empty JSON object "{}".
+        </p>
+
+<p>POST Example body:</p>
+<div class="pre-div"><pre>
+{
+}
+</pre></div>
+
+        <h3>POST /terminate</h3>
+
+        This is essentially sending a hard "die" function to forcibly shutdown the NodeJs web server.
+        A confirmation flag of type boolen is required in an &quotterminate&quot property
+        in the POST body.
+
+<p>POST Example body:</p>
+<div class="pre-div"><pre>
+{
+  "terminate": "YES"
+}
+</pre></div>
+
+      </div> <!-- /text-div -->
+
+    </div> <!-- outer-div -->
+
+    <div class="footer-div">
+      Repository:
+      <a href="https://github.com/cotarr/irc-hybrid-client">
+        https://github.com/cotarr/irc-hybrid-client</a>
+    </div> <!-- /footer-div -->
+	</body>
+</html>
