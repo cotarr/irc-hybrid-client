@@ -1,0 +1,531 @@
+{
+	"info": {
+		"_postman_id": "651198fc-7da8-4864-8385-ef06fe8d0e2c",
+		"name": "irc-hybrid-client message debug",
+		"description": "# Description\n\nThis collection was used during manual debugging to exercise different POST requests for the purpose of manually checking API function and data validation. \n\nIn most cases, the response to the request is returned asychronously as stream data via the websocket. The web browser should be simultaneously logged into the server. The view-raw and view-comms checkboxes will show the websocket responses. The GET requests are not included in this collection.\n\n- Suggest delete cookie before running tests.\n- Assign a temporary user/password in the web server for testing.\n- In Postman, create a environment with the variables listed below. Set values to the temporary user/password and server URL.\n\n# Postman\n- Postman settings: General: Automatically follow redirects: OFF\n\n# Enviornment\n- server_URL\n- server_user1\n- server_password1\n\n# Instruction\n\nTo get a valid cookie, run selectin 1, then 2. After a valid cookie is present, the remainder of POST requests can be performed manually. Open a web browser concurrently with postman. Using Server --> Tools, select the View-Raw and View-Comms checkboxes to see the responses within the websocket stream",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1 - Debug /login get valid nonce",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"",
+							"pm.test(\"Fail if already logged in\", function () {",
+							"    // If already logged in, then redirect to main page. The nonce can not be tested.     ",
+							"    let statusCode = pm.response.code;",
+							"    if (statusCode === 302) {",
+							"      console.log('You can not get a nonce while logged in, use /logout');",
+							"    }",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"//",
+							"// This assumes that the nonce is in the 23 quote delimitered string fragment.",
+							"//",
+							"pm.test(\"Parse the random nonce from login form\", function () {",
+							"    pm.globals.unset('server_nonce');",
+							"",
+							"    // get response body as string (find the one with the nonce)",
+							"    let arrayOfQuotedStrings = pm.response.text().split('\"')",
+							"    // console.log(arrayOfQuotedStrings)",
+							"    ",
+							"    // Extract n-th the string fragment with nonce from array",
+							"    // Example: /login-authorize?nonce=lWCgTNWj",
+							"    let actionPath = arrayOfQuotedStrings[19];",
+							"    // console.log(actionPath);",
+							"    ",
+							"    // Extract nonce as string.",
+							"    // Example: lWCgTNWj",
+							"    let parsedNonce = actionPath.split('=')[1];",
+							"    // console.log(parsedNonce);",
+							"    if ((parsedNonce) && (parsedNonce.length > 0)) {",
+							"        pm.globals.set('server_nonce', parsedNonce);",
+							"        console.log('/login has set lobal variable server_nonce set to: ' + pm.globals.get('server_nonce'));",
+							"    }",
+							"    ",
+							"    pm.expect(parsedNonce).to.have.lengthOf.above(1);",
+							"});",
+							"",
+							"pm.test(\"Has header to set cookie\", function () {",
+							"    pm.response.to.have.header(\"Set-Cookie\");",
+							"});",
+							"",
+							"pm.test(\"Has received cookie\", function() {",
+							"    pm.expect(pm.cookies.has('irc-hybrid-client')).to.be.true; ",
+							"});",
+							"",
+							"pm.test(\"Response has body\", function () {",
+							"    pm.response.to.have.body();",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "text/css"
+					}
+				],
+				"url": {
+					"raw": "{{server_URL}}/login",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "2 - Debug /login-authorize get cookie",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 302\", function () {",
+							"    pm.response.to.have.status(302);",
+							"});",
+							"",
+							"pm.globals.unset(\"server_nonce\");",
+							"",
+							"pm.test(\"Redirect address is /irc/webclient.html\", function () {",
+							"    let location = pm.response.headers.get('Location');",
+							"    pm.expect(location).to.equal('/irc/webclient.html')",
+							"});",
+							"",
+							"pm.test(\"Has received cookie\", function() {",
+							"    pm.expect(pm.cookies.has('irc-hybrid-client')).to.be.true; ",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Accept",
+						"value": "text/html"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "user",
+							"value": "{{server_user1}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{server_password1}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{server_URL}}/login-authorize?nonce={{server_nonce}}",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"login-authorize"
+					],
+					"query": [
+						{
+							"key": "nonce",
+							"value": "{{server_nonce}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Debug  /irc/server",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"index\": -1\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server_URL}}/irc/server",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"server"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Debug  /irc/connect",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"nickName\": \"myNickName\",\n  \"realName\": \"John Doe\",\n  \"userMode\": \"\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server_URL}}/irc/connect",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"connect"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Debug  /irc/message",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"message\": \"PRIVMSG #test :hello, how are you\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server_URL}}/irc/message",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"message"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Debug  /irc/prune",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"channel\": \"#test\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server_URL}}/irc/prune",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"prune"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Debug  /irc/cache",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{server_URL}}/irc/cache",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"cache"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Debug  /irc/getircstate",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server_URL}}/irc/getircstate",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"getircstate"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Debug  /irc/erase",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"erase\": \"YES\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server_URL}}/irc/erase",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"erase"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Debug  /irc/disconnect",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server_URL}}/irc/disconnect",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"disconnect"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

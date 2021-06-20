@@ -1,0 +1,659 @@
+{
+	"info": {
+		"_postman_id": "25e112a6-0168-4fd9-b1e7-58b3486ee333",
+		"name": "irc-hybrid-client websocket auth tests",
+		"description": "# Tests associated with browser to server websocket\n- Suggest delete cookie before running tests.\n- Assign a temporary user/password in the web server for testing.\n- In Postman, create a environment with the variables listed below. Set values to the temporary user/password and server URL.\n- A series of tests is run to test the websocket authroization.\n\n# Enviornment\n- server_URL\n- server_user1\n- server_password1",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "5.1 /logout",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "text/html"
+					}
+				],
+				"url": {
+					"raw": "{{server_URL}}/logout",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"logout"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "5.2 /login get valid nonce",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"",
+							"pm.test(\"Fail if already logged in\", function () {",
+							"    // If already logged in, then redirect to main page. The nonce can not be tested.     ",
+							"    let statusCode = pm.response.code;",
+							"    if (statusCode === 302) {",
+							"      console.log('You can not get a nonce while logged in, use /logout');",
+							"    }",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"//",
+							"// This assumes that the nonce is in the 23 quote delimitered string fragment.",
+							"//",
+							"pm.test(\"Parse the random nonce from login form\", function () {",
+							"    pm.globals.unset('server_nonce');",
+							"",
+							"    // get response body as string (find the one with the nonce)",
+							"    let arrayOfQuotedStrings = pm.response.text().split('\"')",
+							"    // console.log(arrayOfQuotedStrings)",
+							"    ",
+							"    // Extract n-th the string fragment with nonce from array",
+							"    // Example: /login-authorize?nonce=lWCgTNWj",
+							"    let actionPath = arrayOfQuotedStrings[19];",
+							"    // console.log(actionPath);",
+							"    ",
+							"    // Extract nonce as string.",
+							"    // Example: lWCgTNWj",
+							"    let parsedNonce = actionPath.split('=')[1];",
+							"    // console.log(parsedNonce);",
+							"    if ((parsedNonce) && (parsedNonce.length > 0)) {",
+							"        pm.globals.set('server_nonce', parsedNonce);",
+							"        console.log('/login has set lobal variable server_nonce set to: ' + pm.globals.get('server_nonce'));",
+							"    }",
+							"    ",
+							"    pm.expect(parsedNonce).to.have.lengthOf.above(1);",
+							"});",
+							"",
+							"pm.test(\"Has header to set cookie\", function () {",
+							"    pm.response.to.have.header(\"Set-Cookie\");",
+							"});",
+							"",
+							"pm.test(\"Has received cookie\", function() {",
+							"    pm.expect(pm.cookies.has('irc-hybrid-client')).to.be.true; ",
+							"});",
+							"",
+							"pm.test(\"Response has body\", function () {",
+							"    pm.response.to.have.body();",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "text/css"
+					}
+				],
+				"url": {
+					"raw": "{{server_URL}}/login",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "5.3 /login-authorize success",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 302\", function () {",
+							"    pm.response.to.have.status(302);",
+							"});",
+							"",
+							"pm.globals.unset(\"server_nonce\");",
+							"",
+							"pm.test(\"Redirect address is /irc/webclient.html\", function () {",
+							"    let location = pm.response.headers.get('Location');",
+							"    pm.expect(location).to.equal('/irc/webclient.html')",
+							"});",
+							"",
+							"pm.test(\"Has received cookie\", function() {",
+							"    pm.expect(pm.cookies.has('irc-hybrid-client')).to.be.true; ",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Accept",
+						"value": "text/html"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "user",
+							"value": "{{server_user1}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{server_password1}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{server_URL}}/login-authorize?nonce={{server_nonce}}",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"login-authorize"
+					],
+					"query": [
+						{
+							"key": "nonce",
+							"value": "{{server_nonce}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "5.4 /irc/wsauth websocket auth request",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"purpose\": \"websocket-auth\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server_URL}}/irc/wsauth",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"wsauth"
+					]
+				},
+				"description": "This is a preliminary setup call. On the server end, this call will initiate a server-side timer. This his creates a window during which websocket connections will be accepted. The websocket request requires a valid cookie."
+			},
+			"response": []
+		},
+		{
+			"name": "5.5 /irc/ws (Auth ucceeds, expect 400)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//",
+							"// Postman can not connect a websocket",
+							"// If the auth succeds, then the attempt will return a 400 Bad Request",
+							"// If the auth fails, the attempt will return a 401 Unauthorized.",
+							"pm.test(\"Status code is 400 Unauthorized\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "connection",
+						"value": "Upgrade",
+						"description": "For upgrade to websocket",
+						"type": "text"
+					},
+					{
+						"key": "upgrade",
+						"value": "websocket",
+						"description": "For upgrade to websocket",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"purpose\": \"websocket-auth\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server_URL}}/irc/ws",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"ws"
+					]
+				},
+				"description": "This will set headers necessary to issue and upgrade request to generate a web socket connection. Since a postman GET request can not open an actual websocket, the expected response is 400 Bad Request (GET request to websocket upgrade)"
+			},
+			"response": []
+		},
+		{
+			"name": "6.1 /irc/wsauth websocket auth request (save previous cookie nonce)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"purpose\": \"websocket-auth\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server_URL}}/irc/wsauth",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"wsauth"
+					]
+				},
+				"description": "This is a preliminary follow up call. A new timer will be started and the cookie hash will be saved."
+			},
+			"response": []
+		},
+		{
+			"name": "6.2 /logout (remove previous cookie)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "text/html"
+					}
+				],
+				"url": {
+					"raw": "{{server_URL}}/logout",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"logout"
+					]
+				},
+				"description": "Remove cookie associated with save cookie hash"
+			},
+			"response": []
+		},
+		{
+			"name": "6.3 /login get valid nonce (to change cookie)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"",
+							"pm.test(\"Fail if already logged in\", function () {",
+							"    // If already logged in, then redirect to main page. The nonce can not be tested.     ",
+							"    let statusCode = pm.response.code;",
+							"    if (statusCode === 302) {",
+							"      console.log('You can not get a nonce while logged in, use /logout');",
+							"    }",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"//",
+							"// This assumes that the nonce is in the 23 quote delimitered string fragment.",
+							"//",
+							"pm.test(\"Parse the random nonce from login form\", function () {",
+							"    pm.globals.unset('server_nonce');",
+							"",
+							"    // get response body as string (find the one with the nonce)",
+							"    let arrayOfQuotedStrings = pm.response.text().split('\"')",
+							"    // console.log(arrayOfQuotedStrings)",
+							"    ",
+							"    // Extract n-th the string fragment with nonce from array",
+							"    // Example: /login-authorize?nonce=lWCgTNWj",
+							"    let actionPath = arrayOfQuotedStrings[19];",
+							"    // console.log(actionPath);",
+							"    ",
+							"    // Extract nonce as string.",
+							"    // Example: lWCgTNWj",
+							"    let parsedNonce = actionPath.split('=')[1];",
+							"    // console.log(parsedNonce);",
+							"    if ((parsedNonce) && (parsedNonce.length > 0)) {",
+							"        pm.globals.set('server_nonce', parsedNonce);",
+							"        console.log('/login has set lobal variable server_nonce set to: ' + pm.globals.get('server_nonce'));",
+							"    }",
+							"    ",
+							"    pm.expect(parsedNonce).to.have.lengthOf.above(1);",
+							"});",
+							"",
+							"pm.test(\"Has header to set cookie\", function () {",
+							"    pm.response.to.have.header(\"Set-Cookie\");",
+							"});",
+							"",
+							"pm.test(\"Has received cookie\", function() {",
+							"    pm.expect(pm.cookies.has('irc-hybrid-client')).to.be.true; ",
+							"});",
+							"",
+							"pm.test(\"Response has body\", function () {",
+							"    pm.response.to.have.body();",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "text/css"
+					}
+				],
+				"url": {
+					"raw": "{{server_URL}}/login",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"login"
+					]
+				},
+				"description": "New nonce for login request."
+			},
+			"response": []
+		},
+		{
+			"name": "6.4 /login-authorize success (now different cookie)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 302\", function () {",
+							"    pm.response.to.have.status(302);",
+							"});",
+							"",
+							"pm.globals.unset(\"server_nonce\");",
+							"",
+							"pm.test(\"Redirect address is /irc/webclient.html\", function () {",
+							"    let location = pm.response.headers.get('Location');",
+							"    pm.expect(location).to.equal('/irc/webclient.html')",
+							"});",
+							"",
+							"pm.test(\"Has received cookie\", function() {",
+							"    pm.expect(pm.cookies.has('irc-hybrid-client')).to.be.true; ",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Accept",
+						"value": "text/html"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "user",
+							"value": "{{server_user1}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{server_password1}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{server_URL}}/login-authorize?nonce={{server_nonce}}",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"login-authorize"
+					],
+					"query": [
+						{
+							"key": "nonce",
+							"value": "{{server_nonce}}"
+						}
+					]
+				},
+				"description": "This gives postman a new cookie, but it will not match the saved value for the websocket upgrade request."
+			},
+			"response": []
+		},
+		{
+			"name": "6.5 /irc/ws (Auth fails, expect 401)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//",
+							"// Postman can not connect a websocket",
+							"// If the auth succeds, then the attempt will return a 400 Bad Request",
+							"// If the auth fails, the attempt will return a 401 Unauthorized.",
+							"pm.test(\"Status code is 401 Unauthorized\", function () {",
+							"    pm.response.to.have.status(401);",
+							"});",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "connection",
+						"value": "Upgrade",
+						"description": "For upgrade to websocket",
+						"type": "text"
+					},
+					{
+						"key": "upgrade",
+						"value": "websocket",
+						"description": "For upgrade to websocket",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"purpose\": \"websocket-auth\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server_URL}}/irc/ws",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"ws"
+					]
+				},
+				"description": "This is a websocket upgrade. The current cookie hash will not match the saved cache, so authorization failure is expected and 401 Unauthorized is tested."
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

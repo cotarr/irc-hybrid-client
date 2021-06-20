@@ -1,0 +1,1756 @@
+{
+	"info": {
+		"_postman_id": "77f64e47-8d37-4738-addf-b3d5d1c1f5f4",
+		"name": "irc-hybrid-client API auth tests",
+		"description": "# Tests associated with user login and cookies\n- Suggest delete cookie before running tests.\n- Assign a temporary user/password in the web server for testing.\n- In Postman, create a environment with the variables listed below. Set values to the temporary user/password and server URL.\n- A series of tests is run to make sure all the API endpoints are protected.\n\n# Postman\n- Postman settings: General: Automatically follow redirects: OFF\n\n# Enviornment\n- server_URL\n- server_user1\n- server_password1",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1.1 /logout (clear old sessions)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 302\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "text/html"
+					}
+				],
+				"url": {
+					"raw": "{{server_URL}}/logout",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"logout"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "1.2 /status confirm server running",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200 Forbidden\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "text/html"
+					}
+				],
+				"url": {
+					"raw": "{{server_URL}}/status",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"status"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "1.3 /secure confirm one secure route will fail",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 403 Forbidden\", function () {",
+							"    pm.response.to.have.status(403);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "text/html"
+					}
+				],
+				"url": {
+					"raw": "{{server_URL}}/secure",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"secure"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "2.1 /login get valid nonce",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"",
+							"pm.test(\"Fail if already logged in\", function () {",
+							"    // If already logged in, then redirect to main page. The nonce can not be tested.     ",
+							"    let statusCode = pm.response.code;",
+							"    if (statusCode === 302) {",
+							"      console.log('You can not get a nonce while logged in, use /logout');",
+							"    }",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"//",
+							"// This assumes that the nonce is in the 23 quote delimitered string fragment.",
+							"//",
+							"pm.test(\"Parse the random nonce from login form\", function () {",
+							"    pm.globals.unset('server_nonce');",
+							"",
+							"    // get response body as string (find the one with the nonce)",
+							"    // console.log(pm.response.text().toString().split('\"'));",
+							"    let arrayOfQuotedStrings = pm.response.text().split('\"')",
+							"    // console.log(arrayOfQuotedStrings)",
+							"    ",
+							"    // Extract n-th the string fragment with nonce from array",
+							"    // Example: /login-authorize?nonce=lWCgTNWj",
+							"    let actionPath = arrayOfQuotedStrings[19];",
+							"    // console.log(actionPath);",
+							"    ",
+							"    // Extract nonce as string.",
+							"    // Example: lWCgTNWj",
+							"    let parsedNonce = actionPath.split('=')[1];",
+							"    // console.log(parsedNonce);",
+							"    if ((parsedNonce) && (parsedNonce.length > 0)) {",
+							"        pm.globals.set('server_nonce', parsedNonce);",
+							"        console.log('/login has set lobal variable server_nonce set to: ' + pm.globals.get('server_nonce'));",
+							"    }",
+							"    ",
+							"    pm.expect(parsedNonce).to.have.lengthOf.above(1);",
+							"});",
+							"",
+							"pm.test(\"Has header to set cookie\", function () {",
+							"    pm.response.to.have.header(\"Set-Cookie\");",
+							"});",
+							"",
+							"pm.test(\"Has received cookie\", function() {",
+							"    pm.expect(pm.cookies.has('irc-hybrid-client')).to.be.true; ",
+							"});",
+							"",
+							"pm.test(\"Response has body\", function () {",
+							"    pm.response.to.have.body();",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "text/css"
+					}
+				],
+				"url": {
+					"raw": "{{server_URL}}/login",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"login"
+					]
+				},
+				"description": "This will extract the nonce and save it as a global variable for use in the authorize request."
+			},
+			"response": []
+		},
+		{
+			"name": "2.2 /login-authorize empty body",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Body matches string\", function () {",
+							"    pm.expect(pm.response.text()).to.equal(\"400 Bad Request\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Accept",
+						"value": "text/html"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{server_URL}}/login-authorize?nonce={{server_nonce}}",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"login-authorize"
+					],
+					"query": [
+						{
+							"key": "nonce",
+							"value": "{{server_nonce}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "2.3 /login-authorize no nonce",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Body matches string\", function () {",
+							"    pm.expect(pm.response.text()).to.equal(\"400 Bad Request\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Accept",
+						"value": "text/html"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "user",
+							"value": "{{server_user1}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{server_password1}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{server_URL}}/login-authorize",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"login-authorize"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "2.4 /login get valid nonce",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"",
+							"pm.test(\"Fail if already logged in\", function () {",
+							"    // If already logged in, then redirect to main page. The nonce can not be tested.     ",
+							"    let statusCode = pm.response.code;",
+							"    if (statusCode === 302) {",
+							"      console.log('You can not get a nonce while logged in, use /logout');",
+							"    }",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"//",
+							"// This assumes that the nonce is in the 23 quote delimitered string fragment.",
+							"//",
+							"pm.test(\"Parse the random nonce from login form\", function () {",
+							"    pm.globals.unset('server_nonce');",
+							"",
+							"    // get response body as string (find the one with the nonce)",
+							"    // console.log(pm.response.text().toString().split('\"'));",
+							"    let arrayOfQuotedStrings = pm.response.text().split('\"')",
+							"    // console.log(arrayOfQuotedStrings)",
+							"    ",
+							"    // Extract n-th the string fragment with nonce from array",
+							"    // Example: /login-authorize?nonce=lWCgTNWj",
+							"    let actionPath = arrayOfQuotedStrings[19];",
+							"    // console.log(actionPath);",
+							"    ",
+							"    // Extract nonce as string.",
+							"    // Example: lWCgTNWj",
+							"    let parsedNonce = actionPath.split('=')[1];",
+							"    // console.log(parsedNonce);",
+							"    if ((parsedNonce) && (parsedNonce.length > 0)) {",
+							"        pm.globals.set('server_nonce', parsedNonce);",
+							"        console.log('/login has set lobal variable server_nonce set to: ' + pm.globals.get('server_nonce'));",
+							"    }",
+							"    ",
+							"    pm.expect(parsedNonce).to.have.lengthOf.above(1);",
+							"});",
+							"",
+							"pm.test(\"Has header to set cookie\", function () {",
+							"    pm.response.to.have.header(\"Set-Cookie\");",
+							"});",
+							"",
+							"pm.test(\"Has received cookie\", function() {",
+							"    pm.expect(pm.cookies.has('irc-hybrid-client')).to.be.true; ",
+							"});",
+							"",
+							"pm.test(\"Response has body\", function () {",
+							"    pm.response.to.have.body();",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "text/css"
+					}
+				],
+				"url": {
+					"raw": "{{server_URL}}/login",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "2.5 /login-authorize missing pw",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Body matches string\", function () {",
+							"    pm.expect(pm.response.text()).to.equal(\"400 Bad Request\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Accept",
+						"value": "text/html"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "user",
+							"value": "{{server_user1}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{server_URL}}/login-authorize?nonce={{server_nonce}}",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"login-authorize"
+					],
+					"query": [
+						{
+							"key": "nonce",
+							"value": "{{server_nonce}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "2.6 /login set incorrect nonce",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"",
+							"pm.test(\"Fail if already logged in\", function () {",
+							"    // If already logged in, then redirect to main page. The nonce can not be tested.     ",
+							"    let statusCode = pm.response.code;",
+							"    if (statusCode === 302) {",
+							"      console.log('You can not get a nonce while logged in, use /logout');",
+							"    }",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.globals.set('server_nonce', 'xxxxxxxx');",
+							"",
+							"pm.test(\"Has header to set cookie\", function () {",
+							"    pm.response.to.have.header(\"Set-Cookie\");",
+							"});",
+							"",
+							"pm.test(\"Has received cookie\", function() {",
+							"    pm.expect(pm.cookies.has('irc-hybrid-client')).to.be.true; ",
+							"});",
+							"",
+							"pm.test(\"Response has body\", function () {",
+							"    pm.response.to.have.body();",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "text/css"
+					}
+				],
+				"url": {
+					"raw": "{{server_URL}}/login",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "2.7 /login-authorize incorrect nonce",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 302\", function () {",
+							"    pm.response.to.have.status(302);",
+							"});",
+							"",
+							"pm.test(\"Redirect address is /login/\", function () {",
+							"    let location = pm.response.headers.get('Location');",
+							"    pm.expect(location).to.equal('/login')",
+							"});",
+							"",
+							"pm.test(\"Has received cookie\", function() {",
+							"    pm.expect(pm.cookies.has('irc-hybrid-client')).to.be.true; ",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Accept",
+						"value": "text/html"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "user",
+							"value": "{{server_user1}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{server_password1}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{server_URL}}/login-authorize?nonce={{server_nonce}}",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"login-authorize"
+					],
+					"query": [
+						{
+							"key": "nonce",
+							"value": "{{server_nonce}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "2.8 /login get valid nonce",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"",
+							"pm.test(\"Fail if already logged in\", function () {",
+							"    // If already logged in, then redirect to main page. The nonce can not be tested.     ",
+							"    let statusCode = pm.response.code;",
+							"    if (statusCode === 302) {",
+							"      console.log('You can not get a nonce while logged in, use /logout');",
+							"    }",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"//",
+							"// This assumes that the nonce is in the 23 quote delimitered string fragment.",
+							"//",
+							"pm.test(\"Parse the random nonce from login form\", function () {",
+							"    pm.globals.unset('server_nonce');",
+							"",
+							"    // get response body as string (find the one with the nonce)",
+							"    // console.log(pm.response.text().toString().split('\"'));",
+							"    let arrayOfQuotedStrings = pm.response.text().split('\"')",
+							"    // console.log(arrayOfQuotedStrings)",
+							"    ",
+							"    // Extract n-th the string fragment with nonce from array",
+							"    // Example: /login-authorize?nonce=lWCgTNWj",
+							"    let actionPath = arrayOfQuotedStrings[19];",
+							"    // console.log(actionPath);",
+							"    ",
+							"    // Extract nonce as string.",
+							"    // Example: lWCgTNWj",
+							"    let parsedNonce = actionPath.split('=')[1];",
+							"    // console.log(parsedNonce);",
+							"    if ((parsedNonce) && (parsedNonce.length > 0)) {",
+							"        pm.globals.set('server_nonce', parsedNonce);",
+							"        console.log('/login has set lobal variable server_nonce set to: ' + pm.globals.get('server_nonce'));",
+							"    }",
+							"    ",
+							"    pm.expect(parsedNonce).to.have.lengthOf.above(1);",
+							"});",
+							"",
+							"pm.test(\"Has header to set cookie\", function () {",
+							"    pm.response.to.have.header(\"Set-Cookie\");",
+							"});",
+							"",
+							"pm.test(\"Has received cookie\", function() {",
+							"    pm.expect(pm.cookies.has('irc-hybrid-client')).to.be.true; ",
+							"});",
+							"",
+							"pm.test(\"Response has body\", function () {",
+							"    pm.response.to.have.body();",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "text/css"
+					}
+				],
+				"url": {
+					"raw": "{{server_URL}}/login",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "2.9 /login-authorize bad user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 302\", function () {",
+							"    pm.response.to.have.status(302);",
+							"});",
+							"",
+							"pm.test(\"Redirect address is /login\", function () {",
+							"    let location = pm.response.headers.get('Location');",
+							"    pm.expect(location).to.equal('/login')",
+							"});",
+							"",
+							"pm.test(\"Has received cookie\", function() {",
+							"    pm.expect(pm.cookies.has('irc-hybrid-client')).to.be.true; ",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Accept",
+						"value": "text/html"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "user",
+							"value": "xxxxxxxx",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{server_password1}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{server_URL}}/login-authorize?nonce={{server_nonce}}",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"login-authorize"
+					],
+					"query": [
+						{
+							"key": "nonce",
+							"value": "{{server_nonce}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "2.10 /login (confirm bad login message)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"",
+							"pm.test(\"Fail if already logged in\", function () {",
+							"    // If already logged in, then redirect to main page. The nonce can not be tested.     ",
+							"    let statusCode = pm.response.code;",
+							"    if (statusCode === 302) {",
+							"      console.log('You can not get a nonce while logged in, use /logout');",
+							"    }",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"//",
+							"// This assumes that the nonce is in the 23 quote delimitered string fragment.",
+							"//",
+							"pm.test(\"Parse the random nonce from login form\", function () {",
+							"    pm.globals.unset('server_nonce');",
+							"",
+							"    // get response body as string (find the one with the nonce)",
+							"    let arrayOfQuotedStrings = pm.response.text().split('\"')",
+							"    // console.log(arrayOfQuotedStrings)",
+							"    ",
+							"    // Extract n-th the string fragment with nonce from array",
+							"    // Example: /login-authorize?nonce=lWCgTNWj",
+							"    let actionPath = arrayOfQuotedStrings[19];",
+							"    // console.log(actionPath);",
+							"    ",
+							"    // Extract nonce as string.",
+							"    // Example: lWCgTNWj",
+							"    let parsedNonce = actionPath.split('=')[1];",
+							"    // console.log(parsedNonce);",
+							"    if ((parsedNonce) && (parsedNonce.length > 0)) {",
+							"        pm.globals.set('server_nonce', parsedNonce);",
+							"        console.log('/login has set lobal variable server_nonce set to: ' + pm.globals.get('server_nonce'));",
+							"    }",
+							"    ",
+							"    pm.expect(parsedNonce).to.have.lengthOf.above(1);",
+							"});",
+							"",
+							"pm.test(\"Has header to set cookie\", function () {",
+							"    pm.response.to.have.header(\"Set-Cookie\");",
+							"});",
+							"",
+							"pm.test(\"Has received cookie\", function() {",
+							"    pm.expect(pm.cookies.has('irc-hybrid-client')).to.be.true; ",
+							"});",
+							"",
+							"pm.test(\"Response has body\", function () {",
+							"    pm.response.to.have.body();",
+							"});",
+							"",
+							"//",
+							"// // There was previous bad login, so it should have additional message",
+							"//",
+							"pm.test(\"Body includes bad login string\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Login failed, try again.\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "text/css"
+					}
+				],
+				"url": {
+					"raw": "{{server_URL}}/login",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "2.11 /login-authorizr bad password",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 302\", function () {",
+							"    pm.response.to.have.status(302);",
+							"});",
+							"",
+							"pm.globals.unset(\"server_nonce\");",
+							"",
+							"pm.test(\"Redirect address is /login\", function () {",
+							"    let location = pm.response.headers.get('Location');",
+							"    pm.expect(location).to.equal('/login')",
+							"});",
+							"",
+							"pm.test(\"Has received cookie\", function() {",
+							"    pm.expect(pm.cookies.has('irc-hybrid-client')).to.be.true; ",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Accept",
+						"value": "text/html"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "user",
+							"value": "{{server_user1}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "xxxxxxxx",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{server_URL}}/login-authorize?nonce={{server_nonce}}",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"login-authorize"
+					],
+					"query": [
+						{
+							"key": "nonce",
+							"value": "{{server_nonce}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "2.12/irc/webclient.html confirm fail",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 302\", function () {",
+							"    pm.response.to.have.status(302);",
+							"});",
+							"",
+							"pm.test(\"Redirect address is /login\", function () {",
+							"    let location = pm.response.headers.get('Location');",
+							"    pm.expect(location).to.equal('/login')",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{server_URL}}/irc/webclient.html",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"webclient.html"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "3.1 /login get valid nonce",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"",
+							"pm.test(\"Fail if already logged in\", function () {",
+							"    // If already logged in, then redirect to main page. The nonce can not be tested.     ",
+							"    let statusCode = pm.response.code;",
+							"    if (statusCode === 302) {",
+							"      console.log('You can not get a nonce while logged in, use /logout');",
+							"    }",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"//",
+							"// This assumes that the nonce is in the 23 quote delimitered string fragment.",
+							"//",
+							"pm.test(\"Parse the random nonce from login form\", function () {",
+							"    pm.globals.unset('server_nonce');",
+							"",
+							"    // get response body as string (find the one with the nonce)",
+							"    let arrayOfQuotedStrings = pm.response.text().split('\"')",
+							"    // console.log(arrayOfQuotedStrings)",
+							"    ",
+							"    // Extract n-th the string fragment with nonce from array",
+							"    // Example: /login-authorize?nonce=lWCgTNWj",
+							"    let actionPath = arrayOfQuotedStrings[19];",
+							"    // console.log(actionPath);",
+							"    ",
+							"    // Extract nonce as string.",
+							"    // Example: lWCgTNWj",
+							"    let parsedNonce = actionPath.split('=')[1];",
+							"    // console.log(parsedNonce);",
+							"    if ((parsedNonce) && (parsedNonce.length > 0)) {",
+							"        pm.globals.set('server_nonce', parsedNonce);",
+							"        console.log('/login has set lobal variable server_nonce set to: ' + pm.globals.get('server_nonce'));",
+							"    }",
+							"    ",
+							"    pm.expect(parsedNonce).to.have.lengthOf.above(1);",
+							"});",
+							"",
+							"pm.test(\"Has header to set cookie\", function () {",
+							"    pm.response.to.have.header(\"Set-Cookie\");",
+							"});",
+							"",
+							"pm.test(\"Has received cookie\", function() {",
+							"    pm.expect(pm.cookies.has('irc-hybrid-client')).to.be.true; ",
+							"});",
+							"",
+							"pm.test(\"Response has body\", function () {",
+							"    pm.response.to.have.body();",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "text/css"
+					}
+				],
+				"url": {
+					"raw": "{{server_URL}}/login",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "3.2 /login-authorize success",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 302\", function () {",
+							"    pm.response.to.have.status(302);",
+							"});",
+							"",
+							"pm.globals.unset(\"server_nonce\");",
+							"",
+							"pm.test(\"Redirect address is /irc/webclient.html\", function () {",
+							"    let location = pm.response.headers.get('Location');",
+							"    pm.expect(location).to.equal('/irc/webclient.html')",
+							"});",
+							"",
+							"pm.test(\"Has received cookie\", function() {",
+							"    pm.expect(pm.cookies.has('irc-hybrid-client')).to.be.true; ",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Accept",
+						"value": "text/html"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "user",
+							"value": "{{server_user1}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{server_password1}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{server_URL}}/login-authorize?nonce={{server_nonce}}",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"login-authorize"
+					],
+					"query": [
+						{
+							"key": "nonce",
+							"value": "{{server_nonce}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "3.3 /irc/webclient.html verify access",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Has cookie\", function() {",
+							"    pm.expect(pm.cookies.has('irc-hybrid-client')).to.be.true; ",
+							"});",
+							"",
+							"pm.test(\"Response has body\", function () {",
+							"    pm.response.to.have.body();",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "text/html"
+					}
+				],
+				"url": {
+					"raw": "{{server_URL}}/irc/webclient.html",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"webclient.html"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "3.4 /irc/getircstate verify access",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Has cookie\", function() {",
+							"    pm.expect(pm.cookies.has('irc-hybrid-client')).to.be.true; ",
+							"});",
+							"",
+							"pm.test(\"Response has body\", function () {",
+							"    pm.response.to.have.jsonBody();",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/ecmascript"
+					}
+				],
+				"url": {
+					"raw": "{{server_URL}}/irc/getircstate",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"getircstate"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "4.1 /logout",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "text/html"
+					}
+				],
+				"url": {
+					"raw": "{{server_URL}}/logout",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"logout"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "4.2 /irc/webclient.html confirm fail",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 302\", function () {",
+							"    pm.response.to.have.status(302);",
+							"});",
+							"",
+							"pm.test(\"Redirect address is /login\", function () {",
+							"    let location = pm.response.headers.get('Location');",
+							"    pm.expect(location).to.equal('/login')",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "text/html"
+					}
+				],
+				"url": {
+					"raw": "{{server_URL}}/irc/webclient.html",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"webclient.html"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "4.3 /irc/js/webclient.js confirm fail",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 403 Forbidden\", function () {",
+							"    pm.response.to.have.status(403);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/javascript"
+					}
+				],
+				"url": {
+					"raw": "{{server_URL}}/irc/js/webclient.js",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"js",
+						"webclient.js"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "4.4 /irc/server confirm fail",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 403 Forbidden\", function () {",
+							"    pm.response.to.have.status(403);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"index\": -1\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server_URL}}/irc/server",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"server"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "4.5 /irc/connect confirm fail",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 403 Forbidden\", function () {",
+							"    pm.response.to.have.status(403);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"nickName\": \"myNick7231\",\n  \"userName\": \"myUser7231\",\n  \"realName\": \"Irc Hybrid Client\",\n  \"userMode\": \"+i\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server_URL}}/irc/connect",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"connect"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "4.6 /irc/disconnect confirm fail",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 403 Forbidden\", function () {",
+							"    pm.response.to.have.status(403);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server_URL}}/irc/disconnect",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"disconnect"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "4.7 /irc/message confirm fail",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 403 Forbidden\", function () {",
+							"    pm.response.to.have.status(403);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"message\": \"TIME\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server_URL}}/irc/message",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"message"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "4.8 /irc/getircstate confirm fail",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 403 Forbidden\", function () {",
+							"    pm.response.to.have.status(403);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{server_URL}}/irc/getircstate",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"getircstate"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "4.9 /irc/cache confirm fail",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 403 Forbidden\", function () {",
+							"    pm.response.to.have.status(403);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{server_URL}}/irc/cache",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"cache"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "4.10 /irc/prune confirm fail",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 403 Forbidden\", function () {",
+							"    pm.response.to.have.status(403);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"channel\": \"#test\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server_URL}}/irc/prune",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"prune"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "4.11/irc/erase confirm fail",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 403 Forbidden\", function () {",
+							"    pm.response.to.have.status(403);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"erase\": \"YES\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server_URL}}/irc/erase",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"erase"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "4.12 /terminate confirm fail",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 403 Forbidden\", function () {",
+							"    pm.response.to.have.status(403);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					},
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"terminate\": \"YES\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server_URL}}/terminate",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"terminate"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
