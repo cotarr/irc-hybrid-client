@@ -437,6 +437,28 @@ document.addEventListener('server-message', function(event) {
   }
 }); // server-message event handler
 
+//
+// Add cache reload message to server window
+//
+// Example:  14:33:02 -----Cache Reload-----
+//
+document.addEventListener('cache-reload-done', function(event) {
+  // console.log('Event cache-reload-done');
+  let markerString = '';
+  let timestampString = '';
+  if (('detail' in event) && ('timestamp' in event.detail)) {
+    timestampString = unixTimestampToHMS(event.detail.timestamp);
+  }
+  if (timestampString) {
+    markerString += timestampString;
+  }
+  markerString += ' ' + cacheReloadString + '\n';
+
+  document.getElementById('rawMessageDisplay').value += markerString;
+  document.getElementById('rawMessageDisplay').scrollTop =
+    document.getElementById('rawMessageDisplay').scrollHeight;
+}.bind(this));
+
 // -------------------------
 // raw Show/Hide button handler
 // -------------------------

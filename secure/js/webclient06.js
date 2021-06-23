@@ -1212,6 +1212,30 @@ function createChannelEl (name) {
     channelInputAreaEl.value = '';
   }.bind(this));
 
+  //
+  // Add cache reload message to channel window
+  //
+  // Example:  14:33:02 -----Cache Reload-----
+  //
+  document.addEventListener('cache-reload-done', function(event) {
+    // console.log('Event cache-reload-done');
+    let markerString = '';
+    let timestampString = '';
+    if (('detail' in event) && ('timestamp' in event.detail)) {
+      timestampString = unixTimestampToHMS(event.detail.timestamp);
+    }
+    if (timestampString) {
+      markerString += timestampString;
+    }
+    markerString += ' ' + cacheReloadString + '\n';
+    if (channelMainSectionEl.hasAttribute('brief-enabled')) {
+      markerString += '\n';
+    }
+    channelTextAreaEl.value += markerString;
+    // move scroll bar so text is scrolled all the way up
+    channelTextAreaEl.scrollTop = channelTextAreaEl.scrollHeight;
+  }.bind(this));
+
   // set visibility and divs
   updateVisibility();
   // -----------------------------------------------------------

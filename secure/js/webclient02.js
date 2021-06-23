@@ -166,6 +166,31 @@ const timestampToHMS = function (timeString) {
   return outString;
 };
 
+// ----------------------------------------------------------------
+// Convert unix timestamp in seconds to HH:MM:SS string local time
+// ----------------------------------------------------------------
+const unixTimestampToHMS = function (seconds) {
+  // console.log('timeString ' + timeString);
+  let outString = '';
+  if ((typeof seconds === 'number') &&
+    (Number.isInteger(seconds)) &&
+    (seconds > 1000000000) &&
+    (seconds < 1000000000000)) {
+    let timeObj = new Date(seconds * 1000);
+    let language;
+    if (window.navigator.languages) {
+      language = window.navigator.languages[0];
+    } else {
+      language = window.navigator.userLanguage || window.navigator.language || 'en-US';
+    }
+    outString = timeObj.toLocaleTimeString(language, {hour12: false}); // hh:mm:ss browser time
+  } else {
+    outString = null;
+  }
+  // console.log(seconds, outString);
+  return outString;
+};
+
 // --------------------------------------------------------
 // Convert string with IRCv3 timestamp to Unix Seconds
 // --------------------------------------------------------
@@ -487,6 +512,28 @@ function displayNoticeMessage(parsedMessage) {
   }
 } // displayNoticeMessage()
 
+//
+// Add cache reload message to notice window
+//
+// Example:  14:33:02 -----Cache Reload-----
+//
+document.addEventListener('cache-reload-done', function(event) {
+  // console.log('Event cache-reload-done');
+  let markerString = '';
+  let timestampString = '';
+  if (('detail' in event) && ('timestamp' in event.detail)) {
+    timestampString = unixTimestampToHMS(event.detail.timestamp);
+  }
+  if (timestampString) {
+    markerString += timestampString;
+  }
+  markerString += ' ' + cacheReloadString + '\n';
+
+  document.getElementById('noticeMessageDisplay').value += markerString;
+  document.getElementById('noticeMessageDisplay').scrollTop =
+    document.getElementById('noticeMessageDisplay').scrollHeight;
+}.bind(this));
+
 // -----------------------------------------------------
 // Wallops (+w) messages are displayed here
 // Note: notice window controls are in another module
@@ -515,6 +562,28 @@ function displayWallopsMessage(parsedMessage) {
     default:
   }
 } // displayWallopsMessage
+
+//
+// Add cache reload message to wallops window
+//
+// Example:  14:33:02 -----Cache Reload-----
+//
+document.addEventListener('cache-reload-done', function(event) {
+  // console.log('Event cache-reload-done');
+  let markerString = '';
+  let timestampString = '';
+  if (('detail' in event) && ('timestamp' in event.detail)) {
+    timestampString = unixTimestampToHMS(event.detail.timestamp);
+  }
+  if (timestampString) {
+    markerString += timestampString;
+  }
+  markerString += ' ' + cacheReloadString + '\n';
+
+  document.getElementById('wallopsMessageDisplay').value += markerString;
+  document.getElementById('wallopsMessageDisplay').scrollTop =
+    document.getElementById('wallopsMessageDisplay').scrollHeight;
+}.bind(this));
 
 // ----------------------------------------------
 // Insert a text string into the server window

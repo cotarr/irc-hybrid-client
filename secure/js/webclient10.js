@@ -103,6 +103,14 @@ function updateFromCache () {
             _parseBufferMessage(responseArray[i]);
           }
         }
+        // this is to inform windows that cache reload has completed.
+        let timestamp = unixTimestamp();
+        document.dispatchEvent(new CustomEvent('cache-reload-done', {
+          bubbles: true,
+          detail: {
+            timestamp: timestamp
+          }
+        }));
       }
     })
     .catch( (error) => {

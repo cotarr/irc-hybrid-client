@@ -255,6 +255,28 @@ function createPrivateMessageEl (name, parsedMessage) {
     privMsgInputAreaEl.value = '';
   }.bind(this));
 
+  //
+  // Add cache reload message to private message window
+  //
+  // Example:  14:33:02 -----Cache Reload-----
+  //
+  document.addEventListener('cache-reload-done', function(event) {
+    // console.log('Event cache-reload-done');
+    let markerString = '';
+    let timestampString = '';
+    if (('detail' in event) && ('timestamp' in event.detail)) {
+      timestampString = unixTimestampToHMS(event.detail.timestamp);
+    }
+    if (timestampString) {
+      markerString += timestampString;
+    }
+    markerString += ' ' + cacheReloadString + '\n';
+
+    privMsgTextAreaEl.value += markerString;
+    // move scroll bar so text is scrolled all the way up
+    privMsgTextAreaEl.scrollTop = privMsgTextAreaEl.scrollHeight;
+  }.bind(this));
+
   // Hide PM window, Hide PM data section, Hide buttons
   document.addEventListener('priv-msg-hide-all', function(event) {
     privMsgBottomDivEl.setAttribute('hidden', '');

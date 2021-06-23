@@ -50,6 +50,7 @@ const nickChannelSpacer = ' | ';
 const pmNameSpacer = ' - ';
 // Time during which incoming messages do not trigger activity icon
 const activityIconInhibitTimerValue = 10;
+const cacheReloadString = '-----Cache Reload-----';
 
 
 // ----------------------------------------------------------
@@ -260,7 +261,7 @@ function errorTimerTickHandler () {
 // -----------------------------------------
 function unixTimestamp () {
   let now = new Date;
-  return parseInt(now.valueOf() / 1000).toString();
+  return parseInt(now.valueOf() / 1000);
 };
 
 // --------------------------------------
