@@ -196,7 +196,7 @@ document.getElementById('ircConnectIconId').addEventListener('click', function()
       forceDisconnectHandler();
     } else {
       // else, connected to server, exit gracefully by command.
-      _sendIrcServerMessage('QUIT');
+      _sendIrcServerMessage('QUIT :' + ircState.progName + ' ' + ircState.progVersion);
     }
   } else {
     //
@@ -217,7 +217,7 @@ document.getElementById('quitButton').addEventListener('click', function() {
     forceDisconnectHandler();
   } else {
     // else, connected to server, exit gracefully by command.
-    _sendIrcServerMessage('QUIT');
+    _sendIrcServerMessage('QUIT :' + ircState.progName + ' ' + ircState.progVersion);
   }
 });
 

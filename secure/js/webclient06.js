@@ -416,7 +416,7 @@ function createChannelEl (name) {
   // Part button handler
   // -------------------------
   channelPartButtonEl.addEventListener('click', function() {
-    let message = 'PART ' + name;
+    let message = 'PART ' + name + ' :' + ircState.progName + ' ' + ircState.progVersion;
     _sendIrcServerMessage(message);
   });
 
