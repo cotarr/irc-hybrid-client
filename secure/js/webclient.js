@@ -305,6 +305,9 @@ function hideRawMessageWindow() {
   document.getElementById('rawHiddenElements').setAttribute('hidden', '');
   document.getElementById('rawHiddenElementsButton').textContent = '+';
   document.getElementById('rawHeadRightButtons').setAttribute('hidden', '');
+  document.getElementById('hiddenDebugDiv').setAttribute('hidden', '');
+  document.getElementById('variablesDivId').setAttribute('hidden', '');
+  document.getElementById('showDebugButton').textContent = 'More...';
 } // hideRawMessageWindow()
 
 // ----------------------------------------------
@@ -371,6 +374,13 @@ document.getElementById('chanMsgIconId').addEventListener('click', function() {
   resetChanActivityIcon(-1);
 }.bind(this));
 
+// Some initialization of div visibility at laod time
+// Hidden divs to allow <noscrpit> when not javascript
+// In case of javascript, show them
+document.getElementById('annunciatorBackgroundDivId').removeAttribute('hidden');
+document.getElementById('annunciatiorDivId').removeAttribute('hidden');
+document.getElementById('scrollableDivId').removeAttribute('hidden');
+hideRawMessageWindow();
 // --------------------------------------------------------------
 // Single function to visibility of all display divs on the page
 // --------------------------------------------------------------
@@ -378,7 +388,8 @@ function updateDivVisibility() {
   // return; // uncomment to show hidden divs.
   if (webState.webConnected) {
     document.getElementById('webDisconnectedVisibleDiv').setAttribute('hidden', '');
-    document.getElementById('webDisconnectedHiddenDiv').removeAttribute('hidden');
+    document.getElementById('webDisconnectedHiddenDiv1').removeAttribute('hidden');
+    document.getElementById('webDisconnectedHiddenDiv2').removeAttribute('hidden');
     document.getElementById('reconnectStatusDiv').textContent = '';
     document.getElementById('webConnectIconId').setAttribute('connected', '');
     document.getElementById('webConnectIconId').removeAttribute('connecting');
@@ -471,11 +482,18 @@ function updateDivVisibility() {
       document.getElementById('noticeSectionDiv').setAttribute('hidden', '');
       webState.wallopsOpen = false;
       document.getElementById('wallopsSectionDiv').setAttribute('hidden', '');
+      // next time visible, show channel join options
+      document.getElementById('ircChannelsMainHiddenDiv').removeAttribute('hidden');
+      document.getElementById('ircChannelsMainHiddenButton').textContent = '-';
     }
   } else {
     // Else, WEb server disconnected
+    document.getElementById('hiddenInfoDiv').setAttribute('hidden', '');
+    document.getElementById('infoOpenCloseButton').textContent = '+';
+    hideRawMessageWindow();
     document.getElementById('webDisconnectedVisibleDiv').removeAttribute('hidden');
-    document.getElementById('webDisconnectedHiddenDiv').setAttribute('hidden', '');
+    document.getElementById('webDisconnectedHiddenDiv1').setAttribute('hidden', '');
+    document.getElementById('webDisconnectedHiddenDiv2').setAttribute('hidden', '');
     document.getElementById('waitConnectIconId').setAttribute('hidden', '');
     document.getElementById('cycleNextServerButton').setAttribute('disabled', '');
     if (webState.webConnecting) {
@@ -514,13 +532,15 @@ document.addEventListener('show-all-divs', function(event) {
   document.getElementById('hideLoginSectionButton').textContent = '-';
   document.getElementById('privMsgMainHiddenDiv').removeAttribute('hidden');
   document.getElementById('privMsgMainHiddenButton').textContent = '-';
+  document.getElementById('ircChannelsMainHiddenDiv').removeAttribute('hidden');
+  document.getElementById('ircChannelsMainHiddenButton').textContent = '-';
   showRawMessageWindow();
   webState.noticeOpen = true;
   webState.wallopsOpen = true;
   document.getElementById('noticeSectionDiv').removeAttribute('hidden');
   document.getElementById('wallopsSectionDiv').removeAttribute('hidden');
   // document.getElementById('hiddenInfoDiv').removeAttribute('hidden');
-  document.getElementById('infoOpenCloseButton').textContent = '-';
+  // document.getElementById('infoOpenCloseButton').textContent = '-';
 });
 
 // -----------------------------------
@@ -532,6 +552,8 @@ document.addEventListener('hide-all-divs', function(event) {
   document.getElementById('hideLoginSectionButton').textContent = '+';
   document.getElementById('privMsgMainHiddenDiv').setAttribute('hidden', '');
   document.getElementById('privMsgMainHiddenButton').textContent = '+';
+  document.getElementById('ircChannelsMainHiddenDiv').setAttribute('hidden', '');
+  document.getElementById('ircChannelsMainHiddenButton').textContent = '+';
   hideRawMessageWindow();
   webState.noticeOpen = false;
   document.getElementById('noticeSectionDiv').setAttribute('hidden', '');

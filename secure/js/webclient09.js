@@ -500,9 +500,11 @@ document.getElementById('rawNormalButton').addEventListener('click', function() 
 document.getElementById('showDebugButton').addEventListener('click', function() {
   if (document.getElementById('hiddenDebugDiv').hasAttribute('hidden')) {
     document.getElementById('hiddenDebugDiv').removeAttribute('hidden');
+    document.getElementById('showDebugButton').textContent = 'Less...';
   } else {
     document.getElementById('hiddenDebugDiv').setAttribute('hidden', '');
     document.getElementById('variablesDivId').setAttribute('hidden', '');
+    document.getElementById('showDebugButton').textContent = 'More...';
   }
 }.bind(this));
 

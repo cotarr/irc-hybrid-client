@@ -17,6 +17,11 @@
     <title>irc-hybrid-client</title>
   </head>
   <body>
+    <noscript>
+      <br>
+      <h1>JavaScript is required to load this page.</h1>
+    </noscript>
+
     <div class="error-div" id='errorDiv' hidden>
       <div id='errorContentDiv'>
         <!-- Errors dynamically generated -->
@@ -25,7 +30,7 @@
         Tap to Close
       </div>
     </div>
-    <div class="annunciator-background">
+    <div class="annunciator-background" id="annunciatorBackgroundDivId" hidden>
       <div class="head-flex">
         <div class="head-left">
         </div>
@@ -35,7 +40,7 @@
         </div>
       </div>
     </div>
-    <div class="annunciator-div">
+    <div class="annunciator-div" id="annunciatiorDivId" hidden>
       <div class="annunciator-connect-icon" id="webConnectIconId">Web</div>
       <div class="annunciator-connect-icon" id="ircConnectIconId">IRC</div>
       <div class="annunciator-wait-icon" id="waitConnectIconId" hidden>Wait...</div>
@@ -45,7 +50,7 @@
       <div class="message-icon color-notice" id="notMsgIconId" hidden>N</div>
     </div>
 
-    <div class="aa-start-scrollable">
+    <div class="aa-start-scrollable" id="scrollableDivId" hidden>
 
       <div class="aa-section-div info-section-div" id="infoSectionDiv">
         <div class='head-flex'>
@@ -142,68 +147,162 @@ a raw command to the IRC server directly.
           Web page login is independant of IRC login.
         </div>
       </div>
-      <div class="aa-section-div color-connect">
-        <div class='head-flex'>
-          <div class="head-left">
-            <button id="hideLoginSectionButton">-</button>
-            <span>IRC Controls</span>
-          </div>
-          <div class="head-right">
-            <button id='webLogoutButton'>Web logout</button>
-          </div>
-        </div>
-        <div class="vh10"></div>
-        <div class="button-div">
-          <span class="user-span" id="headerServer">server</span>
-          <span class="user-span" id="headerUser"></span>
-        </div>
-        <div class="vh10"></div>
-        <div id="hideLoginSection">
-          <div class="vh10"></div>
-          <div class="button-div">
-            <input type="text" id="ircServerNameInputId" size="10" value="" disabled>
-            <input type="checkbox" id="ircServerTlsCheck" disabled>
-            <span>TLS</span>
-            <button id="cycleNextServerButton">Next Server</button>
-          </div>
-          <div class="button-div">
-            <input type="text" id="ircServerAddrInputId" size="26" value="" disabled>
-            <span>:</span>
-            <input type="text" id="ircServerPortInputId" size="4" value="" disabled>
-          </div>
-          <div class="vh10"></div>
-          <div class="button-div">
-            <input type="text" id="nickNameInputId" value="">
-            <div class="input-label-right">Nickname</div>
-          </div>
-          <div class="button-div">
-            <input type="text" id="userNameInputId" value="" disabled>
-            <div class="input-label-right">Username</div>
-          </div>
-          <div class="button-div">
-            <input type="text" id="realNameInputId" value="">
-            <div class="input-label-right">Real Name</div>
-          </div>
-          <div class="button-div">
-            <input type="text" id = "userModeInputId" size="6" value="">
-            <div class="input-label-right">Initial User Mode</div>
-          </div>
-          <div class="button-div">
-            <input type="text" id = "userAwayMessageId" size="20" value="AFK">
-            <button id=setAwayButton>Away</button>
-            <button id=setBackButton>Back</button>
-          </div>
-          <div class="vh10"></div>
-          <div class="button-div">
-            <button id="connectButton">Connect IRC</button>
-            <button id="quitButton">Disconnect IRC</button>
-          </div>
-        </div>
-      </div>
 
-      <!-- No hidden attreibute for webDisconnectedHiddenDiv (breaks auto-resize) -->
-      <div id="webDisconnectedHiddenDiv">
+      <div id="webDisconnectedHiddenDiv1" hidden>
+        <div class="aa-section-div color-connect">
+          <div class='head-flex'>
+            <div class="head-left">
+              <button id="hideLoginSectionButton">-</button>
+              <span>IRC Controls</span>
+            </div>
+            <div class="head-right">
+              <button id='webLogoutButton'>Web logout</button>
+            </div>
+          </div>
+          <div class="vh10"></div>
+          <div class="button-div">
+            <span class="user-span" id="headerServer">server</span>
+            <span class="user-span" id="headerUser"></span>
+          </div>
+          <div class="vh10"></div>
+          <div id="hideLoginSection">
+            <div class="vh10"></div>
+            <div>
+              To modify, edit file: &quotservers.json&quot
+            </div>
+            <div class="button-div">
+              <input type="text" id="ircServerNameInputId" size="10" value="" disabled>
+              <input type="checkbox" id="ircServerTlsCheck" disabled>
+              <span>TLS</span>
+              <button id="cycleNextServerButton">Next Server</button>
+            </div>
+            <div class="button-div">
+              <input type="text" id="ircServerAddrInputId" size="26" value="" disabled>
+              <span>:</span>
+              <input type="text" id="ircServerPortInputId" size="4" value="" disabled>
+            </div>
+            <div class="vh10"></div>
+            <div class="button-div">
+              <input type="text" id="nickNameInputId" value="">
+              <div class="input-label-right">Nickname</div>
+            </div>
+            <div class="button-div">
+              <input type="text" id="userNameInputId" value="" disabled>
+              <div class="input-label-right">Username</div>
+            </div>
+            <div class="button-div">
+              <input type="text" id="realNameInputId" value="">
+              <div class="input-label-right">Real Name</div>
+            </div>
+            <div class="button-div">
+              <input type="text" id = "userModeInputId" size="6" value="">
+              <div class="input-label-right">Initial User Mode</div>
+            </div>
+            <div class="button-div">
+              <input type="text" id = "userAwayMessageId" size="20" value="AFK">
+              <button id=setAwayButton>Away</button>
+              <button id=setBackButton>Back</button>
+            </div>
+            <div class="vh10"></div>
+            <div class="button-div">
+              <button id="connectButton">Connect IRC</button>
+              <button id="quitButton">Disconnect IRC</button>
+            </div>
+          </div>
+        </div>
+      </div><!-- webDisconnectedHiddenDiv1 -->
 
+      <div><!-- both webDisconnect and web connected -->
+        <div class="aa-section-div color-raw" id="rawSectionDiv">
+          <div class='head-flex'>
+            <div class="head-left">
+              <button class="notice-button" id="rawHiddenElementsButton">-</button>
+              <span>Server</span>
+            </div>
+            <div class="head-center">
+            </div>
+            <div class="head-right">
+              <div id='rawHeadRightButtons'>
+                <button id="rawTallerButton">Taller</button>
+                <button id="rawNormalButton">Normal</button>
+                <button id="rawClearButton">Clear</button>
+              </div>
+            </div>
+
+          </div>
+
+          <div id="rawHiddenElements">
+            <div>
+              <textarea id="rawMessageDisplay" cols="120" rows="10" spellCheck="false" readonly></textarea>
+            </div>
+            <div id='hideRawButtons'>
+              <div class="button-div">
+                <textarea class="va-middle" spellcheck="false" id="rawMessageInputId" cols="83" rows="1" ></textarea>
+                <button class="va-middle" id="sendRawMessageButton">Send</button>
+              </div>
+              <div class="button-div">
+                <button id="loadFromCacheButton">Refresh</button>
+                <button id="eraseCacheButton">Erase Cache</button>
+                <button id="showDebugButton">More...</button>
+              </div>
+
+              <div id="hiddenDebugDiv" hidden>
+                <div class="button-div">
+                  <input class="raw-cb-cb" type="checkbox" id="viewRawMessagesCheckbox">
+                  <span class="raw-cb-span">View-Raw</span>
+                  <input class="raw-cb-cb" type="checkbox" id="showCommsCheckbox" disabled>
+                  <span class="raw-cb-span">Add-Comms</span>
+                  <input class="raw-cb-cb" type="checkbox" id="showRawInHexCheckbox" disabled>
+                  <span class="raw-cb-span">Add-Hex</span>
+                </div>
+                <div class="debug-div-time">
+                  <div>
+                    <pre id='elapsedTimeDiv'></pre>
+                  </div>
+                </div>
+                <div class="button-div">
+                  <button id="test1Button">Test-1</button>
+                  <span>Server: </span>
+                  <span id="test1ButtonDesc"></span>
+                </div>
+                <div class="button-div">
+                  <button id="test2Button">Test-2</button>
+                  <span>Server: </span>
+                  <span id="test2ButtonDesc"></span>
+                </div>
+                <div class="button-div">
+                  <button id="test3Button">Test-3</button>
+                  <span>Local: </span>
+                  <span id="test3ButtonDesc"></span>
+                </div>
+                <div class="button-div">
+                  <button id="test4Button">Test-4</button>
+                  <span>Local: </span>
+                  <span id="test4ButtonDesc"></span>
+                </div>
+                <div class="button-div">
+                  <button id="disconnectButton">Force IRC Disconnect</button>
+                  <button id="serverTerminateButton">Die Web Server</button>
+                </div>
+                <div class="button-div">
+                  <button id="variablesButtonId">Show Variables</button>
+                </div>
+                <div class='variables-div' id="variablesDivId" hidden>
+                  <pre id=variablesPreId></pre>
+                </div>
+              </div>
+
+            </div>
+
+            <div class="program-version-div">
+              <span><a href="https://cotarr.github.io/irc-hybrid-client">irc-hybrid-client</a></span>
+              <span id="programVersionDiv"></span>
+            </div>
+          </div>
+        </div>
+      </div><!-- /both webDisconnect and web connected -->
+
+      <div id="webDisconnectedHiddenDiv2" hidden>
         <div id="ircDisconnectedHiddenDiv" hidden>
 
           <div class="aa-section-div color-wallops" id="wallopsSectionDiv" hidden>
@@ -265,11 +364,18 @@ a raw command to the IRC server directly.
           </div>
 
           <div class="aa-section-div color-channel" id="channelMenuDiv">
-            <div class="button-div">
-              <textarea class="va-middle" id="newChannelNameInputId" cols="20" rows="1" ></textarea>
-                <button class="va-middle" id="newChannelButton" class="rm20">Join Channel</button>
+            <div>
+              <button id="ircChannelsMainHiddenButton">+</button>
+              <span>IRC Channels</span>
             </div>
-            <div class="button-div" id="channelJoinButtonContainer">
+            <div id="ircChannelsMainHiddenDiv">
+              <div class="vh10"></div>
+              <div class="button-div">
+                <textarea class="va-middle" id="newChannelNameInputId" cols="20" rows="1" ></textarea>
+                  <button class="va-middle" id="newChannelButton" class="rm20">Join Channel</button>
+              </div>
+              <div class="button-div" id="channelJoinButtonContainer">
+              </div>
             </div>
           </div>
 
@@ -278,99 +384,6 @@ a raw command to the IRC server directly.
           </div>
 
         </div><!-- end irc disconnected div -->
-
-        <div class="aa-section-div color-raw" id="rawSectionDiv">
-          <div class='head-flex'>
-            <div class="head-left">
-              <button class="notice-button" id="rawHiddenElementsButton">-</button>
-              <span>Server</span>
-            </div>
-            <div class="head-center">
-            </div>
-            <div class="head-right">
-              <div id='rawHeadRightButtons'>
-                <button id="rawTallerButton">Taller</button>
-                <button id="rawNormalButton">Normal</button>
-                <button id="rawClearButton">Clear</button>
-              </div>
-            </div>
-
-          </div>
-
-          <!-- Do not hide rawHiddenElements in HTML.
-          It is used to calculate width and it
-          breaks if the area is hidden.
-          See end of source webclient09.js -->
-          <div id="rawHiddenElements">
-
-            <div>
-              <textarea id="rawMessageDisplay" cols="120" rows="10" spellCheck="false" readonly></textarea>
-            </div>
-            <div id='hideRawButtons'>
-              <div class="button-div">
-                <textarea class="va-middle" spellcheck="false" id="rawMessageInputId" cols="83" rows="1" ></textarea>
-                <button class="va-middle" id="sendRawMessageButton">Send</button>
-              </div>
-              <div class="button-div">
-                <button id="loadFromCacheButton">Refresh</button>
-                <button id="eraseCacheButton">Erase Cache</button>
-                <button id="showDebugButton">Tools...</button>
-              </div>
-
-              <div id="hiddenDebugDiv" hidden>
-                <div class="button-div">
-                  <input class="raw-cb-cb" type="checkbox" id="viewRawMessagesCheckbox">
-                  <span class="raw-cb-span">View-Raw</span>
-                  <input class="raw-cb-cb" type="checkbox" id="showCommsCheckbox" disabled>
-                  <span class="raw-cb-span">Add-Comms</span>
-                  <input class="raw-cb-cb" type="checkbox" id="showRawInHexCheckbox" disabled>
-                  <span class="raw-cb-span">Add-Hex</span>
-                </div>
-                <div class="debug-div-time">
-                  <div>
-                    <pre id='elapsedTimeDiv'></pre>
-                  </div>
-                </div>
-                <div class="button-div">
-                  <button id="test1Button">Test-1</button>
-                  <span>Server: </span>
-                  <span id="test1ButtonDesc"></span>
-                </div>
-                <div class="button-div">
-                  <button id="test2Button">Test-2</button>
-                  <span>Server: </span>
-                  <span id="test2ButtonDesc"></span>
-                </div>
-                <div class="button-div">
-                  <button id="test3Button">Test-3</button>
-                  <span>Local: </span>
-                  <span id="test3ButtonDesc"></span>
-                </div>
-                <div class="button-div">
-                  <button id="test4Button">Test-4</button>
-                  <span>Local: </span>
-                  <span id="test4ButtonDesc"></span>
-                </div>
-                <div class="button-div">
-                  <button id="disconnectButton">Force IRC Disconnect</button>
-                  <button id="serverTerminateButton">Die Web Server</button>
-                </div>
-                <div class="button-div">
-                  <button id="variablesButtonId">Show Variables</button>
-                </div>
-                <div class='variables-div' id="variablesDivId" hidden>
-                  <pre id=variablesPreId></pre>
-                </div>
-              </div>
-
-            </div>
-
-            <div class="program-version-div">
-              <span><a href="https://cotarr.github.io/irc-hybrid-client">irc-hybrid-client</a></span>
-              <span id="programVersionDiv"></span>
-            </div>
-          </div>
-        </div>
       </div><!-- end web disconnected div -->
 
       <div id="webDisconnectedVisibleDiv" hidden>

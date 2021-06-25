@@ -1311,6 +1311,19 @@ document.addEventListener('irc-state-changed', function(event) {
   } // needButtonUpdate
 }); // addEventListener('irc-state-changed
 
+// -------------------------------------
+// IRC Channel (Open/Close) Buttons
+// -------------------------------------
+document.getElementById('ircChannelsMainHiddenButton').addEventListener('click', function() {
+  if (document.getElementById('ircChannelsMainHiddenDiv').hasAttribute('hidden')) {
+    document.getElementById('ircChannelsMainHiddenDiv').removeAttribute('hidden');
+    document.getElementById('ircChannelsMainHiddenButton').textContent = '-';
+  } else {
+    document.getElementById('ircChannelsMainHiddenDiv').setAttribute('hidden', '');
+    document.getElementById('ircChannelsMainHiddenButton').textContent = '+';
+  }
+}.bind(this));
+
 // ---------------------------------------
 // Join New Channel (Button and Enter)
 // ---------------------------------------
