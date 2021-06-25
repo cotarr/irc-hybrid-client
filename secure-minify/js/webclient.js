@@ -381,7 +381,7 @@ console.log("createChannelEl: channel already exist");return}const defaultHeight
 ;channelTextAreaEl.setAttribute("cols","30");channelTextAreaEl.setAttribute("rows",defaultHeightInRows);channelTextAreaEl.setAttribute("spellCheck","false")
 ;channelTextAreaEl.setAttribute("readonly","");let channelBottomDiv1El=document.createElement("div");channelBottomDiv1El.classList.add("button-div")
 ;let channelInputAreaEl=document.createElement("textarea");let channelInputAreaId="chan"+channelIndex.toString()+"InputInputId";channelInputAreaEl.id=channelInputAreaId
-;channelInputAreaEl.setAttribute("cols","120");channelInputAreaEl.setAttribute("rows","1");channelInputAreaEl.classList.add("va-middle");channelInputAreaEl.classList.add("rm10")
+;channelInputAreaEl.setAttribute("cols","120");channelInputAreaEl.setAttribute("rows","1");channelInputAreaEl.classList.add("va-middle");channelInputAreaEl.classList.add("rm5")
 ;let channelSendButtonEl=document.createElement("button");channelSendButtonEl.textContent="Send";channelSendButtonEl.classList.add("va-middle");let channelBottomDiv2El=document.createElement("div")
 ;channelBottomDiv2El.classList.add("button-div");let channelJoinButtonEl=document.createElement("button");channelJoinButtonEl.textContent="Join";channelJoinButtonEl.classList.add("channel-button")
 ;let channelPartButtonEl=document.createElement("button");channelPartButtonEl.textContent="Leave";channelPartButtonEl.classList.add("channel-button")
@@ -562,7 +562,7 @@ function createPrivateMessageEl(name,parsedMessage){if(webState.activePrivateMes
 ;let privMsgTextAreaId="privMsg"+privMsgIndex.toString()+"TextAreaId";privMsgTextAreaEl.id=privMsgTextAreaId;privMsgTextAreaEl.setAttribute("cols","120");privMsgTextAreaEl.setAttribute("rows","6")
 ;privMsgTextAreaEl.setAttribute("spellCheck","false");privMsgTextAreaEl.setAttribute("readonly","");let privMsgButtonDiv1El=document.createElement("div")
 ;privMsgButtonDiv1El.classList.add("button-div");let privMsgInputAreaEl=document.createElement("textarea");let privMsgInputAreaId="privMsg"+privMsgIndex.toString()+"InputAreaId"
-;privMsgInputAreaEl.id=privMsgInputAreaId;privMsgInputAreaEl.classList.add("va-middle");privMsgInputAreaEl.classList.add("rm10");privMsgInputAreaEl.setAttribute("cols","120")
+;privMsgInputAreaEl.id=privMsgInputAreaId;privMsgInputAreaEl.classList.add("va-middle");privMsgInputAreaEl.classList.add("rm5");privMsgInputAreaEl.setAttribute("cols","120")
 ;privMsgInputAreaEl.setAttribute("rows","1");let privMsgSendButtonEl=document.createElement("button");privMsgSendButtonEl.textContent="Send";privMsgSendButtonEl.classList.add("va-middle")
 ;let privMsgBottomDiv4El=document.createElement("div");privMsgBottomDiv4El.classList.add("button-div");let privMsgBeep1CBInputEl=document.createElement("input")
 ;privMsgBeep1CBInputEl.classList.add("pm-cb-cb");privMsgBeep1CBInputEl.setAttribute("type","checkbox");let privMsgBeep1CBTitleEl=document.createElement("span")
@@ -740,18 +740,27 @@ showError(responseJson.message)}}).catch(error=>{console.log(error);if(error)sho
 ;document.getElementById("test3Button").addEventListener("click",function(){console.log("Test 3 button pressed.");console.log("Test 3 button: expire heart beat timer")
 ;heartbeatUpCounter=heartbeatExpirationTimeSeconds-1});document.getElementById("test3ButtonDesc").textContent="Emulate websocket timeout"
 ;document.getElementById("test4Button").addEventListener("click",function(){console.log("Test 4 button pressed.");console.log("Test 4 getIrcState()");getIrcState()})
-;document.getElementById("test4ButtonDesc").textContent="Call getIrcState()";const columnSize=(document.getElementById("rawMessageDisplay").getBoundingClientRect().width+10)/120
-;const adjustInputToWidowWidth=function(innerWidth){let cols=parseInt(window.innerWidth/columnSize-5);document.getElementById("userPrivMsgInputId").setAttribute("cols",(cols-8).toString())
-;document.getElementById("noticeMessageDisplay").setAttribute("cols",cols.toString());document.getElementById("wallopsMessageDisplay").setAttribute("cols",cols.toString())
-;document.getElementById("rawMessageDisplay").setAttribute("cols",cols.toString());document.getElementById("rawMessageInputId").setAttribute("cols",(cols-8).toString())
-;if(webState.resizableChanSplitTextareaIds.length>0){webState.resizableChanSplitTextareaIds.forEach(function(id){if(document.getElementById(id)){if(window.innerWidth>600){
-document.getElementById(id).setAttribute("cols",(cols-23).toString())}else{document.getElementById(id).setAttribute("cols",cols.toString())}}else{console.log("Error: "+id)}})}
+;document.getElementById("test4ButtonDesc").textContent="Call getIrcState()";let rulerDivEl=document.getElementById("rulerDiv");let rulerX1=10;let rulerX2=20
+;let rulerTextareaEl=document.createElement("textarea");rulerTextareaEl.setAttribute("cols",rulerX1.toString());rulerTextareaEl.setAttribute("rows","1");rulerDivEl.appendChild(rulerTextareaEl)
+;let rulerY1=rulerTextareaEl.getBoundingClientRect().width;rulerTextareaEl.setAttribute("cols",rulerX2.toString());let rulerY2=rulerTextareaEl.getBoundingClientRect().width
+;rulerDivEl.removeChild(rulerTextareaEl);if(!webState.watch)webState.dynamic={};webState.dynamic.inputAreaCharWidthPx=(rulerY2-rulerY1)/(rulerX2-rulerX1)
+;webState.dynamic.inputAreaEndsWidthPx=rulerY1-rulerX1*webState.dynamic.inputAreaCharWidthPx;let rulerButtonEl=document.createElement("button");rulerButtonEl.textContent="Send"
+;rulerDivEl.appendChild(rulerButtonEl);webState.dynamic.sendButtonWidthPx=rulerButtonEl.getBoundingClientRect().width;rulerDivEl.removeChild(rulerButtonEl)
+;const calcInputAreaColSize=function(marginPxWidth){
+if(typeof marginPxWidth==="number"&&webState.dynamic.inputAreaCharWidthPx&&typeof webState.dynamic.inputAreaCharWidthPx==="number"&&webState.dynamic.inputAreaCharWidthPx>1&&webState.dynamic.inputAreaEndsWidthPx&&typeof webState.dynamic.inputAreaEndsWidthPx==="number"&&webState.dynamic.inputAreaEndsWidthPx>1){
+let margin=marginPxWidth;if(margin<0)margin=0;let cols=parseInt((window.innerWidth-webState.dynamic.inputAreaEndsWidthPx-margin)/webState.dynamic.inputAreaCharWidthPx);return cols.toString()}else{
+console.log("alcInputAreaColSize() invalid input");return null}};const adjustInputToWidowWidth=function(innerWidth){let mar1=50
+;document.getElementById("rawMessageDisplay").setAttribute("cols",calcInputAreaColSize(mar1));document.getElementById("noticeMessageDisplay").setAttribute("cols",calcInputAreaColSize(mar1))
+;document.getElementById("wallopsMessageDisplay").setAttribute("cols",calcInputAreaColSize(mar1));let mar2=mar1+5+webState.dynamic.sendButtonWidthPx
+;document.getElementById("rawMessageInputId").setAttribute("cols",calcInputAreaColSize(mar2));document.getElementById("userPrivMsgInputId").setAttribute("cols",calcInputAreaColSize(mar2))
+;let mar3=mar1+170;if(webState.resizableChanSplitTextareaIds.length>0){webState.resizableChanSplitTextareaIds.forEach(function(id){if(document.getElementById(id)){if(window.innerWidth>600){
+document.getElementById(id).setAttribute("cols",calcInputAreaColSize(mar3))}else{document.getElementById(id).setAttribute("cols",calcInputAreaColSize(mar1))}}else{console.log("Error: "+id)}})}
 if(webState.resizableSendButtonTextareaIds.length>0){webState.resizableSendButtonTextareaIds.forEach(function(id){if(document.getElementById(id)){
-document.getElementById(id).setAttribute("cols",(cols-8).toString())}else{console.log("Error: "+id)}})}if(webState.resizablePrivMsgTextareaIds.length>0){
-webState.resizablePrivMsgTextareaIds.forEach(function(id){if(document.getElementById(id)){document.getElementById(id).setAttribute("cols",cols.toString())}else{console.log("Error: "+id)}})}
+document.getElementById(id).setAttribute("cols",calcInputAreaColSize(mar2))}else{console.log("Error: "+id)}})}if(webState.resizablePrivMsgTextareaIds.length>0){
+webState.resizablePrivMsgTextareaIds.forEach(function(id){if(document.getElementById(id)){document.getElementById(id).setAttribute("cols",calcInputAreaColSize(mar1))}else{console.log("Error: "+id)}})}
 if(webState.resizableSendButtonPMTextareaIds.length>0){webState.resizableSendButtonPMTextareaIds.forEach(function(id){if(document.getElementById(id)){
-document.getElementById(id).setAttribute("cols",(cols-8).toString())}else{console.log("Error: "+id)}})}document.getElementById("errorDiv").style.width="100%";if(!webState.watch)webState.watch={}
-;webState.watch.innerWidth=window.innerWidth.toString()+"px";webState.watch.innerHeight=window.innerHeight.toString()+"px"};window.addEventListener("resize",function(event){if(columnSize){
-adjustInputToWidowWidth(event.currentTarget.innerWidth)}}.bind(this));window.addEventListener("element-resize",function(event){adjustInputToWidowWidth(window.innerWidth)}.bind(this))
-;adjustInputToWidowWidth(window.innerWidth);setInterval(function(){errorTimerTickHandler();heartbeatTimerTickHandler();reconnectTimerTickHandler();beepTimerTick();updateElapsedTimeDisplay()
-;cacheInhibitTimerTick()}.bind(this),1e3);firstWebSocketConnectOnPageLoad();
+document.getElementById(id).setAttribute("cols",calcInputAreaColSize(mar2))}else{console.log("Error: "+id)}})}document.getElementById("errorDiv").style.width="100%"
+;if(!webState.watch)webState.watch={};webState.watch.innerWidth=window.innerWidth.toString()+"px";webState.watch.innerHeight=window.innerHeight.toString()+"px"}
+;window.addEventListener("resize",function(event){if(webState.dynamic.inputAreaCharWidthPx){adjustInputToWidowWidth(event.currentTarget.innerWidth)}}.bind(this))
+;window.addEventListener("element-resize",function(event){adjustInputToWidowWidth(window.innerWidth)}.bind(this));adjustInputToWidowWidth(window.innerWidth);setInterval(function(){
+errorTimerTickHandler();heartbeatTimerTickHandler();reconnectTimerTickHandler();beepTimerTick();updateElapsedTimeDisplay();cacheInhibitTimerTick()}.bind(this),1e3);firstWebSocketConnectOnPageLoad();

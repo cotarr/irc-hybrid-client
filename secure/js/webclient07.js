@@ -170,7 +170,7 @@ function createPrivateMessageEl (name, parsedMessage) {
   let privMsgInputAreaId = 'privMsg' + privMsgIndex.toString() + 'InputAreaId';
   privMsgInputAreaEl.id = privMsgInputAreaId;
   privMsgInputAreaEl.classList.add('va-middle');
-  privMsgInputAreaEl.classList.add('rm10');
+  privMsgInputAreaEl.classList.add('rm5');
   privMsgInputAreaEl.setAttribute('cols', '120');
   privMsgInputAreaEl.setAttribute('rows', '1');
 

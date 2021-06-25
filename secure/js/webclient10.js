@@ -348,37 +348,138 @@ document.getElementById('test4ButtonDesc').textContent = 'Call getIrcState()';
 
 // ---------------------------------------------------------------------------
 // This is some code to dynamically resize the width of the textarea elements
-//
-// First, html file defines textarea with width of 120 columns.
-// Next get the width in pixels for 120 columns (font dependant?)
-// Save this factor as a constant
-// Get the window innerWidth and divide by the factor.
 // ---------------------------------------------------------------------------
-const columnSize =
-  (document.getElementById('rawMessageDisplay').getBoundingClientRect().width + 10)/ 120;
 
-// console.log('columnSize ' + columnSize);
-// console.log(document.getElementById('rawMessageDisplay').getBoundingClientRect());
+// ---------------------------------------------------------------------------
+// This runs as part of page load
 //
-// Function called both initially and also no event
-const adjustInputToWidowWidth = function (innerWidth) {
-  let cols = parseInt((window.innerWidth / columnSize) - 5);
-  // static text area defined in webclient.html
-  document.getElementById('userPrivMsgInputId').setAttribute('cols', (cols-8).toString());
-  document.getElementById('noticeMessageDisplay').setAttribute('cols', cols.toString());
-  document.getElementById('wallopsMessageDisplay').setAttribute('cols', cols.toString());
-  document.getElementById('rawMessageDisplay').setAttribute('cols', cols.toString());
-  document.getElementById('rawMessageInputId').setAttribute('cols', (cols-8).toString());
+// This program displays and receives user input using <textarea> elements.
+// The <textarea> elements render differently in desktop and mobile devices
+// The size of the buttons is different in desktop and mobile devices.
+//
+// Therefore, it is necessary to dynamically create <textarea> and <button>
+// elements and determine the size in pixels for a particular browser and zoom.
+//
+// The width of a <textarea> element is the sum of a fixed
+// value for margin, or difference between element pixel internal characters.
+// The second part is the pixel size of each character in the <textarea>
+// For Chrome on my Linux desktop with a zoom of 100%,
+// a <textarea> element is 7 pixels per character plus 21 pixels
+// per character.
+//
+// For this to work, a fixed width font is required.
+//
+// The following code will:
+//   dynamically insert a <textarea> element
+//   set character width
+//   measure element pixel width
+//   change character width
+//   measure changed element width.
+//   Calculate regression to get slope and intercept
+//   Intercept is margin width
+//   slope is the pixel width of each character.
+//   remove the element
+//
+//   dynamically insert a <button> element
+//   set textContent to "Send"
+//   measure pixel width of [Send] button
+//   remove the element
+//
+// These values to be used to determine value of the "cols" attribute
+// of a <textarea> element to dynamically size it to a variable window width.
+// ---------------------------------------------------------------------------
+//
+// This element exists hardcoded at the bottom of webclient.html
+// It will be used to hold temporary elements while measuring the width
+let rulerDivEl = document.getElementById('rulerDiv');
 
-  // In the IRC channel area, this is to handle main
-  //     text area when it is split with nickname list.
+// Value of temporary character size (cols attribute)
+let rulerX1 = 10;
+let rulerX2 = 20;
+// Create <textarea> element using first width value
+let rulerTextareaEl = document.createElement('textarea');
+rulerTextareaEl.setAttribute('cols', rulerX1.toString());
+rulerTextareaEl.setAttribute('rows', '1');
+rulerDivEl.appendChild(rulerTextareaEl);
+// the rulerY1 is the pixel width of a textarea with rulerX1 characters
+let rulerY1 = rulerTextareaEl.getBoundingClientRect().width;
+// repeat with different character and pixel width
+rulerTextareaEl.setAttribute('cols', rulerX2.toString());
+let rulerY2 = rulerTextareaEl.getBoundingClientRect().width;
+// done, remove the temporary element
+rulerDivEl.removeChild(rulerTextareaEl);
+
+// perform regression (2 equation, 2 variables) to get slope and intercept (Y = mX + b)
+if (!webState.watch) webState.dynamic = {};
+webState.dynamic.inputAreaCharWidthPx = (rulerY2 - rulerY1) / (rulerX2-rulerX1);
+webState.dynamic.inputAreaEndsWidthPx = rulerY1 - (rulerX1 * webState.dynamic.inputAreaCharWidthPx);
+
+// Create <button> elment and fill with "Send" string value
+let rulerButtonEl = document.createElement('button');
+rulerButtonEl.textContent = 'Send';
+rulerDivEl.appendChild(rulerButtonEl);
+webState.dynamic.sendButtonWidthPx = rulerButtonEl.getBoundingClientRect().width;
+// done, remove the temporary element
+rulerDivEl.removeChild(rulerButtonEl);
+//
+// Finished determination of dynamic element width varaibles
+// ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+// Function to calculate <textarea> "cols" attribute for proper width on page.
+//
+// Input: margin width outside <textarea>  (innerWidth - element width)
+// Output: String contgaining integer value of textarea "cols" attribute
+// --------------------------------------------------------------------------
+const calcInputAreaColSize = function (marginPxWidth) {
+  if ((typeof marginPxWidth === 'number') &&
+    (webState.dynamic.inputAreaCharWidthPx) &&
+    (typeof webState.dynamic.inputAreaCharWidthPx === 'number') &&
+    (webState.dynamic.inputAreaCharWidthPx > 1) &&
+    (webState.dynamic.inputAreaEndsWidthPx) &&
+    (typeof webState.dynamic.inputAreaEndsWidthPx === 'number') &&
+    (webState.dynamic.inputAreaEndsWidthPx > 1)) {
+    let margin = marginPxWidth;
+    if (margin < 0) margin = 0;
+    let cols = parseInt(
+      (window.innerWidth - webState.dynamic.inputAreaEndsWidthPx - margin) /
+      webState.dynamic.inputAreaCharWidthPx);
+    return cols.toString();
+  } else {
+    console.log('alcInputAreaColSize() invalid input');
+    return null;
+  }
+}; // calcInputAreaColSize()
+
+//
+// Function called both initially and also on browser event
+//
+const adjustInputToWidowWidth = function (innerWidth) {
+  // pixel width mar1 is reserved space on edges of input area at full screen width
+  let mar1 = 50;
+  // set width of input area elements
+  document.getElementById('rawMessageDisplay').setAttribute('cols', calcInputAreaColSize(mar1));
+  document.getElementById('noticeMessageDisplay').setAttribute('cols', calcInputAreaColSize(mar1));
+  document.getElementById('wallopsMessageDisplay').setAttribute('cols', calcInputAreaColSize(mar1));
+
+  // pixel width mar2 is reserved space on edges of input area with send button added
+  let mar2 = mar1 + 5 + webState.dynamic.sendButtonWidthPx;
+  // set width of input area elements
+  document.getElementById('rawMessageInputId').setAttribute('cols', calcInputAreaColSize(mar2));
+  document.getElementById('userPrivMsgInputId').setAttribute('cols', calcInputAreaColSize(mar2));
+
+  // pixed width mar3 is reserved space on edges of input area with channel nickname list on sides
+  let mar3 = mar1 + 170;
+
+  // In the IRC channel area (dynamic generated window)
+  // This is to handle main text area when it is split with nickname list.
   if (webState.resizableChanSplitTextareaIds.length > 0) {
     webState.resizableChanSplitTextareaIds.forEach(function(id) {
       if (document.getElementById(id)) {
         if (window.innerWidth > 600) {
-          document.getElementById(id).setAttribute('cols', (cols-23).toString());
+          document.getElementById(id).setAttribute('cols', calcInputAreaColSize(mar3));
         } else {
-          document.getElementById(id).setAttribute('cols', cols.toString());
+          document.getElementById(id).setAttribute('cols', calcInputAreaColSize(mar1));
         }
       } else {
         console.log('Error: ' + id);
@@ -386,32 +487,35 @@ const adjustInputToWidowWidth = function (innerWidth) {
     });
   }
 
-  // This is single line text area with SEND button next to it.
+  // In the IRC channel area (dynamic generated window),
+  //      this is to handle the text input area with SEND button next to it.
   if (webState.resizableSendButtonTextareaIds.length > 0) {
     webState.resizableSendButtonTextareaIds.forEach(function(id) {
       if (document.getElementById(id)) {
-        document.getElementById(id).setAttribute('cols', (cols-8).toString());
+        document.getElementById(id).setAttribute('cols', calcInputAreaColSize(mar2));
       } else {
         console.log('Error: ' + id);
       }
     });
   }
 
-  // This is for dynamically generated elements
-  // Private message <textarea> element for auto-resize
+  // In the private message area (dynamic generated window)
+  //   this is to handle the main text area
   if (webState.resizablePrivMsgTextareaIds.length > 0) {
     webState.resizablePrivMsgTextareaIds.forEach(function(id) {
       if (document.getElementById(id)) {
-        document.getElementById(id).setAttribute('cols', cols.toString());
+        document.getElementById(id).setAttribute('cols', calcInputAreaColSize(mar1));
       } else {
         console.log('Error: ' + id);
       }
     });
   }
+  // In the private message area (dynamic generated window)
+  //   this is to handle the text input area next to send button
   if (webState.resizableSendButtonPMTextareaIds.length > 0) {
     webState.resizableSendButtonPMTextareaIds.forEach(function(id) {
       if (document.getElementById(id)) {
-        document.getElementById(id).setAttribute('cols', (cols-8).toString());
+        document.getElementById(id).setAttribute('cols', calcInputAreaColSize(mar2));
       } else {
         console.log('Error: ' + id);
       }
@@ -423,12 +527,13 @@ const adjustInputToWidowWidth = function (innerWidth) {
   if (!webState.watch) webState.watch = {};
   webState.watch.innerWidth = window.innerWidth.toString() + 'px';
   webState.watch.innerHeight = window.innerHeight.toString() + 'px';
-};
+}; // adjustInputToWidowWidth()
 //
-// Event listener for resize widnow
+// Event listener for resize window (generic browser event)
 //
 window.addEventListener('resize', function(event) {
-  if (columnSize) {
+  // ignore resize events before dynamic size variables exist
+  if (webState.dynamic.inputAreaCharWidthPx) {
     adjustInputToWidowWidth(event.currentTarget.innerWidth);
   }
 }.bind(this));
@@ -442,14 +547,6 @@ window.addEventListener('element-resize', function(event) {
 // Do initially on page load
 //
 adjustInputToWidowWidth(window.innerWidth);
-
-//
-// After everything is sized, the area may be hidden
-//
-// document.getElementById('webDisconnectedHiddenDiv').setAttribute('hidden', '');
-// document.getElementById('rawHiddenElements').setAttribute('hidden', '');
-// document.getElementById('rawHiddenElementsButton').textContent = '+';
-// document.getElementById('rawHeadRightButtons').setAttribute('hidden', '');
 
 //
 // 1 second utility timer

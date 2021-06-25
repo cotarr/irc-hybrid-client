@@ -193,7 +193,7 @@ function createChannelEl (name) {
   channelInputAreaEl.setAttribute('cols', '120');
   channelInputAreaEl.setAttribute('rows', '1');
   channelInputAreaEl.classList.add('va-middle');
-  channelInputAreaEl.classList.add('rm10');
+  channelInputAreaEl.classList.add('rm5');
 
   // send button
   let channelSendButtonEl = document.createElement('button');
