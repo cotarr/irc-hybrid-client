@@ -412,7 +412,7 @@ rulerDivEl.removeChild(rulerTextareaEl);
 // perform regression (2 equation, 2 variables) to get slope and intercept (Y = mX + b)
 if (!webState.watch) webState.dynamic = {};
 webState.dynamic.inputAreaCharWidthPx = (rulerY2 - rulerY1) / (rulerX2-rulerX1);
-webState.dynamic.inputAreaEndsWidthPx = rulerY1 - (rulerX1 * webState.dynamic.inputAreaCharWidthPx);
+webState.dynamic.inputAreaSideWidthPx = rulerY1 - (rulerX1 * webState.dynamic.inputAreaCharWidthPx);
 
 // Create <button> elment and fill with "Send" string value
 let rulerButtonEl = document.createElement('button');
@@ -421,6 +421,11 @@ rulerDivEl.appendChild(rulerButtonEl);
 webState.dynamic.sendButtonWidthPx = rulerButtonEl.getBoundingClientRect().width;
 // done, remove the temporary element
 rulerDivEl.removeChild(rulerButtonEl);
+
+//
+// Common margin for all windows in pixels (window width outside textarea)
+//
+webState.dynamic.commonMargin = 50;
 //
 // Finished determination of dynamic element width varaibles
 // ---------------------------------------------------------------------------
@@ -436,13 +441,13 @@ const calcInputAreaColSize = function (marginPxWidth) {
     (webState.dynamic.inputAreaCharWidthPx) &&
     (typeof webState.dynamic.inputAreaCharWidthPx === 'number') &&
     (webState.dynamic.inputAreaCharWidthPx > 1) &&
-    (webState.dynamic.inputAreaEndsWidthPx) &&
-    (typeof webState.dynamic.inputAreaEndsWidthPx === 'number') &&
-    (webState.dynamic.inputAreaEndsWidthPx > 1)) {
+    (webState.dynamic.inputAreaSideWidthPx) &&
+    (typeof webState.dynamic.inputAreaSideWidthPx === 'number') &&
+    (webState.dynamic.inputAreaSideWidthPx > 1)) {
     let margin = marginPxWidth;
     if (margin < 0) margin = 0;
     let cols = parseInt(
-      (window.innerWidth - webState.dynamic.inputAreaEndsWidthPx - margin) /
+      (window.innerWidth - webState.dynamic.inputAreaSideWidthPx - margin) /
       webState.dynamic.inputAreaCharWidthPx);
     return cols.toString();
   } else {
@@ -456,48 +461,17 @@ const calcInputAreaColSize = function (marginPxWidth) {
 //
 const adjustInputToWidowWidth = function (innerWidth) {
   // pixel width mar1 is reserved space on edges of input area at full screen width
-  let mar1 = 50;
+  let mar1 = webState.dynamic.commonMargin;
   // set width of input area elements
   document.getElementById('rawMessageDisplay').setAttribute('cols', calcInputAreaColSize(mar1));
   document.getElementById('noticeMessageDisplay').setAttribute('cols', calcInputAreaColSize(mar1));
   document.getElementById('wallopsMessageDisplay').setAttribute('cols', calcInputAreaColSize(mar1));
 
   // pixel width mar2 is reserved space on edges of input area with send button added
-  let mar2 = mar1 + 5 + webState.dynamic.sendButtonWidthPx;
+  let mar2 = webState.dynamic.commonMargin + 5 + webState.dynamic.sendButtonWidthPx;
   // set width of input area elements
   document.getElementById('rawMessageInputId').setAttribute('cols', calcInputAreaColSize(mar2));
   document.getElementById('userPrivMsgInputId').setAttribute('cols', calcInputAreaColSize(mar2));
-
-  // pixed width mar3 is reserved space on edges of input area with channel nickname list on sides
-  let mar3 = mar1 + 170;
-
-  // In the IRC channel area (dynamic generated window)
-  // This is to handle main text area when it is split with nickname list.
-  if (webState.resizableChanSplitTextareaIds.length > 0) {
-    webState.resizableChanSplitTextareaIds.forEach(function(id) {
-      if (document.getElementById(id)) {
-        if (window.innerWidth > 600) {
-          document.getElementById(id).setAttribute('cols', calcInputAreaColSize(mar3));
-        } else {
-          document.getElementById(id).setAttribute('cols', calcInputAreaColSize(mar1));
-        }
-      } else {
-        console.log('Error: ' + id);
-      }
-    });
-  }
-
-  // In the IRC channel area (dynamic generated window),
-  //      this is to handle the text input area with SEND button next to it.
-  if (webState.resizableSendButtonTextareaIds.length > 0) {
-    webState.resizableSendButtonTextareaIds.forEach(function(id) {
-      if (document.getElementById(id)) {
-        document.getElementById(id).setAttribute('cols', calcInputAreaColSize(mar2));
-      } else {
-        console.log('Error: ' + id);
-      }
-    });
-  }
 
   // In the private message area (dynamic generated window)
   //   this is to handle the main text area

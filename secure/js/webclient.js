@@ -129,8 +129,6 @@ webState.lastIrcServerIndex = -1;
 // Some IRC channel local variables (most in ircState)
 webState.channels = [];
 webState.channelStates = [];
-webState.resizableChanSplitTextareaIds = [];
-webState.resizableSendButtonTextareaIds = [];
 // Private message variables
 webState.lastPMNick = '';
 webState.activePrivateMessageNicks = [];
@@ -580,8 +578,6 @@ function setVariablesShowingIRCDisconnected () {
   }
   webState.channels = [];
   webState.channelStates = [];
-  webState.resizableChanSplitTextareaIds = [];
-  webState.resizableSendButtonTextareaIds = [];
   // Note PM area arrays managed during reload instead of Disconnect
   // This is because they are not in ircState and there managed in the browser.
 };

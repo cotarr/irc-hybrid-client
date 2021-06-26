@@ -29,16 +29,16 @@ progVersion:"0.0.0",progName:"",times:{programRun:0,ircConnect:0},count:{ircConn
 ;document.getElementById("ircConnectIconId").removeAttribute("connected");document.getElementById("webConnectIconId").removeAttribute("connecting")
 ;document.getElementById("ircConnectIconId").removeAttribute("connecting");var webState={};webState.loginUser={};webState.webConnectOn=true;webState.webConnected=false;webState.webConnecting=false
 ;webState.ircConnecting=false;webState.websocketCount=0;webState.noticeOpen=false;webState.wallopsOpen=false;webState.viewRawMessages=false;webState.showRawInHex=false;webState.showCommsMessages=false
-;webState.lastIrcServerIndex=-1;webState.channels=[];webState.channelStates=[];webState.resizableChanSplitTextareaIds=[];webState.resizableSendButtonTextareaIds=[];webState.lastPMNick=""
-;webState.activePrivateMessageNicks=[];webState.resizablePrivMsgTextareaIds=[];webState.resizableSendButtonPMTextareaIds=[];webState.times={webConnect:0};webState.count={webConnect:0}
-;webState.cacheInhibitTimer=0;var webServerUrl="https://";var webSocketUrl="wss://";if(document.location.protocol==="http:"){webServerUrl="http://";webSocketUrl="ws://"}
-webServerUrl+=window.location.hostname+":"+window.location.port;webSocketUrl+=window.location.hostname+":"+window.location.port;var wsocket=null;const beep1=new Audio("sounds/short-beep1.mp3")
-;const beep2=new Audio("sounds/short-beep2.mp3");const beep3=new Audio("sounds/short-beep3.mp3");var beep1InhibitTimer=0;var beep2InhibitTimer=0;var beep3InhibitTimer=0;function beepTimerTick(){
-if(beep1InhibitTimer>0)beep1InhibitTimer--;if(beep2InhibitTimer>0)beep2InhibitTimer--;if(beep3InhibitTimer>0)beep3InhibitTimer--}function inhibitBeep(seconds){beep1InhibitTimer=seconds
-;beep2InhibitTimer=seconds;beep3InhibitTimer=seconds}function playBeep1Sound(){if(beep1InhibitTimer===0){beep1.play();beep1InhibitTimer=5}}function playBeep2Sound(){if(beep2InhibitTimer===0){
-beep2.play();beep2InhibitTimer=5}}function playBeep3Sound(){if(beep3InhibitTimer===0){beep3.play();beep3InhibitTimer=5}}const errorExpireSeconds=5;var errorRemainSeconds=0;function clearError(){
-let errorDivEl=document.getElementById("errorDiv");errorDivEl.setAttribute("hidden","");let errorContentDivEl=document.getElementById("errorContentDiv");while(errorContentDivEl.firstChild){
-errorContentDivEl.removeChild(errorContentDivEl.firstChild)}errorRemainSeconds=0}function showError(errorString){let errorDivEl=document.getElementById("errorDiv");errorDivEl.removeAttribute("hidden")
+;webState.lastIrcServerIndex=-1;webState.channels=[];webState.channelStates=[];webState.lastPMNick="";webState.activePrivateMessageNicks=[];webState.resizablePrivMsgTextareaIds=[]
+;webState.resizableSendButtonPMTextareaIds=[];webState.times={webConnect:0};webState.count={webConnect:0};webState.cacheInhibitTimer=0;var webServerUrl="https://";var webSocketUrl="wss://"
+;if(document.location.protocol==="http:"){webServerUrl="http://";webSocketUrl="ws://"}webServerUrl+=window.location.hostname+":"+window.location.port
+;webSocketUrl+=window.location.hostname+":"+window.location.port;var wsocket=null;const beep1=new Audio("sounds/short-beep1.mp3");const beep2=new Audio("sounds/short-beep2.mp3")
+;const beep3=new Audio("sounds/short-beep3.mp3");var beep1InhibitTimer=0;var beep2InhibitTimer=0;var beep3InhibitTimer=0;function beepTimerTick(){if(beep1InhibitTimer>0)beep1InhibitTimer--
+;if(beep2InhibitTimer>0)beep2InhibitTimer--;if(beep3InhibitTimer>0)beep3InhibitTimer--}function inhibitBeep(seconds){beep1InhibitTimer=seconds;beep2InhibitTimer=seconds;beep3InhibitTimer=seconds}
+function playBeep1Sound(){if(beep1InhibitTimer===0){beep1.play();beep1InhibitTimer=5}}function playBeep2Sound(){if(beep2InhibitTimer===0){beep2.play();beep2InhibitTimer=5}}function playBeep3Sound(){
+if(beep3InhibitTimer===0){beep3.play();beep3InhibitTimer=5}}const errorExpireSeconds=5;var errorRemainSeconds=0;function clearError(){let errorDivEl=document.getElementById("errorDiv")
+;errorDivEl.setAttribute("hidden","");let errorContentDivEl=document.getElementById("errorContentDiv");while(errorContentDivEl.firstChild){errorContentDivEl.removeChild(errorContentDivEl.firstChild)}
+errorRemainSeconds=0}function showError(errorString){let errorDivEl=document.getElementById("errorDiv");errorDivEl.removeAttribute("hidden")
 ;let errorContentDivEl=document.getElementById("errorContentDiv");let errorMessageEl=document.createElement("div");errorMessageEl.textContent=errorString||"Error: unknown error (2993)"
 ;errorContentDivEl.appendChild(errorMessageEl);errorRemainSeconds=errorExpireSeconds}document.addEventListener("show-error-message",function(event){showError(event.detail.message)})
 ;document.getElementById("errorDiv").addEventListener("click",function(){clearError()});function errorTimerTickHandler(){if(errorRemainSeconds>0){errorRemainSeconds--;if(errorRemainSeconds===0){
@@ -116,9 +116,9 @@ document.getElementById("webConnectIconId").removeAttribute("connected");documen
 ;document.getElementById("hiddenInfoDiv").setAttribute("hidden","");document.getElementById("infoOpenCloseButton").textContent="+"});function setVariablesShowingIRCDisconnected(){
 document.getElementById("headerUser").textContent="";document.getElementById("headerServer").textContent="";document.dispatchEvent(new CustomEvent("cancel-beep-sounds",{bubbles:true}))
 ;let channelContainerDivEl=document.getElementById("channelContainerDiv");while(channelContainerDivEl.firstChild){channelContainerDivEl.removeChild(channelContainerDivEl.firstChild)}
-webState.channels=[];webState.channelStates=[];webState.resizableChanSplitTextareaIds=[];webState.resizableSendButtonTextareaIds=[]}const heartbeatExpirationTimeSeconds=15;var heartbeatUpCounter=0
-;function resetHeartbeatTimer(){heartbeatUpCounter=0}function onHeartbeatReceived(){heartbeatUpCounter=0}function heartbeatTimerTickHandler(){heartbeatUpCounter++;if(webState.webConnected){
-if(heartbeatUpCounter>heartbeatExpirationTimeSeconds+1){console.log("HEARTBEAT timeout + 2 seconds, socket unresponsive, forcing disconnect")
+webState.channels=[];webState.channelStates=[]}const heartbeatExpirationTimeSeconds=15;var heartbeatUpCounter=0;function resetHeartbeatTimer(){heartbeatUpCounter=0}function onHeartbeatReceived(){
+heartbeatUpCounter=0}function heartbeatTimerTickHandler(){heartbeatUpCounter++;if(webState.webConnected){if(heartbeatUpCounter>heartbeatExpirationTimeSeconds+1){
+console.log("HEARTBEAT timeout + 2 seconds, socket unresponsive, forcing disconnect")
 ;document.getElementById("reconnectStatusDiv").textContent+="Web socket connection timeout, socket unresponsive, force disconnect\n";webState.webConnected=false;webState.webConnecting=false
 ;setVariablesShowingIRCDisconnected();updateDivVisibility()}else if(heartbeatUpCounter===heartbeatExpirationTimeSeconds){console.log("HEARTBEAT timeout + 0 seconds , attempting to closing socket")
 ;document.getElementById("reconnectStatusDiv").textContent+="Web socket connection timeout, attempting to close\n";if(wsocket){wsocket.close(3e3,"Heartbeat timeout")}}}}
@@ -381,10 +381,10 @@ console.log("createChannelEl: channel already exist");return}const defaultHeight
 ;channelNormalButtonEl.classList.add("channel-button");let channelClearButtonEl=document.createElement("button");channelClearButtonEl.textContent="Clear"
 ;channelClearButtonEl.classList.add("channel-button");let channelBottomDivEl=document.createElement("div");channelBottomDivEl.classList.add("channel-bottom-div")
 ;let channelTopicDivEl=document.createElement("div");channelTopicDivEl.textContent=cleanFormatting(ircState.channelStates[channelIndex].topic);channelTopicDivEl.classList.add("chan-topic-div")
-;let channelNamesDisplayEl=document.createElement("textarea");channelNamesDisplayEl.classList.add("channel-names-display");channelNamesDisplayEl.setAttribute("cols","20")
-;channelNamesDisplayEl.setAttribute("rows",defaultHeightInRows);channelNamesDisplayEl.setAttribute("spellCheck","false");channelNamesDisplayEl.setAttribute("readonly","")
-;let channelTextAreaEl=document.createElement("textarea");let channelTextAreaId="chan"+channelIndex.toString()+"TextAreaId";channelTextAreaEl.id=channelTextAreaId
-;channelTextAreaEl.setAttribute("cols","30");channelTextAreaEl.setAttribute("rows",defaultHeightInRows);channelTextAreaEl.setAttribute("spellCheck","false")
+;let channelNamesCharWidth=20;let channelNamesDisplayEl=document.createElement("textarea");channelNamesDisplayEl.classList.add("channel-names-display")
+;channelNamesDisplayEl.setAttribute("cols",channelNamesCharWidth.toString());channelNamesDisplayEl.setAttribute("rows",defaultHeightInRows);channelNamesDisplayEl.setAttribute("spellCheck","false")
+;channelNamesDisplayEl.setAttribute("readonly","");let channelTextAreaEl=document.createElement("textarea");let channelTextAreaId="chan"+channelIndex.toString()+"TextAreaId"
+;channelTextAreaEl.id=channelTextAreaId;channelTextAreaEl.setAttribute("cols","30");channelTextAreaEl.setAttribute("rows",defaultHeightInRows);channelTextAreaEl.setAttribute("spellCheck","false")
 ;channelTextAreaEl.setAttribute("readonly","");let channelBottomDiv1El=document.createElement("div");channelBottomDiv1El.classList.add("button-div")
 ;let channelInputAreaEl=document.createElement("textarea");let channelInputAreaId="chan"+channelIndex.toString()+"InputInputId";channelInputAreaEl.id=channelInputAreaId
 ;channelInputAreaEl.setAttribute("cols","120");channelInputAreaEl.setAttribute("rows","1");channelInputAreaEl.classList.add("va-middle");channelInputAreaEl.classList.add("rm5")
@@ -428,15 +428,13 @@ let newRows=parseInt(channelTextAreaEl.getAttribute("rows"))+10;channelTextAreaE
 ;channelHideButtonEl.textContent="+";channelTopRightHidableDivEl.setAttribute("hidden","")});channelJoinButtonEl.addEventListener("click",function(){let message="JOIN "+name
 ;_sendIrcServerMessage(message)});channelPartButtonEl.addEventListener("click",function(){let message="PART "+name+" :"+ircState.progName+" "+ircState.progVersion;_sendIrcServerMessage(message)})
 ;channelPruneButtonEl.addEventListener("click",function(){function _removeChannelFromDom(){let webStateChannelsIndex=webState.channels.indexOf(name.toLowerCase());if(webStateChannelsIndex>=0){
-webState.channels.splice(webStateChannelsIndex,1);webState.channelStates.splice(webStateChannelsIndex,1)}let tempIndex1=webState.resizableSendButtonTextareaIds.indexOf(channelInputAreaId)
-;if(tempIndex1>=0){webState.resizableSendButtonTextareaIds.splice(tempIndex1,1)}let tempIndex2=webState.resizableChanSplitTextareaIds.indexOf(channelTextAreaId);if(tempIndex2>=0){
-webState.resizableChanSplitTextareaIds.splice(tempIndex2,1)}channelContainerDivEl.removeChild(channelMainSectionEl)}let index=ircState.channels.indexOf(name.toLowerCase());if(index>=0){
-if(!ircState.channelStates[index].joined){let fetchURL=webServerUrl+"/irc/prune";let fetchOptions={method:"POST",headers:{"Content-type":"application/json",Accept:"application/json"},
-body:JSON.stringify({channel:name})};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()}else{throw new Error("Fetch status "+response.status+" "+response.statusText)}
-}).then(responseJson=>{if(responseJson.error){showError(responseJson.message)}else{_removeChannelFromDom()}}).catch(error=>{console.log(error)})}}else{_removeChannelFromDom()}})
-;channelRefreshButtonEl.addEventListener("click",function(){document.dispatchEvent(new CustomEvent("update-from-cache",{bubbles:true}));channelNamesDisplayEl.value=""
-;_sendIrcServerMessage("NAMES "+name)});channelSendButtonEl.addEventListener("click",function(){_sendTextToChannel(channelIndex,channelInputAreaEl);channelInputAreaEl.focus()
-;resetChanActivityIcon(channelIndex);activityIconInhibitTimer=activityIconInhibitTimerValue}.bind(this));channelInputAreaEl.addEventListener("input",function(event){
+webState.channels.splice(webStateChannelsIndex,1);webState.channelStates.splice(webStateChannelsIndex,1)}channelContainerDivEl.removeChild(channelMainSectionEl)}
+let index=ircState.channels.indexOf(name.toLowerCase());if(index>=0){if(!ircState.channelStates[index].joined){let fetchURL=webServerUrl+"/irc/prune";let fetchOptions={method:"POST",headers:{
+"Content-type":"application/json",Accept:"application/json"},body:JSON.stringify({channel:name})};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()}else{
+throw new Error("Fetch status "+response.status+" "+response.statusText)}}).then(responseJson=>{if(responseJson.error){showError(responseJson.message)}else{_removeChannelFromDom()}}).catch(error=>{
+console.log(error)})}}else{_removeChannelFromDom()}});channelRefreshButtonEl.addEventListener("click",function(){document.dispatchEvent(new CustomEvent("update-from-cache",{bubbles:true}))
+;channelNamesDisplayEl.value="";_sendIrcServerMessage("NAMES "+name)});channelSendButtonEl.addEventListener("click",function(){_sendTextToChannel(channelIndex,channelInputAreaEl)
+;channelInputAreaEl.focus();resetChanActivityIcon(channelIndex);activityIconInhibitTimer=activityIconInhibitTimerValue}.bind(this));channelInputAreaEl.addEventListener("input",function(event){
 if(event.inputType==="insertText"&&event.data===null||event.inputType==="insertLineBreak"){_sendTextToChannel(channelIndex,channelInputAreaEl);resetChanActivityIcon(channelIndex)
 ;activityIconInhibitTimer=activityIconInhibitTimerValue}}.bind(this));channelMainSectionEl.addEventListener("click",function(){resetChanActivityIcon(channelIndex)
 ;activityIconInhibitTimer=activityIconInhibitTimerValue}.bind(this));function updateVisibility(){let index=ircState.channels.indexOf(name.toLowerCase());if(index>=0){
@@ -536,8 +534,13 @@ _addText(parsedMessage.timestamp,"*","Topic for "+parsedMessage.params[0]+' chan
 ;document.addEventListener("erase-before-reload",function(event){channelTextAreaEl.value="";channelInputAreaEl.value=""}.bind(this));document.addEventListener("cache-reload-done",function(event){
 let markerString="";let timestampString="";if("detail"in event&&"timestamp"in event.detail){timestampString=unixTimestampToHMS(event.detail.timestamp)}if(timestampString){markerString+=timestampString
 }markerString+=" "+cacheReloadString+"\n";if(channelMainSectionEl.hasAttribute("brief-enabled")){markerString+="\n"}channelTextAreaEl.value+=markerString
-;channelTextAreaEl.scrollTop=channelTextAreaEl.scrollHeight}.bind(this));updateVisibility();webState.resizableSendButtonTextareaIds.push(channelInputAreaId)
-;webState.resizableChanSplitTextareaIds.push(channelTextAreaId);document.dispatchEvent(new CustomEvent("element-resize",{bubbles:true}))}var lastJoinedChannelCount=-1;var lastIrcServerIndex=-1
+;channelTextAreaEl.scrollTop=channelTextAreaEl.scrollHeight}.bind(this));updateVisibility();const adjustChannelInputToWidowWidth=function(innerWidth){let mar1=webState.dynamic.commonMargin
+;let mar2=webState.dynamic.commonMargin+5+webState.dynamic.sendButtonWidthPx
+;let nicknameListPixelWidth=webState.dynamic.inputAreaSideWidthPx+channelNamesCharWidth*webState.dynamic.inputAreaCharWidthPx;let mar3=webState.dynamic.commonMargin+nicknameListPixelWidth+6
+;if(window.innerWidth>600){channelNamesDisplayEl.setAttribute("cols",channelNamesCharWidth.toString());channelTextAreaEl.setAttribute("cols",calcInputAreaColSize(mar3))}else{
+channelNamesDisplayEl.setAttribute("cols",calcInputAreaColSize(mar1));channelTextAreaEl.setAttribute("cols",calcInputAreaColSize(mar1))}
+channelInputAreaEl.setAttribute("cols",calcInputAreaColSize(mar2))};window.addEventListener("resize",function(event){if(webState.dynamic.inputAreaCharWidthPx){
+adjustChannelInputToWidowWidth(event.currentTarget.innerWidth)}}.bind(this));adjustChannelInputToWidowWidth(window.innerWidth)}var lastJoinedChannelCount=-1;var lastIrcServerIndex=-1
 ;document.addEventListener("irc-state-changed",function(event){if(ircState.channels.length>0){for(let i=0;i<ircState.channels.length;i++){let name=ircState.channels[i]
 ;if(webState.channels.indexOf(name.toLowerCase())===-1){createChannelEl(name)}}}let needButtonUpdate=false;let joinedChannelCount=0;if(ircState.channels.length>0){
 for(let i=0;i<ircState.channels.length;i++){if(ircState.channelStates[i].joined)joinedChannelCount++}}if(joinedChannelCount!==lastJoinedChannelCount){needButtonUpdate=true
@@ -754,23 +757,20 @@ showError(responseJson.message)}}).catch(error=>{console.log(error);if(error)sho
 ;let rulerTextareaEl=document.createElement("textarea");rulerTextareaEl.setAttribute("cols",rulerX1.toString());rulerTextareaEl.setAttribute("rows","1");rulerDivEl.appendChild(rulerTextareaEl)
 ;let rulerY1=rulerTextareaEl.getBoundingClientRect().width;rulerTextareaEl.setAttribute("cols",rulerX2.toString());let rulerY2=rulerTextareaEl.getBoundingClientRect().width
 ;rulerDivEl.removeChild(rulerTextareaEl);if(!webState.watch)webState.dynamic={};webState.dynamic.inputAreaCharWidthPx=(rulerY2-rulerY1)/(rulerX2-rulerX1)
-;webState.dynamic.inputAreaEndsWidthPx=rulerY1-rulerX1*webState.dynamic.inputAreaCharWidthPx;let rulerButtonEl=document.createElement("button");rulerButtonEl.textContent="Send"
-;rulerDivEl.appendChild(rulerButtonEl);webState.dynamic.sendButtonWidthPx=rulerButtonEl.getBoundingClientRect().width;rulerDivEl.removeChild(rulerButtonEl)
+;webState.dynamic.inputAreaSideWidthPx=rulerY1-rulerX1*webState.dynamic.inputAreaCharWidthPx;let rulerButtonEl=document.createElement("button");rulerButtonEl.textContent="Send"
+;rulerDivEl.appendChild(rulerButtonEl);webState.dynamic.sendButtonWidthPx=rulerButtonEl.getBoundingClientRect().width;rulerDivEl.removeChild(rulerButtonEl);webState.dynamic.commonMargin=50
 ;const calcInputAreaColSize=function(marginPxWidth){
-if(typeof marginPxWidth==="number"&&webState.dynamic.inputAreaCharWidthPx&&typeof webState.dynamic.inputAreaCharWidthPx==="number"&&webState.dynamic.inputAreaCharWidthPx>1&&webState.dynamic.inputAreaEndsWidthPx&&typeof webState.dynamic.inputAreaEndsWidthPx==="number"&&webState.dynamic.inputAreaEndsWidthPx>1){
-let margin=marginPxWidth;if(margin<0)margin=0;let cols=parseInt((window.innerWidth-webState.dynamic.inputAreaEndsWidthPx-margin)/webState.dynamic.inputAreaCharWidthPx);return cols.toString()}else{
-console.log("alcInputAreaColSize() invalid input");return null}};const adjustInputToWidowWidth=function(innerWidth){let mar1=50
+if(typeof marginPxWidth==="number"&&webState.dynamic.inputAreaCharWidthPx&&typeof webState.dynamic.inputAreaCharWidthPx==="number"&&webState.dynamic.inputAreaCharWidthPx>1&&webState.dynamic.inputAreaSideWidthPx&&typeof webState.dynamic.inputAreaSideWidthPx==="number"&&webState.dynamic.inputAreaSideWidthPx>1){
+let margin=marginPxWidth;if(margin<0)margin=0;let cols=parseInt((window.innerWidth-webState.dynamic.inputAreaSideWidthPx-margin)/webState.dynamic.inputAreaCharWidthPx);return cols.toString()}else{
+console.log("alcInputAreaColSize() invalid input");return null}};const adjustInputToWidowWidth=function(innerWidth){let mar1=webState.dynamic.commonMargin
 ;document.getElementById("rawMessageDisplay").setAttribute("cols",calcInputAreaColSize(mar1));document.getElementById("noticeMessageDisplay").setAttribute("cols",calcInputAreaColSize(mar1))
-;document.getElementById("wallopsMessageDisplay").setAttribute("cols",calcInputAreaColSize(mar1));let mar2=mar1+5+webState.dynamic.sendButtonWidthPx
+;document.getElementById("wallopsMessageDisplay").setAttribute("cols",calcInputAreaColSize(mar1));let mar2=webState.dynamic.commonMargin+5+webState.dynamic.sendButtonWidthPx
 ;document.getElementById("rawMessageInputId").setAttribute("cols",calcInputAreaColSize(mar2));document.getElementById("userPrivMsgInputId").setAttribute("cols",calcInputAreaColSize(mar2))
-;let mar3=mar1+170;if(webState.resizableChanSplitTextareaIds.length>0){webState.resizableChanSplitTextareaIds.forEach(function(id){if(document.getElementById(id)){if(window.innerWidth>600){
-document.getElementById(id).setAttribute("cols",calcInputAreaColSize(mar3))}else{document.getElementById(id).setAttribute("cols",calcInputAreaColSize(mar1))}}else{console.log("Error: "+id)}})}
-if(webState.resizableSendButtonTextareaIds.length>0){webState.resizableSendButtonTextareaIds.forEach(function(id){if(document.getElementById(id)){
-document.getElementById(id).setAttribute("cols",calcInputAreaColSize(mar2))}else{console.log("Error: "+id)}})}if(webState.resizablePrivMsgTextareaIds.length>0){
-webState.resizablePrivMsgTextareaIds.forEach(function(id){if(document.getElementById(id)){document.getElementById(id).setAttribute("cols",calcInputAreaColSize(mar1))}else{console.log("Error: "+id)}})}
-if(webState.resizableSendButtonPMTextareaIds.length>0){webState.resizableSendButtonPMTextareaIds.forEach(function(id){if(document.getElementById(id)){
-document.getElementById(id).setAttribute("cols",calcInputAreaColSize(mar2))}else{console.log("Error: "+id)}})}document.getElementById("errorDiv").style.width="100%"
-;if(!webState.watch)webState.watch={};webState.watch.innerWidth=window.innerWidth.toString()+"px";webState.watch.innerHeight=window.innerHeight.toString()+"px"}
-;window.addEventListener("resize",function(event){if(webState.dynamic.inputAreaCharWidthPx){adjustInputToWidowWidth(event.currentTarget.innerWidth)}}.bind(this))
-;window.addEventListener("element-resize",function(event){adjustInputToWidowWidth(window.innerWidth)}.bind(this));adjustInputToWidowWidth(window.innerWidth);setInterval(function(){
-errorTimerTickHandler();heartbeatTimerTickHandler();reconnectTimerTickHandler();beepTimerTick();updateElapsedTimeDisplay();cacheInhibitTimerTick()}.bind(this),1e3);firstWebSocketConnectOnPageLoad();
+;if(webState.resizablePrivMsgTextareaIds.length>0){webState.resizablePrivMsgTextareaIds.forEach(function(id){if(document.getElementById(id)){
+document.getElementById(id).setAttribute("cols",calcInputAreaColSize(mar1))}else{console.log("Error: "+id)}})}if(webState.resizableSendButtonPMTextareaIds.length>0){
+webState.resizableSendButtonPMTextareaIds.forEach(function(id){if(document.getElementById(id)){document.getElementById(id).setAttribute("cols",calcInputAreaColSize(mar2))}else{
+console.log("Error: "+id)}})}document.getElementById("errorDiv").style.width="100%";if(!webState.watch)webState.watch={};webState.watch.innerWidth=window.innerWidth.toString()+"px"
+;webState.watch.innerHeight=window.innerHeight.toString()+"px"};window.addEventListener("resize",function(event){if(webState.dynamic.inputAreaCharWidthPx){
+adjustInputToWidowWidth(event.currentTarget.innerWidth)}}.bind(this));window.addEventListener("element-resize",function(event){adjustInputToWidowWidth(window.innerWidth)}.bind(this))
+;adjustInputToWidowWidth(window.innerWidth);setInterval(function(){errorTimerTickHandler();heartbeatTimerTickHandler();reconnectTimerTickHandler();beepTimerTick();updateElapsedTimeDisplay()
+;cacheInhibitTimerTick()}.bind(this),1e3);firstWebSocketConnectOnPageLoad();

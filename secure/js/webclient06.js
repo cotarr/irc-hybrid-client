@@ -166,9 +166,10 @@ function createChannelEl (name) {
   channelTopicDivEl.classList.add('chan-topic-div');
 
   // list of nick names display
+  let channelNamesCharWidth = 20;
   let channelNamesDisplayEl = document.createElement('textarea');
   channelNamesDisplayEl.classList.add('channel-names-display');
-  channelNamesDisplayEl.setAttribute('cols', '20');
+  channelNamesDisplayEl.setAttribute('cols', channelNamesCharWidth.toString());
   channelNamesDisplayEl.setAttribute('rows', defaultHeightInRows);
   channelNamesDisplayEl.setAttribute('spellCheck', 'false');
   channelNamesDisplayEl.setAttribute('readonly', '');
@@ -177,6 +178,7 @@ function createChannelEl (name) {
   let channelTextAreaEl = document.createElement('textarea');
   let channelTextAreaId = 'chan' + channelIndex.toString() + 'TextAreaId';
   channelTextAreaEl.id = channelTextAreaId;
+  // this is temporary, the width (cols attribute) will be resized dynamically
   channelTextAreaEl.setAttribute('cols', '30');
   channelTextAreaEl.setAttribute('rows', defaultHeightInRows);
   channelTextAreaEl.setAttribute('spellCheck', 'false');
@@ -432,16 +434,6 @@ function createChannelEl (name) {
       if (webStateChannelsIndex >= 0) {
         webState.channels.splice(webStateChannelsIndex, 1);
         webState.channelStates.splice(webStateChannelsIndex, 1);
-      }
-
-      // remove resizeable screenwidth references
-      let tempIndex1 = webState.resizableSendButtonTextareaIds.indexOf(channelInputAreaId);
-      if (tempIndex1 >= 0) {
-        webState.resizableSendButtonTextareaIds.splice(tempIndex1, 1);
-      }
-      let tempIndex2 = webState.resizableChanSplitTextareaIds.indexOf(channelTextAreaId);
-      if (tempIndex2 >= 0) {
-        webState.resizableChanSplitTextareaIds.splice(tempIndex2, 1);
       }
 
       // This removes self (own element)
@@ -1238,12 +1230,50 @@ function createChannelEl (name) {
 
   // set visibility and divs
   updateVisibility();
+
   // -----------------------------------------------------------
-  // Setup textarea elements as dynamically resizable (globally)
+  // Setup textarea elements as dynamically resizable
   // -----------------------------------------------------------
-  webState.resizableSendButtonTextareaIds.push(channelInputAreaId);
-  webState.resizableChanSplitTextareaIds.push(channelTextAreaId);
-  document.dispatchEvent(new CustomEvent('element-resize', {bubbles: true}));
+  //
+  // Scale values for <textarea> are calculated in webclient10.js
+  // and saved globally in the webState object
+  //
+  const adjustChannelInputToWidowWidth = function (innerWidth) {
+    // pixel width mar1 is reserved space on edges of input area at full screen width
+    let mar1 = webState.dynamic.commonMargin;
+    // pixel width mar2 is reserved space on edges of input area with send button added
+    let mar2 = webState.dynamic.commonMargin + 5 + webState.dynamic.sendButtonWidthPx;
+    // pixed width mar3 is reserved space on edges of input area with channel nickname list on sides
+
+    // get size of nickname list element
+    let nicknameListPixelWidth = webState.dynamic.inputAreaSideWidthPx +
+      (channelNamesCharWidth * webState.dynamic.inputAreaCharWidthPx);
+
+    // nickname list + right margin.
+    let mar3 = webState.dynamic.commonMargin + nicknameListPixelWidth + 6;
+
+    if (window.innerWidth > 600) {
+      channelNamesDisplayEl.setAttribute('cols', channelNamesCharWidth.toString());
+      channelTextAreaEl.setAttribute('cols', calcInputAreaColSize(mar3));
+    } else {
+      channelNamesDisplayEl.setAttribute('cols', calcInputAreaColSize(mar1));
+      channelTextAreaEl.setAttribute('cols', calcInputAreaColSize(mar1));
+    }
+    channelInputAreaEl.setAttribute('cols', calcInputAreaColSize(mar2));
+  }; // adjustChannelInputToWidowWidth()
+  //
+  // Event listener for resize window (generic browser event)
+  //
+  window.addEventListener('resize', function(event) {
+    // ignore resize events before dynamic size variables exist
+    if (webState.dynamic.inputAreaCharWidthPx) {
+      adjustChannelInputToWidowWidth(event.currentTarget.innerWidth);
+    }
+  }.bind(this));
+  //
+  // Resize on creating channel window
+  //
+  adjustChannelInputToWidowWidth(window.innerWidth);
 };
 
 // ----------------------------------------------------------------------
