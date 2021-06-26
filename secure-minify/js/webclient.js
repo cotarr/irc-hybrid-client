@@ -29,16 +29,15 @@ progVersion:"0.0.0",progName:"",times:{programRun:0,ircConnect:0},count:{ircConn
 ;document.getElementById("ircConnectIconId").removeAttribute("connected");document.getElementById("webConnectIconId").removeAttribute("connecting")
 ;document.getElementById("ircConnectIconId").removeAttribute("connecting");var webState={};webState.loginUser={};webState.webConnectOn=true;webState.webConnected=false;webState.webConnecting=false
 ;webState.ircConnecting=false;webState.websocketCount=0;webState.noticeOpen=false;webState.wallopsOpen=false;webState.viewRawMessages=false;webState.showRawInHex=false;webState.showCommsMessages=false
-;webState.lastIrcServerIndex=-1;webState.channels=[];webState.channelStates=[];webState.lastPMNick="";webState.activePrivateMessageNicks=[];webState.resizablePrivMsgTextareaIds=[]
-;webState.resizableSendButtonPMTextareaIds=[];webState.times={webConnect:0};webState.count={webConnect:0};webState.cacheInhibitTimer=0;var webServerUrl="https://";var webSocketUrl="wss://"
-;if(document.location.protocol==="http:"){webServerUrl="http://";webSocketUrl="ws://"}webServerUrl+=window.location.hostname+":"+window.location.port
-;webSocketUrl+=window.location.hostname+":"+window.location.port;var wsocket=null;const beep1=new Audio("sounds/short-beep1.mp3");const beep2=new Audio("sounds/short-beep2.mp3")
-;const beep3=new Audio("sounds/short-beep3.mp3");var beep1InhibitTimer=0;var beep2InhibitTimer=0;var beep3InhibitTimer=0;function beepTimerTick(){if(beep1InhibitTimer>0)beep1InhibitTimer--
-;if(beep2InhibitTimer>0)beep2InhibitTimer--;if(beep3InhibitTimer>0)beep3InhibitTimer--}function inhibitBeep(seconds){beep1InhibitTimer=seconds;beep2InhibitTimer=seconds;beep3InhibitTimer=seconds}
-function playBeep1Sound(){if(beep1InhibitTimer===0){beep1.play();beep1InhibitTimer=5}}function playBeep2Sound(){if(beep2InhibitTimer===0){beep2.play();beep2InhibitTimer=5}}function playBeep3Sound(){
-if(beep3InhibitTimer===0){beep3.play();beep3InhibitTimer=5}}const errorExpireSeconds=5;var errorRemainSeconds=0;function clearError(){let errorDivEl=document.getElementById("errorDiv")
-;errorDivEl.setAttribute("hidden","");let errorContentDivEl=document.getElementById("errorContentDiv");while(errorContentDivEl.firstChild){errorContentDivEl.removeChild(errorContentDivEl.firstChild)}
-errorRemainSeconds=0}function showError(errorString){let errorDivEl=document.getElementById("errorDiv");errorDivEl.removeAttribute("hidden")
+;webState.lastIrcServerIndex=-1;webState.channels=[];webState.channelStates=[];webState.lastPMNick="";webState.activePrivateMessageNicks=[];webState.times={webConnect:0};webState.count={webConnect:0}
+;webState.cacheInhibitTimer=0;var webServerUrl="https://";var webSocketUrl="wss://";if(document.location.protocol==="http:"){webServerUrl="http://";webSocketUrl="ws://"}
+webServerUrl+=window.location.hostname+":"+window.location.port;webSocketUrl+=window.location.hostname+":"+window.location.port;var wsocket=null;const beep1=new Audio("sounds/short-beep1.mp3")
+;const beep2=new Audio("sounds/short-beep2.mp3");const beep3=new Audio("sounds/short-beep3.mp3");var beep1InhibitTimer=0;var beep2InhibitTimer=0;var beep3InhibitTimer=0;function beepTimerTick(){
+if(beep1InhibitTimer>0)beep1InhibitTimer--;if(beep2InhibitTimer>0)beep2InhibitTimer--;if(beep3InhibitTimer>0)beep3InhibitTimer--}function inhibitBeep(seconds){beep1InhibitTimer=seconds
+;beep2InhibitTimer=seconds;beep3InhibitTimer=seconds}function playBeep1Sound(){if(beep1InhibitTimer===0){beep1.play();beep1InhibitTimer=5}}function playBeep2Sound(){if(beep2InhibitTimer===0){
+beep2.play();beep2InhibitTimer=5}}function playBeep3Sound(){if(beep3InhibitTimer===0){beep3.play();beep3InhibitTimer=5}}const errorExpireSeconds=5;var errorRemainSeconds=0;function clearError(){
+let errorDivEl=document.getElementById("errorDiv");errorDivEl.setAttribute("hidden","");let errorContentDivEl=document.getElementById("errorContentDiv");while(errorContentDivEl.firstChild){
+errorContentDivEl.removeChild(errorContentDivEl.firstChild)}errorRemainSeconds=0}function showError(errorString){let errorDivEl=document.getElementById("errorDiv");errorDivEl.removeAttribute("hidden")
 ;let errorContentDivEl=document.getElementById("errorContentDiv");let errorMessageEl=document.createElement("div");errorMessageEl.textContent=errorString||"Error: unknown error (2993)"
 ;errorContentDivEl.appendChild(errorMessageEl);errorRemainSeconds=errorExpireSeconds}document.addEventListener("show-error-message",function(event){showError(event.detail.message)})
 ;document.getElementById("errorDiv").addEventListener("click",function(){clearError()});function errorTimerTickHandler(){if(errorRemainSeconds>0){errorRemainSeconds--;if(errorRemainSeconds===0){
@@ -616,25 +615,28 @@ privMsgSectionEl.removeAttribute("hidden");privMsgBottomDivEl.removeAttribute("h
 ;document.getElementById("privMsgMainHiddenDiv").removeAttribute("hidden");document.getElementById("privMsgMainHiddenButton").textContent="-"
 ;if(document.activeElement!==privMsgInputAreaEl&&document.activeElement!==privMsgSendButtonEl&&webState.cacheInhibitTimer===0&&activityIconInhibitTimer===0){setPmActivityIcon(privMsgIndex)}}}break
 ;default:}});if(webState.cacheInhibitTimer===0){setPmActivityIcon(privMsgIndex)}document.getElementById("privMsgMainHiddenDiv").removeAttribute("hidden")
-;document.getElementById("privMsgMainHiddenButton").textContent="-";webState.resizablePrivMsgTextareaIds.push(privMsgTextAreaId);webState.resizableSendButtonPMTextareaIds.push(privMsgInputAreaId)
-;document.dispatchEvent(new CustomEvent("element-resize",{bubbles:true}))}document.addEventListener("private-message",function(event){let name=event.detail.parsedMessage.nick
-;if(name===ircState.nickName){name=event.detail.parsedMessage.params[0]}if(webState.activePrivateMessageNicks.indexOf(name.toLowerCase())<0){createPrivateMessageEl(name,event.detail.parsedMessage)}})
-;function _buildPrivateMessageText(){if(document.getElementById("userPrivMsgInputId").value.length===0)return;let inputAreaEl=document.getElementById("userPrivMsgInputId")
-;let text=stripTrailingCrLf(inputAreaEl.value);if(detectMultiLineString(text)){inputAreaEl.value="";showError("Multi-line input is not supported.")}else{if(text.length>0){if(text.charAt(0)==="/"){
-let commandAction=textCommandParser({inputString:text,originType:"generic",originName:null});inputAreaEl.value="";if(commandAction.error){showError(commandAction.message);return}else{
-if(commandAction.ircMessage&&commandAction.ircMessage.length>0){_sendIrcServerMessage(commandAction.ircMessage)}return}return}console.log("else not command")
-;if(document.getElementById("pmNickNameInputId").value.length===0)return;let targetNickname=document.getElementById("pmNickNameInputId").value;let message="PRIVMSG "+targetNickname+" :"+text
-;_sendIrcServerMessage(message);inputAreaEl.value=""}}inputAreaEl.value=""}document.getElementById("userPrivMsgInputId").addEventListener("input",function(event){
-if(event.inputType==="insertText"&&event.data===null){_buildPrivateMessageText()}if(event.inputType==="insertLineBreak"){_buildPrivateMessageText()}}.bind(this))
-;document.getElementById("UserPrivMsgSendButton").addEventListener("click",function(){_buildPrivateMessageText()}.bind(this));document.addEventListener("erase-before-reload",function(event){
-document.getElementById("pmNickNameInputId").value="";document.getElementById("userPrivMsgInputId").value=""}.bind(this));document.getElementById("whoisButton").addEventListener("click",function(){
-if(document.getElementById("pmNickNameInputId").value.length>0){showRawMessageWindow();let message="WHOIS "+document.getElementById("pmNickNameInputId").value;_sendIrcServerMessage(message)
-;showRawMessageWindow()}else{showError("Input required")}});document.getElementById("privMsgMainHiddenButton").addEventListener("click",function(){
-if(document.getElementById("privMsgMainHiddenDiv").hasAttribute("hidden")){document.getElementById("privMsgMainHiddenDiv").removeAttribute("hidden")
-;document.getElementById("privMsgMainHiddenButton").textContent="-";document.dispatchEvent(new CustomEvent("priv-msg-show-all",{bubbles:true}))}else{
-document.getElementById("privMsgMainHiddenDiv").setAttribute("hidden","");document.getElementById("privMsgMainHiddenButton").textContent="+"
-;document.dispatchEvent(new CustomEvent("priv-msg-hide-all",{bubbles:true}))}}.bind(this));"use strict";document.getElementById("closeNoticeButton").addEventListener("click",function(){
-webState.noticeOpen=false;updateDivVisibility()}.bind(this));document.getElementById("noticeClearButton").addEventListener("click",function(){document.getElementById("noticeMessageDisplay").value=""
+;document.getElementById("privMsgMainHiddenButton").textContent="-";const adjustPMInputToWidowWidth=function(innerWidth){let mar1=webState.dynamic.commonMargin
+;let mar2=webState.dynamic.commonMargin+5+webState.dynamic.sendButtonWidthPx;privMsgTextAreaEl.setAttribute("cols",calcInputAreaColSize(mar1))
+;privMsgInputAreaEl.setAttribute("cols",calcInputAreaColSize(mar2))};window.addEventListener("resize",function(event){if(webState.dynamic.inputAreaCharWidthPx){
+adjustPMInputToWidowWidth(event.currentTarget.innerWidth)}}.bind(this));adjustPMInputToWidowWidth(window.innerWidth)}document.addEventListener("private-message",function(event){
+let name=event.detail.parsedMessage.nick;if(name===ircState.nickName){name=event.detail.parsedMessage.params[0]}if(webState.activePrivateMessageNicks.indexOf(name.toLowerCase())<0){
+createPrivateMessageEl(name,event.detail.parsedMessage)}});function _buildPrivateMessageText(){if(document.getElementById("userPrivMsgInputId").value.length===0)return
+;let inputAreaEl=document.getElementById("userPrivMsgInputId");let text=stripTrailingCrLf(inputAreaEl.value);if(detectMultiLineString(text)){inputAreaEl.value=""
+;showError("Multi-line input is not supported.")}else{if(text.length>0){if(text.charAt(0)==="/"){let commandAction=textCommandParser({inputString:text,originType:"generic",originName:null})
+;inputAreaEl.value="";if(commandAction.error){showError(commandAction.message);return}else{if(commandAction.ircMessage&&commandAction.ircMessage.length>0){
+_sendIrcServerMessage(commandAction.ircMessage)}return}return}console.log("else not command");if(document.getElementById("pmNickNameInputId").value.length===0)return
+;let targetNickname=document.getElementById("pmNickNameInputId").value;let message="PRIVMSG "+targetNickname+" :"+text;_sendIrcServerMessage(message);inputAreaEl.value=""}}inputAreaEl.value=""}
+document.getElementById("userPrivMsgInputId").addEventListener("input",function(event){if(event.inputType==="insertText"&&event.data===null){_buildPrivateMessageText()}
+if(event.inputType==="insertLineBreak"){_buildPrivateMessageText()}}.bind(this));document.getElementById("UserPrivMsgSendButton").addEventListener("click",function(){_buildPrivateMessageText()
+}.bind(this));document.addEventListener("erase-before-reload",function(event){document.getElementById("pmNickNameInputId").value="";document.getElementById("userPrivMsgInputId").value=""}.bind(this))
+;document.getElementById("whoisButton").addEventListener("click",function(){if(document.getElementById("pmNickNameInputId").value.length>0){showRawMessageWindow()
+;let message="WHOIS "+document.getElementById("pmNickNameInputId").value;_sendIrcServerMessage(message);showRawMessageWindow()}else{showError("Input required")}})
+;document.getElementById("privMsgMainHiddenButton").addEventListener("click",function(){if(document.getElementById("privMsgMainHiddenDiv").hasAttribute("hidden")){
+document.getElementById("privMsgMainHiddenDiv").removeAttribute("hidden");document.getElementById("privMsgMainHiddenButton").textContent="-"
+;document.dispatchEvent(new CustomEvent("priv-msg-show-all",{bubbles:true}))}else{document.getElementById("privMsgMainHiddenDiv").setAttribute("hidden","")
+;document.getElementById("privMsgMainHiddenButton").textContent="+";document.dispatchEvent(new CustomEvent("priv-msg-hide-all",{bubbles:true}))}}.bind(this));"use strict"
+;document.getElementById("closeNoticeButton").addEventListener("click",function(){webState.noticeOpen=false;updateDivVisibility()}.bind(this))
+;document.getElementById("noticeClearButton").addEventListener("click",function(){document.getElementById("noticeMessageDisplay").value=""
 ;document.getElementById("noticeMessageDisplay").setAttribute("rows","5")});document.getElementById("noticeTallerButton").addEventListener("click",function(){
 let newRows=parseInt(document.getElementById("noticeMessageDisplay").getAttribute("rows"))+5;document.getElementById("noticeMessageDisplay").setAttribute("rows",newRows.toString())}.bind(this))
 ;document.getElementById("noticeNormalButton").addEventListener("click",function(){document.getElementById("noticeMessageDisplay").setAttribute("rows","5")}.bind(this))
@@ -724,19 +726,19 @@ if(document.getElementById("hiddenInfoDiv").hasAttribute("hidden")){document.get
 ;let fetchOptions={method:"GET",headers:{Accept:"application/json"}};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()}else{
 throw new Error("Fetch status "+response.status+" "+response.statusText)}}).then(responseArray=>{if(Array.isArray(responseArray)&&responseArray.length>0){
 let privMsgSessionEl=document.getElementById("privateMessageContainerDiv");while(privMsgSessionEl.firstChild){privMsgSessionEl.removeChild(privMsgSessionEl.firstChild)}webState.lastPMNick=""
-;webState.activePrivateMessageNicks=[];webState.resizablePrivMsgTextareaIds=[];webState.resizableSendButtonPMTextareaIds=[];document.getElementById("noticeMessageDisplay").value=""
-;document.getElementById("wallopsMessageDisplay").value="";document.getElementById("pmNickNameInputId").value="";document.getElementById("newChannelNameInputId").value=""
-;document.getElementById("rawMessageDisplay").value="";document.getElementById("rawMessageInputId").value="";webState.noticeOpen=false;webState.wallopsOpen=false
-;for(let i=0;i<responseArray.length;i++){if(responseArray[i].length>0){_parseBufferMessage(responseArray[i])}}let timestamp=unixTimestamp();document.dispatchEvent(new CustomEvent("cache-reload-done",{
-bubbles:true,detail:{timestamp:timestamp}}))}}).catch(error=>{console.log(error)})}window.addEventListener("update-from-cache",function(event){updateFromCache()}.bind(this))
-;function cacheInhibitTimerTick(){if(webState.cacheInhibitTimer>0)webState.cacheInhibitTimer--}webState.cacheInhibitTimer=3
-;document.getElementById("serverTerminateButton").addEventListener("click",function(){console.log("Requesting backend server to terminate");let fetchURL=webServerUrl+"/terminate";let fetchOptions={
-method:"POST",headers:{"Content-type":"application/json",Accept:"application/json"},body:JSON.stringify({terminate:"YES"})};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){
-return response.json()}else{throw new Error("Fetch status "+response.status+" "+response.statusText)}}).then(responseJson=>{console.log(JSON.stringify(responseJson))}).catch(error=>{
-showError("Terminate: Unable to connect");console.log(error)})});document.getElementById("eraseCacheButton").addEventListener("click",function(){if(ircState.ircConnected){
-showError("You must be disconnected from IRC to clear cache.");return}document.dispatchEvent(new CustomEvent("erase-before-reload",{bubbles:true,detail:{}}));let fetchURL=webServerUrl+"/irc/erase"
-;let fetchOptions={method:"POST",headers:{"Content-type":"application/json",Accept:"application/json"},body:JSON.stringify({erase:"YES"})};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){
-return response.json()}else{throw new Error("Fetch status "+response.status+" "+response.statusText)}}).then(responseJson=>{if(responseJson.error){showError(responseJson.message)}else{
+;webState.activePrivateMessageNicks=[];document.getElementById("noticeMessageDisplay").value="";document.getElementById("wallopsMessageDisplay").value=""
+;document.getElementById("pmNickNameInputId").value="";document.getElementById("newChannelNameInputId").value="";document.getElementById("rawMessageDisplay").value=""
+;document.getElementById("rawMessageInputId").value="";webState.noticeOpen=false;webState.wallopsOpen=false;for(let i=0;i<responseArray.length;i++){if(responseArray[i].length>0){
+_parseBufferMessage(responseArray[i])}}let timestamp=unixTimestamp();document.dispatchEvent(new CustomEvent("cache-reload-done",{bubbles:true,detail:{timestamp:timestamp}}))}}).catch(error=>{
+console.log(error)})}window.addEventListener("update-from-cache",function(event){updateFromCache()}.bind(this));function cacheInhibitTimerTick(){
+if(webState.cacheInhibitTimer>0)webState.cacheInhibitTimer--}webState.cacheInhibitTimer=3;document.getElementById("serverTerminateButton").addEventListener("click",function(){
+console.log("Requesting backend server to terminate");let fetchURL=webServerUrl+"/terminate";let fetchOptions={method:"POST",headers:{"Content-type":"application/json",Accept:"application/json"},
+body:JSON.stringify({terminate:"YES"})};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()}else{
+throw new Error("Fetch status "+response.status+" "+response.statusText)}}).then(responseJson=>{console.log(JSON.stringify(responseJson))}).catch(error=>{showError("Terminate: Unable to connect")
+;console.log(error)})});document.getElementById("eraseCacheButton").addEventListener("click",function(){if(ircState.ircConnected){showError("You must be disconnected from IRC to clear cache.");return}
+document.dispatchEvent(new CustomEvent("erase-before-reload",{bubbles:true,detail:{}}));let fetchURL=webServerUrl+"/irc/erase";let fetchOptions={method:"POST",headers:{
+"Content-type":"application/json",Accept:"application/json"},body:JSON.stringify({erase:"YES"})};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()}else{
+throw new Error("Fetch status "+response.status+" "+response.statusText)}}).then(responseJson=>{if(responseJson.error){showError(responseJson.message)}else{
 let privMsgSessionEl=document.getElementById("privateMessageContainerDiv");while(privMsgSessionEl.firstChild){privMsgSessionEl.removeChild(privMsgSessionEl.firstChild)}
 document.getElementById("noticeMessageDisplay").value="";document.getElementById("wallopsMessageDisplay").value="";document.getElementById("pmNickNameInputId").value=""
 ;document.getElementById("newChannelNameInputId").value="";document.getElementById("rawMessageDisplay").value="";document.getElementById("rawMessageInputId").value="";webState.privMsgOpen=false
@@ -766,11 +768,7 @@ console.log("alcInputAreaColSize() invalid input");return null}};const adjustInp
 ;document.getElementById("rawMessageDisplay").setAttribute("cols",calcInputAreaColSize(mar1));document.getElementById("noticeMessageDisplay").setAttribute("cols",calcInputAreaColSize(mar1))
 ;document.getElementById("wallopsMessageDisplay").setAttribute("cols",calcInputAreaColSize(mar1));let mar2=webState.dynamic.commonMargin+5+webState.dynamic.sendButtonWidthPx
 ;document.getElementById("rawMessageInputId").setAttribute("cols",calcInputAreaColSize(mar2));document.getElementById("userPrivMsgInputId").setAttribute("cols",calcInputAreaColSize(mar2))
-;if(webState.resizablePrivMsgTextareaIds.length>0){webState.resizablePrivMsgTextareaIds.forEach(function(id){if(document.getElementById(id)){
-document.getElementById(id).setAttribute("cols",calcInputAreaColSize(mar1))}else{console.log("Error: "+id)}})}if(webState.resizableSendButtonPMTextareaIds.length>0){
-webState.resizableSendButtonPMTextareaIds.forEach(function(id){if(document.getElementById(id)){document.getElementById(id).setAttribute("cols",calcInputAreaColSize(mar2))}else{
-console.log("Error: "+id)}})}document.getElementById("errorDiv").style.width="100%";if(!webState.watch)webState.watch={};webState.watch.innerWidth=window.innerWidth.toString()+"px"
+;document.getElementById("errorDiv").style.width="100%";if(!webState.watch)webState.watch={};webState.watch.innerWidth=window.innerWidth.toString()+"px"
 ;webState.watch.innerHeight=window.innerHeight.toString()+"px"};window.addEventListener("resize",function(event){if(webState.dynamic.inputAreaCharWidthPx){
-adjustInputToWidowWidth(event.currentTarget.innerWidth)}}.bind(this));window.addEventListener("element-resize",function(event){adjustInputToWidowWidth(window.innerWidth)}.bind(this))
-;adjustInputToWidowWidth(window.innerWidth);setInterval(function(){errorTimerTickHandler();heartbeatTimerTickHandler();reconnectTimerTickHandler();beepTimerTick();updateElapsedTimeDisplay()
-;cacheInhibitTimerTick()}.bind(this),1e3);firstWebSocketConnectOnPageLoad();
+adjustInputToWidowWidth(event.currentTarget.innerWidth)}}.bind(this));adjustInputToWidowWidth(window.innerWidth);setInterval(function(){errorTimerTickHandler();heartbeatTimerTickHandler()
+;reconnectTimerTickHandler();beepTimerTick();updateElapsedTimeDisplay();cacheInhibitTimerTick()}.bind(this),1e3);firstWebSocketConnectOnPageLoad();

@@ -75,8 +75,6 @@ function updateFromCache () {
         }
         webState.lastPMNick = '';
         webState.activePrivateMessageNicks = [];
-        webState.resizablePrivMsgTextareaIds = [];
-        webState.resizableSendButtonPMTextareaIds = [];
         document.getElementById('noticeMessageDisplay').value = '';
         document.getElementById('wallopsMessageDisplay').value = '';
         document.getElementById('pmNickNameInputId').value = '';
@@ -473,28 +471,6 @@ const adjustInputToWidowWidth = function (innerWidth) {
   document.getElementById('rawMessageInputId').setAttribute('cols', calcInputAreaColSize(mar2));
   document.getElementById('userPrivMsgInputId').setAttribute('cols', calcInputAreaColSize(mar2));
 
-  // In the private message area (dynamic generated window)
-  //   this is to handle the main text area
-  if (webState.resizablePrivMsgTextareaIds.length > 0) {
-    webState.resizablePrivMsgTextareaIds.forEach(function(id) {
-      if (document.getElementById(id)) {
-        document.getElementById(id).setAttribute('cols', calcInputAreaColSize(mar1));
-      } else {
-        console.log('Error: ' + id);
-      }
-    });
-  }
-  // In the private message area (dynamic generated window)
-  //   this is to handle the text input area next to send button
-  if (webState.resizableSendButtonPMTextareaIds.length > 0) {
-    webState.resizableSendButtonPMTextareaIds.forEach(function(id) {
-      if (document.getElementById(id)) {
-        document.getElementById(id).setAttribute('cols', calcInputAreaColSize(mar2));
-      } else {
-        console.log('Error: ' + id);
-      }
-    });
-  }
   document.getElementById('errorDiv').style.width = '100%';
 
   // Debug: To watch a variable, put it here.
@@ -511,12 +487,7 @@ window.addEventListener('resize', function(event) {
     adjustInputToWidowWidth(event.currentTarget.innerWidth);
   }
 }.bind(this));
-//
-// Resize on request by fire event
-//
-window.addEventListener('element-resize', function(event) {
-  adjustInputToWidowWidth(window.innerWidth);
-}.bind(this));
+
 //
 // Do initially on page load
 //

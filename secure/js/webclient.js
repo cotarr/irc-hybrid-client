@@ -132,8 +132,6 @@ webState.channelStates = [];
 // Private message variables
 webState.lastPMNick = '';
 webState.activePrivateMessageNicks = [];
-webState.resizablePrivMsgTextareaIds = [];
-webState.resizableSendButtonPMTextareaIds = [];
 webState.times = {webConnect: 0};
 webState.count = {webConnect: 0};
 webState.cacheInhibitTimer = 0;

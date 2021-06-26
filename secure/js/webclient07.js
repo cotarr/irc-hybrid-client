@@ -504,11 +504,35 @@ function createPrivateMessageEl (name, parsedMessage) {
   document.getElementById('privMsgMainHiddenButton').textContent = '-';
 
   // -----------------------------------------------------------
-  // Setup textarea elements as dynamically resizable (globally)
+  // Setup textarea elements as dynamically resizable
   // -----------------------------------------------------------
-  webState.resizablePrivMsgTextareaIds.push(privMsgTextAreaId);
-  webState.resizableSendButtonPMTextareaIds.push(privMsgInputAreaId);
-  document.dispatchEvent(new CustomEvent('element-resize', {bubbles: true}));
+  //
+  // Scale values for <textarea> are calculated in webclient10.js
+  // and saved globally in the webState object
+  //
+  const adjustPMInputToWidowWidth = function (innerWidth) {
+    // pixel width mar1 is reserved space on edges of input area at full screen width
+    let mar1 = webState.dynamic.commonMargin;
+    // pixel width mar2 is reserved space on edges of input area with send button added
+    let mar2 = webState.dynamic.commonMargin + 5 + webState.dynamic.sendButtonWidthPx;
+    // pixed width mar3 is reserved space on edges of input area with channel nickname list on sides
+
+    privMsgTextAreaEl.setAttribute('cols', calcInputAreaColSize(mar1));
+    privMsgInputAreaEl.setAttribute('cols', calcInputAreaColSize(mar2));
+  }; // adjustPMInputToWidowWidth()
+  //
+  // Event listener for resize window (generic browser event)
+  //
+  window.addEventListener('resize', function(event) {
+    // ignore resize events before dynamic size variables exist
+    if (webState.dynamic.inputAreaCharWidthPx) {
+      adjustPMInputToWidowWidth(event.currentTarget.innerWidth);
+    }
+  }.bind(this));
+  //
+  // Resize on creating private message window
+  //
+  adjustPMInputToWidowWidth(window.innerWidth);
 };
 
 // ----------------------------------------------------------
