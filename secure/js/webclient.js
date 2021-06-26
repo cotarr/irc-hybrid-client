@@ -541,8 +541,15 @@ document.addEventListener('show-all-divs', function(event) {
 
 // -----------------------------------
 // Global event to hide all divs
+//
+// The event contains a detail.zoom property
+//  of type string that may be used to inhibit hiding
+// a specific window. If the property
+// is absent or zero length string, all hideable windows
+// hard hidden
 // -----------------------------------
 document.addEventListener('hide-all-divs', function(event) {
+  // console.log(JSON.stringify(event.detail, null, 2));
   // document.getElementById('errorDiv').setAttribute('hidden', '');
   document.getElementById('hideLoginSection').setAttribute('hidden', '');
   document.getElementById('hideLoginSectionButton').textContent = '+';

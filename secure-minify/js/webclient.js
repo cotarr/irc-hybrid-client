@@ -366,17 +366,17 @@ message:'Command "/'+parsedCommand.command+'" unknown command.',ircMessage:null}
 ;if(detectMultiLineString(text)){textAreaEl.value="";showError("Multi-line input is not supported.")}else{if(text.length>0){if(text.charAt(0)==="/"){let commandAction=textCommandParser({
 inputString:text,originType:"channel",originName:ircState.channelStates[channelIndex].name});textAreaEl.value="";if(commandAction.error){showError(commandAction.message);return}else{
 if(commandAction.ircMessage&&commandAction.ircMessage.length>0){_sendIrcServerMessage(commandAction.ircMessage)}return}}let message="PRIVMSG "+ircState.channelStates[channelIndex].name+" :"+text
-;_sendIrcServerMessage(message);textAreaEl.value=""}}textAreaEl.value=""}function createChannelEl(name){if(webState.channels.indexOf(name.toLowerCase())>=0){
-console.log("createChannelEl: channel already exist");return}const defaultHeightInRows="17";webState.channels.push(name.toLowerCase())
+;_sendIrcServerMessage(message);textAreaEl.value=""}}textAreaEl.value=""}var zoomIndexNumber=0;var mobileBreakpointPx=600;function createChannelEl(name){
+if(webState.channels.indexOf(name.toLowerCase())>=0){console.log("createChannelEl: channel already exist");return}const defaultHeightInRows="17";webState.channels.push(name.toLowerCase())
 ;let initIrcStateIndex=ircState.channels.indexOf(name.toLowerCase());webState.channelStates.push({lastJoined:ircState.channelStates[initIrcStateIndex].joined});var maxNickLength=0
 ;let channelIndex=ircState.channels.indexOf(name.toLowerCase());let channelContainerDivEl=document.getElementById("channelContainerDiv");let channelMainSectionEl=document.createElement("div")
 ;channelMainSectionEl.classList.add("color-channel");channelMainSectionEl.classList.add("aa-section-div");let channelTopDivEl=document.createElement("div")
 ;channelTopDivEl.classList.add("channel-top-div");channelTopDivEl.classList.add("head-flex");let channelTopLeftDivEl=document.createElement("div");channelTopLeftDivEl.classList.add("head-left")
-;let channelTopRightDivEl=document.createElement("div");channelTopRightDivEl.classList.add("head-right");let channelTopRightHidableDivEl=document.createElement("div")
-;channelTopRightHidableDivEl.classList.add("head-right-hidable-div");let channelHideButtonEl=document.createElement("button");channelHideButtonEl.textContent="-"
-;channelHideButtonEl.classList.add("channel-button");let channelNameDivEl=document.createElement("div");channelNameDivEl.textContent=ircState.channelStates[channelIndex].name
-;channelNameDivEl.classList.add("chan-name-div");let channelTallerButtonEl=document.createElement("button");channelTallerButtonEl.textContent="Taller"
-;channelTallerButtonEl.classList.add("channel-button");let channelNormalButtonEl=document.createElement("button");channelNormalButtonEl.textContent="Normal"
+;let channelTopSpacerDivEl=document.createElement("div");channelTopSpacerDivEl.classList.add("vh5");let channelTopRightDivEl=document.createElement("div")
+;channelTopRightDivEl.classList.add("head-right");let channelTopRightHidableDivEl=document.createElement("div");channelTopRightHidableDivEl.classList.add("head-right-hidable-div")
+;let channelHideButtonEl=document.createElement("button");channelHideButtonEl.textContent="-";channelHideButtonEl.classList.add("channel-button");let channelNameDivEl=document.createElement("div")
+;channelNameDivEl.textContent=ircState.channelStates[channelIndex].name;channelNameDivEl.classList.add("chan-name-div");let channelTallerButtonEl=document.createElement("button")
+;channelTallerButtonEl.textContent="Taller";channelTallerButtonEl.classList.add("channel-button");let channelNormalButtonEl=document.createElement("button");channelNormalButtonEl.textContent="Normal"
 ;channelNormalButtonEl.classList.add("channel-button");let channelClearButtonEl=document.createElement("button");channelClearButtonEl.textContent="Clear"
 ;channelClearButtonEl.classList.add("channel-button");let channelBottomDivEl=document.createElement("div");channelBottomDivEl.classList.add("channel-bottom-div")
 ;let channelTopicDivEl=document.createElement("div");channelTopicDivEl.textContent=cleanFormatting(ircState.channelStates[channelIndex].topic);channelTopicDivEl.classList.add("chan-topic-div")
@@ -389,8 +389,9 @@ console.log("createChannelEl: channel already exist");return}const defaultHeight
 ;channelInputAreaEl.setAttribute("cols","120");channelInputAreaEl.setAttribute("rows","1");channelInputAreaEl.classList.add("va-middle");channelInputAreaEl.classList.add("rm5")
 ;let channelSendButtonEl=document.createElement("button");channelSendButtonEl.textContent="Send";channelSendButtonEl.classList.add("va-middle");let channelBottomDiv2El=document.createElement("div")
 ;channelBottomDiv2El.classList.add("button-div");let channelJoinButtonEl=document.createElement("button");channelJoinButtonEl.textContent="Join";channelJoinButtonEl.classList.add("channel-button")
-;let channelPartButtonEl=document.createElement("button");channelPartButtonEl.textContent="Leave";channelPartButtonEl.classList.add("channel-button")
 ;let channelPruneButtonEl=document.createElement("button");channelPruneButtonEl.textContent="Prune";channelPruneButtonEl.classList.add("channel-button")
+;let channelPartButtonEl=document.createElement("button");channelPartButtonEl.textContent="Leave";channelPartButtonEl.classList.add("channel-button")
+;let channelZoomButtonEl=document.createElement("button");channelZoomButtonEl.textContent="Zoom";channelZoomButtonEl.classList.add("channel-button")
 ;let channelRefreshButtonEl=document.createElement("button");channelRefreshButtonEl.textContent="Refresh";channelRefreshButtonEl.classList.add("channel-button")
 ;let channelBottomDiv3El=document.createElement("div");channelBottomDiv3El.classList.add("button-div");let channelFormatCBInputEl=document.createElement("input")
 ;channelFormatCBInputEl.classList.add("channel-cb-cb");channelFormatCBInputEl.setAttribute("type","checkbox");let channelFormatCBTitleEl=document.createElement("span")
@@ -405,29 +406,27 @@ console.log("createChannelEl: channel already exist");return}const defaultHeight
 ;channelBeep3CBInputEl.setAttribute("type","checkbox");let channelBeep3CBTitleEl=document.createElement("span");channelBeep3CBTitleEl.classList.add("channel-cb-span")
 ;channelBeep3CBTitleEl.textContent="Name-beep";channelTopLeftDivEl.appendChild(channelHideButtonEl);channelTopLeftDivEl.appendChild(channelNameDivEl)
 ;channelTopRightHidableDivEl.appendChild(channelJoinButtonEl);channelTopRightHidableDivEl.appendChild(channelPruneButtonEl);channelTopRightHidableDivEl.appendChild(channelPartButtonEl)
-;channelTopRightDivEl.appendChild(channelTopRightHidableDivEl);channelTopDivEl.appendChild(channelTopLeftDivEl);channelTopDivEl.appendChild(channelTopRightDivEl)
-;channelBottomDiv1El.appendChild(channelInputAreaEl);channelBottomDiv1El.appendChild(channelSendButtonEl);channelBottomDiv2El.appendChild(channelRefreshButtonEl)
-;channelBottomDiv2El.appendChild(channelClearButtonEl);channelBottomDiv2El.appendChild(channelTallerButtonEl);channelBottomDiv2El.appendChild(channelNormalButtonEl)
-;channelBottomDiv3El.appendChild(channelFormatCBInputEl);channelBottomDiv3El.appendChild(channelFormatCBTitleEl);channelBottomDiv3El.appendChild(channelAutoCompCBInputEl)
-;channelBottomDiv3El.appendChild(channelAutoCompCBTitleEl);channelBottomDiv4El.appendChild(channelBeep1CBInputEl);channelBottomDiv4El.appendChild(channelBeep1CBTitleEl)
-;channelBottomDiv4El.appendChild(channelBeep2CBInputEl);channelBottomDiv4El.appendChild(channelBeep2CBTitleEl);channelBottomDiv4El.appendChild(channelBeep3CBInputEl)
-;channelBottomDiv4El.appendChild(channelBeep3CBTitleEl);channelBottomDivEl.appendChild(channelTopicDivEl);channelBottomDivEl.appendChild(channelNamesDisplayEl)
-;channelBottomDivEl.appendChild(channelTextAreaEl);channelBottomDivEl.appendChild(channelBottomDiv1El);channelBottomDivEl.appendChild(channelBottomDiv2El)
-;channelBottomDivEl.appendChild(channelBottomDiv3El);channelBottomDivEl.appendChild(channelBottomDiv4El);channelMainSectionEl.appendChild(channelTopDivEl)
-;channelMainSectionEl.appendChild(channelBottomDivEl);if(channelContainerDivEl.firstChild){channelContainerDivEl.insertBefore(channelMainSectionEl,channelContainerDivEl.firstChild)}else{
-channelContainerDivEl.appendChild(channelMainSectionEl)}if(ircState.channelStates[initIrcStateIndex].joined){hideRawMessageWindow()}var activityIconInhibitTimer=0;setInterval(function(){
-if(activityIconInhibitTimer>0)activityIconInhibitTimer--}.bind(this),1e3);channelHideButtonEl.addEventListener("click",function(){if(channelBottomDivEl.hasAttribute("hidden")){
-channelBottomDivEl.removeAttribute("hidden");channelHideButtonEl.textContent="-";channelTopRightHidableDivEl.removeAttribute("hidden")}else{channelBottomDivEl.setAttribute("hidden","")
-;channelHideButtonEl.textContent="+";channelTopRightHidableDivEl.setAttribute("hidden","")}});channelTallerButtonEl.addEventListener("click",function(){
-let newRows=parseInt(channelTextAreaEl.getAttribute("rows"))+10;channelTextAreaEl.setAttribute("rows",newRows.toString());channelNamesDisplayEl.setAttribute("rows",newRows.toString())})
-;channelNormalButtonEl.addEventListener("click",function(){channelTextAreaEl.setAttribute("rows",defaultHeightInRows);channelNamesDisplayEl.setAttribute("rows",defaultHeightInRows)})
-;channelClearButtonEl.addEventListener("click",function(){channelTextAreaEl.value="";channelTextAreaEl.setAttribute("rows",defaultHeightInRows)
-;channelNamesDisplayEl.setAttribute("rows",defaultHeightInRows)});document.addEventListener("show-all-divs",function(event){channelBottomDivEl.removeAttribute("hidden")
-;channelHideButtonEl.textContent="-";channelTopRightHidableDivEl.removeAttribute("hidden")});document.addEventListener("hide-all-divs",function(event){channelBottomDivEl.setAttribute("hidden","")
-;channelHideButtonEl.textContent="+";channelTopRightHidableDivEl.setAttribute("hidden","")});channelJoinButtonEl.addEventListener("click",function(){let message="JOIN "+name
-;_sendIrcServerMessage(message)});channelPartButtonEl.addEventListener("click",function(){let message="PART "+name+" :"+ircState.progName+" "+ircState.progVersion;_sendIrcServerMessage(message)})
-;channelPruneButtonEl.addEventListener("click",function(){function _removeChannelFromDom(){let webStateChannelsIndex=webState.channels.indexOf(name.toLowerCase());if(webStateChannelsIndex>=0){
-webState.channels.splice(webStateChannelsIndex,1);webState.channelStates.splice(webStateChannelsIndex,1)}channelContainerDivEl.removeChild(channelMainSectionEl)}
+;channelTopRightHidableDivEl.appendChild(channelZoomButtonEl);channelTopRightDivEl.appendChild(channelTopRightHidableDivEl);channelTopDivEl.appendChild(channelTopLeftDivEl)
+;channelTopDivEl.appendChild(channelTopRightDivEl);channelBottomDiv1El.appendChild(channelInputAreaEl);channelBottomDiv1El.appendChild(channelSendButtonEl)
+;channelBottomDiv2El.appendChild(channelRefreshButtonEl);channelBottomDiv2El.appendChild(channelClearButtonEl);channelBottomDiv2El.appendChild(channelTallerButtonEl)
+;channelBottomDiv2El.appendChild(channelNormalButtonEl);channelBottomDiv3El.appendChild(channelFormatCBInputEl);channelBottomDiv3El.appendChild(channelFormatCBTitleEl)
+;channelBottomDiv3El.appendChild(channelAutoCompCBInputEl);channelBottomDiv3El.appendChild(channelAutoCompCBTitleEl);channelBottomDiv4El.appendChild(channelBeep1CBInputEl)
+;channelBottomDiv4El.appendChild(channelBeep1CBTitleEl);channelBottomDiv4El.appendChild(channelBeep2CBInputEl);channelBottomDiv4El.appendChild(channelBeep2CBTitleEl)
+;channelBottomDiv4El.appendChild(channelBeep3CBInputEl);channelBottomDiv4El.appendChild(channelBeep3CBTitleEl);channelBottomDivEl.appendChild(channelTopicDivEl)
+;channelBottomDivEl.appendChild(channelNamesDisplayEl);channelBottomDivEl.appendChild(channelTextAreaEl);channelBottomDivEl.appendChild(channelBottomDiv1El)
+;channelBottomDivEl.appendChild(channelBottomDiv2El);channelBottomDivEl.appendChild(channelBottomDiv3El);channelBottomDivEl.appendChild(channelBottomDiv4El)
+;channelMainSectionEl.appendChild(channelTopDivEl);channelMainSectionEl.appendChild(channelTopSpacerDivEl);channelMainSectionEl.appendChild(channelBottomDivEl);if(channelContainerDivEl.firstChild){
+channelContainerDivEl.insertBefore(channelMainSectionEl,channelContainerDivEl.firstChild)}else{channelContainerDivEl.appendChild(channelMainSectionEl)}
+if(ircState.channelStates[initIrcStateIndex].joined){hideRawMessageWindow()}var activityIconInhibitTimer=0;setInterval(function(){if(activityIconInhibitTimer>0)activityIconInhibitTimer--
+}.bind(this),1e3);channelHideButtonEl.addEventListener("click",function(){if(channelBottomDivEl.hasAttribute("hidden")){channelBottomDivEl.removeAttribute("hidden");channelHideButtonEl.textContent="-"
+;channelTopRightHidableDivEl.removeAttribute("hidden")}else{channelBottomDivEl.setAttribute("hidden","");channelHideButtonEl.textContent="+";channelTopRightHidableDivEl.setAttribute("hidden","")}})
+;channelTallerButtonEl.addEventListener("click",function(){let newRows=parseInt(channelTextAreaEl.getAttribute("rows"))+10;channelTextAreaEl.setAttribute("rows",newRows.toString())
+;channelNamesDisplayEl.setAttribute("rows",newRows.toString())});channelNormalButtonEl.addEventListener("click",function(){channelTextAreaEl.setAttribute("rows",defaultHeightInRows)
+;channelNamesDisplayEl.setAttribute("rows",defaultHeightInRows)});channelClearButtonEl.addEventListener("click",function(){channelTextAreaEl.value=""
+;channelTextAreaEl.setAttribute("rows",defaultHeightInRows);channelNamesDisplayEl.setAttribute("rows",defaultHeightInRows)});channelJoinButtonEl.addEventListener("click",function(){
+let message="JOIN "+name;_sendIrcServerMessage(message)});channelPartButtonEl.addEventListener("click",function(){let message="PART "+name+" :"+ircState.progName+" "+ircState.progVersion
+;_sendIrcServerMessage(message)});channelPruneButtonEl.addEventListener("click",function(){function _removeChannelFromDom(){let webStateChannelsIndex=webState.channels.indexOf(name.toLowerCase())
+;if(webStateChannelsIndex>=0){webState.channels.splice(webStateChannelsIndex,1);webState.channelStates.splice(webStateChannelsIndex,1)}channelContainerDivEl.removeChild(channelMainSectionEl)}
 let index=ircState.channels.indexOf(name.toLowerCase());if(index>=0){if(!ircState.channelStates[index].joined){let fetchURL=webServerUrl+"/irc/prune";let fetchOptions={method:"POST",headers:{
 "Content-type":"application/json",Accept:"application/json"},body:JSON.stringify({channel:name})};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()}else{
 throw new Error("Fetch status "+response.status+" "+response.statusText)}}).then(responseJson=>{if(responseJson.error){showError(responseJson.message)}else{_removeChannelFromDom()}}).catch(error=>{
@@ -439,30 +438,44 @@ if(event.inputType==="insertText"&&event.data===null||event.inputType==="insertL
 ;activityIconInhibitTimer=activityIconInhibitTimerValue}.bind(this));function updateVisibility(){let index=ircState.channels.indexOf(name.toLowerCase());if(index>=0){
 if(ircState.channelStates[index].joined){channelTopicDivEl.textContent=cleanFormatting(ircState.channelStates[index].topic);channelNamesDisplayEl.removeAttribute("disabled")
 ;channelTextAreaEl.removeAttribute("disabled");channelInputAreaEl.removeAttribute("disabled");channelSendButtonEl.removeAttribute("disabled");channelJoinButtonEl.setAttribute("hidden","")
-;channelPruneButtonEl.setAttribute("hidden","");channelPartButtonEl.removeAttribute("hidden")}else{channelNamesDisplayEl.setAttribute("disabled","");channelTextAreaEl.setAttribute("disabled","")
+;channelPruneButtonEl.setAttribute("hidden","");channelPartButtonEl.removeAttribute("hidden");channelZoomButtonEl.removeAttribute("hidden");if(channelMainSectionEl.hasAttribute("zoom")){
+channelTopicDivEl.setAttribute("hidden","");channelBottomDiv2El.setAttribute("hidden","");channelBottomDiv3El.setAttribute("hidden","");channelBottomDiv4El.setAttribute("hidden","")
+;if(window.innerWidth>mobileBreakpointPx){channelNamesDisplayEl.removeAttribute("hidden")}else{channelNamesDisplayEl.setAttribute("hidden","")}}else{channelTopicDivEl.removeAttribute("hidden")
+;channelBottomDiv2El.removeAttribute("hidden");channelBottomDiv3El.removeAttribute("hidden");channelBottomDiv4El.removeAttribute("hidden");channelNamesDisplayEl.removeAttribute("hidden")}}else{
+channelMainSectionEl.removeAttribute("zoom");channelZoomButtonEl.textContent="Zoom";channelNamesDisplayEl.setAttribute("disabled","");channelTextAreaEl.setAttribute("disabled","")
 ;channelInputAreaEl.setAttribute("disabled","");channelSendButtonEl.setAttribute("disabled","");channelJoinButtonEl.removeAttribute("hidden");channelPruneButtonEl.removeAttribute("hidden")
-;channelPartButtonEl.setAttribute("hidden","")}if(channelMainSectionEl.hasAttribute("beep1-enabled")){channelBeep1CBInputEl.checked=true}else{channelBeep1CBInputEl.checked=false}
-if(channelMainSectionEl.hasAttribute("beep2-enabled")){channelBeep2CBInputEl.checked=true}else{channelBeep2CBInputEl.checked=false}if(channelMainSectionEl.hasAttribute("beep3-enabled")){
-channelBeep3CBInputEl.checked=true}else{channelBeep3CBInputEl.checked=false}if(channelMainSectionEl.hasAttribute("brief-enabled")){channelFormatCBInputEl.checked=true}else{
-channelFormatCBInputEl.checked=false}if(channelMainSectionEl.hasAttribute("auto-comp-enabled")){channelAutoCompCBInputEl.checked=true}else{channelAutoCompCBInputEl.checked=false}}}
-channelBeep1CBInputEl.addEventListener("click",function(e){if(channelMainSectionEl.hasAttribute("beep1-enabled")){channelMainSectionEl.removeAttribute("beep1-enabled")}else{
-channelMainSectionEl.setAttribute("beep1-enabled","");playBeep1Sound()}updateVisibility()});channelBeep2CBInputEl.addEventListener("click",function(e){
-if(channelMainSectionEl.hasAttribute("beep2-enabled")){channelMainSectionEl.removeAttribute("beep2-enabled")}else{channelMainSectionEl.setAttribute("beep2-enabled","");playBeep1Sound()}
-updateVisibility()});channelBeep3CBInputEl.addEventListener("click",function(e){if(channelMainSectionEl.hasAttribute("beep3-enabled")){channelMainSectionEl.removeAttribute("beep3-enabled")}else{
-channelMainSectionEl.setAttribute("beep3-enabled","");playBeep2Sound()}updateVisibility()});document.addEventListener("cancel-beep-sounds",function(event){
-channelMainSectionEl.removeAttribute("beep1-enabled");channelMainSectionEl.removeAttribute("beep2-enabled");channelMainSectionEl.removeAttribute("beep3-enabled")}.bind(this))
-;channelFormatCBInputEl.addEventListener("click",function(){if(channelMainSectionEl.hasAttribute("brief-enabled")){channelMainSectionEl.removeAttribute("brief-enabled")}else{
-channelMainSectionEl.setAttribute("brief-enabled","")}document.dispatchEvent(new CustomEvent("update-from-cache",{bubbles:true}))});if(window.innerWidth<600){
-channelMainSectionEl.setAttribute("brief-enabled","");channelFormatCBInputEl.checked=true}else{channelMainSectionEl.removeAttribute("brief-enabled");channelFormatCBInputEl.checked=false}
-updateVisibility();channelAutoCompCBInputEl.addEventListener("click",function(){if(channelMainSectionEl.hasAttribute("auto-comp-enabled")){channelMainSectionEl.removeAttribute("auto-comp-enabled")
-}else{channelMainSectionEl.setAttribute("auto-comp-enabled","")}updateVisibility()});if(window.InputEvent&&typeof InputEvent.prototype.getTargetRanges==="function"){
-channelMainSectionEl.setAttribute("auto-comp-enabled","");updateVisibility()}else{channelMainSectionEl.setAttribute("auto-comp-enabled","");updateVisibility()
-;channelAutoCompCBInputEl.setAttribute("disabled","")}const _autoCompleteInputElement=function(snippet){let last="";const trailingSpaceKey=32;let matchedCommand=""
-;if(autoCompleteCommandList.length>0){for(let i=0;i<autoCompleteCommandList.length;i++){if(autoCompleteCommandList[i].indexOf(snippet.toUpperCase())===0){matchedCommand=autoCompleteCommandList[i]}}}
-let matchedRawCommand="";if(autoCompleteRawCommandList.length>0){for(let i=0;i<autoCompleteRawCommandList.length;i++){if(autoCompleteRawCommandList[i].indexOf(snippet.toUpperCase())===0){
-matchedRawCommand=autoCompleteRawCommandList[i]}}}if(matchedCommand.length>0&&channelInputAreaEl.value===snippet){
-channelInputAreaEl.value=channelInputAreaEl.value.slice(0,channelInputAreaEl.value.length-snippet.length);channelInputAreaEl.value+=matchedCommand
-;channelInputAreaEl.value+=String.fromCharCode(trailingSpaceKey);last=matchedCommand}else if(matchedRawCommand.length>0&&channelInputAreaEl.value.slice(0,7).toUpperCase()==="/QUOTE "){
+;channelPartButtonEl.setAttribute("hidden","");channelZoomButtonEl.setAttribute("hidden","");channelTopicDivEl.removeAttribute("hidden");channelBottomDiv2El.removeAttribute("hidden")
+;channelBottomDiv3El.removeAttribute("hidden");channelBottomDiv4El.removeAttribute("hidden");channelNamesDisplayEl.removeAttribute("hidden")}if(channelMainSectionEl.hasAttribute("beep1-enabled")){
+channelBeep1CBInputEl.checked=true}else{channelBeep1CBInputEl.checked=false}if(channelMainSectionEl.hasAttribute("beep2-enabled")){channelBeep2CBInputEl.checked=true}else{
+channelBeep2CBInputEl.checked=false}if(channelMainSectionEl.hasAttribute("beep3-enabled")){channelBeep3CBInputEl.checked=true}else{channelBeep3CBInputEl.checked=false}
+if(channelMainSectionEl.hasAttribute("brief-enabled")){channelFormatCBInputEl.checked=true}else{channelFormatCBInputEl.checked=false}if(channelMainSectionEl.hasAttribute("auto-comp-enabled")){
+channelAutoCompCBInputEl.checked=true}else{channelAutoCompCBInputEl.checked=false}}}zoomIndexNumber++;let zoomEventId="chan"+zoomIndexNumber.toString()+"ZoomId"
+;channelZoomButtonEl.addEventListener("click",function(){if(channelMainSectionEl.hasAttribute("zoom")){channelMainSectionEl.removeAttribute("zoom");channelZoomButtonEl.textContent="Zoom"
+;updateVisibility()}else{channelMainSectionEl.setAttribute("zoom","");channelZoomButtonEl.textContent="No Zoom";updateVisibility();document.dispatchEvent(new CustomEvent("hide-all-divs",{bubbles:true,
+detail:{zoom:zoomEventId}}))}});document.addEventListener("show-all-divs",function(event){channelBottomDivEl.removeAttribute("hidden");channelHideButtonEl.textContent="-"
+;channelTopRightHidableDivEl.removeAttribute("hidden");channelMainSectionEl.removeAttribute("zoom");channelZoomButtonEl.textContent="Zoom";updateVisibility()})
+;document.addEventListener("hide-all-divs",function(event){if(event.detail&&event.detail.zoom&&event.detail.zoom.length>0){if(event.detail.zoom!==zoomEventId){
+channelBottomDivEl.setAttribute("hidden","");channelHideButtonEl.textContent="+";channelTopRightHidableDivEl.setAttribute("hidden","");channelMainSectionEl.removeAttribute("zoom")
+;channelZoomButtonEl.textContent="Zoom";updateVisibility()}}else{channelBottomDivEl.setAttribute("hidden","");channelHideButtonEl.textContent="+";channelTopRightHidableDivEl.setAttribute("hidden","")
+;channelMainSectionEl.removeAttribute("zoom");channelZoomButtonEl.textContent="Zoom";updateVisibility()}});channelBeep1CBInputEl.addEventListener("click",function(e){
+if(channelMainSectionEl.hasAttribute("beep1-enabled")){channelMainSectionEl.removeAttribute("beep1-enabled")}else{channelMainSectionEl.setAttribute("beep1-enabled","");playBeep1Sound()}
+updateVisibility()});channelBeep2CBInputEl.addEventListener("click",function(e){if(channelMainSectionEl.hasAttribute("beep2-enabled")){channelMainSectionEl.removeAttribute("beep2-enabled")}else{
+channelMainSectionEl.setAttribute("beep2-enabled","");playBeep1Sound()}updateVisibility()});channelBeep3CBInputEl.addEventListener("click",function(e){
+if(channelMainSectionEl.hasAttribute("beep3-enabled")){channelMainSectionEl.removeAttribute("beep3-enabled")}else{channelMainSectionEl.setAttribute("beep3-enabled","");playBeep2Sound()}
+updateVisibility()});document.addEventListener("cancel-beep-sounds",function(event){channelMainSectionEl.removeAttribute("beep1-enabled");channelMainSectionEl.removeAttribute("beep2-enabled")
+;channelMainSectionEl.removeAttribute("beep3-enabled")}.bind(this));channelFormatCBInputEl.addEventListener("click",function(){if(channelMainSectionEl.hasAttribute("brief-enabled")){
+channelMainSectionEl.removeAttribute("brief-enabled")}else{channelMainSectionEl.setAttribute("brief-enabled","")}document.dispatchEvent(new CustomEvent("update-from-cache",{bubbles:true}))})
+;if(window.innerWidth<mobileBreakpointPx){channelMainSectionEl.setAttribute("brief-enabled","");channelFormatCBInputEl.checked=true}else{channelMainSectionEl.removeAttribute("brief-enabled")
+;channelFormatCBInputEl.checked=false}updateVisibility();channelAutoCompCBInputEl.addEventListener("click",function(){if(channelMainSectionEl.hasAttribute("auto-comp-enabled")){
+channelMainSectionEl.removeAttribute("auto-comp-enabled")}else{channelMainSectionEl.setAttribute("auto-comp-enabled","")}updateVisibility()})
+;if(window.InputEvent&&typeof InputEvent.prototype.getTargetRanges==="function"){channelMainSectionEl.setAttribute("auto-comp-enabled","");updateVisibility()}else{
+channelMainSectionEl.setAttribute("auto-comp-enabled","");updateVisibility();channelAutoCompCBInputEl.setAttribute("disabled","")}const _autoCompleteInputElement=function(snippet){let last=""
+;const trailingSpaceKey=32;let matchedCommand="";if(autoCompleteCommandList.length>0){for(let i=0;i<autoCompleteCommandList.length;i++){
+if(autoCompleteCommandList[i].indexOf(snippet.toUpperCase())===0){matchedCommand=autoCompleteCommandList[i]}}}let matchedRawCommand="";if(autoCompleteRawCommandList.length>0){
+for(let i=0;i<autoCompleteRawCommandList.length;i++){if(autoCompleteRawCommandList[i].indexOf(snippet.toUpperCase())===0){matchedRawCommand=autoCompleteRawCommandList[i]}}}
+if(matchedCommand.length>0&&channelInputAreaEl.value===snippet){channelInputAreaEl.value=channelInputAreaEl.value.slice(0,channelInputAreaEl.value.length-snippet.length)
+;channelInputAreaEl.value+=matchedCommand;channelInputAreaEl.value+=String.fromCharCode(trailingSpaceKey);last=matchedCommand
+}else if(matchedRawCommand.length>0&&channelInputAreaEl.value.slice(0,7).toUpperCase()==="/QUOTE "){
 channelInputAreaEl.value=channelInputAreaEl.value.slice(0,channelInputAreaEl.value.length-snippet.length);channelInputAreaEl.value+=matchedRawCommand
 ;channelInputAreaEl.value+=String.fromCharCode(trailingSpaceKey);last=matchedRawCommand}else if(name.toLowerCase().indexOf(snippet.toLowerCase())===0){
 channelInputAreaEl.value=channelInputAreaEl.value.slice(0,channelInputAreaEl.value.length-snippet.length);channelInputAreaEl.value+=name;channelInputAreaEl.value+=String.fromCharCode(trailingSpaceKey)
@@ -536,11 +549,11 @@ let markerString="";let timestampString="";if("detail"in event&&"timestamp"in ev
 ;channelTextAreaEl.scrollTop=channelTextAreaEl.scrollHeight}.bind(this));updateVisibility();const adjustChannelInputToWidowWidth=function(innerWidth){let mar1=webState.dynamic.commonMargin
 ;let mar2=webState.dynamic.commonMargin+5+webState.dynamic.sendButtonWidthPx
 ;let nicknameListPixelWidth=webState.dynamic.inputAreaSideWidthPx+channelNamesCharWidth*webState.dynamic.inputAreaCharWidthPx;let mar3=webState.dynamic.commonMargin+nicknameListPixelWidth+6
-;if(window.innerWidth>600){channelNamesDisplayEl.setAttribute("cols",channelNamesCharWidth.toString());channelTextAreaEl.setAttribute("cols",calcInputAreaColSize(mar3))}else{
-channelNamesDisplayEl.setAttribute("cols",calcInputAreaColSize(mar1));channelTextAreaEl.setAttribute("cols",calcInputAreaColSize(mar1))}
-channelInputAreaEl.setAttribute("cols",calcInputAreaColSize(mar2))};window.addEventListener("resize",function(event){if(webState.dynamic.inputAreaCharWidthPx){
-adjustChannelInputToWidowWidth(event.currentTarget.innerWidth)}}.bind(this));adjustChannelInputToWidowWidth(window.innerWidth)}var lastJoinedChannelCount=-1;var lastIrcServerIndex=-1
-;document.addEventListener("irc-state-changed",function(event){if(ircState.channels.length>0){for(let i=0;i<ircState.channels.length;i++){let name=ircState.channels[i]
+;if(window.innerWidth>mobileBreakpointPx){channelTextAreaEl.setAttribute("cols",calcInputAreaColSize(mar3));channelNamesDisplayEl.removeAttribute("hidden")}else{
+channelTextAreaEl.setAttribute("cols",calcInputAreaColSize(mar1));if(channelMainSectionEl.hasAttribute("zoom")){channelNamesDisplayEl.setAttribute("hidden","")}else{
+channelNamesDisplayEl.removeAttribute("hidden")}}channelInputAreaEl.setAttribute("cols",calcInputAreaColSize(mar2))};window.addEventListener("resize",function(event){
+if(webState.dynamic.inputAreaCharWidthPx){adjustChannelInputToWidowWidth(event.currentTarget.innerWidth)}}.bind(this));adjustChannelInputToWidowWidth(window.innerWidth)}var lastJoinedChannelCount=-1
+;var lastIrcServerIndex=-1;document.addEventListener("irc-state-changed",function(event){if(ircState.channels.length>0){for(let i=0;i<ircState.channels.length;i++){let name=ircState.channels[i]
 ;if(webState.channels.indexOf(name.toLowerCase())===-1){createChannelEl(name)}}}let needButtonUpdate=false;let joinedChannelCount=0;if(ircState.channels.length>0){
 for(let i=0;i<ircState.channels.length;i++){if(ircState.channelStates[i].joined)joinedChannelCount++}}if(joinedChannelCount!==lastJoinedChannelCount){needButtonUpdate=true
 ;lastJoinedChannelCount=joinedChannelCount}if(ircState.ircServerIndex!==lastIrcServerIndex){needButtonUpdate=true;lastIrcServerIndex=ircState.ircServerIndex}if(needButtonUpdate){

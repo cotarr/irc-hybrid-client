@@ -75,6 +75,9 @@ function _sendTextToChannel(channelIndex, textAreaEl) {
   textAreaEl.value = '';
 }; // _sendTextToChannel
 
+var zoomIndexNumber = 0;
+var mobileBreakpointPx = 600;
+
 // --------------------------------------------------------
 // This creates a new channel window and adds it to the DOM
 //
@@ -120,6 +123,9 @@ function createChannelEl (name) {
   // left flexbox div
   let channelTopLeftDivEl = document.createElement('div');
   channelTopLeftDivEl.classList.add('head-left');
+
+  let channelTopSpacerDivEl = document.createElement('div');
+  channelTopSpacerDivEl.classList.add('vh5');
 
   // center if needed here
 
@@ -211,15 +217,20 @@ function createChannelEl (name) {
   channelJoinButtonEl.textContent = 'Join';
   channelJoinButtonEl.classList.add('channel-button');
 
+  // prune button
+  let channelPruneButtonEl = document.createElement('button');
+  channelPruneButtonEl.textContent = 'Prune';
+  channelPruneButtonEl.classList.add('channel-button');
+
   // part button
   let channelPartButtonEl = document.createElement('button');
   channelPartButtonEl.textContent = 'Leave';
   channelPartButtonEl.classList.add('channel-button');
 
-  // prune button
-  let channelPruneButtonEl = document.createElement('button');
-  channelPruneButtonEl.textContent = 'Prune';
-  channelPruneButtonEl.classList.add('channel-button');
+  // zoom button
+  let channelZoomButtonEl = document.createElement('button');
+  channelZoomButtonEl.textContent = 'Zoom';
+  channelZoomButtonEl.classList.add('channel-button');
 
   // refresh button
   let channelRefreshButtonEl = document.createElement('button');
@@ -284,6 +295,7 @@ function createChannelEl (name) {
   channelTopRightHidableDivEl.appendChild(channelJoinButtonEl);
   channelTopRightHidableDivEl.appendChild(channelPruneButtonEl);
   channelTopRightHidableDivEl.appendChild(channelPartButtonEl);
+  channelTopRightHidableDivEl.appendChild(channelZoomButtonEl);
 
   channelTopRightDivEl.appendChild(channelTopRightHidableDivEl);
 
@@ -319,6 +331,7 @@ function createChannelEl (name) {
   channelBottomDivEl.appendChild(channelBottomDiv4El);
 
   channelMainSectionEl.appendChild(channelTopDivEl);
+  channelMainSectionEl.appendChild(channelTopSpacerDivEl);
   channelMainSectionEl.appendChild(channelBottomDivEl);
 
   if (channelContainerDivEl.firstChild) {
@@ -387,23 +400,6 @@ function createChannelEl (name) {
     channelTextAreaEl.value = '';
     channelTextAreaEl.setAttribute('rows', defaultHeightInRows);
     channelNamesDisplayEl.setAttribute('rows', defaultHeightInRows);
-  });
-
-  // ----------------
-  // show all event
-  // ----------------
-  document.addEventListener('show-all-divs', function(event) {
-    channelBottomDivEl.removeAttribute('hidden');
-    channelHideButtonEl.textContent = '-';
-    channelTopRightHidableDivEl.removeAttribute('hidden');
-  });
-  // ----------------
-  // hide all event
-  // ----------------
-  document.addEventListener('hide-all-divs', function(event) {
-    channelBottomDivEl.setAttribute('hidden', '');
-    channelHideButtonEl.textContent = '+';
-    channelTopRightHidableDivEl.setAttribute('hidden', '');
   });
 
   // -------------------------
@@ -541,7 +537,30 @@ function createChannelEl (name) {
         channelJoinButtonEl.setAttribute('hidden', '');
         channelPruneButtonEl.setAttribute('hidden', '');
         channelPartButtonEl.removeAttribute('hidden');
+        channelZoomButtonEl.removeAttribute('hidden');
+
+        if (channelMainSectionEl.hasAttribute('zoom')) {
+          channelTopicDivEl.setAttribute('hidden', '');
+          channelBottomDiv2El.setAttribute('hidden', '');
+          channelBottomDiv3El.setAttribute('hidden', '');
+          channelBottomDiv4El.setAttribute('hidden', '');
+          if (window.innerWidth > mobileBreakpointPx) {
+            channelNamesDisplayEl.removeAttribute('hidden');
+          } else {
+            channelNamesDisplayEl.setAttribute('hidden', '');
+          }
+        } else {
+          channelTopicDivEl.removeAttribute('hidden');
+          channelBottomDiv2El.removeAttribute('hidden');
+          channelBottomDiv3El.removeAttribute('hidden');
+          channelBottomDiv4El.removeAttribute('hidden');
+          channelNamesDisplayEl.removeAttribute('hidden');
+        }
       } else {
+        // not joined, cancel zoom
+        channelMainSectionEl.removeAttribute('zoom');
+        channelZoomButtonEl.textContent = 'Zoom';
+
         channelNamesDisplayEl.setAttribute('disabled', '');
         channelTextAreaEl.setAttribute('disabled', '');
         channelInputAreaEl.setAttribute('disabled', '');
@@ -550,6 +569,13 @@ function createChannelEl (name) {
         channelJoinButtonEl.removeAttribute('hidden');
         channelPruneButtonEl.removeAttribute('hidden');
         channelPartButtonEl.setAttribute('hidden', '');
+        channelZoomButtonEl.setAttribute('hidden', '');
+
+        channelTopicDivEl.removeAttribute('hidden');
+        channelBottomDiv2El.removeAttribute('hidden');
+        channelBottomDiv3El.removeAttribute('hidden');
+        channelBottomDiv4El.removeAttribute('hidden');
+        channelNamesDisplayEl.removeAttribute('hidden');
       }
 
       if (channelMainSectionEl.hasAttribute('beep1-enabled')) {
@@ -578,7 +604,72 @@ function createChannelEl (name) {
         channelAutoCompCBInputEl.checked = false;
       }
     }
-  }
+  } // updateVisibility()
+
+  // -------------------------
+  // Zoom button handler
+  // -------------------------
+  zoomIndexNumber++;
+  let zoomEventId = 'chan' + zoomIndexNumber.toString() + 'ZoomId';
+  channelZoomButtonEl.addEventListener('click', function() {
+    if (channelMainSectionEl.hasAttribute('zoom')) {
+      channelMainSectionEl.removeAttribute('zoom');
+      channelZoomButtonEl.textContent = 'Zoom';
+      updateVisibility();
+    } else {
+      channelMainSectionEl.setAttribute('zoom', '');
+      channelZoomButtonEl.textContent = 'No Zoom';
+      updateVisibility();
+
+      // this will be executed by all other windows.
+      // The handler for this window will match zoomEventId
+      // and ignore the request
+      document.dispatchEvent(new CustomEvent('hide-all-divs',
+        {
+          bubbles: true,
+          detail: {zoom: zoomEventId}
+        }
+      ));
+    }
+  });
+
+  // ----------------
+  // show all event
+  // ----------------
+  document.addEventListener('show-all-divs', function(event) {
+    channelBottomDivEl.removeAttribute('hidden');
+    channelHideButtonEl.textContent = '-';
+    channelTopRightHidableDivEl.removeAttribute('hidden');
+    channelMainSectionEl.removeAttribute('zoom');
+    channelZoomButtonEl.textContent = 'Zoom';
+    updateVisibility();
+  });
+  // -----------------------------------------------------------
+  // hide all event
+  //
+  // If event.detail.zoom === zoomEventId, abort without action
+  // -----------------------------------------------------------
+  document.addEventListener('hide-all-divs', function(event) {
+    if ((event.detail) &&
+      (event.detail.zoom) &&
+      (event.detail.zoom.length > 0)) {
+      if (event.detail.zoom !== zoomEventId) {
+        channelBottomDivEl.setAttribute('hidden', '');
+        channelHideButtonEl.textContent = '+';
+        channelTopRightHidableDivEl.setAttribute('hidden', '');
+        channelMainSectionEl.removeAttribute('zoom');
+        channelZoomButtonEl.textContent = 'Zoom';
+        updateVisibility();
+      }
+    } else {
+      channelBottomDivEl.setAttribute('hidden', '');
+      channelHideButtonEl.textContent = '+';
+      channelTopRightHidableDivEl.setAttribute('hidden', '');
+      channelMainSectionEl.removeAttribute('zoom');
+      channelZoomButtonEl.textContent = 'Zoom';
+      updateVisibility();
+    }
+  });
 
   // -------------------------
   // Beep On Message checkbox handler
@@ -648,7 +739,7 @@ function createChannelEl (name) {
   });
 
   // First time on page load
-  if (window.innerWidth < 600) {
+  if (window.innerWidth < mobileBreakpointPx) {
     channelMainSectionEl.setAttribute('brief-enabled', '');
     channelFormatCBInputEl.checked = true;
   } else {
@@ -1252,12 +1343,21 @@ function createChannelEl (name) {
     // nickname list + right margin.
     let mar3 = webState.dynamic.commonMargin + nicknameListPixelWidth + 6;
 
-    if (window.innerWidth > 600) {
-      channelNamesDisplayEl.setAttribute('cols', channelNamesCharWidth.toString());
+    if (window.innerWidth > mobileBreakpointPx) {
+      // channelNamesDisplayEl.setAttribute('cols', channelNamesCharWidth.toString());
+
       channelTextAreaEl.setAttribute('cols', calcInputAreaColSize(mar3));
+      channelNamesDisplayEl.removeAttribute('hidden');
     } else {
-      channelNamesDisplayEl.setAttribute('cols', calcInputAreaColSize(mar1));
+      // option to set name list to full with when above text window
+      // channelNamesDisplayEl.setAttribute('cols', calcInputAreaColSize(mar1));
+
       channelTextAreaEl.setAttribute('cols', calcInputAreaColSize(mar1));
+      if (channelMainSectionEl.hasAttribute('zoom')) {
+        channelNamesDisplayEl.setAttribute('hidden', '');
+      } else {
+        channelNamesDisplayEl.removeAttribute('hidden');
+      }
     }
     channelInputAreaEl.setAttribute('cols', calcInputAreaColSize(mar2));
   }; // adjustChannelInputToWidowWidth()
