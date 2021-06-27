@@ -38,6 +38,12 @@
         <p>
           This project is still under development and changes frequently.
         </p>
+        <p>
+          The development and debugging were done using an iPhone and IOS Chrome Browser.
+          The examples on this page are limited to mobile phone screen shots. However,
+          the IRC client also works well using Chrome desktop browser on Linux. The desktop
+          and mobile browser can be opened concurrently and will remain in sync.
+        </p>
 
         <div class="home-detail">
           <div class="image-text">
@@ -83,10 +89,9 @@
             </p>
           </div>
           <div class="image-photo">
-            <img src=images/irc-login.png width="389" height="639"alt="IRC login form">
+            <img src=images/irc-login.png width="391" height="507"alt="IRC login form image">
           </div>
         </div>
-
 
         <div class="home-detail">
           <div class="image-text">
@@ -95,11 +100,10 @@
               server is logged into the IRC network.
             </p>
             <p>
-              The user interface for this program is divided into
-              collapsible sections that can be expanded with the [+]
-              buttons located on the left. The interface can be returned
-              to this configuration with all sections collapsed by tapping the [-all]
-              button in the status bar at the top.
+              Up on successful connection to the IRC server, a lot of content
+              will scroll within the server window.
+              This includes information about the server and the IRC server message
+              of the day (motd).
             </p>
             <p>
               At any time you can disconnect from the IRC server by tapping the
@@ -107,15 +111,33 @@
               from the web page, leaving your nickname present on IRC by
               tapping the green [Web] icon at the top.
             </p>
+          </div>
+          <div class="image-photo">
+            <img src=images/irc-connected.png width="388" height="650" alt="IRC connected image">
+          </div>
+        </div>
+
+        <div class="home-detail">
+          <div class="image-text">
+            <p>
+              The user interface for this program is divided into
+              collapsible sections that can be expanded with the [+]
+              buttons located on the left. The interface can be returned
+              to this configuration with all sections collapsed by tapping the [-all]
+              button in the status bar at the top.
+            </p>
+            <p>
+              In this case, server window was closed with the [-] Server button.
+            </p>
             <p>
               If you defined some favorite IRC channel names in the configuration
               file, buttons will be added to allow easy navigation
               to join channels while using a smartphone. In this example
-              we will tap the "#mychannel" button.
+              we will tap the "#myChannel" button.
             </p>
           </div>
           <div class="image-photo">
-            <img src=images/collapsed.png width="386" height="637"alt="Main view collapsed">
+            <img src=images/collapsed.png width="384" height="425"alt="Main view collapsed image">
           </div>
         </div>
 
@@ -123,8 +145,6 @@
         <div class="home-detail">
           <div class="image-text">
             <p>
-              This IRC channel interface should be expected to evolve in the future.
-            </p><p>
               The channel name and topic are displayed at the top of the channel window.
               Below the title is a list of nicknames for users present in the channel,
               followed by a text area where messages are displayed.
@@ -137,7 +157,6 @@
               include channel name and nicknames present on the channel list.
               The auto-complete trigger is tab character, or double space
               (space-space) on mobile devices. Double tab or triple space fills channel name.
-              Auto-complete is only available in channel windows.
             </p><p>
               Checkboxes can be selected to enable an audible beep tone to
               trigger when messages are typed in the channel, or when your
@@ -146,7 +165,28 @@
             </p>
           </div>
           <div class="image-photo">
-            <img src=images/channel-vertical.png width="392" height="669"alt="Channel Vertical">
+            <img src=images/channel-vertical.png width="387" height="688"alt="Channel Vertical image">
+          </div>
+        </div>
+
+        <div class="home-detail">
+          <div class="image-text">
+            <p>
+              Pressing the [Zoom] button in the upper right of the channel window
+              will select channel zoom mode.
+            </p>
+            <p>
+              Zoom mode will collapse all other windows.
+            </p>
+            <p>
+              While in channel zoom mode, the buttons and checkboxes at the
+              bottom of the channel window will be hidden.
+              If the screen width is below a minimum value, the nickname list is also hidden.
+              The hidden items can be toggled to visible by clicking the [Zoom] / [No Zoom] button.
+            </p>
+          </div>
+          <div class="image-photo">
+            <img src=images/channel-zoom.png width="385" height="691"alt="Channel Zoom mode image">
           </div>
         </div>
 
@@ -155,15 +195,17 @@
             <p>
               When the smartphone is flipped on it's side, the screen layout
               will adapt to the new screen width.
+              In this case the channel is still enabled.
             </p>
             <p>
               There are two different text format schemes that are selected
               automatically when the page loads. These can be toggled at any
               time by selecting the checkbox marked: [X] Brief.
+              The Brief checkbox is not visible here because the Zoom was enabled.
             </p>
           </div>
           <div class="image-photo">
-            <img src=images/channel-horizontal.png width="684" height="353"alt="Channel Horizontal">
+            <img src=images/channel-horizontal.png width="725" height="340"alt="Channel Horizontal image">
           </div>
         </div>
 
@@ -177,7 +219,8 @@
               A limited set of IRC text commands are supported.
               Text commands start with a slash / character and
               text commands can be entered in any of the windows.
-              The server window supports limited auto complete.
+              If you scroll to the top, the Info/License window
+              includes a list of supported IRC text commands.
             </p>
             <p>
               Buttons marked [Refresh] are located on several windows.
@@ -191,7 +234,7 @@
             </p>
           </div>
           <div class="image-photo">
-            <img src=images/server-message.png width="686" height="331"alt="IRC Server Horizontal">
+            <img src=images/server-message.png width="686" height="331"alt="IRC Server message image">
           </div>
         </div>
 
@@ -204,11 +247,14 @@
               A separate window is used for each separate nickname.
             </p>
             <p>
+              The checkbox at the bottom enables an audible sound beep when messages arrive.
+            </p>
+            <p>
               DCC CHAT messaging is not supported.
             </p>
           </div>
           <div class="image-photo">
-            <img src=images/private-message.png width="393" height="657"alt="Private Message">
+            <img src=images/private-message.png width="389" height="597"alt="Private Message image">
           </div>
         </div>
 
@@ -221,7 +267,7 @@
             </p>
           </div>
           <div class="image-photo">
-            <img src=images/notice-vert.png width="394" height="668"alt="Notice and Wallops">
+            <img src=images/notice-vert.png width="386" height="627"alt="Notice and Wallops image">
           </div>
         </div>
 
