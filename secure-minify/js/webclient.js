@@ -451,15 +451,16 @@ channelBeep2CBInputEl.checked=false}if(channelMainSectionEl.hasAttribute("beep3-
 if(channelMainSectionEl.hasAttribute("brief-enabled")){channelFormatCBInputEl.checked=true}else{channelFormatCBInputEl.checked=false}if(channelMainSectionEl.hasAttribute("auto-comp-enabled")){
 channelAutoCompCBInputEl.checked=true}else{channelAutoCompCBInputEl.checked=false}}}zoomIndexNumber++;let zoomEventId="chan"+zoomIndexNumber.toString()+"ZoomId"
 ;channelZoomButtonEl.addEventListener("click",function(){if(channelMainSectionEl.hasAttribute("zoom")){channelMainSectionEl.removeAttribute("zoom");channelZoomButtonEl.textContent="Zoom"
-;updateVisibility()}else{channelMainSectionEl.setAttribute("zoom","");channelZoomButtonEl.textContent="No Zoom";updateVisibility();document.dispatchEvent(new CustomEvent("hide-all-divs",{bubbles:true,
-detail:{zoom:zoomEventId}}))}});document.addEventListener("show-all-divs",function(event){channelBottomDivEl.removeAttribute("hidden");channelHideButtonEl.textContent="-"
-;channelTopRightHidableDivEl.removeAttribute("hidden");channelMainSectionEl.removeAttribute("zoom");channelZoomButtonEl.textContent="Zoom";updateVisibility()})
-;document.addEventListener("hide-all-divs",function(event){if(event.detail&&event.detail.zoom&&event.detail.zoom.length>0){if(event.detail.zoom!==zoomEventId){
+;updateVisibility();channelTextAreaEl.scrollTop=channelTextAreaEl.scrollHeight}else{channelMainSectionEl.setAttribute("zoom","");channelZoomButtonEl.textContent="No Zoom";updateVisibility()
+;channelTextAreaEl.scrollTop=channelTextAreaEl.scrollHeight;document.dispatchEvent(new CustomEvent("hide-all-divs",{bubbles:true,detail:{zoom:zoomEventId}}))}})
+;document.addEventListener("show-all-divs",function(event){channelBottomDivEl.removeAttribute("hidden");channelHideButtonEl.textContent="-";channelTopRightHidableDivEl.removeAttribute("hidden")
+;channelMainSectionEl.removeAttribute("zoom");channelZoomButtonEl.textContent="Zoom";updateVisibility()});document.addEventListener("hide-all-divs",function(event){
+if(event.detail&&event.detail.zoom&&event.detail.zoom.length>0){if(event.detail.zoom!==zoomEventId){channelBottomDivEl.setAttribute("hidden","");channelHideButtonEl.textContent="+"
+;channelTopRightHidableDivEl.setAttribute("hidden","");channelMainSectionEl.removeAttribute("zoom");channelZoomButtonEl.textContent="Zoom";updateVisibility()}}else{
 channelBottomDivEl.setAttribute("hidden","");channelHideButtonEl.textContent="+";channelTopRightHidableDivEl.setAttribute("hidden","");channelMainSectionEl.removeAttribute("zoom")
-;channelZoomButtonEl.textContent="Zoom";updateVisibility()}}else{channelBottomDivEl.setAttribute("hidden","");channelHideButtonEl.textContent="+";channelTopRightHidableDivEl.setAttribute("hidden","")
-;channelMainSectionEl.removeAttribute("zoom");channelZoomButtonEl.textContent="Zoom";updateVisibility()}});channelBeep1CBInputEl.addEventListener("click",function(e){
-if(channelMainSectionEl.hasAttribute("beep1-enabled")){channelMainSectionEl.removeAttribute("beep1-enabled")}else{channelMainSectionEl.setAttribute("beep1-enabled","");playBeep1Sound()}
-updateVisibility()});channelBeep2CBInputEl.addEventListener("click",function(e){if(channelMainSectionEl.hasAttribute("beep2-enabled")){channelMainSectionEl.removeAttribute("beep2-enabled")}else{
+;channelZoomButtonEl.textContent="Zoom";updateVisibility()}});channelBeep1CBInputEl.addEventListener("click",function(e){if(channelMainSectionEl.hasAttribute("beep1-enabled")){
+channelMainSectionEl.removeAttribute("beep1-enabled")}else{channelMainSectionEl.setAttribute("beep1-enabled","");playBeep1Sound()}updateVisibility()})
+;channelBeep2CBInputEl.addEventListener("click",function(e){if(channelMainSectionEl.hasAttribute("beep2-enabled")){channelMainSectionEl.removeAttribute("beep2-enabled")}else{
 channelMainSectionEl.setAttribute("beep2-enabled","");playBeep1Sound()}updateVisibility()});channelBeep3CBInputEl.addEventListener("click",function(e){
 if(channelMainSectionEl.hasAttribute("beep3-enabled")){channelMainSectionEl.removeAttribute("beep3-enabled")}else{channelMainSectionEl.setAttribute("beep3-enabled","");playBeep2Sound()}
 updateVisibility()});document.addEventListener("cancel-beep-sounds",function(event){channelMainSectionEl.removeAttribute("beep1-enabled");channelMainSectionEl.removeAttribute("beep2-enabled")

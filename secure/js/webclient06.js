@@ -613,13 +613,19 @@ function createChannelEl (name) {
   let zoomEventId = 'chan' + zoomIndexNumber.toString() + 'ZoomId';
   channelZoomButtonEl.addEventListener('click', function() {
     if (channelMainSectionEl.hasAttribute('zoom')) {
+      // Turn off channel zoom
       channelMainSectionEl.removeAttribute('zoom');
       channelZoomButtonEl.textContent = 'Zoom';
       updateVisibility();
+      // scroll text to most recent messages
+      channelTextAreaEl.scrollTop = channelTextAreaEl.scrollHeight;
     } else {
+      // Turn on channel zoom
       channelMainSectionEl.setAttribute('zoom', '');
       channelZoomButtonEl.textContent = 'No Zoom';
       updateVisibility();
+      // scroll text to most recent messages
+      channelTextAreaEl.scrollTop = channelTextAreaEl.scrollHeight;
 
       // this will be executed by all other windows.
       // The handler for this window will match zoomEventId
