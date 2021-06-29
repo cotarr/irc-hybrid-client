@@ -65,6 +65,21 @@ function _sendTextToChannel(channelIndex, textAreaEl) {
       }
 
       // Else not slash / command, assume is input intended to send to channel.
+      //
+      // Check if marked away, if so cancel away, 1 second delay
+      //
+      if ((ircState.ircConnected) && (ircState.ircIsAway)) {
+        setTimeout(function() {
+          // check again after timer, abort if not away
+          if ((ircState.ircConnected) && (ircState.ircIsAway)) {
+            // cancel away state, IRC server response will be parsed in backend
+            _sendIrcServerMessage('AWAY');
+          }
+        }, 1000);
+      }
+      //
+      // Send message to channel
+      //
       let message = 'PRIVMSG ' +
         ircState.channelStates[channelIndex].name +
         ' :' + text;

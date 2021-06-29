@@ -253,7 +253,7 @@ function substituteHmsTime(inMessage) {
 // Else, this is where filtered server message are formatted for display
 // ---------------------------------------------------------------------------
 document.addEventListener('server-message', function(event) {
-  // console.log(JSON.stringify(event.detail, null, 2));
+  console.log(JSON.stringify(event.detail, null, 2));
 
   // This will skip prefix, command, and param[0], printing the rest
   // If title provided, it will replace timestamp
@@ -318,7 +318,6 @@ document.addEventListener('server-message', function(event) {
     // Whois response
     //
     case '275':
-    case '301':
     case '307':
     case '311':
     case '312':
@@ -328,6 +327,22 @@ document.addEventListener('server-message', function(event) {
     case '378':
     case '379':
       _showAfterParamZero(event.detail.parsedMessage, 'WHOIS');
+      break;
+    // AWAY message
+    case '301':
+      if (event.detail.parsedMessage.params.length !== 3) {
+        // unexpected parse, just display verbatum from server
+        _showAfterParamZero(event.detail.parsedMessage, 'WHOIS');
+      } else {
+        // else, show: WHOIS <nick> is away: <away message>
+        let outMessage = 'WHOIS ' +
+          event.detail.parsedMessage.params[1] +
+          ' is away: ' +
+          event.detail.parsedMessage.params[2];
+        displayRawMessage(
+          cleanFormatting(
+            cleanCtcpDelimiter(outMessage)));
+      }
       break;
     case '318':
       displayRawMessage('WHOIS --End--');
