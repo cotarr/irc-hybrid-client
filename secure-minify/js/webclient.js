@@ -691,12 +691,12 @@ snippet=snippetArray[snippetArray.length-1]}if(snippet.length>0){let matchStr=_a
 ;e.preventDefault()}}else{serverInputAreaEl.value+=String.fromCharCode(autoCompleteSpaceKey)}}}}else{}}}.bind(this)
 ;document.getElementById("rawMessageInputId").addEventListener("keydown",serverAutoComplete,false);function substituteHmsTime(inMessage){let timeString=inMessage.split(" ")[0]
 ;let restOfMessage=inMessage.slice(timeString.length+1,inMessage.length);let hmsString=timestampToHMS(timeString);return hmsString+" "+restOfMessage}
-document.addEventListener("server-message",function(event){console.log(JSON.stringify(event.detail,null,2));function _showAfterParamZero(parsedMessage,title){let msgString=""
-;if(parsedMessage.params.length>1){for(let i=1;i<parsedMessage.params.length;i++){msgString+=" "+parsedMessage.params[i]}}else{console.log("Error _showAfterParamZero() no parsed field")}
-let outMessage=parsedMessage.timestamp+msgString;if(title){outMessage=title+msgString}displayRawMessage(cleanFormatting(cleanCtcpDelimiter(outMessage)))}switch(event.detail.parsedMessage.command){
-case"001":case"002":case"003":case"004":_showAfterParamZero(event.detail.parsedMessage,null);break;case"005":break;case"250":case"251":case"252":case"254":case"255":case"265":case"265":
-_showAfterParamZero(event.detail.parsedMessage,null);break;case"256":case"257":case"258":case"259":_showAfterParamZero(event.detail.parsedMessage,null);break;case"315":displayRawMessage("WHO --End--")
-;break;case"352":_showAfterParamZero(event.detail.parsedMessage,"WHO");break;case"275":case"307":case"311":case"312":case"313":case"317":case"319":case"378":case"379":
+document.addEventListener("server-message",function(event){function _showAfterParamZero(parsedMessage,title){let msgString="";if(parsedMessage.params.length>1){
+for(let i=1;i<parsedMessage.params.length;i++){msgString+=" "+parsedMessage.params[i]}}else{console.log("Error _showAfterParamZero() no parsed field")}let outMessage=parsedMessage.timestamp+msgString
+;if(title){outMessage=title+msgString}displayRawMessage(cleanFormatting(cleanCtcpDelimiter(outMessage)))}switch(event.detail.parsedMessage.command){case"001":case"002":case"003":case"004":
+_showAfterParamZero(event.detail.parsedMessage,null);break;case"005":break;case"250":case"251":case"252":case"254":case"255":case"265":case"265":_showAfterParamZero(event.detail.parsedMessage,null)
+;break;case"256":case"257":case"258":case"259":_showAfterParamZero(event.detail.parsedMessage,null);break;case"315":displayRawMessage("WHO --End--");break;case"352":
+_showAfterParamZero(event.detail.parsedMessage,"WHO");break;case"275":case"307":case"311":case"312":case"313":case"317":case"319":case"378":case"379":
 _showAfterParamZero(event.detail.parsedMessage,"WHOIS");break;case"301":if(event.detail.parsedMessage.params.length!==3){_showAfterParamZero(event.detail.parsedMessage,"WHOIS")}else{
 let outMessage="WHOIS "+event.detail.parsedMessage.params[1]+" is away: "+event.detail.parsedMessage.params[2];displayRawMessage(cleanFormatting(cleanCtcpDelimiter(outMessage)))}break;case"318":
 displayRawMessage("WHOIS --End--");break;case"322":if(event.detail.parsedMessage.params.length===4){let outMessage="LIST "+event.detail.parsedMessage.params[1]+" "+event.detail.parsedMessage.params[2]

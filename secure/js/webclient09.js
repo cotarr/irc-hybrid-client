@@ -253,7 +253,7 @@ function substituteHmsTime(inMessage) {
 // Else, this is where filtered server message are formatted for display
 // ---------------------------------------------------------------------------
 document.addEventListener('server-message', function(event) {
-  console.log(JSON.stringify(event.detail, null, 2));
+  // console.log(JSON.stringify(event.detail, null, 2));
 
   // This will skip prefix, command, and param[0], printing the rest
   // If title provided, it will replace timestamp
