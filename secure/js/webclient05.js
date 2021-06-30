@@ -22,6 +22,9 @@
 //
 // ----------------------------------------------
 // webclient05.js - User Input Text Command Parser
+//
+//   Browser (here) --> backend-webserver --> IRC server
+//
 // ----------------------------------------------
 'use strict';
 
@@ -29,6 +32,8 @@ const autoCompleteCommandList = [
   '/ADMIN',
   '/AWAY',
   '/CTCP',
+  '/DEOP',
+  '/DEVOICE',
   '/JOIN',
   '/LIST',
   '/ME',
@@ -38,12 +43,14 @@ const autoCompleteCommandList = [
   '/NICK',
   '/NOP',
   '/NOTICE',
+  '/OP',
   '/PART',
   '/QUERY',
   '/QUIT',
   '/QUOTE',
   '/TOPIC',
   '/VERSION',
+  '/VOICE',
   '/WHO',
   '/WHOIS'
 ];
@@ -363,6 +370,83 @@ function textCommandParser (inputObj) {
     } // after no param + optional string
   } // after command
 
+  // -----------------------------------------------------------
+  // Internal founction to handle commands such as /VOICE
+  //
+  // modevalue: '+' or '-'
+  // chanUserMode: letter, such as "v" and "o"
+  // ircCommand: irc text command such ans "VOICE" and "OP"
+  //
+  // Success return example:
+  //
+  // {
+  //   error: false,
+  //   message: '',
+  //   ircMessage: '/MODE #channel +vvv nick1 nick2 nick3'
+  // }
+  //
+  // Error return example:
+  //
+  // {
+  //   error: true,
+  //   message: 'Expect: /VOICE <nick1> ... [nick5]',
+  //   ircMessage: null
+  // }
+  //
+  // -----------------------------------------------------------
+  function _parseChannelModes (modeValue, chanUserMode, ircCommand, parsedCommand, inputObj) {
+    if (inputObj.originType !== 'channel') {
+      return {
+        error: true,
+        message: '' + ircCommand + ' must be used in channel widnow',
+        ircMessage: null
+      };
+    } else if (parsedCommand.params.length > 0) {
+      let nameArray = [];
+      if (parsedCommand.params.length === 1) {
+        nameArray.push(parsedCommand.restOf[0]);
+      } else {
+        for (let i=1; i<parsedCommand.params.length; i++) {
+          nameArray.push(parsedCommand.params[i]);
+        }
+        nameArray.push(parsedCommand.restOf[parsedCommand.restOf.length - 1]);
+      }
+      if (nameArray.length > 5) {
+        return {
+          error: true,
+          message: '' + ircCommand + ' command maximum of 5 names exceeded',
+          ircMessage: null
+        };
+      } else if (channelPrefixChars.indexOf(nameArray[0].charAt(0)) >= 0) {
+        return {
+          error: true,
+          message: '' + ircCommand + ' command does not accept the channel name.',
+          ircMessage: null
+        };
+      } else {
+        let returnObj = {
+          error: false,
+          message: '',
+          ircMessage: null
+        };
+        returnObj.ircMessage = 'MODE ';
+        returnObj.ircMessage += inputObj.originName + ' ' + modeValue;
+        for (let i=0; i<nameArray.length; i++) {
+          returnObj.ircMessage += chanUserMode;
+        }
+        for (let i=0; i<nameArray.length; i++) {
+          returnObj.ircMessage += ' ' + nameArray[i];
+        }
+        return returnObj;
+      }
+    } else {
+      return {
+        error: true,
+        message: 'Expect: /' + ircCommand + ' <nick1> ... [nick5]',
+        ircMessage: null
+      };
+    }
+  } // _parseChannelModes()
 
   // console.log('Remain: >' + inStr.slice(idx, inStrLen) + '<');
   // console.log('textCommandParser inputObj:' + JSON.stringify(inputObj, null, 2));
@@ -400,6 +484,28 @@ function textCommandParser (inputObj) {
         }
         ircMessage = 'PRIVMSG ' + parsedCommand.params[1] + ' :' + String.fromCharCode(ctcpDelim) +
           parsedCommand.restOf[1].toUpperCase() + String.fromCharCode(ctcpDelim);
+      }
+      break;
+    //
+    case 'DEOP':
+      if (true) {
+        let ro = _parseChannelModes('-', 'o', 'DEOP', parsedCommand, inputObj);
+        if (ro.error) {
+          return ro;
+        } else {
+          ircMessage = ro.ircMessage;
+        }
+      }
+      break;
+    //
+    case 'DEVOICE':
+      if (true) {
+        let ro = _parseChannelModes('-', 'v', 'DEVOICE', parsedCommand, inputObj);
+        if (ro.error) {
+          return ro;
+        } else {
+          ircMessage = ro.ircMessage;
+        }
       }
       break;
     //
@@ -558,6 +664,17 @@ function textCommandParser (inputObj) {
       }
       break;
     //
+    case 'OP':
+      if (true) {
+        let ro = _parseChannelModes('+', 'o', 'OP', parsedCommand, inputObj);
+        if (ro.error) {
+          return ro;
+        } else {
+          ircMessage = ro.ircMessage;
+        }
+      }
+      break;
+    //
     case 'PART':
       if (parsedCommand.params.length < 1) {
         if (inputObj.originType === 'channel') {
@@ -634,6 +751,16 @@ function textCommandParser (inputObj) {
       ircMessage = 'VERSION';
       if (parsedCommand.restOf.length === 1) {
         ircMessage = 'VERSION ' + parsedCommand.restOf[0];
+      }
+      break;
+    case 'VOICE':
+      if (true) {
+        let ro = _parseChannelModes('+', 'v', 'VOICE', parsedCommand, inputObj);
+        if (ro.error) {
+          return ro;
+        } else {
+          ircMessage = ro.ircMessage;
+        }
       }
       break;
     case 'WHO':
