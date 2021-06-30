@@ -308,7 +308,8 @@ if(ircState.ircConnected&&webState.webConnected||!webState.webConnected){documen
 ;document.getElementById("setAwayButton").addEventListener("click",function(){if(ircState.ircConnected&&document.getElementById("userAwayMessageId").value.length>0){
 _sendIrcServerMessage("AWAY "+document.getElementById("userAwayMessageId").value)}});document.getElementById("setBackButton").addEventListener("click",function(){
 if(ircState.ircConnected&&ircState.ircIsAway){_sendIrcServerMessage("AWAY")}});"use strict"
-;const autoCompleteCommandList=["/ADMIN","/AWAY","/CTCP","/JOIN","/LIST","/ME","/MODE","/MOTD","/MSG","/NICK","/NOP","/NOTICE","/PART","/QUERY","/QUIT","/QUOTE","/TOPIC","/VERSION","/WHO","/WHOIS"]
+;const autoCompleteCommandList=["/ADMIN","/AWAY","/CTCP","/DEOP","/DEVOICE","/JOIN","/LIST","/ME","/MODE","/MOTD","/MSG","/NICK","/NOP","/NOTICE","/OP","/PART","/QUERY","/QUIT","/QUOTE","/TOPIC","/VERSION","/VOICE","/WHO","/WHOIS"]
+
 ;const autoCompleteRawCommandList=["ADMIN","AWAY","CAP","CONNECT","DIE","DISCONNECT","ERROR","GLINE","HELP","INFO","INVITE","ISON","JOIN","KICK","KILL","KLINE","LINKS","LIST","LUSERS","MODE","MOTD","NAMES","NICK","NOTICE","OPER","PART","PASS","PING","PONG","PRIVMSG","QUIT","REHASH","RESTART","SERVLIST","SQUERY","SQUIT","STATS","SUMMON","TIME","TOPIC","TRACE","USER","USERHOST","USERS","VERSION","WALLOPS","WHO","WHOIS","WHOWAS"]
 ;function detectMultiLineString(inString){let inLength=inString.length;if(inLength>0&&inString.charCodeAt(inLength-1)===10)inLength--;if(inLength>0){let countCR=0;for(let i=0;i<inLength;i++){
 if(inString.charCodeAt(i)===10)countCR++}if(countCR===0){return false}else{return true}}else{return false}}function stripTrailingCrLf(inString){let inLength=inString.length
@@ -327,13 +328,22 @@ while(_isWS(inStr.charAt(idx))&&idx<inStrLen){idx++}if(inStr.slice(idx,inStrLen)
 parsedCommand.params.push(chars3);parsedCommand.restOf.push(inStr.slice(idx,inStrLen));let chars4="";while(!_isWS(inStr.charAt(idx))&&idx<inStrLen){chars4+=inStr.charAt(idx);idx++}
 while(_isWS(inStr.charAt(idx))&&idx<inStrLen){idx++}if(inStr.slice(idx,inStrLen).length>0){parsedCommand.params.push(chars4);parsedCommand.restOf.push(inStr.slice(idx,inStrLen));let chars5=""
 ;while(!_isWS(inStr.charAt(idx))&&idx<inStrLen){chars5+=inStr.charAt(idx);idx++}while(_isWS(inStr.charAt(idx))&&idx<inStrLen){idx++}if(inStr.slice(idx,inStrLen).length>0){
-parsedCommand.params.push(chars5);parsedCommand.restOf.push(inStr.slice(idx,inStrLen))}}}}}}let ircMessage=null;switch(parsedCommand.command){case"ADMIN":showRawMessageWindow();ircMessage="ADMIN"
-;if(parsedCommand.restOf.length===1){ircMessage="ADMIN "+parsedCommand.restOf[0]}break;case"AWAY":ircMessage="AWAY";if(parsedCommand.restOf.length>0){ircMessage="AWAY :"+parsedCommand.restOf[0]}break
-;case"CTCP":if(true){let ctcpDelim=1;if(parsedCommand.params.length!==2){return{error:true,message:"Expect: /CTCP <nickname> <ctcp_command>",ircMessage:null}}
-ircMessage="PRIVMSG "+parsedCommand.params[1]+" :"+String.fromCharCode(ctcpDelim)+parsedCommand.restOf[1].toUpperCase()+String.fromCharCode(ctcpDelim)}break;case"JOIN":
-if(parsedCommand.params.length<1){return{error:true,message:"Expect: /JOIN <#channel>",ircMessage:null}}if(parsedCommand.params.length===1){ircMessage="JOIN "+parsedCommand.restOf[0]}
-if(parsedCommand.params.length===2){ircMessage="JOIN "+parsedCommand.params[1]+" "+parsedCommand.restOf[1]}break;case"LIST":showRawMessageWindow();if(parsedCommand.params.length===0){ircMessage="LIST"
-}else{ircMessage="LIST "+parsedCommand.restOf[0]}break;case"ME":if(true){if(parsedCommand.params.length<1){return{error:true,message:"Expect: /ME <action-message>",ircMessage:null}}let ctcpDelim=1
+parsedCommand.params.push(chars5);parsedCommand.restOf.push(inStr.slice(idx,inStrLen))}}}}}}function _parseChannelModes(modeValue,chanUserMode,ircCommand,parsedCommand,inputObj){
+if(inputObj.originType!=="channel"){return{error:true,message:""+ircCommand+" must be used in channel widnow",ircMessage:null}}else if(parsedCommand.params.length>0){let nameArray=[]
+;if(parsedCommand.params.length===1){nameArray.push(parsedCommand.restOf[0])}else{for(let i=1;i<parsedCommand.params.length;i++){nameArray.push(parsedCommand.params[i])}
+nameArray.push(parsedCommand.restOf[parsedCommand.restOf.length-1])}if(nameArray.length>5){return{error:true,message:""+ircCommand+" command maximum of 5 names exceeded",ircMessage:null}
+}else if(channelPrefixChars.indexOf(nameArray[0].charAt(0))>=0){return{error:true,message:""+ircCommand+" command does not accept the channel name.",ircMessage:null}}else{let returnObj={error:false,
+message:"",ircMessage:null};returnObj.ircMessage="MODE ";returnObj.ircMessage+=inputObj.originName+" "+modeValue;for(let i=0;i<nameArray.length;i++){returnObj.ircMessage+=chanUserMode}
+for(let i=0;i<nameArray.length;i++){returnObj.ircMessage+=" "+nameArray[i]}return returnObj}}else{return{error:true,message:"Expect: /"+ircCommand+" <nick1> ... [nick5]",ircMessage:null}}}
+let ircMessage=null;switch(parsedCommand.command){case"ADMIN":showRawMessageWindow();ircMessage="ADMIN";if(parsedCommand.restOf.length===1){ircMessage="ADMIN "+parsedCommand.restOf[0]}break
+;case"AWAY":ircMessage="AWAY";if(parsedCommand.restOf.length>0){ircMessage="AWAY :"+parsedCommand.restOf[0]}break;case"CTCP":if(true){let ctcpDelim=1;if(parsedCommand.params.length!==2){return{
+error:true,message:"Expect: /CTCP <nickname> <ctcp_command>",ircMessage:null}}
+ircMessage="PRIVMSG "+parsedCommand.params[1]+" :"+String.fromCharCode(ctcpDelim)+parsedCommand.restOf[1].toUpperCase()+String.fromCharCode(ctcpDelim)}break;case"DEOP":if(true){
+let ro=_parseChannelModes("-","o","DEOP",parsedCommand,inputObj);if(ro.error){return ro}else{ircMessage=ro.ircMessage}}break;case"DEVOICE":if(true){
+let ro=_parseChannelModes("-","v","DEVOICE",parsedCommand,inputObj);if(ro.error){return ro}else{ircMessage=ro.ircMessage}}break;case"JOIN":if(parsedCommand.params.length<1){return{error:true,
+message:"Expect: /JOIN <#channel>",ircMessage:null}}if(parsedCommand.params.length===1){ircMessage="JOIN "+parsedCommand.restOf[0]}if(parsedCommand.params.length===2){
+ircMessage="JOIN "+parsedCommand.params[1]+" "+parsedCommand.restOf[1]}break;case"LIST":showRawMessageWindow();if(parsedCommand.params.length===0){ircMessage="LIST"}else{
+ircMessage="LIST "+parsedCommand.restOf[0]}break;case"ME":if(true){if(parsedCommand.params.length<1){return{error:true,message:"Expect: /ME <action-message>",ircMessage:null}}let ctcpDelim=1
 ;if(inputObj.originType==="channel"){ircMessage="PRIVMSG "+inputObj.originName+" :"+String.fromCharCode(ctcpDelim)+"ACTION "+parsedCommand.restOf[0]+String.fromCharCode(ctcpDelim)}
 if(inputObj.originType==="private"){ircMessage="PRIVMSG "+inputObj.originName+" :"+String.fromCharCode(ctcpDelim)+"ACTION "+parsedCommand.restOf[0]+String.fromCharCode(ctcpDelim)}}break;case"MODE":
 if(true){if(parsedCommand.restOf.length===0&&inputObj.originType!=="channel"){ircMessage="MODE "+ircState.nickName
@@ -350,8 +360,9 @@ message:"Expect: /MSG <nickname> <message-text>",ircMessage:null}}break;case"NIC
 showRawMessageWindow();ircMessage="NICK "+parsedCommand.restOf[0];break;case"NOP":console.log("textCommandParser inputObj:"+JSON.stringify(inputObj,null,2))
 ;console.log("parsedCommand "+JSON.stringify(parsedCommand,null,2));return{error:false,message:null,ircMessage:null};break;case"NOTICE":
 if(parsedCommand.params.length>1&&parsedCommand.restOf[1].length>0){ircMessage="NOTICE "+parsedCommand.params[1]+" :"+parsedCommand.restOf[1]}else{return{error:true,
-message:"Expect: /NOTICE <nickname> <message-text>",ircMessage:null}}break;case"PART":if(parsedCommand.params.length<1){if(inputObj.originType==="channel"){ircMessage="PART "+inputObj.originName}else{
-return{error:true,message:"Expect: /PART #channel [Optional message]",ircMessage:null}}}else{if(parsedCommand.params.length===1){ircMessage="PART "+parsedCommand.restOf[0]}else{
+message:"Expect: /NOTICE <nickname> <message-text>",ircMessage:null}}break;case"OP":if(true){let ro=_parseChannelModes("+","o","OP",parsedCommand,inputObj);if(ro.error){return ro}else{
+ircMessage=ro.ircMessage}}break;case"PART":if(parsedCommand.params.length<1){if(inputObj.originType==="channel"){ircMessage="PART "+inputObj.originName}else{return{error:true,
+message:"Expect: /PART #channel [Optional message]",ircMessage:null}}}else{if(parsedCommand.params.length===1){ircMessage="PART "+parsedCommand.restOf[0]}else{
 ircMessage="PART "+parsedCommand.params[1]+" :"+parsedCommand.restOf[1]}}break;case"QUERY":if(parsedCommand.params.length>1&&channelPrefixChars.indexOf(parsedCommand.params[1].charAt(0))<0){
 ircMessage="PRIVMSG "+parsedCommand.params[1]+" :"+parsedCommand.restOf[1]}else{return{error:true,message:"Expect: /QUERY <nickname> <message-text>",ircMessage:null}}break;case"QUIT":ircMessage="QUIT"
 ;if(parsedCommand.restOf.length>0){ircMessage="QUIT :"+parsedCommand.restOf[0]}break;case"QUOTE":if(parsedCommand.restOf.length>0){showRawMessageWindow();ircMessage=parsedCommand.restOf[0]}else{
@@ -359,7 +370,8 @@ return{error:true,message:"Expect: /QUOTE RAWCOMMAND [arguments]",ircMessage:nul
 if(parsedCommand.params.length>1&&ircState.channels.indexOf(parsedCommand.params[1].toLowerCase())>=0){ircMessage="TOPIC "+parsedCommand.params[1]+" :"+parsedCommand.restOf[1]
 }else if(parsedCommand.params.length>0&&channelPrefixChars.indexOf(parsedCommand.restOf[0].charAt(0))<0&&inputObj.originType==="channel"){
 ircMessage="TOPIC "+inputObj.originName+" :"+parsedCommand.restOf[0]}else{return{error:true,message:"Expect: /TOPIC <#channel> <New-channel-topic-message>",ircMessage:null}}break;case"VERSION":
-showRawMessageWindow();ircMessage="VERSION";if(parsedCommand.restOf.length===1){ircMessage="VERSION "+parsedCommand.restOf[0]}break;case"WHO":if(parsedCommand.params.length===0){showRawMessageWindow()
+showRawMessageWindow();ircMessage="VERSION";if(parsedCommand.restOf.length===1){ircMessage="VERSION "+parsedCommand.restOf[0]}break;case"VOICE":if(true){
+let ro=_parseChannelModes("+","v","VOICE",parsedCommand,inputObj);if(ro.error){return ro}else{ircMessage=ro.ircMessage}}break;case"WHO":if(parsedCommand.params.length===0){showRawMessageWindow()
 ;ircMessage="WHO"}else{showRawMessageWindow();ircMessage="WHO "+parsedCommand.restOf[0]}break;case"WHOIS":if(parsedCommand.params.length<1){return{error:true,message:"Expect: /WHOIS <nickname>",
 ircMessage:null}}showRawMessageWindow();ircMessage="WHOIS "+parsedCommand.restOf[0];break;default:}if(ircMessage){return{error:false,message:null,ircMessage:ircMessage}}return{error:true,
 message:'Command "/'+parsedCommand.command+'" unknown command.',ircMessage:null}}"use strict";function _sendTextToChannel(channelIndex,textAreaEl){let text=stripTrailingCrLf(textAreaEl.value)
