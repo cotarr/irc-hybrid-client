@@ -215,6 +215,11 @@ document.getElementById('quitButton').addEventListener('click', function() {
     webState.ircConnecting = false;
     // stuck trying to connect, just request server to destroy socket
     forceDisconnectHandler();
+  } else if ((ircState.ircAutoReconnect) && (ircState.ircConnectOn) &&
+    (!ircState.ircConnected) && (!ircState.ircConnecting)) {
+    // case of backend waiting on timer to reconnect.
+    // when QUIT pressed, send hard disconnet to kill timer.
+    forceDisconnectHandler();
   } else {
     // else, connected to server, exit gracefully by command.
     _sendIrcServerMessage('QUIT :' + ircState.progName + ' ' + ircState.progVersion);

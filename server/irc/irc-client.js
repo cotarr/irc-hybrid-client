@@ -320,15 +320,17 @@
         vars.ircState.ircRegistered = false;
         vars.ircState.ircIsAway = false;
         global.sendToBrowser('UPDATE\nwebError: IRC server timeout while connecting\n');
+        ircLog.writeIrcLog('IRC server timeout while connecting');
       }
     }.bind(this), vars.ircSocketConnectingTimeout * 1000);
 
-    let connectMessage = 'webServer: Opening socket to ' + vars.ircState.ircServerName + ' ' +
+    let connectMessage = 'Opening socket to ' + vars.ircState.ircServerName + ' ' +
       vars.ircState.ircServerHost + ':' + vars.ircState.ircServerPort;
     if (vars.ircState.ircTLSEnabled) {
       connectMessage += ' (TLS)';
     }
-    global.sendToBrowser('UPDATE\n' + connectMessage + '\n');
+    global.sendToBrowser('UPDATE\nwebServer: ' + connectMessage + '\n');
+    ircLog.writeIrcLog(connectMessage);
 
     if (vars.ircState.ircTLSEnabled) {
       ircSocket = new tls.TLSSocket();
@@ -344,6 +346,7 @@
       // clear watchdog timer
       if (watchdogTimer) clearTimeout(watchdogTimer);
       global.sendToBrowser('webServer: Connected\n');
+      ircLog.writeIrcLog('IRC server connected');
     });
 
     // -----------
@@ -391,9 +394,11 @@
       if (hadError) {
         global.sendToBrowser('UPDATE\nwebError: Socket to IRC server closed, hadError: ' +
           hadError.toString() + '\n');
+        ircLog.writeIrcLog('Socket to IRC server closed, hadError: ' + hadError.toString());
       } else {
         global.sendToBrowser('UPDATE\nwebServer: Socket to IRC server closed, hadError: ' +
           hadError.toString() + '\n');
+        ircLog.writeIrcLog('Socket to IRC server closed, hadError: ' + hadError.toString());
       }
     });
 
@@ -423,6 +428,7 @@
       // clear watchdog timer
       if (watchdogTimer) clearTimeout(watchdogTimer);
       global.sendToBrowser('UPDATE\nwebError: IRC server socket error, connected flags reset\n');
+      ircLog.writeIrcLog('IRC server socket error, connected flags reset');
     });
 
     // ----------------------------------
@@ -461,6 +467,7 @@
       vars.ircState.ircRegistered = false;
       vars.ircState.ircIsAway = false;
       global.sendToBrowser('UPDATE\nwebError: IRC server Nickname registration timeout\n');
+      ircLog.writeIrcLog('IRC server Nickname registration timeout');
     }
   }; // registrationWatchdogTimerTick()
 
@@ -501,6 +508,8 @@
 
     // Array of integers representing reconnect times in seconds
     if (vars.ircServerReconnectIntervals.indexOf(vars.ircServerReconnectTimerSeconds) >= 0) {
+      ircLog.writeIrcLog('Reconnect handler activated after ' +
+        vars.ircServerReconnectTimerSeconds.toString() + ' seconds.');
       // channels here on connect, browser on disconnect
       vars.ircState.ircServerPrefix = '';
       vars.ircState.channels = [];
@@ -544,6 +553,7 @@
       vars.ircState.ircRegistered = false;
       vars.ircState.ircIsAway = false;
       global.sendToBrowser('UPDATE\nwebError: IRC server activity watchdog expired\n');
+      ircLog.writeIrcLog('IRC server activity watchdog expired');
     }
   }; // activityWatchdogTimerTick()
 
@@ -601,7 +611,9 @@
   //  }
   //----------------------------------------
   const serverHandler = function(req, res, next) {
-    if ((vars.ircState.ircConnected) || (vars.ircState.ircConnecting)) {
+    if ((vars.ircState.ircConnected) ||
+      (vars.ircState.ircConnecting) ||
+      (vars.ircState.ircConnectOn)) {
       return res.json({
         error: true,
         message: 'Can not change servers while connected or connecting'
@@ -859,6 +871,7 @@
     vars.ircServerReconnectChannelString = '';
     vars.ircServerReconnectAwayString = '';
     global.sendToBrowser('webServer: Forcibly closing IRC server TCP socket\n');
+    ircLog.writeIrcLog('Forcibly closing IRC server TCP socket');
     if (ircSocket) {
       ircSocket.destroy();
       vars.ircState.ircServerPrefix = '';

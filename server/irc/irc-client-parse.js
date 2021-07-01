@@ -682,6 +682,36 @@
       case 'ERROR':
         // console.log(messageBuffer.toString('utf8'));
         tellBrowserToRequestState();
+        if (parsedMessage.params.length > 0) {
+          ircLog.writeIrcLog('Received ERROR from irc server: ' + parsedMessage.params[0]);
+          if (parsedMessage.params[0].length > 4) {
+            let abortFlag = false;
+            //
+            // These string match may need some adjustment for different type of IRC server.
+            //
+            if (parsedMessage.params[0].toUpperCase().indexOf('KILL') >= 0) {
+              ircLog.writeIrcLog('KILL detected from IRC server');
+              abortFlag = true;
+            }
+            if (parsedMessage.params[0].toUpperCase().indexOf('ACCESS DENIED') >= 0) {
+              ircLog.writeIrcLog('Access denied detected from IRC server');
+              abortFlag = true;
+            }
+            if ((parsedMessage.params[0].toUpperCase().indexOf('K-LINE') >= 0) ||
+              (parsedMessage.params[0].toUpperCase().indexOf('KLINE') >= 0)) {
+              ircLog.writeIrcLog('K-Line detected from IRC server');
+              abortFlag = true;
+            }
+            // ----------------------------------
+            // Abort the auto-reconnect if banned
+            // ----------------------------------
+            if (abortFlag) {
+              vars.ircState.ircConnectOn = false;
+            }
+          }
+        } else {
+          ircLog.writeIrcLog('Received ERROR from irc server');
+        }
         break;
       //
       case 'JOIN':

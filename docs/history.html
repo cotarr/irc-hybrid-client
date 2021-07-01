@@ -32,9 +32,15 @@
         <div class="desc-title">
           Change Log
         </div>
+        (next)
+          Recode IRC auto-reconnect login.
+          Detection of KILL and K-Line will cancel reconnect timer.
+          Disconnect IRC button will cancel reconnect timer.
+          The IRC server select next button disabled while reconnect timer.
+          Add additional logging for IRC server TCP socket errors, Kill and K-Line detection. 
         <p>
-          (next)
-          Added text command /OP /DEOP /VOICE /DEVOICE commands. 
+          (2021-06-30 (0.1.11)
+          Added text command /OP /DEOP /VOICE /DEVOICE commands.
           Auto cancel away on channel message, fix away WHOIS message.
           Changing channel zoom scroll window to most recent message.
         </p>
