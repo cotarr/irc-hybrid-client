@@ -27,7 +27,7 @@
 //  back to the browser, so the user can see their own submissions.
 //
 // -----------------------------------------------------------------------------
-(function() {
+(function () {
   'use strict';
 
   // const ircWrite = require('./irc-client-write');
@@ -40,7 +40,7 @@
   //   global.sendToBrowser('UPDATE\r\n');
   // };
 
-  //-----------------------------------------------------------------
+  // -----------------------------------------------------------------
   //
   //  B R O W S E R   M E S S A G E   C O M M A N D   P A R S E R
   //
@@ -53,7 +53,7 @@
   //           }
   //
   //  web-broswer --> web server --> [THIS PARSER] --> irc-server
-  //-----------------------------------------------------------------
+  // -----------------------------------------------------------------
   const parseBrowserMessageForCommand = function (message) {
     // console.log('Browser --> backend message: ' + message);
 
@@ -126,7 +126,7 @@
             vars.ircState.channelStates[index].names = [];
           }
         }
-        return {error: false};
+        return { error: false };
         break;
       case 'NAMES':
         if (true) {
@@ -136,7 +136,7 @@
             vars.ircState.channelStates[index].names = [];
           }
         }
-        return {error: false};
+        return { error: false };
         break;
       //
       case 'NOTICE':
@@ -150,7 +150,7 @@
             ':' + vars.ircState.nickName + '!*@* ' + message;
             ircMessageCache.addMessage(fromMessage);
             global.sendToBrowser(fromMessage + '\r\n');
-            return {error: false};
+            return { error: false };
           }
         }
         //
@@ -163,7 +163,7 @@
               ':' + vars.ircState.nickName + '!*@* ' + message;
             ircMessageCache.addMessage(fromMessage);
             global.sendToBrowser(fromMessage + '\r\n');
-            return {error: false};
+            return { error: false };
           }
           return {
             error: true,
@@ -183,7 +183,7 @@
             ':' + vars.ircState.nickName + '!*@* ' + message;
             ircMessageCache.addMessage(fromMessage);
             global.sendToBrowser(fromMessage + '\r\n');
-            return {error: false};
+            return { error: false };
           }
         }
         //
@@ -196,7 +196,7 @@
               ':' + vars.ircState.nickName + '!*@* ' + message;
             ircMessageCache.addMessage(fromMessage);
             global.sendToBrowser(fromMessage + '\r\n');
-            return {error: false};
+            return { error: false };
           }
           return {
             error: true,
@@ -217,7 +217,7 @@
     }
 
     // by default messages are valid
-    return {error: false};
+    return { error: false };
   }; // parseBrowserMessageForCommand
 
   module.exports = {

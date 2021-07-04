@@ -54,11 +54,11 @@ function updateFromCache () {
   let fetchOptions = {
     method: 'GET',
     headers: {
-      'Accept': 'application/json'
+      Accept: 'application/json'
     }
   };
   fetch(fetchURL, fetchOptions)
-    .then( (response) => {
+    .then((response) => {
       // console.log(response.status);
       if (response.ok) {
         return response.json();
@@ -66,7 +66,7 @@ function updateFromCache () {
         throw new Error('Fetch status ' + response.status + ' ' + response.statusText);
       }
     })
-    .then( (responseArray) => {
+    .then((responseArray) => {
       if ((Array.isArray(responseArray)) && (responseArray.length > 0)) {
         // remove dynamically created private message elements to match list
         let privMsgSessionEl = document.getElementById('privateMessageContainerDiv');
@@ -96,7 +96,7 @@ function updateFromCache () {
         //
         // Option 2, recieve array of utf8 string message
         //
-        for (let i=0; i<responseArray.length; i++) {
+        for (let i = 0; i < responseArray.length; i++) {
           if (responseArray[i].length > 0) {
             _parseBufferMessage(responseArray[i]);
           }
@@ -111,11 +111,11 @@ function updateFromCache () {
         }));
       }
     })
-    .catch( (error) => {
+    .catch((error) => {
       console.log(error);
     });
 }; // updateFromCache;
-window.addEventListener('update-from-cache', function(event) {
+window.addEventListener('update-from-cache', function (event) {
   updateFromCache();
 }.bind(this));
 
@@ -129,19 +129,19 @@ webState.cacheInhibitTimer = 3;
 // -----------------------
 // Die (Server) button
 // -----------------------
-document.getElementById('serverTerminateButton').addEventListener('click', function() {
+document.getElementById('serverTerminateButton').addEventListener('click', function () {
   console.log('Requesting backend server to terminate');
   let fetchURL = webServerUrl + '/terminate';
   let fetchOptions = {
     method: 'POST',
     headers: {
       'Content-type': 'application/json',
-      'Accept': 'application/json'
+      Accept: 'application/json'
     },
-    body: JSON.stringify({terminate: 'YES'})
+    body: JSON.stringify({ terminate: 'YES' })
   };
   fetch(fetchURL, fetchOptions)
-    .then( (response) => {
+    .then((response) => {
       // console.log(response.status);
       if (response.ok) {
         return response.json();
@@ -149,10 +149,10 @@ document.getElementById('serverTerminateButton').addEventListener('click', funct
         throw new Error('Fetch status ' + response.status + ' ' + response.statusText);
       }
     })
-    .then( (responseJson) => {
+    .then((responseJson) => {
       console.log(JSON.stringify(responseJson));
     })
-    .catch( (error) => {
+    .catch((error) => {
       showError('Terminate: Unable to connect');
       console.log(error);
     });
@@ -163,7 +163,7 @@ document.getElementById('serverTerminateButton').addEventListener('click', funct
 //
 // Route:  /erase
 // ---------------------------------------
-document.getElementById('eraseCacheButton').addEventListener('click', function() {
+document.getElementById('eraseCacheButton').addEventListener('click', function () {
   if (ircState.ircConnected) {
     showError('You must be disconnected from IRC to clear cache.');
     return;
@@ -179,12 +179,12 @@ document.getElementById('eraseCacheButton').addEventListener('click', function()
     method: 'POST',
     headers: {
       'Content-type': 'application/json',
-      'Accept': 'application/json'
+      Accept: 'application/json'
     },
-    body: JSON.stringify({erase: 'YES'})
+    body: JSON.stringify({ erase: 'YES' })
   };
   fetch(fetchURL, fetchOptions)
-    .then( (response) => {
+    .then((response) => {
       // console.log(response.status);
       if (response.ok) {
         return response.json();
@@ -192,7 +192,7 @@ document.getElementById('eraseCacheButton').addEventListener('click', function()
         throw new Error('Fetch status ' + response.status + ' ' + response.statusText);
       }
     })
-    .then( (responseJson) => {
+    .then((responseJson) => {
       if (responseJson.error) {
         showError(responseJson.message);
       } else {
@@ -213,7 +213,7 @@ document.getElementById('eraseCacheButton').addEventListener('click', function()
         updateDivVisibility();
       }
     })
-    .catch( (error) => {
+    .catch((error) => {
       console.log(error);
     });
 });
@@ -226,11 +226,11 @@ function updateUsername () {
   let fetchOptions = {
     method: 'GET',
     headers: {
-      'Accept': 'application/json'
+      Accept: 'application/json'
     }
   };
   fetch(fetchURL, fetchOptions)
-    .then( (response) => {
+    .then((response) => {
       // console.log(response.status);
       if (response.ok) {
         return response.json();
@@ -238,10 +238,10 @@ function updateUsername () {
         throw new Error('Fetch status ' + response.status + ' ' + response.statusText);
       }
     })
-    .then( (responseJson) => {
+    .then((responseJson) => {
       webState.loginUser = responseJson;
     })
-    .catch( (error) => {
+    .catch((error) => {
       console.log(error);
     });
 };
@@ -250,18 +250,18 @@ updateUsername();
 // --------------------
 // Test Button #1
 // --------------------
-document.getElementById('test1Button').addEventListener('click', function() {
+document.getElementById('test1Button').addEventListener('click', function () {
   console.log('Test1 button pressed.');
 
   let fetchURL = webServerUrl + '/irc/test1';
   let fetchOptions = {
     method: 'GET',
     headers: {
-      'Accept': 'application/json'
+      Accept: 'application/json'
     }
   };
   fetch(fetchURL, fetchOptions)
-    .then( (response) => {
+    .then((response) => {
       // console.log(response.status);
       if (response.ok) {
         return response.json();
@@ -269,13 +269,13 @@ document.getElementById('test1Button').addEventListener('click', function() {
         throw new Error('Fetch status ' + response.status + ' ' + response.statusText);
       }
     })
-    .then( (responseJson) => {
+    .then((responseJson) => {
       console.log(JSON.stringify(responseJson, null, 2));
       if (responseJson.error) {
         showError(responseJson.message);
       }
     })
-    .catch( (error) => {
+    .catch((error) => {
       console.log(error);
       if (error) showError(error.toString());
     });
@@ -285,18 +285,18 @@ document.getElementById('test1ButtonDesc').textContent = 'Force garbage collect'
 // --------------------
 // Test Button #2
 // --------------------
-document.getElementById('test2Button').addEventListener('click', function() {
+document.getElementById('test2Button').addEventListener('click', function () {
   console.log('Test2 button pressed.');
 
   let fetchURL = webServerUrl + '/irc/test2';
   let fetchOptions = {
     method: 'GET',
     headers: {
-      'Accept': 'application/json'
+      Accept: 'application/json'
     }
   };
   fetch(fetchURL, fetchOptions)
-    .then( (response) => {
+    .then((response) => {
       // console.log(response.status);
       if (response.ok) {
         return response.json();
@@ -305,13 +305,13 @@ document.getElementById('test2Button').addEventListener('click', function() {
         throw new Error('Fetch status ' + response.status + ' ' + response.statusText);
       }
     })
-    .then( (responseJson) => {
+    .then((responseJson) => {
       console.log(JSON.stringify(responseJson, null, 2));
       if (responseJson.error) {
         showError(responseJson.message);
       }
     })
-    .catch( (error) => {
+    .catch((error) => {
       console.log(error);
       if (error) showError(error.toString());
     });
@@ -321,7 +321,7 @@ document.getElementById('test2ButtonDesc').textContent = 'Emulate IRC ping timeo
 // --------------------
 // Test Button #3
 // --------------------
-document.getElementById('test3Button').addEventListener('click', function() {
+document.getElementById('test3Button').addEventListener('click', function () {
   console.log('Test 3 button pressed.');
   // ---------------------------------
   console.log('Test 3 button: expire heart beat timer');
@@ -334,7 +334,7 @@ document.getElementById('test3ButtonDesc').textContent = 'Emulate websocket time
 // --------------------
 // Test Button #4
 // --------------------
-document.getElementById('test4Button').addEventListener('click', function() {
+document.getElementById('test4Button').addEventListener('click', function () {
   console.log('Test 4 button pressed.');
 
   // ---------------------------------
@@ -409,7 +409,7 @@ rulerDivEl.removeChild(rulerTextareaEl);
 
 // perform regression (2 equation, 2 variables) to get slope and intercept (Y = mX + b)
 if (!webState.watch) webState.dynamic = {};
-webState.dynamic.inputAreaCharWidthPx = (rulerY2 - rulerY1) / (rulerX2-rulerX1);
+webState.dynamic.inputAreaCharWidthPx = (rulerY2 - rulerY1) / (rulerX2 - rulerX1);
 webState.dynamic.inputAreaSideWidthPx = rulerY1 - (rulerX1 * webState.dynamic.inputAreaCharWidthPx);
 
 // Create <button> elment and fill with "Send" string value
@@ -481,7 +481,7 @@ const adjustInputToWidowWidth = function (innerWidth) {
 //
 // Event listener for resize window (generic browser event)
 //
-window.addEventListener('resize', function(event) {
+window.addEventListener('resize', function (event) {
   // ignore resize events before dynamic size variables exist
   if (webState.dynamic.inputAreaCharWidthPx) {
     adjustInputToWidowWidth(event.currentTarget.innerWidth);
@@ -496,7 +496,7 @@ adjustInputToWidowWidth(window.innerWidth);
 //
 // 1 second utility timer
 //
-setInterval(function() {
+setInterval(function () {
   errorTimerTickHandler();
   heartbeatTimerTickHandler();
   reconnectTimerTickHandler();

@@ -52,7 +52,6 @@ const pmNameSpacer = ' - ';
 const activityIconInhibitTimerValue = 10;
 const cacheReloadString = '-----Cache Reload-----';
 
-
 // ----------------------------------------------------------
 // Do not edit ircState contents from within browser.
 //
@@ -132,8 +131,8 @@ webState.channelStates = [];
 // Private message variables
 webState.lastPMNick = '';
 webState.activePrivateMessageNicks = [];
-webState.times = {webConnect: 0};
-webState.count = {webConnect: 0};
+webState.times = { webConnect: 0 };
+webState.count = { webConnect: 0 };
 webState.cacheInhibitTimer = 0;
 
 // -------------------------------
@@ -167,13 +166,13 @@ var beep1InhibitTimer = 0;
 var beep2InhibitTimer = 0;
 var beep3InhibitTimer = 0;
 
-function beepTimerTick() {
+function beepTimerTick () {
   if (beep1InhibitTimer > 0) beep1InhibitTimer--;
   if (beep2InhibitTimer > 0) beep2InhibitTimer--;
   if (beep3InhibitTimer > 0) beep3InhibitTimer--;
 }
 
-function inhibitBeep(seconds) {
+function inhibitBeep (seconds) {
   // used for reload/update
   beep1InhibitTimer = seconds;
   beep2InhibitTimer = seconds;
@@ -206,7 +205,7 @@ function playBeep3Sound () {
 const errorExpireSeconds = 5;
 var errorRemainSeconds = 0;
 
-function clearError() {
+function clearError () {
   let errorDivEl = document.getElementById('errorDiv');
   errorDivEl.setAttribute('hidden', '');
   let errorContentDivEl = document.getElementById('errorContentDiv');
@@ -226,14 +225,14 @@ function showError (errorString) {
   errorRemainSeconds = errorExpireSeconds;
 }
 
-document.addEventListener('show-error-message', function(event) {
+document.addEventListener('show-error-message', function (event) {
   showError(event.detail.message);
 });
 
 // ------------------------------------
 // Click error to remove error display
 // ------------------------------------
-document.getElementById('errorDiv').addEventListener('click', function() {
+document.getElementById('errorDiv').addEventListener('click', function () {
   clearError();
 });
 
@@ -256,7 +255,7 @@ function errorTimerTickHandler () {
 // Return current UNIX timestamp in seconds
 // -----------------------------------------
 function unixTimestamp () {
-  let now = new Date;
+  let now = new Date();
   return parseInt(now.valueOf() / 1000);
 };
 
@@ -266,7 +265,7 @@ function unixTimestamp () {
 // 2 = require both web and IRC
 // 3 = require both web and IRC and Registered
 // --------------------------------------
-function checkConnect(code) {
+function checkConnect (code) {
   if ((code >= 1) && (!webState.webConnected)) {
     showError('Error: not connected to web server');
     return false;
@@ -282,11 +281,11 @@ function checkConnect(code) {
   return true;
 }
 
-//--------------------------------------------------
+// --------------------------------------------------
 // Open server message window if it is hidden
 //     (used in multiple modules)
-//--------------------------------------------------
-function showRawMessageWindow() {
+// --------------------------------------------------
+function showRawMessageWindow () {
   document.getElementById('rawHiddenElements').removeAttribute('hidden');
   document.getElementById('rawHiddenElementsButton').textContent = '-';
   document.getElementById('rawHeadRightButtons').removeAttribute('hidden');
@@ -294,10 +293,10 @@ function showRawMessageWindow() {
   document.getElementById('rawMessageDisplay').scrollTop =
     document.getElementById('rawMessageDisplay').scrollHeight;
 } // showRawMessageWindow()
-//--------------------------------------------------
+// --------------------------------------------------
 // Hide server message window if it is hidden
-//--------------------------------------------------
-function hideRawMessageWindow() {
+// --------------------------------------------------
+function hideRawMessageWindow () {
   document.getElementById('rawHiddenElements').setAttribute('hidden', '');
   document.getElementById('rawHiddenElementsButton').textContent = '+';
   document.getElementById('rawHeadRightButtons').setAttribute('hidden', '');
@@ -309,12 +308,12 @@ function hideRawMessageWindow() {
 // ----------------------------------------------
 // Functions to handle activity indicator icons
 // ----------------------------------------------
-function setNotActivityIcon(index) {
+function setNotActivityIcon (index) {
   document.getElementById('notMsgIconId').removeAttribute('hidden');
 }
 // -1 indicates icon is available to be shown
 var lastPmActivityIconIndex = -1;
-function setPmActivityIcon(index) {
+function setPmActivityIcon (index) {
   if (lastPmActivityIconIndex === -1) {
     lastPmActivityIconIndex = index;
     document.getElementById('pmMsgIconId').removeAttribute('hidden');
@@ -323,17 +322,17 @@ function setPmActivityIcon(index) {
 }
 // -1 indicates icon is available to be shown
 var lastChanActivityIconIndex = -1;
-function setChanActivityIcon(index) {
+function setChanActivityIcon (index) {
   if (lastChanActivityIconIndex === -1) {
     lastChanActivityIconIndex = index;
     document.getElementById('chanMsgIconId').removeAttribute('hidden');
   }
   // else ignore request
 }
-function resetNotActivityIcon(index) {
+function resetNotActivityIcon (index) {
   document.getElementById('notMsgIconId').setAttribute('hidden', '');
 }
-function resetPmActivityIcon(index) {
+function resetPmActivityIcon (index) {
   if (index === -1) {
     // code -1 match any channel
     lastPmActivityIconIndex = -1;
@@ -345,7 +344,7 @@ function resetPmActivityIcon(index) {
   }
   // else ignore request
 }
-function resetChanActivityIcon(index) {
+function resetChanActivityIcon (index) {
   if (index === -1) {
     // code -1 match any channel
     lastChanActivityIconIndex = -1;
@@ -360,13 +359,13 @@ function resetChanActivityIcon(index) {
 // --------------------------
 // Clear message activity ICONs by tapping icon
 // --------------------------
-document.getElementById('notMsgIconId').addEventListener('click', function() {
+document.getElementById('notMsgIconId').addEventListener('click', function () {
   resetNotActivityIcon();
 }.bind(this));
-document.getElementById('pmMsgIconId').addEventListener('click', function() {
+document.getElementById('pmMsgIconId').addEventListener('click', function () {
   resetPmActivityIcon(-1);
 }.bind(this));
-document.getElementById('chanMsgIconId').addEventListener('click', function() {
+document.getElementById('chanMsgIconId').addEventListener('click', function () {
   resetChanActivityIcon(-1);
 }.bind(this));
 
@@ -380,7 +379,7 @@ hideRawMessageWindow();
 // --------------------------------------------------------------
 // Single function to visibility of all display divs on the page
 // --------------------------------------------------------------
-function updateDivVisibility() {
+function updateDivVisibility () {
   // return; // uncomment to show hidden divs.
   if (webState.webConnected) {
     document.getElementById('webDisconnectedVisibleDiv').setAttribute('hidden', '');
@@ -534,7 +533,7 @@ function updateDivVisibility() {
 // -------------------------------------------------
 // Global event to make all hidden divs visible
 // -------------------------------------------------
-document.addEventListener('show-all-divs', function(event) {
+document.addEventListener('show-all-divs', function (event) {
   // document.getElementById('errorDiv').removeAttribute('hidden');
   document.getElementById('hideLoginSection').removeAttribute('hidden');
   document.getElementById('hideLoginSectionButton').textContent = '-';
@@ -560,7 +559,7 @@ document.addEventListener('show-all-divs', function(event) {
 // is absent or zero length string, all hideable windows
 // hard hidden
 // -----------------------------------
-document.addEventListener('hide-all-divs', function(event) {
+document.addEventListener('hide-all-divs', function (event) {
   // console.log(JSON.stringify(event.detail, null, 2));
   // document.getElementById('errorDiv').setAttribute('hidden', '');
   document.getElementById('hideLoginSection').setAttribute('hidden', '');
@@ -587,7 +586,7 @@ function setVariablesShowingIRCDisconnected () {
   document.getElementById('headerUser').textContent = '';
   document.getElementById('headerServer').textContent = '';
 
-  document.dispatchEvent(new CustomEvent('cancel-beep-sounds', {bubbles: true}));
+  document.dispatchEvent(new CustomEvent('cancel-beep-sounds', { bubbles: true }));
 
   let channelContainerDivEl = document.getElementById('channelContainerDiv');
   while (channelContainerDivEl.firstChild) {
@@ -599,12 +598,12 @@ function setVariablesShowingIRCDisconnected () {
   // This is because they are not in ircState and there managed in the browser.
 };
 
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 // Group of heartbeat functions.
 //
 // Web server sends websocket message 'HEARTBEAT' at 10 second intervals
 // Command parser intercept the HEATBEAT message and calls onHeartbeatReceived()
-//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
 const heartbeatExpirationTimeSeconds = 15;
 var heartbeatUpCounter = 0;
 // One second global timer
@@ -653,7 +652,7 @@ function heartbeatTimerTickHandler () {
 // called 1/second by timer tick
 // -----------------------------------
 function updateElapsedTimeDisplay () {
-  function toTimeString(seconds) {
+  function toTimeString (seconds) {
     let remainSec = seconds;
     let day = 0;
     let hour = 0;
@@ -707,11 +706,11 @@ function getIrcState (callback) {
   let fetchOptions = {
     method: 'GET',
     headers: {
-      'Accept': 'application/json'
+      Accept: 'application/json'
     }
   };
   fetch(fetchURL, fetchOptions)
-    .then( (response) => {
+    .then((response) => {
       // console.log(response.status);
       if (response.ok) {
         return response.json();
@@ -721,7 +720,7 @@ function getIrcState (callback) {
         throw new Error('Fetch status ' + response.status + ' ' + response.statusText);
       }
     })
-    .then( (responseJson) => {
+    .then((responseJson) => {
       // console.log('getIrcState() ' + JSON.stringify(responseJson, null, 2));
       let lastIrcState = ircState;
       ircState = responseJson;
@@ -805,7 +804,7 @@ function getIrcState (callback) {
         callback(null, ircState);
       }
     })
-    .catch( (error) => {
+    .catch((error) => {
       console.log(error);
       if (callback) {
         callback(error, {});

@@ -34,7 +34,7 @@
 // Send text as private message to other user
 //     (internal function)
 // --------------------------------------------
-function _sendPrivMessageToUser(targetNickname, textAreaEl) {
+function _sendPrivMessageToUser (targetNickname, textAreaEl) {
   let text = stripTrailingCrLf(textAreaEl.value);
   if (detectMultiLineString(text)) {
     textAreaEl.value = '';
@@ -73,7 +73,6 @@ function _sendPrivMessageToUser(targetNickname, textAreaEl) {
   }
   textAreaEl.value = '';
 }; // _sendPrivMessageToUser
-
 
 // --------------------------------------------------------
 // This creates a new PM window and adds it to the DOM
@@ -237,7 +236,7 @@ function createPrivateMessageEl (name, parsedMessage) {
 
   // inhibit timer to prevent display of activity icon
   var activityIconInhibitTimer = 0;
-  setInterval(function() {
+  setInterval(function () {
     if (activityIconInhibitTimer > 0) activityIconInhibitTimer--;
   }.bind(this), 1000);
 
@@ -249,7 +248,7 @@ function createPrivateMessageEl (name, parsedMessage) {
   // Remove text content, but do not change visibility
   // This may not be necessary because child PM elements
   // like this one are removed by the erase and reload process.
-  document.addEventListener('erase-before-reload', function(event) {
+  document.addEventListener('erase-before-reload', function (event) {
     // console.log('Event erase-before-reload');
     privMsgTextAreaEl.value = '';
     privMsgInputAreaEl.value = '';
@@ -260,7 +259,7 @@ function createPrivateMessageEl (name, parsedMessage) {
   //
   // Example:  14:33:02 -----Cache Reload-----
   //
-  document.addEventListener('cache-reload-done', function(event) {
+  document.addEventListener('cache-reload-done', function (event) {
     // console.log('Event cache-reload-done');
     let markerString = '';
     let timestampString = '';
@@ -278,7 +277,7 @@ function createPrivateMessageEl (name, parsedMessage) {
   }.bind(this));
 
   // Hide PM window, Hide PM data section, Hide buttons
-  document.addEventListener('priv-msg-hide-all', function(event) {
+  document.addEventListener('priv-msg-hide-all', function (event) {
     privMsgBottomDivEl.setAttribute('hidden', '');
     privMsgHideButtonEl.textContent = '+';
     privMsgTopRightHidableDivEl.setAttribute('hidden', '');
@@ -286,7 +285,7 @@ function createPrivateMessageEl (name, parsedMessage) {
   }.bind(this));
 
   // Show PM window
-  document.addEventListener('priv-msg-show-all', function(event) {
+  document.addEventListener('priv-msg-show-all', function (event) {
     privMsgSectionEl.removeAttribute('hidden');
   }.bind(this));
 
@@ -295,7 +294,7 @@ function createPrivateMessageEl (name, parsedMessage) {
   // -------------------------
   // if closed: Window unchanged, show Data secton, show Buttons
   // if open:  Hide Window, hide Data section, Hide Buttons
-  privMsgHideButtonEl.addEventListener('click', function() {
+  privMsgHideButtonEl.addEventListener('click', function () {
     if (privMsgBottomDivEl.hasAttribute('hidden')) {
       privMsgBottomDivEl.removeAttribute('hidden');
       privMsgHideButtonEl.textContent = '-';
@@ -311,7 +310,7 @@ function createPrivateMessageEl (name, parsedMessage) {
   // -------------------------
   // Taller button handler
   // -------------------------
-  privMsgTallerButtonEl.addEventListener('click', function() {
+  privMsgTallerButtonEl.addEventListener('click', function () {
     let newRows = parseInt(privMsgTextAreaEl.getAttribute('rows')) + 5;
     privMsgTextAreaEl.setAttribute('rows', newRows.toString());
   });
@@ -319,14 +318,14 @@ function createPrivateMessageEl (name, parsedMessage) {
   // -------------------------
   // Normal button handler
   // -------------------------
-  privMsgNormalButtonEl.addEventListener('click', function() {
+  privMsgNormalButtonEl.addEventListener('click', function () {
     privMsgTextAreaEl.setAttribute('rows', '6');
   });
 
   // -------------------------
   // Clear button handler
   // -------------------------
-  privMsgClearButtonEl.addEventListener('click', function() {
+  privMsgClearButtonEl.addEventListener('click', function () {
     privMsgTextAreaEl.value = '';
     privMsgTextAreaEl.setAttribute('rows', '6');
   });
@@ -335,14 +334,14 @@ function createPrivateMessageEl (name, parsedMessage) {
   // show all event
   // ----------------
   // show window, leaving data section and buttons unchanged (proabably closed)
-  document.addEventListener('show-all-divs', function(event) {
+  document.addEventListener('show-all-divs', function (event) {
     privMsgSectionEl.removeAttribute('hidden');
   });
   // ----------------
   // hide all event
   // ----------------
   // hide window, data section and buttons.
-  document.addEventListener('hide-all-divs', function(event) {
+  document.addEventListener('hide-all-divs', function (event) {
     privMsgBottomDivEl.setAttribute('hidden', '');
     privMsgHideButtonEl.textContent = '+';
     privMsgTopRightHidableDivEl.setAttribute('hidden', '');
@@ -352,7 +351,7 @@ function createPrivateMessageEl (name, parsedMessage) {
   // -------------
   // send button
   // -------------
-  privMsgSendButtonEl.addEventListener('click', function() {
+  privMsgSendButtonEl.addEventListener('click', function () {
     _sendPrivMessageToUser(name, privMsgInputAreaEl);
     privMsgInputAreaEl.focus();
     resetPmActivityIcon(privMsgIndex);
@@ -362,7 +361,7 @@ function createPrivateMessageEl (name, parsedMessage) {
   // ---------------
   // Enter pressed
   // ---------------
-  privMsgInputAreaEl.addEventListener('input', function(event) {
+  privMsgInputAreaEl.addEventListener('input', function (event) {
     if (((event.inputType === 'insertText') && (event.data === null)) ||
       (event.inputType === 'insertLineBreak')) {
       _sendPrivMessageToUser(name, privMsgInputAreaEl);
@@ -375,12 +374,12 @@ function createPrivateMessageEl (name, parsedMessage) {
   // Clear message activity ICON by click anywhere on the
   // dynamically created private message window
   // -------------------------------------------------
-  privMsgSectionEl.addEventListener('click', function() {
+  privMsgSectionEl.addEventListener('click', function () {
     resetPmActivityIcon(privMsgIndex);
     activityIconInhibitTimer = activityIconInhibitTimerValue;
   }.bind(this));
 
-  function updateVisibility() {
+  function updateVisibility () {
     if (privMsgSectionEl.hasAttribute('beep1-enabled')) {
       privMsgBeep1CBInputEl.checked = true;
     } else {
@@ -391,7 +390,7 @@ function createPrivateMessageEl (name, parsedMessage) {
   // -------------------------
   // Beep On Message checkbox handler
   // -------------------------
-  privMsgBeep1CBInputEl.addEventListener('click', function(e) {
+  privMsgBeep1CBInputEl.addEventListener('click', function (e) {
     if (privMsgSectionEl.hasAttribute('beep1-enabled')) {
       privMsgSectionEl.removeAttribute('beep1-enabled');
     } else {
@@ -404,7 +403,7 @@ function createPrivateMessageEl (name, parsedMessage) {
   // -----------------------
   // Cancel all beep sounds
   // -----------------------
-  document.addEventListener('cancel-beep-sounds', function(event) {
+  document.addEventListener('cancel-beep-sounds', function (event) {
     privMsgSectionEl.removeAttribute('beep1-enabled');
   }.bind(this));
 
@@ -412,7 +411,7 @@ function createPrivateMessageEl (name, parsedMessage) {
   // if window closed,
   //  - open control window,
   //  - show window, data section and buttons.
-  document.addEventListener('private-message', function(event) {
+  document.addEventListener('private-message', function (event) {
     function _addText (text) {
       // append text to textarea
       privMsgTextAreaEl.value += cleanFormatting(text) + '\n';
@@ -421,7 +420,7 @@ function createPrivateMessageEl (name, parsedMessage) {
     }
     let parsedMessage = event.detail.parsedMessage;
     // console.log('Event private-message: ' + JSON.stringify(parsedMessage, null, 2));
-    switch(parsedMessage.command) {
+    switch (parsedMessage.command) {
       //
       // TODO cases for user left IRC or other error
 
@@ -523,7 +522,7 @@ function createPrivateMessageEl (name, parsedMessage) {
   //
   // Event listener for resize window (generic browser event)
   //
-  window.addEventListener('resize', function(event) {
+  window.addEventListener('resize', function (event) {
     // ignore resize events before dynamic size variables exist
     if (webState.dynamic.inputAreaCharWidthPx) {
       adjustPMInputToWidowWidth(event.currentTarget.innerWidth);
@@ -540,7 +539,7 @@ function createPrivateMessageEl (name, parsedMessage) {
 // ----------------------------------------------------------
 
 // Event listener for messages to create new window
-document.addEventListener('private-message', function(event) {
+document.addEventListener('private-message', function (event) {
   // console.log('Event: private-message ' + JSON.stringify(event.detail, null, 2));
   // Determine if message is ingoing or outgoing
   // assume it is incoming
@@ -560,7 +559,7 @@ document.addEventListener('private-message', function(event) {
 // --------------------------------
 // Send private message
 // --------------------------------
-function _buildPrivateMessageText() {
+function _buildPrivateMessageText () {
   if (document.getElementById('userPrivMsgInputId').value.length === 0) return;
   let inputAreaEl = document.getElementById('userPrivMsgInputId');
   let text = stripTrailingCrLf(inputAreaEl.value);
@@ -603,7 +602,7 @@ function _buildPrivateMessageText() {
   }
   inputAreaEl.value = '';
 };
-document.getElementById('userPrivMsgInputId').addEventListener('input', function(event) {
+document.getElementById('userPrivMsgInputId').addEventListener('input', function (event) {
   if ((event.inputType === 'insertText') && (event.data === null)) {
     _buildPrivateMessageText();
   }
@@ -611,12 +610,12 @@ document.getElementById('userPrivMsgInputId').addEventListener('input', function
     _buildPrivateMessageText();
   }
 }.bind(this));
-document.getElementById('UserPrivMsgSendButton').addEventListener('click', function() {
+document.getElementById('UserPrivMsgSendButton').addEventListener('click', function () {
   _buildPrivateMessageText();
 }.bind(this));
 
 // Initialize all input elements on reload
-document.addEventListener('erase-before-reload', function(event) {
+document.addEventListener('erase-before-reload', function (event) {
   document.getElementById('pmNickNameInputId').value = '';
   document.getElementById('userPrivMsgInputId').value = '';
 }.bind(this));
@@ -624,7 +623,7 @@ document.addEventListener('erase-before-reload', function(event) {
 // -------------------------
 // Whois button handler
 // -------------------------
-document.getElementById('whoisButton').addEventListener('click', function() {
+document.getElementById('whoisButton').addEventListener('click', function () {
   if (document.getElementById('pmNickNameInputId').value.length > 0) {
     showRawMessageWindow();
     let message = 'WHOIS ' + document.getElementById('pmNickNameInputId').value;
@@ -638,14 +637,14 @@ document.getElementById('whoisButton').addEventListener('click', function() {
 // -------------------------------------
 // Private Message (Open/Close) Buttons
 // -------------------------------------
-document.getElementById('privMsgMainHiddenButton').addEventListener('click', function() {
+document.getElementById('privMsgMainHiddenButton').addEventListener('click', function () {
   if (document.getElementById('privMsgMainHiddenDiv').hasAttribute('hidden')) {
     document.getElementById('privMsgMainHiddenDiv').removeAttribute('hidden');
     document.getElementById('privMsgMainHiddenButton').textContent = '-';
-    document.dispatchEvent(new CustomEvent('priv-msg-show-all', {bubbles: true}));
+    document.dispatchEvent(new CustomEvent('priv-msg-show-all', { bubbles: true }));
   } else {
     document.getElementById('privMsgMainHiddenDiv').setAttribute('hidden', '');
     document.getElementById('privMsgMainHiddenButton').textContent = '+';
-    document.dispatchEvent(new CustomEvent('priv-msg-hide-all', {bubbles: true}));
+    document.dispatchEvent(new CustomEvent('priv-msg-hide-all', { bubbles: true }));
   }
 }.bind(this));

@@ -26,7 +26,7 @@
 // -----------------------------------------------------------------------------
 
 // wrap in function to limit namespace scope
-(function() {
+(function () {
   'use strict';
   // node native modules
   const fs = require('fs');
@@ -85,7 +85,7 @@
           mode: 0o644,
           flag: 'a'
         },
-        function(err) {
+        function (err) {
           if (err) {
             // in case disk full, kill server
             throw new Error('Error writing auth.log');
@@ -107,7 +107,7 @@
   //
   // Setup authentication variables inside session
   //
-  const _initSession = function(req) {
+  const _initSession = function (req) {
     if (req.session) {
       if (!(req.session.sessionAuth)) {
         req.session.sessionAuth = {};
@@ -119,7 +119,7 @@
   //
   // Check session authorized flag and return true/false
   //
-  const _checkIfAuthorized = function(req) {
+  const _checkIfAuthorized = function (req) {
     // console.log('req.session.sessionAuth ' + JSON.stringify(req.session.sessionAuth, null, 2));
 
     // ****************
@@ -148,7 +148,7 @@
   //
   // Mark the session as not authorized
   //
-  const _removeAuthorizationFromSession = function(req) {
+  const _removeAuthorizationFromSession = function (req) {
     if (req.session) {
       _initSession(req);
       if (req.session.sessionAuth) {
@@ -165,7 +165,7 @@
   //
   // Remove temporary login data from session.
   //
-  const _removeLoginNonceFromSession = function(req) {
+  const _removeLoginNonceFromSession = function (req) {
     if (req.session) {
       _initSession(req);
       if (req.session.sessionAuth) {
@@ -178,7 +178,7 @@
   // ----------------------------------------
   // If not authorized, redirect to login
   // ----------------------------------------
-  const authorizeOrLogin = function(req, res, next) {
+  const authorizeOrLogin = function (req, res, next) {
     if (_checkIfAuthorized(req)) {
       next();
     } else {
@@ -188,14 +188,14 @@
   // ----------------------
   // Route: GET /blocked
   // ----------------------
-  const blockedCookies = function(req, res, next) {
+  const blockedCookies = function (req, res, next) {
     res.send(blockedCookieFragment);
   };
 
   // ---------------------------------------------
   // If not authorized, return 401 Unauthorized
   // ---------------------------------------------
-  const authorizeOrFail = function(req, res, next) {
+  const authorizeOrFail = function (req, res, next) {
     if (_checkIfAuthorized(req)) {
       next();
     } else {
@@ -203,25 +203,25 @@
     }
   };
 
-  const generateRandomNonce = function(nonceLength) {
+  const generateRandomNonce = function (nonceLength) {
     if ((typeof nonceLength !== 'number') || (nonceLength < 3)) {
       throw new Error('generateRandonNonce() length too short');
     }
     let intNonceLength = parseInt(nonceLength);
     let nonce = '';
     let charSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    for (let i=0; i<intNonceLength; i++) {
+    for (let i = 0; i < intNonceLength; i++) {
       nonce += charSet.charAt(parseInt(Math.random() * charSet.length));
     }
     return nonce;
   };
 
-  const sanatizeString = function(inString) {
+  const sanatizeString = function (inString) {
     let sanitizedString = '';
     const allowedChars =
       'abcdefghijklmnoqprstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     if ((typeof inString === 'string') && (inString.length > 0)) {
-      for (let i=0; i<inString.length; i++) {
+      for (let i = 0; i < inString.length; i++) {
         let allowedCharIndex = allowedChars.indexOf(inString[i]);
         if (allowedCharIndex > -1) {
           sanitizedString += allowedChars[allowedCharIndex];
@@ -234,7 +234,7 @@
   //
   // Timing safe compare (From github.com/LionC/express-basic-auth)
   //
-  const safeCompare = function(userInput, secret) {
+  const safeCompare = function (userInput, secret) {
     const userInputLength = Buffer.byteLength(userInput);
     const secretLength = Buffer.byteLength(secret);
     const userInputBuffer = Buffer.alloc(userInputLength, 0, 'utf8');
@@ -248,7 +248,7 @@
   // -------------------------------------
   // Route: POST /login-authorize
   // -------------------------------------
-  const loginAuthorize = function(req, res, next) {
+  const loginAuthorize = function (req, res, next) {
     // console.log('sessionAuth ' + JSON.stringify(req.session.sessionAuth, null, 2));
     // console.log('body ' + JSON.stringify(req.body, null, 2));
     // console.log('query ' + JSON.stringify(req.query));
@@ -292,7 +292,7 @@
           //
           let postedUser = sanatizeString(inputUser);
           let userIndex = -1;
-          for (let i=0; i<userArray.length; i++) {
+          for (let i = 0; i < userArray.length; i++) {
             if (userArray[i].user === postedUser) {
               userIndex = i;
             }
@@ -400,7 +400,7 @@
   // -------------------------
   // Route: GET /login
   // -------------------------
-  const loginPage = function(req, res, next) {
+  const loginPage = function (req, res, next) {
     _initSession(req);
     if (_checkIfAuthorized(req)) {
       return res.redirect('/irc/webclient.html');
@@ -416,7 +416,7 @@
       req.session.sessionAuth.loginExpireTimeSec = timeNowSeconds + 60;
       // res.set('Cache-Control', 'no-store');
       return res.send(loginHtmlTop +
-        loginFormFragment1 + '?nonce=' +loginNonce + loginFormFragment2 +
+        loginFormFragment1 + '?nonce=' + loginNonce + loginFormFragment2 +
         warningDiv + loginHtmlBottom);
     }
   };
@@ -424,7 +424,7 @@
   // ---------------------------
   // Route: GET /logout
   // ---------------------------
-  const logout = function(req, res, next) {
+  const logout = function (req, res, next) {
     // if logged in then add to logfile
     let user;
     if ((req.session) && (req.session.sessionAuth) && (req.session.sessionAuth.authorized)) {
@@ -440,7 +440,7 @@
         path: req.session.cookie.path
       };
       _removeAuthorizationFromSession(req);
-      req.session.destroy(function(err) {
+      req.session.destroy(function (err) {
         if (err) {
           console.log('Error destroying session ' + err);
         }
@@ -476,7 +476,7 @@
   // -----------------------
   // Route: GET /login.css
   // -----------------------
-  const loginStyleSheet = function(req, res, next) {
+  const loginStyleSheet = function (req, res, next) {
     fs.readFile('./server/fragments/login.css', 'utf8', function (err, privacyStr) {
       if (err) {
         next(); // fall through to 404

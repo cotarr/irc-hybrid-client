@@ -50,7 +50,7 @@
 // 16) On receipt event getIrcState() POST, set connected state in browser, accept user input.
 // ---------------------------------------------------------------------------------------------
 
-(function() {
+(function () {
   'use strict';
 
   const path = require('path');
@@ -96,7 +96,7 @@
           mode: 0o644,
           flag: 'a'
         },
-        function(err) {
+        function (err) {
           if (err) {
             // in case disk full, kill server
             throw new Error('Error writing auth.log');
@@ -111,7 +111,7 @@
   //
   // Timing safe compare (From github.com/LionC/express-basic-auth)
   //
-  const safeCompare = function(userInput, secret) {
+  const safeCompare = function (userInput, secret) {
     const userInputLength = Buffer.byteLength(userInput);
     const secretLength = Buffer.byteLength(secret);
     const userInputBuffer = Buffer.alloc(userInputLength, 0, 'utf8');

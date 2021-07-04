@@ -26,7 +26,7 @@
 //                       M A I N   M O D U L E
 //
 // -----------------------------------------------------------------------------
-(function() {
+(function () {
   'use strict';
 
   const net = require('net');
@@ -112,13 +112,12 @@
   vars.ircState.progVersion = require('../../package.json').version;
   vars.ircState.progName = require('../../package.json').name;
 
-  vars.ircState.times = {programRun: 0, ircConnect: 0};
+  vars.ircState.times = { programRun: 0, ircConnect: 0 };
   vars.ircState.count = {
     ircConnect: 0,
     ircConnectError: 0
   };
   vars.ircState.websocketCount = 0;
-
 
   ircLog.setRawMessageLogEnabled(servers.rawMessageLog);
 
@@ -140,7 +139,7 @@
     console.log('IRC raw message log enabled: (console)');
   }
 
-  const tellBrowserToRequestState = function() {
+  const tellBrowserToRequestState = function () {
     global.sendToBrowser('UPDATE\r\n');
   };
 
@@ -151,12 +150,12 @@
   //
   // NOTE: does not support channel passwords
   // -----------------------------------------------------
-  const onDisconnectGrabState = function() {
+  const onDisconnectGrabState = function () {
     vars.ircServerReconnectChannelString = '';
     vars.ircServerReconnectAwayString = '';
     let channelCount = 0;
     if (vars.ircState.channels.length > 0) {
-      for (let i=0; i<vars.ircState.channels.length; i++) {
+      for (let i = 0; i < vars.ircState.channels.length; i++) {
         if (vars.ircState.channelStates[i].joined) {
           if (i < 5) {
             if (i > 0) vars.ircServerReconnectChannelString += ',';
@@ -173,9 +172,9 @@
   //      R e g i s t e r   w i t h   I R C
   //
   // -------------------------------------------
-  const _readyEventHandler = function(socket) {
+  const _readyEventHandler = function (socket) {
     global.sendToBrowser('webServer: Ready\n');
-    setTimeout(function() {
+    setTimeout(function () {
       // check state, if error occurred this will be false.
       if (vars.ircState.ircConnecting) {
         if ((vars.ircServerPassword) && (vars.ircServerPassword.length > 0)) {
@@ -226,7 +225,7 @@
     if (len === 0) return;
     let index = 0;
     let count = 0;
-    for (let i=0; i<len; i++) {
+    for (let i = 0; i < len; i++) {
       // this is a 8 bit integer
       let charCode = data.readUInt8(i);
       if ((charCode !== 10) && (charCode !== 13)) {
@@ -305,7 +304,7 @@
     // Note: Timer does not detect failure to register with IRC server
     //       Timer is cleared where possible in case multiple manual connects in a row.
     //
-    let watchdogTimer = setTimeout(function() {
+    let watchdogTimer = setTimeout(function () {
       if (vars.ircState.ircConnecting) {
         // console.log('Connecting watchdog detect timeout error');
         if (ircSocket) {
@@ -341,7 +340,7 @@
     // --------------------------------------------------
     //   On Connect   (IRC client socket connected)
     // --------------------------------------------------
-    ircSocket.on('connect', function() {
+    ircSocket.on('connect', function () {
       // console.log('Event: connect');
       // clear watchdog timer
       if (watchdogTimer) clearTimeout(watchdogTimer);
@@ -352,7 +351,7 @@
     // -----------
     //  On Ready
     // -----------
-    ircSocket.on('ready', function() {
+    ircSocket.on('ready', function () {
       // console.log('Event: ready');
       _readyEventHandler(ircSocket);
     }); // ircSocket.on('ready'
@@ -360,7 +359,7 @@
     // -----------
     // ON Data
     // -----------
-    ircSocket.on('data', function(data) {
+    ircSocket.on('data', function (data) {
       vars.activityWatchdogTimerSeconds = 0;
       extractMessagesFromStream(ircSocket, data);
     });
@@ -368,7 +367,7 @@
     // -------------------------------------------
     //   On Close    (IRC client socket closed)
     // -------------------------------------------
-    ircSocket.on('close', function(hadError) {
+    ircSocket.on('close', function (hadError) {
       // console.log('Event: socket.close, hadError=' + hadError +
       //   ' destroyed=' + ircSocket.destroyed);
       if (((vars.ircState.ircConnectOn) && (vars.ircState.ircConnected)) ||
@@ -405,7 +404,7 @@
     // --------------------------
     //   On Error   (IRC client socket)
     // --------------------------
-    ircSocket.on('error', function(err) {
+    ircSocket.on('error', function (err) {
       // console.log('Event: socket.error ' + err.toString());
       // console.log(err);
       if ((vars.ircState.ircConnected) || (vars.ircState.ircConnecting)) {
@@ -435,9 +434,9 @@
     // All even listeners are created
     // Go ahead can connect the socket.
     // ----------------------------------
-    ircSocket.connect(vars.ircState.ircServerPort, vars.ircState.ircServerHost, function() {
+    ircSocket.connect(vars.ircState.ircServerPort, vars.ircState.ircServerHost, function () {
       ircLog.writeIrcLog('Connected to IRC server ' + vars.ircState.ircServerName + ' ' +
-        vars.ircState.ircServerHost + ':'+ vars.ircState.ircServerPort);
+        vars.ircState.ircServerHost + ':' + vars.ircState.ircServerPort);
     });
   }; // connectIRC()
 
@@ -447,7 +446,7 @@
   // This assumed TCP socket is already connected, that is a different watchdog
   // --------------------------------------------------------------------------
   var registrationWatchdogSeconds = 0;
-  const registrationWatchdogTimerTick = function() {
+  const registrationWatchdogTimerTick = function () {
     if ((vars.ircState.ircConnected) && (!vars.ircState.ircRegistered)) {
       registrationWatchdogSeconds++;
     } else {
@@ -586,7 +585,6 @@
     }
   }; // clientToServerPingTimerTick()
 
-
   // -----------------------------------------------------
   //
   //          R O U T E   H A N D L E R S
@@ -597,7 +595,7 @@
   //  Includes all socket event listeners
   // -----------------------------------------------------
 
-  //----------------------------------------
+  // ----------------------------------------
   // Cycle server from available server list
   //
   // Method: POST
@@ -609,8 +607,8 @@
   //  req.body{
   //    "index": -1
   //  }
-  //----------------------------------------
-  const serverHandler = function(req, res, next) {
+  // ----------------------------------------
+  const serverHandler = function (req, res, next) {
     if ((vars.ircState.ircConnected) ||
       (vars.ircState.ircConnecting) ||
       (vars.ircState.ircConnectOn)) {
@@ -621,7 +619,7 @@
     }
     // Check for presence of extraneous keys
     let validKeys = ['index'];
-    Object.keys(req.body).forEach(function(key) {
+    Object.keys(req.body).forEach(function (key) {
       if (validKeys.indexOf(key) < 0) {
         let err = new Error('BAD REQUEST');
         err.status = 400;
@@ -704,7 +702,7 @@
   // }
 
   // -----------------------------------------------------
-  const connectHandler = function(req, res, next) {
+  const connectHandler = function (req, res, next) {
     // Abort if already connected.
     if ((vars.ircState.ircConnected) || (vars.ircState.ircConnecting)) {
       return res.json({
@@ -719,7 +717,7 @@
       return next(err);
     }
     let validKeys = ['nickName', 'realName', 'userMode'];
-    Object.keys(req.body).forEach(function(key) {
+    Object.keys(req.body).forEach(function (key) {
       if (validKeys.indexOf(key) < 0) {
         let err = new Error('BAD REQUEST');
         err.status = 400;
@@ -856,7 +854,7 @@
   //  req.body{}
   //
   // ------------------------------------
-  const disconnectHandler = function(req, res, next) {
+  const disconnectHandler = function (req, res, next) {
     // console.log('disconnect handler called');
     // console.log(JSON.stringify(req.body));
     if (Object.keys(req.body).length > 0) {
@@ -880,12 +878,12 @@
       vars.ircState.ircRegistered = false;
       vars.ircState.ircIsAway = false;
       tellBrowserToRequestState();
-      res.json({error: false});
+      res.json({ error: false });
     } else {
       global.sendToBrowser('webServer: Can not destry socket before it is created\n');
-      res.json({error: true, message: 'Can not destry socket before it is created.'});
+      res.json({ error: true, message: 'Can not destry socket before it is created.' });
     }
-  }; //disconnectHandler()
+  }; // disconnectHandler()
 
   // ------------------------------------------------------
   // IRC commands from browser for send to IRC server
@@ -900,7 +898,7 @@
   //  }
   //
   // ------------------------------------------------------
-  const messageHandler = function(req, res, next) {
+  const messageHandler = function (req, res, next) {
     // console.log(req.body);
     if (!vars.ircState.ircConnected) {
       global.sendToBrowser('webError: messageHandler() IRC server not connected\n');
@@ -911,7 +909,7 @@
     }
     // Check for presence of extraneous keys
     let validKeys = ['message'];
-    Object.keys(req.body).forEach(function(key) {
+    Object.keys(req.body).forEach(function (key) {
       if (validKeys.indexOf(key) < 0) {
         let err = new Error('BAD REQUEST');
         err.status = 400;
@@ -941,34 +939,34 @@
     }
     let messageBuf = Buffer.from(req.body.message, 'utf8');
     if (!isValidUTF8(messageBuf)) {
-      return res.json({error: true, message: 'IRC message failed UTF-8 validation'});
+      return res.json({ error: true, message: 'IRC message failed UTF-8 validation' });
     }
     if (messageBuf.includes(0)) {
-      return res.json({error: true, message: 'IRC message failed zero byte validation'});
+      return res.json({ error: true, message: 'IRC message failed zero byte validation' });
     }
     if (messageBuf.length === 0) {
-      return res.json({error: true, message: 'Ignoring Empty message'});
+      return res.json({ error: true, message: 'Ignoring Empty message' });
     } else {
       let message = messageBuf.toString('utf8');
       // If present, remove tailing new line character
-      if (message.charAt(message.length-1) === '\n') {
-        message = message.slice(0, message.length-1);
+      if (message.charAt(message.length - 1) === '\n') {
+        message = message.slice(0, message.length - 1);
       }
       // If present, remove tailing new return character
-      if (message.charAt(message.length-1) === '\r') {
-        message = message.slice(0, message.length-1);
+      if (message.charAt(message.length - 1) === '\r') {
+        message = message.slice(0, message.length - 1);
       }
       // Multiple line strings are not allowed.
       if ((message.indexOf('\n') >= 0) || (message.indexOf('\r') >= 0)) {
-        return res.json({error: true, message: 'Invalid multiple line message'});
+        return res.json({ error: true, message: 'Invalid multiple line message' });
       } else {
         let parseResult = ircCommand.parseBrowserMessageForCommand(message);
         if (parseResult.error) {
-          return res.json({error: true, message: parseResult.message});
+          return res.json({ error: true, message: parseResult.message });
         } else {
           // Send browser message on to web server
           ircWrite.writeSocket(ircSocket, message);
-          res.json({error: false});
+          res.json({ error: false });
         }
       }
     }
@@ -981,7 +979,7 @@
   // Route:  /irc/getircstate
   //
   // ---------------------------------------------------
-  const getIrcState = function(req, res, next) {
+  const getIrcState = function (req, res, next) {
     vars.ircState.websocketCount = global.getWebsocketCount();
     res.json(vars.ircState);
   };
@@ -992,7 +990,7 @@
   // Method: GET
   // Route:  /irc/cache
   // -----------------------------------------------
-  const getCache = function(req, res, next) {
+  const getCache = function (req, res, next) {
     if (Object.keys(req.body).length > 0) {
       let err = new Error('BAD REQUEST');
       err.status = 400;
@@ -1003,7 +1001,7 @@
     let outArray = [];
     let err = false;
     if (cacheArrayOfBuffers.length > 0) {
-      for (let i=0; i<cacheArrayOfBuffers.length; i++) {
+      for (let i = 0; i < cacheArrayOfBuffers.length; i++) {
         if ((Buffer.isBuffer(cacheArrayOfBuffers[i])) &&
           (isValidUTF8(cacheArrayOfBuffers[i])) &&
           (!cacheArrayOfBuffers[i].includes(0))) {
@@ -1036,7 +1034,7 @@
   //  }
   //
   // -----------------------------------------------
-  const pruneChannel = function(req, res, next) {
+  const pruneChannel = function (req, res, next) {
     let inputChannel = '';
     //
     // Validate request
@@ -1066,7 +1064,7 @@
     }
     // Check for presence of extraneous keys
     let validKeys = ['channel'];
-    Object.keys(req.body).forEach(function(key) {
+    Object.keys(req.body).forEach(function (key) {
       if (validKeys.indexOf(key) < 0) {
         let err = new Error('BAD REQUEST');
         err.status = 400;
@@ -1121,7 +1119,7 @@
   //  }
   //
   // -----------------------------------------------
-  const eraseCache = function(req, res, next) {
+  const eraseCache = function (req, res, next) {
     // Abort if connected.
     if ((vars.ircState.ircConnected) || (vars.ircState.ircConnecting)) {
       return res.json({
@@ -1131,7 +1129,7 @@
     }
     // Check for presence of extraneous keys
     let validKeys = ['erase'];
-    Object.keys(req.body).forEach(function(key) {
+    Object.keys(req.body).forEach(function (key) {
       if (validKeys.indexOf(key) < 0) {
         let err = new Error('BAD REQUEST');
         err.status = 400;
@@ -1148,7 +1146,7 @@
     }
     if (inputVerifyString === 'YES') {
       ircMessageCache.eraseCache();
-      res.json({error: false});
+      res.json({ error: false });
     } else {
       let error = new Error('Bad Reqeust');
       error.status = 400;
@@ -1166,14 +1164,14 @@
   // You can place a function here called by /irc/test1 route.
   //
   // --------------------------------------------------------------
-  const test1Handler = function(req, res, next) {
+  const test1Handler = function (req, res, next) {
     // -------- test code here -----------------
     //
     // Check allocated memory, garbage collect, check memory again.
     if (global.gc) {
       let before = process.memoryUsage();
       global.gc();
-      setTimeout(function() {
+      setTimeout(function () {
         let after = process.memoryUsage();
         res.json({
           error: false,
@@ -1210,7 +1208,7 @@
   //
   // --------------------------------------------------------------
 
-  const test2Handler = function(req, res, next) {
+  const test2Handler = function (req, res, next) {
     // -------- test code here -----------------
     // emulate ping timeout of IRC server (for test auto reconnect)
     vars.activityWatchdogTimerSeconds = 1000;
@@ -1224,7 +1222,7 @@
   //
   // 1 second timer
   //
-  setInterval(function() {
+  setInterval(function () {
     ircServerReconnectTimerTick();
     registrationWatchdogTimerTick();
     activityWatchdogTimerTick();

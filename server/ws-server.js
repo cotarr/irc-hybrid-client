@@ -38,7 +38,7 @@ const customLog = require('./middlewares/ws-authorize').customLog;
 // ----------------------------------------
 // Set up a headless websocket server
 // ----------------------------------------
-const wsServer = new ws.Server({noServer: true});
+const wsServer = new ws.Server({ noServer: true });
 
 // -------------------------------------------------
 // Message handler (browser --> web server)
@@ -65,7 +65,7 @@ wsServer.on('connection', function (socket) {
 // send messages from the web server to the
 // browser. It is global in scope.
 // ---------------------------------------
-global.sendToBrowser = function(message) {
+global.sendToBrowser = function (message) {
   if (message.length === 0) return;
   let out = null;
   if (typeof message === 'string') {
@@ -90,10 +90,10 @@ global.sendToBrowser = function(message) {
   }
 };
 
-global.getWebsocketCount = function() {
+global.getWebsocketCount = function () {
   if ((wsServer) && (wsServer.clients)) {
     let count = 0;
-    wsServer.clients.forEach(function() {
+    wsServer.clients.forEach(function () {
       count++;
     });
     return count;
@@ -105,7 +105,7 @@ global.getWebsocketCount = function() {
 // ------------------------------------------------
 // Monitored by browser to detect socket disconnect
 // ------------------------------------------------
-setInterval(function() {
+setInterval(function () {
   global.sendToBrowser('HEARTBEAT\n');
 }, 10000);
 

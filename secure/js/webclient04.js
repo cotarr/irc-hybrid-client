@@ -26,7 +26,7 @@
 // ------------------------
 // Next Server Button
 // ------------------------
-document.getElementById('cycleNextServerButton').addEventListener('click', function() {
+document.getElementById('cycleNextServerButton').addEventListener('click', function () {
   // Are we connected to web server?
   if (ircState.ircConnected) {
     showError('Can not change servers while connected');
@@ -42,13 +42,13 @@ document.getElementById('cycleNextServerButton').addEventListener('click', funct
     method: 'POST',
     headers: {
       'Content-type': 'application/json',
-      'Accept': 'application/json'
+      Accept: 'application/json'
     },
-    body: JSON.stringify({index: -1})
+    body: JSON.stringify({ index: -1 })
   };
 
   fetch(fetchURL, fetchOptions)
-    .then( (response) => {
+    .then((response) => {
       // console.log(response.status);
       if (response.ok) {
         return response.json();
@@ -56,7 +56,7 @@ document.getElementById('cycleNextServerButton').addEventListener('click', funct
         throw new Error('Fetch status ' + response.status + ' ' + response.statusText);
       }
     })
-    .then( (responseJson) => {
+    .then((responseJson) => {
       // console.log(JSON.stringify(responseJson, null, 2));
       if (responseJson.error) {
         showError(responseJson.message);
@@ -66,7 +66,7 @@ document.getElementById('cycleNextServerButton').addEventListener('click', funct
         webState.lastIrcServerIndex = -1;
       }
     })
-    .catch( (error) => {
+    .catch((error) => {
       console.log(error);
       showError(error.toString());
     });
@@ -75,7 +75,7 @@ document.getElementById('cycleNextServerButton').addEventListener('click', funct
 // -------------------------
 // Connect Button Handler
 // -------------------------
-function connectButtonHandler() {
+function connectButtonHandler () {
   // Are we connected to web server?
   if (!checkConnect(1)) return;
   // Is web server already connected to IRC?
@@ -104,13 +104,13 @@ function connectButtonHandler() {
     method: 'POST',
     headers: {
       'Content-type': 'application/json',
-      'Accept': 'application/json'
+      Accept: 'application/json'
     },
     body: JSON.stringify(connectObject)
   };
 
   fetch(fetchURL, fetchOptions)
-    .then( (response) => {
+    .then((response) => {
       // console.log(response.status);
       if (response.ok) {
         return response.json();
@@ -119,13 +119,13 @@ function connectButtonHandler() {
         throw new Error('Fetch status ' + response.status + ' ' + response.statusText);
       }
     })
-    .then( (responseJson) => {
+    .then((responseJson) => {
       // console.log(JSON.stringify(responseJson, null, 2));
       if (responseJson.error) {
         showError(responseJson.message);
       }
     })
-    .catch( (error) => {
+    .catch((error) => {
       console.log(error);
     });
 }; // connectButtonHandler
@@ -135,19 +135,19 @@ function connectButtonHandler() {
 //
 // Route /disconnect
 // ----------------------------------
-function forceDisconnectHandler() {
+function forceDisconnectHandler () {
   console.log('Disconnect button pressed.');
   let fetchURL = webServerUrl + '/irc/disconnect';
   let fetchOptions = {
     method: 'POST',
     headers: {
       'Content-type': 'application/json',
-      'Accept': 'application/json'
+      Accept: 'application/json'
     },
     body: JSON.stringify({})
   };
   fetch(fetchURL, fetchOptions)
-    .then( (response) => {
+    .then((response) => {
       // console.log(response.status);
       if (response.ok) {
         return response.json();
@@ -155,22 +155,22 @@ function forceDisconnectHandler() {
         throw new Error('Fetch status ' + response.status + ' ' + response.statusText);
       }
     })
-    .then( (responseJson) => {
+    .then((responseJson) => {
       console.log(JSON.stringify(responseJson, null, 2));
       if (responseJson.error) {
         showError(responseJson.message);
       }
     })
-    .catch( (error) => {
+    .catch((error) => {
       console.log(error);
     });
 } // forceDisconnectHandler()
 
-document.getElementById('connectButton').addEventListener('click', function() {
+document.getElementById('connectButton').addEventListener('click', function () {
   connectButtonHandler();
 }.bind(this));
 
-document.getElementById('disconnectButton').addEventListener('click', function() {
+document.getElementById('disconnectButton').addEventListener('click', function () {
   forceDisconnectHandler();
 }.bind(this));
 
@@ -178,11 +178,11 @@ document.getElementById('disconnectButton').addEventListener('click', function()
 // Tap "Web" status icon to connect/disconnect
 // ------------------------------------------------
 var ircStatusIconTouchDebounce = false;
-document.getElementById('ircConnectIconId').addEventListener('click', function() {
+document.getElementById('ircConnectIconId').addEventListener('click', function () {
   // debounce button
   if (ircStatusIconTouchDebounce) return;
   ircStatusIconTouchDebounce = true;
-  setTimeout(function() {
+  setTimeout(function () {
     ircStatusIconTouchDebounce = false;
   }, 1000);
   if ((ircState.ircConnected) || (ircState.ircConnecting) || (webState.ircConnecting)) {
@@ -208,7 +208,7 @@ document.getElementById('ircConnectIconId').addEventListener('click', function()
 // ------------------------------------------------------
 // Quit Button handler (Send QUIT message to IRC server)
 // ------------------------------------------------------
-document.getElementById('quitButton').addEventListener('click', function() {
+document.getElementById('quitButton').addEventListener('click', function () {
   if ((webState.ircConnecting) || (ircState.webConnecting) ||
     ((ircState.ircConnected) && (!ircState.ircRegistered))) {
     // with this false, icon depend only on backend state
@@ -229,7 +229,7 @@ document.getElementById('quitButton').addEventListener('click', function() {
 // ---------------------------------------------
 // Toggle visibility of IRC connect section
 // ---------------------------------------------
-document.getElementById('hideLoginSectionButton').addEventListener('click', function() {
+document.getElementById('hideLoginSectionButton').addEventListener('click', function () {
   if (document.getElementById('hideLoginSection').hasAttribute('hidden')) {
     document.getElementById('hideLoginSection').removeAttribute('hidden');
     document.getElementById('hideLoginSectionButton').textContent = '-';
@@ -242,36 +242,36 @@ document.getElementById('hideLoginSectionButton').addEventListener('click', func
 // ---------------------------------
 // Web page logout button handler
 // ---------------------------------
-document.getElementById('webLogoutButton').addEventListener('click', function() {
+document.getElementById('webLogoutButton').addEventListener('click', function () {
   if (((ircState.ircConnected) && (webState.webConnected)) || (!webState.webConnected)) {
     document.getElementById('logoutConfirmDiv').removeAttribute('hidden');
   } else {
-    window.location.href='/logout';
+    window.location.href = '/logout';
   }
 });
 
 // -----------------------------------------------------
 // If web logout while IRC connect, confirm the logout
 // -----------------------------------------------------
-document.getElementById('cancelLogoutConfirmButton').addEventListener('click', function() {
+document.getElementById('cancelLogoutConfirmButton').addEventListener('click', function () {
   document.getElementById('logoutConfirmDiv').setAttribute('hidden', '');
 });
 
 // ---------------------------------
 // Away icon and buttons
 // ---------------------------------
-document.getElementById('ircIsAwayIconId').addEventListener('click', function() {
+document.getElementById('ircIsAwayIconId').addEventListener('click', function () {
   if ((ircState.ircConnected) && (ircState.ircIsAway)) {
     _sendIrcServerMessage('AWAY');
   }
 });
-document.getElementById('setAwayButton').addEventListener('click', function() {
+document.getElementById('setAwayButton').addEventListener('click', function () {
   if ((ircState.ircConnected) &&
     (document.getElementById('userAwayMessageId').value.length > 0)) {
     _sendIrcServerMessage('AWAY ' + document.getElementById('userAwayMessageId').value);
   }
 });
-document.getElementById('setBackButton').addEventListener('click', function() {
+document.getElementById('setBackButton').addEventListener('click', function () {
   if ((ircState.ircConnected) && (ircState.ircIsAway)) {
     _sendIrcServerMessage('AWAY');
   }

@@ -36,7 +36,7 @@ const getPass = readline.createInterface({
   output: process.stdout
 });
 
-function _isEOL(inChar) {
+function _isEOL (inChar) {
   if (inChar.charAt(0) === '\n') return true;
   if (inChar.charAt(0) === '\r') return true;
   return false;
@@ -44,21 +44,21 @@ function _isEOL(inChar) {
 
 function _removeCRLF (inStr) {
   // If tailing CR-LF, remove them
-  if ((inStr.length > 0) && (_isEOL(inStr.charAt(inStr.length-1)))) {
+  if ((inStr.length > 0) && (_isEOL(inStr.charAt(inStr.length - 1)))) {
     inStr = inStr.slice(0, inStr.length - 1);
   }
-  if ((inStr.length > 0) && (_isEOL(inStr.charAt(inStr.length-1)))) {
+  if ((inStr.length > 0) && (_isEOL(inStr.charAt(inStr.length - 1)))) {
     inStr = inStr.slice(0, inStr.length - 1);
   }
   return inStr;
 }
 
-const _sanatizeString = function(inString) {
+const _sanatizeString = function (inString) {
   let sanitizedString = '';
   const allowedChars =
     'abcdefghijklmnoqprstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   if ((typeof inString === 'string') && (inString.length > 0)) {
-    for (let i=0; i<inString.length; i++) {
+    for (let i = 0; i < inString.length; i++) {
       let allowedCharIndex = allowedChars.indexOf(inString[i]);
       if (allowedCharIndex > -1) {
         sanitizedString += allowedChars[allowedCharIndex];
@@ -77,21 +77,21 @@ console.log('It is intended there is only one user for the program');
 console.log('This must be run from the tools folder to find credentials.json');
 
 console.log('\nUser up to 16 characters a-z,A-Z,0-9');
-getPass.question('Enter new user:', function(user) {
+getPass.question('Enter new user:', function (user) {
   user = _sanatizeString(_removeCRLF(user));
   if (user.length > 16) {
     console.log('Error: Exceeded maximum username 16 characters');
     process.exit(1);
   }
   console.log('\nName up to 32 characters a-z,A-Z,0-9');
-  getPass.question('Enter new name (' + user + '):', function(name) {
+  getPass.question('Enter new name (' + user + '):', function (name) {
     if (name.length === 0) name = user;
     name = _sanatizeString(_removeCRLF(name));
     if (name.length > 32) {
       console.log('Error: Exceeded maximum username 32 characters');
       process.exit(1);
     }
-    getPass.question('\nEnter new password:', function(password) {
+    getPass.question('\nEnter new password:', function (password) {
       // Unicode characters can be up to 4 bytes, bcrypt has maximum input 72 characters.
       let uint8PasswordArray = new TextEncoder('utf8').encode(password);
       if (uint8PasswordArray.length > 72) {

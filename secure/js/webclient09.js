@@ -29,7 +29,7 @@
 // Internal function to detect IRC slash commands
 // by parsing input on server window user input textarea.
 // -------------------------------------------------------------------------
-function _parseInputForIRCCommands(textAreaEl) {
+function _parseInputForIRCCommands (textAreaEl) {
   let text = stripTrailingCrLf(textAreaEl.value);
   if (detectMultiLineString(text)) {
     textAreaEl.value = '';
@@ -62,14 +62,14 @@ function _parseInputForIRCCommands(textAreaEl) {
 // -----------------------------------------------
 // Send IRC server textarea send button pressed
 // -----------------------------------------------
-document.getElementById('sendRawMessageButton').addEventListener('click', function() {
+document.getElementById('sendRawMessageButton').addEventListener('click', function () {
   _parseInputForIRCCommands(document.getElementById('rawMessageInputId'));
   document.getElementById('rawMessageInputId').focus();
 }.bind(this));
 // ---------------------------------------
 // Send IRC server textarea Enter pressed
 // ---------------------------------------
-document.getElementById('rawMessageInputId').addEventListener('input', function(event) {
+document.getElementById('rawMessageInputId').addEventListener('input', function (event) {
   if (((event.inputType === 'insertText') && (event.data === null)) ||
     (event.inputType === 'insertLineBreak')) {
     _parseInputForIRCCommands(document.getElementById('rawMessageInputId'));
@@ -84,7 +84,7 @@ document.getElementById('rawMessageInputId').addEventListener('input', function(
 // Keys:  desktop: tab,  mobile phone: space-space
 // Channel name selected by tab-tab or space-space-space
 // ---------------------------------------
-const _autoCompleteServInputElement = function(snippet) {
+const _autoCompleteServInputElement = function (snippet) {
   var serverInputAreaEl = document.getElementById('rawMessageInputId');
   let last = '';
   const trailingSpaceKey = 32;
@@ -94,7 +94,7 @@ const _autoCompleteServInputElement = function(snippet) {
   // Check snippet in list of IRC text commands
   let matchedCommand = '';
   if (autoCompleteCommandList.length > 0) {
-    for (let i=0; i<autoCompleteCommandList.length; i++) {
+    for (let i = 0; i < autoCompleteCommandList.length; i++) {
       if (autoCompleteCommandList[i].indexOf(snippet.toUpperCase()) === 0) {
         matchedCommand = autoCompleteCommandList[i];
       }
@@ -103,7 +103,7 @@ const _autoCompleteServInputElement = function(snippet) {
   // Check snippet in list of IRC text commands
   let matchedRawCommand = '';
   if (autoCompleteRawCommandList.length > 0) {
-    for (let i=0; i<autoCompleteRawCommandList.length; i++) {
+    for (let i = 0; i < autoCompleteRawCommandList.length; i++) {
       if (autoCompleteRawCommandList[i].indexOf(snippet.toUpperCase()) === 0) {
         matchedRawCommand = autoCompleteRawCommandList[i];
       }
@@ -141,7 +141,7 @@ const _autoCompleteServInputElement = function(snippet) {
   return last;
 };
 var lastServAutoCompleteMatch = '';
-const serverAutoComplete = function(e) {
+const serverAutoComplete = function (e) {
   var serverInputAreaEl = document.getElementById('rawMessageInputId');
   const autoCompleteTabKey = 9;
   const autoCompleteSpaceKey = 32;
@@ -149,7 +149,7 @@ const serverAutoComplete = function(e) {
   if (!e.keyCode) return;
 
   if ((e.keyCode) && (e.keyCode === autoCompleteTabKey)) {
-    if(serverInputAreaEl.value.length < 2) {
+    if (serverInputAreaEl.value.length < 2) {
       e.preventDefault();
       return;
     }
@@ -177,12 +177,12 @@ const serverAutoComplete = function(e) {
   //
   // Case of space key to autocomplete on space-space
   if ((e.keyCode) && (e.keyCode === autoCompleteSpaceKey)) {
-    if(serverInputAreaEl.value.length > 0) {
+    if (serverInputAreaEl.value.length > 0) {
       // if previous characters is space (and this key is space too)
-      if (serverInputAreaEl.value.charCodeAt(serverInputAreaEl.value.length-1) ===
+      if (serverInputAreaEl.value.charCodeAt(serverInputAreaEl.value.length - 1) ===
       autoCompleteSpaceKey) {
         if ((serverInputAreaEl.value.length > 1) &&
-          (serverInputAreaEl.value.charCodeAt(serverInputAreaEl.value.length-2) ===
+          (serverInputAreaEl.value.charCodeAt(serverInputAreaEl.value.length - 2) ===
           autoCompleteSpaceKey)) {
           //
           // auto complete from:  space-space-space
@@ -236,7 +236,7 @@ document.getElementById('rawMessageInputId').addEventListener('keydown', serverA
 // In first text field of message
 // Exchange Unix seconds with HH:MM:SS time format
 // -------------------------------------------------
-function substituteHmsTime(inMessage) {
+function substituteHmsTime (inMessage) {
   let timeString = inMessage.split(' ')[0];
   let restOfMessage = inMessage.slice(timeString.length + 1, inMessage.length);
   let hmsString = timestampToHMS(timeString);
@@ -252,7 +252,7 @@ function substituteHmsTime(inMessage) {
 //
 // Else, this is where filtered server message are formatted for display
 // ---------------------------------------------------------------------------
-document.addEventListener('server-message', function(event) {
+document.addEventListener('server-message', function (event) {
   // console.log(JSON.stringify(event.detail, null, 2));
 
   // This will skip prefix, command, and param[0], printing the rest
@@ -260,7 +260,7 @@ document.addEventListener('server-message', function(event) {
   function _showAfterParamZero (parsedMessage, title) {
     let msgString = '';
     if (parsedMessage.params.length > 1) {
-      for (let i = 1; i< parsedMessage.params.length; i++) {
+      for (let i = 1; i < parsedMessage.params.length; i++) {
         msgString += ' ' + parsedMessage.params[i];
       }
     } else {
@@ -275,7 +275,7 @@ document.addEventListener('server-message', function(event) {
         cleanCtcpDelimiter(outMessage)));
   }
 
-  switch(event.detail.parsedMessage.command) {
+  switch (event.detail.parsedMessage.command) {
     //
     // Server First connect messages
     //
@@ -292,7 +292,6 @@ document.addEventListener('server-message', function(event) {
     case '252':
     case '254':
     case '255':
-    case '265':
     case '265':
       _showAfterParamZero(event.detail.parsedMessage, null);
       break;
@@ -457,7 +456,7 @@ document.addEventListener('server-message', function(event) {
 //
 // Example:  14:33:02 -----Cache Reload-----
 //
-document.addEventListener('cache-reload-done', function(event) {
+document.addEventListener('cache-reload-done', function (event) {
   // console.log('Event cache-reload-done');
   let markerString = '';
   let timestampString = '';
@@ -477,7 +476,7 @@ document.addEventListener('cache-reload-done', function(event) {
 // -------------------------
 // raw Show/Hide button handler
 // -------------------------
-document.getElementById('rawHiddenElementsButton').addEventListener('click', function() {
+document.getElementById('rawHiddenElementsButton').addEventListener('click', function () {
   if (document.getElementById('rawHiddenElements').hasAttribute('hidden')) {
     showRawMessageWindow();
   } else {
@@ -488,7 +487,7 @@ document.getElementById('rawHiddenElementsButton').addEventListener('click', fun
 // -------------------------
 // raw Clear button handler
 // -------------------------
-document.getElementById('rawClearButton').addEventListener('click', function() {
+document.getElementById('rawClearButton').addEventListener('click', function () {
   document.getElementById('rawMessageDisplay').value = '';
   document.getElementById('rawMessageDisplay').setAttribute('rows', '10');
   document.getElementById('rawMessageInputId').value = '';
@@ -496,7 +495,7 @@ document.getElementById('rawClearButton').addEventListener('click', function() {
 // -------------------------
 // raw Taller button handler
 // -------------------------
-document.getElementById('rawTallerButton').addEventListener('click', function() {
+document.getElementById('rawTallerButton').addEventListener('click', function () {
   let newRows =
     parseInt(document.getElementById('rawMessageDisplay').getAttribute('rows')) + 10;
   document.getElementById('rawMessageDisplay').setAttribute('rows', newRows.toString());
@@ -505,14 +504,14 @@ document.getElementById('rawTallerButton').addEventListener('click', function() 
 // -------------------------
 // raw Normal button handler
 // -------------------------
-document.getElementById('rawNormalButton').addEventListener('click', function() {
+document.getElementById('rawNormalButton').addEventListener('click', function () {
   document.getElementById('rawMessageDisplay').setAttribute('rows', '10');
 }.bind(this));
 
 // -----------------------------
 // Show Debug button handler
 // -----------------------------
-document.getElementById('showDebugButton').addEventListener('click', function() {
+document.getElementById('showDebugButton').addEventListener('click', function () {
   if (document.getElementById('hiddenDebugDiv').hasAttribute('hidden')) {
     document.getElementById('hiddenDebugDiv').removeAttribute('hidden');
     document.getElementById('showDebugButton').textContent = 'Less...';
@@ -526,31 +525,31 @@ document.getElementById('showDebugButton').addEventListener('click', function() 
 // --------------------------------
 // Update from cache (button)
 // --------------------------------
-document.getElementById('loadFromCacheButton').addEventListener('click', function() {
+document.getElementById('loadFromCacheButton').addEventListener('click', function () {
   // updateFromCache();
-  document.dispatchEvent(new CustomEvent('update-from-cache', {bubbles: true}));
+  document.dispatchEvent(new CustomEvent('update-from-cache', { bubbles: true }));
 }.bind(this));
 
 // -----------------------
 // Show all divs button
 // -----------------------
-document.getElementById('showAllDivsButton').addEventListener('click', function() {
+document.getElementById('showAllDivsButton').addEventListener('click', function () {
   // Emit event for dynamically generated hidden divs
-  document.dispatchEvent(new CustomEvent('show-all-divs', {bubbles: true}));
+  document.dispatchEvent(new CustomEvent('show-all-divs', { bubbles: true }));
 }.bind(this));
 
 // -----------------------
 // Hide all divs button
 // -----------------------
-document.getElementById('hideAllDivsButton').addEventListener('click', function() {
+document.getElementById('hideAllDivsButton').addEventListener('click', function () {
   // Emit event for dynamically generated hidden divs
-  document.dispatchEvent(new CustomEvent('hide-all-divs', {bubbles: true}));
+  document.dispatchEvent(new CustomEvent('hide-all-divs', { bubbles: true }));
 }.bind(this));
 
 // -----------------------
 // Variables button
 // -----------------------
-document.getElementById('variablesButtonId').addEventListener('click', function() {
+document.getElementById('variablesButtonId').addEventListener('click', function () {
   if (document.getElementById('variablesDivId').hasAttribute('hidden')) {
     document.getElementById('variablesDivId').removeAttribute('hidden');
 
@@ -566,7 +565,7 @@ document.getElementById('variablesButtonId').addEventListener('click', function(
 // -------------------------
 // Text Format checkbox handler
 // -------------------------
-document.getElementById('viewRawMessagesCheckbox').addEventListener('click', function(e) {
+document.getElementById('viewRawMessagesCheckbox').addEventListener('click', function (e) {
   if (document.getElementById('viewRawMessagesCheckbox').checked) {
     document.getElementById('showRawInHexCheckbox').removeAttribute('disabled');
     document.getElementById('showCommsCheckbox').removeAttribute('disabled');
@@ -581,31 +580,31 @@ document.getElementById('viewRawMessagesCheckbox').addEventListener('click', fun
     webState.showCommsMessages = false;
   }
   // this forces a global update which will refreesh text area
-  document.dispatchEvent(new CustomEvent('update-from-cache', {bubbles: true}));
+  document.dispatchEvent(new CustomEvent('update-from-cache', { bubbles: true }));
 });
-document.getElementById('showRawInHexCheckbox').addEventListener('click', function() {
+document.getElementById('showRawInHexCheckbox').addEventListener('click', function () {
   if (document.getElementById('showRawInHexCheckbox').checked) {
     webState.showRawInHex = true;
   } else {
     webState.showRawInHex = false;
   }
   // this forces a global update which will refreesh text area
-  document.dispatchEvent(new CustomEvent('update-from-cache', {bubbles: true}));
+  document.dispatchEvent(new CustomEvent('update-from-cache', { bubbles: true }));
 });
-document.getElementById('showCommsCheckbox').addEventListener('click', function() {
+document.getElementById('showCommsCheckbox').addEventListener('click', function () {
   if (document.getElementById('showCommsCheckbox').checked) {
     webState.showCommsMessages = true;
   } else {
     webState.showCommsMessages = false;
   }
   // this forces a global update which will refreesh text area
-  document.dispatchEvent(new CustomEvent('update-from-cache', {bubbles: true}));
+  document.dispatchEvent(new CustomEvent('update-from-cache', { bubbles: true }));
 });
 
 // -------------------------
 //  Show/Hide license info
 // -------------------------
-document.getElementById('infoOpenCloseButton').addEventListener('click', function() {
+document.getElementById('infoOpenCloseButton').addEventListener('click', function () {
   if (document.getElementById('hiddenInfoDiv').hasAttribute('hidden')) {
     document.getElementById('hiddenInfoDiv').removeAttribute('hidden');
     document.getElementById('infoOpenCloseButton').textContent = '-';

@@ -27,7 +27,7 @@
 // from the client.
 //
 // -----------------------------------------------------------------------------
-(function() {
+(function () {
   'use strict';
 
   const ircWrite = require('./irc-client-write');
@@ -47,13 +47,13 @@
   const ctcpMaxFlood = 3;
   var ctcpDownCounterSeconds = 0;
   var ctcpReplyCounter = 0;
-  const checkCtcpNotFlood = function() {
+  const checkCtcpNotFlood = function () {
     if (ctcpDownCounterSeconds === 0) ctcpDownCounterSeconds = ctcpFloodTimeSec;
     ctcpReplyCounter++;
     if (ctcpReplyCounter > ctcpMaxFlood) return false;
     return true;
   };
-  const ctcpTimerTick = function() {
+  const ctcpTimerTick = function () {
     if (ctcpDownCounterSeconds > 0) {
       ctcpDownCounterSeconds--;
       if (ctcpDownCounterSeconds < 1) {
@@ -135,7 +135,7 @@
 
       case 'TIME':
         if (true) {
-          let d = new Date;
+          let d = new Date();
 
           // This returns Fri Jun 11 2021 12:50:57 GMT+0000
           // let ctcpReply = 'TIME ' + d.toString().split('(')[0];
@@ -197,7 +197,7 @@
   //
   // 1 second utility timer
   //
-  setInterval(function() {
+  setInterval(function () {
     ctcpTimerTick();
   }.bind(this), 1000);
 

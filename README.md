@@ -104,3 +104,14 @@ The there is a separate repository for this called
 [irc-hybrid-client-dev-tools](https://github.com/cotarr/irc-hybrid-client-dev-tools).
 There are complete instructions for use of this utility in the
 [irc-hybrid-client-dev-tools](https://github.com/cotarr/irc-hybrid-client-dev-tools) repository.
+
+### eslint
+
+```
+# Lint browser
+npx eslint secure/js/*.js
+
+# Lint server
+npx eslint server/*/*.js server/*.js bin/www
+
+```

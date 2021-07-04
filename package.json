@@ -32,5 +32,11 @@
     "utf-8-validate": "^5.0.5",
     "ws": "^7.5.0"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "eslint": "^7.30.0",
+    "eslint-config-standard": "^16.0.3",
+    "eslint-plugin-import": "^2.23.4",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^5.1.0"
+  }
 }

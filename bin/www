@@ -67,8 +67,8 @@ if (('port' in credentials) && (parseInt(credentials.port) !== 0)) {
 }
 server.listen(port);
 
-server.on('listening', function() {
-  let now = new Date;
+server.on('listening', function () {
+  let now = new Date();
   var address = server.address();
   console.log('listening: ' + address.address + ':' + address.port +
     ' ' + address.family);
@@ -87,7 +87,7 @@ server.on('listening', function() {
 // web socket upgrade handler
 server.on('upgrade', wss.wsOnUpgrade);
 
-server.on('error', function(error) {
+server.on('error', function (error) {
   if (error.syscall !== 'listen') {
     throw error;
   }

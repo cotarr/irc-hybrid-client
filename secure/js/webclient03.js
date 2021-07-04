@@ -54,12 +54,12 @@ function initWebSocketAuth (callback) {
     method: 'POST',
     headers: {
       'Content-type': 'application/json',
-      'Accept': 'application/json'
+      Accept: 'application/json'
     },
-    body: JSON.stringify({purpose: 'websocket-auth'})
+    body: JSON.stringify({ purpose: 'websocket-auth' })
   };
   fetch(fetchURL, fetchOptions)
-    .then( (response) => {
+    .then((response) => {
       // console.log(response.status);
       if (response.ok) {
         return response.json();
@@ -67,12 +67,12 @@ function initWebSocketAuth (callback) {
         throw new Error('Fetch status ' + response.status + ' ' + response.statusText);
       }
     })
-    .then( (responseJson) => {
+    .then((responseJson) => {
       if (callback) {
         callback(null, ircState);
       }
     })
-    .catch( (error) => {
+    .catch((error) => {
       console.log(error);
       webState.webConnected = false;
       webState.webConnecting = false;
@@ -107,11 +107,11 @@ function connectWebSocket () {
     updateDivVisibility();
 
     // load state of IRC connection
-    getIrcState(function(err, data) {
+    getIrcState(function (err, data) {
       if (!err) {
         // then pull in existing data
         // updateFromCache();
-        document.dispatchEvent(new CustomEvent('update-from-cache', {bubbles: true}));
+        document.dispatchEvent(new CustomEvent('update-from-cache', { bubbles: true }));
       }
     });
   });
@@ -170,7 +170,6 @@ function connectWebSocket () {
   // does not end in a LF, then wait for next data and merge old and new message.
   // -----------------------------------------------------------------------------
 
-
   // -------------------------------------------------------------------------
   // Process Buffer object from socket stream
   //
@@ -188,7 +187,7 @@ function connectWebSocket () {
     if (len === 0) return;
     let index = 0;
     let count = 0;
-    for (let i=0; i<len; i++) {
+    for (let i = 0; i < len; i++) {
       // this is a 8 bit integer
       let charCode = data.charCodeAt(i);
       if ((charCode !== 10) && (charCode !== 13)) {
@@ -208,7 +207,6 @@ function connectWebSocket () {
       previousBufferFragment = data.slice(index, index + count);
     }
   };
-
 
   // -----------------------------------
   // Listen for messages on websocket
@@ -236,12 +234,12 @@ function _sendIrcServerMessage (message) {
     method: 'POST',
     headers: {
       'Content-type': 'application/json',
-      'Accept': 'application/json'
+      Accept: 'application/json'
     },
     body: JSON.stringify(body)
   };
   fetch(fetchURL, fetchOptions)
-    .then( (response) => {
+    .then((response) => {
       // console.log(response.status);
       if (response.ok) {
         return response.json();
@@ -250,13 +248,13 @@ function _sendIrcServerMessage (message) {
         throw new Error('Fetch status ' + response.status + ' ' + response.statusText);
       }
     })
-    .then( (responseJson) => {
+    .then((responseJson) => {
       // console.log(JSON.stringify(responseJson, null, 2));
       if (responseJson.error) {
         showError(responseJson.message);
       }
     })
-    .catch( (error) => {
+    .catch((error) => {
       showError(error.toString());
       console.log(error);
     });
@@ -271,13 +269,13 @@ function _sendIrcServerMessage (message) {
 // 3) Call function to open socket
 //
 // --------------------------------------
-function reconnectWebSocketAfterDisconnect() {
+function reconnectWebSocketAfterDisconnect () {
   let statusURL = webServerUrl + '/status';
   let secureStatusURL = webServerUrl + '/secure';
   let fetchOptions = {
     method: 'GET',
     headers: {
-      'Accept': 'application/json'
+      Accept: 'application/json'
     }
   };
   //
@@ -286,7 +284,7 @@ function reconnectWebSocketAfterDisconnect() {
   // GET to see if server is up and internet is connected.
   // ----------------------------------------------
   fetch(statusURL, fetchOptions)
-    .then( (response) => {
+    .then((response) => {
       // console.log(response.status);
       if (response.ok) {
         return response.json();
@@ -294,7 +292,7 @@ function reconnectWebSocketAfterDisconnect() {
         throw new Error('Fetch status ' + response.status + ' ' + response.statusText);
       }
     })
-    .then( (responseJson) => {
+    .then((responseJson) => {
       // console.log(JSON.stringify(responseJson));
       document.getElementById('reconnectStatusDiv').textContent +=
         'Server found, Checking authoriztion.\n';
@@ -305,7 +303,7 @@ function reconnectWebSocketAfterDisconnect() {
       // expired.
       // --------------------------------------
       fetch(secureStatusURL, fetchOptions)
-        .then( (response) => {
+        .then((response) => {
           // console.log(response.status);
           // if (response.status === 403) {
           //   window.location.href = '/login';
@@ -318,15 +316,15 @@ function reconnectWebSocketAfterDisconnect() {
             throw new Error('Fetch status ' + response.status + ' ' + response.statusText);
           }
         })
-        .then( (responseJson) => {
+        .then((responseJson) => {
           // console.log(JSON.stringify(responseJson));
           document.getElementById('reconnectStatusDiv').textContent +=
             'Authorizton confirmed, opening web socket.\n';
-          //-------------------------------------------
+          // -------------------------------------------
           // Step 3, initiate the 10 second auth window
           // for the web socket to conenct.
-          //-------------------------------------------
-          initWebSocketAuth(function(err, data) {
+          // -------------------------------------------
+          initWebSocketAuth(function (err, data) {
             if (err) {
               showError('Error connecting web socket');
               console.log(err);
@@ -341,13 +339,13 @@ function reconnectWebSocketAfterDisconnect() {
               // Perform a HTTP Upgrade request
               // with cookie to authorize.
               // --------------------------------------
-              setTimeout(function() {
+              setTimeout(function () {
                 connectWebSocket();
               }.bind(this), 100);
             }
           });
         })
-        .catch( (error) => {
+        .catch((error) => {
           console.log(error);
           document.getElementById('reconnectStatusDiv').textContent +=
             'Error: Error checking authorization\n';
@@ -356,7 +354,7 @@ function reconnectWebSocketAfterDisconnect() {
           updateDivVisibility();
         });
     })
-    .catch( (error) => {
+    .catch((error) => {
       console.log(error);
       document.getElementById('reconnectStatusDiv').textContent +=
         'Error: No internet or server down\n';
@@ -373,15 +371,15 @@ function reconnectWebSocketAfterDisconnect() {
 //
 // This is called at the end of all JavaScript load
 // ---------------------------------------------
-function firstWebSocketConnectOnPageLoad() {
+function firstWebSocketConnectOnPageLoad () {
   if ((!webState.webConnected) && (!webState.webConnecting)) {
     webState.webConnecting = true;
-    initWebSocketAuth(function(err, data) {
+    initWebSocketAuth(function (err, data) {
       if (err) {
         showError('Error connecting web socket');
         console.log(err);
       } else {
-        setTimeout(function() {
+        setTimeout(function () {
           connectWebSocket();
         }.bind(this), 100);
       }
@@ -392,7 +390,7 @@ function firstWebSocketConnectOnPageLoad() {
 // ------------------------------------------------
 // Button to initiate manual web socket reconnect
 // ------------------------------------------------
-document.getElementById('manualWebSocketReconnectButton').addEventListener('click', function() {
+document.getElementById('manualWebSocketReconnectButton').addEventListener('click', function () {
   if ((!webState.webConnected) && (!webState.webConnecting)) {
     webState.webConnectOn = true;
     webState.webConnecting = true;
@@ -407,11 +405,11 @@ document.getElementById('manualWebSocketReconnectButton').addEventListener('clic
 // Tap "Web" status icon to connect/disconnect
 // ------------------------------------------------
 var webStatusIconTouchDebounce = false;
-document.getElementById('webConnectIconId').addEventListener('click', function() {
+document.getElementById('webConnectIconId').addEventListener('click', function () {
   // debounce button
   if (webStatusIconTouchDebounce) return;
   webStatusIconTouchDebounce = true;
-  setTimeout(function() {
+  setTimeout(function () {
     webStatusIconTouchDebounce = false;
   }, 1000);
   //
@@ -438,7 +436,7 @@ document.getElementById('webConnectIconId').addEventListener('click', function()
 // ------------------------------------------------
 // Button to stop manual web socket reconnect
 // ------------------------------------------------
-document.getElementById('stopWebSocketReconnectButton').addEventListener('click', function() {
+document.getElementById('stopWebSocketReconnectButton').addEventListener('click', function () {
   if (!webState.webConnected) {
     webState.webConnectOn = false;
     webState.webConnecting = false;
@@ -447,14 +445,13 @@ document.getElementById('stopWebSocketReconnectButton').addEventListener('click'
   }
 });
 
-
-//---------------------------------
+// ---------------------------------
 // Timer called once per second to
 // manage web-socket reconnection.
-//---------------------------------
+// ---------------------------------
 var wsReconnectCounter = 0;
 var wsReconnectTimer = 0;
-function reconnectTimerTickHandler() {
+function reconnectTimerTickHandler () {
   // If disabled, or if connection successful, reset counter/timer
   if ((!webState.webConnectOn) || (webState.webConnected)) {
     wsReconnectCounter = 0;

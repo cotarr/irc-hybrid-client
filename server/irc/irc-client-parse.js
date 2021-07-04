@@ -31,7 +31,7 @@
 //        Browser  <--   Web Server (here)  <--   IRC server
 //
 // -----------------------------------------------------------------------------
-(function() {
+(function () {
   'use strict';
 
   const ircCtcp = require('./irc-client-ctcp');
@@ -41,7 +41,7 @@
   var ircMessageCache = require('./irc-client-cache');
   var vars = require('./irc-client-vars');
 
-  const tellBrowserToRequestState = function() {
+  const tellBrowserToRequestState = function () {
     global.sendToBrowser('UPDATE\r\n');
   };
 
@@ -82,7 +82,7 @@
     // :prefix command param1 param2 .... :lastParam
     //         ======= ====== ======
     //
-    function _extractMidString(start, end, messageBuffer) {
+    function _extractMidString (start, end, messageBuffer) {
       let i = start;
       let outString = '';
       // ASCII 20 is space character
@@ -104,7 +104,7 @@
     // :prefix command param1 param2 .... :lastParam
     //                                     =========
     //
-    function _extractFinalString(start, end, messageBuffer) {
+    function _extractFinalString (start, end, messageBuffer) {
       let i = start;
       let outString = '';
       while (i <= end) {
@@ -122,9 +122,9 @@
 
     // nick!user@host.domain
     // nick!user@nn:nn:nn:nn: (ipv6)
-    function _extractNickname(inText) {
+    function _extractNickname (inText) {
       if (inText) {
-        if ((inText.indexOf('!') >= 0 ) &&
+        if ((inText.indexOf('!') >= 0) &&
           (inText.indexOf('@') >= 0) &&
           (inText.indexOf('!') < inText.indexOf('@'))) {
           let nick = inText.split('!')[0];
@@ -137,9 +137,9 @@
       }
     } // _extractNickname()
 
-    function _extractHostname(inText) {
+    function _extractHostname (inText) {
       if (inText) {
-        if ((inText.indexOf('!') >= 0 ) &&
+        if ((inText.indexOf('!') >= 0) &&
           (inText.indexOf('@') >= 0) &&
           (inText.indexOf('!') < inText.indexOf('@'))) {
           let host = inText.split('!')[1];
@@ -171,7 +171,7 @@
     //
     // Parsing variables
     let end = messageBuffer.length - 1;
-    let temp = {nextIndex: 0};
+    let temp = { nextIndex: 0 };
 
     // 1) Check if prefix exist, if exit parse value, return nextIndex
     temp = _isColonString(temp.nextIndex, messageBuffer);
@@ -220,7 +220,6 @@
     };
   }; // _parseIrcMessage
 
-
   // -----------------------------------------
   // #Channel MODE changes to Op/Voice status
   //
@@ -247,13 +246,13 @@
     const userQueue = [];
     let selector = '';
     if (vars.ircState.channels.length === 0) return;
-    for (let i=0; i<vars.ircState.channels.length; i++) {
+    for (let i = 0; i < vars.ircState.channels.length; i++) {
       if (parsedMessage.params[0].toLowerCase() === vars.ircState.channels[i]) {
         // index into vars.ircState.channels[]
         let chanIndex = i;
         let modeList = parsedMessage.params[1];
         if (modeList.length > 0) {
-          for (let j=0; j<modeList.length; j++) {
+          for (let j = 0; j < modeList.length; j++) {
             if (selectorChars.indexOf(modeList.charAt(j)) >= 0) {
               // selector is "+" or "-"
               selector = modeList.charAt(j);
@@ -264,18 +263,18 @@
           }
         } // params[1].length
         if ((modeQueue.length > 0) && (modeQueue.length + 2 === parsedMessage.params.length)) {
-          for (let j=0; j<modeQueue.length; j++) {
-            userQueue.push(parsedMessage.params[j+2]);
+          for (let j = 0; j < modeQueue.length; j++) {
+            userQueue.push(parsedMessage.params[j + 2]);
           }
           let strippedNicks = [];
-          for (let j=0; j<vars.ircState.channelStates[chanIndex].names.length; j++) {
+          for (let j = 0; j < vars.ircState.channelStates[chanIndex].names.length; j++) {
             let tempNick = vars.ircState.channelStates[chanIndex].names[j];
             if (modeChars.indexOf(tempNick.charAt(0)) >= 0) {
               tempNick = tempNick.slice(1, tempNick.length);
             }
             strippedNicks.push(tempNick);
           }
-          for (let j=0; j<modeQueue.length; j++) {
+          for (let j = 0; j < modeQueue.length; j++) {
             let userIndex = strippedNicks.indexOf(userQueue[j]);
             let tempNick = strippedNicks[userIndex];
             if (modeQueue[j] === '+v') tempNick = '+' + tempNick;
@@ -295,7 +294,7 @@
   // cycle through all channels and replace
   // the new nickname, preserving op character
   // -------------------------------------------
-  function _exchangeNames(oldNick, newNick) {
+  function _exchangeNames (oldNick, newNick) {
     if (!newNick) return;
     if (newNick.length < 1) return;
     if (!oldNick) return;
@@ -312,12 +311,12 @@
       pureNewNick = pureNewNick.slice(1, pureNewNick.length);
     }
     // ci = channel index into channels array
-    for (let ci=0; ci<vars.ircState.channels.length; ci++) {
+    for (let ci = 0; ci < vars.ircState.channels.length; ci++) {
       let nickCount = vars.ircState.channelStates[ci].names.length;
       if (nickCount > 0) {
         let matchIndex = -1;
         let opChar = '';
-        for (let i=0; i<nickCount; i++) {
+        for (let i = 0; i < nickCount; i++) {
           let pureNick = vars.ircState.channelStates[ci].names[i];
           let tempOpChar = '';
           if (vars.nicknamePrefixChars.indexOf(pureNick.charAt(0)) >= 0) {
@@ -341,7 +340,7 @@
   // Add a nicname to channel array list
   // If op or voice (@,+) not match, then update the existing name
   // --------------------------------------------------------------
-  function _addName(newNick, channel) {
+  function _addName (newNick, channel) {
     if (!newNick) return;
     if (newNick.length < 1) return;
     // console.log('Adding ' + newNick + ' to ' + channel);
@@ -355,7 +354,7 @@
         if (vars.nicknamePrefixChars.indexOf(pureNewNick.charAt(0)) >= 0) {
           pureNewNick = pureNewNick.slice(1, pureNewNick.length);
         }
-        for (let i=0; i<nickCount; i++) {
+        for (let i = 0; i < nickCount; i++) {
           let pureNick = vars.ircState.channelStates[channelIndex].names[i];
           if (vars.nicknamePrefixChars.indexOf(pureNick.charAt(0)) >= 0) {
             opChar = pureNick.charAt(0);
@@ -384,7 +383,7 @@
   // Remove a nicname to channel array list
   // Ignore op or voice (@,+) when removing
   // ---------------------------------------------
-  function _removeName(oldNick, channel) {
+  function _removeName (oldNick, channel) {
     // console.log('Removing ' + oldNick + ' from ' + channel);
     let channelIndex = vars.ircState.channels.indexOf(channel.toLowerCase());
     if (channelIndex >= 0) {
@@ -395,7 +394,7 @@
         if (vars.nicknamePrefixChars.indexOf(pureOldNick.charAt(0)) >= 0) {
           pureOldNick = pureOldNick.slice(1, pureOldNick.length);
         }
-        for (let i=0; i<nickCount; i++) {
+        for (let i = 0; i < nickCount; i++) {
           let pureNick = vars.ircState.channelStates[channelIndex].names[i];
           if (vars.nicknamePrefixChars.indexOf(pureNick.charAt(0)) >= 0) {
             pureNick = pureNick.slice(1, pureNick.length);
@@ -411,7 +410,7 @@
     return;
   } // _removeName()
 
-  //-----------------------------------------------------------------
+  // -----------------------------------------------------------------
   //
   //  I R C   M E S S A G E   C O M M A N D   P A R S E R
   //
@@ -420,7 +419,7 @@
   // Single message line from IRC server, parsed for command actions
   //
   // Input: Node.js UTF-8 encoded Buffer object
-  //-----------------------------------------------------------------
+  // -----------------------------------------------------------------
   const _processIrcMessage = function (socket, messageBuffer) {
     //
     // parse message into: prefix, command, and param array
@@ -439,7 +438,7 @@
       // 512 btye maximum size from RFC 2812 2.3 Messages
       if (outBuffer.length <= 512) {
         socket.write(outBuffer, 'utf8');
-        if (vars.excludedCommands.indexOf('PING') <0) {
+        if (vars.excludedCommands.indexOf('PING') < 0) {
           ircMessageCache.addMessage(Buffer.concat([
             Buffer.from(vars.timestamp() + ' '),
             messageBuffer
@@ -483,7 +482,7 @@
     // -------------------------------------------------
     // Individual ommands from IRC server are parsed here
     // -------------------------------------------------
-    switch(parsedMessage.command) {
+    switch (parsedMessage.command) {
       case '001':
         if (!vars.ircState.ircRegistered) {
           // extract my client info from last argument in 001 message
@@ -501,7 +500,7 @@
             // set user mode
             //
             if (vars.ircState.userMode.length > 0) {
-              setTimeout(function() {
+              setTimeout(function () {
                 ircWrite.writeSocket(socket, 'MODE ' + vars.ircState.nickName +
                   ' ' + vars.ircState.userMode);
               }.bind(this), 500);
@@ -510,7 +509,7 @@
             // nickserv registration
             //
             if ((vars.nsIdentifyNick.length > 0) && (vars.nsIdentifyCommand.length > 0)) {
-              setTimeout(function() {
+              setTimeout(function () {
                 if ((vars.ircState.ircConnected) &&
                   (vars.ircState.nickName === vars.nsIdentifyNick)) {
                   ircWrite.writeSocket(socket, vars.nsIdentifyCommand);
@@ -523,7 +522,7 @@
             if ((vars.ircState.ircAutoReconnect) &&
               (vars.ircState.ircConnectOn) &&
               (vars.ircState.count.ircConnect > 0)) {
-              setTimeout(function() {
+              setTimeout(function () {
                 if ((vars.ircState.ircAutoReconnect) &&
                   (vars.ircState.ircConnectOn) &&
                   (vars.ircState.count.ircConnect > 0)) {
@@ -536,7 +535,7 @@
             //
             // Wait 2 second for async stuff, then ask browser to update connected status
             // THis is duplicate request, some networks miss the first one.
-            setTimeout(function() {
+            setTimeout(function () {
               tellBrowserToRequestState();
             }.bind(this), 2000);
             // tell browser to update itself
@@ -609,7 +608,7 @@
                 (parsedMessage.params[3].length > 0)) {
                 let nameArray = parsedMessage.params[3].split(' ');
                 if (nameArray.length > 0) {
-                  for (let i=0; i<nameArray.length; i++) {
+                  for (let i = 0; i < nameArray.length; i++) {
                     _addName(nameArray[i], channelName);
                   }
                 }
@@ -832,7 +831,7 @@
           if (parsedMessage.nick !== vars.ircState.nickname) {
             // case of it is not me who QUIT
             if (vars.ircState.channels.length > 0) {
-              for (let i = 0; i<vars.ircState.channels.length; i++) {
+              for (let i = 0; i < vars.ircState.channels.length; i++) {
                 if (vars.ircState.channelStates[i].joined) {
                   _removeName(parsedMessage.nick, vars.ircState.channels[i]);
                   tellBrowserToRequestState();

@@ -32,27 +32,27 @@
 // be a long term off-line cache or logger.
 //
 // -----------------------------------------------------------------------------
-(function() {
+(function () {
   'use strict';
 
   // size in lines of text
   const cacheSize = 100;
   var cacheInPointer = 0;
   var cacheArray = [];
-  for (let i=0; i< cacheSize; i++) {
+  for (let i = 0; i < cacheSize; i++) {
     cacheArray.push(null);
   }
 
-  const eraseCache = function() {
+  const eraseCache = function () {
     // console.log('Cache Erased');
     cacheInPointer = 0;
     cacheArray = [];
-    for (let i=0; i< cacheSize; i++) {
+    for (let i = 0; i < cacheSize; i++) {
       cacheArray.push(null);
     }
   };
 
-  const addMessage = function(message) {
+  const addMessage = function (message) {
     if (Buffer.isBuffer(message)) {
       cacheArray[cacheInPointer] = Buffer.from(message);
     } else if (typeof message === 'string') {
@@ -62,10 +62,10 @@
     if (cacheInPointer >= cacheSize) cacheInPointer = 0;
   };
 
-  const allMessages = function() {
+  const allMessages = function () {
     let outArray = [];
     let cacheOutPointer = cacheInPointer;
-    for (let i=0; i<cacheSize; i++) {
+    for (let i = 0; i < cacheSize; i++) {
       if ((cacheArray[cacheOutPointer]) && (cacheArray[cacheOutPointer].length > 0)) {
         // Option 1 to send array of utf8 encoded Buffer objects
         outArray.push(cacheArray[cacheOutPointer]);
@@ -78,11 +78,11 @@
     return outArray;
   };
 
-  const cacheInfo = function() {
+  const cacheInfo = function () {
     let size = 0;
     let lines = 0;
     if (cacheArray.length > 0) {
-      for (let i=0; i<cacheArray.length; i++) {
+      for (let i = 0; i < cacheArray.length; i++) {
         if ((cacheArray[i]) && (cacheArray[i].length > 0)) {
           lines++;
           size += cacheArray[i].length;

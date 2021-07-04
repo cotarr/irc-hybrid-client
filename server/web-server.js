@@ -31,7 +31,7 @@
 const http = require('http');
 const https = require('https');
 const path = require('path');
-const fs=require('fs');
+const fs = require('fs');
 
 // express packages
 const express = require('express');
@@ -79,14 +79,14 @@ const sessionExpireAfterMs = 1000 * sessionExpireAfterSec;
 var nodeEnv = process.env.NODE_ENV || 'development';
 
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.urlencoded({ extended: false }));
 // cookieParser is not required for express-session
 // cookieParser used for user-authenticate.js cookie enabled in browser
 // cookieParser used for ws-server /irc/wsauth route cookie match
 app.use(cookieParser(cookieSecret));
 
 // Generic console log to debug various nodejs req object properties
-const logStuff = function(req, res, next) {
+const logStuff = function (req, res, next) {
   // console.log('req.headers' + JSON.stringify(req.headers, null, 2));
   // console.log('req.rawHeaders ' + req.rawHeaders);
   // console.log('req.body' + JSON.stringify(req.body, null, 2));
@@ -131,7 +131,7 @@ if (nodeEnv === 'development') {
 app.use(helmet({
   hidePoweredBy: false
 }));
-app.use(helmet.referrerPolicy({policy: 'no-referrer'}));
+app.use(helmet.referrerPolicy({ policy: 'no-referrer' }));
 
 // ------------------------------------------------
 // test error, check for stack dump on production
@@ -144,7 +144,7 @@ app.use(helmet.referrerPolicy({policy: 'no-referrer'}));
 //
 //   /status    Is the server alive?
 //
-app.get('/status', (req, res) => res.json({status: 'ok'}));
+app.get('/status', (req, res) => res.json({ status: 'ok' }));
 
 // ----------------------------------------
 // CSP Content Security Policy
@@ -172,7 +172,7 @@ app.use(helmet.contentSecurityPolicy({
 const securityContact = credentials.securityContact;
 const securityExpires = credentials.securityExpires;
 if (securityContact.length > 0) {
-  app.get('/.well-known/security.txt', function(req, res) {
+  app.get('/.well-known/security.txt', function (req, res) {
     res.set('Content-Type', 'text/plain');
     res.send(
       '# Website security contact \r\n' +
@@ -185,7 +185,7 @@ if (securityContact.length > 0) {
 //
 // Robot exclusion policy (robots.txt)
 //
-app.get('/robots.txt', function(req, res) {
+app.get('/robots.txt', function (req, res) {
   res.set('Content-Type', 'text/plain');
   res.send(
     'User-agent: *\n' +
@@ -241,7 +241,7 @@ app.get('/blocked', userAuth.blockedCookies);
 //    "terminate": "YES"
 //  }
 //
-app.post('/terminate', authorizeOrFail, function(req, res, next) {
+app.post('/terminate', authorizeOrFail, function (req, res, next) {
   let inputVerifyString = '';
   if (('terminate' in req.body) && (typeof req.body.terminate === 'string')) {
     inputVerifyString = req.body.terminate;
@@ -260,10 +260,10 @@ app.post('/terminate', authorizeOrFail, function(req, res, next) {
       // ignore
     }
     console.log(dieMessage);
-    setTimeout(function() {
+    setTimeout(function () {
       process.exit(1);
     }, 1000);
-    res.json({error: false, message: 'Terminate received'});
+    res.json({ error: false, message: 'Terminate received' });
   } else {
     let error = new Error('Bad Reqeust');
     error.status = 400;
@@ -272,7 +272,7 @@ app.post('/terminate', authorizeOrFail, function(req, res, next) {
 });
 
 // Route used to verify cookie not expired before reconnecting
-app.get('/secure', authorizeOrFail, (req, res) => res.json({secure: 'ok'}));
+app.get('/secure', authorizeOrFail, (req, res) => res.json({ secure: 'ok' }));
 
 // -----------------------------------------
 //          Websocket Auth
@@ -303,7 +303,7 @@ app.get('/secure', authorizeOrFail, (req, res) => res.json({secure: 'ok'}));
 // Data stored globally, time expiration 10 seconds.
 //
 // -----------------------------------------
-app.post('/irc/wsauth', authorizeOrFail, function(req, res, next) {
+app.post('/irc/wsauth', authorizeOrFail, function (req, res, next) {
   global.webSocketAuth = {
     expire: 0,
     cookie: ''
@@ -318,7 +318,7 @@ app.post('/irc/wsauth', authorizeOrFail, function(req, res, next) {
         expire: timeNow + 10,
         cookie: cookieValue
       };
-      return res.json({error: false});
+      return res.json({ error: false });
     }
   }
   let error = new Error('Invalid Auth Request');
@@ -354,7 +354,7 @@ app.get('/irc/test2', authorizeOrFail, ircClient.test2Handler);
 // all other static files return 403
 // if unauthorized
 // -------------------------------
-app.get('/irc/webclient.html', authorizeOrLogin, function(req, res, next) {
+app.get('/irc/webclient.html', authorizeOrLogin, function (req, res, next) {
   next();
 });
 
@@ -378,7 +378,7 @@ app.use('/irc', authorizeOrFail, express.static(secureDir));
 //
 // catch 404 and forward to error handler
 //
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   let responseObject = {};
   responseObject.error = {
     status: 404,
@@ -409,7 +409,7 @@ app.use(function(req, res, next) {
 //
 // Custom error handler
 //
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   if (nodeEnv === 'development') {
     // console.log(err);
   }

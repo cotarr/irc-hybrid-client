@@ -56,10 +56,10 @@ function cleanFormatting (inString) {
 
   // Loop through all characters in input string
   let active = true;
-  while (i<l) {
+  while (i < l) {
     active = true;
     // Filter format characters capable of toggle on/off
-    if ((active) && (i<l) && (formattingChars.indexOf(inString.charCodeAt(i)) >= 0)) {
+    if ((active) && (i < l) && (formattingChars.indexOf(inString.charCodeAt(i)) >= 0)) {
       active = false;
       i++;
     }
@@ -70,40 +70,39 @@ function cleanFormatting (inString) {
     //     0x03 + '03'
     //     0x03 + '3,4'
     //     0x03 + '03,04'
-    if ((active) && (i<l) && (inString.charCodeAt(i) === 3)) {
+    if ((active) && (i < l) && (inString.charCodeAt(i) === 3)) {
       active = false;
       i++;
-      if ((i<l) && (inString.charAt(i) >= '0') && (inString.charAt(i) <= '9')) i++;
-      if ((i<l) && (inString.charAt(i) >= '0') && (inString.charAt(i) <= '9')) i++;
-      if ((i<l) && (inString.charAt(i) === ',')) {
+      if ((i < l) && (inString.charAt(i) >= '0') && (inString.charAt(i) <= '9')) i++;
+      if ((i < l) && (inString.charAt(i) >= '0') && (inString.charAt(i) <= '9')) i++;
+      if ((i < l) && (inString.charAt(i) === ',')) {
         i++;
-        if ((i<l) && (inString.charAt(i) >= '0') && (inString.charAt(i) <= '9')) i++;
-        if ((i<l) && (inString.charAt(i) >= '0') && (inString.charAt(i) <= '9')) i++;
+        if ((i < l) && (inString.charAt(i) >= '0') && (inString.charAt(i) <= '9')) i++;
+        if ((i < l) && (inString.charAt(i) >= '0') && (inString.charAt(i) <= '9')) i++;
       }
     }
     // Hexadecimal colors 0x04 + 6 hexadecimal digits
     // followed by optional comma and 6 hexadeciaml digits for background color
     // In this case, 6 characters are removed regardless if 0-9, A-F
-    if ((active) && (i<l) && (inString.charCodeAt(i) === 4)) {
+    if ((active) && (i < l) && (inString.charCodeAt(i) === 4)) {
       active = false;
       i++;
       if (((inString.charAt(i) >= '0') &&
-        (inString.charAt(i) <= '9'))
-        ||
+        (inString.charAt(i) <= '9')) ||
         ((inString.toUpperCase().charAt(i) >= 'A') &&
         (inString.toUpperCase().charAt(i) <= 'F'))) {
-        for (let j=0; j<6; j++) {
-          if (i<l) i++;
+        for (let j = 0; j < 6; j++) {
+          if (i < l) i++;
         }
-        if ((i<l) && (inString.charAt(i) === ',')) {
+        if ((i < l) && (inString.charAt(i) === ',')) {
           i++;
-          for (let j=0; j<6; j++) {
-            if (i<l) i++;
+          for (let j = 0; j < 6; j++) {
+            if (i < l) i++;
           }
         }
       }
     }
-    if ((active) && (i<l)) {
+    if ((active) && (i < l)) {
       active = false;
       outString += inString.charAt(i);
       i++;
@@ -133,11 +132,11 @@ function cleanCtcpDelimiter (inString) {
   let l = inString.length;
   if (l === 0) return outString;
   let i = 0;
-  while (i<l) {
-    if ((i<l) && (inString.charCodeAt(i) === ctcpDelim)) {
+  while (i < l) {
+    if ((i < l) && (inString.charCodeAt(i) === ctcpDelim)) {
       i++;
     } else {
-      if (i<l) outString += inString.charAt(i);
+      if (i < l) outString += inString.charAt(i);
       i++;
     }
   }
@@ -183,7 +182,7 @@ const unixTimestampToHMS = function (seconds) {
     } else {
       language = window.navigator.userLanguage || window.navigator.language || 'en-US';
     }
-    outString = timeObj.toLocaleTimeString(language, {hour12: false}); // hh:mm:ss browser time
+    outString = timeObj.toLocaleTimeString(language, { hour12: false }); // hh:mm:ss browser time
   } else {
     outString = null;
   }
@@ -228,7 +227,7 @@ function _parseIrcMessage (message) {
   // timestamp :prefix command param1 param2 .... :lastParam
   // =========
   //
-  function _extractTimeString(start, end, messageString) {
+  function _extractTimeString (start, end, messageString) {
     let i = start;
     let timeString = '';
     while ((messageString.charAt(i) !== ' ') && (i <= end)) {
@@ -266,7 +265,7 @@ function _parseIrcMessage (message) {
   // timestamp :prefix command param1 param2 .... :lastParam
   //                   ======= ====== ======
   //
-  function _extractMidString(start, end, messageString) {
+  function _extractMidString (start, end, messageString) {
     let i = start;
     let outString = '';
     while ((messageString.charAt(i) !== ' ') && (i <= end)) {
@@ -284,7 +283,7 @@ function _parseIrcMessage (message) {
   // timestamp :prefix command param1 param2 .... :lastParam
   //                                               =========
   //
-  function _extractFinalString(start, end, messageString) {
+  function _extractFinalString (start, end, messageString) {
     let i = start;
     let outString = '';
     while (i <= end) {
@@ -302,9 +301,9 @@ function _parseIrcMessage (message) {
   //
   // nick!user@host.domain
   // nick!user@nn:nn:nn:nn: (ipv6)
-  function _extractNickname(inText) {
+  function _extractNickname (inText) {
     if (inText) {
-      if ((inText.indexOf('!') >= 0 ) &&
+      if ((inText.indexOf('!') >= 0) &&
         (inText.indexOf('@') >= 0) &&
         (inText.indexOf('!') < inText.indexOf('@'))) {
         let nick = inText.split('!')[0];
@@ -319,9 +318,9 @@ function _parseIrcMessage (message) {
   //
   // Extract hostname
   //
-  function _extractHostname(inText) {
+  function _extractHostname (inText) {
     if (inText) {
-      if ((inText.indexOf('!') >= 0 ) &&
+      if ((inText.indexOf('!') >= 0) &&
         (inText.indexOf('@') >= 0) &&
         (inText.indexOf('!') < inText.indexOf('@'))) {
         let host = inText.split('!')[1];
@@ -354,7 +353,7 @@ function _parseIrcMessage (message) {
   // Parsing variables
   let messageString = message.toString();
   let end = messageString.length - 1;
-  let temp = {nextIndex: 0};
+  let temp = { nextIndex: 0 };
 
   // 1) Extract timestamp
   temp = _extractTimeString(temp.nextIndex, end, messageString);
@@ -415,7 +414,7 @@ function _parseIrcMessage (message) {
 // -----------------------------------------------------------------------
 // :nick!~user@host.domain PRIVMSG #channel :This is channel text message.
 // -----------------------------------------------------------------------
-function displayChannelMessage(parsedMessage) {
+function displayChannelMessage (parsedMessage) {
   document.dispatchEvent(new CustomEvent('channel-message',
     {
       bubbles: true,
@@ -432,7 +431,7 @@ function displayChannelMessage(parsedMessage) {
 // -----------------------------------------------------------------------
 // :nick!~user@host.domain PRIVMSG nickname :This is private text message.
 // -----------------------------------------------------------------------
-function displayPrivateMessage(parsedMessage) {
+function displayPrivateMessage (parsedMessage) {
   document.dispatchEvent(new CustomEvent('private-message',
     {
       bubbles: true,
@@ -448,7 +447,7 @@ function displayPrivateMessage(parsedMessage) {
 //
 // Note: notice window controls are in another module
 // -----------------------------------------------------
-function displayNoticeMessage(parsedMessage) {
+function displayNoticeMessage (parsedMessage) {
   function _addText (text) {
     document.getElementById('noticeMessageDisplay').value +=
       cleanFormatting(text) + '\n';
@@ -456,7 +455,7 @@ function displayNoticeMessage(parsedMessage) {
       document.getElementById('noticeMessageDisplay').scrollHeight;
   }
   // console.log('parsedMessage ' + JSON.stringify(parsedMessage, null, 2));
-  switch(parsedMessage.command) {
+  switch (parsedMessage.command) {
     case 'NOTICE':
       const ctcpDelim = 1;
       if (((parsedMessage.params.length === 2) &&
@@ -517,7 +516,7 @@ function displayNoticeMessage(parsedMessage) {
 //
 // Example:  14:33:02 -----Cache Reload-----
 //
-document.addEventListener('cache-reload-done', function(event) {
+document.addEventListener('cache-reload-done', function (event) {
   // console.log('Event cache-reload-done');
   let markerString = '';
   let timestampString = '';
@@ -538,14 +537,14 @@ document.addEventListener('cache-reload-done', function(event) {
 // Wallops (+w) messages are displayed here
 // Note: notice window controls are in another module
 // -----------------------------------------------------
-function displayWallopsMessage(parsedMessage) {
+function displayWallopsMessage (parsedMessage) {
   function _addText (text) {
     document.getElementById('wallopsMessageDisplay').value += cleanFormatting(text) + '\n';
     document.getElementById('wallopsMessageDisplay').scrollTop =
       document.getElementById('wallopsMessageDisplay').scrollHeight;
   }
   // console.log('Priv Msg: ' + JSON.stringify(parsedMessage, null, 2));
-  switch(parsedMessage.command) {
+  switch (parsedMessage.command) {
     case 'WALLOPS':
       if (parsedMessage.nick) {
         _addText(parsedMessage.timestamp + ' ' +
@@ -568,7 +567,7 @@ function displayWallopsMessage(parsedMessage) {
 //
 // Example:  14:33:02 -----Cache Reload-----
 //
-document.addEventListener('cache-reload-done', function(event) {
+document.addEventListener('cache-reload-done', function (event) {
   // console.log('Event cache-reload-done');
   let markerString = '';
   let timestampString = '';
@@ -604,7 +603,7 @@ function displayRawMessage (inString) {
 function displayRawMessageInHex (message) {
   let uint8String = new TextEncoder('utf8').encode(message);
   let hexString = '';
-  for (let i=0; i<uint8String.length; i++) {
+  for (let i = 0; i < uint8String.length; i++) {
     hexString += uint8String[i].toString(16).padStart(2, '0') + ' ';
   }
   displayRawMessage(hexString);
@@ -614,7 +613,7 @@ function displayRawMessageInHex (message) {
 // This is called to apply message formatting
 // to IRC server message for display
 // -------------------------------------------
-function displayFormattedServerMessage(parsedMessage, message) {
+function displayFormattedServerMessage (parsedMessage, message) {
   document.dispatchEvent(new CustomEvent('server-message',
     {
       bubbles: true,
@@ -699,7 +698,7 @@ function _parseCtcpMessage (parsedMessage) {
         //
         let replyContents = '';
         if (parsedMessage.params.length > 2) {
-          for (let i=2; i<parsedMessage.params.length; i++) {
+          for (let i = 2; i < parsedMessage.params.length; i++) {
             if (parsedMessage.params[i].charCodeAt(0) !== ctcpDelim) {
               replyContents += cleanCtcpDelimiter(parsedMessage.params[i]);
               if (i !== parsedMessage.params.length) {
@@ -777,14 +776,14 @@ const ircMessageCommandDisplayFilter = [
 // then parse the command and relevant actions accordingly.
 // -------------------------------------------------------------
 function _parseBufferMessage (message) {
-  if (message === 'HEARTBEAT' ) {
+  if (message === 'HEARTBEAT') {
     // 1) Check if websocket heartbeat
     // console.log('heartbeat');
     onHeartbeatReceived();
     if (webState.showCommsMessages) {
       displayRawMessage('HEARTBEAT');
     }
-  } else if ( message === 'UPDATE' ) {
+  } else if (message === 'UPDATE') {
     // 2) Else check if backend requests browser to
     //       poll the state API and update
     // console.log('update');
@@ -797,10 +796,10 @@ function _parseBufferMessage (message) {
     // 3) Else, this is IRC message to be parsed for IRC browser user.
 
     // Internal function
-    function _showNotExpiredError(errStr) {
+    function _showNotExpiredError (errStr) {
       // current UNIX time in seconds
       let timeNow = new Date();
-      let timeNowSeconds = parseInt(timeNow/1000);
+      let timeNowSeconds = parseInt(timeNow / 1000);
       let timeMessageSeconds = timestampToUnixSeconds(message.split(' ')[0]);
       // subtract timestamp from (possibly chached) server messages
       // and show error only if condition not expired
@@ -857,15 +856,14 @@ function _parseBufferMessage (message) {
     // Check if server is responding with error code
     //
     if ((parseInt(parsedMessage.command) >= 400) &&
-      (parseInt(parsedMessage.command) <500)) {
+      (parseInt(parsedMessage.command) < 500)) {
       // TODO temporarily remove timestamp with slice, can use better parse.
       _showNotExpiredError(message.slice(12, message.length));
     }
 
-
     // Decoding complete, Parse commands
     //
-    switch(parsedMessage.command) {
+    switch (parsedMessage.command) {
       case 'ERROR':
         // console.log(message.toString());
         // This is to popup error before registration, Bad server Password error
@@ -913,10 +911,10 @@ function _parseBufferMessage (message) {
           }
           let present = false;
           if (ircState.channels.length > 0) {
-            for (let i=0; i<ircState.channels.length; i++) {
+            for (let i = 0; i < ircState.channels.length; i++) {
               if ((ircState.channelStates[i].joined) &&
                 (ircState.channelStates[i].names.length > 0)) {
-                for (let j=0; j<ircState.channelStates[i].names.length; j++) {
+                for (let j = 0; j < ircState.channelStates[i].names.length; j++) {
                   let checkNick = ircState.channelStates[i].names[j].toLowerCase();
                   // if channel nickname start with an OP character remove it
                   if (nicknamePrefixChars.indexOf(checkNick.charAt(0)) >= 0) {
@@ -998,10 +996,10 @@ function _parseBufferMessage (message) {
           }
           let present = false;
           if (ircState.channels.length > 0) {
-            for (let i=0; i<ircState.channels.length; i++) {
+            for (let i = 0; i < ircState.channels.length; i++) {
               if ((ircState.channelStates[i].joined) &&
                 (ircState.channelStates[i].names.length > 0)) {
-                for (let j=0; j<ircState.channelStates[i].names.length; j++) {
+                for (let j = 0; j < ircState.channelStates[i].names.length; j++) {
                   let checkNick = ircState.channelStates[i].names[j].toLowerCase();
                   // if channel nickname start with an OP character remove it
                   if (nicknamePrefixChars.indexOf(checkNick.charAt(0)) >= 0) {

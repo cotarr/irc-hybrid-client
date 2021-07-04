@@ -118,13 +118,13 @@ const autoCompleteRawCommandList = [
 //
 // Returns true if string is multi-line
 // -------------------------------------------------
-function detectMultiLineString(inString) {
+function detectMultiLineString (inString) {
   let inLength = inString.length;
   // if last character is newline 0x0A, then reduce by 1
-  if ((inLength > 0) && (inString.charCodeAt(inLength-1) === 10)) inLength--;
+  if ((inLength > 0) && (inString.charCodeAt(inLength - 1) === 10)) inLength--;
   if (inLength > 0) {
     let countCR = 0;
-    for (let i=0; i<inLength; i++) {
+    for (let i = 0; i < inLength; i++) {
       if (inString.charCodeAt(i) === 10) countCR++;
     }
     if (countCR === 0) {
@@ -142,13 +142,13 @@ function detectMultiLineString(inString) {
 //
 // Returns new string
 // -------------------------
-function stripTrailingCrLf(inString) {
+function stripTrailingCrLf (inString) {
   let inLength = inString.length;
-  if ((inLength > 0) && (inString.charCodeAt(inLength-1) === 10)) inLength--;
-  if ((inLength > 0) && (inString.charCodeAt(inLength-1) === 13)) inLength--;
+  if ((inLength > 0) && (inString.charCodeAt(inLength - 1) === 10)) inLength--;
+  if ((inLength > 0) && (inString.charCodeAt(inLength - 1) === 13)) inLength--;
   // remove trailing ascii space (left from auto-complete)
-  if ((inLength > 0) && (inString.charCodeAt(inLength-1) === 32)) inLength--;
-  if ((inLength > 0) && (inString.charCodeAt(inLength-1) === 32)) inLength--;
+  if ((inLength > 0) && (inString.charCodeAt(inLength - 1) === 32)) inLength--;
+  if ((inLength > 0) && (inString.charCodeAt(inLength - 1) === 32)) inLength--;
   if (inLength === 0) {
     return '';
   } else {
@@ -175,12 +175,12 @@ function stripTrailingCrLf(inString) {
 // --------------------------------------------------------
 function textCommandParser (inputObj) {
   // Internal function, detect whitespace character
-  function _isWS(inChar) {
+  function _isWS (inChar) {
     if (inChar.charAt(0) === ' ') return true;
     if (inChar.charCodeAt(0) === 9) return true;
     return false;
   }
-  function _isEOL(inChar) {
+  function _isEOL (inChar) {
     if (inChar.charAt(0) === '\n') return true;
     if (inChar.charAt(0) === '\r') return true;
     return false;
@@ -189,10 +189,10 @@ function textCommandParser (inputObj) {
   let inStr = inputObj.inputString;
 
   // If tailing CR-LF, remove them
-  if ((inStr.length > 0) && (_isEOL(inStr.charAt(inStr.length-1)))) {
+  if ((inStr.length > 0) && (_isEOL(inStr.charAt(inStr.length - 1)))) {
     inStr = inStr.slice(0, inStr.length - 1);
   }
-  if ((inStr.length > 0) && (_isEOL(inStr.charAt(inStr.length-1)))) {
+  if ((inStr.length > 0) && (_isEOL(inStr.charAt(inStr.length - 1)))) {
     inStr = inStr.slice(0, inStr.length - 1);
   }
 
@@ -406,7 +406,7 @@ function textCommandParser (inputObj) {
       if (parsedCommand.params.length === 1) {
         nameArray.push(parsedCommand.restOf[0]);
       } else {
-        for (let i=1; i<parsedCommand.params.length; i++) {
+        for (let i = 1; i < parsedCommand.params.length; i++) {
           nameArray.push(parsedCommand.params[i]);
         }
         nameArray.push(parsedCommand.restOf[parsedCommand.restOf.length - 1]);
@@ -431,10 +431,10 @@ function textCommandParser (inputObj) {
         };
         returnObj.ircMessage = 'MODE ';
         returnObj.ircMessage += inputObj.originName + ' ' + modeValue;
-        for (let i=0; i<nameArray.length; i++) {
+        for (let i = 0; i < nameArray.length; i++) {
           returnObj.ircMessage += chanUserMode;
         }
-        for (let i=0; i<nameArray.length; i++) {
+        for (let i = 0; i < nameArray.length; i++) {
           returnObj.ircMessage += ' ' + nameArray[i];
         }
         return returnObj;
@@ -468,7 +468,7 @@ function textCommandParser (inputObj) {
     case 'AWAY':
       ircMessage = 'AWAY';
       if (parsedCommand.restOf.length > 0) {
-        ircMessage ='AWAY :' + parsedCommand.restOf[0];
+        ircMessage = 'AWAY :' + parsedCommand.restOf[0];
       }
       break;
     //
@@ -713,7 +713,7 @@ function textCommandParser (inputObj) {
     case 'QUIT':
       ircMessage = 'QUIT';
       if (parsedCommand.restOf.length > 0) {
-        ircMessage ='QUIT :' + parsedCommand.restOf[0];
+        ircMessage = 'QUIT :' + parsedCommand.restOf[0];
       }
       break;
     //

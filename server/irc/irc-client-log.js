@@ -25,7 +25,7 @@
 //
 // -----------------------------------------------------------------------------
 
-(function() {
+(function () {
   'use strict';
 
   const path = require('path');
@@ -69,7 +69,7 @@
           mode: 0o644,
           flag: 'a'
         },
-        function(err) {
+        function (err) {
           if (err) {
             // in case disk full, kill server
             throw new Error('Error writing ' + accessLogFilename);
@@ -104,7 +104,7 @@
             mode: 0o644,
             flag: 'a'
           },
-          function(err) {
+          function (err) {
             if (err) {
               // in case disk full, kill server
               throw new Error('Error writing ' + ircLogFilename);

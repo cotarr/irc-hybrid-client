@@ -34,7 +34,7 @@
 // Send text to channel (internal function)
 // Intercept IRC text command if detected
 // ------------------------------------------
-function _sendTextToChannel(channelIndex, textAreaEl) {
+function _sendTextToChannel (channelIndex, textAreaEl) {
   let text = stripTrailingCrLf(textAreaEl.value);
   if (detectMultiLineString(text)) {
     textAreaEl.value = '';
@@ -69,7 +69,7 @@ function _sendTextToChannel(channelIndex, textAreaEl) {
       // Check if marked away, if so cancel away, 1 second delay
       //
       if ((ircState.ircConnected) && (ircState.ircIsAway)) {
-        setTimeout(function() {
+        setTimeout(function () {
           // check again after timer, abort if not away
           if ((ircState.ircConnected) && (ircState.ircIsAway)) {
             // cancel away state, IRC server response will be parsed in backend
@@ -181,7 +181,7 @@ function createChannelEl (name) {
   let channelBottomDivEl = document.createElement('div');
   channelBottomDivEl.classList.add('channel-bottom-div');
 
-  //Channel topic
+  // hannel topic
   let channelTopicDivEl = document.createElement('div');
   channelTopicDivEl.textContent = cleanFormatting(ircState.channelStates[channelIndex].topic);
   channelTopicDivEl.classList.add('chan-topic-div');
@@ -368,7 +368,7 @@ function createChannelEl (name) {
 
   // inhibit timer to prevent display of activity icon
   var activityIconInhibitTimer = 0;
-  setInterval(function() {
+  setInterval(function () {
     if (activityIconInhibitTimer > 0) activityIconInhibitTimer--;
   }.bind(this), 1000);
 
@@ -379,7 +379,7 @@ function createChannelEl (name) {
   // -------------------------
   // Show/Hide button handler
   // -------------------------
-  channelHideButtonEl.addEventListener('click', function() {
+  channelHideButtonEl.addEventListener('click', function () {
     if (channelBottomDivEl.hasAttribute('hidden')) {
       channelBottomDivEl.removeAttribute('hidden');
       channelHideButtonEl.textContent = '-';
@@ -394,7 +394,7 @@ function createChannelEl (name) {
   // -------------------------
   // Taller button handler
   // -------------------------
-  channelTallerButtonEl.addEventListener('click', function() {
+  channelTallerButtonEl.addEventListener('click', function () {
     let newRows = parseInt(channelTextAreaEl.getAttribute('rows')) + 10;
     channelTextAreaEl.setAttribute('rows', newRows.toString());
     channelNamesDisplayEl.setAttribute('rows', newRows.toString());
@@ -403,7 +403,7 @@ function createChannelEl (name) {
   // -------------------------
   // Normal button handler
   // -------------------------
-  channelNormalButtonEl.addEventListener('click', function() {
+  channelNormalButtonEl.addEventListener('click', function () {
     channelTextAreaEl.setAttribute('rows', defaultHeightInRows);
     channelNamesDisplayEl.setAttribute('rows', defaultHeightInRows);
   });
@@ -411,7 +411,7 @@ function createChannelEl (name) {
   // -------------------------
   // Clear button handler
   // -------------------------
-  channelClearButtonEl.addEventListener('click', function() {
+  channelClearButtonEl.addEventListener('click', function () {
     channelTextAreaEl.value = '';
     channelTextAreaEl.setAttribute('rows', defaultHeightInRows);
     channelNamesDisplayEl.setAttribute('rows', defaultHeightInRows);
@@ -420,7 +420,7 @@ function createChannelEl (name) {
   // -------------------------
   // Join button handler
   // -------------------------
-  channelJoinButtonEl.addEventListener('click', function() {
+  channelJoinButtonEl.addEventListener('click', function () {
     let message = 'JOIN ' + name;
     _sendIrcServerMessage(message);
   });
@@ -428,7 +428,7 @@ function createChannelEl (name) {
   // -------------------------
   // Part button handler
   // -------------------------
-  channelPartButtonEl.addEventListener('click', function() {
+  channelPartButtonEl.addEventListener('click', function () {
     let message = 'PART ' + name + ' :' + ircState.progName + ' ' + ircState.progVersion;
     _sendIrcServerMessage(message);
   });
@@ -436,7 +436,7 @@ function createChannelEl (name) {
   // -------------------------
   // Prune button handler
   // -------------------------
-  channelPruneButtonEl.addEventListener('click', function() {
+  channelPruneButtonEl.addEventListener('click', function () {
     // Internal function to remove channel window from DOM
     // Some variabes are within variable namespace of parent function.
     function _removeChannelFromDom () {
@@ -462,12 +462,12 @@ function createChannelEl (name) {
           method: 'POST',
           headers: {
             'Content-type': 'application/json',
-            'Accept': 'application/json'
+            Accept: 'application/json'
           },
-          body: JSON.stringify({channel: name})
+          body: JSON.stringify({ channel: name })
         };
         fetch(fetchURL, fetchOptions)
-          .then( (response) => {
+          .then((response) => {
             // console.log(response.status);
             if (response.ok) {
               return response.json();
@@ -475,7 +475,7 @@ function createChannelEl (name) {
               throw new Error('Fetch status ' + response.status + ' ' + response.statusText);
             }
           })
-          .then( (responseJson) => {
+          .then((responseJson) => {
             // console.log(JSON.stringify(responseJson, null, 2));
             if (responseJson.error) {
               showError(responseJson.message);
@@ -484,7 +484,7 @@ function createChannelEl (name) {
               _removeChannelFromDom();
             }
           })
-          .catch( (error) => {
+          .catch((error) => {
             console.log(error);
           });
       }
@@ -499,9 +499,9 @@ function createChannelEl (name) {
   // -------------------------
   // Refresh button handler
   // -------------------------
-  channelRefreshButtonEl.addEventListener('click', function() {
+  channelRefreshButtonEl.addEventListener('click', function () {
     // this forces a global update which will refreesh text area
-    document.dispatchEvent(new CustomEvent('update-from-cache', {bubbles: true}));
+    document.dispatchEvent(new CustomEvent('update-from-cache', { bubbles: true }));
     // THis will request a new nickname list from IRC server.
     channelNamesDisplayEl.value = '';
     _sendIrcServerMessage('NAMES ' + name);
@@ -510,7 +510,7 @@ function createChannelEl (name) {
   // -------------
   // send button
   // -------------
-  channelSendButtonEl.addEventListener('click', function() {
+  channelSendButtonEl.addEventListener('click', function () {
     _sendTextToChannel(channelIndex, channelInputAreaEl);
     channelInputAreaEl.focus();
     resetChanActivityIcon(channelIndex);
@@ -520,7 +520,7 @@ function createChannelEl (name) {
   // ---------------
   // Enter pressed
   // ---------------
-  channelInputAreaEl.addEventListener('input', function(event) {
+  channelInputAreaEl.addEventListener('input', function (event) {
     if (((event.inputType === 'insertText') && (event.data === null)) ||
       (event.inputType === 'insertLineBreak')) {
       _sendTextToChannel(channelIndex, channelInputAreaEl);
@@ -533,12 +533,12 @@ function createChannelEl (name) {
   // Clear message activity ICON by click anywhere on the
   // dynamically created channel message window
   // -------------------------------------------------
-  channelMainSectionEl.addEventListener('click', function() {
+  channelMainSectionEl.addEventListener('click', function () {
     resetChanActivityIcon(channelIndex);
     activityIconInhibitTimer = activityIconInhibitTimerValue;
   }.bind(this));
 
-  function updateVisibility() {
+  function updateVisibility () {
     // console.log('Event: irc-state-changed (createChannelEl)');
     let index = ircState.channels.indexOf(name.toLowerCase());
     if (index >= 0) {
@@ -626,7 +626,7 @@ function createChannelEl (name) {
   // -------------------------
   zoomIndexNumber++;
   let zoomEventId = 'chan' + zoomIndexNumber.toString() + 'ZoomId';
-  channelZoomButtonEl.addEventListener('click', function() {
+  channelZoomButtonEl.addEventListener('click', function () {
     if (channelMainSectionEl.hasAttribute('zoom')) {
       // Turn off channel zoom
       channelMainSectionEl.removeAttribute('zoom');
@@ -648,7 +648,7 @@ function createChannelEl (name) {
       document.dispatchEvent(new CustomEvent('hide-all-divs',
         {
           bubbles: true,
-          detail: {zoom: zoomEventId}
+          detail: { zoom: zoomEventId }
         }
       ));
     }
@@ -657,7 +657,7 @@ function createChannelEl (name) {
   // ----------------
   // show all event
   // ----------------
-  document.addEventListener('show-all-divs', function(event) {
+  document.addEventListener('show-all-divs', function (event) {
     channelBottomDivEl.removeAttribute('hidden');
     channelHideButtonEl.textContent = '-';
     channelTopRightHidableDivEl.removeAttribute('hidden');
@@ -670,7 +670,7 @@ function createChannelEl (name) {
   //
   // If event.detail.zoom === zoomEventId, abort without action
   // -----------------------------------------------------------
-  document.addEventListener('hide-all-divs', function(event) {
+  document.addEventListener('hide-all-divs', function (event) {
     if ((event.detail) &&
       (event.detail.zoom) &&
       (event.detail.zoom.length > 0)) {
@@ -695,7 +695,7 @@ function createChannelEl (name) {
   // -------------------------
   // Beep On Message checkbox handler
   // -------------------------
-  channelBeep1CBInputEl.addEventListener('click', function(e) {
+  channelBeep1CBInputEl.addEventListener('click', function (e) {
     if (channelMainSectionEl.hasAttribute('beep1-enabled')) {
       channelMainSectionEl.removeAttribute('beep1-enabled');
     } else {
@@ -708,7 +708,7 @@ function createChannelEl (name) {
   // -------------------------
   // Beep On Join checkbox handler
   // -------------------------
-  channelBeep2CBInputEl.addEventListener('click', function(e) {
+  channelBeep2CBInputEl.addEventListener('click', function (e) {
     if (channelMainSectionEl.hasAttribute('beep2-enabled')) {
       channelMainSectionEl.removeAttribute('beep2-enabled');
     } else {
@@ -721,7 +721,7 @@ function createChannelEl (name) {
   // -------------------------
   // Beep On match my nickname checkbox handler
   // -------------------------
-  channelBeep3CBInputEl.addEventListener('click', function(e) {
+  channelBeep3CBInputEl.addEventListener('click', function (e) {
     if (channelMainSectionEl.hasAttribute('beep3-enabled')) {
       channelMainSectionEl.removeAttribute('beep3-enabled');
     } else {
@@ -734,7 +734,7 @@ function createChannelEl (name) {
   // -----------------------
   // Cancel all beep sounds
   // -----------------------
-  document.addEventListener('cancel-beep-sounds', function(event) {
+  document.addEventListener('cancel-beep-sounds', function (event) {
     channelMainSectionEl.removeAttribute('beep1-enabled');
     channelMainSectionEl.removeAttribute('beep2-enabled');
     channelMainSectionEl.removeAttribute('beep3-enabled');
@@ -743,7 +743,7 @@ function createChannelEl (name) {
   // -------------------------
   // Text Format checkbox handler
   // -------------------------
-  channelFormatCBInputEl.addEventListener('click', function() {
+  channelFormatCBInputEl.addEventListener('click', function () {
     if (channelMainSectionEl.hasAttribute('brief-enabled')) {
       channelMainSectionEl.removeAttribute('brief-enabled');
     } else {
@@ -752,7 +752,7 @@ function createChannelEl (name) {
     // updateVisibility();
 
     // this forces a global update which will refreesh text area
-    document.dispatchEvent(new CustomEvent('update-from-cache', {bubbles: true}));
+    document.dispatchEvent(new CustomEvent('update-from-cache', { bubbles: true }));
 
     // THis will request a new nickname list from IRC server.
     // channelNamesDisplayEl.value = '';
@@ -773,7 +773,7 @@ function createChannelEl (name) {
   // -------------------------
   // AutoComplete checkbox handler
   // -------------------------
-  channelAutoCompCBInputEl.addEventListener('click', function() {
+  channelAutoCompCBInputEl.addEventListener('click', function () {
     if (channelMainSectionEl.hasAttribute('auto-comp-enabled')) {
       channelMainSectionEl.removeAttribute('auto-comp-enabled');
     } else {
@@ -800,7 +800,7 @@ function createChannelEl (name) {
   // Keys:  desktop: tab,  mobile phone: space-space
   // Channel name selected by tab-tab or space-space-space
   // ---------------------------------------
-  const _autoCompleteInputElement = function(snippet) {
+  const _autoCompleteInputElement = function (snippet) {
     let last = '';
     const trailingSpaceKey = 32;
     // parse last space character delimitered string
@@ -809,7 +809,7 @@ function createChannelEl (name) {
     // Check snippet in list of IRC text commands
     let matchedCommand = '';
     if (autoCompleteCommandList.length > 0) {
-      for (let i=0; i<autoCompleteCommandList.length; i++) {
+      for (let i = 0; i < autoCompleteCommandList.length; i++) {
         if (autoCompleteCommandList[i].indexOf(snippet.toUpperCase()) === 0) {
           matchedCommand = autoCompleteCommandList[i];
         }
@@ -818,7 +818,7 @@ function createChannelEl (name) {
     // Check snippet in list of IRC text commands
     let matchedRawCommand = '';
     if (autoCompleteRawCommandList.length > 0) {
-      for (let i=0; i<autoCompleteRawCommandList.length; i++) {
+      for (let i = 0; i < autoCompleteRawCommandList.length; i++) {
         if (autoCompleteRawCommandList[i].indexOf(snippet.toUpperCase()) === 0) {
           matchedRawCommand = autoCompleteRawCommandList[i];
         }
@@ -862,7 +862,7 @@ function createChannelEl (name) {
       let chanIndex = ircState.channels.indexOf(name.toLowerCase());
       if (chanIndex >= 0) {
         if (ircState.channelStates[chanIndex].names.length > 0) {
-          for (let i=0; i<ircState.channelStates[chanIndex].names.length; i++) {
+          for (let i = 0; i < ircState.channelStates[chanIndex].names.length; i++) {
             let matchNick = ircState.channelStates[chanIndex].names[i];
             // if nick starts with op character, remove first character
             if (nicknamePrefixChars.indexOf(matchNick.charAt(0)) >= 0) {
@@ -888,7 +888,7 @@ function createChannelEl (name) {
     return last;
   };
   var lastAutoCompleteMatch = '';
-  const channelAutoComplete = function(e) {
+  const channelAutoComplete = function (e) {
     const autoCompleteTabKey = 9;
     const autoCompleteSpaceKey = 32;
     const trailingSpaceKey = 32;
@@ -897,7 +897,7 @@ function createChannelEl (name) {
     if (!e.keyCode) return;
 
     if ((e.keyCode) && (e.keyCode === autoCompleteTabKey)) {
-      if(channelInputAreaEl.value.length < 2) {
+      if (channelInputAreaEl.value.length < 2) {
         e.preventDefault();
         return;
       }
@@ -926,12 +926,12 @@ function createChannelEl (name) {
     //
     // Case of space key to autocomplete on space-space
     if ((e.keyCode) && (e.keyCode === autoCompleteSpaceKey)) {
-      if(channelInputAreaEl.value.length > 0) {
+      if (channelInputAreaEl.value.length > 0) {
         // if previous characters is space (and this key is space too)
-        if (channelInputAreaEl.value.charCodeAt(channelInputAreaEl.value.length-1) ===
+        if (channelInputAreaEl.value.charCodeAt(channelInputAreaEl.value.length - 1) ===
         autoCompleteSpaceKey) {
           if ((channelInputAreaEl.value.length > 1) &&
-            (channelInputAreaEl.value.charCodeAt(channelInputAreaEl.value.length-2) ===
+            (channelInputAreaEl.value.charCodeAt(channelInputAreaEl.value.length - 2) ===
             autoCompleteSpaceKey)) {
             //
             // auto complete from:  space-space-space
@@ -981,10 +981,10 @@ function createChannelEl (name) {
   // channelInputAreaEl.addEventListener('beforeinput', channelAutoComplete);
   channelInputAreaEl.addEventListener('keydown', channelAutoComplete, false);
 
-  //----------------
+  // ----------------
   // Nickname list
-  //----------------
-  function _updateNickList() {
+  // ----------------
+  function _updateNickList () {
     let index = ircState.channels.indexOf(name.toLowerCase());
     if (index >= 0) {
       maxNickLength = 0;
@@ -992,7 +992,7 @@ function createChannelEl (name) {
         channelNamesDisplayEl.value = '';
         let opList = [];
         let otherList = [];
-        for (let i=0; i<ircState.channelStates[index].names.length; i++) {
+        for (let i = 0; i < ircState.channelStates[index].names.length; i++) {
           if (ircState.channelStates[index].names[i].charAt(0) === '@') {
             opList.push(ircState.channelStates[index].names[i]);
           } else {
@@ -1002,7 +1002,7 @@ function createChannelEl (name) {
         let sortedOpList = opList.sort();
         let sortedOtherList = otherList.sort();
         if (sortedOpList.length > 0) {
-          for (let i=0; i<sortedOpList.length; i++) {
+          for (let i = 0; i < sortedOpList.length; i++) {
             channelNamesDisplayEl.value += sortedOpList[i] + '\n';
             if (maxNickLength < sortedOpList[i].length) {
               maxNickLength = sortedOpList[i].length;
@@ -1010,7 +1010,7 @@ function createChannelEl (name) {
           }
         }
         if (sortedOtherList.length > 0) {
-          for (let i=0; i<sortedOtherList.length; i++) {
+          for (let i = 0; i < sortedOtherList.length; i++) {
             channelNamesDisplayEl.value += sortedOtherList[i] + '\n';
             if (maxNickLength < sortedOtherList[i].length) {
               maxNickLength = sortedOtherList[i].length;
@@ -1019,7 +1019,7 @@ function createChannelEl (name) {
         }
       }
     }
-  } //_updateNickList()
+  } // _updateNickList()
   // populate it initially on creating the element
   _updateNickList();
 
@@ -1045,11 +1045,11 @@ function createChannelEl (name) {
   // do one upon channel creation
   _updateChannelTitle();
 
-  function _isNickInChannel(nickString, channelString) {
+  function _isNickInChannel (nickString, channelString) {
     if ((!nickString) || (nickString.length === 0)) return false;
     if (ircState.channels.length === 0) return false;
     let channelIndex = -1;
-    for (let i=0; i<ircState.channels.length; i++) {
+    for (let i = 0; i < ircState.channels.length; i++) {
       if (channelString.toLowerCase() === ircState.channels[i].toLowerCase()) channelIndex = i;
     }
     if (channelIndex < 0) return false;
@@ -1060,7 +1060,7 @@ function createChannelEl (name) {
       pureNick = pureNick.slice(1, pureNick.length);
     }
     let present = false;
-    for (let i=0; i<ircState.channelStates[channelIndex].names.length; i++) {
+    for (let i = 0; i < ircState.channelStates[channelIndex].names.length; i++) {
       let checkNick = ircState.channelStates[channelIndex].names[i].toLowerCase();
       // if channel nickname start with an OP character remove it
       if (nicknamePrefixChars.indexOf(checkNick.charAt(0)) >= 0) {
@@ -1071,7 +1071,7 @@ function createChannelEl (name) {
     return present;
   } // _nickInChannel()
 
-  document.addEventListener('irc-state-changed', function(event) {
+  document.addEventListener('irc-state-changed', function (event) {
     // console.log('Event: irc-state-changed (createChannelEl)');
 
     //
@@ -1101,7 +1101,7 @@ function createChannelEl (name) {
     updateVisibility();
   }.bind(this));
 
-  document.addEventListener('channel-message', function(event) {
+  document.addEventListener('channel-message', function (event) {
     function _addText (timestamp, nick, text) {
       //
       let out = '';
@@ -1127,8 +1127,7 @@ function createChannelEl (name) {
     let parsedMessage = event.detail.parsedMessage;
     // console.log('Event channel-message: ' + JSON.stringify(parsedMessage, null, 2));
 
-
-    switch(parsedMessage.command) {
+    switch (parsedMessage.command) {
       //
       // TODO cases for channel closed or other error
       //
@@ -1144,7 +1143,7 @@ function createChannelEl (name) {
             _addText(parsedMessage.timestamp,
               '*',
               parsedMessage.nick + ' has kicked ' + parsedMessage.params[1] +
-              ' (' + reason + ')' );
+              ' (' + reason + ')');
           }
         }
         break;
@@ -1238,7 +1237,7 @@ function createChannelEl (name) {
             _addText(parsedMessage.timestamp,
               '*',
               parsedMessage.nick + ' (' + parsedMessage.host + ') has left ' +
-              '(' + reason + ')' );
+              '(' + reason + ')');
           }
         }
         break;
@@ -1294,7 +1293,7 @@ function createChannelEl (name) {
             _addText(parsedMessage.timestamp,
               '*',
               parsedMessage.nick + ' (' + parsedMessage.host + ') has quit ' +
-              '(' + reason + ')' );
+              '(' + reason + ')');
           }
         }
         break;
@@ -1310,7 +1309,7 @@ function createChannelEl (name) {
     }
   });
 
-  document.addEventListener('erase-before-reload', function(event) {
+  document.addEventListener('erase-before-reload', function (event) {
     // console.log('Event erase-before-reload');
     channelTextAreaEl.value = '';
     channelInputAreaEl.value = '';
@@ -1321,7 +1320,7 @@ function createChannelEl (name) {
   //
   // Example:  14:33:02 -----Cache Reload-----
   //
-  document.addEventListener('cache-reload-done', function(event) {
+  document.addEventListener('cache-reload-done', function (event) {
     // console.log('Event cache-reload-done');
     let markerString = '';
     let timestampString = '';
@@ -1385,7 +1384,7 @@ function createChannelEl (name) {
   //
   // Event listener for resize window (generic browser event)
   //
-  window.addEventListener('resize', function(event) {
+  window.addEventListener('resize', function (event) {
     // ignore resize events before dynamic size variables exist
     if (webState.dynamic.inputAreaCharWidthPx) {
       adjustChannelInputToWidowWidth(event.currentTarget.innerWidth);
@@ -1403,12 +1402,12 @@ function createChannelEl (name) {
 // init to zero to force first update
 var lastJoinedChannelCount = -1;
 var lastIrcServerIndex = -1;
-document.addEventListener('irc-state-changed', function(event) {
+document.addEventListener('irc-state-changed', function (event) {
   // console.log('checking for channel updates');
 
   // Check list of server's channels and create new if missing.
   if (ircState.channels.length > 0) {
-    for (let i=0; i<ircState.channels.length; i++) {
+    for (let i = 0; i < ircState.channels.length; i++) {
       let name = ircState.channels[i];
       if (webState.channels.indexOf(name.toLowerCase()) === -1) {
         // console.log('Creating new channel ' + name);
@@ -1423,7 +1422,7 @@ document.addEventListener('irc-state-changed', function(event) {
   let needButtonUpdate = false;
   let joinedChannelCount = 0;
   if (ircState.channels.length > 0) {
-    for (let i=0; i<ircState.channels.length; i++) {
+    for (let i = 0; i < ircState.channels.length; i++) {
       if (ircState.channelStates[i].joined) joinedChannelCount++;
     }
   }
@@ -1444,7 +1443,7 @@ document.addEventListener('irc-state-changed', function(event) {
       channelJoinButtonContainerEl.removeChild(channelJoinButtonContainerEl.firstChild);
     }
     if (ircState.channelList.length > 0) {
-      for (let i=0; i<ircState.channelList.length; i++) {
+      for (let i = 0; i < ircState.channelList.length; i++) {
         let channelIndex = ircState.channels.indexOf(ircState.channelList[i].toLowerCase());
         if ((channelIndex < 0) || (!ircState.channelStates[channelIndex].joined)) {
           // console.log('adding ' + ircState.channelList[i]);
@@ -1452,7 +1451,7 @@ document.addEventListener('irc-state-changed', function(event) {
           joinButtonEl.textContent = ircState.channelList[i];
           joinButtonEl.classList.add('channel-button');
           channelJoinButtonContainerEl.appendChild(joinButtonEl);
-          joinButtonEl.addEventListener('click', function() {
+          joinButtonEl.addEventListener('click', function () {
             _sendIrcServerMessage('JOIN ' + ircState.channelList[i]);
             hideRawMessageWindow();
           });
@@ -1465,7 +1464,7 @@ document.addEventListener('irc-state-changed', function(event) {
 // -------------------------------------
 // IRC Channel (Open/Close) Buttons
 // -------------------------------------
-document.getElementById('ircChannelsMainHiddenButton').addEventListener('click', function() {
+document.getElementById('ircChannelsMainHiddenButton').addEventListener('click', function () {
   if (document.getElementById('ircChannelsMainHiddenDiv').hasAttribute('hidden')) {
     document.getElementById('ircChannelsMainHiddenDiv').removeAttribute('hidden');
     document.getElementById('ircChannelsMainHiddenButton').textContent = '-';
@@ -1478,7 +1477,7 @@ document.getElementById('ircChannelsMainHiddenButton').addEventListener('click',
 // ---------------------------------------
 // Join New Channel (Button and Enter)
 // ---------------------------------------
-function _newChannel() {
+function _newChannel () {
   let newChannel = document.getElementById('newChannelNameInputId').value;
   document.getElementById('newChannelNameInputId').value = '';
   let chanPrefixChars = '#&+!';
@@ -1491,12 +1490,12 @@ function _newChannel() {
     showError('Invalid Channel Name');
   }
 }
-document.getElementById('newChannelNameInputId').addEventListener('input', function(event) {
+document.getElementById('newChannelNameInputId').addEventListener('input', function (event) {
   if (((event.inputType === 'insertText') && (event.data === null)) ||
     (event.inputType === 'insertLineBreak')) {
     _newChannel();
   }
 }.bind(this));
-document.getElementById('newChannelButton').addEventListener('click', function() {
+document.getElementById('newChannelButton').addEventListener('click', function () {
   _newChannel();
 });

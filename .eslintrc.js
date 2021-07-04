@@ -1,55 +1,49 @@
-/*
- * ESlint configuraion
- *
- * 0 = off
- * 1 = warn
- * 2 = error
- * */
-'use strict';
-
 module.exports = {
   env: {
-    'browser': true,
-    'node': true,
-    'es6': true
+    browser: true,
+    commonjs: true,
+    es2021: true,
+    node: true
   },
-  globals: {
-    'require': true,
-    'module': true
+  extends: [
+    'standard'
+  ],
+  parserOptions: {
+    ecmaVersion: 12
   },
   rules: {
-    'array-bracket-spacing': ['error', 'never'],
-    "arrow-parens": "error",
-    'block-spacing': 'error',
-    'brace-style': 'error',
-    'camelcase': ['error', {properties: 'never'}],
+    // Customize eslint standard style definitions
     'comma-dangle': ['error', 'never'],
-    'comma-spacing': ['error', {'before': false, 'after': true}],
-    'comma-style': ['error', 'last'],
-    'computed-property-spacing': ['error', 'never'],
-    "curly": ["error", "multi-line"],
-    'default-case': 'error',
-    'eqeqeq': 'error',
-    'indent': ['error', 2, {'SwitchCase': 1}],
-    'jsx-quotes': ['error', 'prefer-single'],
-    'key-spacing': ['error', {'mode': 'strict'}],
-    'linebreak-style': 'error',
-    'max-len': ['error', {code: 100, tabWidth: 2, ignoreUrls: true}],
-    "no-console": "off",
-    'no-irregular-whitespace': ['error', {'skipComments': true, 'skipRegExps': true, 'skipTemplates': true}],
-    'no-alert': 'error',
-    'no-multi-spaces': 'error',
-    'no-use-before-define': 'error',
-    'no-mixed-spaces-and-tabs': 'error',
-    'no-multiple-empty-lines': ['error', {max: 2}],
-    'no-trailing-spaces': 'error',
-    'object-curly-spacing': 'error',
-    'one-var': ['error', {var: 'never', let: 'never', const: 'never'}],
-    'padded-blocks': ['error', 'never'],
-    'quote-props': ['error', 'consistent'],
-    'quotes': ['error', 'single', {allowTemplateLiterals: true}],
-    'semi-spacing': 'error',
-    'semi': 'error',
-    'space-before-blocks': 'error'
+    'linebreak-style': ['error', 'unix'],
+    'max-len': ['error', { code: 100, tabWidth: 2, ignoreUrls: true }],
+    semi: ['error', 'always'],
+
+    // Temporary bypass on javascript rules
+    // Need to test this first, then begin code changes to match linter.
+    // First pass is to address simple syntax, like missing spaces and extra lines.
+    // No code change in the first pass, give clean lint with following disabled.
+
+    // First lint - issues in both browser and nodejs
+    'prefer-const': 'off',
+    'no-constant-condition': 'off',
+    'no-extra-bind': 'off',
+    'no-undef': 'off',
+    'no-unreachable': 'off',
+    'no-unused-vars': 'off',
+    'no-useless-return': 'off',
+    'no-var': 'off',
+    'node/handle-callback-err': 'off',
+
+    // First lint issues in browser code
+    'no-case-declarations': 'off',
+    'no-useless-escape': 'off',
+
+    // First lint issues nodejs server code
+    'dot-notation': 'off',
+    'no-dupe-keys': 'off',
+    'no-redeclare': 'off',
+    'no-useless-escape': 'off',
+    'node/no-deprecated-api': 'off',
+    'object-property-newline': 'off'
   }
 };
