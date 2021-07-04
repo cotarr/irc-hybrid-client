@@ -29,7 +29,6 @@
 
 const path = require('path');
 const ws = require('ws');
-const url = require('url');
 const isValidUTF8 = require('utf-8-validate');
 
 const authorizeWebSocket = require('./middlewares/ws-authorize').authorizeWebSocket;
@@ -117,8 +116,11 @@ setInterval(function () {
 // 3) Connect the webscket
 // ----------------------------------------
 const wsOnUpgrade = function (request, socket, head) {
-  const pathname = url.parse(request.url).pathname;
-  if (pathname === '/irc/ws') {
+  let upgradePath = '';
+  if (('url' in request) && (typeof request.url === 'string')) {
+    upgradePath = request.url;
+  }
+  if (upgradePath === '/irc/ws') {
     if (authorizeWebSocket(request)) {
       customLog(request, 'websocket-connection');
       wsServer.handleUpgrade(request, socket, head, function (socket) {

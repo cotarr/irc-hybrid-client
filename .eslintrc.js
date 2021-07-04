@@ -43,7 +43,6 @@ module.exports = {
     'no-dupe-keys': 'off',
     'no-redeclare': 'off',
     'no-useless-escape': 'off',
-    'node/no-deprecated-api': 'off',
     'object-property-newline': 'off'
   }
 };
