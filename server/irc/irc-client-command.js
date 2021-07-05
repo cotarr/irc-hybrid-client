@@ -105,7 +105,7 @@
 
     switch (outboundCommand) {
       case 'JOIN':
-        if (true) {
+        {
           const index = vars.ircState.channels.indexOf(outboundArg1.toLowerCase());
           if ((index >= 0) && (vars.ircState.channelStates[index].joined)) {
             // case of already in this channel
@@ -126,21 +126,19 @@
             vars.ircState.channelStates[index].names = [];
           }
         }
-        return { error: false };
         break;
       case 'NAMES':
-        if (true) {
+        {
           const index = vars.ircState.channels.indexOf(outboundArg1.toLowerCase());
           // Clear names list, a new one will arrive after join
           if (index >= 0) {
             vars.ircState.channelStates[index].names = [];
           }
         }
-        return { error: false };
         break;
       //
       case 'NOTICE':
-        if (true) {
+        {
           //
           // case of channel notice
           //
@@ -152,11 +150,9 @@
             global.sendToBrowser(fromMessage + '\r\n');
             return { error: false };
           }
-        }
-        //
-        // case of private notice
-        //
-        if (true) {
+          //
+          // case of private notice
+          //
           const firstChar = outboundArg1.charAt(0);
           if (vars.channelPrefixChars.indexOf(firstChar) < 0) {
             const fromMessage = vars.timestamp() + ' ' +
@@ -165,15 +161,15 @@
             global.sendToBrowser(fromMessage + '\r\n');
             return { error: false };
           }
-          return {
-            error: true,
-            message: 'Error parsing NOTICE message before send to IRC server.'
-          };
         }
-        break;
+        return {
+          error: true,
+          message: 'Error parsing NOTICE message before send to IRC server.'
+        };
+        // break;
       //
       case 'PRIVMSG':
-        if (true) {
+        {
           //
           // case of channel message
           //
@@ -185,11 +181,9 @@
             global.sendToBrowser(fromMessage + '\r\n');
             return { error: false };
           }
-        }
-        //
-        // case of private message
-        //
-        if (true) {
+          //
+          // case of private message
+          //
           const firstChar = outboundArg1.charAt(0);
           if (vars.channelPrefixChars.indexOf(firstChar) < 0) {
             const fromMessage = vars.timestamp() + ' ' +
@@ -198,19 +192,17 @@
             global.sendToBrowser(fromMessage + '\r\n');
             return { error: false };
           }
-          return {
-            error: true,
-            message: 'Error parsing PRIVMSG message before send to IRC server.'
-          };
         }
-        break;
+        return {
+          error: true,
+          message: 'Error parsing PRIVMSG message before send to IRC server.'
+        };
+        // break;
       case 'QUIT':
-        if (true) {
-          vars.ircState.ircConnectOn = false;
-          vars.ircServerReconnectTimerSeconds = 0;
-          vars.ircServerReconnectChannelString = '';
-          vars.ircServerReconnectAwayString = '';
-        }
+        vars.ircState.ircConnectOn = false;
+        vars.ircServerReconnectTimerSeconds = 0;
+        vars.ircServerReconnectChannelString = '';
+        vars.ircServerReconnectAwayString = '';
         break;
       //
       default:

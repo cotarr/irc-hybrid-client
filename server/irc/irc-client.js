@@ -123,7 +123,7 @@
 
   console.log('Starting web server: ' + vars.ircState.progName +
     ' version-' + vars.ircState.progVersion);
-  console.log('Point web browser to <your-http-domain-name> + \"/irc/webclient.html\"');
+  console.log('Point web browser to <your-http-domain-name> + "/irc/webclient.html"');
 
   // report log file status
   if (nodeEnv === 'production') {
@@ -320,7 +320,7 @@
         global.sendToBrowser('UPDATE\nwebError: IRC server timeout while connecting\n');
         ircLog.writeIrcLog('IRC server timeout while connecting');
       }
-    }.bind(this), vars.ircSocketConnectingTimeout * 1000);
+    }, vars.ircSocketConnectingTimeout * 1000);
 
     let connectMessage = 'Opening socket to ' + vars.ircState.ircServerName + ' ' +
       vars.ircState.ircServerHost + ':' + vars.ircState.ircServerPort;
@@ -1135,8 +1135,7 @@
         const err = new Error('BAD REQUEST');
         err.status = 400;
         err.message = 'Extraneous property in erase request';
-        next(err);
-        return;
+        return next(err);
       }
     });
     let inputVerifyString = '';
@@ -1182,7 +1181,7 @@
             after: after
           }
         });
-      }.bind(this), 1000);
+      }, 1000);
     } else {
       res.json({
         error: true,
@@ -1228,7 +1227,7 @@
     registrationWatchdogTimerTick();
     activityWatchdogTimerTick();
     clientToServerPingTimerTick();
-  }.bind(this), 1000);
+  }, 1000);
 
   // Program run timestamp
   vars.ircState.times.programRun = vars.unixTimestamp();

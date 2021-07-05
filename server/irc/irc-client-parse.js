@@ -334,7 +334,6 @@
         }
       }
     } // next ci
-    return;
   } // _exchangeNames()
 
   // --------------------------------------------------------------
@@ -377,7 +376,6 @@
         vars.ircState.channelStates[channelIndex].names.push(newNick);
       }
     }
-    return;
   } // _addName()
 
   // ---------------------------------------------
@@ -408,7 +406,6 @@
         }
       }
     }
-    return;
   } // _removeName()
 
   // -----------------------------------------------------------------
@@ -504,7 +501,7 @@
               setTimeout(function () {
                 ircWrite.writeSocket(socket, 'MODE ' + vars.ircState.nickName +
                   ' ' + vars.ircState.userMode);
-              }.bind(this), 500);
+              }, 500);
             }
             //
             // nickserv registration
@@ -515,7 +512,7 @@
                   (vars.ircState.nickName === vars.nsIdentifyNick)) {
                   ircWrite.writeSocket(socket, vars.nsIdentifyCommand);
                 }
-              }.bind(this), 1500);
+              }, 1500);
             }
             //
             // Upon reconnect, auto-JOIN previous irc channels
@@ -531,14 +528,14 @@
                     ircWrite.writeSocket(socket, 'JOIN ' + vars.ircServerReconnectChannelString);
                   }
                 }
-              }.bind(this), 2500);
+              }, 2500);
             }
             //
             // Wait 2 second for async stuff, then ask browser to update connected status
             // THis is duplicate request, some networks miss the first one.
             setTimeout(function () {
               tellBrowserToRequestState();
-            }.bind(this), 2000);
+            }, 2000);
             // tell browser to update itself
             tellBrowserToRequestState();
           } else {
@@ -558,27 +555,23 @@
         break;
       // 305 RPL_UNAWAY
       case '305':
-        if (true) {
-          if (parsedMessage.params[0].toLowerCase() === vars.ircState.nickName.toLowerCase()) {
-            vars.ircState.ircIsAway = false;
-            tellBrowserToRequestState();
-          }
+        if (parsedMessage.params[0].toLowerCase() === vars.ircState.nickName.toLowerCase()) {
+          vars.ircState.ircIsAway = false;
+          tellBrowserToRequestState();
         }
         break;
       // 305 RPL_NOWAWAY
       case '306':
-        if (true) {
-          if (parsedMessage.params[0].toLowerCase() === vars.ircState.nickName.toLowerCase()) {
-            vars.ircState.ircIsAway = true;
-            tellBrowserToRequestState();
-          }
+        if (parsedMessage.params[0].toLowerCase() === vars.ircState.nickName.toLowerCase()) {
+          vars.ircState.ircIsAway = true;
+          tellBrowserToRequestState();
         }
         break;
       //
       // 332 RPL_TOPIC
       // TODO RFC2812 conflict, channel is params[0] (no nickname)
       case '332':
-        if (true) {
+        {
           const channelName = parsedMessage.params[1].toLowerCase();
           const index = vars.ircState.channels.indexOf(channelName);
           if (index >= 0) {
@@ -595,87 +588,79 @@
       // 353 RPL_NAMREPLY
       // TODO RFC2812 conflict, channel is params[0] (no nickname)
       case '353':
-        if (true) {
-          // type '=' public '@' secret '*' private
-          if (parsedMessage.params.length > 2) {
-            // const channelType = parsedMessage.params[1];
-            const channelName = parsedMessage.params[2].toLowerCase();
-            const index = vars.ircState.channels.indexOf(channelName);
-            // if names array exist
-            if (index >= 0) {
-              // this crash with .params[3] value of null, not sure why it was null
-              // check for null is a patch over
-              if ((parsedMessage.params) && (parsedMessage.params[3]) &&
-                (parsedMessage.params[3].length > 0)) {
-                const nameArray = parsedMessage.params[3].split(' ');
-                if (nameArray.length > 0) {
-                  for (let i = 0; i < nameArray.length; i++) {
-                    _addName(nameArray[i], channelName);
-                  }
+        // type '=' public '@' secret '*' private
+        if (parsedMessage.params.length > 2) {
+          // const channelType = parsedMessage.params[1];
+          const channelName = parsedMessage.params[2].toLowerCase();
+          const index = vars.ircState.channels.indexOf(channelName);
+          // if names array exist
+          if (index >= 0) {
+            // this crash with .params[3] value of null, not sure why it was null
+            // check for null is a patch over
+            if ((parsedMessage.params) && (parsedMessage.params[3]) &&
+              (parsedMessage.params[3].length > 0)) {
+              const nameArray = parsedMessage.params[3].split(' ');
+              if (nameArray.length > 0) {
+                for (let i = 0; i < nameArray.length; i++) {
+                  _addName(nameArray[i], channelName);
                 }
               }
-            } else {
-              console.log('Error message 353 for non-existant channel');
             }
           } else {
-            console.log('Error message 353 missing params');
+            console.log('Error message 353 for non-existant channel');
           }
+        } else {
+          console.log('Error message 353 missing params');
         }
         break;
       //
       // 366 RPL_ENDOFNAMES
       // TODO RFC2812 conflict, channel is params[0] (no nickname)
       case '366':
-        if (true) {
-          tellBrowserToRequestState();
-        }
+        tellBrowserToRequestState();
         break;
       //
       // 433 ERR_NICKNAMEINUSE
       //
       case '433':
-        if (true) {
-          // Connect to IRC has failed, nickname already in use, disconnect to try again
-          if (!vars.ircState.ircRegistered) {
-            if (socket) {
-              socket.destroy();
-            }
-            // signal browser to show an error
-            vars.ircState.count.ircConnectError++;
-
-            vars.ircState.ircServerPrefix = '';
-            // Do not reconnect
-            vars.ircState.ircConnectOn = false;
-            vars.ircState.ircConnecting = false;
-            vars.ircState.ircConnected = false;
-            vars.ircState.ircRegistered = false;
-            vars.ircState.ircIsAway = false;
-            tellBrowserToRequestState();
+        // Connect to IRC has failed, nickname already in use, disconnect to try again
+        if (!vars.ircState.ircRegistered) {
+          if (socket) {
+            socket.destroy();
           }
+          // signal browser to show an error
+          vars.ircState.count.ircConnectError++;
+
+          vars.ircState.ircServerPrefix = '';
+          // Do not reconnect
+          vars.ircState.ircConnectOn = false;
+          vars.ircState.ircConnecting = false;
+          vars.ircState.ircConnected = false;
+          vars.ircState.ircRegistered = false;
+          vars.ircState.ircIsAway = false;
+          tellBrowserToRequestState();
         }
         break;
       //
       // 451 ERR_NOTREGISERED
       //
       case '451':
-        if (true) {
-          // Connect to IRC has failed, disconnect to try again
-          if (!vars.ircState.ircRegistered) {
-            if (socket) {
-              socket.destroy();
-            }
-            // signal browser to show an error
-            vars.ircState.count.ircConnectError++;
-
-            vars.ircState.ircServerPrefix = '';
-            // Do not reconnect
-            vars.ircState.ircConnectOn = false;
-            vars.ircState.ircConnecting = false;
-            vars.ircState.ircConnected = false;
-            vars.ircState.ircRegistered = false;
-            vars.ircState.ircIsAway = false;
-            tellBrowserToRequestState();
+        // Connect to IRC has failed, disconnect to try again
+        if (!vars.ircState.ircRegistered) {
+          if (socket) {
+            socket.destroy();
           }
+          // signal browser to show an error
+          vars.ircState.count.ircConnectError++;
+
+          vars.ircState.ircServerPrefix = '';
+          // Do not reconnect
+          vars.ircState.ircConnectOn = false;
+          vars.ircState.ircConnecting = false;
+          vars.ircState.ircConnected = false;
+          vars.ircState.ircRegistered = false;
+          vars.ircState.ircIsAway = false;
+          tellBrowserToRequestState();
         }
         break;
       //
@@ -715,7 +700,7 @@
         break;
       //
       case 'JOIN':
-        if (true) {
+        {
           const channelName = parsedMessage.params[0].toLowerCase();
           const index = vars.ircState.channels.indexOf(channelName);
           if (index >= 0) {
@@ -748,7 +733,7 @@
         break;
       //
       case 'KICK':
-        if (true) {
+        {
           const channelName = parsedMessage.params[0].toLowerCase();
           const index = vars.ircState.channels.indexOf(channelName);
           if (parsedMessage.params[1] === vars.ircState.nickName) {
@@ -767,36 +752,32 @@
         break;
       //
       case 'MODE':
-        if (true) {
-          if (parsedMessage.params[0] === vars.ircState.nickName) {
-            // Case of User mode for IRC client has changed
-            // console.log('TODO your user mode on server has been changed changed.');
-          } else if (vars.ircState.channels.indexOf(parsedMessage.params[0].toLowerCase() >= 0)) {
-            // This is case of a #channel mode has changed.
-            parseChannelModeChanges(socket, parsedMessage);
-          } else {
-            console.log('Error: MODE message not for myself or channel');
-          }
+        if (parsedMessage.params[0] === vars.ircState.nickName) {
+          // Case of User mode for IRC client has changed
+          // console.log('TODO your user mode on server has been changed changed.');
+        } else if (vars.ircState.channels.indexOf(parsedMessage.params[0].toLowerCase() >= 0)) {
+          // This is case of a #channel mode has changed.
+          parseChannelModeChanges(socket, parsedMessage);
+        } else {
+          console.log('Error: MODE message not for myself or channel');
         }
         break;
 
       case 'NICK':
-        if (true) {
-          if ((parsedMessage.nick === vars.ircState.nickName) &&
-            (parsedMessage.host === vars.ircState.userHost)) {
-            vars.ircState.nickName = parsedMessage.params[0];
-          }
-          if (vars.ircState.channels.length > 0) {
-            const previousNick = parsedMessage.nick;
-            const nextNick = parsedMessage.params[0];
-            _exchangeNames(previousNick, nextNick);
-          }
-          tellBrowserToRequestState();
+        if ((parsedMessage.nick === vars.ircState.nickName) &&
+          (parsedMessage.host === vars.ircState.userHost)) {
+          vars.ircState.nickName = parsedMessage.params[0];
         }
+        if (vars.ircState.channels.length > 0) {
+          const previousNick = parsedMessage.nick;
+          const nextNick = parsedMessage.params[0];
+          _exchangeNames(previousNick, nextNick);
+        }
+        tellBrowserToRequestState();
         break;
       //
       case 'PART':
-        if (true) {
+        {
           const channelName = parsedMessage.params[0].toLowerCase();
           const index = vars.ircState.channels.indexOf(channelName);
           if (index >= 0) {
@@ -818,7 +799,7 @@
         }
         break;
       case 'PRIVMSG':
-        if (true) {
+        {
           // check for CTCP message
           const ctcpDelim = 1;
           if (parsedMessage.params[1].charCodeAt(0) === ctcpDelim) {
@@ -828,15 +809,13 @@
         }
         break;
       case 'QUIT':
-        if (true) {
-          if (parsedMessage.nick !== vars.ircState.nickname) {
-            // case of it is not me who QUIT
-            if (vars.ircState.channels.length > 0) {
-              for (let i = 0; i < vars.ircState.channels.length; i++) {
-                if (vars.ircState.channelStates[i].joined) {
-                  _removeName(parsedMessage.nick, vars.ircState.channels[i]);
-                  tellBrowserToRequestState();
-                }
+        if (parsedMessage.nick !== vars.ircState.nickname) {
+          // case of it is not me who QUIT
+          if (vars.ircState.channels.length > 0) {
+            for (let i = 0; i < vars.ircState.channels.length; i++) {
+              if (vars.ircState.channelStates[i].joined) {
+                _removeName(parsedMessage.nick, vars.ircState.channels[i]);
+                tellBrowserToRequestState();
               }
             }
           }
@@ -845,7 +824,7 @@
       //
       // TOPIC
       case 'TOPIC':
-        if (true) {
+        {
           const channelName = parsedMessage.params[0].toLowerCase();
           const index = vars.ircState.channels.indexOf(channelName);
           if (index >= 0) {

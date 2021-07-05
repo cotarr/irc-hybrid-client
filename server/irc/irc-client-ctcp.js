@@ -111,7 +111,7 @@
 
     switch (ctcpCommand) {
       case 'CLIENTINFO':
-        if (true) {
+        {
           const ctcpReply = 'CLIENTINFO ' +
           'ACTION ' +
           'CLIENTINFO ' +
@@ -125,7 +125,7 @@
         break;
 
       case 'PING':
-        if (true) {
+        {
           const ctcpReply = 'PING ' + ctcpRest;
           const ircMessage = 'NOTICE ' + parsedMessage.nick + ' :' +
           String.fromCharCode(ctcpDelim) + ctcpReply + String.fromCharCode(ctcpDelim);
@@ -134,7 +134,7 @@
         break;
 
       case 'TIME':
-        if (true) {
+        {
           const d = new Date();
 
           // This returns Fri Jun 11 2021 12:50:57 GMT+0000
@@ -183,7 +183,7 @@
         break;
       //
       case 'VERSION':
-        if (true) {
+        {
           const ctcpReply = 'VERSION ' + vars.ircState.progName + '-' + vars.ircState.progVersion;
           const ircMessage = 'NOTICE ' + parsedMessage.nick + ' :' +
           String.fromCharCode(ctcpDelim) + ctcpReply + String.fromCharCode(ctcpDelim);
@@ -199,7 +199,7 @@
   //
   setInterval(function () {
     ctcpTimerTick();
-  }.bind(this), 1000);
+  }, 1000);
 
   module.exports = {
     _parseCtcpMessage: _parseCtcpMessage

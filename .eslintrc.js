@@ -18,26 +18,20 @@ module.exports = {
     'max-len': ['error', { code: 100, tabWidth: 2, ignoreUrls: true }],
     semi: ['error', 'always'],
 
-    // Temporary bypass on javascript rules
-    // Need to test this first, then begin code changes to match linter.
-    // First pass is to address simple syntax, like missing spaces and extra lines.
-    // No code change in the first pass, give clean lint with following disabled.
+    'no-unused-vars': 'off'
 
-    // First lint - issues in both browser and nodejs
+    // Temporary bypass on javascript rules
+
     // 'prefer-const': 'off',
-    'no-constant-condition': 'off',
-    'no-extra-bind': 'off',
+    // 'no-constant-condition': 'off',
+    // 'no-extra-bind': 'off',
     // 'no-undef': 'off',
-    'no-unreachable': 'off',
-    'no-useless-return': 'off',
+    // 'no-unreachable': 'off',
+    // 'no-useless-return': 'off',
     // 'no-var': 'off',
     // 'node/handle-callback-err': 'off',
-
-    'no-unused-vars': 'off',
-
-    // First lint issues in browser code
     // 'no-case-declarations': 'off',
-    'no-useless-escape': 'off'
+    // 'no-useless-escape': 'off'
   },
   overrides: [
     {

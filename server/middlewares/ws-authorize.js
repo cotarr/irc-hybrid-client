@@ -178,6 +178,8 @@
       console.log('_authorizeWebSocket no cookies found');
       return false;
     }
+    // In case of code error return false (unreachable return)
+    // eslint-disable-next-line no-unreachable
     return false;
   };
 

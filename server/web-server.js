@@ -400,7 +400,7 @@ app.use(function (req, res, next) {
   return res.status(responseObject.error.status).send(htmlString);
 
   // Else: default node express error handler generate HTML
-  next();
+  // next();
 });
 
 //
@@ -443,7 +443,7 @@ app.use(function (err, req, res, next) {
   return res.status(responseObject.error.status).send(htmlString);
 
   // Else not application/json, let default node express error handler generate HTML
-  next(err);
+  // next(err);
 });
 
 module.exports = app;
