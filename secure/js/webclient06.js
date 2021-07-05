@@ -370,7 +370,7 @@ function createChannelEl (name) {
   var activityIconInhibitTimer = 0;
   setInterval(function () {
     if (activityIconInhibitTimer > 0) activityIconInhibitTimer--;
-  }.bind(this), 1000);
+  }, 1000);
 
   // --------------------------
   // Channel Event listeners
@@ -515,7 +515,7 @@ function createChannelEl (name) {
     channelInputAreaEl.focus();
     resetChanActivityIcon(channelIndex);
     activityIconInhibitTimer = activityIconInhibitTimerValue;
-  }.bind(this));
+  });
 
   // ---------------
   // Enter pressed
@@ -527,7 +527,7 @@ function createChannelEl (name) {
       resetChanActivityIcon(channelIndex);
       activityIconInhibitTimer = activityIconInhibitTimerValue;
     }
-  }.bind(this));
+  });
 
   // ------------------------------------------------
   // Clear message activity ICON by click anywhere on the
@@ -536,7 +536,7 @@ function createChannelEl (name) {
   channelMainSectionEl.addEventListener('click', function () {
     resetChanActivityIcon(channelIndex);
     activityIconInhibitTimer = activityIconInhibitTimerValue;
-  }.bind(this));
+  });
 
   function updateVisibility () {
     // console.log('Event: irc-state-changed (createChannelEl)');
@@ -738,7 +738,7 @@ function createChannelEl (name) {
     channelMainSectionEl.removeAttribute('beep1-enabled');
     channelMainSectionEl.removeAttribute('beep2-enabled');
     channelMainSectionEl.removeAttribute('beep3-enabled');
-  }.bind(this));
+  });
 
   // -------------------------
   // Text Format checkbox handler
@@ -977,7 +977,7 @@ function createChannelEl (name) {
         // do nothing, allow space to be appended
       }
     } // case of tab key
-  }.bind(this);
+  };
   // channelInputAreaEl.addEventListener('beforeinput', channelAutoComplete);
   channelInputAreaEl.addEventListener('keydown', channelAutoComplete, false);
 
@@ -1099,7 +1099,7 @@ function createChannelEl (name) {
     _updateChannelTitle();
     // show/hide disable or enable channel elements depend on state
     updateVisibility();
-  }.bind(this));
+  });
 
   document.addEventListener('channel-message', function (event) {
     function _addText (timestamp, nick, text) {
@@ -1301,8 +1301,8 @@ function createChannelEl (name) {
         if (parsedMessage.params[0].toLowerCase() === name.toLowerCase()) {
           _addText(parsedMessage.timestamp,
             '*',
-            'Topic for ' + parsedMessage.params[0] + ' changed to \"' +
-            parsedMessage.params[1] + '\" by ' + parsedMessage.nick);
+            'Topic for ' + parsedMessage.params[0] + ' changed to "' +
+            parsedMessage.params[1] + '" by ' + parsedMessage.nick);
         }
         break;
       default:
@@ -1313,7 +1313,7 @@ function createChannelEl (name) {
     // console.log('Event erase-before-reload');
     channelTextAreaEl.value = '';
     channelInputAreaEl.value = '';
-  }.bind(this));
+  });
 
   //
   // Add cache reload message to channel window
@@ -1337,7 +1337,7 @@ function createChannelEl (name) {
     channelTextAreaEl.value += markerString;
     // move scroll bar so text is scrolled all the way up
     channelTextAreaEl.scrollTop = channelTextAreaEl.scrollHeight;
-  }.bind(this));
+  });
 
   // set visibility and divs
   updateVisibility();
@@ -1389,7 +1389,7 @@ function createChannelEl (name) {
     if (webState.dynamic.inputAreaCharWidthPx) {
       adjustChannelInputToWidowWidth(event.currentTarget.innerWidth);
     }
-  }.bind(this));
+  });
   //
   // Resize on creating channel window
   //
@@ -1472,7 +1472,7 @@ document.getElementById('ircChannelsMainHiddenButton').addEventListener('click',
     document.getElementById('ircChannelsMainHiddenDiv').setAttribute('hidden', '');
     document.getElementById('ircChannelsMainHiddenButton').textContent = '+';
   }
-}.bind(this));
+});
 
 // ---------------------------------------
 // Join New Channel (Button and Enter)
@@ -1495,7 +1495,7 @@ document.getElementById('newChannelNameInputId').addEventListener('input', funct
     (event.inputType === 'insertLineBreak')) {
     _newChannel();
   }
-}.bind(this));
+});
 document.getElementById('newChannelButton').addEventListener('click', function () {
   _newChannel();
 });

@@ -238,7 +238,7 @@ function createPrivateMessageEl (name, parsedMessage) {
   var activityIconInhibitTimer = 0;
   setInterval(function () {
     if (activityIconInhibitTimer > 0) activityIconInhibitTimer--;
-  }.bind(this), 1000);
+  }, 1000);
 
   // --------------------------
   // Private Message Event listeners
@@ -252,7 +252,7 @@ function createPrivateMessageEl (name, parsedMessage) {
     // console.log('Event erase-before-reload');
     privMsgTextAreaEl.value = '';
     privMsgInputAreaEl.value = '';
-  }.bind(this));
+  });
 
   //
   // Add cache reload message to private message window
@@ -274,7 +274,7 @@ function createPrivateMessageEl (name, parsedMessage) {
     privMsgTextAreaEl.value += markerString;
     // move scroll bar so text is scrolled all the way up
     privMsgTextAreaEl.scrollTop = privMsgTextAreaEl.scrollHeight;
-  }.bind(this));
+  });
 
   // Hide PM window, Hide PM data section, Hide buttons
   document.addEventListener('priv-msg-hide-all', function (event) {
@@ -282,12 +282,12 @@ function createPrivateMessageEl (name, parsedMessage) {
     privMsgHideButtonEl.textContent = '+';
     privMsgTopRightHidableDivEl.setAttribute('hidden', '');
     privMsgSectionEl.setAttribute('hidden', '');
-  }.bind(this));
+  });
 
   // Show PM window
   document.addEventListener('priv-msg-show-all', function (event) {
     privMsgSectionEl.removeAttribute('hidden');
-  }.bind(this));
+  });
 
   // -------------------------
   // How/Hide button handler
@@ -356,7 +356,7 @@ function createPrivateMessageEl (name, parsedMessage) {
     privMsgInputAreaEl.focus();
     resetPmActivityIcon(privMsgIndex);
     activityIconInhibitTimer = activityIconInhibitTimerValue;
-  }.bind(this));
+  });
 
   // ---------------
   // Enter pressed
@@ -368,7 +368,7 @@ function createPrivateMessageEl (name, parsedMessage) {
       resetPmActivityIcon(privMsgIndex);
       activityIconInhibitTimer = activityIconInhibitTimerValue;
     }
-  }.bind(this));
+  });
 
   // ------------------------------------------------
   // Clear message activity ICON by click anywhere on the
@@ -377,7 +377,7 @@ function createPrivateMessageEl (name, parsedMessage) {
   privMsgSectionEl.addEventListener('click', function () {
     resetPmActivityIcon(privMsgIndex);
     activityIconInhibitTimer = activityIconInhibitTimerValue;
-  }.bind(this));
+  });
 
   function updateVisibility () {
     if (privMsgSectionEl.hasAttribute('beep1-enabled')) {
@@ -405,7 +405,7 @@ function createPrivateMessageEl (name, parsedMessage) {
   // -----------------------
   document.addEventListener('cancel-beep-sounds', function (event) {
     privMsgSectionEl.removeAttribute('beep1-enabled');
-  }.bind(this));
+  });
 
   // PM window PRIVMSG event handler
   // if window closed,
@@ -527,7 +527,7 @@ function createPrivateMessageEl (name, parsedMessage) {
     if (webState.dynamic.inputAreaCharWidthPx) {
       adjustPMInputToWidowWidth(event.currentTarget.innerWidth);
     }
-  }.bind(this));
+  });
   //
   // Resize on creating private message window
   //
@@ -609,16 +609,16 @@ document.getElementById('userPrivMsgInputId').addEventListener('input', function
   if (event.inputType === 'insertLineBreak') {
     _buildPrivateMessageText();
   }
-}.bind(this));
+});
 document.getElementById('UserPrivMsgSendButton').addEventListener('click', function () {
   _buildPrivateMessageText();
-}.bind(this));
+});
 
 // Initialize all input elements on reload
 document.addEventListener('erase-before-reload', function (event) {
   document.getElementById('pmNickNameInputId').value = '';
   document.getElementById('userPrivMsgInputId').value = '';
-}.bind(this));
+});
 
 // -------------------------
 // Whois button handler
@@ -647,4 +647,4 @@ document.getElementById('privMsgMainHiddenButton').addEventListener('click', fun
     document.getElementById('privMsgMainHiddenButton').textContent = '+';
     document.dispatchEvent(new CustomEvent('priv-msg-hide-all', { bubbles: true }));
   }
-}.bind(this));
+});

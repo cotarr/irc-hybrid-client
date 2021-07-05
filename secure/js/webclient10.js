@@ -117,7 +117,7 @@ function updateFromCache () {
 }; // updateFromCache;
 window.addEventListener('update-from-cache', function (event) {
   updateFromCache();
-}.bind(this));
+});
 
 function cacheInhibitTimerTick () {
   if (webState.cacheInhibitTimer > 0) webState.cacheInhibitTimer--;
@@ -486,7 +486,7 @@ window.addEventListener('resize', function (event) {
   if (webState.dynamic.inputAreaCharWidthPx) {
     adjustInputToWidowWidth(event.currentTarget.innerWidth);
   }
-}.bind(this));
+});
 
 //
 // Do initially on page load
@@ -503,7 +503,7 @@ setInterval(function () {
   beepTimerTick();
   updateElapsedTimeDisplay();
   cacheInhibitTimerTick();
-}.bind(this), 1000);
+}, 1000);
 
 // -----------------------------
 //   D O   T H I S   L A S T

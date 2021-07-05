@@ -361,13 +361,13 @@ function resetChanActivityIcon (index) {
 // --------------------------
 document.getElementById('notMsgIconId').addEventListener('click', function () {
   resetNotActivityIcon();
-}.bind(this));
+});
 document.getElementById('pmMsgIconId').addEventListener('click', function () {
   resetPmActivityIcon(-1);
-}.bind(this));
+});
 document.getElementById('chanMsgIconId').addEventListener('click', function () {
   resetChanActivityIcon(-1);
-}.bind(this));
+});
 
 // Some initialization of div visibility at laod time
 // Hidden divs to allow <noscrpit> when not javascript

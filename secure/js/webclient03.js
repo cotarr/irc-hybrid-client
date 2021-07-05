@@ -341,7 +341,7 @@ function reconnectWebSocketAfterDisconnect () {
               // --------------------------------------
               setTimeout(function () {
                 connectWebSocket();
-              }.bind(this), 100);
+              }, 100);
             }
           });
         })
@@ -381,7 +381,7 @@ function firstWebSocketConnectOnPageLoad () {
       } else {
         setTimeout(function () {
           connectWebSocket();
-        }.bind(this), 100);
+        }, 100);
       }
     });
   }

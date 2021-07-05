@@ -531,7 +531,7 @@ document.addEventListener('cache-reload-done', function (event) {
   document.getElementById('noticeMessageDisplay').value += markerString;
   document.getElementById('noticeMessageDisplay').scrollTop =
     document.getElementById('noticeMessageDisplay').scrollHeight;
-}.bind(this));
+});
 
 // -----------------------------------------------------
 // Wallops (+w) messages are displayed here
@@ -582,7 +582,7 @@ document.addEventListener('cache-reload-done', function (event) {
   document.getElementById('wallopsMessageDisplay').value += markerString;
   document.getElementById('wallopsMessageDisplay').scrollTop =
     document.getElementById('wallopsMessageDisplay').scrollHeight;
-}.bind(this));
+});
 
 // ----------------------------------------------
 // Insert a text string into the server window

@@ -65,7 +65,7 @@ function _parseInputForIRCCommands (textAreaEl) {
 document.getElementById('sendRawMessageButton').addEventListener('click', function () {
   _parseInputForIRCCommands(document.getElementById('rawMessageInputId'));
   document.getElementById('rawMessageInputId').focus();
-}.bind(this));
+});
 // ---------------------------------------
 // Send IRC server textarea Enter pressed
 // ---------------------------------------
@@ -74,7 +74,7 @@ document.getElementById('rawMessageInputId').addEventListener('input', function 
     (event.inputType === 'insertLineBreak')) {
     _parseInputForIRCCommands(document.getElementById('rawMessageInputId'));
   }
-}.bind(this));
+});
 
 // ---------------------------------------
 // textarea before input event handler
@@ -229,7 +229,7 @@ const serverAutoComplete = function (e) {
       // do nothing, allow space to be appended
     }
   } // case of tab key
-}.bind(this);
+};
 document.getElementById('rawMessageInputId').addEventListener('keydown', serverAutoComplete, false);
 
 // -------------------------------------------------
@@ -471,7 +471,7 @@ document.addEventListener('cache-reload-done', function (event) {
   document.getElementById('rawMessageDisplay').value += markerString;
   document.getElementById('rawMessageDisplay').scrollTop =
     document.getElementById('rawMessageDisplay').scrollHeight;
-}.bind(this));
+});
 
 // -------------------------
 // raw Show/Hide button handler
@@ -499,14 +499,14 @@ document.getElementById('rawTallerButton').addEventListener('click', function ()
   let newRows =
     parseInt(document.getElementById('rawMessageDisplay').getAttribute('rows')) + 10;
   document.getElementById('rawMessageDisplay').setAttribute('rows', newRows.toString());
-}.bind(this));
+});
 
 // -------------------------
 // raw Normal button handler
 // -------------------------
 document.getElementById('rawNormalButton').addEventListener('click', function () {
   document.getElementById('rawMessageDisplay').setAttribute('rows', '10');
-}.bind(this));
+});
 
 // -----------------------------
 // Show Debug button handler
@@ -520,7 +520,7 @@ document.getElementById('showDebugButton').addEventListener('click', function ()
     document.getElementById('variablesDivId').setAttribute('hidden', '');
     document.getElementById('showDebugButton').textContent = 'More...';
   }
-}.bind(this));
+});
 
 // --------------------------------
 // Update from cache (button)
@@ -528,7 +528,7 @@ document.getElementById('showDebugButton').addEventListener('click', function ()
 document.getElementById('loadFromCacheButton').addEventListener('click', function () {
   // updateFromCache();
   document.dispatchEvent(new CustomEvent('update-from-cache', { bubbles: true }));
-}.bind(this));
+});
 
 // -----------------------
 // Show all divs button
@@ -536,7 +536,7 @@ document.getElementById('loadFromCacheButton').addEventListener('click', functio
 document.getElementById('showAllDivsButton').addEventListener('click', function () {
   // Emit event for dynamically generated hidden divs
   document.dispatchEvent(new CustomEvent('show-all-divs', { bubbles: true }));
-}.bind(this));
+});
 
 // -----------------------
 // Hide all divs button
@@ -544,7 +544,7 @@ document.getElementById('showAllDivsButton').addEventListener('click', function 
 document.getElementById('hideAllDivsButton').addEventListener('click', function () {
   // Emit event for dynamically generated hidden divs
   document.dispatchEvent(new CustomEvent('hide-all-divs', { bubbles: true }));
-}.bind(this));
+});
 
 // -----------------------
 // Variables button
@@ -560,7 +560,7 @@ document.getElementById('variablesButtonId').addEventListener('click', function 
   } else {
     document.getElementById('variablesDivId').setAttribute('hidden', '');
   }
-}.bind(this));
+});
 
 // -------------------------
 // Text Format checkbox handler

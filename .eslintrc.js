@@ -18,19 +18,19 @@ module.exports = {
     'max-len': ['error', { code: 100, tabWidth: 2, ignoreUrls: true }],
     semi: ['error', 'always'],
 
-    'no-unused-vars': 'off'
+    'no-unused-vars': 'off',
 
     // Temporary bypass on javascript rules
 
-    // 'prefer-const': 'off',
-    // 'no-constant-condition': 'off',
+    'prefer-const': 'off',
+    'no-constant-condition': 'off',
     // 'no-extra-bind': 'off',
-    // 'no-undef': 'off',
-    // 'no-unreachable': 'off',
-    // 'no-useless-return': 'off',
-    // 'no-var': 'off',
-    // 'node/handle-callback-err': 'off',
-    // 'no-case-declarations': 'off',
+    'no-undef': 'off',
+    'no-unreachable': 'off',
+    'no-useless-return': 'off',
+    'no-var': 'off',
+    'node/handle-callback-err': 'off',
+    'no-case-declarations': 'off'
     // 'no-useless-escape': 'off'
   },
   overrides: [

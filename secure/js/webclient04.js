@@ -168,11 +168,11 @@ function forceDisconnectHandler () {
 
 document.getElementById('connectButton').addEventListener('click', function () {
   connectButtonHandler();
-}.bind(this));
+});
 
 document.getElementById('disconnectButton').addEventListener('click', function () {
   forceDisconnectHandler();
-}.bind(this));
+});
 
 // ------------------------------------------------
 // Tap "Web" status icon to connect/disconnect
@@ -203,7 +203,7 @@ document.getElementById('ircConnectIconId').addEventListener('click', function (
     // Connect
     connectButtonHandler();
   }
-}.bind(this));
+});
 
 // ------------------------------------------------------
 // Quit Button handler (Send QUIT message to IRC server)
