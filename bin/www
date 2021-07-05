@@ -28,24 +28,26 @@
 // -----------------------------------------------------------------------------
 'use strict';
 
-let timestamp = new Date();
+const timestamp = new Date();
 console.log('Server timestamp: ' + timestamp.toISOString());
 
 // ------------------------------------------------------------------------
 // Two servers available on same port (express web server, websocket server)
 
-var app = require('../server/web-server');
-var wss = require('../server/ws-server');
+const app = require('../server/web-server');
+const wss = require('../server/ws-server');
 // ------------------------------------------------------------------------
 
 // node server modules
-var http = require('http');
-var https = require('https');
-var fs = require('fs');
+const http = require('http');
+const https = require('https');
+const fs = require('fs');
 
 const credentials = JSON.parse(fs.readFileSync('./credentials.json', 'utf8'));
 
-var nodeEnv = process.env.NODE_ENV || 'development';
+const nodeEnv = process.env.NODE_ENV || 'development';
+
+let server = null;
 
 if (credentials.tls) {
   console.log('NODE_ENV ' + nodeEnv + ' starting https  (TLS encrypted)');
@@ -54,13 +56,13 @@ if (credentials.tls) {
     cert: fs.readFileSync(credentials.serverTlsCert),
     minVersion: 'TLSv1.2'
   };
-  var server = https.createServer(options, app);
+  server = https.createServer(options, app);
 } else {
   console.log('NODE_ENV ' + nodeEnv + ' starting http (non-encrypted)');
-  var server = http.createServer(app);
+  server = http.createServer(app);
 }
 
-var port = 3003;
+let port = 3003;
 
 if (('port' in credentials) && (parseInt(credentials.port) !== 0)) {
   port = parseInt(credentials.port);
@@ -68,13 +70,12 @@ if (('port' in credentials) && (parseInt(credentials.port) !== 0)) {
 server.listen(port);
 
 server.on('listening', function () {
-  let now = new Date();
-  var address = server.address();
+  const address = server.address();
   console.log('listening: ' + address.address + ':' + address.port +
     ' ' + address.family);
   // intended for use in logrotate, or in restart bash script
   try {
-    let pidFilename = credentials.pidFilename;
+    const pidFilename = credentials.pidFilename;
     if ((pidFilename) && (pidFilename.length > 0)) {
       fs.writeFileSync(pidFilename, '' + process.pid + '\n');
     }

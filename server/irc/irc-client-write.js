@@ -43,7 +43,7 @@
   // Send Buffer encoded utf8 to IRC server socket
   // ----------------------------------------------------
   const isValidUTF8 = require('utf-8-validate');
-  var vars = require('./irc-client-vars');
+  const vars = require('./irc-client-vars');
 
   const writeSocket = function (socket, message) {
     if (message.length === 0) return;
@@ -53,7 +53,7 @@
       // The filter only applies to log file and browser.
       // Messages to IRC server are not filtered.
       //
-      let filterWords = [
+      const filterWords = [
         'OPER',
         'PASS',
         'NICKSERV',
@@ -61,7 +61,7 @@
         'CHANSERV',
         'CS'
       ];
-      let filterCommand = message.toString().split(' ')[0].toUpperCase();
+      const filterCommand = message.toString().split(' ')[0].toUpperCase();
       let filtered = message.toString();
       if (filterWords.indexOf(filterCommand) >= 0) {
         if (!vars.ircState.ircTLSEnabled) {

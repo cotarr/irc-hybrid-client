@@ -38,7 +38,6 @@
 
   // other imports
   const sessionExpireAfterSec = credentials.sessionExpireAfterSec || 86400;
-  const sessionExpireAfterMs = 1000 * sessionExpireAfterSec;
 
   // HTML fragments for login page
   const loginHtmlTop = fs.readFileSync('./server/fragments/login-top.html', 'utf8');
@@ -47,7 +46,7 @@
   const logoutHtmlTop = fs.readFileSync('./server/fragments/logout-top.html', 'utf8');
   const logoutHtmlBottom = fs.readFileSync('./server/fragments/logout-bottom.html', 'utf8');
 
-  var nodeEnv = process.env.NODE_ENV || 'development';
+  const nodeEnv = process.env.NODE_ENV || 'development';
 
   //
   // Load credentials, user database from file, check users exist
@@ -65,7 +64,7 @@
     //
     // build log text string
     //
-    let now = new Date();
+    const now = new Date();
     let logEntry = now.toISOString();
     if ('_remoteAddress' in req) {
       logEntry += ' ' + req._remoteAddress;
@@ -131,7 +130,7 @@
     // ****************
 
     let authorized = false;
-    let timeNowSeconds = Math.floor(Date.now() / 1000);
+    const timeNowSeconds = Math.floor(Date.now() / 1000);
     if ((req.session) && (req.session.sessionAuth)) {
       if (req.session.sessionAuth.authorized) {
         if (req.session.sessionAuth.sessionExpireTimeSec) {
@@ -207,9 +206,9 @@
     if ((typeof nonceLength !== 'number') || (nonceLength < 3)) {
       throw new Error('generateRandonNonce() length too short');
     }
-    let intNonceLength = parseInt(nonceLength);
+    const intNonceLength = parseInt(nonceLength);
     let nonce = '';
-    let charSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const charSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     for (let i = 0; i < intNonceLength; i++) {
       nonce += charSet.charAt(parseInt(Math.random() * charSet.length));
     }
@@ -222,7 +221,7 @@
       'abcdefghijklmnoqprstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     if ((typeof inString === 'string') && (inString.length > 0)) {
       for (let i = 0; i < inString.length; i++) {
-        let allowedCharIndex = allowedChars.indexOf(inString[i]);
+        const allowedCharIndex = allowedChars.indexOf(inString[i]);
         if (allowedCharIndex > -1) {
           sanitizedString += allowedChars[allowedCharIndex];
         }
@@ -261,7 +260,7 @@
       if ((req.signedCookies) && (req.session) && (req.session.sessionAuth)) {
       // remove previous credentials if there are any
         _removeAuthorizationFromSession(req);
-        let timeNowSeconds = Math.floor(Date.now() / 1000);
+        const timeNowSeconds = Math.floor(Date.now() / 1000);
         // make sure all expected data has been supplied, else bad request error
         let inputNonce = '';
         let inputUser = '';
@@ -279,7 +278,7 @@
           inputPassword = req.body.password.toString('utf8');
         }
         // Unicode characters can be up to 4 bytes, bcrypt has maximum input 72 characters.
-        let uint8PasswordArray = new TextEncoder('utf8').encode(inputPassword);
+        const uint8PasswordArray = new TextEncoder('utf8').encode(inputPassword);
         if ((inputNonce.length > 1) &&
           (inputNonce.length <= 16) &&
           (inputUser.length > 0) &&
@@ -290,7 +289,7 @@
           //
           // Query user array to find index to matching user.
           //
-          let postedUser = sanatizeString(inputUser);
+          const postedUser = sanatizeString(inputUser);
           let userIndex = -1;
           for (let i = 0; i < userArray.length; i++) {
             if (userArray[i].user === postedUser) {
@@ -368,7 +367,7 @@
     } catch (error) {
       customLog(req, 'Bad login try catch error during login');
       console.log('Try catch error during login ' + error);
-      let err = new Error('Internal Server Error');
+      const err = new Error('Internal Server Error');
       err.status = 500;
       if (nodeEnv === 'development') {
         err.errors = '' + error;
@@ -405,13 +404,13 @@
     if (_checkIfAuthorized(req)) {
       return res.redirect('/irc/webclient.html');
     } else {
-      let timeNowSeconds = Math.floor(Date.now() / 1000);
+      const timeNowSeconds = Math.floor(Date.now() / 1000);
       let warningDiv = '';
       if ((req.session.sessionAuth.previousFailTimeSec) &&
         ((req.session.sessionAuth.previousFailTimeSec + 10) > timeNowSeconds)) {
         warningDiv = loginWarningFragment;
       }
-      let loginNonce = generateRandomNonce(8);
+      const loginNonce = generateRandomNonce(8);
       req.session.sessionAuth.loginNonce = loginNonce;
       req.session.sessionAuth.loginExpireTimeSec = timeNowSeconds + 60;
       // res.set('Cache-Control', 'no-store');
@@ -432,7 +431,7 @@
       user = req.session.sessionAuth.user;
     }
     if (req.session) {
-      let cookieOptions = {
+      const cookieOptions = {
         maxAge: req.session.cookie.originalMaxAge,
         expires: req.session.cookie.expires,
         secure: req.session.cookie.secure,
@@ -463,7 +462,7 @@
       (req.session.sessionAuth.user) &&
       (req.session.sessionAuth.authorized)) {
       // Return user information
-      let userInfo = {};
+      const userInfo = {};
       userInfo.user = req.session.sessionAuth.user;
       userInfo.name = req.session.sessionAuth.name;
       userInfo.userid = req.session.sessionAuth.userid;

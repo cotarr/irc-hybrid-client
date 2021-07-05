@@ -33,8 +33,8 @@
   // const ircWrite = require('./irc-client-write');
   // const ircLog = require('./irc-client-log');
 
-  var ircMessageCache = require('./irc-client-cache');
-  var vars = require('./irc-client-vars');
+  const ircMessageCache = require('./irc-client-cache');
+  const vars = require('./irc-client-vars');
 
   // const tellBrowserToRequestState = function() {
   //   global.sendToBrowser('UPDATE\r\n');
@@ -106,7 +106,7 @@
     switch (outboundCommand) {
       case 'JOIN':
         if (true) {
-          let index = vars.ircState.channels.indexOf(outboundArg1.toLowerCase());
+          const index = vars.ircState.channels.indexOf(outboundArg1.toLowerCase());
           if ((index >= 0) && (vars.ircState.channelStates[index].joined)) {
             // case of already in this channel
             return {
@@ -130,7 +130,7 @@
         break;
       case 'NAMES':
         if (true) {
-          let index = vars.ircState.channels.indexOf(outboundArg1.toLowerCase());
+          const index = vars.ircState.channels.indexOf(outboundArg1.toLowerCase());
           // Clear names list, a new one will arrive after join
           if (index >= 0) {
             vars.ircState.channelStates[index].names = [];
@@ -144,9 +144,9 @@
           //
           // case of channel notice
           //
-          let index = vars.ircState.channels.indexOf(outboundArg1.toLowerCase());
+          const index = vars.ircState.channels.indexOf(outboundArg1.toLowerCase());
           if ((index >= 0) && (vars.ircState.channelStates[index].joined)) {
-            let fromMessage = vars.timestamp() + ' ' +
+            const fromMessage = vars.timestamp() + ' ' +
             ':' + vars.ircState.nickName + '!*@* ' + message;
             ircMessageCache.addMessage(fromMessage);
             global.sendToBrowser(fromMessage + '\r\n');
@@ -157,9 +157,9 @@
         // case of private notice
         //
         if (true) {
-          let firstChar = outboundArg1.charAt(0);
+          const firstChar = outboundArg1.charAt(0);
           if (vars.channelPrefixChars.indexOf(firstChar) < 0) {
-            let fromMessage = vars.timestamp() + ' ' +
+            const fromMessage = vars.timestamp() + ' ' +
               ':' + vars.ircState.nickName + '!*@* ' + message;
             ircMessageCache.addMessage(fromMessage);
             global.sendToBrowser(fromMessage + '\r\n');
@@ -177,9 +177,9 @@
           //
           // case of channel message
           //
-          let index = vars.ircState.channels.indexOf(outboundArg1.toLowerCase());
+          const index = vars.ircState.channels.indexOf(outboundArg1.toLowerCase());
           if ((index >= 0) && (vars.ircState.channelStates[index].joined)) {
-            let fromMessage = vars.timestamp() + ' ' +
+            const fromMessage = vars.timestamp() + ' ' +
             ':' + vars.ircState.nickName + '!*@* ' + message;
             ircMessageCache.addMessage(fromMessage);
             global.sendToBrowser(fromMessage + '\r\n');
@@ -190,9 +190,9 @@
         // case of private message
         //
         if (true) {
-          let firstChar = outboundArg1.charAt(0);
+          const firstChar = outboundArg1.charAt(0);
           if (vars.channelPrefixChars.indexOf(firstChar) < 0) {
-            let fromMessage = vars.timestamp() + ' ' +
+            const fromMessage = vars.timestamp() + ' ' +
               ':' + vars.ircState.nickName + '!*@* ' + message;
             ircMessageCache.addMessage(fromMessage);
             global.sendToBrowser(fromMessage + '\r\n');

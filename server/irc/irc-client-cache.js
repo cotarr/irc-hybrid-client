@@ -37,8 +37,8 @@
 
   // size in lines of text
   const cacheSize = 100;
-  var cacheInPointer = 0;
-  var cacheArray = [];
+  let cacheInPointer = 0;
+  let cacheArray = [];
   for (let i = 0; i < cacheSize; i++) {
     cacheArray.push(null);
   }
@@ -63,7 +63,7 @@
   };
 
   const allMessages = function () {
-    let outArray = [];
+    const outArray = [];
     let cacheOutPointer = cacheInPointer;
     for (let i = 0; i < cacheSize; i++) {
       if ((cacheArray[cacheOutPointer]) && (cacheArray[cacheOutPointer].length > 0)) {
@@ -89,7 +89,7 @@
         }
       }
     }
-    info = {};
+    const info = {};
     info.sizeCache = cacheSize;
     info.sizeArray = cacheArray.length;
     info.inPointer = cacheInPointer;

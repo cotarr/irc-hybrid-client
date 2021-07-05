@@ -63,7 +63,7 @@
   const cookieSecret = credentials.cookieSecret;
   // console.log('cookieSecret ' + cookieSecret);
 
-  var nodeEnv = process.env.NODE_ENV || 'development';
+  const nodeEnv = process.env.NODE_ENV || 'development';
 
   //
   // Custom log file (Option: setup to fail2ban to block IP addresses)
@@ -73,7 +73,7 @@
     //
     // build log text string
     //
-    let now = new Date();
+    const now = new Date();
     let logEntry = now.toISOString();
     if (('connection' in request) && ('remoteAddress' in request.connection)) {
       logEntry += ' ' + request.connection.remoteAddress;
@@ -131,17 +131,17 @@
     // Check if header contains cookies
     if (('headers' in request) && ('cookie' in request.headers)) {
       // decode cookies into array of un-escaped strings
-      let cookies = cookie.parse(request.headers.cookie);
+      const cookies = cookie.parse(request.headers.cookie);
       // console.log(JSON.stringify(cookies, null, 2));
       // Get cookie with matching name
-      let raw = cookies['irc-hybrid-client'];
+      const raw = cookies['irc-hybrid-client'];
       // console.log(raw);
       if (raw) {
         // check prefix to verify it has signature
         if (raw.substr(0, 2) === 's:') {
           // console.log(raw.substr(0, 2));
           // Validate signature using cookie-signature module
-          let result = signature.unsign(raw.slice(2), cookieSecret);
+          const result = signature.unsign(raw.slice(2), cookieSecret);
           // check if signature was valid
           if (result !== false) {
             // console.log('valid cookie  ' + result);
@@ -150,7 +150,7 @@
             // Check if cookie value matches value from POST /irc/wsauth
             // and that 10 second expiration time is not exceeded.
             //
-            let timeNow = parseInt(Date.now() / 1000); // seconds
+            const timeNow = parseInt(Date.now() / 1000); // seconds
             if (('webSocketAuth' in global) &&
               ('cookie' in global.webSocketAuth) &&
               (safeCompare(result, global.webSocketAuth.cookie)) &&
@@ -183,6 +183,6 @@
 
   module.exports = {
     authorizeWebSocket: authorizeWebSocket,
-    customLog, customLog
+    customLog: customLog
   };
 })();

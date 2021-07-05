@@ -33,8 +33,8 @@
   const ircWrite = require('./irc-client-write');
   // const ircLog = require('./irc-client-log');
 
-  var ircMessageCache = require('./irc-client-cache');
-  var vars = require('./irc-client-vars');
+  const ircMessageCache = require('./irc-client-cache');
+  const vars = require('./irc-client-vars');
 
   // const tellBrowserToRequestState = function() {
   //   global.sendToBrowser('UPDATE\r\n');
@@ -45,8 +45,8 @@
   // ----------------------------
   const ctcpFloodTimeSec = 5;
   const ctcpMaxFlood = 3;
-  var ctcpDownCounterSeconds = 0;
-  var ctcpReplyCounter = 0;
+  let ctcpDownCounterSeconds = 0;
+  let ctcpReplyCounter = 0;
   const checkCtcpNotFlood = function () {
     if (ctcpDownCounterSeconds === 0) ctcpDownCounterSeconds = ctcpFloodTimeSec;
     ctcpReplyCounter++;
@@ -69,8 +69,8 @@
     // Internal function
     function _sendCtcpMessage (socket, ircMessage, ctcpReply, ctcpTo) {
       // It is necessary to fake out a message back to self to show the reply
-      let ctcpDelim = 1;
-      let outgoingBackToSelf = vars.timestamp() +
+      const ctcpDelim = 1;
+      const outgoingBackToSelf = vars.timestamp() +
         ' :' + vars.ircState.nickName + '!*@* NOTICE ' + ctcpTo + ' ' +
         String.fromCharCode(ctcpDelim) + ctcpReply + String.fromCharCode(ctcpDelim);
       if (checkCtcpNotFlood()) {
@@ -80,8 +80,8 @@
       }
     }
     const ctcpDelim = 1;
-    let ctcpMessage = parsedMessage.params[1];
-    let end = ctcpMessage.length - 1;
+    const ctcpMessage = parsedMessage.params[1];
+    const end = ctcpMessage.length - 1;
     if (ctcpMessage.charCodeAt(0) !== 1) {
       console.log('_parseCtcpMessage() missing CTCP start delimiter');
       return;
@@ -112,13 +112,13 @@
     switch (ctcpCommand) {
       case 'CLIENTINFO':
         if (true) {
-          let ctcpReply = 'CLIENTINFO ' +
+          const ctcpReply = 'CLIENTINFO ' +
           'ACTION ' +
           'CLIENTINFO ' +
           'PING ' +
           'TIME ' +
           'VERSION';
-          let ircMessage = 'NOTICE ' + parsedMessage.nick + ' :' +
+          const ircMessage = 'NOTICE ' + parsedMessage.nick + ' :' +
           String.fromCharCode(ctcpDelim) + ctcpReply + String.fromCharCode(ctcpDelim);
           _sendCtcpMessage(socket, ircMessage, ctcpReply, parsedMessage.nick);
         }
@@ -126,8 +126,8 @@
 
       case 'PING':
         if (true) {
-          let ctcpReply = 'PING ' + ctcpRest;
-          let ircMessage = 'NOTICE ' + parsedMessage.nick + ' :' +
+          const ctcpReply = 'PING ' + ctcpRest;
+          const ircMessage = 'NOTICE ' + parsedMessage.nick + ' :' +
           String.fromCharCode(ctcpDelim) + ctcpReply + String.fromCharCode(ctcpDelim);
           _sendCtcpMessage(socket, ircMessage, ctcpReply, parsedMessage.nick);
         }
@@ -135,7 +135,7 @@
 
       case 'TIME':
         if (true) {
-          let d = new Date();
+          const d = new Date();
 
           // This returns Fri Jun 11 2021 12:50:57 GMT+0000
           // let ctcpReply = 'TIME ' + d.toString().split('(')[0];
@@ -149,7 +149,7 @@
           //
           // CTCP reply: "TIME Fri, 11 Jun 2021 10:20:35 UTC"
           //
-          let ctcpReply = 'TIME ' +
+          const ctcpReply = 'TIME ' +
             // "Mon, "
             d.toLocaleDateString(vars.ctcpTimeLocale[0], {
               timeZone: vars.ctcpTimeLocale[1],
@@ -176,7 +176,7 @@
               hour12: false,
               timeZoneName: 'short'
             });
-          let ircMessage = 'NOTICE ' + parsedMessage.nick + ' :' +
+          const ircMessage = 'NOTICE ' + parsedMessage.nick + ' :' +
           String.fromCharCode(ctcpDelim) + ctcpReply + String.fromCharCode(ctcpDelim);
           _sendCtcpMessage(socket, ircMessage, ctcpReply, parsedMessage.nick);
         }
@@ -184,8 +184,8 @@
       //
       case 'VERSION':
         if (true) {
-          let ctcpReply = 'VERSION ' + vars.ircState.progName + '-' + vars.ircState.progVersion;
-          let ircMessage = 'NOTICE ' + parsedMessage.nick + ' :' +
+          const ctcpReply = 'VERSION ' + vars.ircState.progName + '-' + vars.ircState.progVersion;
+          const ircMessage = 'NOTICE ' + parsedMessage.nick + ' :' +
           String.fromCharCode(ctcpDelim) + ctcpReply + String.fromCharCode(ctcpDelim);
           _sendCtcpMessage(socket, ircMessage, ctcpReply, parsedMessage.nick);
         }

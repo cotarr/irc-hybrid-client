@@ -39,14 +39,15 @@
   ];
 
   // ircState hold main IRC state variables visible to browser and backend
-  var ircState = {};
-  var ircServerPassword = null;
-  var nsIdentifyNick = null;
-  var nsIdentifyCommand = null;
+  const ircState = {};
+  let ircServerPassword = null;
+  let nsIdentifyNick = null;
+  let nsIdentifyCommand = null;
 
-  var nickNameLength = 32;
-  var userNameLength = 32;
-  var realNameLength = 64;
+  // in future these could be updated from a specific server
+  let nickNameLength = 32;
+  let userNameLength = 32;
+  let realNameLength = 64;
 
   const channelPrefixChars = '@#+!';
   const channelUserModeChars = 'qaohv';
@@ -55,34 +56,34 @@
 
   // IRC server reconnect when timer matches (time in seconds)
   const ircServerReconnectIntervals = [10, 60, 120, 180, 300, 600, 900];
-  var ircServerReconnectTimerSeconds = 0;
-  var ircServerReconnectChannelString = '';
-  var ircServerReconnectAwayString = '';
+  let ircServerReconnectTimerSeconds = 0;
+  let ircServerReconnectChannelString = '';
+  let ircServerReconnectAwayString = '';
 
   // Time inseconds
   const ircSocketConnectingTimeout = 10;
   const ircRegistrationTimeout = 30;
 
   // Time in seconds
-  var activityWatchdogTimerSeconds = 0;
+  let activityWatchdogTimerSeconds = 0;
   const activityWatchdogTimerLimit = 300;
 
   // Time in seconds
-  var clientToServerPingTimer = 0;
+  let clientToServerPingTimer = 0;
   const clientToServerPingInterval = 60;
 
   // used by JavaScript built in toLocaleString(locales, options.timeZone)
-  var ctcpTimeLocale = ['en-US', 'UTC'];
+  let ctcpTimeLocale = ['en-US', 'UTC'];
 
   // Reference: https://ircv3.net/specs/extensions/server-time
   // @time=2011-10-19T16:40:51.620Z :Angel!angel@example.org PRIVMSG Wiz :Hello
   const timestamp = function () {
-    let now = new Date();
+    const now = new Date();
     // return parseInt(now.valueOf() / 1000).toString();
     return '@time=' + now.toISOString();
   };
   const unixTimestamp = function () {
-    let now = new Date();
+    const now = new Date();
     return parseInt(now.valueOf() / 1000).toString();
   };
 

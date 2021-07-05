@@ -37,9 +37,10 @@
   const ircCtcp = require('./irc-client-ctcp');
   const ircWrite = require('./irc-client-write');
   const ircLog = require('./irc-client-log');
+  ircLog.test = 'test';
 
-  var ircMessageCache = require('./irc-client-cache');
-  var vars = require('./irc-client-vars');
+  const ircMessageCache = require('./irc-client-cache');
+  const vars = require('./irc-client-vars');
 
   const tellBrowserToRequestState = function () {
     global.sendToBrowser('UPDATE\r\n');
@@ -127,7 +128,7 @@
         if ((inText.indexOf('!') >= 0) &&
           (inText.indexOf('@') >= 0) &&
           (inText.indexOf('!') < inText.indexOf('@'))) {
-          let nick = inText.split('!')[0];
+          const nick = inText.split('!')[0];
           return nick;
         } else {
           return null;
@@ -142,7 +143,7 @@
         if ((inText.indexOf('!') >= 0) &&
           (inText.indexOf('@') >= 0) &&
           (inText.indexOf('!') < inText.indexOf('@'))) {
-          let host = inText.split('!')[1];
+          const host = inText.split('!')[1];
           return host;
         } else {
           return null;
@@ -167,10 +168,10 @@
     let command = null;
     let extNick = null;
     let extHost = null;
-    let params = [];
+    const params = [];
     //
     // Parsing variables
-    let end = messageBuffer.length - 1;
+    const end = messageBuffer.length - 1;
     let temp = { nextIndex: 0 };
 
     // 1) Check if prefix exist, if exit parse value, return nextIndex
@@ -249,8 +250,8 @@
     for (let i = 0; i < vars.ircState.channels.length; i++) {
       if (parsedMessage.params[0].toLowerCase() === vars.ircState.channels[i]) {
         // index into vars.ircState.channels[]
-        let chanIndex = i;
-        let modeList = parsedMessage.params[1];
+        const chanIndex = i;
+        const modeList = parsedMessage.params[1];
         if (modeList.length > 0) {
           for (let j = 0; j < modeList.length; j++) {
             if (selectorChars.indexOf(modeList.charAt(j)) >= 0) {
@@ -266,7 +267,7 @@
           for (let j = 0; j < modeQueue.length; j++) {
             userQueue.push(parsedMessage.params[j + 2]);
           }
-          let strippedNicks = [];
+          const strippedNicks = [];
           for (let j = 0; j < vars.ircState.channelStates[chanIndex].names.length; j++) {
             let tempNick = vars.ircState.channelStates[chanIndex].names[j];
             if (modeChars.indexOf(tempNick.charAt(0)) >= 0) {
@@ -275,7 +276,7 @@
             strippedNicks.push(tempNick);
           }
           for (let j = 0; j < modeQueue.length; j++) {
-            let userIndex = strippedNicks.indexOf(userQueue[j]);
+            const userIndex = strippedNicks.indexOf(userQueue[j]);
             let tempNick = strippedNicks[userIndex];
             if (modeQueue[j] === '+v') tempNick = '+' + tempNick;
             if (modeQueue[j] === '+h') tempNick = '%' + tempNick;
@@ -312,7 +313,7 @@
     }
     // ci = channel index into channels array
     for (let ci = 0; ci < vars.ircState.channels.length; ci++) {
-      let nickCount = vars.ircState.channelStates[ci].names.length;
+      const nickCount = vars.ircState.channelStates[ci].names.length;
       if (nickCount > 0) {
         let matchIndex = -1;
         let opChar = '';
@@ -344,12 +345,12 @@
     if (!newNick) return;
     if (newNick.length < 1) return;
     // console.log('Adding ' + newNick + ' to ' + channel);
-    let channelIndex = vars.ircState.channels.indexOf(channel.toLowerCase());
+    const channelIndex = vars.ircState.channels.indexOf(channel.toLowerCase());
     if (channelIndex >= 0) {
-      let nickCount = vars.ircState.channelStates[channelIndex].names.length;
+      const nickCount = vars.ircState.channelStates[channelIndex].names.length;
       if (nickCount > 0) {
         let matchIndex = -1;
-        let opChar = '';
+        // let opChar = '';
         let pureNewNick = newNick;
         if (vars.nicknamePrefixChars.indexOf(pureNewNick.charAt(0)) >= 0) {
           pureNewNick = pureNewNick.slice(1, pureNewNick.length);
@@ -357,7 +358,7 @@
         for (let i = 0; i < nickCount; i++) {
           let pureNick = vars.ircState.channelStates[channelIndex].names[i];
           if (vars.nicknamePrefixChars.indexOf(pureNick.charAt(0)) >= 0) {
-            opChar = pureNick.charAt(0);
+            // opChar = pureNick.charAt(0);
             pureNick = pureNick.slice(1, pureNick.length);
           }
           if (pureNewNick === pureNick) matchIndex = i;
@@ -385,9 +386,9 @@
   // ---------------------------------------------
   function _removeName (oldNick, channel) {
     // console.log('Removing ' + oldNick + ' from ' + channel);
-    let channelIndex = vars.ircState.channels.indexOf(channel.toLowerCase());
+    const channelIndex = vars.ircState.channels.indexOf(channel.toLowerCase());
     if (channelIndex >= 0) {
-      let nickCount = vars.ircState.channelStates[channelIndex].names.length;
+      const nickCount = vars.ircState.channelStates[channelIndex].names.length;
       if (nickCount > 0) {
         let matchIndex = -1;
         let pureOldNick = oldNick;
@@ -424,7 +425,7 @@
     //
     // parse message into: prefix, command, and param array
     //
-    let parsedMessage = _parseIrcMessage(messageBuffer);
+    const parsedMessage = _parseIrcMessage(messageBuffer);
     // console.log('(IRC-->) parsedMessage ' + JSON.stringify(parsedMessage, null, 2));
 
     //
@@ -434,7 +435,7 @@
     // which makes PING and PONG visible to browser and inserted into message cache
     //
     if (parsedMessage.command === 'PING') {
-      let outBuffer = Buffer.from('PONG ' + parsedMessage.params[0] + '\r\n', 'utf8');
+      const outBuffer = Buffer.from('PONG ' + parsedMessage.params[0] + '\r\n', 'utf8');
       // 512 btye maximum size from RFC 2812 2.3 Messages
       if (outBuffer.length <= 512) {
         socket.write(outBuffer, 'utf8');
@@ -486,9 +487,9 @@
       case '001':
         if (!vars.ircState.ircRegistered) {
           // extract my client info from last argument in 001 message
-          let splitparams1 = parsedMessage.params[1].split(' ');
-          let parsedNick = splitparams1[splitparams1.length - 1].split('!')[0];
-          let parsedUserhost = splitparams1[splitparams1.length - 1].split('!')[1];
+          const splitparams1 = parsedMessage.params[1].split(' ');
+          const parsedNick = splitparams1[splitparams1.length - 1].split('!')[0];
+          const parsedUserhost = splitparams1[splitparams1.length - 1].split('!')[1];
           if (parsedNick === vars.ircState.nickName) {
             // case of successful register with nickname, set registered state
             vars.ircState.ircRegistered = true;
@@ -578,8 +579,8 @@
       // TODO RFC2812 conflict, channel is params[0] (no nickname)
       case '332':
         if (true) {
-          let channelName = parsedMessage.params[1].toLowerCase();
-          let index = vars.ircState.channels.indexOf(channelName);
+          const channelName = parsedMessage.params[1].toLowerCase();
+          const index = vars.ircState.channels.indexOf(channelName);
           if (index >= 0) {
             // case of already exist
             vars.ircState.channelStates[index].topic = parsedMessage.params[2];
@@ -597,16 +598,16 @@
         if (true) {
           // type '=' public '@' secret '*' private
           if (parsedMessage.params.length > 2) {
-            let channelType = parsedMessage.params[1];
-            let channelName = parsedMessage.params[2].toLowerCase();
-            let index = vars.ircState.channels.indexOf(channelName);
+            // const channelType = parsedMessage.params[1];
+            const channelName = parsedMessage.params[2].toLowerCase();
+            const index = vars.ircState.channels.indexOf(channelName);
             // if names array exist
             if (index >= 0) {
               // this crash with .params[3] value of null, not sure why it was null
               // check for null is a patch over
               if ((parsedMessage.params) && (parsedMessage.params[3]) &&
                 (parsedMessage.params[3].length > 0)) {
-                let nameArray = parsedMessage.params[3].split(' ');
+                const nameArray = parsedMessage.params[3].split(' ');
                 if (nameArray.length > 0) {
                   for (let i = 0; i < nameArray.length; i++) {
                     _addName(nameArray[i], channelName);
@@ -715,8 +716,8 @@
       //
       case 'JOIN':
         if (true) {
-          let channelName = parsedMessage.params[0].toLowerCase();
-          let index = vars.ircState.channels.indexOf(channelName);
+          const channelName = parsedMessage.params[0].toLowerCase();
+          const index = vars.ircState.channels.indexOf(channelName);
           if (index >= 0) {
             // case of already exist
             if (parsedMessage.nick === vars.ircState.nickName) {
@@ -732,7 +733,7 @@
             }
           } else {
             // case of new channel
-            let chanState = {
+            const chanState = {
               name: channelName,
               topic: '',
               names: [],
@@ -748,8 +749,8 @@
       //
       case 'KICK':
         if (true) {
-          let channelName = parsedMessage.params[0].toLowerCase();
-          let index = vars.ircState.channels.indexOf(channelName);
+          const channelName = parsedMessage.params[0].toLowerCase();
+          const index = vars.ircState.channels.indexOf(channelName);
           if (parsedMessage.params[1] === vars.ircState.nickName) {
             // case of me, I was kicked
             vars.ircState.channelStates[index].topic = '';
@@ -786,8 +787,8 @@
             vars.ircState.nickName = parsedMessage.params[0];
           }
           if (vars.ircState.channels.length > 0) {
-            let previousNick = parsedMessage.nick;
-            let nextNick = parsedMessage.params[0];
+            const previousNick = parsedMessage.nick;
+            const nextNick = parsedMessage.params[0];
             _exchangeNames(previousNick, nextNick);
           }
           tellBrowserToRequestState();
@@ -796,8 +797,8 @@
       //
       case 'PART':
         if (true) {
-          let channelName = parsedMessage.params[0].toLowerCase();
-          let index = vars.ircState.channels.indexOf(channelName);
+          const channelName = parsedMessage.params[0].toLowerCase();
+          const index = vars.ircState.channels.indexOf(channelName);
           if (index >= 0) {
             if (parsedMessage.nick === vars.ircState.nickName) {
               // case of me, I have parted the channel
@@ -845,8 +846,8 @@
       // TOPIC
       case 'TOPIC':
         if (true) {
-          let channelName = parsedMessage.params[0].toLowerCase();
-          let index = vars.ircState.channels.indexOf(channelName);
+          const channelName = parsedMessage.params[0].toLowerCase();
+          const index = vars.ircState.channels.indexOf(channelName);
           if (index >= 0) {
             // case of already exist
             vars.ircState.channelStates[index].topic = parsedMessage.params[1];

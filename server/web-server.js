@@ -29,7 +29,6 @@
 
 // native node packages
 const http = require('http');
-const https = require('https');
 const path = require('path');
 const fs = require('fs');
 
@@ -76,7 +75,7 @@ const sessionExpireAfterSec = credentials.sessionExpireAfterSec || 86400;
 const sessionExpireAfterMs = 1000 * sessionExpireAfterSec;
 // console.log('sessionExpireAfterMs ' + sessionExpireAfterMs);
 
-var nodeEnv = process.env.NODE_ENV || 'development';
+const nodeEnv = process.env.NODE_ENV || 'development';
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -86,16 +85,14 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser(cookieSecret));
 
 // Generic console log to debug various nodejs req object properties
-const logStuff = function (req, res, next) {
-  // console.log('req.headers' + JSON.stringify(req.headers, null, 2));
-  // console.log('req.rawHeaders ' + req.rawHeaders);
-  // console.log('req.body' + JSON.stringify(req.body, null, 2));
-  // console.log('isVhostMatch ' + checkVhost.isVhostMatch(req));
-  // console.log('notVhostMatch ' + checkVhost.notVhostMatch(req));
-  // console.log('cookie ' + req.headers.cookie);
-  // console.log('signedCookies ' + JSON.stringify(req.signedCookies));
-  next();
-};
+// const logStuff = function (req, res, next) {
+//   // console.log('req.headers' + JSON.stringify(req.headers, null, 2));
+//   // console.log('req.rawHeaders ' + req.rawHeaders);
+//   // console.log('req.body' + JSON.stringify(req.body, null, 2));
+//   // console.log('cookie ' + req.headers.cookie);
+//   // console.log('signedCookies ' + JSON.stringify(req.signedCookies));
+//   next();
+// };
 // app.use(logStuff);
 
 if (nodeEnv === 'production') {
@@ -195,7 +192,7 @@ app.get('/robots.txt', function (req, res) {
 //
 // express-session configuration object
 //
-let sessionOptions = {
+const sessionOptions = {
   secret: cookieSecret,
   name: 'irc-hybrid-client', // name also in ws-server.js
   store: new MemoryStore({
@@ -247,7 +244,7 @@ app.post('/terminate', authorizeOrFail, function (req, res, next) {
     inputVerifyString = req.body.terminate;
   }
   if (inputVerifyString === 'YES') {
-    let now = new Date();
+    const now = new Date();
     let dieMessage = now.toISOString() + ' Terminate reqeust ';
     try {
       dieMessage += ' user=' + req.session.sessionAuth.user;
@@ -265,7 +262,7 @@ app.post('/terminate', authorizeOrFail, function (req, res, next) {
     }, 1000);
     res.json({ error: false, message: 'Terminate received' });
   } else {
-    let error = new Error('Bad Reqeust');
+    const error = new Error('Bad Reqeust');
     error.status = 400;
     next(error);
   }
@@ -310,10 +307,10 @@ app.post('/irc/wsauth', authorizeOrFail, function (req, res, next) {
   };
   // requires cookie-parser
   if ('signedCookies' in req) {
-    let cookieValue = req.signedCookies['irc-hybrid-client'];
+    const cookieValue = req.signedCookies['irc-hybrid-client'];
     // if not empty
     if (cookieValue.length > 8) {
-      let timeNow = parseInt(Date.now() / 1000); // seconds
+      const timeNow = parseInt(Date.now() / 1000); // seconds
       global.webSocketAuth = {
         expire: timeNow + 10,
         cookie: cookieValue
@@ -321,7 +318,7 @@ app.post('/irc/wsauth', authorizeOrFail, function (req, res, next) {
       return res.json({ error: false });
     }
   }
-  let error = new Error('Invalid Auth Request');
+  const error = new Error('Invalid Auth Request');
   error.status = 400;
   return next(error);
 });
@@ -379,7 +376,7 @@ app.use('/irc', authorizeOrFail, express.static(secureDir));
 // catch 404 and forward to error handler
 //
 app.use(function (req, res, next) {
-  let responseObject = {};
+  const responseObject = {};
   responseObject.error = {
     status: 404,
     message: http.STATUS_CODES[404]
@@ -388,7 +385,7 @@ app.use(function (req, res, next) {
     // console.log(JSON.stringify(req.url));
     responseObject.error.error = req.method + ' ' + req.url;
   }
-  if (('accept' in req.headers) && (req.headers['accept'].toLowerCase() === 'application/json')) {
+  if (('accept' in req.headers) && (req.headers.accept.toLowerCase() === 'application/json')) {
     return res.status(404).json(responseObject);
   }
   // simple custom handler
@@ -423,7 +420,7 @@ app.use(function (err, req, res, next) {
       message: err.toString()
     };
   };
-  let responseObject = {};
+  const responseObject = {};
   responseObject.error = {};
   responseObject.error.status = err.status || 500;
   responseObject.error.message =
@@ -432,7 +429,7 @@ app.use(function (err, req, res, next) {
     responseObject.error.error = err.message.toString() || '';
     responseObject.error.stack = err.stack || '';
   }
-  if (('accept' in req.headers) && (req.headers['accept'].toLowerCase() === 'application/json')) {
+  if (('accept' in req.headers) && (req.headers.accept.toLowerCase() === 'application/json')) {
     return res.status(responseObject.error.status).json(responseObject);
   }
   let htmlString =

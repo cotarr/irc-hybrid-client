@@ -41,14 +41,14 @@
   const ircParse = require('./irc-client-parse');
   const ircCommand = require('./irc-client-command');
 
-  var ircMessageCache = require('./irc-client-cache');
-  var vars = require('./irc-client-vars');
+  const ircMessageCache = require('./irc-client-cache');
+  const vars = require('./irc-client-vars');
 
-  var nodeEnv = process.env.NODE_ENV || 'development';
+  const nodeEnv = process.env.NODE_ENV || 'development';
 
-  const credentials = JSON.parse(fs.readFileSync('./credentials.json', 'utf8'));
+  // const credentials = JSON.parse(fs.readFileSync('./credentials.json', 'utf8'));
 
-  var servers = JSON.parse(fs.readFileSync('./servers.json', 'utf8'));
+  const servers = JSON.parse(fs.readFileSync('./servers.json', 'utf8'));
   if ((!('configVersion' in servers)) || (servers.configVersion !== 1)) {
     console.log('Error, servers.js wrong configVersion');
     process.exit(1);
@@ -153,7 +153,6 @@
   const onDisconnectGrabState = function () {
     vars.ircServerReconnectChannelString = '';
     vars.ircServerReconnectAwayString = '';
-    let channelCount = 0;
     if (vars.ircState.channels.length > 0) {
       for (let i = 0; i < vars.ircState.channels.length; i++) {
         if (vars.ircState.channelStates[i].joined) {
@@ -211,7 +210,7 @@
   // Pass each message to message parse function as type Buffer
   // If left over characters not terminated in CR-LF, save as next fragment
   // -------------------------------------------------------------------------
-  var previousBufferFragment = Buffer.from('', 'utf8');
+  let previousBufferFragment = Buffer.from('', 'utf8');
   const extractMessagesFromStream = function (socket, inBuffer) {
     if (!inBuffer) return;
     if (!Buffer.isBuffer(inBuffer)) {
@@ -219,15 +218,15 @@
       return;
     }
     // this returns a new Buffer, not a reference to shared memory
-    let data = Buffer.concat([previousBufferFragment, inBuffer]);
+    const data = Buffer.concat([previousBufferFragment, inBuffer]);
     previousBufferFragment = Buffer.from('');
-    let len = data.length;
+    const len = data.length;
     if (len === 0) return;
     let index = 0;
     let count = 0;
     for (let i = 0; i < len; i++) {
       // this is a 8 bit integer
-      let charCode = data.readUInt8(i);
+      const charCode = data.readUInt8(i);
       if ((charCode !== 10) && (charCode !== 13)) {
         // valid message character
         count = count + 1;
@@ -246,7 +245,7 @@
           //    the UTF-8 replacement character 0xEF 0xBF 0xBD (question mark in diamond)
           // 3) Then re-encode back to Buffer (non UTF-8 have been cleaned)
           //
-          let message =
+          const message =
             Buffer.from(
               // wrapped in Buffer.from because slice returns a reference
               Buffer.from(data.slice(index, index + count))
@@ -294,7 +293,7 @@
   // -------------------------------------------------------
   //
   // Placeholder variable to hold socket
-  var ircSocket = null;
+  let ircSocket = null;
   //
   // creates socket to IRC server
   const connectIRC = function () {
@@ -304,7 +303,7 @@
     // Note: Timer does not detect failure to register with IRC server
     //       Timer is cleared where possible in case multiple manual connects in a row.
     //
-    let watchdogTimer = setTimeout(function () {
+    const watchdogTimer = setTimeout(function () {
       if (vars.ircState.ircConnecting) {
         // console.log('Connecting watchdog detect timeout error');
         if (ircSocket) {
@@ -405,8 +404,10 @@
     //   On Error   (IRC client socket)
     // --------------------------
     ircSocket.on('error', function (err) {
-      // console.log('Event: socket.error ' + err.toString());
-      // console.log(err);
+      if (err) {
+        // console.log('Event: socket.error ' + err.toString());
+        // console.log(err);
+      }
       if ((vars.ircState.ircConnected) || (vars.ircState.ircConnecting)) {
         // signal browser to show an error
         vars.ircState.count.ircConnectError++;
@@ -445,7 +446,7 @@
   //
   // This assumed TCP socket is already connected, that is a different watchdog
   // --------------------------------------------------------------------------
-  var registrationWatchdogSeconds = 0;
+  let registrationWatchdogSeconds = 0;
   const registrationWatchdogTimerTick = function () {
     if ((vars.ircState.ircConnected) && (!vars.ircState.ircRegistered)) {
       registrationWatchdogSeconds++;
@@ -575,7 +576,7 @@
       // Unless for debug when PING, PONG removed from excludedCommands array
       // which makes PING and PONG visible to browser and inserted into message cache
       //
-      let outBuffer = Buffer.from('PING ' + vars.ircState.ircServerPrefix + '\r\n', 'utf8');
+      const outBuffer = Buffer.from('PING ' + vars.ircState.ircServerPrefix + '\r\n', 'utf8');
       // console.log(outBuffer.toString());
       // 512 btye maximum size from RFC 2812 2.3 Messages
       if (outBuffer.length <= 512) {
@@ -618,10 +619,10 @@
       });
     }
     // Check for presence of extraneous keys
-    let validKeys = ['index'];
+    const validKeys = ['index'];
     Object.keys(req.body).forEach(function (key) {
       if (validKeys.indexOf(key) < 0) {
-        let err = new Error('BAD REQUEST');
+        const err = new Error('BAD REQUEST');
         err.status = 400;
         err.message = 'Extraneous property in server request';
         return next(err);
@@ -631,13 +632,13 @@
     if ((!('index' in req.body)) ||
       (typeof req.body.index !== 'number') ||
       (!Number.isInteger(req.body.index))) {
-      let error = new Error('Bad Reqeust');
+      const error = new Error('Bad Reqeust');
       error.status = 400;
       error.message = 'index is required property of type integer';
       return next(error);
     }
     // input range validaton
-    let inputIndex = req.body.index;
+    const inputIndex = req.body.index;
     if ((inputIndex < -1) || (inputIndex >= servers.serverArray.length)) {
       return res.json({
         error: true,
@@ -711,15 +712,15 @@
       });
     }
     if ('userName' in req.body) {
-      let err = new Error('BAD REQUEST');
+      const err = new Error('BAD REQUEST');
       err.status = 400;
       err.message = 'IRC user name (userName) set only in config file.';
       return next(err);
     }
-    let validKeys = ['nickName', 'realName', 'userMode'];
+    const validKeys = ['nickName', 'realName', 'userMode'];
     Object.keys(req.body).forEach(function (key) {
       if (validKeys.indexOf(key) < 0) {
-        let err = new Error('BAD REQUEST');
+        const err = new Error('BAD REQUEST');
         err.status = 400;
         err.message = 'Extraneous property in connect request';
         return next(err);
@@ -733,7 +734,7 @@
         (req.body.nickName.length <= vars.nickNameLength)) {
         inputNickName = req.body.nickName;
       } else {
-        let err = new Error('BAD REQUEST');
+        const err = new Error('BAD REQUEST');
         err.status = 400;
         err.message = 'Invalid nick name in connect request';
         return next(err);
@@ -762,7 +763,7 @@
         (req.body.realName.length <= vars.realNameLength)) {
         inputRealName = req.body.realName;
       } else {
-        let err = new Error('BAD REQUEST');
+        const err = new Error('BAD REQUEST');
         err.status = 400;
         err.message = 'Invalid real name in connect request';
         return next(err);
@@ -775,14 +776,14 @@
         (req.body.userMode.length <= 16)) {
         if ((req.body.userMode.length > 0) &&
           (selectorChars.indexOf(req.body.userMode.charAt(0)) < 0)) {
-          let err = new Error('BAD REQUEST');
+          const err = new Error('BAD REQUEST');
           err.status = 400;
           err.message = 'Invalid user mode syntax';
           return next(err);
         }
         inputUserMode = req.body.userMode;
       } else {
-        let err = new Error('BAD REQUEST');
+        const err = new Error('BAD REQUEST');
         err.status = 400;
         err.message = 'Invalid initial user mode in connect request';
         return next(err);
@@ -790,7 +791,7 @@
     }
 
     if (inputNickName.length === 0) {
-      let err = new Error('BAD REQUEST');
+      const err = new Error('BAD REQUEST');
       err.status = 400;
       err.message = 'Error: nickName is a required property in connect request';
       return next(err);
@@ -802,7 +803,7 @@
     //   return next(err);
     // }
     if (inputRealName.length === 0) {
-      let err = new Error('BAD REQUEST');
+      const err = new Error('BAD REQUEST');
       err.status = 400;
       err.message = 'Error: realName is a required property in connect request';
       return next(err);
@@ -858,7 +859,7 @@
     // console.log('disconnect handler called');
     // console.log(JSON.stringify(req.body));
     if (Object.keys(req.body).length > 0) {
-      let err = new Error('BAD REQUEST');
+      const err = new Error('BAD REQUEST');
       err.status = 400;
       err.message = 'Extraneous property in disconnect request';
       return next(err);
@@ -908,36 +909,36 @@
       });
     }
     // Check for presence of extraneous keys
-    let validKeys = ['message'];
+    const validKeys = ['message'];
     Object.keys(req.body).forEach(function (key) {
       if (validKeys.indexOf(key) < 0) {
-        let err = new Error('BAD REQUEST');
+        const err = new Error('BAD REQUEST');
         err.status = 400;
         err.message = 'Extraneous property in message request';
         return next(err);
       }
     });
     if (!('message' in req.body)) {
-      let err = new Error('BAD REQUEST');
+      const err = new Error('BAD REQUEST');
       err.status = 400;
       err.message = 'message is a required property';
       return next(err);
     }
     if (!(typeof req.body.message === 'string')) {
-      let err = new Error('BAD REQUEST');
+      const err = new Error('BAD REQUEST');
       err.status = 400;
       err.message = 'IRC message expect type=string';
       return next(err);
     }
     // This is to address multi-byte characters, IRC limit is in bytes, not characters
-    let uint8BtyeArray = new TextEncoder('utf8').encode(req.body.message);
+    const uint8BtyeArray = new TextEncoder('utf8').encode(req.body.message);
     if (uint8BtyeArray.length > 512) {
-      let err = new Error('BAD REQUEST');
+      const err = new Error('BAD REQUEST');
       err.status = 400;
       err.message = 'IRC message exceeds 512 byte maximum length';
       return next(err);
     }
-    let messageBuf = Buffer.from(req.body.message, 'utf8');
+    const messageBuf = Buffer.from(req.body.message, 'utf8');
     if (!isValidUTF8(messageBuf)) {
       return res.json({ error: true, message: 'IRC message failed UTF-8 validation' });
     }
@@ -960,7 +961,7 @@
       if ((message.indexOf('\n') >= 0) || (message.indexOf('\r') >= 0)) {
         return res.json({ error: true, message: 'Invalid multiple line message' });
       } else {
-        let parseResult = ircCommand.parseBrowserMessageForCommand(message);
+        const parseResult = ircCommand.parseBrowserMessageForCommand(message);
         if (parseResult.error) {
           return res.json({ error: true, message: parseResult.message });
         } else {
@@ -992,13 +993,13 @@
   // -----------------------------------------------
   const getCache = function (req, res, next) {
     if (Object.keys(req.body).length > 0) {
-      let err = new Error('BAD REQUEST');
+      const err = new Error('BAD REQUEST');
       err.status = 400;
       err.message = 'Extraneous property in cache request';
       return next(err);
     }
-    let cacheArrayOfBuffers = ircMessageCache.allMessages();
-    let outArray = [];
+    const cacheArrayOfBuffers = ircMessageCache.allMessages();
+    const outArray = [];
     let err = false;
     if (cacheArrayOfBuffers.length > 0) {
       for (let i = 0; i < cacheArrayOfBuffers.length; i++) {
@@ -1012,7 +1013,7 @@
       }
     }
     if (err) {
-      let error = new Error('Unprocessable Entity');
+      const error = new Error('Unprocessable Entity');
       error.status = 422;
       error.message = 'Cache contains malformed data';
       next(error);
@@ -1051,22 +1052,22 @@
         (vars.channelPrefixChars.indexOf(req.body.channel.charAt(0)) >= 0)) {
         inputChannel = req.body.channel;
       } else {
-        let err = new Error('BAD REQUEST');
+        const err = new Error('BAD REQUEST');
         err.status = 400;
         err.message = 'Invalid channel name in prune request';
         return next(err);
       }
     } else {
-      let err = new Error('BAD REQUEST');
+      const err = new Error('BAD REQUEST');
       err.status = 400;
       err.message = 'channel is a required property';
       return next(err);
     }
     // Check for presence of extraneous keys
-    let validKeys = ['channel'];
+    const validKeys = ['channel'];
     Object.keys(req.body).forEach(function (key) {
       if (validKeys.indexOf(key) < 0) {
-        let err = new Error('BAD REQUEST');
+        const err = new Error('BAD REQUEST');
         err.status = 400;
         err.message = 'Extraneous property in prune request';
         return next(err);
@@ -1076,7 +1077,7 @@
     // Remove the channel
     //
     if (inputChannel.length > 0) {
-      let index = vars.ircState.channels.indexOf(inputChannel.toLowerCase());
+      const index = vars.ircState.channels.indexOf(inputChannel.toLowerCase());
       if (index >= 0) {
         if (!vars.ircState.channelStates[index].joined) {
           // prune the channel from arrays
@@ -1100,7 +1101,7 @@
         });
       }
     }
-    let err = new Error('INTERNAL SERVER ERROR');
+    const err = new Error('INTERNAL SERVER ERROR');
     err.status = 500;
     err.message = 'Error in prune request';
     next(err);
@@ -1128,10 +1129,10 @@
       });
     }
     // Check for presence of extraneous keys
-    let validKeys = ['erase'];
+    const validKeys = ['erase'];
     Object.keys(req.body).forEach(function (key) {
       if (validKeys.indexOf(key) < 0) {
-        let err = new Error('BAD REQUEST');
+        const err = new Error('BAD REQUEST');
         err.status = 400;
         err.message = 'Extraneous property in erase request';
         next(err);
@@ -1148,7 +1149,7 @@
       ircMessageCache.eraseCache();
       res.json({ error: false });
     } else {
-      let error = new Error('Bad Reqeust');
+      const error = new Error('Bad Reqeust');
       error.status = 400;
       error.message = 'Error parsing confirmation property';
       return next(error);
@@ -1169,10 +1170,10 @@
     //
     // Check allocated memory, garbage collect, check memory again.
     if (global.gc) {
-      let before = process.memoryUsage();
+      const before = process.memoryUsage();
       global.gc();
       setTimeout(function () {
-        let after = process.memoryUsage();
+        const after = process.memoryUsage();
         res.json({
           error: false,
           comment: 'Debug: Forcing nodejs garbage collection',

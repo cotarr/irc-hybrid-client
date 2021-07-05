@@ -27,7 +27,6 @@
 
 'use strict';
 
-const path = require('path');
 const ws = require('ws');
 const isValidUTF8 = require('utf-8-validate');
 

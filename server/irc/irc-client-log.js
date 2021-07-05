@@ -48,13 +48,13 @@
   const accessLogFilename = path.join(__dirname, '../../logs/access.log');
   const ircLogFilename = path.join(__dirname, '../../logs/irc.log');
 
-  var nodeEnv = process.env.NODE_ENV || 'development';
+  const nodeEnv = process.env.NODE_ENV || 'development';
 
   const writeAccessLog = function (logString) {
     //
     // build log text string
     //
-    let now = new Date();
+    const now = new Date();
     let logEntry = now.toISOString();
     logEntry += ' ' + logString;
     //
@@ -81,13 +81,13 @@
     }
   };
 
-  var rawMessageLogEnabled = false;
+  let rawMessageLogEnabled = false;
 
   const writeIrcLog = function (inBuffer) {
     //
     // build log text string
     //
-    let now = new Date();
+    const now = new Date();
     let logEntry = now.toISOString();
     // convert buffer to utf8 string
     logEntry += ' ' + inBuffer.toString('utf8');
