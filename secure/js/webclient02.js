@@ -457,52 +457,54 @@ function displayNoticeMessage (parsedMessage) {
   // console.log('parsedMessage ' + JSON.stringify(parsedMessage, null, 2));
   switch (parsedMessage.command) {
     case 'NOTICE':
-      const ctcpDelim = 1;
-      if (((parsedMessage.params.length === 2) &&
-        (parsedMessage.params[1].charCodeAt(0) === ctcpDelim)) ||
-        ((parsedMessage.params.length === 3) &&
-        (parsedMessage.params[2].charCodeAt(0) === ctcpDelim))) {
-        // case of CTCP notice
-        // ignore, handle else
-      } else {
-        if (parsedMessage.params[0] === ircState.nickName) {
-          // Case of regular notice address to my nickname, not CTCP reply
-          if (parsedMessage.nick) {
-            // case of valid user nickname parse
-            _addText(parsedMessage.timestamp + ' ' +
-            parsedMessage.nick + nickChannelSpacer +
-              parsedMessage.params[1]);
-          } else {
-            // else must be a services server message, use prefix
-            _addText(parsedMessage.timestamp + ' ' +
-            parsedMessage.prefix + nickChannelSpacer +
-              parsedMessage.params[1]);
-          }
-          webState.noticeOpen = true;
-          updateDivVisibility();
+      {
+        const ctcpDelim = 1;
+        if (((parsedMessage.params.length === 2) &&
+          (parsedMessage.params[1].charCodeAt(0) === ctcpDelim)) ||
+          ((parsedMessage.params.length === 3) &&
+          (parsedMessage.params[2].charCodeAt(0) === ctcpDelim))) {
+          // case of CTCP notice
+          // ignore, handle else
+        } else {
+          if (parsedMessage.params[0] === ircState.nickName) {
+            // Case of regular notice address to my nickname, not CTCP reply
+            if (parsedMessage.nick) {
+              // case of valid user nickname parse
+              _addText(parsedMessage.timestamp + ' ' +
+              parsedMessage.nick + nickChannelSpacer +
+                parsedMessage.params[1]);
+            } else {
+              // else must be a services server message, use prefix
+              _addText(parsedMessage.timestamp + ' ' +
+              parsedMessage.prefix + nickChannelSpacer +
+                parsedMessage.params[1]);
+            }
+            webState.noticeOpen = true;
+            updateDivVisibility();
 
-          // Message activity Icon
-          // If NOT reload from cache in progress (timer not zero)
-          // then display incoming message activity icon
-          if (webState.cacheInhibitTimer === 0) {
-            setNotActivityIcon();
+            // Message activity Icon
+            // If NOT reload from cache in progress (timer not zero)
+            // then display incoming message activity icon
+            if (webState.cacheInhibitTimer === 0) {
+              setNotActivityIcon();
+            }
+          } else if (ircState.channels.indexOf(parsedMessage.params[0].toLowerCase()) >= 0) {
+            // case of notice to #channel
+            document.dispatchEvent(new CustomEvent('channel-message',
+              {
+                bubbles: true,
+                detail: {
+                  parsedMessage: parsedMessage
+                }
+              }));
+          } else if (parsedMessage.nick === ircState.nickName) {
+            // Case of regular notice, not CTCP reply
+            _addText(parsedMessage.timestamp + ' [to] ' +
+            parsedMessage.params[0] + nickChannelSpacer +
+             parsedMessage.params[1]);
+            webState.noticeOpen = true;
+            updateDivVisibility();
           }
-        } else if (ircState.channels.indexOf(parsedMessage.params[0].toLowerCase()) >= 0) {
-          // case of notice to #channel
-          document.dispatchEvent(new CustomEvent('channel-message',
-            {
-              bubbles: true,
-              detail: {
-                parsedMessage: parsedMessage
-              }
-            }));
-        } else if (parsedMessage.nick === ircState.nickName) {
-          // Case of regular notice, not CTCP reply
-          _addText(parsedMessage.timestamp + ' [to] ' +
-          parsedMessage.params[0] + nickChannelSpacer +
-           parsedMessage.params[1]);
-          webState.noticeOpen = true;
-          updateDivVisibility();
         }
       }
       break;
@@ -880,22 +882,20 @@ function _parseBufferMessage (message) {
         displayChannelMessage(parsedMessage);
         break;
       case 'MODE':
-        if (true) {
-          if (parsedMessage.params[0] === ircState.nickName) {
-            // Case of me, my MODE has changed
-            if (!webState.viewRawMessages) {
-              displayFormattedServerMessage(parsedMessage, message);
-            }
-          } else if (channelPrefixChars.indexOf(parsedMessage.params[0].charAt(0)) >= 0) {
-            // Case of channel name
-            displayChannelMessage(parsedMessage);
-          } else {
-            console.log('Error message MODE to unknown recipient');
+        if (parsedMessage.params[0] === ircState.nickName) {
+          // Case of me, my MODE has changed
+          if (!webState.viewRawMessages) {
+            displayFormattedServerMessage(parsedMessage, message);
           }
+        } else if (channelPrefixChars.indexOf(parsedMessage.params[0].charAt(0)) >= 0) {
+          // Case of channel name
+          displayChannelMessage(parsedMessage);
+        } else {
+          console.log('Error message MODE to unknown recipient');
         }
         break;
       case 'NICK':
-        if (true) {
+        {
           // ------------
           // Is previous nick or new nick in ANY active channel?
           // -----------
@@ -939,27 +939,25 @@ function _parseBufferMessage (message) {
         displayChannelMessage(parsedMessage);
         break;
       case 'NOTICE':
-        if (true) {
-          if ((!parsedMessage.nick) || (parsedMessage.nick.length === 0)) {
-            // case of server messages, check raw disply to avoid duplication in server window
-            if (!webState.viewRawMessages) {
-              displayFormattedServerMessage(parsedMessage, message);
-            }
+        if ((!parsedMessage.nick) || (parsedMessage.nick.length === 0)) {
+          // case of server messages, check raw disply to avoid duplication in server window
+          if (!webState.viewRawMessages) {
+            displayFormattedServerMessage(parsedMessage, message);
+          }
+        } else {
+          const ctcpDelim = 1;
+          if (parsedMessage.params[1] === null) parsedMessage.params[1] = '';
+          if (parsedMessage.params[1].charCodeAt(0) === ctcpDelim) {
+            // case of CTCP message
+            _parseCtcpMessage(parsedMessage);
           } else {
-            const ctcpDelim = 1;
-            if (parsedMessage.params[1] === null) parsedMessage.params[1] = '';
-            if (parsedMessage.params[1].charCodeAt(0) === ctcpDelim) {
-              // case of CTCP message
-              _parseCtcpMessage(parsedMessage);
-            } else {
-              // case of server, user, and channel notices.
-              displayNoticeMessage(parsedMessage);
-            }
+            // case of server, user, and channel notices.
+            displayNoticeMessage(parsedMessage);
           }
         }
         break;
       case 'PRIVMSG':
-        if (true) {
+        {
           // first check for CTCP message
           const ctcpDelim = 1;
           if (parsedMessage.params[1].charCodeAt(0) === ctcpDelim) {
@@ -985,7 +983,7 @@ function _parseBufferMessage (message) {
         // will be displayed in the server window when the channel is unknown.
         // There are 3 places in the code, search: 'QUIT':
         //
-        if (true) {
+        {
           // ------------
           // Is nick in ANY active channel?
           // -----------
@@ -1020,13 +1018,11 @@ function _parseBufferMessage (message) {
         }
         break;
       case 'TOPIC':
-        if (true) {
-          if (channelPrefixChars.indexOf(parsedMessage.params[0].charAt(0)) >= 0) {
-            // Case of channel name
-            displayChannelMessage(parsedMessage);
-          } else {
-            console.log('Error message TOPIC to unknown channel');
-          }
+        if (channelPrefixChars.indexOf(parsedMessage.params[0].charAt(0)) >= 0) {
+          // Case of channel name
+          displayChannelMessage(parsedMessage);
+        } else {
+          console.log('Error message TOPIC to unknown channel');
         }
         break;
       case 'WALLOPS':

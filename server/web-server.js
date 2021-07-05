@@ -245,7 +245,7 @@ app.post('/terminate', authorizeOrFail, function (req, res, next) {
   }
   if (inputVerifyString === 'YES') {
     const now = new Date();
-    let dieMessage = now.toISOString() + ' Terminate reqeust ';
+    let dieMessage = now.toISOString() + ' Terminate request ';
     try {
       dieMessage += ' user=' + req.session.sessionAuth.user;
     } catch (err) {

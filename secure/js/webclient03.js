@@ -154,7 +154,9 @@ function connectWebSocket () {
   // On Error event handler
   // -----------------------
   wsocket.addEventListener('error', function (error) {
-    console.log('Websocket error');
+    if (error) {
+      console.log(error);
+    }
     // showError('WebSocket error occurred.');
     webState.webConnected = false;
     webState.webConnecting = false;
@@ -429,7 +431,7 @@ document.getElementById('webConnectIconId').addEventListener('click', function (
   //
   if (webState.webConnected) {
     webState.webConnectOn = false;
-    wsocket.close(3001, 'Disconnect on reqeust');
+    wsocket.close(3001, 'Disconnect on request');
   }
 });
 
@@ -476,7 +478,6 @@ function reconnectTimerTickHandler () {
         'Reconnect to web server initiated (Timer-1)\n';
       reconnectWebSocketAfterDisconnect();
     }
-    return;
   } else if (wsReconnectCounter === 1) {
     // then second try in 5 seconds
     if (wsReconnectTimer > 5) {
@@ -488,7 +489,6 @@ function reconnectTimerTickHandler () {
         'Reconnect to web server initiated (Timer-2)\n';
       reconnectWebSocketAfterDisconnect();
     }
-    return;
   } else if (wsReconnectCounter > 10) {
     // Stop at the limit
     webState.webConnectOn = false;
@@ -498,7 +498,6 @@ function reconnectTimerTickHandler () {
       document.getElementById('reconnectStatusDiv').textContent +=
         'Reconnect disabled\n';
     }
-    return;
   } else {
     if (wsReconnectTimer > 15) {
       webState.webConnecting = true;
@@ -509,7 +508,5 @@ function reconnectTimerTickHandler () {
         'Reconnect to web server initiated (Timer-3)\n';
       reconnectWebSocketAfterDisconnect();
     }
-    return;
   }
-  return;
 }

@@ -23,14 +23,15 @@ module.exports = {
     // Temporary bypass on javascript rules
 
     'prefer-const': 'off',
-    'no-constant-condition': 'off',
-    // 'no-extra-bind': 'off',
-    'no-undef': 'off',
-    'no-unreachable': 'off',
-    'no-useless-return': 'off',
     'no-var': 'off',
-    'node/handle-callback-err': 'off',
-    'no-case-declarations': 'off'
+    'no-undef': 'off'
+
+    // 'no-constant-condition': 'off',
+    // 'no-extra-bind': 'off',
+    // 'no-unreachable': 'off',
+    // 'no-useless-return': 'off',
+    // 'node/handle-callback-err': 'off',
+    // 'no-case-declarations': 'off'
     // 'no-useless-escape': 'off'
   },
   overrides: [

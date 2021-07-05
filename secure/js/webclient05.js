@@ -473,7 +473,7 @@ function textCommandParser (inputObj) {
       break;
     //
     case 'CTCP':
-      if (true) {
+      {
         let ctcpDelim = 1;
         if (parsedCommand.params.length !== 2) {
           return {
@@ -488,7 +488,7 @@ function textCommandParser (inputObj) {
       break;
     //
     case 'DEOP':
-      if (true) {
+      {
         let ro = _parseChannelModes('-', 'o', 'DEOP', parsedCommand, inputObj);
         if (ro.error) {
           return ro;
@@ -499,7 +499,7 @@ function textCommandParser (inputObj) {
       break;
     //
     case 'DEVOICE':
-      if (true) {
+      {
         let ro = _parseChannelModes('-', 'v', 'DEVOICE', parsedCommand, inputObj);
         if (ro.error) {
           return ro;
@@ -535,7 +535,7 @@ function textCommandParser (inputObj) {
       break;
     //
     case 'ME':
-      if (true) {
+      {
         if (parsedCommand.params.length < 1) {
           return {
             error: true,
@@ -556,53 +556,51 @@ function textCommandParser (inputObj) {
       break;
     //
     case 'MODE':
-      if (true) {
-        // Default to user mode if not in channel
-        if ((parsedCommand.restOf.length === 0) &&
-          (inputObj.originType !== 'channel')) {
-          // console.log('case 1');
-          ircMessage = 'MODE ' + ircState.nickName;
-        // case of own nickname is 1 of 1 parameters, fetch current user mode
-        } else if ((parsedCommand.restOf.length === 1) &&
-          (parsedCommand.restOf[0].toLowerCase() === ircState.nickName.toLowerCase())) {
-          // console.log('case 2');
-          ircMessage = 'MODE ' + ircState.nickName;
-        // case of own nickname and new mode are parameters 1 and 2
-        } else if ((parsedCommand.restOf.length === 2) &&
-          (parsedCommand.params[1].toLowerCase() === ircState.nickName.toLowerCase()) &&
-          (parsedCommand.restOf[1].length > 0)) {
-          // console.log('case 3');
-          ircMessage = 'MODE ' + ircState.nickName + ' ' + parsedCommand.restOf[1];
-        // Default to channel mode if in channel
-        } else if ((parsedCommand.restOf.length === 0) &&
-          (inputObj.originType === 'channel')) {
-          // console.log('case 4');
-          ircMessage = 'MODE ' + inputObj.originName;
-        //  case of only 1 parameter that starts with channel first character
-        } else if ((parsedCommand.restOf.length === 1) &&
-          (ircState.channels.indexOf(parsedCommand.restOf[0].toLowerCase()) >= 0)) {
-          // console.log('case 5');
-          ircMessage = 'MODE ' + parsedCommand.restOf[0];
-        //  case of in channel window and first param starts with + or - or b
-        } else if ((parsedCommand.restOf.length > 0) &&
-          (inputObj.originType === 'channel') &&
-          ((parsedCommand.restOf[0].charAt(0) === '+') ||
-          (parsedCommand.restOf[0].charAt(0) === '-') ||
-          (parsedCommand.restOf[0].charAt(0) === 'b'))) {
-          // console.log('case 6');
-          ircMessage = 'MODE ' + inputObj.originName + ' ' + parsedCommand.restOf[0];
-        //  case of only 1 parameter that starts with channel first character
-        } else if ((parsedCommand.restOf.length > 1) &&
-          (ircState.channels.indexOf(parsedCommand.params[1].toLowerCase()) >= 0)) {
-          // console.log('case 7');
-          ircMessage = 'MODE ' + parsedCommand.params[1] + ' ' + parsedCommand.restOf[1];
-        } else {
-          return {
-            error: true,
-            message: 'Expect: /MODE <nickname> [user-mode] or /MODE <#channel> <channel-mode>',
-            ircMessage: null
-          };
-        }
+      // Default to user mode if not in channel
+      if ((parsedCommand.restOf.length === 0) &&
+        (inputObj.originType !== 'channel')) {
+        // console.log('case 1');
+        ircMessage = 'MODE ' + ircState.nickName;
+      // case of own nickname is 1 of 1 parameters, fetch current user mode
+      } else if ((parsedCommand.restOf.length === 1) &&
+        (parsedCommand.restOf[0].toLowerCase() === ircState.nickName.toLowerCase())) {
+        // console.log('case 2');
+        ircMessage = 'MODE ' + ircState.nickName;
+      // case of own nickname and new mode are parameters 1 and 2
+      } else if ((parsedCommand.restOf.length === 2) &&
+        (parsedCommand.params[1].toLowerCase() === ircState.nickName.toLowerCase()) &&
+        (parsedCommand.restOf[1].length > 0)) {
+        // console.log('case 3');
+        ircMessage = 'MODE ' + ircState.nickName + ' ' + parsedCommand.restOf[1];
+      // Default to channel mode if in channel
+      } else if ((parsedCommand.restOf.length === 0) &&
+        (inputObj.originType === 'channel')) {
+        // console.log('case 4');
+        ircMessage = 'MODE ' + inputObj.originName;
+      //  case of only 1 parameter that starts with channel first character
+      } else if ((parsedCommand.restOf.length === 1) &&
+        (ircState.channels.indexOf(parsedCommand.restOf[0].toLowerCase()) >= 0)) {
+        // console.log('case 5');
+        ircMessage = 'MODE ' + parsedCommand.restOf[0];
+      //  case of in channel window and first param starts with + or - or b
+      } else if ((parsedCommand.restOf.length > 0) &&
+        (inputObj.originType === 'channel') &&
+        ((parsedCommand.restOf[0].charAt(0) === '+') ||
+        (parsedCommand.restOf[0].charAt(0) === '-') ||
+        (parsedCommand.restOf[0].charAt(0) === 'b'))) {
+        // console.log('case 6');
+        ircMessage = 'MODE ' + inputObj.originName + ' ' + parsedCommand.restOf[0];
+      //  case of only 1 parameter that starts with channel first character
+      } else if ((parsedCommand.restOf.length > 1) &&
+        (ircState.channels.indexOf(parsedCommand.params[1].toLowerCase()) >= 0)) {
+        // console.log('case 7');
+        ircMessage = 'MODE ' + parsedCommand.params[1] + ' ' + parsedCommand.restOf[1];
+      } else {
+        return {
+          error: true,
+          message: 'Expect: /MODE <nickname> [user-mode] or /MODE <#channel> <channel-mode>',
+          ircMessage: null
+        };
       }
       break;
     //
@@ -649,7 +647,7 @@ function textCommandParser (inputObj) {
         message: null,
         ircMessage: null
       };
-      break;
+      // break;
     //
     case 'NOTICE':
       // Note: this will send to either channel or user
@@ -665,7 +663,7 @@ function textCommandParser (inputObj) {
       break;
     //
     case 'OP':
-      if (true) {
+      {
         let ro = _parseChannelModes('+', 'o', 'OP', parsedCommand, inputObj);
         if (ro.error) {
           return ro;
@@ -754,7 +752,7 @@ function textCommandParser (inputObj) {
       }
       break;
     case 'VOICE':
-      if (true) {
+      {
         let ro = _parseChannelModes('+', 'v', 'VOICE', parsedCommand, inputObj);
         if (ro.error) {
           return ro;

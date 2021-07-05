@@ -1184,7 +1184,7 @@ function createChannelEl (name) {
         }
         break;
       case 'NICK':
-        if (true) {
+        {
           // ------------
           // Is previous nick or new nick in ANY active channel?
           // -----------

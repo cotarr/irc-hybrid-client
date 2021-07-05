@@ -564,10 +564,13 @@ function _buildPrivateMessageText () {
   let inputAreaEl = document.getElementById('userPrivMsgInputId');
   let text = stripTrailingCrLf(inputAreaEl.value);
   if (detectMultiLineString(text)) {
-    inputAreaEl.value = '';
     showError('Multi-line input is not supported.');
+    inputAreaEl.value = '';
   } else {
-    if (text.length > 0) {
+    if (text.length === 0) {
+      // remove cr/lf if present, then do nothing
+      inputAreaEl.value = '';
+    } else {
       // Check slash character to see if it is an IRC command
       if (text.charAt(0) === '/') {
         // yes, it is command
@@ -582,25 +585,22 @@ function _buildPrivateMessageText () {
         inputAreaEl.value = '';
         if (commandAction.error) {
           showError(commandAction.message);
-          return;
         } else {
           if ((commandAction.ircMessage) && (commandAction.ircMessage.length > 0)) {
             _sendIrcServerMessage(commandAction.ircMessage);
           }
-          return;
         }
-        return;
+      } else {
+        console.log('else not command');
+        // Else not slash / command, assume is input intended to send to private message.
+        if (document.getElementById('pmNickNameInputId').value.length === 0) return;
+        let targetNickname = document.getElementById('pmNickNameInputId').value;
+        let message = 'PRIVMSG ' + targetNickname + ' :' + text;
+        _sendIrcServerMessage(message);
+        inputAreaEl.value = '';
       }
-      console.log('else not command');
-      // Else not slash / command, assume is input intended to send to private message.
-      if (document.getElementById('pmNickNameInputId').value.length === 0) return;
-      let targetNickname = document.getElementById('pmNickNameInputId').value;
-      let message = 'PRIVMSG ' + targetNickname + ' :' + text;
-      _sendIrcServerMessage(message);
-      inputAreaEl.value = '';
     }
   }
-  inputAreaEl.value = '';
 };
 document.getElementById('userPrivMsgInputId').addEventListener('input', function (event) {
   if ((event.inputType === 'insertText') && (event.data === null)) {

@@ -424,7 +424,7 @@ document.addEventListener('server-message', function (event) {
       // will be displayed in the server window when the channel is unknown.
       // There are 3 places in the code, search: 'QUIT':
       //
-      if (true) {
+      {
         let reason = ' ';
         if (event.detail.parsedMessage.params[0]) {
           reason = event.detail.parsedMessage.params[0];
@@ -439,12 +439,10 @@ document.addEventListener('server-message', function (event) {
       break;
     default:
       // this is catch-all, if no formatted case, then display here
-      if (true) {
-        displayRawMessage(
-          cleanFormatting(
-            cleanCtcpDelimiter(
-              substituteHmsTime(event.detail.message))));
-      }
+      displayRawMessage(
+        cleanFormatting(
+          cleanCtcpDelimiter(
+            substituteHmsTime(event.detail.message))));
   } // switch
   if (webState.cacheInhibitTimer === 0) {
     showRawMessageWindow();
