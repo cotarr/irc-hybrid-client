@@ -37,8 +37,8 @@ document.getElementById('cycleNextServerButton').addEventListener('click', funct
   // servers one at a time. For the future, an index can
   // be specified for a specific server
   //
-  let fetchURL = webServerUrl + '/irc/server';
-  let fetchOptions = {
+  const fetchURL = webServerUrl + '/irc/server';
+  const fetchOptions = {
     method: 'POST',
     headers: {
       'Content-type': 'application/json',
@@ -92,15 +92,15 @@ function connectButtonHandler () {
   // change color of icon
   webState.ircConnecting = true;
 
-  let connectObject = {};
+  const connectObject = {};
   connectObject.nickName = document.getElementById('nickNameInputId').value;
   // The username is set only in the config file
   // connectObject.userName = document.getElementById('userNameInputId').value;
   connectObject.realName = document.getElementById('realNameInputId').value;
   connectObject.userMode = document.getElementById('userModeInputId').value;
 
-  let fetchURL = webServerUrl + '/irc/connect';
-  let fetchOptions = {
+  const fetchURL = webServerUrl + '/irc/connect';
+  const fetchOptions = {
     method: 'POST',
     headers: {
       'Content-type': 'application/json',
@@ -137,8 +137,8 @@ function connectButtonHandler () {
 // ----------------------------------
 function forceDisconnectHandler () {
   console.log('Disconnect button pressed.');
-  let fetchURL = webServerUrl + '/irc/disconnect';
-  let fetchOptions = {
+  const fetchURL = webServerUrl + '/irc/disconnect';
+  const fetchOptions = {
     method: 'POST',
     headers: {
       'Content-type': 'application/json',
@@ -177,7 +177,7 @@ document.getElementById('disconnectButton').addEventListener('click', function (
 // ------------------------------------------------
 // Tap "Web" status icon to connect/disconnect
 // ------------------------------------------------
-var ircStatusIconTouchDebounce = false;
+let ircStatusIconTouchDebounce = false;
 document.getElementById('ircConnectIconId').addEventListener('click', function () {
   // debounce button
   if (ircStatusIconTouchDebounce) return;

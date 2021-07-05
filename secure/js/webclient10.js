@@ -50,8 +50,8 @@ function updateFromCache () {
       }
     }));
 
-  let fetchURL = webServerUrl + '/irc/cache';
-  let fetchOptions = {
+  const fetchURL = webServerUrl + '/irc/cache';
+  const fetchOptions = {
     method: 'GET',
     headers: {
       Accept: 'application/json'
@@ -69,7 +69,7 @@ function updateFromCache () {
     .then((responseArray) => {
       if ((Array.isArray(responseArray)) && (responseArray.length > 0)) {
         // remove dynamically created private message elements to match list
-        let privMsgSessionEl = document.getElementById('privateMessageContainerDiv');
+        const privMsgSessionEl = document.getElementById('privateMessageContainerDiv');
         while (privMsgSessionEl.firstChild) {
           privMsgSessionEl.removeChild(privMsgSessionEl.firstChild);
         }
@@ -102,7 +102,7 @@ function updateFromCache () {
           }
         }
         // this is to inform windows that cache reload has completed.
-        let timestamp = unixTimestamp();
+        const timestamp = unixTimestamp();
         document.dispatchEvent(new CustomEvent('cache-reload-done', {
           bubbles: true,
           detail: {
@@ -131,8 +131,8 @@ webState.cacheInhibitTimer = 3;
 // -----------------------
 document.getElementById('serverTerminateButton').addEventListener('click', function () {
   console.log('Requesting backend server to terminate');
-  let fetchURL = webServerUrl + '/terminate';
-  let fetchOptions = {
+  const fetchURL = webServerUrl + '/terminate';
+  const fetchOptions = {
     method: 'POST',
     headers: {
       'Content-type': 'application/json',
@@ -174,8 +174,8 @@ document.getElementById('eraseCacheButton').addEventListener('click', function (
       detail: {
       }
     }));
-  let fetchURL = webServerUrl + '/irc/erase';
-  let fetchOptions = {
+  const fetchURL = webServerUrl + '/irc/erase';
+  const fetchOptions = {
     method: 'POST',
     headers: {
       'Content-type': 'application/json',
@@ -197,7 +197,7 @@ document.getElementById('eraseCacheButton').addEventListener('click', function (
         showError(responseJson.message);
       } else {
         // remove dynamically created private message elements to match list
-        let privMsgSessionEl = document.getElementById('privateMessageContainerDiv');
+        const privMsgSessionEl = document.getElementById('privateMessageContainerDiv');
         while (privMsgSessionEl.firstChild) {
           privMsgSessionEl.removeChild(privMsgSessionEl.firstChild);
         }
@@ -222,8 +222,8 @@ document.getElementById('eraseCacheButton').addEventListener('click', function (
 // Fetch web login user's name and update top
 // --------------------------------------------
 function updateUsername () {
-  let fetchURL = webServerUrl + '/userinfo';
-  let fetchOptions = {
+  const fetchURL = webServerUrl + '/userinfo';
+  const fetchOptions = {
     method: 'GET',
     headers: {
       Accept: 'application/json'
@@ -253,8 +253,8 @@ updateUsername();
 document.getElementById('test1Button').addEventListener('click', function () {
   console.log('Test1 button pressed.');
 
-  let fetchURL = webServerUrl + '/irc/test1';
-  let fetchOptions = {
+  const fetchURL = webServerUrl + '/irc/test1';
+  const fetchOptions = {
     method: 'GET',
     headers: {
       Accept: 'application/json'
@@ -288,8 +288,8 @@ document.getElementById('test1ButtonDesc').textContent = 'Force garbage collect'
 document.getElementById('test2Button').addEventListener('click', function () {
   console.log('Test2 button pressed.');
 
-  let fetchURL = webServerUrl + '/irc/test2';
-  let fetchOptions = {
+  const fetchURL = webServerUrl + '/irc/test2';
+  const fetchOptions = {
     method: 'GET',
     headers: {
       Accept: 'application/json'
@@ -389,21 +389,21 @@ document.getElementById('test4ButtonDesc').textContent = 'Call getIrcState()';
 //
 // This element exists hardcoded at the bottom of webclient.html
 // It will be used to hold temporary elements while measuring the width
-let rulerDivEl = document.getElementById('rulerDiv');
+const rulerDivEl = document.getElementById('rulerDiv');
 
 // Value of temporary character size (cols attribute)
-let rulerX1 = 10;
-let rulerX2 = 20;
+const rulerX1 = 10;
+const rulerX2 = 20;
 // Create <textarea> element using first width value
-let rulerTextareaEl = document.createElement('textarea');
+const rulerTextareaEl = document.createElement('textarea');
 rulerTextareaEl.setAttribute('cols', rulerX1.toString());
 rulerTextareaEl.setAttribute('rows', '1');
 rulerDivEl.appendChild(rulerTextareaEl);
 // the rulerY1 is the pixel width of a textarea with rulerX1 characters
-let rulerY1 = rulerTextareaEl.getBoundingClientRect().width;
+const rulerY1 = rulerTextareaEl.getBoundingClientRect().width;
 // repeat with different character and pixel width
 rulerTextareaEl.setAttribute('cols', rulerX2.toString());
-let rulerY2 = rulerTextareaEl.getBoundingClientRect().width;
+const rulerY2 = rulerTextareaEl.getBoundingClientRect().width;
 // done, remove the temporary element
 rulerDivEl.removeChild(rulerTextareaEl);
 
@@ -413,7 +413,7 @@ webState.dynamic.inputAreaCharWidthPx = (rulerY2 - rulerY1) / (rulerX2 - rulerX1
 webState.dynamic.inputAreaSideWidthPx = rulerY1 - (rulerX1 * webState.dynamic.inputAreaCharWidthPx);
 
 // Create <button> elment and fill with "Send" string value
-let rulerButtonEl = document.createElement('button');
+const rulerButtonEl = document.createElement('button');
 rulerButtonEl.textContent = 'Send';
 rulerDivEl.appendChild(rulerButtonEl);
 webState.dynamic.sendButtonWidthPx = rulerButtonEl.getBoundingClientRect().width;
@@ -444,7 +444,7 @@ const calcInputAreaColSize = function (marginPxWidth) {
     (webState.dynamic.inputAreaSideWidthPx > 1)) {
     let margin = marginPxWidth;
     if (margin < 0) margin = 0;
-    let cols = parseInt(
+    const cols = parseInt(
       (window.innerWidth - webState.dynamic.inputAreaSideWidthPx - margin) /
       webState.dynamic.inputAreaCharWidthPx);
     return cols.toString();
@@ -459,14 +459,14 @@ const calcInputAreaColSize = function (marginPxWidth) {
 //
 const adjustInputToWidowWidth = function (innerWidth) {
   // pixel width mar1 is reserved space on edges of input area at full screen width
-  let mar1 = webState.dynamic.commonMargin;
+  const mar1 = webState.dynamic.commonMargin;
   // set width of input area elements
   document.getElementById('rawMessageDisplay').setAttribute('cols', calcInputAreaColSize(mar1));
   document.getElementById('noticeMessageDisplay').setAttribute('cols', calcInputAreaColSize(mar1));
   document.getElementById('wallopsMessageDisplay').setAttribute('cols', calcInputAreaColSize(mar1));
 
   // pixel width mar2 is reserved space on edges of input area with send button added
-  let mar2 = webState.dynamic.commonMargin + 5 + webState.dynamic.sendButtonWidthPx;
+  const mar2 = webState.dynamic.commonMargin + 5 + webState.dynamic.sendButtonWidthPx;
   // set width of input area elements
   document.getElementById('rawMessageInputId').setAttribute('cols', calcInputAreaColSize(mar2));
   document.getElementById('userPrivMsgInputId').setAttribute('cols', calcInputAreaColSize(mar2));

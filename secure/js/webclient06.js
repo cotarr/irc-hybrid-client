@@ -35,7 +35,7 @@
 // Intercept IRC text command if detected
 // ------------------------------------------
 function _sendTextToChannel (channelIndex, textAreaEl) {
-  let text = stripTrailingCrLf(textAreaEl.value);
+  const text = stripTrailingCrLf(textAreaEl.value);
   if (detectMultiLineString(text)) {
     textAreaEl.value = '';
     showError('Multi-line input is not supported.');
@@ -44,7 +44,7 @@ function _sendTextToChannel (channelIndex, textAreaEl) {
       // Check slash character to see if it is an IRC command
       if (text.charAt(0) === '/') {
         // yes, it is command
-        let commandAction = textCommandParser(
+        const commandAction = textCommandParser(
           {
             inputString: text,
             originType: 'channel',
@@ -80,7 +80,7 @@ function _sendTextToChannel (channelIndex, textAreaEl) {
       //
       // Send message to channel
       //
-      let message = 'PRIVMSG ' +
+      const message = 'PRIVMSG ' +
         ircState.channelStates[channelIndex].name +
         ' :' + text;
       _sendIrcServerMessage(message);
@@ -90,8 +90,8 @@ function _sendTextToChannel (channelIndex, textAreaEl) {
   textAreaEl.value = '';
 }; // _sendTextToChannel
 
-var zoomIndexNumber = 0;
-var mobileBreakpointPx = 600;
+let zoomIndexNumber = 0;
+const mobileBreakpointPx = 600;
 
 // --------------------------------------------------------
 // This creates a new channel window and adds it to the DOM
@@ -110,85 +110,85 @@ function createChannelEl (name) {
   // Add to local browser list of open channels
   webState.channels.push(name.toLowerCase());
   // Initialize local state (note upon page refresh, channel joined may be false)
-  let initIrcStateIndex = ircState.channels.indexOf(name.toLowerCase());
+  const initIrcStateIndex = ircState.channels.indexOf(name.toLowerCase());
   webState.channelStates.push({
     lastJoined: ircState.channelStates[initIrcStateIndex].joined
   });
 
-  var maxNickLength = 0;
+  let maxNickLength = 0;
   // console.log('creating Channel Element ' + name);
 
-  let channelIndex = ircState.channels.indexOf(name.toLowerCase());
+  const channelIndex = ircState.channels.indexOf(name.toLowerCase());
   // console.log('channel state obj ' +
   //   JSON.stringify(ircState.channelStates[channelIndex], null, 2));
 
   // This is static HTML element created in webclient.html (Insert point)
-  let channelContainerDivEl = document.getElementById('channelContainerDiv');
+  const channelContainerDivEl = document.getElementById('channelContainerDiv');
 
   // section-div (main element for each channel)
-  let channelMainSectionEl = document.createElement('div');
+  const channelMainSectionEl = document.createElement('div');
   channelMainSectionEl.classList.add('color-channel');
   channelMainSectionEl.classList.add('aa-section-div');
 
   // Top Element (non-hidden element)
-  let channelTopDivEl = document.createElement('div');
+  const channelTopDivEl = document.createElement('div');
   channelTopDivEl.classList.add('channel-top-div');
   channelTopDivEl.classList.add('head-flex');
 
   // left flexbox div
-  let channelTopLeftDivEl = document.createElement('div');
+  const channelTopLeftDivEl = document.createElement('div');
   channelTopLeftDivEl.classList.add('head-left');
 
-  let channelTopSpacerDivEl = document.createElement('div');
+  const channelTopSpacerDivEl = document.createElement('div');
   channelTopSpacerDivEl.classList.add('vh5');
 
   // center if needed here
 
   // right flexbox div
-  let channelTopRightDivEl = document.createElement('div');
+  const channelTopRightDivEl = document.createElement('div');
   channelTopRightDivEl.classList.add('head-right');
 
   // right hidable div
-  let channelTopRightHidableDivEl = document.createElement('div');
+  const channelTopRightHidableDivEl = document.createElement('div');
   channelTopRightHidableDivEl.classList.add('head-right-hidable-div');
 
   // show/hide button
-  let channelHideButtonEl = document.createElement('button');
+  const channelHideButtonEl = document.createElement('button');
   channelHideButtonEl.textContent = '-';
   channelHideButtonEl.classList.add('channel-button');
 
   // Top Channel name
-  let channelNameDivEl = document.createElement('div');
+  const channelNameDivEl = document.createElement('div');
   channelNameDivEl.textContent = ircState.channelStates[channelIndex].name;
   channelNameDivEl.classList.add('chan-name-div');
 
   // Taller button
-  let channelTallerButtonEl = document.createElement('button');
+  const channelTallerButtonEl = document.createElement('button');
   channelTallerButtonEl.textContent = 'Taller';
   channelTallerButtonEl.classList.add('channel-button');
 
   // Normal button
-  let channelNormalButtonEl = document.createElement('button');
+  const channelNormalButtonEl = document.createElement('button');
   channelNormalButtonEl.textContent = 'Normal';
   channelNormalButtonEl.classList.add('channel-button');
 
   // Clear button
-  let channelClearButtonEl = document.createElement('button');
+  const channelClearButtonEl = document.createElement('button');
   channelClearButtonEl.textContent = 'Clear';
   channelClearButtonEl.classList.add('channel-button');
 
   // Bottom Element (optionally hidden)
-  let channelBottomDivEl = document.createElement('div');
+  const channelBottomDivEl = document.createElement('div');
   channelBottomDivEl.classList.add('channel-bottom-div');
 
-  // hannel topic
-  let channelTopicDivEl = document.createElement('div');
+  // channel topic
+  const channelTopicDivEl = document.createElement('div');
   channelTopicDivEl.textContent = cleanFormatting(ircState.channelStates[channelIndex].topic);
   channelTopicDivEl.classList.add('chan-topic-div');
 
   // list of nick names display
-  let channelNamesCharWidth = 20;
-  let channelNamesDisplayEl = document.createElement('textarea');
+  const channelNamesCharWidth = 20;
+  const channelNamesDisplayEl = document.createElement('textarea');
   channelNamesDisplayEl.classList.add('channel-names-display');
   channelNamesDisplayEl.setAttribute('cols', channelNamesCharWidth.toString());
   channelNamesDisplayEl.setAttribute('rows', defaultHeightInRows);
@@ -196,8 +196,8 @@ function createChannelEl (name) {
   channelNamesDisplayEl.setAttribute('readonly', '');
 
   // resizable text area
-  let channelTextAreaEl = document.createElement('textarea');
-  let channelTextAreaId = 'chan' + channelIndex.toString() + 'TextAreaId';
+  const channelTextAreaEl = document.createElement('textarea');
+  const channelTextAreaId = 'chan' + channelIndex.toString() + 'TextAreaId';
   channelTextAreaEl.id = channelTextAreaId;
   // this is temporary, the width (cols attribute) will be resized dynamically
   channelTextAreaEl.setAttribute('cols', '30');
@@ -206,12 +206,12 @@ function createChannelEl (name) {
   channelTextAreaEl.setAttribute('readonly', '');
 
   // div holding input area and send button
-  let channelBottomDiv1El = document.createElement('div');
+  const channelBottomDiv1El = document.createElement('div');
   channelBottomDiv1El.classList.add('button-div');
 
   // single line user input
-  let channelInputAreaEl = document.createElement('textarea');
-  let channelInputAreaId = 'chan' + channelIndex.toString() + 'InputInputId';
+  const channelInputAreaEl = document.createElement('textarea');
+  const channelInputAreaId = 'chan' + channelIndex.toString() + 'InputInputId';
   channelInputAreaEl.id = channelInputAreaId;
   channelInputAreaEl.setAttribute('cols', '120');
   channelInputAreaEl.setAttribute('rows', '1');
@@ -219,84 +219,84 @@ function createChannelEl (name) {
   channelInputAreaEl.classList.add('rm5');
 
   // send button
-  let channelSendButtonEl = document.createElement('button');
+  const channelSendButtonEl = document.createElement('button');
   channelSendButtonEl.textContent = 'Send';
   channelSendButtonEl.classList.add('va-middle');
 
   // button-div
-  let channelBottomDiv2El = document.createElement('div');
+  const channelBottomDiv2El = document.createElement('div');
   channelBottomDiv2El.classList.add('button-div');
 
   // join button
-  let channelJoinButtonEl = document.createElement('button');
+  const channelJoinButtonEl = document.createElement('button');
   channelJoinButtonEl.textContent = 'Join';
   channelJoinButtonEl.classList.add('channel-button');
 
   // prune button
-  let channelPruneButtonEl = document.createElement('button');
+  const channelPruneButtonEl = document.createElement('button');
   channelPruneButtonEl.textContent = 'Prune';
   channelPruneButtonEl.classList.add('channel-button');
 
   // part button
-  let channelPartButtonEl = document.createElement('button');
+  const channelPartButtonEl = document.createElement('button');
   channelPartButtonEl.textContent = 'Leave';
   channelPartButtonEl.classList.add('channel-button');
 
   // zoom button
-  let channelZoomButtonEl = document.createElement('button');
+  const channelZoomButtonEl = document.createElement('button');
   channelZoomButtonEl.textContent = 'Zoom';
   channelZoomButtonEl.classList.add('channel-button');
 
   // refresh button
-  let channelRefreshButtonEl = document.createElement('button');
+  const channelRefreshButtonEl = document.createElement('button');
   channelRefreshButtonEl.textContent = 'Refresh';
   channelRefreshButtonEl.classList.add('channel-button');
 
   // button-div
-  let channelBottomDiv3El = document.createElement('div');
+  const channelBottomDiv3El = document.createElement('div');
   channelBottomDiv3El.classList.add('button-div');
 
   // Text Format checkbox
-  let channelFormatCBInputEl = document.createElement('input');
+  const channelFormatCBInputEl = document.createElement('input');
   channelFormatCBInputEl.classList.add('channel-cb-cb');
   channelFormatCBInputEl.setAttribute('type', 'checkbox');
-  let channelFormatCBTitleEl = document.createElement('span');
+  const channelFormatCBTitleEl = document.createElement('span');
   channelFormatCBTitleEl.classList.add('channel-cb-span');
   channelFormatCBTitleEl.textContent = 'Brief';
 
   // Auto-complete checkbox
-  let channelAutoCompCBInputEl = document.createElement('input');
+  const channelAutoCompCBInputEl = document.createElement('input');
   channelAutoCompCBInputEl.classList.add('channel-cb-cb');
   channelAutoCompCBInputEl.setAttribute('type', 'checkbox');
-  let channelAutoCompCBTitleEl = document.createElement('span');
+  const channelAutoCompCBTitleEl = document.createElement('span');
   channelAutoCompCBTitleEl.classList.add('channel-cb-span');
   channelAutoCompCBTitleEl.textContent = 'Auto-complete (tab, space-space)';
 
   // button-div
-  let channelBottomDiv4El = document.createElement('div');
+  const channelBottomDiv4El = document.createElement('div');
   channelBottomDiv4El.classList.add('button-div');
 
   // beep on message checkbox
-  let channelBeep1CBInputEl = document.createElement('input');
+  const channelBeep1CBInputEl = document.createElement('input');
   channelBeep1CBInputEl.classList.add('channel-cb-cb');
   channelBeep1CBInputEl.setAttribute('type', 'checkbox');
-  let channelBeep1CBTitleEl = document.createElement('span');
+  const channelBeep1CBTitleEl = document.createElement('span');
   channelBeep1CBTitleEl.classList.add('channel-cb-span');
   channelBeep1CBTitleEl.textContent = 'Line-beep';
 
   // beep on join checkbox
-  let channelBeep2CBInputEl = document.createElement('input');
+  const channelBeep2CBInputEl = document.createElement('input');
   channelBeep2CBInputEl.classList.add('channel-cb-cb');
   channelBeep2CBInputEl.setAttribute('type', 'checkbox');
-  let channelBeep2CBTitleEl = document.createElement('span');
+  const channelBeep2CBTitleEl = document.createElement('span');
   channelBeep2CBTitleEl.classList.add('channel-cb-span');
   channelBeep2CBTitleEl.textContent = 'Join-beep';
 
   // beep on matchNick my nickname checkbox
-  let channelBeep3CBInputEl = document.createElement('input');
+  const channelBeep3CBInputEl = document.createElement('input');
   channelBeep3CBInputEl.classList.add('channel-cb-cb');
   channelBeep3CBInputEl.setAttribute('type', 'checkbox');
-  let channelBeep3CBTitleEl = document.createElement('span');
+  const channelBeep3CBTitleEl = document.createElement('span');
   channelBeep3CBTitleEl.classList.add('channel-cb-span');
   channelBeep3CBTitleEl.textContent = 'Name-beep';
 
@@ -367,7 +367,7 @@ function createChannelEl (name) {
   // --------------------------
 
   // inhibit timer to prevent display of activity icon
-  var activityIconInhibitTimer = 0;
+  let activityIconInhibitTimer = 0;
   setInterval(function () {
     if (activityIconInhibitTimer > 0) activityIconInhibitTimer--;
   }, 1000);
@@ -395,7 +395,7 @@ function createChannelEl (name) {
   // Taller button handler
   // -------------------------
   channelTallerButtonEl.addEventListener('click', function () {
-    let newRows = parseInt(channelTextAreaEl.getAttribute('rows')) + 10;
+    const newRows = parseInt(channelTextAreaEl.getAttribute('rows')) + 10;
     channelTextAreaEl.setAttribute('rows', newRows.toString());
     channelNamesDisplayEl.setAttribute('rows', newRows.toString());
   }); // createChannelEl()
@@ -421,7 +421,7 @@ function createChannelEl (name) {
   // Join button handler
   // -------------------------
   channelJoinButtonEl.addEventListener('click', function () {
-    let message = 'JOIN ' + name;
+    const message = 'JOIN ' + name;
     _sendIrcServerMessage(message);
   });
 
@@ -429,7 +429,7 @@ function createChannelEl (name) {
   // Part button handler
   // -------------------------
   channelPartButtonEl.addEventListener('click', function () {
-    let message = 'PART ' + name + ' :' + ircState.progName + ' ' + ircState.progVersion;
+    const message = 'PART ' + name + ' :' + ircState.progName + ' ' + ircState.progVersion;
     _sendIrcServerMessage(message);
   });
 
@@ -441,7 +441,7 @@ function createChannelEl (name) {
     // Some variabes are within variable namespace of parent function.
     function _removeChannelFromDom () {
       // remove frontend browser state info for this channel
-      let webStateChannelsIndex = webState.channels.indexOf(name.toLowerCase());
+      const webStateChannelsIndex = webState.channels.indexOf(name.toLowerCase());
       if (webStateChannelsIndex >= 0) {
         webState.channels.splice(webStateChannelsIndex, 1);
         webState.channelStates.splice(webStateChannelsIndex, 1);
@@ -453,12 +453,12 @@ function createChannelEl (name) {
     }
 
     // Fetch API to remove channel from backend server
-    let index = ircState.channels.indexOf(name.toLowerCase());
+    const index = ircState.channels.indexOf(name.toLowerCase());
     if (index >= 0) {
       // if not joined, this is quietly ignored without error
       if (!ircState.channelStates[index].joined) {
-        let fetchURL = webServerUrl + '/irc/prune';
-        let fetchOptions = {
+        const fetchURL = webServerUrl + '/irc/prune';
+        const fetchOptions = {
           method: 'POST',
           headers: {
             'Content-type': 'application/json',
@@ -540,7 +540,7 @@ function createChannelEl (name) {
 
   function updateVisibility () {
     // console.log('Event: irc-state-changed (createChannelEl)');
-    let index = ircState.channels.indexOf(name.toLowerCase());
+    const index = ircState.channels.indexOf(name.toLowerCase());
     if (index >= 0) {
       if (ircState.channelStates[index].joined) {
         channelTopicDivEl.textContent = cleanFormatting(ircState.channelStates[index].topic);
@@ -625,7 +625,7 @@ function createChannelEl (name) {
   // Zoom button handler
   // -------------------------
   zoomIndexNumber++;
-  let zoomEventId = 'chan' + zoomIndexNumber.toString() + 'ZoomId';
+  const zoomEventId = 'chan' + zoomIndexNumber.toString() + 'ZoomId';
   channelZoomButtonEl.addEventListener('click', function () {
     if (channelMainSectionEl.hasAttribute('zoom')) {
       // Turn off channel zoom
@@ -859,7 +859,7 @@ function createChannelEl (name) {
     } else {
       // #6 check channel nickname list
       let completeNick = '';
-      let chanIndex = ircState.channels.indexOf(name.toLowerCase());
+      const chanIndex = ircState.channels.indexOf(name.toLowerCase());
       if (chanIndex >= 0) {
         if (ircState.channelStates[chanIndex].names.length > 0) {
           for (let i = 0; i < ircState.channelStates[chanIndex].names.length; i++) {
@@ -887,7 +887,7 @@ function createChannelEl (name) {
     }
     return last;
   };
-  var lastAutoCompleteMatch = '';
+  let lastAutoCompleteMatch = '';
   const channelAutoComplete = function (e) {
     const autoCompleteTabKey = 9;
     const autoCompleteSpaceKey = 32;
@@ -902,7 +902,7 @@ function createChannelEl (name) {
         return;
       }
       let snippet = '';
-      let snippetArray = channelInputAreaEl.value.split(' ');
+      const snippetArray = channelInputAreaEl.value.split(' ');
       if (snippetArray.length > 0) {
         snippet = snippetArray[snippetArray.length - 1];
       }
@@ -956,12 +956,12 @@ function createChannelEl (name) {
             channelInputAreaEl.value =
               channelInputAreaEl.value.slice(0, channelInputAreaEl.value.length - 1);
             let snippet = '';
-            let snippetArray = channelInputAreaEl.value.split(' ');
+            const snippetArray = channelInputAreaEl.value.split(' ');
             if (snippetArray.length > 0) {
               snippet = snippetArray[snippetArray.length - 1];
             }
             if (snippet.length > 0) {
-              let matchStr = _autoCompleteInputElement(snippet);
+              const matchStr = _autoCompleteInputElement(snippet);
               if (lastAutoCompleteMatch !== matchStr) {
                 lastAutoCompleteMatch = matchStr;
                 e.preventDefault();
@@ -985,13 +985,13 @@ function createChannelEl (name) {
   // Nickname list
   // ----------------
   function _updateNickList () {
-    let index = ircState.channels.indexOf(name.toLowerCase());
+    const index = ircState.channels.indexOf(name.toLowerCase());
     if (index >= 0) {
       maxNickLength = 0;
       if (ircState.channelStates[index].names.length > 0) {
         channelNamesDisplayEl.value = '';
-        let opList = [];
-        let otherList = [];
+        const opList = [];
+        const otherList = [];
         for (let i = 0; i < ircState.channelStates[index].names.length; i++) {
           if (ircState.channelStates[index].names[i].charAt(0) === '@') {
             opList.push(ircState.channelStates[index].names[i]);
@@ -999,8 +999,8 @@ function createChannelEl (name) {
             otherList.push(ircState.channelStates[index].names[i]);
           }
         }
-        let sortedOpList = opList.sort();
-        let sortedOtherList = otherList.sort();
+        const sortedOpList = opList.sort();
+        const sortedOtherList = otherList.sort();
         if (sortedOpList.length > 0) {
           for (let i = 0; i < sortedOpList.length; i++) {
             channelNamesDisplayEl.value += sortedOpList[i] + '\n';
@@ -1028,7 +1028,7 @@ function createChannelEl (name) {
   //
   function _updateChannelTitle () {
     let titleStr = name + ' (';
-    let index = ircState.channels.indexOf(name.toLowerCase());
+    const index = ircState.channels.indexOf(name.toLowerCase());
     if (index >= 0) {
       if (ircState.channelStates[index].joined) {
         titleStr += parseInt(ircState.channelStates[index].names.length).toString();
@@ -1078,8 +1078,8 @@ function createChannelEl (name) {
     // If channel was previously joined, then parted, then re-joined
     // Check for joined change to true and show channel if hidden
     //
-    let ircStateIndex = ircState.channels.indexOf(name.toLowerCase());
-    let webStateIndex = webState.channels.indexOf(name.toLowerCase());
+    const ircStateIndex = ircState.channels.indexOf(name.toLowerCase());
+    const webStateIndex = webState.channels.indexOf(name.toLowerCase());
     if ((ircStateIndex >= 0) && (webStateIndex >= 0)) {
       if (ircState.channelStates[ircStateIndex].joined !==
         webState.channelStates[webStateIndex].lastJoined) {
@@ -1124,7 +1124,7 @@ function createChannelEl (name) {
       channelTextAreaEl.scrollTop = channelTextAreaEl.scrollHeight;
     }
 
-    let parsedMessage = event.detail.parsedMessage;
+    const parsedMessage = event.detail.parsedMessage;
     // console.log('Event channel-message: ' + JSON.stringify(parsedMessage, null, 2));
 
     switch (parsedMessage.command) {
@@ -1251,7 +1251,7 @@ function createChannelEl (name) {
             playBeep1Sound();
           }
           if (channelMainSectionEl.hasAttribute('beep3-enabled')) {
-            let checkLine = parsedMessage.params[1].toLowerCase();
+            const checkLine = parsedMessage.params[1].toLowerCase();
             if ((checkLine.indexOf(ircState.nickName.toLowerCase()) >= 0) &&
               (webState.cacheInhibitTimer === 0)) {
               setTimeout(playBeep2Sound, 250);
@@ -1351,17 +1351,17 @@ function createChannelEl (name) {
   //
   const adjustChannelInputToWidowWidth = function (innerWidth) {
     // pixel width mar1 is reserved space on edges of input area at full screen width
-    let mar1 = webState.dynamic.commonMargin;
+    const mar1 = webState.dynamic.commonMargin;
     // pixel width mar2 is reserved space on edges of input area with send button added
-    let mar2 = webState.dynamic.commonMargin + 5 + webState.dynamic.sendButtonWidthPx;
+    const mar2 = webState.dynamic.commonMargin + 5 + webState.dynamic.sendButtonWidthPx;
     // pixed width mar3 is reserved space on edges of input area with channel nickname list on sides
 
     // get size of nickname list element
-    let nicknameListPixelWidth = webState.dynamic.inputAreaSideWidthPx +
+    const nicknameListPixelWidth = webState.dynamic.inputAreaSideWidthPx +
       (channelNamesCharWidth * webState.dynamic.inputAreaCharWidthPx);
 
     // nickname list + right margin.
-    let mar3 = webState.dynamic.commonMargin + nicknameListPixelWidth + 6;
+    const mar3 = webState.dynamic.commonMargin + nicknameListPixelWidth + 6;
 
     if (window.innerWidth > mobileBreakpointPx) {
       // channelNamesDisplayEl.setAttribute('cols', channelNamesCharWidth.toString());
@@ -1400,15 +1400,15 @@ function createChannelEl (name) {
 // A change in state occurred, check if new channel need to be created.
 // ----------------------------------------------------------------------
 // init to zero to force first update
-var lastJoinedChannelCount = -1;
-var lastIrcServerIndex = -1;
+let lastJoinedChannelCount = -1;
+let lastIrcServerIndex = -1;
 document.addEventListener('irc-state-changed', function (event) {
   // console.log('checking for channel updates');
 
   // Check list of server's channels and create new if missing.
   if (ircState.channels.length > 0) {
     for (let i = 0; i < ircState.channels.length; i++) {
-      let name = ircState.channels[i];
+      const name = ircState.channels[i];
       if (webState.channels.indexOf(name.toLowerCase()) === -1) {
         // console.log('Creating new channel ' + name);
         createChannelEl(name);
@@ -1438,16 +1438,16 @@ document.addEventListener('irc-state-changed', function (event) {
   if (needButtonUpdate) {
     // console.log('Updating favorite channel buttons');
     // remove old button elements
-    let channelJoinButtonContainerEl = document.getElementById('channelJoinButtonContainer');
+    const channelJoinButtonContainerEl = document.getElementById('channelJoinButtonContainer');
     while (channelJoinButtonContainerEl.firstChild) {
       channelJoinButtonContainerEl.removeChild(channelJoinButtonContainerEl.firstChild);
     }
     if (ircState.channelList.length > 0) {
       for (let i = 0; i < ircState.channelList.length; i++) {
-        let channelIndex = ircState.channels.indexOf(ircState.channelList[i].toLowerCase());
+        const channelIndex = ircState.channels.indexOf(ircState.channelList[i].toLowerCase());
         if ((channelIndex < 0) || (!ircState.channelStates[channelIndex].joined)) {
           // console.log('adding ' + ircState.channelList[i]);
-          let joinButtonEl = document.createElement('button');
+          const joinButtonEl = document.createElement('button');
           joinButtonEl.textContent = ircState.channelList[i];
           joinButtonEl.classList.add('channel-button');
           channelJoinButtonContainerEl.appendChild(joinButtonEl);
@@ -1478,12 +1478,11 @@ document.getElementById('ircChannelsMainHiddenButton').addEventListener('click',
 // Join New Channel (Button and Enter)
 // ---------------------------------------
 function _newChannel () {
-  let newChannel = document.getElementById('newChannelNameInputId').value;
+  const newChannel = document.getElementById('newChannelNameInputId').value;
   document.getElementById('newChannelNameInputId').value = '';
-  let chanPrefixChars = '#&+!';
   if ((newChannel.length > 1) &&
-    (chanPrefixChars.indexOf(newChannel.charAt(0)) >= 0)) {
-    let message = 'JOIN ' + newChannel;
+    (channelPrefixChars.indexOf(newChannel.charAt(0)) >= 0)) {
+    const message = 'JOIN ' + newChannel;
     _sendIrcServerMessage(message);
     hideRawMessageWindow();
   } else {

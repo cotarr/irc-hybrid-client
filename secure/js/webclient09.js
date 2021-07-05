@@ -30,13 +30,13 @@
 // by parsing input on server window user input textarea.
 // -------------------------------------------------------------------------
 function _parseInputForIRCCommands (textAreaEl) {
-  let text = stripTrailingCrLf(textAreaEl.value);
+  const text = stripTrailingCrLf(textAreaEl.value);
   if (detectMultiLineString(text)) {
     textAreaEl.value = '';
     showError('Multi-line input is not supported.');
   } else {
     if (text.length > 0) {
-      let commandAction = textCommandParser(
+      const commandAction = textCommandParser(
         {
           inputString: text,
           originType: 'generic',
@@ -85,7 +85,7 @@ document.getElementById('rawMessageInputId').addEventListener('input', function 
 // Channel name selected by tab-tab or space-space-space
 // ---------------------------------------
 const _autoCompleteServInputElement = function (snippet) {
-  var serverInputAreaEl = document.getElementById('rawMessageInputId');
+  const serverInputAreaEl = document.getElementById('rawMessageInputId');
   let last = '';
   const trailingSpaceKey = 32;
   // parse last space character delimitered string
@@ -140,9 +140,9 @@ const _autoCompleteServInputElement = function (snippet) {
   }
   return last;
 };
-var lastServAutoCompleteMatch = '';
+let lastServAutoCompleteMatch = '';
 const serverAutoComplete = function (e) {
-  var serverInputAreaEl = document.getElementById('rawMessageInputId');
+  const serverInputAreaEl = document.getElementById('rawMessageInputId');
   const autoCompleteTabKey = 9;
   const autoCompleteSpaceKey = 32;
   const trailingSpaceKey = 32;
@@ -154,7 +154,7 @@ const serverAutoComplete = function (e) {
       return;
     }
     let snippet = '';
-    let snippetArray = serverInputAreaEl.value.split(' ');
+    const snippetArray = serverInputAreaEl.value.split(' ');
     if (snippetArray.length > 0) {
       snippet = snippetArray[snippetArray.length - 1];
     }
@@ -208,12 +208,12 @@ const serverAutoComplete = function (e) {
           serverInputAreaEl.value =
             serverInputAreaEl.value.slice(0, serverInputAreaEl.value.length - 1);
           let snippet = '';
-          let snippetArray = serverInputAreaEl.value.split(' ');
+          const snippetArray = serverInputAreaEl.value.split(' ');
           if (snippetArray.length > 0) {
             snippet = snippetArray[snippetArray.length - 1];
           }
           if (snippet.length > 0) {
-            let matchStr = _autoCompleteServInputElement(snippet);
+            const matchStr = _autoCompleteServInputElement(snippet);
             if (lastServAutoCompleteMatch !== matchStr) {
               lastServAutoCompleteMatch = matchStr;
               e.preventDefault();
@@ -237,9 +237,9 @@ document.getElementById('rawMessageInputId').addEventListener('keydown', serverA
 // Exchange Unix seconds with HH:MM:SS time format
 // -------------------------------------------------
 function substituteHmsTime (inMessage) {
-  let timeString = inMessage.split(' ')[0];
-  let restOfMessage = inMessage.slice(timeString.length + 1, inMessage.length);
-  let hmsString = timestampToHMS(timeString);
+  const timeString = inMessage.split(' ')[0];
+  const restOfMessage = inMessage.slice(timeString.length + 1, inMessage.length);
+  const hmsString = timestampToHMS(timeString);
   return hmsString + ' ' + restOfMessage;
 }
 
@@ -334,7 +334,7 @@ document.addEventListener('server-message', function (event) {
         _showAfterParamZero(event.detail.parsedMessage, 'WHOIS');
       } else {
         // else, show: WHOIS <nick> is away: <away message>
-        let outMessage = 'WHOIS ' +
+        const outMessage = 'WHOIS ' +
           event.detail.parsedMessage.params[1] +
           ' is away: ' +
           event.detail.parsedMessage.params[2];
@@ -494,7 +494,7 @@ document.getElementById('rawClearButton').addEventListener('click', function () 
 // raw Taller button handler
 // -------------------------
 document.getElementById('rawTallerButton').addEventListener('click', function () {
-  let newRows =
+  const newRows =
     parseInt(document.getElementById('rawMessageDisplay').getAttribute('rows')) + 10;
   document.getElementById('rawMessageDisplay').setAttribute('rows', newRows.toString());
 });

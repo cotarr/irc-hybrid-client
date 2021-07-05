@@ -45,7 +45,7 @@ document.getElementById('noticeClearButton').addEventListener('click', function 
 // Notice Taller button handler
 // -------------------------
 document.getElementById('noticeTallerButton').addEventListener('click', function () {
-  let newRows =
+  const newRows =
     parseInt(document.getElementById('noticeMessageDisplay').getAttribute('rows')) + 5;
   document.getElementById('noticeMessageDisplay').setAttribute('rows', newRows.toString());
 });
@@ -85,7 +85,7 @@ document.getElementById('wallopsClearButton').addEventListener('click', function
 // Wallops Taller button handler
 // -------------------------
 document.getElementById('wallopsTallerButton').addEventListener('click', function () {
-  let newRows =
+  const newRows =
     parseInt(document.getElementById('wallopsMessageDisplay').getAttribute('rows')) + 5;
   document.getElementById('wallopsMessageDisplay').setAttribute('rows', newRows.toString());
 });

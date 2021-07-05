@@ -34,7 +34,7 @@
 // ------------------------------------------
 function cleanFormatting (inString) {
   // Filterable formatting codes
-  let formattingChars = [
+  const formattingChars = [
     2, // 0x02 bold
     7, // 0x07 bell character
     15, // 0x0F reset
@@ -49,7 +49,7 @@ function cleanFormatting (inString) {
   // 0x04+color (6 digit hexadecimal color)
   let outString = '';
   // l = length of input string
-  let l = inString.length;
+  const l = inString.length;
   if (l === 0) return outString;
   // i = index into input string
   let i = 0;
@@ -127,9 +127,9 @@ function cleanFormatting (inString) {
 // ------------------------------------------
 function cleanCtcpDelimiter (inString) {
   // Filterable formatting codes
-  let ctcpDelim = 1;
+  const ctcpDelim = 1;
   let outString = '';
-  let l = inString.length;
+  const l = inString.length;
   if (l === 0) return outString;
   let i = 0;
   while (i < l) {
@@ -154,7 +154,7 @@ const timestampToHMS = function (timeString) {
     outString = null;
   } else {
     if (timeString.indexOf('@time=') === 0) {
-      let timeObj = new Date(timeString.slice(6, timeString.length));
+      const timeObj = new Date(timeString.slice(6, timeString.length));
       outString += timeObj.getHours().toString().padStart(2, '0') + ':';
       outString += timeObj.getMinutes().toString().padStart(2, '0') + ':';
       outString += timeObj.getSeconds().toString().padStart(2, '0');
@@ -175,7 +175,7 @@ const unixTimestampToHMS = function (seconds) {
     (Number.isInteger(seconds)) &&
     (seconds > 1000000000) &&
     (seconds < 1000000000000)) {
-    let timeObj = new Date(seconds * 1000);
+    const timeObj = new Date(seconds * 1000);
     let language;
     if (window.navigator.languages) {
       language = window.navigator.languages[0];
@@ -201,7 +201,7 @@ const timestampToUnixSeconds = function (timeString) {
     outSeconds = null;
   } else {
     if (timeString.indexOf('@time=') === 0) {
-      let timeObj = new Date(timeString.slice(6, timeString.length));
+      const timeObj = new Date(timeString.slice(6, timeString.length));
       outSeconds = parseInt(timeObj.valueOf() / 1000);
     } else {
       outSeconds = null;
@@ -234,7 +234,7 @@ function _parseIrcMessage (message) {
       timeString += messageString.charAt(i);
       i++;
     }
-    let outString = timestampToHMS(timeString);
+    const outString = timestampToHMS(timeString);
     return {
       data: outString,
       nextIndex: i + 1
@@ -306,7 +306,7 @@ function _parseIrcMessage (message) {
       if ((inText.indexOf('!') >= 0) &&
         (inText.indexOf('@') >= 0) &&
         (inText.indexOf('!') < inText.indexOf('@'))) {
-        let nick = inText.split('!')[0];
+        const nick = inText.split('!')[0];
         return nick;
       } else {
         return null;
@@ -323,7 +323,7 @@ function _parseIrcMessage (message) {
       if ((inText.indexOf('!') >= 0) &&
         (inText.indexOf('@') >= 0) &&
         (inText.indexOf('!') < inText.indexOf('@'))) {
-        let host = inText.split('!')[1];
+        const host = inText.split('!')[1];
         return host;
       } else {
         return null;
@@ -346,13 +346,12 @@ function _parseIrcMessage (message) {
   let prefix = null;
   let extNick = null;
   let extHost = null;
-  let hostname = null;
   let command = null;
-  let params = [];
+  const params = [];
   //
   // Parsing variables
-  let messageString = message.toString();
-  let end = messageString.length - 1;
+  const messageString = message.toString();
+  const end = messageString.length - 1;
   let temp = { nextIndex: 0 };
 
   // 1) Extract timestamp
@@ -603,7 +602,7 @@ function displayRawMessage (inString) {
 // bytes using TextEncoder.
 // ----------------------------------------------------------------
 function displayRawMessageInHex (message) {
-  let uint8String = new TextEncoder('utf8').encode(message);
+  const uint8String = new TextEncoder('utf8').encode(message);
   let hexString = '';
   for (let i = 0; i < uint8String.length; i++) {
     hexString += uint8String[i].toString(16).padStart(2, '0') + ' ';
@@ -642,8 +641,8 @@ function _parseCtcpMessage (parsedMessage) {
       document.getElementById('noticeMessageDisplay').scrollHeight;
   }
   const ctcpDelim = 1;
-  let ctcpMessage = parsedMessage.params[1];
-  let end = ctcpMessage.length - 1;
+  const ctcpMessage = parsedMessage.params[1];
+  const end = ctcpMessage.length - 1;
   if (ctcpMessage.charCodeAt(0) !== 1) {
     console.log('_parseCtcpMessage() missing CTCP start delimiter');
     return;
@@ -671,7 +670,7 @@ function _parseCtcpMessage (parsedMessage) {
   //   ACTION
   //
   if (ctcpCommand === 'ACTION') {
-    let index = ircState.channels.indexOf(parsedMessage.params[0].toLowerCase());
+    const index = ircState.channels.indexOf(parsedMessage.params[0].toLowerCase());
     if (index >= 0) {
       parsedMessage.params[1] = parsedMessage.nick + ' ' + ctcpRest;
       parsedMessage.nick = '*';
@@ -800,9 +799,9 @@ function _parseBufferMessage (message) {
     // Internal function
     function _showNotExpiredError (errStr) {
       // current UNIX time in seconds
-      let timeNow = new Date();
-      let timeNowSeconds = parseInt(timeNow / 1000);
-      let timeMessageSeconds = timestampToUnixSeconds(message.split(' ')[0]);
+      const timeNow = new Date();
+      const timeNowSeconds = parseInt(timeNow / 1000);
+      const timeMessageSeconds = timestampToUnixSeconds(message.split(' ')[0]);
       // subtract timestamp from (possibly chached) server messages
       // and show error only if condition not expired
       if (timeNowSeconds - timeMessageSeconds < errorExpireSeconds) {
@@ -833,7 +832,7 @@ function _parseBufferMessage (message) {
     //
     // parse message into: prefix, command, and param array
     //
-    let parsedMessage = _parseIrcMessage(message);
+    const parsedMessage = _parseIrcMessage(message);
     // console.log('parsedMessage' + JSON.stringify(parsedMessage, null, 2));
 
     //
@@ -965,7 +964,7 @@ function _parseBufferMessage (message) {
             _parseCtcpMessage(parsedMessage);
           } else {
             // else not a CTCP message
-            let index = ircState.channels.indexOf(parsedMessage.params[0].toLowerCase());
+            const index = ircState.channels.indexOf(parsedMessage.params[0].toLowerCase());
             if (index >= 0) {
               displayChannelMessage(parsedMessage);
             } else {

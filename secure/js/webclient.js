@@ -111,7 +111,7 @@ document.getElementById('ircConnectIconId').removeAttribute('connecting');
 // ---------------------------------------------------
 // webState represents state of web page in browser
 // ---------------------------------------------------
-var webState = {};
+const webState = {};
 webState.loginUser = {};
 webState.webConnectOn = true;
 webState.webConnected = false;
@@ -138,8 +138,8 @@ webState.cacheInhibitTimer = 0;
 // -------------------------------
 // Build URL from page location
 // -------------------------------
-var webServerUrl = 'https://';
-var webSocketUrl = 'wss://';
+let webServerUrl = 'https://';
+let webSocketUrl = 'wss://';
 if (document.location.protocol === 'http:') {
   webServerUrl = 'http://';
   webSocketUrl = 'ws://';
@@ -162,9 +162,9 @@ const beep2 = new Audio('sounds/short-beep2.mp3');
 // 1175 Hz 0.75 Amplitude 0.250 Sec
 const beep3 = new Audio('sounds/short-beep3.mp3');
 
-var beep1InhibitTimer = 0;
-var beep2InhibitTimer = 0;
-var beep3InhibitTimer = 0;
+let beep1InhibitTimer = 0;
+let beep2InhibitTimer = 0;
+let beep3InhibitTimer = 0;
 
 function beepTimerTick () {
   if (beep1InhibitTimer > 0) beep1InhibitTimer--;
@@ -203,12 +203,12 @@ function playBeep3Sound () {
 // --------------------------
 
 const errorExpireSeconds = 5;
-var errorRemainSeconds = 0;
+let errorRemainSeconds = 0;
 
 function clearError () {
-  let errorDivEl = document.getElementById('errorDiv');
+  const errorDivEl = document.getElementById('errorDiv');
   errorDivEl.setAttribute('hidden', '');
-  let errorContentDivEl = document.getElementById('errorContentDiv');
+  const errorContentDivEl = document.getElementById('errorContentDiv');
   while (errorContentDivEl.firstChild) {
     errorContentDivEl.removeChild(errorContentDivEl.firstChild);
   }
@@ -216,10 +216,10 @@ function clearError () {
 };
 
 function showError (errorString) {
-  let errorDivEl = document.getElementById('errorDiv');
+  const errorDivEl = document.getElementById('errorDiv');
   errorDivEl.removeAttribute('hidden');
-  let errorContentDivEl = document.getElementById('errorContentDiv');
-  let errorMessageEl = document.createElement('div');
+  const errorContentDivEl = document.getElementById('errorContentDiv');
+  const errorMessageEl = document.createElement('div');
   errorMessageEl.textContent = errorString || 'Error: unknown error (2993)';
   errorContentDivEl.appendChild(errorMessageEl);
   errorRemainSeconds = errorExpireSeconds;
@@ -255,7 +255,7 @@ function errorTimerTickHandler () {
 // Return current UNIX timestamp in seconds
 // -----------------------------------------
 function unixTimestamp () {
-  let now = new Date();
+  const now = new Date();
   return parseInt(now.valueOf() / 1000);
 };
 
@@ -312,7 +312,7 @@ function setNotActivityIcon (index) {
   document.getElementById('notMsgIconId').removeAttribute('hidden');
 }
 // -1 indicates icon is available to be shown
-var lastPmActivityIconIndex = -1;
+let lastPmActivityIconIndex = -1;
 function setPmActivityIcon (index) {
   if (lastPmActivityIconIndex === -1) {
     lastPmActivityIconIndex = index;
@@ -321,7 +321,7 @@ function setPmActivityIcon (index) {
   // else ignore request
 }
 // -1 indicates icon is available to be shown
-var lastChanActivityIconIndex = -1;
+let lastChanActivityIconIndex = -1;
 function setChanActivityIcon (index) {
   if (lastChanActivityIconIndex === -1) {
     lastChanActivityIconIndex = index;
@@ -588,7 +588,7 @@ function setVariablesShowingIRCDisconnected () {
 
   document.dispatchEvent(new CustomEvent('cancel-beep-sounds', { bubbles: true }));
 
-  let channelContainerDivEl = document.getElementById('channelContainerDiv');
+  const channelContainerDivEl = document.getElementById('channelContainerDiv');
   while (channelContainerDivEl.firstChild) {
     channelContainerDivEl.removeChild(channelContainerDivEl.firstChild);
   }
@@ -605,7 +605,7 @@ function setVariablesShowingIRCDisconnected () {
 // Command parser intercept the HEATBEAT message and calls onHeartbeatReceived()
 // ------------------------------------------------------------------------------
 const heartbeatExpirationTimeSeconds = 15;
-var heartbeatUpCounter = 0;
+let heartbeatUpCounter = 0;
 // One second global timer
 function resetHeartbeatTimer () {
   heartbeatUpCounter = 0;
@@ -670,8 +670,8 @@ function updateElapsedTimeDisplay () {
       sec.toString().padStart(2, '0');
   }
 
-  let timePreEl = document.getElementById('elapsedTimeDiv');
-  let now = unixTimestamp();
+  const timePreEl = document.getElementById('elapsedTimeDiv');
+  const now = unixTimestamp();
   let timeStr = '';
   if (webState.webConnected) {
     timeStr += 'Web Connected: ' + toTimeString(now - webState.times.webConnect) +
@@ -693,7 +693,7 @@ function updateElapsedTimeDisplay () {
   timePreEl.textContent = timeStr;
 }
 
-var lastConnectErrorCount = 0;
+let lastConnectErrorCount = 0;
 // --------------------------------------
 // Contact web server and get state of
 // the connection to the IRC server
@@ -702,8 +702,8 @@ var lastConnectErrorCount = 0;
 // as well as browser (read only here)
 // --------------------------------------
 function getIrcState (callback) {
-  let fetchURL = webServerUrl + '/irc/getircstate';
-  let fetchOptions = {
+  const fetchURL = webServerUrl + '/irc/getircstate';
+  const fetchOptions = {
     method: 'GET',
     headers: {
       Accept: 'application/json'
@@ -722,7 +722,6 @@ function getIrcState (callback) {
     })
     .then((responseJson) => {
       // console.log('getIrcState() ' + JSON.stringify(responseJson, null, 2));
-      let lastIrcState = ircState;
       ircState = responseJson;
       //
       // ---------------------------------------------------------------

@@ -196,7 +196,7 @@ function textCommandParser (inputObj) {
     inStr = inStr.slice(0, inStr.length - 1);
   }
 
-  let inStrLen = inStr.length;
+  const inStrLen = inStr.length;
 
   // Example decoded line
   //
@@ -222,7 +222,7 @@ function textCommandParser (inputObj) {
   //   ]
   // }
   //
-  let parsedCommand = {
+  const parsedCommand = {
     command: '',
     params: [],
     restOf: []
@@ -252,7 +252,7 @@ function textCommandParser (inputObj) {
   }
 
   // character index, start after slash /
-  var idx = 1;
+  let idx = 1;
 
   // ----------------
   // C O M M A N D
@@ -402,7 +402,7 @@ function textCommandParser (inputObj) {
         ircMessage: null
       };
     } else if (parsedCommand.params.length > 0) {
-      let nameArray = [];
+      const nameArray = [];
       if (parsedCommand.params.length === 1) {
         nameArray.push(parsedCommand.restOf[0]);
       } else {
@@ -424,7 +424,7 @@ function textCommandParser (inputObj) {
           ircMessage: null
         };
       } else {
-        let returnObj = {
+        const returnObj = {
           error: false,
           message: '',
           ircMessage: null
@@ -474,7 +474,7 @@ function textCommandParser (inputObj) {
     //
     case 'CTCP':
       {
-        let ctcpDelim = 1;
+        const ctcpDelim = 1;
         if (parsedCommand.params.length !== 2) {
           return {
             error: true,
@@ -489,7 +489,7 @@ function textCommandParser (inputObj) {
     //
     case 'DEOP':
       {
-        let ro = _parseChannelModes('-', 'o', 'DEOP', parsedCommand, inputObj);
+        const ro = _parseChannelModes('-', 'o', 'DEOP', parsedCommand, inputObj);
         if (ro.error) {
           return ro;
         } else {
@@ -500,7 +500,7 @@ function textCommandParser (inputObj) {
     //
     case 'DEVOICE':
       {
-        let ro = _parseChannelModes('-', 'v', 'DEVOICE', parsedCommand, inputObj);
+        const ro = _parseChannelModes('-', 'v', 'DEVOICE', parsedCommand, inputObj);
         if (ro.error) {
           return ro;
         } else {
@@ -543,7 +543,7 @@ function textCommandParser (inputObj) {
             ircMessage: null
           };
         }
-        let ctcpDelim = 1;
+        const ctcpDelim = 1;
         if (inputObj.originType === 'channel') {
           ircMessage = 'PRIVMSG ' + inputObj.originName + ' :' + String.fromCharCode(ctcpDelim) +
             'ACTION ' + parsedCommand.restOf[0] + String.fromCharCode(ctcpDelim);
@@ -664,7 +664,7 @@ function textCommandParser (inputObj) {
     //
     case 'OP':
       {
-        let ro = _parseChannelModes('+', 'o', 'OP', parsedCommand, inputObj);
+        const ro = _parseChannelModes('+', 'o', 'OP', parsedCommand, inputObj);
         if (ro.error) {
           return ro;
         } else {
@@ -753,7 +753,7 @@ function textCommandParser (inputObj) {
       break;
     case 'VOICE':
       {
-        let ro = _parseChannelModes('+', 'v', 'VOICE', parsedCommand, inputObj);
+        const ro = _parseChannelModes('+', 'v', 'VOICE', parsedCommand, inputObj);
         if (ro.error) {
           return ro;
         } else {

@@ -49,8 +49,8 @@
 //  will have a valid session cookie.
 // -------------------------------------------------
 function initWebSocketAuth (callback) {
-  let fetchURL = webServerUrl + '/irc/wsauth';
-  let fetchOptions = {
+  const fetchURL = webServerUrl + '/irc/wsauth';
+  const fetchOptions = {
     method: 'POST',
     headers: {
       'Content-type': 'application/json',
@@ -180,25 +180,25 @@ function connectWebSocket () {
   // Pass each message to message parse function as type Buffer
   // If left over characters not terminated in CR-LF, save as next fragment
   // -------------------------------------------------------------------------
-  var previousBufferFragment = '';
+  let previousBufferFragment = '';
   function parseStreamBuffer (inBuffer) {
     if (!inBuffer) return;
-    let data = previousBufferFragment.concat(inBuffer);
+    const data = previousBufferFragment.concat(inBuffer);
     previousBufferFragment = '';
-    let len = data.length;
+    const len = data.length;
     if (len === 0) return;
     let index = 0;
     let count = 0;
     for (let i = 0; i < len; i++) {
       // this is a 8 bit integer
-      let charCode = data.charCodeAt(i);
+      const charCode = data.charCodeAt(i);
       if ((charCode !== 10) && (charCode !== 13)) {
         // valid message character
         count = count + 1;
       } else {
         // case of CR or LF as message separator
         if (count > 0) {
-          let message = data.slice(index, index + count);
+          const message = data.slice(index, index + count);
           _parseBufferMessage(message);
         }
         index = i + 1;
@@ -228,11 +228,11 @@ function connectWebSocket () {
 function _sendIrcServerMessage (message) {
   if (!checkConnect(3)) return;
 
-  let body = {
+  const body = {
     message: message
   };
-  let fetchURL = webServerUrl + '/irc/message';
-  let fetchOptions = {
+  const fetchURL = webServerUrl + '/irc/message';
+  const fetchOptions = {
     method: 'POST',
     headers: {
       'Content-type': 'application/json',
@@ -272,9 +272,9 @@ function _sendIrcServerMessage (message) {
 //
 // --------------------------------------
 function reconnectWebSocketAfterDisconnect () {
-  let statusURL = webServerUrl + '/status';
-  let secureStatusURL = webServerUrl + '/secure';
-  let fetchOptions = {
+  const statusURL = webServerUrl + '/status';
+  const secureStatusURL = webServerUrl + '/secure';
+  const fetchOptions = {
     method: 'GET',
     headers: {
       Accept: 'application/json'
@@ -406,7 +406,7 @@ document.getElementById('manualWebSocketReconnectButton').addEventListener('clic
 // ------------------------------------------------
 // Tap "Web" status icon to connect/disconnect
 // ------------------------------------------------
-var webStatusIconTouchDebounce = false;
+let webStatusIconTouchDebounce = false;
 document.getElementById('webConnectIconId').addEventListener('click', function () {
   // debounce button
   if (webStatusIconTouchDebounce) return;
@@ -451,8 +451,8 @@ document.getElementById('stopWebSocketReconnectButton').addEventListener('click'
 // Timer called once per second to
 // manage web-socket reconnection.
 // ---------------------------------
-var wsReconnectCounter = 0;
-var wsReconnectTimer = 0;
+let wsReconnectCounter = 0;
+let wsReconnectTimer = 0;
 function reconnectTimerTickHandler () {
   // If disabled, or if connection successful, reset counter/timer
   if ((!webState.webConnectOn) || (webState.webConnected)) {
