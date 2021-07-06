@@ -156,6 +156,38 @@ function stripTrailingCrLf (inString) {
   }
 }
 
+// -------------------------------------------------
+// Remove one CR-LF anywhere from inputArea element
+//
+// Modifies HTML element value (contents)
+// ------------------------------------------------
+function stripOneCrLfFromElement (textAreaElement) {
+  if (!textAreaElement.value) return;
+  let inString = textAreaElement.value.toString();
+  //
+  // detect \n or \r\n, and remove one time
+  //
+  let crCount = 0;
+  let lfCount = 0;
+  if (inString.length > 0) {
+    for (let i = 0; i < inString.length; i++) {
+      if (inString.charAt(i) === '\r') crCount++;
+      if (inString.charAt(i) === '\n') lfCount++;
+    }
+  }
+  // Case of Unix end of line
+  if ((crCount === 0) && (lfCount === 1)) {
+    inString = inString.replace('\n', '');
+  }
+  // Case of Windows end of line
+  if ((crCount === 1) && (lfCount === 1)) {
+    inString = inString.replace('\n', '');
+    inString = inString.replace('\r', '');
+  }
+  // Exchange value (contents) with new string in html element
+  textAreaElement.value = inString;
+} // stripOneCrLfFromElement()
+
 // --------------------------------------------------------
 // This is the command input parser to interpret
 // and execute IRC text commands, such as /JOIN

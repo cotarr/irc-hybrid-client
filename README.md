@@ -23,9 +23,6 @@ from development folders without compression.
 The server files are located in the `server/` folder. The server is launched
 from the socket server in the `bin/` folder.
 
-The development npm dependencies are only required for the minify process.
-Development dependencies are not needed unless you plan to edit the JavaScript.
-
 ### Installation
 
 There is a complete step by step installation instruction in the

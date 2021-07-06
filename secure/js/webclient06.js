@@ -523,6 +523,8 @@ function createChannelEl (name) {
   channelInputAreaEl.addEventListener('input', function (event) {
     if (((event.inputType === 'insertText') && (event.data === null)) ||
       (event.inputType === 'insertLineBreak')) {
+      // Remove EOL characters at cursor loction
+      stripOneCrLfFromElement(channelInputAreaEl);
       _sendTextToChannel(channelIndex, channelInputAreaEl);
       resetChanActivityIcon(channelIndex);
       activityIconInhibitTimer = activityIconInhibitTimerValue;

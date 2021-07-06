@@ -72,6 +72,8 @@ document.getElementById('sendRawMessageButton').addEventListener('click', functi
 document.getElementById('rawMessageInputId').addEventListener('input', function (event) {
   if (((event.inputType === 'insertText') && (event.data === null)) ||
     (event.inputType === 'insertLineBreak')) {
+    // Remove EOL characters at cursor loction
+    stripOneCrLfFromElement(document.getElementById('rawMessageInputId'));
     _parseInputForIRCCommands(document.getElementById('rawMessageInputId'));
   }
 });

@@ -321,12 +321,15 @@ if(ircState.ircConnected&&ircState.ircIsAway){_sendIrcServerMessage("AWAY")}})
 ;function detectMultiLineString(inString){let inLength=inString.length;if(inLength>0&&inString.charCodeAt(inLength-1)===10)inLength--;if(inLength>0){let countCR=0;for(let i=0;i<inLength;i++){
 if(inString.charCodeAt(i)===10)countCR++}if(countCR===0){return false}else{return true}}else{return false}}function stripTrailingCrLf(inString){let inLength=inString.length
 ;if(inLength>0&&inString.charCodeAt(inLength-1)===10)inLength--;if(inLength>0&&inString.charCodeAt(inLength-1)===13)inLength--;if(inLength>0&&inString.charCodeAt(inLength-1)===32)inLength--
-;if(inLength>0&&inString.charCodeAt(inLength-1)===32)inLength--;if(inLength===0){return""}else{return inString.slice(0,inLength)}}function textCommandParser(inputObj){function _isWS(inChar){
-if(inChar.charAt(0)===" ")return true;if(inChar.charCodeAt(0)===9)return true;return false}function _isEOL(inChar){if(inChar.charAt(0)==="\n")return true;if(inChar.charAt(0)==="\r")return true
-;return false}let inStr=inputObj.inputString;if(inStr.length>0&&_isEOL(inStr.charAt(inStr.length-1))){inStr=inStr.slice(0,inStr.length-1)}if(inStr.length>0&&_isEOL(inStr.charAt(inStr.length-1))){
-inStr=inStr.slice(0,inStr.length-1)}const inStrLen=inStr.length;const parsedCommand={command:"",params:[],restOf:[]};if(inStr.length<2){return{error:true,message:"Error no command not found",
-ircMessage:null}}if(inStr.charAt(0)!=="/"){return{error:true,message:"Error missing / before command",ircMessage:null}}if(_isWS(inStr.charAt(1))){return{error:true,message:"Error space after slash",
-ircMessage:null}}let idx=1;while(!_isWS(inStr.charAt(idx))&&idx<inStrLen){parsedCommand.command+=inStr.charAt(idx);idx++}while(_isWS(inStr.charAt(idx))&&idx<inStrLen){idx++}
+;if(inLength>0&&inString.charCodeAt(inLength-1)===32)inLength--;if(inLength===0){return""}else{return inString.slice(0,inLength)}}function stripOneCrLfFromElement(textAreaElement){
+if(!textAreaElement.value)return;let inString=textAreaElement.value.toString();let crCount=0;let lfCount=0;if(inString.length>0){for(let i=0;i<inString.length;i++){
+if(inString.charAt(i)==="\r")crCount++;if(inString.charAt(i)==="\n")lfCount++}}if(crCount===0&&lfCount===1){inString=inString.replace("\n","")}if(crCount===1&&lfCount===1){
+inString=inString.replace("\n","");inString=inString.replace("\r","")}textAreaElement.value=inString}function textCommandParser(inputObj){function _isWS(inChar){if(inChar.charAt(0)===" ")return true
+;if(inChar.charCodeAt(0)===9)return true;return false}function _isEOL(inChar){if(inChar.charAt(0)==="\n")return true;if(inChar.charAt(0)==="\r")return true;return false}let inStr=inputObj.inputString
+;if(inStr.length>0&&_isEOL(inStr.charAt(inStr.length-1))){inStr=inStr.slice(0,inStr.length-1)}if(inStr.length>0&&_isEOL(inStr.charAt(inStr.length-1))){inStr=inStr.slice(0,inStr.length-1)}
+const inStrLen=inStr.length;const parsedCommand={command:"",params:[],restOf:[]};if(inStr.length<2){return{error:true,message:"Error no command not found",ircMessage:null}}if(inStr.charAt(0)!=="/"){
+return{error:true,message:"Error missing / before command",ircMessage:null}}if(_isWS(inStr.charAt(1))){return{error:true,message:"Error space after slash",ircMessage:null}}let idx=1
+;while(!_isWS(inStr.charAt(idx))&&idx<inStrLen){parsedCommand.command+=inStr.charAt(idx);idx++}while(_isWS(inStr.charAt(idx))&&idx<inStrLen){idx++}
 parsedCommand.command=parsedCommand.command.toUpperCase();if(inStr.slice(idx,inStrLen).length>0){parsedCommand.params.push(null);parsedCommand.restOf.push(inStr.slice(idx,inStrLen));let chars1=""
 ;while(!_isWS(inStr.charAt(idx))&&idx<inStrLen){chars1+=inStr.charAt(idx);idx++}while(_isWS(inStr.charAt(idx))&&idx<inStrLen){idx++}if(inStr.slice(idx,inStrLen).length>0){
 parsedCommand.params.push(chars1);parsedCommand.restOf.push(inStr.slice(idx,inStrLen));let chars2="";while(!_isWS(inStr.charAt(idx))&&idx<inStrLen){chars2+=inStr.charAt(idx);idx++}
@@ -453,8 +456,8 @@ throw new Error("Fetch status "+response.status+" "+response.statusText)}}).then
 console.log(error)})}}else{_removeChannelFromDom()}});channelRefreshButtonEl.addEventListener("click",function(){document.dispatchEvent(new CustomEvent("update-from-cache",{bubbles:true}))
 ;channelNamesDisplayEl.value="";_sendIrcServerMessage("NAMES "+name)});channelSendButtonEl.addEventListener("click",function(){_sendTextToChannel(channelIndex,channelInputAreaEl)
 ;channelInputAreaEl.focus();resetChanActivityIcon(channelIndex);activityIconInhibitTimer=activityIconInhibitTimerValue});channelInputAreaEl.addEventListener("input",function(event){
-if(event.inputType==="insertText"&&event.data===null||event.inputType==="insertLineBreak"){_sendTextToChannel(channelIndex,channelInputAreaEl);resetChanActivityIcon(channelIndex)
-;activityIconInhibitTimer=activityIconInhibitTimerValue}});channelMainSectionEl.addEventListener("click",function(){resetChanActivityIcon(channelIndex)
+if(event.inputType==="insertText"&&event.data===null||event.inputType==="insertLineBreak"){stripOneCrLfFromElement(channelInputAreaEl);_sendTextToChannel(channelIndex,channelInputAreaEl)
+;resetChanActivityIcon(channelIndex);activityIconInhibitTimer=activityIconInhibitTimerValue}});channelMainSectionEl.addEventListener("click",function(){resetChanActivityIcon(channelIndex)
 ;activityIconInhibitTimer=activityIconInhibitTimerValue});function updateVisibility(){const index=ircState.channels.indexOf(name.toLowerCase());if(index>=0){if(ircState.channelStates[index].joined){
 channelTopicDivEl.textContent=cleanFormatting(ircState.channelStates[index].topic);channelNamesDisplayEl.removeAttribute("disabled");channelTextAreaEl.removeAttribute("disabled")
 ;channelInputAreaEl.removeAttribute("disabled");channelSendButtonEl.removeAttribute("disabled");channelJoinButtonEl.setAttribute("hidden","");channelPruneButtonEl.setAttribute("hidden","")
@@ -632,14 +635,14 @@ privMsgSectionEl.setAttribute("hidden","");privMsgBottomDivEl.setAttribute("hidd
 ;document.addEventListener("hide-all-divs",function(event){privMsgBottomDivEl.setAttribute("hidden","");privMsgHideButtonEl.textContent="+";privMsgTopRightHidableDivEl.setAttribute("hidden","")
 ;privMsgSectionEl.setAttribute("hidden","")});privMsgSendButtonEl.addEventListener("click",function(){_sendPrivMessageToUser(name,privMsgInputAreaEl);privMsgInputAreaEl.focus()
 ;resetPmActivityIcon(privMsgIndex);activityIconInhibitTimer=activityIconInhibitTimerValue});privMsgInputAreaEl.addEventListener("input",function(event){
-if(event.inputType==="insertText"&&event.data===null||event.inputType==="insertLineBreak"){_sendPrivMessageToUser(name,privMsgInputAreaEl);resetPmActivityIcon(privMsgIndex)
-;activityIconInhibitTimer=activityIconInhibitTimerValue}});privMsgSectionEl.addEventListener("click",function(){resetPmActivityIcon(privMsgIndex);activityIconInhibitTimer=activityIconInhibitTimerValue
-});function updateVisibility(){if(privMsgSectionEl.hasAttribute("beep1-enabled")){privMsgBeep1CBInputEl.checked=true}else{privMsgBeep1CBInputEl.checked=false}}
-privMsgBeep1CBInputEl.addEventListener("click",function(e){if(privMsgSectionEl.hasAttribute("beep1-enabled")){privMsgSectionEl.removeAttribute("beep1-enabled")}else{
-privMsgSectionEl.setAttribute("beep1-enabled","");playBeep3Sound()}updateVisibility()});document.addEventListener("cancel-beep-sounds",function(event){privMsgSectionEl.removeAttribute("beep1-enabled")
-});document.addEventListener("private-message",function(event){function _addText(text){privMsgTextAreaEl.value+=cleanFormatting(text)+"\n";privMsgTextAreaEl.scrollTop=privMsgTextAreaEl.scrollHeight}
-const parsedMessage=event.detail.parsedMessage;switch(parsedMessage.command){case"PRIVMSG":if(parsedMessage.nick===ircState.nickName){if(parsedMessage.params[0].toLowerCase()===name.toLowerCase()){
-if("isPmCtcpAction"in parsedMessage){_addText(parsedMessage.timestamp+pmNameSpacer+parsedMessage.nick+" "+parsedMessage.params[1])}else{
+if(event.inputType==="insertText"&&event.data===null||event.inputType==="insertLineBreak"){stripOneCrLfFromElement(privMsgInputAreaEl);_sendPrivMessageToUser(name,privMsgInputAreaEl)
+;resetPmActivityIcon(privMsgIndex);activityIconInhibitTimer=activityIconInhibitTimerValue}});privMsgSectionEl.addEventListener("click",function(){resetPmActivityIcon(privMsgIndex)
+;activityIconInhibitTimer=activityIconInhibitTimerValue});function updateVisibility(){if(privMsgSectionEl.hasAttribute("beep1-enabled")){privMsgBeep1CBInputEl.checked=true}else{
+privMsgBeep1CBInputEl.checked=false}}privMsgBeep1CBInputEl.addEventListener("click",function(e){if(privMsgSectionEl.hasAttribute("beep1-enabled")){privMsgSectionEl.removeAttribute("beep1-enabled")
+}else{privMsgSectionEl.setAttribute("beep1-enabled","");playBeep3Sound()}updateVisibility()});document.addEventListener("cancel-beep-sounds",function(event){
+privMsgSectionEl.removeAttribute("beep1-enabled")});document.addEventListener("private-message",function(event){function _addText(text){privMsgTextAreaEl.value+=cleanFormatting(text)+"\n"
+;privMsgTextAreaEl.scrollTop=privMsgTextAreaEl.scrollHeight}const parsedMessage=event.detail.parsedMessage;switch(parsedMessage.command){case"PRIVMSG":if(parsedMessage.nick===ircState.nickName){
+if(parsedMessage.params[0].toLowerCase()===name.toLowerCase()){if("isPmCtcpAction"in parsedMessage){_addText(parsedMessage.timestamp+pmNameSpacer+parsedMessage.nick+" "+parsedMessage.params[1])}else{
 _addText(parsedMessage.timestamp+" "+parsedMessage.nick+pmNameSpacer+parsedMessage.params[1])}if(privMsgSectionEl.hasAttribute("beep1-enabled")&&webState.cacheInhibitTimer===0){playBeep3Sound()}
 privMsgSectionEl.removeAttribute("hidden");privMsgBottomDivEl.removeAttribute("hidden");privMsgHideButtonEl.textContent="-";privMsgTopRightHidableDivEl.removeAttribute("hidden")
 ;document.getElementById("privMsgMainHiddenDiv").removeAttribute("hidden");document.getElementById("privMsgMainHiddenButton").textContent="-"}}else{
@@ -658,18 +661,19 @@ createPrivateMessageEl(name,event.detail.parsedMessage)}});function _buildPrivat
 ;const inputAreaEl=document.getElementById("userPrivMsgInputId");const text=stripTrailingCrLf(inputAreaEl.value);if(detectMultiLineString(text)){showError("Multi-line input is not supported.")
 ;inputAreaEl.value=""}else{if(text.length===0){inputAreaEl.value=""}else{if(text.charAt(0)==="/"){const commandAction=textCommandParser({inputString:text,originType:"generic",originName:null})
 ;inputAreaEl.value="";if(commandAction.error){showError(commandAction.message)}else{if(commandAction.ircMessage&&commandAction.ircMessage.length>0){_sendIrcServerMessage(commandAction.ircMessage)}}
-}else{console.log("else not command");if(document.getElementById("pmNickNameInputId").value.length===0)return;const targetNickname=document.getElementById("pmNickNameInputId").value
-;const message="PRIVMSG "+targetNickname+" :"+text;_sendIrcServerMessage(message);inputAreaEl.value=""}}}}document.getElementById("userPrivMsgInputId").addEventListener("input",function(event){
-if(event.inputType==="insertText"&&event.data===null){_buildPrivateMessageText()}if(event.inputType==="insertLineBreak"){_buildPrivateMessageText()}})
-;document.getElementById("UserPrivMsgSendButton").addEventListener("click",function(){_buildPrivateMessageText()});document.addEventListener("erase-before-reload",function(event){
-document.getElementById("pmNickNameInputId").value="";document.getElementById("userPrivMsgInputId").value=""});document.getElementById("whoisButton").addEventListener("click",function(){
-if(document.getElementById("pmNickNameInputId").value.length>0){showRawMessageWindow();const message="WHOIS "+document.getElementById("pmNickNameInputId").value;_sendIrcServerMessage(message)
-;showRawMessageWindow()}else{showError("Input required")}});document.getElementById("privMsgMainHiddenButton").addEventListener("click",function(){
-if(document.getElementById("privMsgMainHiddenDiv").hasAttribute("hidden")){document.getElementById("privMsgMainHiddenDiv").removeAttribute("hidden")
-;document.getElementById("privMsgMainHiddenButton").textContent="-";document.dispatchEvent(new CustomEvent("priv-msg-show-all",{bubbles:true}))}else{
-document.getElementById("privMsgMainHiddenDiv").setAttribute("hidden","");document.getElementById("privMsgMainHiddenButton").textContent="+"
-;document.dispatchEvent(new CustomEvent("priv-msg-hide-all",{bubbles:true}))}});document.getElementById("closeNoticeButton").addEventListener("click",function(){webState.noticeOpen=false
-;updateDivVisibility()});document.getElementById("noticeClearButton").addEventListener("click",function(){document.getElementById("noticeMessageDisplay").value=""
+}else{if(document.getElementById("pmNickNameInputId").value.length===0)return;const targetNickname=document.getElementById("pmNickNameInputId").value;const message="PRIVMSG "+targetNickname+" :"+text
+;_sendIrcServerMessage(message);inputAreaEl.value=""}}}}document.getElementById("userPrivMsgInputId").addEventListener("input",function(event){if(event.inputType==="insertText"&&event.data===null){
+stripOneCrLfFromElement(document.getElementById("userPrivMsgInputId"));_buildPrivateMessageText()}if(event.inputType==="insertLineBreak"){
+stripOneCrLfFromElement(document.getElementById("userPrivMsgInputId"));_buildPrivateMessageText()}});document.getElementById("UserPrivMsgSendButton").addEventListener("click",function(){
+_buildPrivateMessageText()});document.addEventListener("erase-before-reload",function(event){document.getElementById("pmNickNameInputId").value=""
+;document.getElementById("userPrivMsgInputId").value=""});document.getElementById("whoisButton").addEventListener("click",function(){if(document.getElementById("pmNickNameInputId").value.length>0){
+showRawMessageWindow();const message="WHOIS "+document.getElementById("pmNickNameInputId").value;_sendIrcServerMessage(message);showRawMessageWindow()}else{showError("Input required")}})
+;document.getElementById("privMsgMainHiddenButton").addEventListener("click",function(){if(document.getElementById("privMsgMainHiddenDiv").hasAttribute("hidden")){
+document.getElementById("privMsgMainHiddenDiv").removeAttribute("hidden");document.getElementById("privMsgMainHiddenButton").textContent="-"
+;document.dispatchEvent(new CustomEvent("priv-msg-show-all",{bubbles:true}))}else{document.getElementById("privMsgMainHiddenDiv").setAttribute("hidden","")
+;document.getElementById("privMsgMainHiddenButton").textContent="+";document.dispatchEvent(new CustomEvent("priv-msg-hide-all",{bubbles:true}))}})
+;document.getElementById("closeNoticeButton").addEventListener("click",function(){webState.noticeOpen=false;updateDivVisibility()})
+;document.getElementById("noticeClearButton").addEventListener("click",function(){document.getElementById("noticeMessageDisplay").value=""
 ;document.getElementById("noticeMessageDisplay").setAttribute("rows","5")});document.getElementById("noticeTallerButton").addEventListener("click",function(){
 const newRows=parseInt(document.getElementById("noticeMessageDisplay").getAttribute("rows"))+5;document.getElementById("noticeMessageDisplay").setAttribute("rows",newRows.toString())})
 ;document.getElementById("noticeNormalButton").addEventListener("click",function(){document.getElementById("noticeMessageDisplay").setAttribute("rows","5")})
@@ -683,13 +687,14 @@ if(text.length>0){const commandAction=textCommandParser({inputString:text,origin
 }else{if(commandAction.ircMessage&&commandAction.ircMessage.length>0){_sendIrcServerMessage(commandAction.ircMessage)}return}}}textAreaEl.value=""}
 document.getElementById("sendRawMessageButton").addEventListener("click",function(){_parseInputForIRCCommands(document.getElementById("rawMessageInputId"))
 ;document.getElementById("rawMessageInputId").focus()});document.getElementById("rawMessageInputId").addEventListener("input",function(event){
-if(event.inputType==="insertText"&&event.data===null||event.inputType==="insertLineBreak"){_parseInputForIRCCommands(document.getElementById("rawMessageInputId"))}})
-;const _autoCompleteServInputElement=function(snippet){const serverInputAreaEl=document.getElementById("rawMessageInputId");let last="";const trailingSpaceKey=32;let matchedCommand=""
-;if(autoCompleteCommandList.length>0){for(let i=0;i<autoCompleteCommandList.length;i++){if(autoCompleteCommandList[i].indexOf(snippet.toUpperCase())===0){matchedCommand=autoCompleteCommandList[i]}}}
-let matchedRawCommand="";if(autoCompleteRawCommandList.length>0){for(let i=0;i<autoCompleteRawCommandList.length;i++){if(autoCompleteRawCommandList[i].indexOf(snippet.toUpperCase())===0){
-matchedRawCommand=autoCompleteRawCommandList[i]}}}if(matchedCommand.length>0&&serverInputAreaEl.value===snippet){
-serverInputAreaEl.value=serverInputAreaEl.value.slice(0,serverInputAreaEl.value.length-snippet.length);serverInputAreaEl.value+=matchedCommand
-;serverInputAreaEl.value+=String.fromCharCode(trailingSpaceKey);last=matchedCommand}else if(matchedRawCommand.length>0&&serverInputAreaEl.value.slice(0,7).toUpperCase()==="/QUOTE "){
+if(event.inputType==="insertText"&&event.data===null||event.inputType==="insertLineBreak"){stripOneCrLfFromElement(document.getElementById("rawMessageInputId"))
+;_parseInputForIRCCommands(document.getElementById("rawMessageInputId"))}});const _autoCompleteServInputElement=function(snippet){const serverInputAreaEl=document.getElementById("rawMessageInputId")
+;let last="";const trailingSpaceKey=32;let matchedCommand="";if(autoCompleteCommandList.length>0){for(let i=0;i<autoCompleteCommandList.length;i++){
+if(autoCompleteCommandList[i].indexOf(snippet.toUpperCase())===0){matchedCommand=autoCompleteCommandList[i]}}}let matchedRawCommand="";if(autoCompleteRawCommandList.length>0){
+for(let i=0;i<autoCompleteRawCommandList.length;i++){if(autoCompleteRawCommandList[i].indexOf(snippet.toUpperCase())===0){matchedRawCommand=autoCompleteRawCommandList[i]}}}
+if(matchedCommand.length>0&&serverInputAreaEl.value===snippet){serverInputAreaEl.value=serverInputAreaEl.value.slice(0,serverInputAreaEl.value.length-snippet.length)
+;serverInputAreaEl.value+=matchedCommand;serverInputAreaEl.value+=String.fromCharCode(trailingSpaceKey);last=matchedCommand
+}else if(matchedRawCommand.length>0&&serverInputAreaEl.value.slice(0,7).toUpperCase()==="/QUOTE "){
 serverInputAreaEl.value=serverInputAreaEl.value.slice(0,serverInputAreaEl.value.length-snippet.length);serverInputAreaEl.value+=matchedRawCommand
 ;serverInputAreaEl.value+=String.fromCharCode(trailingSpaceKey);last=matchedRawCommand}else if(ircState.nickName.toLowerCase().indexOf(snippet.toLowerCase())===0){
 serverInputAreaEl.value=serverInputAreaEl.value.slice(0,serverInputAreaEl.value.length-snippet.length);serverInputAreaEl.value+=ircState.nickName

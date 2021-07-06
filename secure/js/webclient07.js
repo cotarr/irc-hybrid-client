@@ -364,6 +364,8 @@ function createPrivateMessageEl (name, parsedMessage) {
   privMsgInputAreaEl.addEventListener('input', function (event) {
     if (((event.inputType === 'insertText') && (event.data === null)) ||
       (event.inputType === 'insertLineBreak')) {
+      // Remove EOL characters at cursor loction
+      stripOneCrLfFromElement(privMsgInputAreaEl);
       _sendPrivMessageToUser(name, privMsgInputAreaEl);
       resetPmActivityIcon(privMsgIndex);
       activityIconInhibitTimer = activityIconInhibitTimerValue;
@@ -591,7 +593,7 @@ function _buildPrivateMessageText () {
           }
         }
       } else {
-        console.log('else not command');
+        // console.log('else not command');
         // Else not slash / command, assume is input intended to send to private message.
         if (document.getElementById('pmNickNameInputId').value.length === 0) return;
         const targetNickname = document.getElementById('pmNickNameInputId').value;
@@ -604,9 +606,13 @@ function _buildPrivateMessageText () {
 };
 document.getElementById('userPrivMsgInputId').addEventListener('input', function (event) {
   if ((event.inputType === 'insertText') && (event.data === null)) {
+    // Remove EOL characters at cursor loction
+    stripOneCrLfFromElement(document.getElementById('userPrivMsgInputId'));
     _buildPrivateMessageText();
   }
   if (event.inputType === 'insertLineBreak') {
+    // Remove EOL characters at cursor loction
+    stripOneCrLfFromElement(document.getElementById('userPrivMsgInputId'));
     _buildPrivateMessageText();
   }
 });
