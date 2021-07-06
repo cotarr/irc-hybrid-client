@@ -108,10 +108,10 @@ There are complete instructions for use of this utility in the
 ### eslint
 
 ```
-# Lint browser
+# Lint browser JavaScript
 npx eslint secure/js/*.js
 
-# Lint server
+# Lint server JavaScript
 npx eslint server/*/*.js server/*.js bin/www
 
 ```
