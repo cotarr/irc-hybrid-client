@@ -462,44 +462,44 @@ if(event.inputType==="insertText"&&event.data===null||event.inputType==="insertL
 channelTopicDivEl.textContent=cleanFormatting(ircState.channelStates[index].topic);channelNamesDisplayEl.removeAttribute("disabled");channelTextAreaEl.removeAttribute("disabled")
 ;channelInputAreaEl.removeAttribute("disabled");channelSendButtonEl.removeAttribute("disabled");channelJoinButtonEl.setAttribute("hidden","");channelPruneButtonEl.setAttribute("hidden","")
 ;channelPartButtonEl.removeAttribute("hidden");channelZoomButtonEl.removeAttribute("hidden");if(channelMainSectionEl.hasAttribute("zoom")){channelTopicDivEl.setAttribute("hidden","")
-;channelBottomDiv2El.setAttribute("hidden","");channelBottomDiv3El.setAttribute("hidden","");channelBottomDiv4El.setAttribute("hidden","");if(window.innerWidth>mobileBreakpointPx){
-channelNamesDisplayEl.removeAttribute("hidden")}else{channelNamesDisplayEl.setAttribute("hidden","")}}else{channelTopicDivEl.removeAttribute("hidden");channelBottomDiv2El.removeAttribute("hidden")
-;channelBottomDiv3El.removeAttribute("hidden");channelBottomDiv4El.removeAttribute("hidden");channelNamesDisplayEl.removeAttribute("hidden")}}else{channelMainSectionEl.removeAttribute("zoom")
-;channelZoomButtonEl.textContent="Zoom";channelNamesDisplayEl.setAttribute("disabled","");channelTextAreaEl.setAttribute("disabled","");channelInputAreaEl.setAttribute("disabled","")
-;channelSendButtonEl.setAttribute("disabled","");channelJoinButtonEl.removeAttribute("hidden");channelPruneButtonEl.removeAttribute("hidden");channelPartButtonEl.setAttribute("hidden","")
-;channelZoomButtonEl.setAttribute("hidden","");channelTopicDivEl.removeAttribute("hidden");channelBottomDiv2El.removeAttribute("hidden");channelBottomDiv3El.removeAttribute("hidden")
-;channelBottomDiv4El.removeAttribute("hidden");channelNamesDisplayEl.removeAttribute("hidden")}if(channelMainSectionEl.hasAttribute("beep1-enabled")){channelBeep1CBInputEl.checked=true}else{
-channelBeep1CBInputEl.checked=false}if(channelMainSectionEl.hasAttribute("beep2-enabled")){channelBeep2CBInputEl.checked=true}else{channelBeep2CBInputEl.checked=false}
-if(channelMainSectionEl.hasAttribute("beep3-enabled")){channelBeep3CBInputEl.checked=true}else{channelBeep3CBInputEl.checked=false}if(channelMainSectionEl.hasAttribute("brief-enabled")){
-channelFormatCBInputEl.checked=true}else{channelFormatCBInputEl.checked=false}if(channelMainSectionEl.hasAttribute("auto-comp-enabled")){channelAutoCompCBInputEl.checked=true}else{
-channelAutoCompCBInputEl.checked=false}}}zoomIndexNumber++;const zoomEventId="chan"+zoomIndexNumber.toString()+"ZoomId";channelZoomButtonEl.addEventListener("click",function(){
-if(channelMainSectionEl.hasAttribute("zoom")){channelMainSectionEl.removeAttribute("zoom");channelZoomButtonEl.textContent="Zoom";updateVisibility()
-;channelTextAreaEl.scrollTop=channelTextAreaEl.scrollHeight}else{channelMainSectionEl.setAttribute("zoom","");channelZoomButtonEl.textContent="No Zoom";updateVisibility()
-;channelTextAreaEl.scrollTop=channelTextAreaEl.scrollHeight;document.dispatchEvent(new CustomEvent("hide-all-divs",{bubbles:true,detail:{zoom:zoomEventId}}))}})
-;document.addEventListener("show-all-divs",function(event){channelBottomDivEl.removeAttribute("hidden");channelHideButtonEl.textContent="-";channelTopRightHidableDivEl.removeAttribute("hidden")
-;channelMainSectionEl.removeAttribute("zoom");channelZoomButtonEl.textContent="Zoom";updateVisibility()});document.addEventListener("hide-all-divs",function(event){
-if(event.detail&&event.detail.zoom&&event.detail.zoom.length>0){if(event.detail.zoom!==zoomEventId){channelBottomDivEl.setAttribute("hidden","");channelHideButtonEl.textContent="+"
-;channelTopRightHidableDivEl.setAttribute("hidden","");channelMainSectionEl.removeAttribute("zoom");channelZoomButtonEl.textContent="Zoom";updateVisibility()}}else{
-channelBottomDivEl.setAttribute("hidden","");channelHideButtonEl.textContent="+";channelTopRightHidableDivEl.setAttribute("hidden","");channelMainSectionEl.removeAttribute("zoom")
-;channelZoomButtonEl.textContent="Zoom";updateVisibility()}});channelBeep1CBInputEl.addEventListener("click",function(e){if(channelMainSectionEl.hasAttribute("beep1-enabled")){
-channelMainSectionEl.removeAttribute("beep1-enabled")}else{channelMainSectionEl.setAttribute("beep1-enabled","");playBeep1Sound()}updateVisibility()})
-;channelBeep2CBInputEl.addEventListener("click",function(e){if(channelMainSectionEl.hasAttribute("beep2-enabled")){channelMainSectionEl.removeAttribute("beep2-enabled")}else{
-channelMainSectionEl.setAttribute("beep2-enabled","");playBeep1Sound()}updateVisibility()});channelBeep3CBInputEl.addEventListener("click",function(e){
-if(channelMainSectionEl.hasAttribute("beep3-enabled")){channelMainSectionEl.removeAttribute("beep3-enabled")}else{channelMainSectionEl.setAttribute("beep3-enabled","");playBeep2Sound()}
-updateVisibility()});document.addEventListener("cancel-beep-sounds",function(event){channelMainSectionEl.removeAttribute("beep1-enabled");channelMainSectionEl.removeAttribute("beep2-enabled")
-;channelMainSectionEl.removeAttribute("beep3-enabled")});channelFormatCBInputEl.addEventListener("click",function(){if(channelMainSectionEl.hasAttribute("brief-enabled")){
-channelMainSectionEl.removeAttribute("brief-enabled")}else{channelMainSectionEl.setAttribute("brief-enabled","")}document.dispatchEvent(new CustomEvent("update-from-cache",{bubbles:true}))})
-;if(window.innerWidth<mobileBreakpointPx){channelMainSectionEl.setAttribute("brief-enabled","");channelFormatCBInputEl.checked=true}else{channelMainSectionEl.removeAttribute("brief-enabled")
-;channelFormatCBInputEl.checked=false}updateVisibility();channelAutoCompCBInputEl.addEventListener("click",function(){if(channelMainSectionEl.hasAttribute("auto-comp-enabled")){
-channelMainSectionEl.removeAttribute("auto-comp-enabled")}else{channelMainSectionEl.setAttribute("auto-comp-enabled","")}updateVisibility()})
-;if(window.InputEvent&&typeof InputEvent.prototype.getTargetRanges==="function"){channelMainSectionEl.setAttribute("auto-comp-enabled","");updateVisibility()}else{
-channelMainSectionEl.setAttribute("auto-comp-enabled","");updateVisibility();channelAutoCompCBInputEl.setAttribute("disabled","")}const _autoCompleteInputElement=function(snippet){let last=""
-;const trailingSpaceKey=32;let matchedCommand="";if(autoCompleteCommandList.length>0){for(let i=0;i<autoCompleteCommandList.length;i++){
-if(autoCompleteCommandList[i].indexOf(snippet.toUpperCase())===0){matchedCommand=autoCompleteCommandList[i]}}}let matchedRawCommand="";if(autoCompleteRawCommandList.length>0){
-for(let i=0;i<autoCompleteRawCommandList.length;i++){if(autoCompleteRawCommandList[i].indexOf(snippet.toUpperCase())===0){matchedRawCommand=autoCompleteRawCommandList[i]}}}
-if(matchedCommand.length>0&&channelInputAreaEl.value===snippet){channelInputAreaEl.value=channelInputAreaEl.value.slice(0,channelInputAreaEl.value.length-snippet.length)
-;channelInputAreaEl.value+=matchedCommand;channelInputAreaEl.value+=String.fromCharCode(trailingSpaceKey);last=matchedCommand
-}else if(matchedRawCommand.length>0&&channelInputAreaEl.value.slice(0,7).toUpperCase()==="/QUOTE "){
+;channelBottomDiv2El.setAttribute("hidden","");channelBottomDiv3El.setAttribute("hidden","");channelBottomDiv4El.setAttribute("hidden","")
+;if(document.querySelector("body").clientWidth>mobileBreakpointPx){channelNamesDisplayEl.removeAttribute("hidden")}else{channelNamesDisplayEl.setAttribute("hidden","")}}else{
+channelTopicDivEl.removeAttribute("hidden");channelBottomDiv2El.removeAttribute("hidden");channelBottomDiv3El.removeAttribute("hidden");channelBottomDiv4El.removeAttribute("hidden")
+;channelNamesDisplayEl.removeAttribute("hidden")}}else{channelMainSectionEl.removeAttribute("zoom");channelZoomButtonEl.textContent="Zoom";channelNamesDisplayEl.setAttribute("disabled","")
+;channelTextAreaEl.setAttribute("disabled","");channelInputAreaEl.setAttribute("disabled","");channelSendButtonEl.setAttribute("disabled","");channelJoinButtonEl.removeAttribute("hidden")
+;channelPruneButtonEl.removeAttribute("hidden");channelPartButtonEl.setAttribute("hidden","");channelZoomButtonEl.setAttribute("hidden","");channelTopicDivEl.removeAttribute("hidden")
+;channelBottomDiv2El.removeAttribute("hidden");channelBottomDiv3El.removeAttribute("hidden");channelBottomDiv4El.removeAttribute("hidden");channelNamesDisplayEl.removeAttribute("hidden")}
+if(channelMainSectionEl.hasAttribute("beep1-enabled")){channelBeep1CBInputEl.checked=true}else{channelBeep1CBInputEl.checked=false}if(channelMainSectionEl.hasAttribute("beep2-enabled")){
+channelBeep2CBInputEl.checked=true}else{channelBeep2CBInputEl.checked=false}if(channelMainSectionEl.hasAttribute("beep3-enabled")){channelBeep3CBInputEl.checked=true}else{
+channelBeep3CBInputEl.checked=false}if(channelMainSectionEl.hasAttribute("brief-enabled")){channelFormatCBInputEl.checked=true}else{channelFormatCBInputEl.checked=false}
+if(channelMainSectionEl.hasAttribute("auto-comp-enabled")){channelAutoCompCBInputEl.checked=true}else{channelAutoCompCBInputEl.checked=false}}}zoomIndexNumber++
+;const zoomEventId="chan"+zoomIndexNumber.toString()+"ZoomId";channelZoomButtonEl.addEventListener("click",function(){if(channelMainSectionEl.hasAttribute("zoom")){
+channelMainSectionEl.removeAttribute("zoom");channelZoomButtonEl.textContent="Zoom";updateVisibility();channelTextAreaEl.scrollTop=channelTextAreaEl.scrollHeight}else{
+channelMainSectionEl.setAttribute("zoom","");channelZoomButtonEl.textContent="No Zoom";updateVisibility();channelTextAreaEl.scrollTop=channelTextAreaEl.scrollHeight
+;document.dispatchEvent(new CustomEvent("hide-all-divs",{bubbles:true,detail:{zoom:zoomEventId}}))}});document.addEventListener("show-all-divs",function(event){
+channelBottomDivEl.removeAttribute("hidden");channelHideButtonEl.textContent="-";channelTopRightHidableDivEl.removeAttribute("hidden");channelMainSectionEl.removeAttribute("zoom")
+;channelZoomButtonEl.textContent="Zoom";updateVisibility()});document.addEventListener("hide-all-divs",function(event){if(event.detail&&event.detail.zoom&&event.detail.zoom.length>0){
+if(event.detail.zoom!==zoomEventId){channelBottomDivEl.setAttribute("hidden","");channelHideButtonEl.textContent="+";channelTopRightHidableDivEl.setAttribute("hidden","")
+;channelMainSectionEl.removeAttribute("zoom");channelZoomButtonEl.textContent="Zoom";updateVisibility()}}else{channelBottomDivEl.setAttribute("hidden","");channelHideButtonEl.textContent="+"
+;channelTopRightHidableDivEl.setAttribute("hidden","");channelMainSectionEl.removeAttribute("zoom");channelZoomButtonEl.textContent="Zoom";updateVisibility()}})
+;channelBeep1CBInputEl.addEventListener("click",function(e){if(channelMainSectionEl.hasAttribute("beep1-enabled")){channelMainSectionEl.removeAttribute("beep1-enabled")}else{
+channelMainSectionEl.setAttribute("beep1-enabled","");playBeep1Sound()}updateVisibility()});channelBeep2CBInputEl.addEventListener("click",function(e){
+if(channelMainSectionEl.hasAttribute("beep2-enabled")){channelMainSectionEl.removeAttribute("beep2-enabled")}else{channelMainSectionEl.setAttribute("beep2-enabled","");playBeep1Sound()}
+updateVisibility()});channelBeep3CBInputEl.addEventListener("click",function(e){if(channelMainSectionEl.hasAttribute("beep3-enabled")){channelMainSectionEl.removeAttribute("beep3-enabled")}else{
+channelMainSectionEl.setAttribute("beep3-enabled","");playBeep2Sound()}updateVisibility()});document.addEventListener("cancel-beep-sounds",function(event){
+channelMainSectionEl.removeAttribute("beep1-enabled");channelMainSectionEl.removeAttribute("beep2-enabled");channelMainSectionEl.removeAttribute("beep3-enabled")})
+;channelFormatCBInputEl.addEventListener("click",function(){if(channelMainSectionEl.hasAttribute("brief-enabled")){channelMainSectionEl.removeAttribute("brief-enabled")}else{
+channelMainSectionEl.setAttribute("brief-enabled","")}document.dispatchEvent(new CustomEvent("update-from-cache",{bubbles:true}))});if(document.querySelector("body").clientWidth<mobileBreakpointPx){
+channelMainSectionEl.setAttribute("brief-enabled","");channelFormatCBInputEl.checked=true}else{channelMainSectionEl.removeAttribute("brief-enabled");channelFormatCBInputEl.checked=false}
+updateVisibility();channelAutoCompCBInputEl.addEventListener("click",function(){if(channelMainSectionEl.hasAttribute("auto-comp-enabled")){channelMainSectionEl.removeAttribute("auto-comp-enabled")
+}else{channelMainSectionEl.setAttribute("auto-comp-enabled","")}updateVisibility()});if(window.InputEvent&&typeof InputEvent.prototype.getTargetRanges==="function"){
+channelMainSectionEl.setAttribute("auto-comp-enabled","");updateVisibility()}else{channelMainSectionEl.setAttribute("auto-comp-enabled","");updateVisibility()
+;channelAutoCompCBInputEl.setAttribute("disabled","")}const _autoCompleteInputElement=function(snippet){let last="";const trailingSpaceKey=32;let matchedCommand=""
+;if(autoCompleteCommandList.length>0){for(let i=0;i<autoCompleteCommandList.length;i++){if(autoCompleteCommandList[i].indexOf(snippet.toUpperCase())===0){matchedCommand=autoCompleteCommandList[i]}}}
+let matchedRawCommand="";if(autoCompleteRawCommandList.length>0){for(let i=0;i<autoCompleteRawCommandList.length;i++){if(autoCompleteRawCommandList[i].indexOf(snippet.toUpperCase())===0){
+matchedRawCommand=autoCompleteRawCommandList[i]}}}if(matchedCommand.length>0&&channelInputAreaEl.value===snippet){
+channelInputAreaEl.value=channelInputAreaEl.value.slice(0,channelInputAreaEl.value.length-snippet.length);channelInputAreaEl.value+=matchedCommand
+;channelInputAreaEl.value+=String.fromCharCode(trailingSpaceKey);last=matchedCommand}else if(matchedRawCommand.length>0&&channelInputAreaEl.value.slice(0,7).toUpperCase()==="/QUOTE "){
 channelInputAreaEl.value=channelInputAreaEl.value.slice(0,channelInputAreaEl.value.length-snippet.length);channelInputAreaEl.value+=matchedRawCommand
 ;channelInputAreaEl.value+=String.fromCharCode(trailingSpaceKey);last=matchedRawCommand}else if(name.toLowerCase().indexOf(snippet.toLowerCase())===0){
 channelInputAreaEl.value=channelInputAreaEl.value.slice(0,channelInputAreaEl.value.length-snippet.length);channelInputAreaEl.value+=name;channelInputAreaEl.value+=String.fromCharCode(trailingSpaceKey)
@@ -570,13 +570,13 @@ _addText(parsedMessage.timestamp,"*","Topic for "+parsedMessage.params[0]+' chan
 ;document.addEventListener("erase-before-reload",function(event){channelTextAreaEl.value="";channelInputAreaEl.value=""});document.addEventListener("cache-reload-done",function(event){
 let markerString="";let timestampString="";if("detail"in event&&"timestamp"in event.detail){timestampString=unixTimestampToHMS(event.detail.timestamp)}if(timestampString){markerString+=timestampString
 }markerString+=" "+cacheReloadString+"\n";if(channelMainSectionEl.hasAttribute("brief-enabled")){markerString+="\n"}channelTextAreaEl.value+=markerString
-;channelTextAreaEl.scrollTop=channelTextAreaEl.scrollHeight});updateVisibility();const adjustChannelInputToWidowWidth=function(innerWidth){const mar1=webState.dynamic.commonMargin
+;channelTextAreaEl.scrollTop=channelTextAreaEl.scrollHeight});updateVisibility();const adjustChannelInputToWidowWidth=function(){const mar1=webState.dynamic.commonMargin
 ;const mar2=webState.dynamic.commonMargin+5+webState.dynamic.sendButtonWidthPx
 ;const nicknameListPixelWidth=webState.dynamic.inputAreaSideWidthPx+channelNamesCharWidth*webState.dynamic.inputAreaCharWidthPx;const mar3=webState.dynamic.commonMargin+nicknameListPixelWidth+6
-;if(window.innerWidth>mobileBreakpointPx){channelTextAreaEl.setAttribute("cols",calcInputAreaColSize(mar3));channelNamesDisplayEl.removeAttribute("hidden")}else{
+;if(document.querySelector("body").clientWidth>mobileBreakpointPx){channelTextAreaEl.setAttribute("cols",calcInputAreaColSize(mar3));channelNamesDisplayEl.removeAttribute("hidden")}else{
 channelTextAreaEl.setAttribute("cols",calcInputAreaColSize(mar1));if(channelMainSectionEl.hasAttribute("zoom")){channelNamesDisplayEl.setAttribute("hidden","")}else{
-channelNamesDisplayEl.removeAttribute("hidden")}}channelInputAreaEl.setAttribute("cols",calcInputAreaColSize(mar2))};window.addEventListener("resize",function(event){
-if(webState.dynamic.inputAreaCharWidthPx){adjustChannelInputToWidowWidth(event.currentTarget.innerWidth)}});adjustChannelInputToWidowWidth(window.innerWidth)}let lastJoinedChannelCount=-1
+channelNamesDisplayEl.removeAttribute("hidden")}}channelInputAreaEl.setAttribute("cols",calcInputAreaColSize(mar2))};window.addEventListener("resize-custom-elements",function(event){
+if(webState.dynamic.inputAreaCharWidthPx){adjustChannelInputToWidowWidth()}});adjustChannelInputToWidowWidth();setTimeout(adjustChannelInputToWidowWidth,100)}let lastJoinedChannelCount=-1
 ;let lastIrcServerIndex=-1;document.addEventListener("irc-state-changed",function(event){if(ircState.channels.length>0){for(let i=0;i<ircState.channels.length;i++){const name=ircState.channels[i]
 ;if(webState.channels.indexOf(name.toLowerCase())===-1){createChannelEl(name)}}}let needButtonUpdate=false;let joinedChannelCount=0;if(ircState.channels.length>0){
 for(let i=0;i<ircState.channels.length;i++){if(ircState.channelStates[i].joined)joinedChannelCount++}}if(joinedChannelCount!==lastJoinedChannelCount){needButtonUpdate=true
@@ -652,10 +652,10 @@ privMsgSectionEl.removeAttribute("hidden");privMsgBottomDivEl.removeAttribute("h
 ;document.getElementById("privMsgMainHiddenDiv").removeAttribute("hidden");document.getElementById("privMsgMainHiddenButton").textContent="-"
 ;if(document.activeElement!==privMsgInputAreaEl&&document.activeElement!==privMsgSendButtonEl&&webState.cacheInhibitTimer===0&&activityIconInhibitTimer===0){setPmActivityIcon(privMsgIndex)}}}break
 ;default:}});if(webState.cacheInhibitTimer===0){setPmActivityIcon(privMsgIndex)}document.getElementById("privMsgMainHiddenDiv").removeAttribute("hidden")
-;document.getElementById("privMsgMainHiddenButton").textContent="-";const adjustPMInputToWidowWidth=function(innerWidth){const mar1=webState.dynamic.commonMargin
+;document.getElementById("privMsgMainHiddenButton").textContent="-";const adjustPMInputToWidowWidth=function(){const mar1=webState.dynamic.commonMargin
 ;const mar2=webState.dynamic.commonMargin+5+webState.dynamic.sendButtonWidthPx;privMsgTextAreaEl.setAttribute("cols",calcInputAreaColSize(mar1))
-;privMsgInputAreaEl.setAttribute("cols",calcInputAreaColSize(mar2))};window.addEventListener("resize",function(event){if(webState.dynamic.inputAreaCharWidthPx){
-adjustPMInputToWidowWidth(event.currentTarget.innerWidth)}});adjustPMInputToWidowWidth(window.innerWidth)}document.addEventListener("private-message",function(event){
+;privMsgInputAreaEl.setAttribute("cols",calcInputAreaColSize(mar2))};window.addEventListener("resize-custom-elements",function(event){if(webState.dynamic.inputAreaCharWidthPx){
+adjustPMInputToWidowWidth()}});adjustPMInputToWidowWidth();setTimeout(adjustPMInputToWidowWidth,150)}document.addEventListener("private-message",function(event){
 let name=event.detail.parsedMessage.nick;if(name===ircState.nickName){name=event.detail.parsedMessage.params[0]}if(webState.activePrivateMessageNicks.indexOf(name.toLowerCase())<0){
 createPrivateMessageEl(name,event.detail.parsedMessage)}});function _buildPrivateMessageText(){if(document.getElementById("userPrivMsgInputId").value.length===0)return
 ;const inputAreaEl=document.getElementById("userPrivMsgInputId");const text=stripTrailingCrLf(inputAreaEl.value);if(detectMultiLineString(text)){showError("Multi-line input is not supported.")
@@ -794,20 +794,27 @@ showError(responseJson.message)}}).catch(error=>{console.log(error);if(error)sho
 ;document.getElementById("test3Button").addEventListener("click",function(){console.log("Test 3 button pressed.");console.log("Test 3 button: expire heart beat timer")
 ;heartbeatUpCounter=heartbeatExpirationTimeSeconds-1});document.getElementById("test3ButtonDesc").textContent="Emulate websocket timeout"
 ;document.getElementById("test4Button").addEventListener("click",function(){console.log("Test 4 button pressed.");console.log("Test 4 getIrcState()");getIrcState()})
-;document.getElementById("test4ButtonDesc").textContent="Call getIrcState()";const rulerDivEl=document.getElementById("rulerDiv");const rulerX1=10;const rulerX2=20
-;const rulerTextareaEl=document.createElement("textarea");rulerTextareaEl.setAttribute("cols",rulerX1.toString());rulerTextareaEl.setAttribute("rows","1");rulerDivEl.appendChild(rulerTextareaEl)
-;const rulerY1=rulerTextareaEl.getBoundingClientRect().width;rulerTextareaEl.setAttribute("cols",rulerX2.toString());const rulerY2=rulerTextareaEl.getBoundingClientRect().width
-;rulerDivEl.removeChild(rulerTextareaEl);if(!webState.watch)webState.dynamic={};webState.dynamic.inputAreaCharWidthPx=(rulerY2-rulerY1)/(rulerX2-rulerX1)
+;document.getElementById("test4ButtonDesc").textContent="Call getIrcState()";const calibrateElementSize=function(){const rulerDivEl=document.getElementById("rulerDiv");const rulerX1=10
+;const rulerX2=20;const rulerTextareaEl=document.createElement("textarea");rulerTextareaEl.setAttribute("cols",rulerX1.toString());rulerTextareaEl.setAttribute("rows","1")
+;rulerDivEl.appendChild(rulerTextareaEl);const rulerY1=rulerTextareaEl.getBoundingClientRect().width;rulerTextareaEl.setAttribute("cols",rulerX2.toString())
+;const rulerY2=rulerTextareaEl.getBoundingClientRect().width;rulerDivEl.removeChild(rulerTextareaEl);if(!webState.dynamic){webState.dynamic={}
+;webState.dynamic.lastClientWidth=document.querySelector("body").clientWidth;webState.dynamic.lastDevicePixelRatio=1;if(window.devicePixelRatio){
+webState.dynamic.lastDevicePixelRatio=window.devicePixelRatio}}webState.dynamic.inputAreaCharWidthPx=(rulerY2-rulerY1)/(rulerX2-rulerX1)
 ;webState.dynamic.inputAreaSideWidthPx=rulerY1-rulerX1*webState.dynamic.inputAreaCharWidthPx;const rulerButtonEl=document.createElement("button");rulerButtonEl.textContent="Send"
-;rulerDivEl.appendChild(rulerButtonEl);webState.dynamic.sendButtonWidthPx=rulerButtonEl.getBoundingClientRect().width;rulerDivEl.removeChild(rulerButtonEl);webState.dynamic.commonMargin=50
+;rulerDivEl.appendChild(rulerButtonEl);webState.dynamic.sendButtonWidthPx=rulerButtonEl.getBoundingClientRect().width;rulerDivEl.removeChild(rulerButtonEl);webState.dynamic.commonMargin=50}
 ;const calcInputAreaColSize=function(marginPxWidth){
 if(typeof marginPxWidth==="number"&&webState.dynamic.inputAreaCharWidthPx&&typeof webState.dynamic.inputAreaCharWidthPx==="number"&&webState.dynamic.inputAreaCharWidthPx>1&&webState.dynamic.inputAreaSideWidthPx&&typeof webState.dynamic.inputAreaSideWidthPx==="number"&&webState.dynamic.inputAreaSideWidthPx>1){
-let margin=marginPxWidth;if(margin<0)margin=0;const cols=parseInt((window.innerWidth-webState.dynamic.inputAreaSideWidthPx-margin)/webState.dynamic.inputAreaCharWidthPx);return cols.toString()}else{
-console.log("alcInputAreaColSize() invalid input");return null}};const adjustInputToWidowWidth=function(innerWidth){const mar1=webState.dynamic.commonMargin
+let margin=marginPxWidth;if(margin<0)margin=0;const cols=parseInt((document.querySelector("body").clientWidth-webState.dynamic.inputAreaSideWidthPx-margin)/webState.dynamic.inputAreaCharWidthPx)
+;return cols.toString()}else{console.log("alcInputAreaColSize() invalid input");return null}};const adjustInputToWidowWidth=function(){const mar1=webState.dynamic.commonMargin
 ;document.getElementById("rawMessageDisplay").setAttribute("cols",calcInputAreaColSize(mar1));document.getElementById("noticeMessageDisplay").setAttribute("cols",calcInputAreaColSize(mar1))
 ;document.getElementById("wallopsMessageDisplay").setAttribute("cols",calcInputAreaColSize(mar1));const mar2=webState.dynamic.commonMargin+5+webState.dynamic.sendButtonWidthPx
 ;document.getElementById("rawMessageInputId").setAttribute("cols",calcInputAreaColSize(mar2));document.getElementById("userPrivMsgInputId").setAttribute("cols",calcInputAreaColSize(mar2))
-;document.getElementById("errorDiv").style.width="100%";if(!webState.watch)webState.watch={};webState.watch.innerWidth=window.innerWidth.toString()+"px"
-;webState.watch.innerHeight=window.innerHeight.toString()+"px"};window.addEventListener("resize",function(event){if(webState.dynamic.inputAreaCharWidthPx){
-adjustInputToWidowWidth(event.currentTarget.innerWidth)}});adjustInputToWidowWidth(window.innerWidth);setInterval(function(){errorTimerTickHandler();heartbeatTimerTickHandler()
-;reconnectTimerTickHandler();beepTimerTick();updateElapsedTimeDisplay();cacheInhibitTimerTick()},1e3);firstWebSocketConnectOnPageLoad();
+;document.getElementById("errorDiv").style.width="100%";if(!webState.watch)webState.watch={};webState.watch.innerHeight=window.innerHeight.toString()+"px"
+;webState.watch.innerWidth=window.innerWidth.toString()+"px";webState.watch.bodyClientWidth=document.querySelector("body").clientWidth.toString()+"px"
+;webState.watch.devicePixelRatio=window.devicePixelRatio};window.addEventListener("resize",function(event){if(webState.dynamic.inputAreaCharWidthPx){if(window.devicePixelRatio){
+if(webState.dynamic.lastDevicePixelRatio!==window.devicePixelRatio){webState.dynamic.lastDevicePixelRatio=window.devicePixelRatio;calibrateElementSize()}}adjustInputToWidowWidth()
+;document.dispatchEvent(new CustomEvent("resize-custom-elements",{bubbles:true,detail:{}}));webState.dynamic.lastClientWidth=document.querySelector("body").clientWidth}})
+;const checkForBrowserZoomChanged=function(){if(webState.dynamic.inputAreaCharWidthPx){if(webState.dynamic.lastClientWidth!==document.querySelector("body").clientWidth){
+webState.dynamic.lastClientWidth=document.querySelector("body").clientWidth;adjustInputToWidowWidth();document.dispatchEvent(new CustomEvent("resize-custom-elements",{bubbles:true,detail:{}}))}}}
+;calibrateElementSize();adjustInputToWidowWidth();setInterval(function(){errorTimerTickHandler();heartbeatTimerTickHandler();reconnectTimerTickHandler();beepTimerTick();updateElapsedTimeDisplay()
+;cacheInhibitTimerTick();checkForBrowserZoomChanged()},1e3);firstWebSocketConnectOnPageLoad();

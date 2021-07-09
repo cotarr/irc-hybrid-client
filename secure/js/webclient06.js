@@ -561,7 +561,7 @@ function createChannelEl (name) {
           channelBottomDiv2El.setAttribute('hidden', '');
           channelBottomDiv3El.setAttribute('hidden', '');
           channelBottomDiv4El.setAttribute('hidden', '');
-          if (window.innerWidth > mobileBreakpointPx) {
+          if (document.querySelector('body').clientWidth > mobileBreakpointPx) {
             channelNamesDisplayEl.removeAttribute('hidden');
           } else {
             channelNamesDisplayEl.setAttribute('hidden', '');
@@ -761,8 +761,10 @@ function createChannelEl (name) {
     // _sendIrcServerMessage('NAMES ' + name);
   });
 
+  //
   // First time on page load
-  if (window.innerWidth < mobileBreakpointPx) {
+  //
+  if (document.querySelector('body').clientWidth < mobileBreakpointPx) {
     channelMainSectionEl.setAttribute('brief-enabled', '');
     channelFormatCBInputEl.checked = true;
   } else {
@@ -1351,7 +1353,7 @@ function createChannelEl (name) {
   // Scale values for <textarea> are calculated in webclient10.js
   // and saved globally in the webState object
   //
-  const adjustChannelInputToWidowWidth = function (innerWidth) {
+  const adjustChannelInputToWidowWidth = function () {
     // pixel width mar1 is reserved space on edges of input area at full screen width
     const mar1 = webState.dynamic.commonMargin;
     // pixel width mar2 is reserved space on edges of input area with send button added
@@ -1365,7 +1367,7 @@ function createChannelEl (name) {
     // nickname list + right margin.
     const mar3 = webState.dynamic.commonMargin + nicknameListPixelWidth + 6;
 
-    if (window.innerWidth > mobileBreakpointPx) {
+    if (document.querySelector('body').clientWidth > mobileBreakpointPx) {
       // channelNamesDisplayEl.setAttribute('cols', channelNamesCharWidth.toString());
 
       channelTextAreaEl.setAttribute('cols', calcInputAreaColSize(mar3));
@@ -1384,18 +1386,26 @@ function createChannelEl (name) {
     channelInputAreaEl.setAttribute('cols', calcInputAreaColSize(mar2));
   }; // adjustChannelInputToWidowWidth()
   //
-  // Event listener for resize window (generic browser event)
+  // Event listener for resize window (fired as global event)
   //
-  window.addEventListener('resize', function (event) {
-    // ignore resize events before dynamic size variables exist
+  window.addEventListener('resize-custom-elements', function (event) {
     if (webState.dynamic.inputAreaCharWidthPx) {
-      adjustChannelInputToWidowWidth(event.currentTarget.innerWidth);
+      adjustChannelInputToWidowWidth();
     }
   });
   //
   // Resize on creating channel window
   //
-  adjustChannelInputToWidowWidth(window.innerWidth);
+  adjustChannelInputToWidowWidth();
+  //
+  // This is a hack. If adding the channel window
+  // causes the vertical scroll to appear,
+  // Then the dynamic element side of inputarea
+  // element will not account for vertical slider width
+  // Fix...wait 0.1 sec for scroll bar to appear and
+  // dynamically size again.
+  //
+  setTimeout(adjustChannelInputToWidowWidth, 100);
 };
 
 // ----------------------------------------------------------------------

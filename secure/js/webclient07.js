@@ -511,7 +511,7 @@ function createPrivateMessageEl (name, parsedMessage) {
   // Scale values for <textarea> are calculated in webclient10.js
   // and saved globally in the webState object
   //
-  const adjustPMInputToWidowWidth = function (innerWidth) {
+  const adjustPMInputToWidowWidth = function () {
     // pixel width mar1 is reserved space on edges of input area at full screen width
     const mar1 = webState.dynamic.commonMargin;
     // pixel width mar2 is reserved space on edges of input area with send button added
@@ -522,18 +522,27 @@ function createPrivateMessageEl (name, parsedMessage) {
     privMsgInputAreaEl.setAttribute('cols', calcInputAreaColSize(mar2));
   }; // adjustPMInputToWidowWidth()
   //
-  // Event listener for resize window (generic browser event)
+  // Event listener for resize window (fired as global event)
   //
-  window.addEventListener('resize', function (event) {
-    // ignore resize events before dynamic size variables exist
+  window.addEventListener('resize-custom-elements', function (event) {
     if (webState.dynamic.inputAreaCharWidthPx) {
-      adjustPMInputToWidowWidth(event.currentTarget.innerWidth);
+      adjustPMInputToWidowWidth();
     }
   });
   //
   // Resize on creating private message window
   //
-  adjustPMInputToWidowWidth(window.innerWidth);
+  adjustPMInputToWidowWidth();
+
+  //
+  // This is a hack. If adding the channel window
+  // causes the vertical scroll to appear,
+  // Then the dynamic element side of inputarea
+  // element will not account for vertical slider width
+  // Fix...wait 0.15 sec for scroll bar to appear and
+  // dynamically size again.
+  //
+  setTimeout(adjustPMInputToWidowWidth, 150);
 };
 
 // ----------------------------------------------------------
