@@ -814,7 +814,8 @@ let margin=marginPxWidth;if(margin<0)margin=0;const cols=parseInt((document.quer
 ;webState.watch.devicePixelRatio=window.devicePixelRatio};window.addEventListener("resize",function(event){if(webState.dynamic.inputAreaCharWidthPx){if(window.devicePixelRatio){
 if(webState.dynamic.lastDevicePixelRatio!==window.devicePixelRatio){webState.dynamic.lastDevicePixelRatio=window.devicePixelRatio;calibrateElementSize()}}adjustInputToWidowWidth()
 ;document.dispatchEvent(new CustomEvent("resize-custom-elements",{bubbles:true,detail:{}}));webState.dynamic.lastClientWidth=document.querySelector("body").clientWidth}})
-;const checkForBrowserZoomChanged=function(){if(webState.dynamic.inputAreaCharWidthPx){if(webState.dynamic.lastClientWidth!==document.querySelector("body").clientWidth){
+;const checkVerticalSliderPageWidth=function(){if(webState.dynamic.inputAreaCharWidthPx){if(webState.dynamic.lastClientWidth!==document.querySelector("body").clientWidth){
 webState.dynamic.lastClientWidth=document.querySelector("body").clientWidth;adjustInputToWidowWidth();document.dispatchEvent(new CustomEvent("resize-custom-elements",{bubbles:true,detail:{}}))}}}
-;calibrateElementSize();adjustInputToWidowWidth();setInterval(function(){errorTimerTickHandler();heartbeatTimerTickHandler();reconnectTimerTickHandler();beepTimerTick();updateElapsedTimeDisplay()
-;cacheInhibitTimerTick();checkForBrowserZoomChanged()},1e3);firstWebSocketConnectOnPageLoad();
+;document.addEventListener("recalcPageWidthButtonId",function(){calibrateElementSize();adjustInputToWidowWidth();document.dispatchEvent(new CustomEvent("resize-custom-elements",{bubbles:true,detail:{}
+}))});calibrateElementSize();adjustInputToWidowWidth();setTimeout(function(){calibrateElementSize();adjustInputToWidowWidth()},900);setInterval(function(){errorTimerTickHandler()
+;heartbeatTimerTickHandler();reconnectTimerTickHandler();beepTimerTick();updateElapsedTimeDisplay();cacheInhibitTimerTick();checkVerticalSliderPageWidth()},1e3);firstWebSocketConnectOnPageLoad();

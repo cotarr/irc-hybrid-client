@@ -476,7 +476,9 @@ const calcInputAreaColSize = function (marginPxWidth) {
   }
 }; // calcInputAreaColSize()
 
-//
+// ----------------------------------------------------
+// Resize inputarea elements for proper width on page
+// ----------------------------------------------------
 // Function called:
 //    1) Initially
 //    2) On  browser resize event
@@ -505,6 +507,7 @@ const adjustInputToWidowWidth = function () {
   webState.watch.bodyClientWidth = document.querySelector('body').clientWidth.toString() + 'px';
   webState.watch.devicePixelRatio = window.devicePixelRatio;
 }; // adjustInputToWidowWidth()
+
 //
 // Event listener for resize window (generic browser event)
 //
@@ -515,19 +518,22 @@ window.addEventListener('resize', function (event) {
     //
     // If browser supports devicePixelRatio, then compare
     // against last value. If change, then user has changed
-    // browser zoom, so dynamic inputArea element resize
+    // browser zoom, so dynamic inputarea element resize
     // will need to be recalibrated.
     //
     if (window.devicePixelRatio) {
       if (webState.dynamic.lastDevicePixelRatio !== window.devicePixelRatio) {
         // case of zoom changed, recalibrate element pixel size
         webState.dynamic.lastDevicePixelRatio = window.devicePixelRatio;
-        // recalibrate pixel width of inputArea elements
+
+        // recalibrate pixel width of inputarea elements
         calibrateElementSize();
       }
     }
 
+    // go resize inputarea elements
     adjustInputToWidowWidth();
+
     // Tell channel windows and PM windows to resize themselves
     document.dispatchEvent(new CustomEvent('resize-custom-elements',
       {
@@ -541,14 +547,21 @@ window.addEventListener('resize', function (event) {
   }
 });
 
-const checkForBrowserZoomChanged = function () {
+//
+// Resize input area elements after page width unexpectedly changes without event.
+// Typically appearance of vertical slider causes this.
+//
+const checkVerticalSliderPageWidth = function () {
   // skip if not initialized
   if (webState.dynamic.inputAreaCharWidthPx) {
     // Case of making window visible/hidden add or remove vertical slider, change width.
     // There is no event to catch this so it's done on a timer.
     if (webState.dynamic.lastClientWidth !== document.querySelector('body').clientWidth) {
       webState.dynamic.lastClientWidth = document.querySelector('body').clientWidth;
+
+      // resize inputarea elements
       adjustInputToWidowWidth();
+
       // Tell channel windows and PM windows to resize themselves
       document.dispatchEvent(new CustomEvent('resize-custom-elements',
         {
@@ -558,13 +571,40 @@ const checkForBrowserZoomChanged = function () {
         }));
     }
   }
-};
+}; // checkVerticalSliderPageWidth()
+
+document.addEventListener('recalcPageWidthButtonId', function () {
+  // recalibrate pixel width of inputarea elements
+  calibrateElementSize();
+
+  // resize inputarea elements
+  adjustInputToWidowWidth();
+
+  // Tell channel windows and PM windows to resize themselves
+  document.dispatchEvent(new CustomEvent('resize-custom-elements',
+    {
+      bubbles: true,
+      detail: {
+      }
+    }
+  ));
+});
 
 //
-// Do initially on page load
+// Do initially on page load, calibrate inputarea element size, and resize input area elements.
 //
 calibrateElementSize();
 adjustInputToWidowWidth();
+
+//
+// And do same one more time...
+// and again, as a work around to prevent to correct
+// condition whree inputarea about 80% of normal on first page load.
+//
+setTimeout(function () {
+  calibrateElementSize();
+  adjustInputToWidowWidth();
+}, 900);
 
 //
 // 1 second utility timer
@@ -576,7 +616,7 @@ setInterval(function () {
   beepTimerTick();
   updateElapsedTimeDisplay();
   cacheInhibitTimerTick();
-  checkForBrowserZoomChanged();
+  checkVerticalSliderPageWidth();
 }, 1000);
 
 // -----------------------------
