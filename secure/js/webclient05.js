@@ -163,7 +163,8 @@ function stripTrailingCrLf (inString) {
 // ------------------------------------------------
 function stripOneCrLfFromElement (textAreaElement) {
   if (!textAreaElement.value) return;
-  let inString = textAreaElement.value.toString();
+  const inString = textAreaElement.value.toString();
+  console.log(inString);
   //
   // detect \n or \r\n, and remove one time
   //
@@ -171,21 +172,32 @@ function stripOneCrLfFromElement (textAreaElement) {
   let lfCount = 0;
   if (inString.length > 0) {
     for (let i = 0; i < inString.length; i++) {
-      if (inString.charAt(i) === '\r') crCount++;
-      if (inString.charAt(i) === '\n') lfCount++;
+      if (inString.charCodeAt(i) === 0x0D) crCount++;
+      if (inString.charCodeAt(i) === 0x0A) lfCount++;
     }
   }
   // Case of Unix end of line
   if ((crCount === 0) && (lfCount === 1)) {
-    inString = inString.replace('\n', '');
+    let newString = '';
+    for (let i = 0; i < inString.length; i++) {
+      if (inString.charCodeAt(i) !== 0x0A) {
+        newString += inString.charAt(i);
+      }
+    }
+    console.log(newString);
+    textAreaElement.value = newString;
   }
   // Case of Windows end of line
   if ((crCount === 1) && (lfCount === 1)) {
-    inString = inString.replace('\n', '');
-    inString = inString.replace('\r', '');
+    let newString = '';
+    for (let i = 0; i < inString.length; i++) {
+      if ((inString.charCodeAt(i) !== 0x0A) && (inString.charCodeAt(i) !== 0x0D)) {
+        newString += inString.charAt(i);
+      }
+    }
+    textAreaElement.value = newString;
   }
   // Exchange value (contents) with new string in html element
-  textAreaElement.value = inString;
 } // stripOneCrLfFromElement()
 
 // --------------------------------------------------------

@@ -322,14 +322,15 @@ if(ircState.ircConnected&&ircState.ircIsAway){_sendIrcServerMessage("AWAY")}})
 if(inString.charCodeAt(i)===10)countCR++}if(countCR===0){return false}else{return true}}else{return false}}function stripTrailingCrLf(inString){let inLength=inString.length
 ;if(inLength>0&&inString.charCodeAt(inLength-1)===10)inLength--;if(inLength>0&&inString.charCodeAt(inLength-1)===13)inLength--;if(inLength>0&&inString.charCodeAt(inLength-1)===32)inLength--
 ;if(inLength>0&&inString.charCodeAt(inLength-1)===32)inLength--;if(inLength===0){return""}else{return inString.slice(0,inLength)}}function stripOneCrLfFromElement(textAreaElement){
-if(!textAreaElement.value)return;let inString=textAreaElement.value.toString();let crCount=0;let lfCount=0;if(inString.length>0){for(let i=0;i<inString.length;i++){
-if(inString.charAt(i)==="\r")crCount++;if(inString.charAt(i)==="\n")lfCount++}}if(crCount===0&&lfCount===1){inString=inString.replace("\n","")}if(crCount===1&&lfCount===1){
-inString=inString.replace("\n","");inString=inString.replace("\r","")}textAreaElement.value=inString}function textCommandParser(inputObj){function _isWS(inChar){if(inChar.charAt(0)===" ")return true
-;if(inChar.charCodeAt(0)===9)return true;return false}function _isEOL(inChar){if(inChar.charAt(0)==="\n")return true;if(inChar.charAt(0)==="\r")return true;return false}let inStr=inputObj.inputString
-;if(inStr.length>0&&_isEOL(inStr.charAt(inStr.length-1))){inStr=inStr.slice(0,inStr.length-1)}if(inStr.length>0&&_isEOL(inStr.charAt(inStr.length-1))){inStr=inStr.slice(0,inStr.length-1)}
-const inStrLen=inStr.length;const parsedCommand={command:"",params:[],restOf:[]};if(inStr.length<2){return{error:true,message:"Error no command not found",ircMessage:null}}if(inStr.charAt(0)!=="/"){
-return{error:true,message:"Error missing / before command",ircMessage:null}}if(_isWS(inStr.charAt(1))){return{error:true,message:"Error space after slash",ircMessage:null}}let idx=1
-;while(!_isWS(inStr.charAt(idx))&&idx<inStrLen){parsedCommand.command+=inStr.charAt(idx);idx++}while(_isWS(inStr.charAt(idx))&&idx<inStrLen){idx++}
+if(!textAreaElement.value)return;const inString=textAreaElement.value.toString();console.log(inString);let crCount=0;let lfCount=0;if(inString.length>0){for(let i=0;i<inString.length;i++){
+if(inString.charCodeAt(i)===13)crCount++;if(inString.charCodeAt(i)===10)lfCount++}}if(crCount===0&&lfCount===1){let newString="";for(let i=0;i<inString.length;i++){if(inString.charCodeAt(i)!==10){
+newString+=inString.charAt(i)}}console.log(newString);textAreaElement.value=newString}if(crCount===1&&lfCount===1){let newString="";for(let i=0;i<inString.length;i++){
+if(inString.charCodeAt(i)!==10&&inString.charCodeAt(i)!==13){newString+=inString.charAt(i)}}textAreaElement.value=newString}}function textCommandParser(inputObj){function _isWS(inChar){
+if(inChar.charAt(0)===" ")return true;if(inChar.charCodeAt(0)===9)return true;return false}function _isEOL(inChar){if(inChar.charAt(0)==="\n")return true;if(inChar.charAt(0)==="\r")return true
+;return false}let inStr=inputObj.inputString;if(inStr.length>0&&_isEOL(inStr.charAt(inStr.length-1))){inStr=inStr.slice(0,inStr.length-1)}if(inStr.length>0&&_isEOL(inStr.charAt(inStr.length-1))){
+inStr=inStr.slice(0,inStr.length-1)}const inStrLen=inStr.length;const parsedCommand={command:"",params:[],restOf:[]};if(inStr.length<2){return{error:true,message:"Error no command not found",
+ircMessage:null}}if(inStr.charAt(0)!=="/"){return{error:true,message:"Error missing / before command",ircMessage:null}}if(_isWS(inStr.charAt(1))){return{error:true,message:"Error space after slash",
+ircMessage:null}}let idx=1;while(!_isWS(inStr.charAt(idx))&&idx<inStrLen){parsedCommand.command+=inStr.charAt(idx);idx++}while(_isWS(inStr.charAt(idx))&&idx<inStrLen){idx++}
 parsedCommand.command=parsedCommand.command.toUpperCase();if(inStr.slice(idx,inStrLen).length>0){parsedCommand.params.push(null);parsedCommand.restOf.push(inStr.slice(idx,inStrLen));let chars1=""
 ;while(!_isWS(inStr.charAt(idx))&&idx<inStrLen){chars1+=inStr.charAt(idx);idx++}while(_isWS(inStr.charAt(idx))&&idx<inStrLen){idx++}if(inStr.slice(idx,inStrLen).length>0){
 parsedCommand.params.push(chars1);parsedCommand.restOf.push(inStr.slice(idx,inStrLen));let chars2="";while(!_isWS(inStr.charAt(idx))&&idx<inStrLen){chars2+=inStr.charAt(idx);idx++}
