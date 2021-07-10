@@ -382,9 +382,9 @@
   const loginFormFragment2 =
     '" method="post">\n' +
     '<label for="user"><strong>User-id</strong></label>\n' +
-    '<input type="text" name="user" required><br>\n' +
+    '<input type="text" name="user" autocomplete="username" required><br>\n' +
     '<label for="password"><strong>Password</strong></label>\n' +
-    '<input type="password" name="password" required>\n' +
+    '<input type="password" name="password" autocomplete="current-password" required>\n' +
     '<div>I consent to use of cookies</div>\n' +
     '<div>\n' +
     '<button class="button" type="submit">Submit Login</button>\n' +
