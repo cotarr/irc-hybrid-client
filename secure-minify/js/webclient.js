@@ -322,9 +322,9 @@ if(ircState.ircConnected&&ircState.ircIsAway){_sendIrcServerMessage("AWAY")}})
 if(inString.charCodeAt(i)===10)countCR++}if(countCR===0){return false}else{return true}}else{return false}}function stripTrailingCrLf(inString){let inLength=inString.length
 ;if(inLength>0&&inString.charCodeAt(inLength-1)===10)inLength--;if(inLength>0&&inString.charCodeAt(inLength-1)===13)inLength--;if(inLength>0&&inString.charCodeAt(inLength-1)===32)inLength--
 ;if(inLength>0&&inString.charCodeAt(inLength-1)===32)inLength--;if(inLength===0){return""}else{return inString.slice(0,inLength)}}function stripOneCrLfFromElement(textAreaElement){
-if(!textAreaElement.value)return;const inString=textAreaElement.value.toString();console.log(inString);let crCount=0;let lfCount=0;if(inString.length>0){for(let i=0;i<inString.length;i++){
+if(!textAreaElement.value)return;const inString=textAreaElement.value.toString();let crCount=0;let lfCount=0;if(inString.length>0){for(let i=0;i<inString.length;i++){
 if(inString.charCodeAt(i)===13)crCount++;if(inString.charCodeAt(i)===10)lfCount++}}if(crCount===0&&lfCount===1){let newString="";for(let i=0;i<inString.length;i++){if(inString.charCodeAt(i)!==10){
-newString+=inString.charAt(i)}}console.log(newString);textAreaElement.value=newString}if(crCount===1&&lfCount===1){let newString="";for(let i=0;i<inString.length;i++){
+newString+=inString.charAt(i)}}textAreaElement.value=newString}if(crCount===1&&lfCount===1){let newString="";for(let i=0;i<inString.length;i++){
 if(inString.charCodeAt(i)!==10&&inString.charCodeAt(i)!==13){newString+=inString.charAt(i)}}textAreaElement.value=newString}}function textCommandParser(inputObj){function _isWS(inChar){
 if(inChar.charAt(0)===" ")return true;if(inChar.charCodeAt(0)===9)return true;return false}function _isEOL(inChar){if(inChar.charAt(0)==="\n")return true;if(inChar.charAt(0)==="\r")return true
 ;return false}let inStr=inputObj.inputString;if(inStr.length>0&&_isEOL(inStr.charAt(inStr.length-1))){inStr=inStr.slice(0,inStr.length-1)}if(inStr.length>0&&_isEOL(inStr.charAt(inStr.length-1))){

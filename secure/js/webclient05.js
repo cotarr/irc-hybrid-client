@@ -164,7 +164,6 @@ function stripTrailingCrLf (inString) {
 function stripOneCrLfFromElement (textAreaElement) {
   if (!textAreaElement.value) return;
   const inString = textAreaElement.value.toString();
-  console.log(inString);
   //
   // detect \n or \r\n, and remove one time
   //
@@ -184,7 +183,7 @@ function stripOneCrLfFromElement (textAreaElement) {
         newString += inString.charAt(i);
       }
     }
-    console.log(newString);
+    // Exchange value (contents) with new string in html element
     textAreaElement.value = newString;
   }
   // Case of Windows end of line
@@ -195,9 +194,9 @@ function stripOneCrLfFromElement (textAreaElement) {
         newString += inString.charAt(i);
       }
     }
+    // Exchange value (contents) with new string in html element
     textAreaElement.value = newString;
   }
-  // Exchange value (contents) with new string in html element
 } // stripOneCrLfFromElement()
 
 // --------------------------------------------------------
