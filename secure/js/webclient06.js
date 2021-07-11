@@ -1216,7 +1216,7 @@ function createChannelEl (name) {
           channelHideButtonEl.textContent = '-';
 
           // Message activity Icon
-          // If focus not <inputarea> elment,
+          // If focus not <textarea> elment,
           // and focus not message send button
           // and NOT reload from cache in progress (timer not zero)
           // then display incoming message activity icon
@@ -1266,7 +1266,7 @@ function createChannelEl (name) {
           channelHideButtonEl.textContent = '-';
 
           // Message activity Icon
-          // If focus not <inputarea> elment,
+          // If focus not <textarea> elment,
           // and focus not message send button
           // and NOT reload from cache in progress (timer not zero)
           // then display incoming message activity icon
@@ -1400,7 +1400,7 @@ function createChannelEl (name) {
   //
   // This is a hack. If adding the channel window
   // causes the vertical scroll to appear,
-  // Then the dynamic element side of inputarea
+  // Then the dynamic element side of textarea
   // element will not account for vertical slider width
   // Fix...wait 0.1 sec for scroll bar to appear and
   // dynamically size again.

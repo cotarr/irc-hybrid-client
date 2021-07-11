@@ -537,7 +537,7 @@ function createPrivateMessageEl (name, parsedMessage) {
   //
   // This is a hack. If adding the channel window
   // causes the vertical scroll to appear,
-  // Then the dynamic element side of inputarea
+  // Then the dynamic element side of textarea
   // element will not account for vertical slider width
   // Fix...wait 0.15 sec for scroll bar to appear and
   // dynamically size again.

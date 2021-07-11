@@ -477,7 +477,7 @@ const calcInputAreaColSize = function (marginPxWidth) {
 }; // calcInputAreaColSize()
 
 // ----------------------------------------------------
-// Resize inputarea elements for proper width on page
+// Resize textarea elements for proper width on page
 // ----------------------------------------------------
 // Function called:
 //    1) Initially
@@ -518,7 +518,7 @@ window.addEventListener('resize', function (event) {
     //
     // If browser supports devicePixelRatio, then compare
     // against last value. If change, then user has changed
-    // browser zoom, so dynamic inputarea element resize
+    // browser zoom, so dynamic textarea element resize
     // will need to be recalibrated.
     //
     if (window.devicePixelRatio) {
@@ -526,12 +526,12 @@ window.addEventListener('resize', function (event) {
         // case of zoom changed, recalibrate element pixel size
         webState.dynamic.lastDevicePixelRatio = window.devicePixelRatio;
 
-        // recalibrate pixel width of inputarea elements
+        // recalibrate pixel width of textarea elements
         calibrateElementSize();
       }
     }
 
-    // go resize inputarea elements
+    // go resize textarea elements
     adjustInputToWidowWidth();
 
     // Tell channel windows and PM windows to resize themselves
@@ -559,7 +559,7 @@ const checkVerticalSliderPageWidth = function () {
     if (webState.dynamic.lastClientWidth !== document.querySelector('body').clientWidth) {
       webState.dynamic.lastClientWidth = document.querySelector('body').clientWidth;
 
-      // resize inputarea elements
+      // resize textarea elements
       adjustInputToWidowWidth();
 
       // Tell channel windows and PM windows to resize themselves
@@ -574,10 +574,10 @@ const checkVerticalSliderPageWidth = function () {
 }; // checkVerticalSliderPageWidth()
 
 document.addEventListener('recalcPageWidthButtonId', function () {
-  // recalibrate pixel width of inputarea elements
+  // recalibrate pixel width of textarea elements
   calibrateElementSize();
 
-  // resize inputarea elements
+  // resize textarea elements
   adjustInputToWidowWidth();
 
   // Tell channel windows and PM windows to resize themselves
@@ -591,7 +591,7 @@ document.addEventListener('recalcPageWidthButtonId', function () {
 });
 
 //
-// Do initially on page load, calibrate inputarea element size, and resize input area elements.
+// Do initially on page load, calibrate textarea element size, and resize input area elements.
 //
 calibrateElementSize();
 adjustInputToWidowWidth();
@@ -599,7 +599,7 @@ adjustInputToWidowWidth();
 //
 // And do same one more time...
 // and again, as a work around to prevent to correct
-// condition whree inputarea about 80% of normal on first page load.
+// condition whree textarea about 80% of normal on first page load.
 //
 setTimeout(function () {
   calibrateElementSize();

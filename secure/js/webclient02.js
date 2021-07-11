@@ -964,10 +964,19 @@ function _parseBufferMessage (message) {
             _parseCtcpMessage(parsedMessage);
           } else {
             // else not a CTCP message
-            const index = ircState.channels.indexOf(parsedMessage.params[0].toLowerCase());
-            if (index >= 0) {
+            const chanPrefixIndex = channelPrefixChars.indexOf(parsedMessage.params[0].charAt(0));
+            const channelIndex = ircState.channels.indexOf(parsedMessage.params[0].toLowerCase());
+            console.log(chanPrefixIndex, channelIndex);
+            if (channelIndex >= 0) {
+              // Case of channel name found in list of active channel
               displayChannelMessage(parsedMessage);
+            } else if (chanPrefixIndex >= 0) {
+              // case of first character show it is channel name
+              // but that is no tan active channel,
+              // so show the message in the server window.
+              displayFormattedServerMessage(parsedMessage, message);
             } else {
+              // else case of private message, who in provate message window.
               displayPrivateMessage(parsedMessage);
             }
           }
