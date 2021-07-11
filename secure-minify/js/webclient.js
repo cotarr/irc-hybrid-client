@@ -235,13 +235,13 @@ displayChannelMessage(parsedMessage)}else{displayFormattedServerMessage(parsedMe
 if(!parsedMessage.nick||parsedMessage.nick.length===0){if(!webState.viewRawMessages){displayFormattedServerMessage(parsedMessage,message)}}else{const ctcpDelim=1
 ;if(parsedMessage.params[1]===null)parsedMessage.params[1]='';if(parsedMessage.params[1].charCodeAt(0)===ctcpDelim){_parseCtcpMessage(parsedMessage)}else{displayNoticeMessage(parsedMessage)}}break
 ;case'PRIVMSG':{const ctcpDelim=1;if(parsedMessage.params[1].charCodeAt(0)===ctcpDelim){_parseCtcpMessage(parsedMessage)}else{
-const chanPrefixIndex=channelPrefixChars.indexOf(parsedMessage.params[0].charAt(0));const channelIndex=ircState.channels.indexOf(parsedMessage.params[0].toLowerCase())
-;console.log(chanPrefixIndex,channelIndex);if(channelIndex>=0){displayChannelMessage(parsedMessage)}else if(chanPrefixIndex>=0){displayFormattedServerMessage(parsedMessage,message)}else{
-displayPrivateMessage(parsedMessage)}}}break;case'QUIT':{let pureNick=parsedMessage.nick.toLowerCase();if(nicknamePrefixChars.indexOf(pureNick.charAt(0))>=0){pureNick=pureNick.slice(1,pureNick.length)
-}let present=false;if(ircState.channels.length>0){for(let i=0;i<ircState.channels.length;i++){if(ircState.channelStates[i].joined&&ircState.channelStates[i].names.length>0){
-for(let j=0;j<ircState.channelStates[i].names.length;j++){let checkNick=ircState.channelStates[i].names[j].toLowerCase();if(nicknamePrefixChars.indexOf(checkNick.charAt(0))>=0){
-checkNick=checkNick.slice(1,checkNick.length)}if(checkNick===pureNick)present=true}}}}if(present){displayChannelMessage(parsedMessage)}else{displayFormattedServerMessage(parsedMessage,message)}}break
-;case'TOPIC':if(channelPrefixChars.indexOf(parsedMessage.params[0].charAt(0))>=0){displayChannelMessage(parsedMessage)}else{console.log('Error message TOPIC to unknown channel')}break;case'WALLOPS':
+const chanPrefixIndex=channelPrefixChars.indexOf(parsedMessage.params[0].charAt(0));const channelIndex=ircState.channels.indexOf(parsedMessage.params[0].toLowerCase());if(channelIndex>=0){
+displayChannelMessage(parsedMessage)}else if(chanPrefixIndex>=0){displayFormattedServerMessage(parsedMessage,message)}else{displayPrivateMessage(parsedMessage)}}}break;case'QUIT':{
+let pureNick=parsedMessage.nick.toLowerCase();if(nicknamePrefixChars.indexOf(pureNick.charAt(0))>=0){pureNick=pureNick.slice(1,pureNick.length)}let present=false;if(ircState.channels.length>0){
+for(let i=0;i<ircState.channels.length;i++){if(ircState.channelStates[i].joined&&ircState.channelStates[i].names.length>0){for(let j=0;j<ircState.channelStates[i].names.length;j++){
+let checkNick=ircState.channelStates[i].names[j].toLowerCase();if(nicknamePrefixChars.indexOf(checkNick.charAt(0))>=0){checkNick=checkNick.slice(1,checkNick.length)}
+if(checkNick===pureNick)present=true}}}}if(present){displayChannelMessage(parsedMessage)}else{displayFormattedServerMessage(parsedMessage,message)}}break;case'TOPIC':
+if(channelPrefixChars.indexOf(parsedMessage.params[0].charAt(0))>=0){displayChannelMessage(parsedMessage)}else{console.log('Error message TOPIC to unknown channel')}break;case'WALLOPS':
 displayWallopsMessage(parsedMessage);break;default:}}}function initWebSocketAuth(callback){const fetchURL=webServerUrl+'/irc/wsauth';const fetchOptions={method:'POST',headers:{
 'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify({purpose:'websocket-auth'})};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()}else{
 throw new Error('Fetch status '+response.status+' '+response.statusText)}}).then(responseJson=>{if(callback){callback(null,ircState)}}).catch(error=>{console.log(error);webState.webConnected=false

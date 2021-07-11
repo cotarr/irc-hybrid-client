@@ -966,7 +966,6 @@ function _parseBufferMessage (message) {
             // else not a CTCP message
             const chanPrefixIndex = channelPrefixChars.indexOf(parsedMessage.params[0].charAt(0));
             const channelIndex = ircState.channels.indexOf(parsedMessage.params[0].toLowerCase());
-            console.log(chanPrefixIndex, channelIndex);
             if (channelIndex >= 0) {
               // Case of channel name found in list of active channel
               displayChannelMessage(parsedMessage);
