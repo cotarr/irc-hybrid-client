@@ -261,6 +261,8 @@ app.post('/terminate', authorizeOrFail, function (req, res, next) {
       process.exit(1);
     }, 1000);
     res.json({ error: false, message: 'Terminate received' });
+  } else if (inputVerifyString === 'NO') {
+    res.json({ error: true, message: 'Terminate Ignored. Not {terminate: YES}' });
   } else {
     const error = new Error('Bad Reqeust');
     error.status = 400;

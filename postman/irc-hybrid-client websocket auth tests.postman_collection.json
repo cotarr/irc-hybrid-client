@@ -1,13 +1,12 @@
 {
 	"info": {
-		"_postman_id": "25e112a6-0168-4fd9-b1e7-58b3486ee333",
 		"name": "irc-hybrid-client websocket auth tests",
-		"description": "# Tests associated with browser to server websocket\n- Suggest delete cookie before running tests.\n- Assign a temporary user/password in the web server for testing.\n- In Postman, create a environment with the variables listed below. Set values to the temporary user/password and server URL.\n- A series of tests is run to test the websocket authroization.\n\n# Enviornment\n- server_URL\n- server_user1\n- server_password1",
+		"description": "# Tests associated with browser to server websocket\n- Suggest delete cookie before running tests.\n- Assign a temporary user/password in the web server for testing.\n- In Postman, create a environment with the variables listed below. Set values to the temporary user/password and server URL.\n- A series of tests is run to test the websocket authroization.\n\n# Enviornment\n- server_URL\n- server_user1\n- server_password1\n- irc_nickname\n- irc_channel\n- sever_die (\"YES\" or \"NO\")",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "5.1 /logout",
+			"name": "5.1 /logout (clear old sessions)",
 			"event": [
 				{
 					"listen": "test",
@@ -39,7 +38,8 @@
 					"path": [
 						"logout"
 					]
-				}
+				},
+				"description": "Request /logout route to remove previous session authorizatin."
 			},
 			"response": []
 		},
@@ -120,7 +120,8 @@
 					"path": [
 						"login"
 					]
-				}
+				},
+				"description": "This will request a login form, then extract the login random nonce from the login form, then temporally save the login nonce as a global variable for use in the authorize request"
 			},
 			"response": []
 		},
@@ -245,12 +246,12 @@
 						"wsauth"
 					]
 				},
-				"description": "This is a preliminary setup call. On the server end, this call will initiate a server-side timer. This his creates a window during which websocket connections will be accepted. The websocket request requires a valid cookie."
+				"description": "This is a preliminary setup call. On the server end, this call will initiate a server-side timer. This his creates a window during which websocket connections will be accepted. The websocket request requires a valid cookie. The contents of the body are ignored and not used by the server."
 			},
 			"response": []
 		},
 		{
-			"name": "5.5 /irc/ws (Auth ucceeds, expect 400)",
+			"name": "5.5 /irc/ws (Auth succeeds, expect 400)",
 			"event": [
 				{
 					"listen": "test",
@@ -368,7 +369,7 @@
 						"wsauth"
 					]
 				},
-				"description": "This is a preliminary follow up call. A new timer will be started and the cookie hash will be saved."
+				"description": "This is a preliminary follow up call. A new timer will be started and the cookie hash will be saved. In the next steps, the backend data will be changed to intentionally cause a mis-match for the test."
 			},
 			"response": []
 		},
@@ -406,7 +407,7 @@
 						"logout"
 					]
 				},
-				"description": "Remove cookie associated with save cookie hash"
+				"description": "Remove session authorization associated with this session cookie. Removing the session will remove any pending websocket hash value. This is a setup step so the pending websocket UPGRADE request will not match."
 			},
 			"response": []
 		},
@@ -488,7 +489,7 @@
 						"login"
 					]
 				},
-				"description": "New nonce for login request."
+				"description": "This will request a login form, then extract the login random nonce from the login form, then temporally save the login nonce as a global variable for use in the authorize request"
 			},
 			"response": []
 		},
@@ -561,7 +562,7 @@
 						}
 					]
 				},
-				"description": "This gives postman a new cookie, but it will not match the saved value for the websocket upgrade request."
+				"description": "This associates the postman cookie with a new  session. Since a websocket request is pending, the new session will intentionally not match the pending websocket request."
 			},
 			"response": []
 		},

@@ -7,6 +7,9 @@ To run these tests it is necessary to install [Postman](https://www.postman.com/
 The test collections can be imported from the postman folder in the cloned git repository.
 These tests were written using Postman v7.28.0., later used with Postman v8.6.2/
 
+The "_postman_id" property has been removed from the exported JSON object, because this value
+changes after inport/export, even if there is no change to the tests.
+
 # API Documentation
 
 [cotarr.github.io/irc-hybrid-client/api.html](https://cotarr.github.io/irc-hybrid-client/api.html)
@@ -29,6 +32,9 @@ the API requests individually, it is recommended to use a dedicated IRC test ser
 - server_URL (Example: "http://localhost:3003")
 - server_user1
 - server_password1
+- irc_nickname
+- irc_channel
+- sever_die ("YES" or "NO")
 
 # Postman config
 * Postman settings: General: automatically follow redirects = OFF
@@ -87,4 +93,20 @@ This collection was used during manual debugging to exercise different POST requ
 
 In most cases, the response to the request is returned asynchronously as stream data via the web-socket. The web browser should be simultaneously logged into the server. Some of the GET requests are not included in this collection.
 
-To get a valid cookie, run selection 1, then 2. After a valid cookie is present, the remainder of POST requests can be performed manually. Open a web browser concurrently with postman. Using Server --> Tools, select the View-Raw and View-Comms checkboxes to see the responses within the websocket stream
+To get a valid cookie, run selection 7.1, 7.2, and 7.3. After a valid cookie is present, the remainder of POST requests can be performed manually. Open a web browser concurrently with postman. Using Server --> Tools, select the View-Raw and View-Comms checkboxes to see the responses within the websocket stream.
+
+RECOMMEND DEDICATED IRC SERVER FOR TESTING
+
+If the tests are executed in order, the follow will be exercised:
+
+* 7.1-7.3 Login to web sevrver
+* 8.1 Selects server index
+* 8.3 Connect backend to IRC
+* 8.5 JOIN an IRC channel
+* 8.7 Send a channel message (PRIVMSG)
+* 8.8 PART or leave the channel.
+* 8.10 Remove (prune) the channel data from backend.
+* 8.12 Retrieve message cache
+* 8.13 Disconnect backend from IRC
+* 8.14 Clear the message cache.
+* 8.16 Terminate (Die) the backend web server.

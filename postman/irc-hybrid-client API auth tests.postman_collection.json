@@ -1,8 +1,7 @@
 {
 	"info": {
-		"_postman_id": "77f64e47-8d37-4738-addf-b3d5d1c1f5f4",
 		"name": "irc-hybrid-client API auth tests",
-		"description": "# Tests associated with user login and cookies\n- Suggest delete cookie before running tests.\n- Assign a temporary user/password in the web server for testing.\n- In Postman, create a environment with the variables listed below. Set values to the temporary user/password and server URL.\n- A series of tests is run to make sure all the API endpoints are protected.\n\n# Postman\n- Postman settings: General: Automatically follow redirects: OFF\n\n# Enviornment\n- server_URL\n- server_user1\n- server_password1",
+		"description": "# Tests associated with user login and cookies\n- Suggest delete cookie before running tests.\n- Assign a temporary user/password in the web server for testing.\n- In Postman, create a environment with the variables listed below. Set values to the temporary user/password and server URL.\n- A series of tests is run to make sure all the API endpoints are protected.\n\n# Postman\n- Postman settings: General: Automatically follow redirects: OFF\n\n# Enviornment\n- server_URL\n- server_user1\n- server_password1\n- irc_nickname\n- irc_channel\n- sever_die (\"YES\" or \"NO\")",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -13,7 +12,7 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Status code is 302\", function () {",
+							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
 							"});",
 							"",
@@ -39,7 +38,8 @@
 					"path": [
 						"logout"
 					]
-				}
+				},
+				"description": "Request /logout route to remove previous session authorizatin."
 			},
 			"response": []
 		},
@@ -65,7 +65,7 @@
 				"header": [
 					{
 						"key": "Accept",
-						"value": "text/html"
+						"value": "application/json"
 					}
 				],
 				"url": {
@@ -76,7 +76,8 @@
 					"path": [
 						"status"
 					]
-				}
+				},
+				"description": "The /status route does not require authorization. This is to confirm the server is running."
 			},
 			"response": []
 		},
@@ -101,7 +102,7 @@
 				"header": [
 					{
 						"key": "Accept",
-						"value": "text/html"
+						"value": "application/json"
 					}
 				],
 				"url": {
@@ -112,7 +113,8 @@
 					"path": [
 						"secure"
 					]
-				}
+				},
+				"description": "The /secure route requires authorization. In this case, this request is expected to fail and return a 403."
 			},
 			"response": []
 		},
@@ -195,7 +197,7 @@
 						"login"
 					]
 				},
-				"description": "This will extract the nonce and save it as a global variable for use in the authorize request."
+				"description": "This will request a login form, then extract the login random nonce from the login form, then temporally save the login nonce as a global variable for use in the authorize request."
 			},
 			"response": []
 		},
@@ -248,7 +250,8 @@
 							"value": "{{server_nonce}}"
 						}
 					]
-				}
+				},
+				"description": "Request expected to fail due to empty body in post request"
 			},
 			"response": []
 		},
@@ -306,7 +309,8 @@
 					"path": [
 						"login-authorize"
 					]
-				}
+				},
+				"description": "Request expected to fail due to missing random login nonce."
 			},
 			"response": []
 		},
@@ -378,7 +382,7 @@
 				"header": [
 					{
 						"key": "Accept",
-						"value": "text/css"
+						"value": "text/html"
 					}
 				],
 				"url": {
@@ -389,7 +393,8 @@
 					"path": [
 						"login"
 					]
-				}
+				},
+				"description": "This will request a login form, then extract the login random nonce from the login form, then temporally save the login nonce as a global variable for use in the authorize request"
 			},
 			"response": []
 		},
@@ -448,7 +453,8 @@
 							"value": "{{server_nonce}}"
 						}
 					]
-				}
+				},
+				"description": "Request expected to fail sue to missing password."
 			},
 			"response": []
 		},
@@ -493,7 +499,7 @@
 				"header": [
 					{
 						"key": "Accept",
-						"value": "text/css"
+						"value": "text/html"
 					}
 				],
 				"url": {
@@ -504,7 +510,8 @@
 					"path": [
 						"login"
 					]
-				}
+				},
+				"description": "Request login form. As setup for the next test, instead of extracting the random nonce from the login form, generate an incorrect nonce and save the nonce for the next test."
 			},
 			"response": []
 		},
@@ -574,7 +581,8 @@
 							"value": "{{server_nonce}}"
 						}
 					]
-				}
+				},
+				"description": "Request expected to fail due to incorrect nonce."
 			},
 			"response": []
 		},
@@ -646,7 +654,7 @@
 				"header": [
 					{
 						"key": "Accept",
-						"value": "text/css"
+						"value": "text/html"
 					}
 				],
 				"url": {
@@ -657,7 +665,8 @@
 					"path": [
 						"login"
 					]
-				}
+				},
+				"description": "This will request a login form, then extract the login random nonce from the login form, then temporally save the login nonce as a global variable for use in the authorize request"
 			},
 			"response": []
 		},
@@ -727,12 +736,13 @@
 							"value": "{{server_nonce}}"
 						}
 					]
-				}
+				},
+				"description": "Request expected to fail due to submission of login form with invalid user."
 			},
 			"response": []
 		},
 		{
-			"name": "2.10 /login (confirm bad login message)",
+			"name": "2.10 /login get valid nonce",
 			"event": [
 				{
 					"listen": "test",
@@ -804,7 +814,7 @@
 				"header": [
 					{
 						"key": "Accept",
-						"value": "text/css"
+						"value": "text/html"
 					}
 				],
 				"url": {
@@ -815,7 +825,8 @@
 					"path": [
 						"login"
 					]
-				}
+				},
+				"description": "This will request a login form, then extract the login random nonce from the login form, then temporally save the login nonce as a global variable for use in the authorize request"
 			},
 			"response": []
 		},
@@ -887,7 +898,8 @@
 							"value": "{{server_nonce}}"
 						}
 					]
-				}
+				},
+				"description": "Request is expected to fail due to submit login with bad password."
 			},
 			"response": []
 		},
@@ -918,7 +930,7 @@
 				"header": [
 					{
 						"key": "Accept",
-						"value": "application/json"
+						"value": "text/html"
 					}
 				],
 				"url": {
@@ -930,7 +942,8 @@
 						"irc",
 						"webclient.html"
 					]
-				}
+				},
+				"description": "This is a standard HTML request to confirm access is not allowed."
 			},
 			"response": []
 		},
@@ -1000,7 +1013,7 @@
 				"header": [
 					{
 						"key": "Accept",
-						"value": "text/css"
+						"value": "text/html"
 					}
 				],
 				"url": {
@@ -1011,7 +1024,8 @@
 					"path": [
 						"login"
 					]
-				}
+				},
+				"description": "This will request a login form, then extract the login random nonce from the login form, then temporally save the login nonce as a global variable for use in the authorize request"
 			},
 			"response": []
 		},
@@ -1083,7 +1097,8 @@
 							"value": "{{server_nonce}}"
 						}
 					]
-				}
+				},
+				"description": "This login request with valid random nonce, valid user and valid password is expected to succeed. It will return a redirect to main entry URL."
 			},
 			"response": []
 		},
@@ -1127,7 +1142,8 @@
 						"irc",
 						"webclient.html"
 					]
-				}
+				},
+				"description": "Confirm HTML page access is allowed."
 			},
 			"response": []
 		},
@@ -1159,7 +1175,7 @@
 				"header": [
 					{
 						"key": "Accept",
-						"value": "application/ecmascript"
+						"value": "application/javascript"
 					}
 				],
 				"url": {
@@ -1171,7 +1187,8 @@
 						"irc",
 						"getircstate"
 					]
-				}
+				},
+				"description": "Confirm that API request is access allowed."
 			},
 			"response": []
 		},
@@ -1208,7 +1225,8 @@
 					"path": [
 						"logout"
 					]
-				}
+				},
+				"description": "Remove login authorization from session. Subsequent requests should fail due access not allowed."
 			},
 			"response": []
 		},
@@ -1377,7 +1395,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"nickName\": \"myNick7231\",\n  \"userName\": \"myUser7231\",\n  \"realName\": \"Irc Hybrid Client\",\n  \"userMode\": \"+i\"\n}\n",
+					"raw": "{\n  \"nickName\": \"{{irc_nickname}}\",\n  \"realName\": \"{{irc_nickname}}\",\n  \"userMode\": \"\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -1609,7 +1627,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"channel\": \"#test\"\n}",
+					"raw": "{\n  \"channel\": \"{{irc_channel}}\"\n}\n",
 					"options": {
 						"raw": {
 							"language": "json"
