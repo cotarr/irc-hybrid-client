@@ -325,6 +325,20 @@ app.post('/irc/wsauth', authorizeOrFail, function (req, res, next) {
   return next(error);
 });
 
+// -------------------------------------------------------
+// Web socket security test
+// Development only.
+// Testing web page: /test2s/test-websocket.html
+//
+//   C A U T I O N    N O    A U T H E N T I C A T I O N
+//
+//               Enable only for testing
+// -------------------------------------------------------
+// if (nodeEnv === 'development') {
+//   const testWs = require('./testws/testws');
+//   app.use('/testws', testWs);
+// }
+
 // ----------------
 // User info API
 //

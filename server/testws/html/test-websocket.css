@@ -1,0 +1,48 @@
+html {
+  margin: 0px 0px 0px 0px;
+  padding: 0px 0px 0px 0px;
+}
+body {
+  margin: 0px 0px 0px 0px;
+  padding: 0px 10px 0px 10px;
+  background-color: #d8f8f8;
+}
+
+button {
+  background-color: #f4f4f4;
+  border-top: 1px solid #777777;
+  border-right: 2px solid #444444;
+  border-bottom: 2px solid #444444;
+  border-left: 1px solid #777777;
+  border-radius: 5px;
+  box-shadow: 2px 2px 3px #808080;
+  color: black;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  cursor: pointer;
+}
+button:hover {
+  background-color: #e2e2e2;
+}
+button[disabled] {
+  background-color: #b8b8b8;
+  color: #444444
+}
+
+.button-div {
+  padding-top: 25px;
+}
+
+.log-div {
+  background-color: white;
+  border: 1px solid black;
+  border-radius: 7px;
+  padding-left: 10px;
+}
+
+.message-div {
+  background-color: white;
+  border: 1px solid black;
+  border-radius: 7px;
+  padding-left: 10px;
+}

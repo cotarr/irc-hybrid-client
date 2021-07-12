@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1.0">
+    <link rel="stylesheet" href="/testws/test-websocket.css">
+    <script src="/testws/test-websocket.js" defer></script>
+
+    <title>test-websocket</title>
+  </head>
+  <body>
+    <h1>test-websocket (development only)</h1>
+
+    <div class="button-div">
+      <div>
+        Use browser back arrow to return here.<br>
+        Wait > 10 seconds before testing.
+      </div>
+      <a href="/login"><button>Login</button></a>
+      <a href="/logout"><button>Logout</button></a>
+    </div>
+
+    <div class="button-div">
+      <div>
+        Schedule authorization before connect.<br>
+        Timeout = 10 seconds.
+      </div>
+      <button id="schedAuthButton">Schedule Auth</button>
+      <button id="connectWebSocket">Connect Websocket</button>
+    </div>
+
+    <h3>Log</h3>
+    <div class="log-div" id="logDiv">
+      <pre id="logContent">
+      </pre>
+    </div>
+
+    <h3>Messages</h3>
+    <div class="message-div" id="messageDiv">
+      <pre id="messageContent">
+      </pre>
+    </div>
+    <p>
+      Expect &quotHEARTBEAT&QUOT at 10 second intervals.
+    </p>
+    <div class="button-div">
+      <button id="clearMessages">Clear All</button>
+    </div>
+    <h2>Recommend Two Tests</h2>
+    <ul>
+      <li>Schedule Auth fails without cookie (no login)</li>
+      <li>Connect Websocket fails without Schedule Auth</li>
+    </ul>
+
+  </body>
+</html>
