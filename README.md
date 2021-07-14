@@ -23,26 +23,6 @@ from development folders without compression.
 The server files are located in the `server/` folder. The server is launched
 from the socket server in the `bin/` folder.
 
-### Multiple Instance Security Caution
-
-A web browser does not consider the server port number when selecting session
-cookies for HTTP server requests. Running multiple instances of irc-hybrid-client with the
-same host name, but different server port numbers, can result in the browser submitting
-multiple session cookies to the web server.
-Although the instanceNumber configuration property is intended to implement unique
-cookie names for each instance (port number), unique cookie names WILL NOT prevent the browser
-from submitting multiple cookies for all sessions that matches the host name.
-Therefore, it is not recommended to run multiple instances of irc-hybrid client on
-the same hostname unless you understand the security implications associated with
-cookies and concurrent sessions. This caution does not apply to different users
-who are connecting from different browser/computer. It does apply to multiple tabs in
-a one web browser. This setup may be useful for one single user to use multiple
-browser tabs for simultaneous connection to different IRC networks.
-
- See the
-[login configuration docs](https://cotarr.github.io/irc-hybrid-client/login-config.html)
-for information on use of the instanceNumber property.
-
 ### Installation
 
 There is a complete step by step installation instruction in the
@@ -121,6 +101,26 @@ The there is a separate repository for this called
 [irc-hybrid-client-dev-tools](https://github.com/cotarr/irc-hybrid-client-dev-tools).
 There are complete instructions for use of this utility in the
 [irc-hybrid-client-dev-tools](https://github.com/cotarr/irc-hybrid-client-dev-tools) repository.
+
+### Multiple Instance Security Caution
+
+A web browser does not consider the server port number when selecting session
+cookies for HTTP server requests. Running multiple instances of irc-hybrid-client with the
+same host name, but different server port numbers, can result in the browser submitting
+multiple session cookies to the web server.
+Although the instanceNumber configuration property is intended to implement unique
+cookie names for each instance (port number), unique cookie names WILL NOT prevent the browser
+from submitting multiple cookies for all sessions that matches the host name.
+Therefore, it is not recommended to run multiple instances of irc-hybrid client on
+the same hostname unless you understand the security implications associated with
+cookies and concurrent sessions. This caution does not apply to different users
+who are connecting from different browser/computer. It does apply to multiple tabs in
+a one web browser. This setup may be useful for one single user to use multiple
+browser tabs for simultaneous connection to different IRC networks.
+
+ See the
+[login configuration docs](https://cotarr.github.io/irc-hybrid-client/login-config.html)
+for information on use of the instanceNumber property.
 
 ### eslint
 
