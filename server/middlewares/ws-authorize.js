@@ -65,6 +65,13 @@
 
   const nodeEnv = process.env.NODE_ENV || 'development';
 
+  // Also set cookieName in web-server.js
+  let cookieName = 'irc-hybrid-client';
+  if (('instanceNumber' in credentials) && (Number.isInteger(credentials.instanceNumber)) &&
+    (credentials.instanceNumber >= 0) && (credentials.instanceNumber < 100)) {
+    cookieName = 'irc-hybrid-client-' + credentials.instanceNumber.toString();
+  }
+
   //
   // Custom log file (Option: setup to fail2ban to block IP addresses)
   //
@@ -134,7 +141,7 @@
       const cookies = cookie.parse(request.headers.cookie);
       // console.log(JSON.stringify(cookies, null, 2));
       // Get cookie with matching name
-      const raw = cookies['irc-hybrid-client'];
+      const raw = cookies[cookieName];
       // console.log(raw);
       if (raw) {
         // check prefix to verify it has signature

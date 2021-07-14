@@ -133,11 +133,41 @@
         <p>
           As as note, the login session information is stored by the web server in RAM memory,
           so each time the web server is restarted, the session information is discarded,
-          and the web page will require password entry.
+          and the web page will require a new user password entry.
+        </p>
+        <p>
+          The configuration property &quotinstanceNumber&quot is used for the case where multiple
+          instances are running, using the same host name, but using different port numbers.
+          In the case where a web browser is connected simultaneiously to two server instances
+          with same host name and the same cookie name,
+          login of one session would likely disconnect the other session due
+          to replacement of the browser session cookie of the same cookie name.
+          The instanceNumber property is used to make the cookie name unique.
+          The instanceNumber should be an integer between 0 and 99.
+          The instanceNumber should be unique for each instance running on a web server.
+        </p>
+        <p>
+          Security Caution:
+        </p>
+        <p>
+          A web browser does not consider the server port number when selecting session
+          cookies for HTTP server requests. Running multiple instances of irc-hybrid-client with the
+          same host name, but different server port numbers, can result in the browser submitting
+          multiple session cookies to the web server.
+          Although the instanceNumber configuration property is intended to implement unique
+          cookie names for each instance (port number), unique cookie names WILL NOT prevent the browser
+          from submitting multiple cookies for all sessions that matches the host name.
+          Therefore, it is not recommended to run multiple instances of irc-hybrid client on
+          the same hostname unless you understand the security implications associated with
+          cookies and concurrent sessions. This caution does not apply to different users
+          who are connecting from different browser/computer. It does apply to multiple tabs in
+          a one web browser. This setup may be useful for one single user to use multiple
+          browser tabs for simultaneous connection to different IRC networks.
         </p>
 <div class="pre-div"><pre>
   "cookieSecret": "Lg9HLgCEmtag4Ff7",
   "sessionExpireAfterSec": 86400,
+  "instanceNumber": 0,
 </pre></div>
 
         <div class="install-section-title">Security Contact</div>
@@ -261,6 +291,7 @@ Enter new password:<blue-example>zuwa79xoJxLJ</blue-example>
   "port": 3003,
   "cookieSecret": "xxxxxxxxxxxxxxxx",
   "sessionExpireAfterSec": 86400,
+  "instanceNumber": 0,
   "securityContact": "mailto:security@example.com",
   "securityExpires": "Fri, 1 Apr 2022 08:00:00 -0600",
   "pidFilename": "/home/user1/tmp/ircHybridClient.PID",

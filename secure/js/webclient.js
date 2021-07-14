@@ -746,6 +746,9 @@ function getIrcState (callback) {
         document.getElementById('userModeInputId').value = ircState.userMode;
       }
       if (ircState.ircConnected) {
+        // For display in browser tab
+        document.title = 'IRC-' + ircState.ircServerName;
+
         document.getElementById('ircServerNameInputId').value = ircState.ircServerName;
         document.getElementById('ircServerAddrInputId').value = ircState.ircServerHost;
         document.getElementById('ircServerPortInputId').value = ircState.ircServerPort;
@@ -763,9 +766,12 @@ function getIrcState (callback) {
         // for color icon
         webState.ircConnecting = false;
       }
-      // Since disconnected from IRC remove all channel plugin div
       if (!ircState.ircConnected) {
+        // Since disconnected from IRC remove all channel plugin div
         setVariablesShowingIRCDisconnected();
+
+        // For display in browser tab
+        document.title = 'irc-hybrid-client';
       }
       if (lastConnectErrorCount !== ircState.count.ircConnectError) {
         lastConnectErrorCount = ircState.count.ircConnectError;

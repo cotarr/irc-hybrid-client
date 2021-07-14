@@ -63,6 +63,13 @@ if ((!('configVersion' in credentials)) || (credentials.configVersion !== 2)) {
   process.exit(1);
 }
 
+// Also set cookieName in ws-authorize.js
+let cookieName = 'irc-hybrid-client';
+if (('instanceNumber' in credentials) && (Number.isInteger(credentials.instanceNumber)) &&
+  (credentials.instanceNumber >= 0) && (credentials.instanceNumber < 100)) {
+  cookieName = 'irc-hybrid-client-' + credentials.instanceNumber.toString();
+}
+
 // For session cookie
 const cookieSecret = credentials.cookieSecret;
 if (cookieSecret.length < 8) {
@@ -194,7 +201,7 @@ app.get('/robots.txt', function (req, res) {
 //
 const sessionOptions = {
   secret: cookieSecret,
-  name: 'irc-hybrid-client', // name also in ws-server.js
+  name: cookieName, // name also in ws-authorize.js
   store: new MemoryStore({
     ttl: sessionExpireAfterMs, // milliseconds
     stale: true, // return expired value before deleting otherwise undefined if false
@@ -203,7 +210,9 @@ const sessionOptions = {
   cookie: {
     path: '/',
     maxAge: sessionExpireAfterMs,
-    secure: (credentials.tls) // When TLS enabled, require secure cookies
+    secure: (credentials.tls), // When TLS enabled, require secure cookies
+    httpOnly: true,
+    sameSite: 'strict'
   },
   proxy: false,
   resave: false, // set to false because memorystore has touch method
@@ -309,7 +318,7 @@ app.post('/irc/wsauth', authorizeOrFail, function (req, res, next) {
   };
   // requires cookie-parser
   if ('signedCookies' in req) {
-    const cookieValue = req.signedCookies['irc-hybrid-client'];
+    const cookieValue = req.signedCookies[cookieName];
     // if not empty
     if (cookieValue.length > 8) {
       const timeNow = parseInt(Date.now() / 1000); // seconds

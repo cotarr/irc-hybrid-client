@@ -141,15 +141,16 @@ const fetchURL=webServerUrl+'/irc/getircstate';const fetchOptions={method:'GET',
 ;document.getElementById('ircServerPortInputId').value=ircState.ircServerPort;if(ircState.ircTLSEnabled){document.getElementById('ircServerTlsCheck').setAttribute('checked','')}else{
 document.getElementById('ircServerTlsCheck').removeAttribute('checked')}document.getElementById('nickNameInputId').value=ircState.nickName
 ;document.getElementById('userNameInputId').value=ircState.userName;document.getElementById('realNameInputId').value=ircState.realName
-;document.getElementById('userModeInputId').value=ircState.userMode}if(ircState.ircConnected){document.getElementById('ircServerNameInputId').value=ircState.ircServerName
-;document.getElementById('ircServerAddrInputId').value=ircState.ircServerHost;document.getElementById('ircServerPortInputId').value=ircState.ircServerPort;if(ircState.ircTLSEnabled){
-document.getElementById('ircServerTlsCheck').setAttribute('checked','')}else{document.getElementById('ircServerTlsCheck').removeAttribute('checked')}
-document.getElementById('headerServer').textContent=ircState.ircServerName;document.getElementById('headerUser').textContent=' ('+ircState.nickName+')'
-;document.getElementById('nickNameInputId').value=ircState.nickName;document.getElementById('userNameInputId').value=ircState.userName
-;document.getElementById('realNameInputId').value=ircState.realName;document.getElementById('userModeInputId').value=ircState.userMode;webState.ircConnecting=false}if(!ircState.ircConnected){
-setVariablesShowingIRCDisconnected()}if(lastConnectErrorCount!==ircState.count.ircConnectError){lastConnectErrorCount=ircState.count.ircConnectError;if(ircState.count.ircConnectError>0){
-if(webState.cacheInhibitTimer===0){showError('An IRC Server connection error occurred')}}webState.ircConnecting=false}document.dispatchEvent(new CustomEvent('irc-state-changed',{bubbles:true,detail:{}
-}));updateDivVisibility();if(!document.getElementById('variablesDivId').hasAttribute('hidden')){
+;document.getElementById('userModeInputId').value=ircState.userMode}if(ircState.ircConnected){document.title='IRC-'+ircState.ircServerName
+;document.getElementById('ircServerNameInputId').value=ircState.ircServerName;document.getElementById('ircServerAddrInputId').value=ircState.ircServerHost
+;document.getElementById('ircServerPortInputId').value=ircState.ircServerPort;if(ircState.ircTLSEnabled){document.getElementById('ircServerTlsCheck').setAttribute('checked','')}else{
+document.getElementById('ircServerTlsCheck').removeAttribute('checked')}document.getElementById('headerServer').textContent=ircState.ircServerName
+;document.getElementById('headerUser').textContent=' ('+ircState.nickName+')';document.getElementById('nickNameInputId').value=ircState.nickName
+;document.getElementById('userNameInputId').value=ircState.userName;document.getElementById('realNameInputId').value=ircState.realName
+;document.getElementById('userModeInputId').value=ircState.userMode;webState.ircConnecting=false}if(!ircState.ircConnected){setVariablesShowingIRCDisconnected();document.title='irc-hybrid-client'}
+if(lastConnectErrorCount!==ircState.count.ircConnectError){lastConnectErrorCount=ircState.count.ircConnectError;if(ircState.count.ircConnectError>0){if(webState.cacheInhibitTimer===0){
+showError('An IRC Server connection error occurred')}}webState.ircConnecting=false}document.dispatchEvent(new CustomEvent('irc-state-changed',{bubbles:true,detail:{}}));updateDivVisibility()
+;if(!document.getElementById('variablesDivId').hasAttribute('hidden')){
 document.getElementById('variablesPreId').textContent='ircState = '+JSON.stringify(ircState,null,2)+'\n\n'+'webState = '+JSON.stringify(webState,null,2)}
 document.getElementById('programVersionDiv').textContent=' version-'+ircState.progVersion;if(callback){callback(null,ircState)}}).catch(error=>{console.log(error);if(callback){callback(error,{})}})}
 function cleanFormatting(inString){const formattingChars=[2,7,15,17,22,29,30,31];let outString='';const l=inString.length;if(l===0)return outString;let i=0;let active=true;while(i<l){active=true
