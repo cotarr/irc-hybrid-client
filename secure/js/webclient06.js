@@ -561,7 +561,7 @@ function createChannelEl (name) {
           channelBottomDiv2El.setAttribute('hidden', '');
           channelBottomDiv3El.setAttribute('hidden', '');
           channelBottomDiv4El.setAttribute('hidden', '');
-          if (document.querySelector('body').clientWidth > mobileBreakpointPx) {
+          if (webState.dynamic.bodyClientWidth > mobileBreakpointPx) {
             channelNamesDisplayEl.removeAttribute('hidden');
           } else {
             channelNamesDisplayEl.setAttribute('hidden', '');
@@ -764,7 +764,7 @@ function createChannelEl (name) {
   //
   // First time on page load
   //
-  if (document.querySelector('body').clientWidth < mobileBreakpointPx) {
+  if (webState.dynamic.bodyClientWidth < mobileBreakpointPx) {
     channelMainSectionEl.setAttribute('brief-enabled', '');
     channelFormatCBInputEl.checked = true;
   } else {
@@ -1367,7 +1367,7 @@ function createChannelEl (name) {
     // nickname list + right margin.
     const mar3 = webState.dynamic.commonMargin + nicknameListPixelWidth + 6;
 
-    if (document.querySelector('body').clientWidth > mobileBreakpointPx) {
+    if (webState.dynamic.bodyClientWidth > mobileBreakpointPx) {
       // channelNamesDisplayEl.setAttribute('cols', channelNamesCharWidth.toString());
 
       channelTextAreaEl.setAttribute('cols', calcInputAreaColSize(mar3));

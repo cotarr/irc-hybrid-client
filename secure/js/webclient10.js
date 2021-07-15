@@ -362,17 +362,14 @@ document.getElementById('test4ButtonDesc').textContent = 'Call getIrcState()';
 // value for margin, or difference between element pixel internal characters.
 // The second part is the pixel size of each character in the <textarea>
 // For Chrome on my Linux desktop with a zoom of 100%,
-// a <textarea> element is 7 pixels per character plus 21 pixels
-// per character.
+// a <textarea> element is 7 pixels per character plus 21 pixels on the sides.
 //
 // For this to work, a fixed width font is required.
 //
 // The following code will:
-//   dynamically insert a <textarea> element
-//   set character width
-//   measure element pixel width
-//   change character width
-//   measure changed element width.
+//   dynamically insert 2 <textarea> elements
+//   set character width2
+//   measure element pixel width of each textarea
 //   Calculate regression to get slope and intercept
 //   Intercept is margin width
 //   slope is the pixel width of each character.
@@ -387,8 +384,22 @@ document.getElementById('test4ButtonDesc').textContent = 'Call getIrcState()';
 // of a <textarea> element to dynamically size it to a variable window width.
 // --------------------------------------------------------------------------
 //
-// Create temporary elements and measure the size in pixels, the delete
+// This is a element measurement function
+// It should be run before resizing elements to avoid browser Reflow violations
 //
+const updatePageMeasurements = function () {
+  webState.dynamic.bodyClientWidth = document.querySelector('body').clientWidth.toString();
+  // Debug: To watch a variable, put it here.
+  if (!webState.watch) webState.watch = {};
+  webState.watch.innerHeight = window.innerHeight.toString() + 'px';
+  webState.watch.innerWidth = window.innerWidth.toString() + 'px';
+  webState.watch.bodyClientWidth = webState.dynamic.bodyClientWidth.toString() + 'px';
+  webState.watch.devicePixelRatio = window.devicePixelRatio;
+}; // updateWatchProps()
+
+// -----------------------------------------------------------------------
+// Create temporary elements and measure the size in pixels, the delete
+// -----------------------------------------------------------------------
 const calibrateElementSize = function () {
   // Insertion parent element
   const rulerDivEl = document.getElementById('rulerDiv');
@@ -396,58 +407,40 @@ const calibrateElementSize = function () {
   // Value of temporary character size (cols attribute)
   const rulerX1 = 10;
   const rulerX2 = 20;
-  // Create <textarea> element using first width value
-  const rulerTextareaEl = document.createElement('textarea');
-  rulerTextareaEl.setAttribute('cols', rulerX1.toString());
-  rulerTextareaEl.setAttribute('rows', '1');
-  rulerDivEl.appendChild(rulerTextareaEl);
-  // the rulerY1 is the pixel width of a textarea with rulerX1 characters
-  const rulerY1 = rulerTextareaEl.getBoundingClientRect().width;
-  // repeat with different character and pixel width
-  rulerTextareaEl.setAttribute('cols', rulerX2.toString());
-  const rulerY2 = rulerTextareaEl.getBoundingClientRect().width;
-  // done, remove the temporary element
-  rulerDivEl.removeChild(rulerTextareaEl);
 
-  // object to hold dynamic variables
-  if (!webState.dynamic) {
-    webState.dynamic = {};
-    //
-    // To detect browser zoom changes, save last devicePixelRatio
-    //
-    // Default if browser not support
-    webState.dynamic.lastClientWidth = document.querySelector('body').clientWidth;
-    webState.dynamic.lastDevicePixelRatio = 1;
-    // only if browser support devicePixelRatio
-    if (window.devicePixelRatio) {
-      webState.dynamic.lastDevicePixelRatio = window.devicePixelRatio;
-    }
-  }
+  // Create size #1 <textarea> element using first width value
+  const rulerTextareaEl1 = document.createElement('textarea');
+  rulerTextareaEl1.setAttribute('cols', rulerX1.toString());
+  rulerTextareaEl1.setAttribute('rows', '1');
+  rulerDivEl.appendChild(rulerTextareaEl1);
+
+  // Create size #2 <textarea> element using first width value
+  const rulerTextareaEl2 = document.createElement('textarea');
+  rulerTextareaEl2.setAttribute('cols', rulerX2.toString());
+  rulerTextareaEl2.setAttribute('rows', '1');
+  rulerDivEl.appendChild(rulerTextareaEl2);
+
+  // Create <button> elment and fill with "Send" string value
+  const rulerButtonEl = document.createElement('button');
+  rulerButtonEl.textContent = 'Send';
+  rulerDivEl.appendChild(rulerButtonEl);
+
+  // the rulerY1, is the pixel width of a textarea with rulerX1 characters
+  const rulerY1 = rulerTextareaEl1.getBoundingClientRect().width;
+  // repeat with different character and pixel width
+  const rulerY2 = rulerTextareaEl2.getBoundingClientRect().width;
 
   // perform regression (2 equation, 2 variables) to get slope and intercept (Y = mX + b)
   webState.dynamic.inputAreaCharWidthPx = (rulerY2 - rulerY1) / (rulerX2 - rulerX1);
   webState.dynamic.inputAreaSideWidthPx =
     rulerY1 - (rulerX1 * webState.dynamic.inputAreaCharWidthPx);
 
-  // Create <button> elment and fill with "Send" string value
-  const rulerButtonEl = document.createElement('button');
-  rulerButtonEl.textContent = 'Send';
-  rulerDivEl.appendChild(rulerButtonEl);
   webState.dynamic.sendButtonWidthPx = rulerButtonEl.getBoundingClientRect().width;
   // done, remove the temporary element
+  rulerDivEl.removeChild(rulerTextareaEl1);
+  rulerDivEl.removeChild(rulerTextareaEl2);
   rulerDivEl.removeChild(rulerButtonEl);
-
-  // Common margin for all windows in pixels (window width outside textarea)
-  //
-  // This represents a space on the right where thumb can be used to side
-  // contents up and down vertically
-  //
-  webState.dynamic.commonMargin = 50;
 }; // calibrateElementSize()
-
-//
-// Finished determination of dynamic element width varaibles
-// ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
 // Function to calculate <textarea> "cols" attribute for proper width on page.
@@ -466,7 +459,7 @@ const calcInputAreaColSize = function (marginPxWidth) {
     let margin = marginPxWidth;
     if (margin < 0) margin = 0;
     const cols = parseInt(
-      (document.querySelector('body').clientWidth -
+      (webState.dynamic.bodyClientWidth -
         webState.dynamic.inputAreaSideWidthPx - margin) /
       webState.dynamic.inputAreaCharWidthPx);
     return cols.toString();
@@ -482,8 +475,13 @@ const calcInputAreaColSize = function (marginPxWidth) {
 // Function called:
 //    1) Initially
 //    2) On  browser resize event
-//    3) timer routine detect scroll bar appear or hide, due to window visiblity
+//    3) Timer routine detect scroll bar appear or hide, due to window visiblity
 //
+// This changes textarea element sizes (elements mutated)
+// To avoid Reflow violations, no element measurements are taken after this.
+//
+// A similar function is used to adjust channel windows.
+// ----------------------------------------------------
 const adjustInputToWidowWidth = function () {
   // pixel width mar1 is reserved space on edges of input area at full screen width
   const mar1 = webState.dynamic.commonMargin;
@@ -499,19 +497,22 @@ const adjustInputToWidowWidth = function () {
   document.getElementById('userPrivMsgInputId').setAttribute('cols', calcInputAreaColSize(mar2));
 
   document.getElementById('errorDiv').style.width = '100%';
-
-  // Debug: To watch a variable, put it here.
-  if (!webState.watch) webState.watch = {};
-  webState.watch.innerHeight = window.innerHeight.toString() + 'px';
-  webState.watch.innerWidth = window.innerWidth.toString() + 'px';
-  webState.watch.bodyClientWidth = document.querySelector('body').clientWidth.toString() + 'px';
-  webState.watch.devicePixelRatio = window.devicePixelRatio;
 }; // adjustInputToWidowWidth()
 
-//
+// -----------------------------------------------------------------
+// All textarea elements in the program are resized with this event
+// -----------------------------------------------------------------
+window.addEventListener('resize-custom-elements', function (event) {
+  if (webState.dynamic.inputAreaCharWidthPx) {
+    adjustInputToWidowWidth();
+  }
+});
+
+// --------------------------------------------------------
 // Event listener for resize window (generic browser event)
-//
+// --------------------------------------------------------
 window.addEventListener('resize', function (event) {
+  updatePageMeasurements();
   // ignore resize events before dynamic size variables exist
   if (webState.dynamic.inputAreaCharWidthPx) {
     // console.log('window resize event');
@@ -531,10 +532,7 @@ window.addEventListener('resize', function (event) {
       }
     }
 
-    // go resize textarea elements
-    adjustInputToWidowWidth();
-
-    // Tell channel windows and PM windows to resize themselves
+    // Resize textarea elements
     document.dispatchEvent(new CustomEvent('resize-custom-elements',
       {
         bubbles: true,
@@ -543,26 +541,27 @@ window.addEventListener('resize', function (event) {
       }));
 
     // This is to prevent unnecessary resize event on timer check (next function below)
-    webState.dynamic.lastClientWidth = document.querySelector('body').clientWidth;
+    webState.dynamic.lastClientWidth = webState.dynamic.bodyClientWidth;
   }
 });
 
 //
-// Resize input area elements after page width unexpectedly changes without event.
+// Timer service routine
+//
+// Resize input area elements after pageClientWidth unexpectedly changes without event.
 // Typically appearance of vertical slider causes this.
 //
 const checkVerticalSliderPageWidth = function () {
+  updatePageMeasurements();
+
   // skip if not initialized
   if (webState.dynamic.inputAreaCharWidthPx) {
     // Case of making window visible/hidden add or remove vertical slider, change width.
     // There is no event to catch this so it's done on a timer.
-    if (webState.dynamic.lastClientWidth !== document.querySelector('body').clientWidth) {
-      webState.dynamic.lastClientWidth = document.querySelector('body').clientWidth;
+    if (webState.dynamic.lastClientWidth !== webState.dynamic.bodyClientWidth) {
+      webState.dynamic.lastClientWidth = webState.dynamic.bodyClientWidth;
 
-      // resize textarea elements
-      adjustInputToWidowWidth();
-
-      // Tell channel windows and PM windows to resize themselves
+      // Resize textarea elements
       document.dispatchEvent(new CustomEvent('resize-custom-elements',
         {
           bubbles: true,
@@ -573,14 +572,14 @@ const checkVerticalSliderPageWidth = function () {
   }
 }; // checkVerticalSliderPageWidth()
 
+// button to manually update widths (may remove in future)
 document.addEventListener('recalcPageWidthButtonId', function () {
+  updatePageMeasurements();
+
   // recalibrate pixel width of textarea elements
   calibrateElementSize();
 
-  // resize textarea elements
-  adjustInputToWidowWidth();
-
-  // Tell channel windows and PM windows to resize themselves
+  // Resize textarea elements
   document.dispatchEvent(new CustomEvent('resize-custom-elements',
     {
       bubbles: true,
@@ -593,8 +592,17 @@ document.addEventListener('recalcPageWidthButtonId', function () {
 //
 // Do initially on page load, calibrate textarea element size, and resize input area elements.
 //
+updatePageMeasurements();
+webState.dynamic.lastClientWidth = webState.dynamic.bodyClientWidth;
 calibrateElementSize();
-adjustInputToWidowWidth();
+// Resize textarea elements
+document.dispatchEvent(new CustomEvent('resize-custom-elements',
+  {
+    bubbles: true,
+    detail: {
+    }
+  }
+));
 
 //
 // And do same one more time...
@@ -603,7 +611,14 @@ adjustInputToWidowWidth();
 //
 setTimeout(function () {
   calibrateElementSize();
-  adjustInputToWidowWidth();
+  // Resize textarea elements
+  document.dispatchEvent(new CustomEvent('resize-custom-elements',
+    {
+      bubbles: true,
+      detail: {
+      }
+    }
+  ));
 }, 900);
 
 //

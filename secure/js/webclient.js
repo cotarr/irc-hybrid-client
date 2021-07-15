@@ -135,6 +135,24 @@ webState.times = { webConnect: 0 };
 webState.count = { webConnect: 0 };
 webState.cacheInhibitTimer = 0;
 
+//
+// dynamic page layout, these values overwritten dynamically
+//
+webState.dynamic = {
+  inputAreaCharWidthPx: null,
+  inputAreaSideWidthPx: null,
+  sendButtonWidthPx: null,
+  // commonMargin represents a space on iPHone right side thumb scroll area
+  commonMargin: 50,
+  lastDevicePixelRatio: 1,
+  bodyClientWidth: document.querySelector('body').clientWidth,
+  lastClientWidth: document.querySelector('body').clientWidth
+};
+// only if browser support devicePixelRatio
+if (window.devicePixelRatio) {
+  webState.dynamic.lastDevicePixelRatio = window.devicePixelRatio;
+}
+
 // -------------------------------
 // Build URL from page location
 // -------------------------------
