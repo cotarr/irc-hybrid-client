@@ -309,8 +309,10 @@ function showRawMessageWindow () {
   document.getElementById('rawHiddenElementsButton').textContent = '-';
   document.getElementById('rawHeadRightButtons').removeAttribute('hidden');
   // scroll message to most recent
-  document.getElementById('rawMessageDisplay').scrollTop =
-    document.getElementById('rawMessageDisplay').scrollHeight;
+  if (!webState.cacheReloadInProgress) {
+    document.getElementById('rawMessageDisplay').scrollTop =
+      document.getElementById('rawMessageDisplay').scrollHeight;
+  }
 } // showRawMessageWindow()
 // --------------------------------------------------
 // Hide server message window if it is hidden

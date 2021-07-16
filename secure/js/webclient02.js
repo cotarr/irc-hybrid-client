@@ -450,8 +450,10 @@ function displayNoticeMessage (parsedMessage) {
   function _addText (text) {
     document.getElementById('noticeMessageDisplay').value +=
       cleanFormatting(text) + '\n';
-    document.getElementById('noticeMessageDisplay').scrollTop =
-      document.getElementById('noticeMessageDisplay').scrollHeight;
+    if (!webState.cacheReloadInProgress) {
+      document.getElementById('noticeMessageDisplay').scrollTop =
+        document.getElementById('noticeMessageDisplay').scrollHeight;
+    }
   }
   // console.log('parsedMessage ' + JSON.stringify(parsedMessage, null, 2));
   switch (parsedMessage.command) {
@@ -553,8 +555,10 @@ document.addEventListener('cache-reload-error', function (event) {
 function displayWallopsMessage (parsedMessage) {
   function _addText (text) {
     document.getElementById('wallopsMessageDisplay').value += cleanFormatting(text) + '\n';
-    document.getElementById('wallopsMessageDisplay').scrollTop =
-      document.getElementById('wallopsMessageDisplay').scrollHeight;
+    if (!webState.cacheReloadInProgress) {
+      document.getElementById('wallopsMessageDisplay').scrollTop =
+        document.getElementById('wallopsMessageDisplay').scrollHeight;
+    }
   }
   // console.log('Priv Msg: ' + JSON.stringify(parsedMessage, null, 2));
   switch (parsedMessage.command) {
@@ -615,8 +619,10 @@ document.addEventListener('cache-reload-error', function (event) {
 function displayRawMessage (inString) {
   document.getElementById('rawMessageDisplay').value += inString + '\n';
   // scroll to view new text
-  document.getElementById('rawMessageDisplay').scrollTop =
-    document.getElementById('rawMessageDisplay').scrollHeight;
+  if (!webState.cacheReloadInProgress) {
+    document.getElementById('rawMessageDisplay').scrollTop =
+      document.getElementById('rawMessageDisplay').scrollHeight;
+  }
 };
 
 // ----------------------------------------------------------------
@@ -660,8 +666,10 @@ function _parseCtcpMessage (parsedMessage) {
   // console.log('_parseCtcpMessage ' + JSON.stringify(parsedMessage, null, 2));
   function _addNoticeText (text) {
     document.getElementById('noticeMessageDisplay').value += text + '\n';
-    document.getElementById('noticeMessageDisplay').scrollTop =
-      document.getElementById('noticeMessageDisplay').scrollHeight;
+    if (!webState.cacheReloadInProgress) {
+      document.getElementById('noticeMessageDisplay').scrollTop =
+        document.getElementById('noticeMessageDisplay').scrollHeight;
+    }
   }
   const ctcpDelim = 1;
   const ctcpMessage = parsedMessage.params[1];
