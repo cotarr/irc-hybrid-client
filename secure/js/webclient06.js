@@ -398,6 +398,7 @@ function createChannelEl (name) {
     const newRows = parseInt(channelTextAreaEl.getAttribute('rows')) + 10;
     channelTextAreaEl.setAttribute('rows', newRows.toString());
     channelNamesDisplayEl.setAttribute('rows', newRows.toString());
+    channelInputAreaEl.setAttribute('rows', '3');
   }); // createChannelEl()
 
   // -------------------------
@@ -406,6 +407,7 @@ function createChannelEl (name) {
   channelNormalButtonEl.addEventListener('click', function () {
     channelTextAreaEl.setAttribute('rows', defaultHeightInRows);
     channelNamesDisplayEl.setAttribute('rows', defaultHeightInRows);
+    channelInputAreaEl.setAttribute('rows', '1');
   });
 
   // -------------------------
@@ -415,6 +417,7 @@ function createChannelEl (name) {
     channelTextAreaEl.value = '';
     channelTextAreaEl.setAttribute('rows', defaultHeightInRows);
     channelNamesDisplayEl.setAttribute('rows', defaultHeightInRows);
+    channelInputAreaEl.setAttribute('rows', '1');
   });
 
   // -------------------------

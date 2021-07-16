@@ -454,20 +454,20 @@ channelContainerDivEl.appendChild(channelMainSectionEl)}if(ircState.channelState
 if(activityIconInhibitTimer>0)activityIconInhibitTimer--},1e3);channelHideButtonEl.addEventListener('click',function(){if(channelBottomDivEl.hasAttribute('hidden')){
 channelBottomDivEl.removeAttribute('hidden');channelHideButtonEl.textContent='-';channelTopRightHidableDivEl.removeAttribute('hidden')}else{channelBottomDivEl.setAttribute('hidden','')
 ;channelHideButtonEl.textContent='+';channelTopRightHidableDivEl.setAttribute('hidden','')}});channelTallerButtonEl.addEventListener('click',function(){
-const newRows=parseInt(channelTextAreaEl.getAttribute('rows'))+10;channelTextAreaEl.setAttribute('rows',newRows.toString());channelNamesDisplayEl.setAttribute('rows',newRows.toString())})
-;channelNormalButtonEl.addEventListener('click',function(){channelTextAreaEl.setAttribute('rows',defaultHeightInRows);channelNamesDisplayEl.setAttribute('rows',defaultHeightInRows)})
-;channelClearButtonEl.addEventListener('click',function(){channelTextAreaEl.value='';channelTextAreaEl.setAttribute('rows',defaultHeightInRows)
-;channelNamesDisplayEl.setAttribute('rows',defaultHeightInRows)});channelJoinButtonEl.addEventListener('click',function(){const message='JOIN '+name;_sendIrcServerMessage(message)})
-;channelPartButtonEl.addEventListener('click',function(){const message='PART '+name+' :'+ircState.progName+' '+ircState.progVersion;_sendIrcServerMessage(message)})
-;channelPruneButtonEl.addEventListener('click',function(){function _removeChannelFromDom(){const webStateChannelsIndex=webState.channels.indexOf(name.toLowerCase());if(webStateChannelsIndex>=0){
-webState.channels.splice(webStateChannelsIndex,1);webState.channelStates.splice(webStateChannelsIndex,1)}channelContainerDivEl.removeChild(channelMainSectionEl)}
-const index=ircState.channels.indexOf(name.toLowerCase());if(index>=0){if(!ircState.channelStates[index].joined){const fetchURL=webServerUrl+'/irc/prune';const fetchOptions={method:'POST',headers:{
-'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify({channel:name})};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()}else{
-throw new Error('Fetch status '+response.status+' '+response.statusText)}}).then(responseJson=>{if(responseJson.error){showError(responseJson.message)}else{_removeChannelFromDom()}}).catch(error=>{
-console.log(error)})}}else{_removeChannelFromDom()}});channelRefreshButtonEl.addEventListener('click',function(){if(!webState.cacheReloadInProgress){
-document.dispatchEvent(new CustomEvent('update-from-cache',{bubbles:true}));channelNamesDisplayEl.value='';_sendIrcServerMessage('NAMES '+name)}})
-;channelSendButtonEl.addEventListener('click',function(){_sendTextToChannel(channelIndex,channelInputAreaEl);channelInputAreaEl.focus();resetChanActivityIcon(channelIndex)
-;activityIconInhibitTimer=activityIconInhibitTimerValue});channelInputAreaEl.addEventListener('input',function(event){
+const newRows=parseInt(channelTextAreaEl.getAttribute('rows'))+10;channelTextAreaEl.setAttribute('rows',newRows.toString());channelNamesDisplayEl.setAttribute('rows',newRows.toString())
+;channelInputAreaEl.setAttribute('rows','3')});channelNormalButtonEl.addEventListener('click',function(){channelTextAreaEl.setAttribute('rows',defaultHeightInRows)
+;channelNamesDisplayEl.setAttribute('rows',defaultHeightInRows);channelInputAreaEl.setAttribute('rows','1')});channelClearButtonEl.addEventListener('click',function(){channelTextAreaEl.value=''
+;channelTextAreaEl.setAttribute('rows',defaultHeightInRows);channelNamesDisplayEl.setAttribute('rows',defaultHeightInRows);channelInputAreaEl.setAttribute('rows','1')})
+;channelJoinButtonEl.addEventListener('click',function(){const message='JOIN '+name;_sendIrcServerMessage(message)});channelPartButtonEl.addEventListener('click',function(){
+const message='PART '+name+' :'+ircState.progName+' '+ircState.progVersion;_sendIrcServerMessage(message)});channelPruneButtonEl.addEventListener('click',function(){function _removeChannelFromDom(){
+const webStateChannelsIndex=webState.channels.indexOf(name.toLowerCase());if(webStateChannelsIndex>=0){webState.channels.splice(webStateChannelsIndex,1)
+;webState.channelStates.splice(webStateChannelsIndex,1)}channelContainerDivEl.removeChild(channelMainSectionEl)}const index=ircState.channels.indexOf(name.toLowerCase());if(index>=0){
+if(!ircState.channelStates[index].joined){const fetchURL=webServerUrl+'/irc/prune';const fetchOptions={method:'POST',headers:{'Content-type':'application/json',Accept:'application/json'},
+body:JSON.stringify({channel:name})};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()}else{throw new Error('Fetch status '+response.status+' '+response.statusText)}
+}).then(responseJson=>{if(responseJson.error){showError(responseJson.message)}else{_removeChannelFromDom()}}).catch(error=>{console.log(error)})}}else{_removeChannelFromDom()}})
+;channelRefreshButtonEl.addEventListener('click',function(){if(!webState.cacheReloadInProgress){document.dispatchEvent(new CustomEvent('update-from-cache',{bubbles:true}))
+;channelNamesDisplayEl.value='';_sendIrcServerMessage('NAMES '+name)}});channelSendButtonEl.addEventListener('click',function(){_sendTextToChannel(channelIndex,channelInputAreaEl)
+;channelInputAreaEl.focus();resetChanActivityIcon(channelIndex);activityIconInhibitTimer=activityIconInhibitTimerValue});channelInputAreaEl.addEventListener('input',function(event){
 if(event.inputType==='insertText'&&event.data===null||event.inputType==='insertLineBreak'){stripOneCrLfFromElement(channelInputAreaEl);_sendTextToChannel(channelIndex,channelInputAreaEl)
 ;resetChanActivityIcon(channelIndex);activityIconInhibitTimer=activityIconInhibitTimerValue}});channelMainSectionEl.addEventListener('click',function(){resetChanActivityIcon(channelIndex)
 ;activityIconInhibitTimer=activityIconInhibitTimerValue});function updateVisibility(){const index=ircState.channels.indexOf(name.toLowerCase());if(index>=0){if(ircState.channelStates[index].joined){
@@ -646,19 +646,20 @@ timestampString=unixTimestampToHMS(event.detail.timestamp)}if(timestampString){e
 ;privMsgHideButtonEl.addEventListener('click',function(){if(privMsgBottomDivEl.hasAttribute('hidden')){privMsgBottomDivEl.removeAttribute('hidden');privMsgHideButtonEl.textContent='-'
 ;privMsgTopRightHidableDivEl.removeAttribute('hidden')}else{privMsgSectionEl.setAttribute('hidden','');privMsgBottomDivEl.setAttribute('hidden','');privMsgHideButtonEl.textContent='+'
 ;privMsgTopRightHidableDivEl.setAttribute('hidden','')}});privMsgTallerButtonEl.addEventListener('click',function(){const newRows=parseInt(privMsgTextAreaEl.getAttribute('rows'))+5
-;privMsgTextAreaEl.setAttribute('rows',newRows.toString())});privMsgNormalButtonEl.addEventListener('click',function(){privMsgTextAreaEl.setAttribute('rows','6')})
-;privMsgClearButtonEl.addEventListener('click',function(){privMsgTextAreaEl.value='';privMsgTextAreaEl.setAttribute('rows','6')});document.addEventListener('show-all-divs',function(event){
-privMsgSectionEl.removeAttribute('hidden')});document.addEventListener('hide-all-divs',function(event){privMsgBottomDivEl.setAttribute('hidden','');privMsgHideButtonEl.textContent='+'
-;privMsgTopRightHidableDivEl.setAttribute('hidden','');privMsgSectionEl.setAttribute('hidden','')});privMsgSendButtonEl.addEventListener('click',function(){
-_sendPrivMessageToUser(name,privMsgInputAreaEl);privMsgInputAreaEl.focus();resetPmActivityIcon(privMsgIndex);activityIconInhibitTimer=activityIconInhibitTimerValue})
-;privMsgInputAreaEl.addEventListener('input',function(event){if(event.inputType==='insertText'&&event.data===null||event.inputType==='insertLineBreak'){stripOneCrLfFromElement(privMsgInputAreaEl)
-;_sendPrivMessageToUser(name,privMsgInputAreaEl);resetPmActivityIcon(privMsgIndex);activityIconInhibitTimer=activityIconInhibitTimerValue}});privMsgSectionEl.addEventListener('click',function(){
-resetPmActivityIcon(privMsgIndex);activityIconInhibitTimer=activityIconInhibitTimerValue});function updateVisibility(){if(privMsgSectionEl.hasAttribute('beep1-enabled')){
-privMsgBeep1CBInputEl.checked=true}else{privMsgBeep1CBInputEl.checked=false}}privMsgBeep1CBInputEl.addEventListener('click',function(e){if(privMsgSectionEl.hasAttribute('beep1-enabled')){
-privMsgSectionEl.removeAttribute('beep1-enabled')}else{privMsgSectionEl.setAttribute('beep1-enabled','');playBeep3Sound()}updateVisibility()})
-;document.addEventListener('cancel-beep-sounds',function(event){privMsgSectionEl.removeAttribute('beep1-enabled')});document.addEventListener('private-message',function(event){function _addText(text){
-privMsgTextAreaEl.value+=cleanFormatting(text)+'\n';if(!webState.cacheReloadInProgress){privMsgTextAreaEl.scrollTop=privMsgTextAreaEl.scrollHeight}}const parsedMessage=event.detail.parsedMessage
-;switch(parsedMessage.command){case'PRIVMSG':if(parsedMessage.nick===ircState.nickName){if(parsedMessage.params[0].toLowerCase()===name.toLowerCase()){if('isPmCtcpAction'in parsedMessage){
+;privMsgTextAreaEl.setAttribute('rows',newRows.toString());privMsgInputAreaEl.setAttribute('rows','3')});privMsgNormalButtonEl.addEventListener('click',function(){
+privMsgTextAreaEl.setAttribute('rows','6');privMsgInputAreaEl.setAttribute('rows','1')});privMsgClearButtonEl.addEventListener('click',function(){privMsgTextAreaEl.value=''
+;privMsgTextAreaEl.setAttribute('rows','6');privMsgInputAreaEl.setAttribute('rows','1')});document.addEventListener('show-all-divs',function(event){privMsgSectionEl.removeAttribute('hidden')})
+;document.addEventListener('hide-all-divs',function(event){privMsgBottomDivEl.setAttribute('hidden','');privMsgHideButtonEl.textContent='+';privMsgTopRightHidableDivEl.setAttribute('hidden','')
+;privMsgSectionEl.setAttribute('hidden','')});privMsgSendButtonEl.addEventListener('click',function(){_sendPrivMessageToUser(name,privMsgInputAreaEl);privMsgInputAreaEl.focus()
+;resetPmActivityIcon(privMsgIndex);activityIconInhibitTimer=activityIconInhibitTimerValue});privMsgInputAreaEl.addEventListener('input',function(event){
+if(event.inputType==='insertText'&&event.data===null||event.inputType==='insertLineBreak'){stripOneCrLfFromElement(privMsgInputAreaEl);_sendPrivMessageToUser(name,privMsgInputAreaEl)
+;resetPmActivityIcon(privMsgIndex);activityIconInhibitTimer=activityIconInhibitTimerValue}});privMsgSectionEl.addEventListener('click',function(){resetPmActivityIcon(privMsgIndex)
+;activityIconInhibitTimer=activityIconInhibitTimerValue});function updateVisibility(){if(privMsgSectionEl.hasAttribute('beep1-enabled')){privMsgBeep1CBInputEl.checked=true}else{
+privMsgBeep1CBInputEl.checked=false}}privMsgBeep1CBInputEl.addEventListener('click',function(e){if(privMsgSectionEl.hasAttribute('beep1-enabled')){privMsgSectionEl.removeAttribute('beep1-enabled')
+}else{privMsgSectionEl.setAttribute('beep1-enabled','');playBeep3Sound()}updateVisibility()});document.addEventListener('cancel-beep-sounds',function(event){
+privMsgSectionEl.removeAttribute('beep1-enabled')});document.addEventListener('private-message',function(event){function _addText(text){privMsgTextAreaEl.value+=cleanFormatting(text)+'\n'
+;if(!webState.cacheReloadInProgress){privMsgTextAreaEl.scrollTop=privMsgTextAreaEl.scrollHeight}}const parsedMessage=event.detail.parsedMessage;switch(parsedMessage.command){case'PRIVMSG':
+if(parsedMessage.nick===ircState.nickName){if(parsedMessage.params[0].toLowerCase()===name.toLowerCase()){if('isPmCtcpAction'in parsedMessage){
 _addText(parsedMessage.timestamp+pmNameSpacer+parsedMessage.nick+' '+parsedMessage.params[1])}else{_addText(parsedMessage.timestamp+' '+parsedMessage.nick+pmNameSpacer+parsedMessage.params[1])}
 if(privMsgSectionEl.hasAttribute('beep1-enabled')&&!webState.cacheReloadInProgress){playBeep3Sound()}privMsgSectionEl.removeAttribute('hidden');privMsgBottomDivEl.removeAttribute('hidden')
 ;privMsgHideButtonEl.textContent='-';privMsgTopRightHidableDivEl.removeAttribute('hidden');document.getElementById('privMsgMainHiddenDiv').removeAttribute('hidden')

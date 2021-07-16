@@ -327,6 +327,7 @@ function createPrivateMessageEl (name, parsedMessage) {
   privMsgTallerButtonEl.addEventListener('click', function () {
     const newRows = parseInt(privMsgTextAreaEl.getAttribute('rows')) + 5;
     privMsgTextAreaEl.setAttribute('rows', newRows.toString());
+    privMsgInputAreaEl.setAttribute('rows', '3');
   });
 
   // -------------------------
@@ -334,6 +335,7 @@ function createPrivateMessageEl (name, parsedMessage) {
   // -------------------------
   privMsgNormalButtonEl.addEventListener('click', function () {
     privMsgTextAreaEl.setAttribute('rows', '6');
+    privMsgInputAreaEl.setAttribute('rows', '1');
   });
 
   // -------------------------
@@ -342,6 +344,7 @@ function createPrivateMessageEl (name, parsedMessage) {
   privMsgClearButtonEl.addEventListener('click', function () {
     privMsgTextAreaEl.value = '';
     privMsgTextAreaEl.setAttribute('rows', '6');
+    privMsgInputAreaEl.setAttribute('rows', '1');
   });
 
   // ----------------
