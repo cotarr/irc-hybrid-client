@@ -446,7 +446,7 @@ document.addEventListener('server-message', function (event) {
           cleanCtcpDelimiter(
             substituteHmsTime(event.detail.message))));
   } // switch
-  if (webState.cacheInhibitTimer === 0) {
+  if (!webState.cacheReloadInProgress) {
     showRawMessageWindow();
   }
 }); // server-message event handler
@@ -457,7 +457,6 @@ document.addEventListener('server-message', function (event) {
 // Example:  14:33:02 -----Cache Reload-----
 //
 document.addEventListener('cache-reload-done', function (event) {
-  // console.log('Event cache-reload-done');
   let markerString = '';
   let timestampString = '';
   if (('detail' in event) && ('timestamp' in event.detail)) {
@@ -471,6 +470,19 @@ document.addEventListener('cache-reload-done', function (event) {
   document.getElementById('rawMessageDisplay').value += markerString;
   document.getElementById('rawMessageDisplay').scrollTop =
     document.getElementById('rawMessageDisplay').scrollHeight;
+});
+
+document.addEventListener('cache-reload-error', function (event) {
+  let errorString = '\n';
+  let timestampString = '';
+  if (('detail' in event) && ('timestamp' in event.detail)) {
+    timestampString = unixTimestampToHMS(event.detail.timestamp);
+  }
+  if (timestampString) {
+    errorString += timestampString;
+  }
+  errorString += ' ' + cacheErrorString + '\n\n';
+  document.getElementById('rawMessageDisplay').value = errorString;
 });
 
 // -------------------------
@@ -527,7 +539,9 @@ document.getElementById('showDebugButton').addEventListener('click', function ()
 // --------------------------------
 document.getElementById('loadFromCacheButton').addEventListener('click', function () {
   // updateFromCache();
-  document.dispatchEvent(new CustomEvent('update-from-cache', { bubbles: true }));
+  if (!webState.cacheReloadInProgress) {
+    document.dispatchEvent(new CustomEvent('update-from-cache', { bubbles: true }));
+  }
 });
 
 // -----------------------

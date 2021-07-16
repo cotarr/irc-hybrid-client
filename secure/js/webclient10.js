@@ -33,9 +33,14 @@
 // the message were real time.
 // -------------------------------------------------
 function updateFromCache () {
-  // Timer down counter to disable
-  // prase events during reload (beeps and activity icons)
-  webState.cacheInhibitTimer = 3;
+  if (webState.cacheReloadInProgress) {
+    // Abort in case of cache reload already in progress
+    console.log('Attempt cache reload, while previous in progress');
+    return;
+  }
+  // Used by event handlers to inhibit various actions.
+  webState.cacheReloadInProgress = true;
+
   // Clear activity icons
   resetNotActivityIcon();
   resetPmActivityIcon(-1);
@@ -60,6 +65,7 @@ function updateFromCache () {
   fetch(fetchURL, fetchOptions)
     .then((response) => {
       // console.log(response.status);
+      // throw new Error('Test error for updateFromCache()');
       if (response.ok) {
         return response.json();
       } else {
@@ -101,30 +107,38 @@ function updateFromCache () {
             _parseBufferMessage(responseArray[i]);
           }
         }
-        // this is to inform windows that cache reload has completed.
-        const timestamp = unixTimestamp();
-        document.dispatchEvent(new CustomEvent('cache-reload-done', {
-          bubbles: true,
-          detail: {
-            timestamp: timestamp
-          }
-        }));
       }
+      // this is to inform windows that cache reload has completed.
+      const timestamp = unixTimestamp();
+      document.dispatchEvent(new CustomEvent('cache-reload-done', {
+        bubbles: true,
+        detail: {
+          timestamp: timestamp
+        }
+      }));
     })
     .catch((error) => {
+      const timestamp = unixTimestamp();
       console.log(error);
+      document.dispatchEvent(new CustomEvent('cache-reload-error', {
+        bubbles: true,
+        detail: {
+          timestamp: timestamp
+        }
+      }));
     });
 }; // updateFromCache;
 window.addEventListener('update-from-cache', function (event) {
   updateFromCache();
 });
 
-function cacheInhibitTimerTick () {
-  if (webState.cacheInhibitTimer > 0) webState.cacheInhibitTimer--;
-}
+window.addEventListener('cache-reload-done', function (event) {
+  webState.cacheReloadInProgress = false;
+});
 
-// On initial load or reload of page, inhibit timers
-webState.cacheInhibitTimer = 3;
+window.addEventListener('cache-reload-error', function (event) {
+  webState.cacheReloadInProgress = false;
+});
 
 // -----------------------
 // Die (Server) button
@@ -630,7 +644,6 @@ setInterval(function () {
   reconnectTimerTickHandler();
   beepTimerTick();
   updateElapsedTimeDisplay();
-  cacheInhibitTimerTick();
   checkVerticalSliderPageWidth();
 }, 1000);
 

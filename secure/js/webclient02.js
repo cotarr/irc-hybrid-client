@@ -484,7 +484,7 @@ function displayNoticeMessage (parsedMessage) {
             // Message activity Icon
             // If NOT reload from cache in progress (timer not zero)
             // then display incoming message activity icon
-            if (webState.cacheInhibitTimer === 0) {
+            if (!webState.cacheReloadInProgress) {
               setNotActivityIcon();
             }
           } else if (ircState.channels.indexOf(parsedMessage.params[0].toLowerCase()) >= 0) {
@@ -518,7 +518,6 @@ function displayNoticeMessage (parsedMessage) {
 // Example:  14:33:02 -----Cache Reload-----
 //
 document.addEventListener('cache-reload-done', function (event) {
-  // console.log('Event cache-reload-done');
   let markerString = '';
   let timestampString = '';
   if (('detail' in event) && ('timestamp' in event.detail)) {
@@ -532,6 +531,19 @@ document.addEventListener('cache-reload-done', function (event) {
   document.getElementById('noticeMessageDisplay').value += markerString;
   document.getElementById('noticeMessageDisplay').scrollTop =
     document.getElementById('noticeMessageDisplay').scrollHeight;
+});
+
+document.addEventListener('cache-reload-error', function (event) {
+  let errorString = '\n';
+  let timestampString = '';
+  if (('detail' in event) && ('timestamp' in event.detail)) {
+    timestampString = unixTimestampToHMS(event.detail.timestamp);
+  }
+  if (timestampString) {
+    errorString += timestampString;
+  }
+  errorString += ' ' + cacheErrorString + '\n\n';
+  document.getElementById('noticeMessageDisplay').value = errorString;
 });
 
 // -----------------------------------------------------
@@ -569,7 +581,6 @@ function displayWallopsMessage (parsedMessage) {
 // Example:  14:33:02 -----Cache Reload-----
 //
 document.addEventListener('cache-reload-done', function (event) {
-  // console.log('Event cache-reload-done');
   let markerString = '';
   let timestampString = '';
   if (('detail' in event) && ('timestamp' in event.detail)) {
@@ -583,6 +594,18 @@ document.addEventListener('cache-reload-done', function (event) {
   document.getElementById('wallopsMessageDisplay').value += markerString;
   document.getElementById('wallopsMessageDisplay').scrollTop =
     document.getElementById('wallopsMessageDisplay').scrollHeight;
+});
+document.addEventListener('cache-reload-error', function (event) {
+  let errorString = '\n';
+  let timestampString = '';
+  if (('detail' in event) && ('timestamp' in event.detail)) {
+    timestampString = unixTimestampToHMS(event.detail.timestamp);
+  }
+  if (timestampString) {
+    errorString += timestampString;
+  }
+  errorString += ' ' + cacheErrorString + '\n\n';
+  document.getElementById('wallopsMessageDisplay').value = errorString;
 });
 
 // ----------------------------------------------
@@ -869,7 +892,7 @@ function _parseBufferMessage (message) {
         // console.log(message.toString());
         // This is to popup error before registration, Bad server Password error
         if ((!ircState.ircRegistered) && (parsedMessage.params.length === 1)) {
-          if (webState.cacheInhibitTimer === 0) {
+          if (!webState.cacheReloadInProgress) {
             showError('ERROR ' + parsedMessage.params[0]);
           }
         }

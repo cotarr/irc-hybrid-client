@@ -500,11 +500,13 @@ function createChannelEl (name) {
   // Refresh button handler
   // -------------------------
   channelRefreshButtonEl.addEventListener('click', function () {
-    // this forces a global update which will refreesh text area
-    document.dispatchEvent(new CustomEvent('update-from-cache', { bubbles: true }));
-    // THis will request a new nickname list from IRC server.
-    channelNamesDisplayEl.value = '';
-    _sendIrcServerMessage('NAMES ' + name);
+    if (!webState.cacheReloadInProgress) {
+      // this forces a global update which will refreesh text area
+      document.dispatchEvent(new CustomEvent('update-from-cache', { bubbles: true }));
+      // THis will request a new nickname list from IRC server.
+      channelNamesDisplayEl.value = '';
+      _sendIrcServerMessage('NAMES ' + name);
+    }
   });
 
   // -------------
@@ -1125,7 +1127,10 @@ function createChannelEl (name) {
       // append text to textarea
       channelTextAreaEl.value += out;
       // move scroll bar so text is scrolled all the way up
-      channelTextAreaEl.scrollTop = channelTextAreaEl.scrollHeight;
+      // Performing this during cache reload will generate browser violation for forced reflow.
+      if (!webState.cacheReloadInProgress) {
+        channelTextAreaEl.scrollTop = channelTextAreaEl.scrollHeight;
+      }
     }
 
     const parsedMessage = event.detail.parsedMessage;
@@ -1163,7 +1168,7 @@ function createChannelEl (name) {
               parsedMessage.nick + ' (' + parsedMessage.host + ') has joined');
           }
           if (channelMainSectionEl.hasAttribute('beep2-enabled') &&
-            (webState.cacheInhibitTimer === 0)) {
+            (!webState.cacheReloadInProgress)) {
             playBeep1Sound();
           }
           // Upon channel make, make section visible.
@@ -1222,7 +1227,7 @@ function createChannelEl (name) {
           // then display incoming message activity icon
           if ((document.activeElement !== channelInputAreaEl) &&
           (document.activeElement !== channelSendButtonEl) &&
-          (webState.cacheInhibitTimer === 0) &&
+          (!webState.cacheReloadInProgress) &&
           (activityIconInhibitTimer === 0)) {
             setChanActivityIcon(channelIndex);
           }
@@ -1251,13 +1256,13 @@ function createChannelEl (name) {
             parsedMessage.nick,
             parsedMessage.params[1]);
           if (channelMainSectionEl.hasAttribute('beep1-enabled') &&
-            (webState.cacheInhibitTimer === 0)) {
+            (!webState.cacheReloadInProgress)) {
             playBeep1Sound();
           }
           if (channelMainSectionEl.hasAttribute('beep3-enabled')) {
             const checkLine = parsedMessage.params[1].toLowerCase();
             if ((checkLine.indexOf(ircState.nickName.toLowerCase()) >= 0) &&
-              (webState.cacheInhibitTimer === 0)) {
+              (!webState.cacheReloadInProgress)) {
               setTimeout(playBeep2Sound, 250);
             }
           }
@@ -1272,7 +1277,7 @@ function createChannelEl (name) {
           // then display incoming message activity icon
           if ((document.activeElement !== channelInputAreaEl) &&
           (document.activeElement !== channelSendButtonEl) &&
-          (webState.cacheInhibitTimer === 0) &&
+          (!webState.cacheReloadInProgress) &&
           (activityIconInhibitTimer === 0)) {
             setChanActivityIcon(channelIndex);
           }
@@ -1325,7 +1330,6 @@ function createChannelEl (name) {
   // Example:  14:33:02 -----Cache Reload-----
   //
   document.addEventListener('cache-reload-done', function (event) {
-    // console.log('Event cache-reload-done');
     let markerString = '';
     let timestampString = '';
     if (('detail' in event) && ('timestamp' in event.detail)) {
@@ -1341,6 +1345,18 @@ function createChannelEl (name) {
     channelTextAreaEl.value += markerString;
     // move scroll bar so text is scrolled all the way up
     channelTextAreaEl.scrollTop = channelTextAreaEl.scrollHeight;
+  });
+  document.addEventListener('cache-reload-error', function (event) {
+    let errorString = '\n';
+    let timestampString = '';
+    if (('detail' in event) && ('timestamp' in event.detail)) {
+      timestampString = unixTimestampToHMS(event.detail.timestamp);
+    }
+    if (timestampString) {
+      errorString += timestampString;
+    }
+    errorString += ' ' + cacheErrorString + '\n\n';
+    channelTextAreaEl.value = errorString;
   });
 
   // set visibility and divs

@@ -50,7 +50,8 @@ const nickChannelSpacer = ' | ';
 const pmNameSpacer = ' - ';
 // Time during which incoming messages do not trigger activity icon
 const activityIconInhibitTimerValue = 10;
-const cacheReloadString = '-----Cache Reload-----';
+const cacheReloadString = '-----IRC Cache Reload-----';
+const cacheErrorString = '-----IRC Cache Error-----';
 
 // ----------------------------------------------------------
 // Do not edit ircState contents from within browser.
@@ -133,7 +134,7 @@ webState.lastPMNick = '';
 webState.activePrivateMessageNicks = [];
 webState.times = { webConnect: 0 };
 webState.count = { webConnect: 0 };
-webState.cacheInhibitTimer = 0;
+webState.cacheReloadInProgress = false;
 
 //
 // dynamic page layout, these values overwritten dynamically
@@ -794,7 +795,7 @@ function getIrcState (callback) {
       if (lastConnectErrorCount !== ircState.count.ircConnectError) {
         lastConnectErrorCount = ircState.count.ircConnectError;
         if (ircState.count.ircConnectError > 0) {
-          if (webState.cacheInhibitTimer === 0) {
+          if (!webState.cacheReloadInProgress) {
             showError('An IRC Server connection error occurred');
           }
         }

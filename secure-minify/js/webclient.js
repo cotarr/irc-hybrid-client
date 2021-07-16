@@ -25,28 +25,28 @@ SOFTWARE.
 'use strict';
 
 const channelPrefixChars='@#+!';const nicknamePrefixChars='~&@%+';const nickChannelSpacer=' | ';const pmNameSpacer=' - ';const activityIconInhibitTimerValue=10
-;const cacheReloadString='-----Cache Reload-----';var ircState={ircConnectOn:false,ircConnecting:false,ircConnected:false,ircRegistered:false,ircIsAway:false,ircAutoReconnect:false,ircServerName:'',
-ircServerHost:'',ircServerPort:6667,ircTLSEnabled:false,ircServerIndex:0,ircServerPrefix:'',channelList:[],nickName:'',userName:'',realName:'',userMode:'',userHost:'',channels:[],channelStates:[],
-progVersion:'0.0.0',progName:'',times:{programRun:0,ircConnect:0},count:{ircConnect:0,ircConnectError:0},websocketCount:0};document.getElementById('webConnectIconId').removeAttribute('connected')
-;document.getElementById('ircConnectIconId').removeAttribute('connected');document.getElementById('webConnectIconId').removeAttribute('connecting')
-;document.getElementById('ircConnectIconId').removeAttribute('connecting');const webState={};webState.loginUser={};webState.webConnectOn=true;webState.webConnected=false;webState.webConnecting=false
-;webState.ircConnecting=false;webState.websocketCount=0;webState.noticeOpen=false;webState.wallopsOpen=false;webState.viewRawMessages=false;webState.showRawInHex=false;webState.showCommsMessages=false
-;webState.lastIrcServerIndex=-1;webState.channels=[];webState.channelStates=[];webState.lastPMNick='';webState.activePrivateMessageNicks=[];webState.times={webConnect:0};webState.count={webConnect:0}
-;webState.cacheInhibitTimer=0;webState.dynamic={inputAreaCharWidthPx:null,inputAreaSideWidthPx:null,sendButtonWidthPx:null,commonMargin:50,lastDevicePixelRatio:1,
-bodyClientWidth:document.querySelector('body').clientWidth,lastClientWidth:document.querySelector('body').clientWidth};if(window.devicePixelRatio){
-webState.dynamic.lastDevicePixelRatio=window.devicePixelRatio}let webServerUrl='https://';let webSocketUrl='wss://';if(document.location.protocol==='http:'){webServerUrl='http://';webSocketUrl='ws://'
-}webServerUrl+=window.location.hostname+':'+window.location.port;webSocketUrl+=window.location.hostname+':'+window.location.port;var wsocket=null;const beep1=new Audio('sounds/short-beep1.mp3')
-;const beep2=new Audio('sounds/short-beep2.mp3');const beep3=new Audio('sounds/short-beep3.mp3');let beep1InhibitTimer=0;let beep2InhibitTimer=0;let beep3InhibitTimer=0;function beepTimerTick(){
-if(beep1InhibitTimer>0)beep1InhibitTimer--;if(beep2InhibitTimer>0)beep2InhibitTimer--;if(beep3InhibitTimer>0)beep3InhibitTimer--}function inhibitBeep(seconds){beep1InhibitTimer=seconds
-;beep2InhibitTimer=seconds;beep3InhibitTimer=seconds}function playBeep1Sound(){if(beep1InhibitTimer===0){beep1.play();beep1InhibitTimer=5}}function playBeep2Sound(){if(beep2InhibitTimer===0){
-beep2.play();beep2InhibitTimer=5}}function playBeep3Sound(){if(beep3InhibitTimer===0){beep3.play();beep3InhibitTimer=5}}const errorExpireSeconds=5;let errorRemainSeconds=0;function clearError(){
-const errorDivEl=document.getElementById('errorDiv');errorDivEl.setAttribute('hidden','');const errorContentDivEl=document.getElementById('errorContentDiv');while(errorContentDivEl.firstChild){
-errorContentDivEl.removeChild(errorContentDivEl.firstChild)}errorRemainSeconds=0}function showError(errorString){const errorDivEl=document.getElementById('errorDiv')
-;errorDivEl.removeAttribute('hidden');const errorContentDivEl=document.getElementById('errorContentDiv');const errorMessageEl=document.createElement('div')
-;errorMessageEl.textContent=errorString||'Error: unknown error (2993)';errorContentDivEl.appendChild(errorMessageEl);errorRemainSeconds=errorExpireSeconds}
-document.addEventListener('show-error-message',function(event){showError(event.detail.message)});document.getElementById('errorDiv').addEventListener('click',function(){clearError()})
-;function errorTimerTickHandler(){if(errorRemainSeconds>0){errorRemainSeconds--;if(errorRemainSeconds===0){clearError()}else{
-document.getElementById('errorTitle').textContent='Tap to Close ('+errorRemainSeconds.toString()+')'}}}function unixTimestamp(){const now=new Date;return parseInt(now.valueOf()/1e3)}
+;const cacheReloadString='-----IRC Cache Reload-----';const cacheErrorString='-----IRC Cache Error-----';var ircState={ircConnectOn:false,ircConnecting:false,ircConnected:false,ircRegistered:false,
+ircIsAway:false,ircAutoReconnect:false,ircServerName:'',ircServerHost:'',ircServerPort:6667,ircTLSEnabled:false,ircServerIndex:0,ircServerPrefix:'',channelList:[],nickName:'',userName:'',realName:'',
+userMode:'',userHost:'',channels:[],channelStates:[],progVersion:'0.0.0',progName:'',times:{programRun:0,ircConnect:0},count:{ircConnect:0,ircConnectError:0},websocketCount:0}
+;document.getElementById('webConnectIconId').removeAttribute('connected');document.getElementById('ircConnectIconId').removeAttribute('connected')
+;document.getElementById('webConnectIconId').removeAttribute('connecting');document.getElementById('ircConnectIconId').removeAttribute('connecting');const webState={};webState.loginUser={}
+;webState.webConnectOn=true;webState.webConnected=false;webState.webConnecting=false;webState.ircConnecting=false;webState.websocketCount=0;webState.noticeOpen=false;webState.wallopsOpen=false
+;webState.viewRawMessages=false;webState.showRawInHex=false;webState.showCommsMessages=false;webState.lastIrcServerIndex=-1;webState.channels=[];webState.channelStates=[];webState.lastPMNick=''
+;webState.activePrivateMessageNicks=[];webState.times={webConnect:0};webState.count={webConnect:0};webState.cacheReloadInProgress=false;webState.dynamic={inputAreaCharWidthPx:null,
+inputAreaSideWidthPx:null,sendButtonWidthPx:null,commonMargin:50,lastDevicePixelRatio:1,bodyClientWidth:document.querySelector('body').clientWidth,
+lastClientWidth:document.querySelector('body').clientWidth};if(window.devicePixelRatio){webState.dynamic.lastDevicePixelRatio=window.devicePixelRatio}let webServerUrl='https://'
+;let webSocketUrl='wss://';if(document.location.protocol==='http:'){webServerUrl='http://';webSocketUrl='ws://'}webServerUrl+=window.location.hostname+':'+window.location.port
+;webSocketUrl+=window.location.hostname+':'+window.location.port;var wsocket=null;const beep1=new Audio('sounds/short-beep1.mp3');const beep2=new Audio('sounds/short-beep2.mp3')
+;const beep3=new Audio('sounds/short-beep3.mp3');let beep1InhibitTimer=0;let beep2InhibitTimer=0;let beep3InhibitTimer=0;function beepTimerTick(){if(beep1InhibitTimer>0)beep1InhibitTimer--
+;if(beep2InhibitTimer>0)beep2InhibitTimer--;if(beep3InhibitTimer>0)beep3InhibitTimer--}function inhibitBeep(seconds){beep1InhibitTimer=seconds;beep2InhibitTimer=seconds;beep3InhibitTimer=seconds}
+function playBeep1Sound(){if(beep1InhibitTimer===0){beep1.play();beep1InhibitTimer=5}}function playBeep2Sound(){if(beep2InhibitTimer===0){beep2.play();beep2InhibitTimer=5}}function playBeep3Sound(){
+if(beep3InhibitTimer===0){beep3.play();beep3InhibitTimer=5}}const errorExpireSeconds=5;let errorRemainSeconds=0;function clearError(){const errorDivEl=document.getElementById('errorDiv')
+;errorDivEl.setAttribute('hidden','');const errorContentDivEl=document.getElementById('errorContentDiv');while(errorContentDivEl.firstChild){errorContentDivEl.removeChild(errorContentDivEl.firstChild)
+}errorRemainSeconds=0}function showError(errorString){const errorDivEl=document.getElementById('errorDiv');errorDivEl.removeAttribute('hidden')
+;const errorContentDivEl=document.getElementById('errorContentDiv');const errorMessageEl=document.createElement('div');errorMessageEl.textContent=errorString||'Error: unknown error (2993)'
+;errorContentDivEl.appendChild(errorMessageEl);errorRemainSeconds=errorExpireSeconds}document.addEventListener('show-error-message',function(event){showError(event.detail.message)})
+;document.getElementById('errorDiv').addEventListener('click',function(){clearError()});function errorTimerTickHandler(){if(errorRemainSeconds>0){errorRemainSeconds--;if(errorRemainSeconds===0){
+clearError()}else{document.getElementById('errorTitle').textContent='Tap to Close ('+errorRemainSeconds.toString()+')'}}}function unixTimestamp(){const now=new Date;return parseInt(now.valueOf()/1e3)}
 function checkConnect(code){if(code>=1&&!webState.webConnected){showError('Error: not connected to web server');return false}if(code>=2&&!ircState.ircConnected){
 showError('Error: Not connected to IRC server.');return false}if(code>=3&&!ircState.ircRegistered){showError('Error: Not connected to IRC server.');return false}return true}
 function showRawMessageWindow(){document.getElementById('rawHiddenElements').removeAttribute('hidden');document.getElementById('rawHiddenElementsButton').textContent='-'
@@ -150,7 +150,7 @@ document.getElementById('ircServerTlsCheck').removeAttribute('checked')}document
 ;document.getElementById('headerUser').textContent=' ('+ircState.nickName+')';document.getElementById('nickNameInputId').value=ircState.nickName
 ;document.getElementById('userNameInputId').value=ircState.userName;document.getElementById('realNameInputId').value=ircState.realName
 ;document.getElementById('userModeInputId').value=ircState.userMode;webState.ircConnecting=false}if(!ircState.ircConnected){setVariablesShowingIRCDisconnected();document.title='irc-hybrid-client'}
-if(lastConnectErrorCount!==ircState.count.ircConnectError){lastConnectErrorCount=ircState.count.ircConnectError;if(ircState.count.ircConnectError>0){if(webState.cacheInhibitTimer===0){
+if(lastConnectErrorCount!==ircState.count.ircConnectError){lastConnectErrorCount=ircState.count.ircConnectError;if(ircState.count.ircConnectError>0){if(!webState.cacheReloadInProgress){
 showError('An IRC Server connection error occurred')}}webState.ircConnecting=false}document.dispatchEvent(new CustomEvent('irc-state-changed',{bubbles:true,detail:{}}));updateDivVisibility()
 ;if(!document.getElementById('variablesDivId').hasAttribute('hidden')){
 document.getElementById('variablesPreId').textContent='ircState = '+JSON.stringify(ircState,null,2)+'\n\n'+'webState = '+JSON.stringify(webState,null,2)}
@@ -188,20 +188,25 @@ function displayNoticeMessage(parsedMessage){function _addText(text){document.ge
 ;document.getElementById('noticeMessageDisplay').scrollTop=document.getElementById('noticeMessageDisplay').scrollHeight}switch(parsedMessage.command){case'NOTICE':{const ctcpDelim=1
 ;if(parsedMessage.params.length===2&&parsedMessage.params[1].charCodeAt(0)===ctcpDelim||parsedMessage.params.length===3&&parsedMessage.params[2].charCodeAt(0)===ctcpDelim){}else{
 if(parsedMessage.params[0]===ircState.nickName){if(parsedMessage.nick){_addText(parsedMessage.timestamp+' '+parsedMessage.nick+nickChannelSpacer+parsedMessage.params[1])}else{
-_addText(parsedMessage.timestamp+' '+parsedMessage.prefix+nickChannelSpacer+parsedMessage.params[1])}webState.noticeOpen=true;updateDivVisibility();if(webState.cacheInhibitTimer===0){
+_addText(parsedMessage.timestamp+' '+parsedMessage.prefix+nickChannelSpacer+parsedMessage.params[1])}webState.noticeOpen=true;updateDivVisibility();if(!webState.cacheReloadInProgress){
 setNotActivityIcon()}}else if(ircState.channels.indexOf(parsedMessage.params[0].toLowerCase())>=0){document.dispatchEvent(new CustomEvent('channel-message',{bubbles:true,detail:{
 parsedMessage:parsedMessage}}))}else if(parsedMessage.nick===ircState.nickName){_addText(parsedMessage.timestamp+' [to] '+parsedMessage.params[0]+nickChannelSpacer+parsedMessage.params[1])
 ;webState.noticeOpen=true;updateDivVisibility()}}}break;default:}}document.addEventListener('cache-reload-done',function(event){let markerString='';let timestampString=''
 ;if('detail'in event&&'timestamp'in event.detail){timestampString=unixTimestampToHMS(event.detail.timestamp)}if(timestampString){markerString+=timestampString}markerString+=' '+cacheReloadString+'\n'
 ;document.getElementById('noticeMessageDisplay').value+=markerString;document.getElementById('noticeMessageDisplay').scrollTop=document.getElementById('noticeMessageDisplay').scrollHeight})
-;function displayWallopsMessage(parsedMessage){function _addText(text){document.getElementById('wallopsMessageDisplay').value+=cleanFormatting(text)+'\n'
+;document.addEventListener('cache-reload-error',function(event){let errorString='\n';let timestampString='';if('detail'in event&&'timestamp'in event.detail){
+timestampString=unixTimestampToHMS(event.detail.timestamp)}if(timestampString){errorString+=timestampString}errorString+=' '+cacheErrorString+'\n\n'
+;document.getElementById('noticeMessageDisplay').value=errorString});function displayWallopsMessage(parsedMessage){function _addText(text){
+document.getElementById('wallopsMessageDisplay').value+=cleanFormatting(text)+'\n'
 ;document.getElementById('wallopsMessageDisplay').scrollTop=document.getElementById('wallopsMessageDisplay').scrollHeight}switch(parsedMessage.command){case'WALLOPS':if(parsedMessage.nick){
 _addText(parsedMessage.timestamp+' '+parsedMessage.nick+nickChannelSpacer+parsedMessage.params[0]);webState.wallopsOpen=true}else{
 _addText(parsedMessage.timestamp+' '+parsedMessage.prefix+nickChannelSpacer+parsedMessage.params[0]);webState.wallopsOpen=true}updateDivVisibility();break;default:}}
 document.addEventListener('cache-reload-done',function(event){let markerString='';let timestampString='';if('detail'in event&&'timestamp'in event.detail){
 timestampString=unixTimestampToHMS(event.detail.timestamp)}if(timestampString){markerString+=timestampString}markerString+=' '+cacheReloadString+'\n'
 ;document.getElementById('wallopsMessageDisplay').value+=markerString;document.getElementById('wallopsMessageDisplay').scrollTop=document.getElementById('wallopsMessageDisplay').scrollHeight})
-;function displayRawMessage(inString){document.getElementById('rawMessageDisplay').value+=inString+'\n'
+;document.addEventListener('cache-reload-error',function(event){let errorString='\n';let timestampString='';if('detail'in event&&'timestamp'in event.detail){
+timestampString=unixTimestampToHMS(event.detail.timestamp)}if(timestampString){errorString+=timestampString}errorString+=' '+cacheErrorString+'\n\n'
+;document.getElementById('wallopsMessageDisplay').value=errorString});function displayRawMessage(inString){document.getElementById('rawMessageDisplay').value+=inString+'\n'
 ;document.getElementById('rawMessageDisplay').scrollTop=document.getElementById('rawMessageDisplay').scrollHeight}function displayRawMessageInHex(message){
 const uint8String=new TextEncoder('utf8').encode(message);let hexString='';for(let i=0;i<uint8String.length;i++){hexString+=uint8String[i].toString(16).padStart(2,'0')+' '}displayRawMessage(hexString)
 }function displayFormattedServerMessage(parsedMessage,message){document.dispatchEvent(new CustomEvent('server-message',{bubbles:true,detail:{parsedMessage:parsedMessage,message:message}}))}
@@ -227,37 +232,37 @@ if(message.split(' ')[0]==='webError:'){if(webState.showCommsMessages)displayRaw
 ;if(webState.viewRawMessages){if(webState.showRawInHex)displayRawMessageInHex(message);displayRawMessage(message)}else{
 if(ircMessageCommandDisplayFilter.indexOf(parsedMessage.command.toUpperCase())<0){displayFormattedServerMessage(parsedMessage,message)}}
 if(parseInt(parsedMessage.command)>=400&&parseInt(parsedMessage.command)<500){_showNotExpiredError(message.slice(12,message.length))}switch(parsedMessage.command){case'ERROR':
-if(!ircState.ircRegistered&&parsedMessage.params.length===1){if(webState.cacheInhibitTimer===0){showError('ERROR '+parsedMessage.params[0])}}break;case'KICK':displayChannelMessage(parsedMessage);break
-;case'JOIN':displayChannelMessage(parsedMessage);break;case'MODE':if(parsedMessage.params[0]===ircState.nickName){if(!webState.viewRawMessages){displayFormattedServerMessage(parsedMessage,message)}
-}else if(channelPrefixChars.indexOf(parsedMessage.params[0].charAt(0))>=0){displayChannelMessage(parsedMessage)}else{console.log('Error message MODE to unknown recipient')}break;case'NICK':{
-let pureNick1=parsedMessage.nick.toLowerCase();if(nicknamePrefixChars.indexOf(pureNick1.charAt(0))>=0){pureNick1=pureNick1.slice(1,pureNick1.length)}let pureNick2=parsedMessage.params[0].toLowerCase()
-;if(nicknamePrefixChars.indexOf(pureNick2.charAt(0))>=0){pureNick2=pureNick2.slice(1,pureNick2.length)}let present=false;if(ircState.channels.length>0){for(let i=0;i<ircState.channels.length;i++){
+if(!ircState.ircRegistered&&parsedMessage.params.length===1){if(!webState.cacheReloadInProgress){showError('ERROR '+parsedMessage.params[0])}}break;case'KICK':displayChannelMessage(parsedMessage)
+;break;case'JOIN':displayChannelMessage(parsedMessage);break;case'MODE':if(parsedMessage.params[0]===ircState.nickName){if(!webState.viewRawMessages){
+displayFormattedServerMessage(parsedMessage,message)}}else if(channelPrefixChars.indexOf(parsedMessage.params[0].charAt(0))>=0){displayChannelMessage(parsedMessage)}else{
+console.log('Error message MODE to unknown recipient')}break;case'NICK':{let pureNick1=parsedMessage.nick.toLowerCase();if(nicknamePrefixChars.indexOf(pureNick1.charAt(0))>=0){
+pureNick1=pureNick1.slice(1,pureNick1.length)}let pureNick2=parsedMessage.params[0].toLowerCase();if(nicknamePrefixChars.indexOf(pureNick2.charAt(0))>=0){pureNick2=pureNick2.slice(1,pureNick2.length)}
+let present=false;if(ircState.channels.length>0){for(let i=0;i<ircState.channels.length;i++){if(ircState.channelStates[i].joined&&ircState.channelStates[i].names.length>0){
+for(let j=0;j<ircState.channelStates[i].names.length;j++){let checkNick=ircState.channelStates[i].names[j].toLowerCase();if(nicknamePrefixChars.indexOf(checkNick.charAt(0))>=0){
+checkNick=checkNick.slice(1,checkNick.length)}if(checkNick===pureNick1)present=true;if(checkNick===pureNick2)present=true}}}}if(present){displayChannelMessage(parsedMessage)}else{
+displayFormattedServerMessage(parsedMessage,message)}}break;case'PART':displayChannelMessage(parsedMessage);break;case'NOTICE':if(!parsedMessage.nick||parsedMessage.nick.length===0){
+if(!webState.viewRawMessages){displayFormattedServerMessage(parsedMessage,message)}}else{const ctcpDelim=1;if(parsedMessage.params[1]===null)parsedMessage.params[1]=''
+;if(parsedMessage.params[1].charCodeAt(0)===ctcpDelim){_parseCtcpMessage(parsedMessage)}else{displayNoticeMessage(parsedMessage)}}break;case'PRIVMSG':{const ctcpDelim=1
+;if(parsedMessage.params[1].charCodeAt(0)===ctcpDelim){_parseCtcpMessage(parsedMessage)}else{const chanPrefixIndex=channelPrefixChars.indexOf(parsedMessage.params[0].charAt(0))
+;const channelIndex=ircState.channels.indexOf(parsedMessage.params[0].toLowerCase());if(channelIndex>=0){displayChannelMessage(parsedMessage)}else if(chanPrefixIndex>=0){
+displayFormattedServerMessage(parsedMessage,message)}else{displayPrivateMessage(parsedMessage)}}}break;case'QUIT':{let pureNick=parsedMessage.nick.toLowerCase()
+;if(nicknamePrefixChars.indexOf(pureNick.charAt(0))>=0){pureNick=pureNick.slice(1,pureNick.length)}let present=false;if(ircState.channels.length>0){for(let i=0;i<ircState.channels.length;i++){
 if(ircState.channelStates[i].joined&&ircState.channelStates[i].names.length>0){for(let j=0;j<ircState.channelStates[i].names.length;j++){let checkNick=ircState.channelStates[i].names[j].toLowerCase()
-;if(nicknamePrefixChars.indexOf(checkNick.charAt(0))>=0){checkNick=checkNick.slice(1,checkNick.length)}if(checkNick===pureNick1)present=true;if(checkNick===pureNick2)present=true}}}}if(present){
-displayChannelMessage(parsedMessage)}else{displayFormattedServerMessage(parsedMessage,message)}}break;case'PART':displayChannelMessage(parsedMessage);break;case'NOTICE':
-if(!parsedMessage.nick||parsedMessage.nick.length===0){if(!webState.viewRawMessages){displayFormattedServerMessage(parsedMessage,message)}}else{const ctcpDelim=1
-;if(parsedMessage.params[1]===null)parsedMessage.params[1]='';if(parsedMessage.params[1].charCodeAt(0)===ctcpDelim){_parseCtcpMessage(parsedMessage)}else{displayNoticeMessage(parsedMessage)}}break
-;case'PRIVMSG':{const ctcpDelim=1;if(parsedMessage.params[1].charCodeAt(0)===ctcpDelim){_parseCtcpMessage(parsedMessage)}else{
-const chanPrefixIndex=channelPrefixChars.indexOf(parsedMessage.params[0].charAt(0));const channelIndex=ircState.channels.indexOf(parsedMessage.params[0].toLowerCase());if(channelIndex>=0){
-displayChannelMessage(parsedMessage)}else if(chanPrefixIndex>=0){displayFormattedServerMessage(parsedMessage,message)}else{displayPrivateMessage(parsedMessage)}}}break;case'QUIT':{
-let pureNick=parsedMessage.nick.toLowerCase();if(nicknamePrefixChars.indexOf(pureNick.charAt(0))>=0){pureNick=pureNick.slice(1,pureNick.length)}let present=false;if(ircState.channels.length>0){
-for(let i=0;i<ircState.channels.length;i++){if(ircState.channelStates[i].joined&&ircState.channelStates[i].names.length>0){for(let j=0;j<ircState.channelStates[i].names.length;j++){
-let checkNick=ircState.channelStates[i].names[j].toLowerCase();if(nicknamePrefixChars.indexOf(checkNick.charAt(0))>=0){checkNick=checkNick.slice(1,checkNick.length)}
-if(checkNick===pureNick)present=true}}}}if(present){displayChannelMessage(parsedMessage)}else{displayFormattedServerMessage(parsedMessage,message)}}break;case'TOPIC':
-if(channelPrefixChars.indexOf(parsedMessage.params[0].charAt(0))>=0){displayChannelMessage(parsedMessage)}else{console.log('Error message TOPIC to unknown channel')}break;case'WALLOPS':
-displayWallopsMessage(parsedMessage);break;default:}}}function initWebSocketAuth(callback){const fetchURL=webServerUrl+'/irc/wsauth';const fetchOptions={method:'POST',headers:{
-'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify({purpose:'websocket-auth'})};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()}else{
-throw new Error('Fetch status '+response.status+' '+response.statusText)}}).then(responseJson=>{if(callback){callback(null,ircState)}}).catch(error=>{console.log(error);webState.webConnected=false
-;webState.webConnecting=false;updateDivVisibility();if(callback){callback(error,{})}})}function connectWebSocket(){wsocket=new WebSocket(webSocketUrl+'/irc/ws');webState.websocketCount++
-;wsocket.addEventListener('open',function(event){webState.webConnected=true;webState.webConnecting=false;webState.times.webConnect=unixTimestamp();webState.count.webConnect++;resetHeartbeatTimer()
-;updateDivVisibility();getIrcState(function(err,data){if(!err){document.dispatchEvent(new CustomEvent('update-from-cache',{bubbles:true}))}})});wsocket.addEventListener('close',function(event){
-if(webState.websocketCount>0){webState.websocketCount--;if(webState.websocketCount===0){if(webState.webConnected){if('code'in event&&event.code===3001){
-document.getElementById('reconnectStatusDiv').textContent+='Web page disconnected at user request\n'}else{
-document.getElementById('reconnectStatusDiv').textContent+='Web socket connection closed, count: '+webState.websocketCount+'\n'+'Code: '+event.code+' '+event.reason+'\n';if(!webState.webConnectOn){
-document.getElementById('reconnectStatusDiv').textContent+='Automatic web reconnect is disabled. \nPlease reconnect manually.\n'}}}webState.webConnected=false;webState.webConnecting=false
-;setVariablesShowingIRCDisconnected();updateDivVisibility()}}});wsocket.addEventListener('error',function(error){if(error){console.log(error)}webState.webConnected=false;webState.webConnecting=false})
-;let previousBufferFragment='';function parseStreamBuffer(inBuffer){if(!inBuffer)return;const data=previousBufferFragment.concat(inBuffer);previousBufferFragment='';const len=data.length
-;if(len===0)return;let index=0;let count=0;for(let i=0;i<len;i++){const charCode=data.charCodeAt(i);if(charCode!==10&&charCode!==13){count=count+1}else{if(count>0){
+;if(nicknamePrefixChars.indexOf(checkNick.charAt(0))>=0){checkNick=checkNick.slice(1,checkNick.length)}if(checkNick===pureNick)present=true}}}}if(present){displayChannelMessage(parsedMessage)}else{
+displayFormattedServerMessage(parsedMessage,message)}}break;case'TOPIC':if(channelPrefixChars.indexOf(parsedMessage.params[0].charAt(0))>=0){displayChannelMessage(parsedMessage)}else{
+console.log('Error message TOPIC to unknown channel')}break;case'WALLOPS':displayWallopsMessage(parsedMessage);break;default:}}}function initWebSocketAuth(callback){
+const fetchURL=webServerUrl+'/irc/wsauth';const fetchOptions={method:'POST',headers:{'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify({purpose:'websocket-auth'})}
+;fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()}else{throw new Error('Fetch status '+response.status+' '+response.statusText)}}).then(responseJson=>{if(callback){
+callback(null,ircState)}}).catch(error=>{console.log(error);webState.webConnected=false;webState.webConnecting=false;updateDivVisibility();if(callback){callback(error,{})}})}
+function connectWebSocket(){wsocket=new WebSocket(webSocketUrl+'/irc/ws');webState.websocketCount++;wsocket.addEventListener('open',function(event){webState.webConnected=true
+;webState.webConnecting=false;webState.times.webConnect=unixTimestamp();webState.count.webConnect++;resetHeartbeatTimer();updateDivVisibility();getIrcState(function(err,data){if(!err){
+document.dispatchEvent(new CustomEvent('update-from-cache',{bubbles:true}))}})});wsocket.addEventListener('close',function(event){if(webState.websocketCount>0){webState.websocketCount--
+;if(webState.websocketCount===0){if(webState.webConnected){if('code'in event&&event.code===3001){document.getElementById('reconnectStatusDiv').textContent+='Web page disconnected at user request\n'
+}else{document.getElementById('reconnectStatusDiv').textContent+='Web socket connection closed, count: '+webState.websocketCount+'\n'+'Code: '+event.code+' '+event.reason+'\n'
+;if(!webState.webConnectOn){document.getElementById('reconnectStatusDiv').textContent+='Automatic web reconnect is disabled. \nPlease reconnect manually.\n'}}}webState.webConnected=false
+;webState.webConnecting=false;setVariablesShowingIRCDisconnected();updateDivVisibility()}}});wsocket.addEventListener('error',function(error){if(error){console.log(error)}webState.webConnected=false
+;webState.webConnecting=false});let previousBufferFragment='';function parseStreamBuffer(inBuffer){if(!inBuffer)return;const data=previousBufferFragment.concat(inBuffer);previousBufferFragment=''
+;const len=data.length;if(len===0)return;let index=0;let count=0;for(let i=0;i<len;i++){const charCode=data.charCodeAt(i);if(charCode!==10&&charCode!==13){count=count+1}else{if(count>0){
 const message=data.slice(index,index+count);_parseBufferMessage(message)}index=i+1;count=0}}if(count>0){previousBufferFragment=data.slice(index,index+count)}}
 wsocket.addEventListener('message',function(event){parseStreamBuffer(event.data)})}function _sendIrcServerMessage(message){if(!checkConnect(3))return;const body={message:message}
 ;const fetchURL=webServerUrl+'/irc/message';const fetchOptions={method:'POST',headers:{'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify(body)}
@@ -458,9 +463,10 @@ webState.channels.splice(webStateChannelsIndex,1);webState.channelStates.splice(
 const index=ircState.channels.indexOf(name.toLowerCase());if(index>=0){if(!ircState.channelStates[index].joined){const fetchURL=webServerUrl+'/irc/prune';const fetchOptions={method:'POST',headers:{
 'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify({channel:name})};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()}else{
 throw new Error('Fetch status '+response.status+' '+response.statusText)}}).then(responseJson=>{if(responseJson.error){showError(responseJson.message)}else{_removeChannelFromDom()}}).catch(error=>{
-console.log(error)})}}else{_removeChannelFromDom()}});channelRefreshButtonEl.addEventListener('click',function(){document.dispatchEvent(new CustomEvent('update-from-cache',{bubbles:true}))
-;channelNamesDisplayEl.value='';_sendIrcServerMessage('NAMES '+name)});channelSendButtonEl.addEventListener('click',function(){_sendTextToChannel(channelIndex,channelInputAreaEl)
-;channelInputAreaEl.focus();resetChanActivityIcon(channelIndex);activityIconInhibitTimer=activityIconInhibitTimerValue});channelInputAreaEl.addEventListener('input',function(event){
+console.log(error)})}}else{_removeChannelFromDom()}});channelRefreshButtonEl.addEventListener('click',function(){if(!webState.cacheReloadInProgress){
+document.dispatchEvent(new CustomEvent('update-from-cache',{bubbles:true}));channelNamesDisplayEl.value='';_sendIrcServerMessage('NAMES '+name)}})
+;channelSendButtonEl.addEventListener('click',function(){_sendTextToChannel(channelIndex,channelInputAreaEl);channelInputAreaEl.focus();resetChanActivityIcon(channelIndex)
+;activityIconInhibitTimer=activityIconInhibitTimerValue});channelInputAreaEl.addEventListener('input',function(event){
 if(event.inputType==='insertText'&&event.data===null||event.inputType==='insertLineBreak'){stripOneCrLfFromElement(channelInputAreaEl);_sendTextToChannel(channelIndex,channelInputAreaEl)
 ;resetChanActivityIcon(channelIndex);activityIconInhibitTimer=activityIconInhibitTimerValue}});channelMainSectionEl.addEventListener('click',function(){resetChanActivityIcon(channelIndex)
 ;activityIconInhibitTimer=activityIconInhibitTimerValue});function updateVisibility(){const index=ircState.channels.indexOf(name.toLowerCase());if(index>=0){if(ircState.channelStates[index].joined){
@@ -548,26 +554,26 @@ channelBottomDivEl.removeAttribute('hidden');channelHideButtonEl.textContent='-'
 webState.channelStates[webStateIndex].lastJoined=ircState.channelStates[ircStateIndex].joined}}_updateNickList();_updateChannelTitle();updateVisibility()})
 ;document.addEventListener('channel-message',function(event){function _addText(timestamp,nick,text){let out='';if(channelMainSectionEl.hasAttribute('brief-enabled')){out=timestamp+' ';if(nick==='*'){
 out+=nick+nickChannelSpacer}else{out+=nick+nickChannelSpacer+'\n'}out+=cleanFormatting(text)+'\n\n'}else{out=timestamp+' '+nick.padStart(maxNickLength,' ')+nickChannelSpacer+cleanFormatting(text)+'\n'
-}channelTextAreaEl.value+=out;channelTextAreaEl.scrollTop=channelTextAreaEl.scrollHeight}const parsedMessage=event.detail.parsedMessage;switch(parsedMessage.command){case'KICK':
-if(parsedMessage.params[0].toLowerCase()===name.toLowerCase()){let reason=' ';if(parsedMessage.params[2])reason=parsedMessage.params[2];if(channelMainSectionEl.hasAttribute('brief-enabled')){
-_addText(parsedMessage.timestamp,'*',parsedMessage.nick+' has kicked '+parsedMessage.params[1])}else{
+}channelTextAreaEl.value+=out;if(!webState.cacheReloadInProgress){channelTextAreaEl.scrollTop=channelTextAreaEl.scrollHeight}}const parsedMessage=event.detail.parsedMessage
+;switch(parsedMessage.command){case'KICK':if(parsedMessage.params[0].toLowerCase()===name.toLowerCase()){let reason=' ';if(parsedMessage.params[2])reason=parsedMessage.params[2]
+;if(channelMainSectionEl.hasAttribute('brief-enabled')){_addText(parsedMessage.timestamp,'*',parsedMessage.nick+' has kicked '+parsedMessage.params[1])}else{
 _addText(parsedMessage.timestamp,'*',parsedMessage.nick+' has kicked '+parsedMessage.params[1]+' ('+reason+')')}}break;case'JOIN':if(parsedMessage.params[0].toLowerCase()===name.toLowerCase()){
 if(channelMainSectionEl.hasAttribute('brief-enabled')){_addText(parsedMessage.timestamp,'*',parsedMessage.nick+' has joined')}else{
-_addText(parsedMessage.timestamp,'*',parsedMessage.nick+' ('+parsedMessage.host+') has joined')}if(channelMainSectionEl.hasAttribute('beep2-enabled')&&webState.cacheInhibitTimer===0){playBeep1Sound()}
-channelBottomDivEl.removeAttribute('hidden');channelHideButtonEl.textContent='-'}break;case'MODE':if(parsedMessage.params[0].toLowerCase()===name.toLowerCase()){if(parsedMessage.nick){
+_addText(parsedMessage.timestamp,'*',parsedMessage.nick+' ('+parsedMessage.host+') has joined')}if(channelMainSectionEl.hasAttribute('beep2-enabled')&&!webState.cacheReloadInProgress){playBeep1Sound()
+}channelBottomDivEl.removeAttribute('hidden');channelHideButtonEl.textContent='-'}break;case'MODE':if(parsedMessage.params[0].toLowerCase()===name.toLowerCase()){if(parsedMessage.nick){
 _addText(parsedMessage.timestamp,'*','Mode '+JSON.stringify(parsedMessage.params)+' by '+parsedMessage.nick)}else{
 _addText(parsedMessage.timestamp,'*','Mode '+JSON.stringify(parsedMessage.params)+' by '+parsedMessage.prefix)}}break;case'NICK':{let present=false
 ;if(_isNickInChannel(parsedMessage.nick,name))present=true;if(_isNickInChannel(parsedMessage.params[0],name))present=true;if(present){
 _addText(parsedMessage.timestamp,'*',parsedMessage.nick+' is now known as '+parsedMessage.params[0])}}break;case'NOTICE':if(parsedMessage.params[0].toLowerCase()===name.toLowerCase()){
 _addText(parsedMessage.timestamp,'*','Notice('+parsedMessage.nick+' to '+parsedMessage.params[0]+') '+parsedMessage.params[1]);channelBottomDivEl.removeAttribute('hidden')
-;channelHideButtonEl.textContent='-';if(document.activeElement!==channelInputAreaEl&&document.activeElement!==channelSendButtonEl&&webState.cacheInhibitTimer===0&&activityIconInhibitTimer===0){
+;channelHideButtonEl.textContent='-';if(document.activeElement!==channelInputAreaEl&&document.activeElement!==channelSendButtonEl&&!webState.cacheReloadInProgress&&activityIconInhibitTimer===0){
 setChanActivityIcon(channelIndex)}}break;case'PART':if(parsedMessage.params[0].toLowerCase()===name.toLowerCase()){let reason=' ';if(parsedMessage.params[1])reason=parsedMessage.params[1]
 ;if(channelMainSectionEl.hasAttribute('brief-enabled')){_addText(parsedMessage.timestamp,'*',parsedMessage.nick+' has left')}else{
 _addText(parsedMessage.timestamp,'*',parsedMessage.nick+' ('+parsedMessage.host+') has left '+'('+reason+')')}}break;case'PRIVMSG':if(parsedMessage.params[0].toLowerCase()===name.toLowerCase()){
-_addText(parsedMessage.timestamp,parsedMessage.nick,parsedMessage.params[1]);if(channelMainSectionEl.hasAttribute('beep1-enabled')&&webState.cacheInhibitTimer===0){playBeep1Sound()}
-if(channelMainSectionEl.hasAttribute('beep3-enabled')){const checkLine=parsedMessage.params[1].toLowerCase();if(checkLine.indexOf(ircState.nickName.toLowerCase())>=0&&webState.cacheInhibitTimer===0){
+_addText(parsedMessage.timestamp,parsedMessage.nick,parsedMessage.params[1]);if(channelMainSectionEl.hasAttribute('beep1-enabled')&&!webState.cacheReloadInProgress){playBeep1Sound()}
+if(channelMainSectionEl.hasAttribute('beep3-enabled')){const checkLine=parsedMessage.params[1].toLowerCase();if(checkLine.indexOf(ircState.nickName.toLowerCase())>=0&&!webState.cacheReloadInProgress){
 setTimeout(playBeep2Sound,250)}}channelBottomDivEl.removeAttribute('hidden');channelHideButtonEl.textContent='-'
-;if(document.activeElement!==channelInputAreaEl&&document.activeElement!==channelSendButtonEl&&webState.cacheInhibitTimer===0&&activityIconInhibitTimer===0){setChanActivityIcon(channelIndex)}}break
+;if(document.activeElement!==channelInputAreaEl&&document.activeElement!==channelSendButtonEl&&!webState.cacheReloadInProgress&&activityIconInhibitTimer===0){setChanActivityIcon(channelIndex)}}break
 ;case'QUIT':if(_isNickInChannel(parsedMessage.nick,name)){let reason=' ';if(parsedMessage.params[0])reason=parsedMessage.params[0];if(channelMainSectionEl.hasAttribute('brief-enabled')){
 _addText(parsedMessage.timestamp,'*',parsedMessage.nick+' has quit')}else{_addText(parsedMessage.timestamp,'*',parsedMessage.nick+' ('+parsedMessage.host+') has quit '+'('+reason+')')}}break
 ;case'TOPIC':if(parsedMessage.params[0].toLowerCase()===name.toLowerCase()){
@@ -575,7 +581,9 @@ _addText(parsedMessage.timestamp,'*','Topic for '+parsedMessage.params[0]+' chan
 ;document.addEventListener('erase-before-reload',function(event){channelTextAreaEl.value='';channelInputAreaEl.value=''});document.addEventListener('cache-reload-done',function(event){
 let markerString='';let timestampString='';if('detail'in event&&'timestamp'in event.detail){timestampString=unixTimestampToHMS(event.detail.timestamp)}if(timestampString){markerString+=timestampString
 }markerString+=' '+cacheReloadString+'\n';if(channelMainSectionEl.hasAttribute('brief-enabled')){markerString+='\n'}channelTextAreaEl.value+=markerString
-;channelTextAreaEl.scrollTop=channelTextAreaEl.scrollHeight});updateVisibility();const adjustChannelInputToWidowWidth=function(){const mar1=webState.dynamic.commonMargin
+;channelTextAreaEl.scrollTop=channelTextAreaEl.scrollHeight});document.addEventListener('cache-reload-error',function(event){let errorString='\n';let timestampString=''
+;if('detail'in event&&'timestamp'in event.detail){timestampString=unixTimestampToHMS(event.detail.timestamp)}if(timestampString){errorString+=timestampString}errorString+=' '+cacheErrorString+'\n\n'
+;channelTextAreaEl.value=errorString});updateVisibility();const adjustChannelInputToWidowWidth=function(){const mar1=webState.dynamic.commonMargin
 ;const mar2=webState.dynamic.commonMargin+5+webState.dynamic.sendButtonWidthPx
 ;const nicknameListPixelWidth=webState.dynamic.inputAreaSideWidthPx+channelNamesCharWidth*webState.dynamic.inputAreaCharWidthPx;const mar3=webState.dynamic.commonMargin+nicknameListPixelWidth+6
 ;if(webState.dynamic.bodyClientWidth>mobileBreakpointPx){channelTextAreaEl.setAttribute('cols',calcInputAreaColSize(mar3));channelNamesDisplayEl.removeAttribute('hidden')}else{
@@ -625,38 +633,41 @@ function createPrivateMessageEl(name,parsedMessage){if(webState.activePrivateMes
 ;privMsgButtonDiv1El.appendChild(privMsgInputAreaEl);privMsgButtonDiv1El.appendChild(privMsgSendButtonEl);privMsgBottomDiv4El.appendChild(privMsgBeep1CBInputEl)
 ;privMsgBottomDiv4El.appendChild(privMsgBeep1CBTitleEl);privMsgBottomDivEl.appendChild(privMsgTextAreaEl);privMsgBottomDivEl.appendChild(privMsgButtonDiv1El)
 ;privMsgBottomDivEl.appendChild(privMsgBottomDiv4El);privMsgSectionEl.appendChild(privMsgTopDivEl);privMsgSectionEl.appendChild(privMsgBottomDivEl);privMsgContainerDivEl.appendChild(privMsgSectionEl)
-;privMsgTextAreaEl.value+=parsedMessage.timestamp+' '+parsedMessage.nick+pmNameSpacer+cleanFormatting(parsedMessage.params[1])+'\n';privMsgTextAreaEl.scrollTop=privMsgTextAreaEl.scrollHeight
-;let activityIconInhibitTimer=0;setInterval(function(){if(activityIconInhibitTimer>0)activityIconInhibitTimer--},1e3);document.addEventListener('erase-before-reload',function(event){
-privMsgTextAreaEl.value='';privMsgInputAreaEl.value=''});document.addEventListener('cache-reload-done',function(event){let markerString='';let timestampString=''
-;if('detail'in event&&'timestamp'in event.detail){timestampString=unixTimestampToHMS(event.detail.timestamp)}if(timestampString){markerString+=timestampString}markerString+=' '+cacheReloadString+'\n'
-;privMsgTextAreaEl.value+=markerString;privMsgTextAreaEl.scrollTop=privMsgTextAreaEl.scrollHeight});document.addEventListener('priv-msg-hide-all',function(event){
-privMsgBottomDivEl.setAttribute('hidden','');privMsgHideButtonEl.textContent='+';privMsgTopRightHidableDivEl.setAttribute('hidden','');privMsgSectionEl.setAttribute('hidden','')})
-;document.addEventListener('priv-msg-show-all',function(event){privMsgSectionEl.removeAttribute('hidden')});privMsgHideButtonEl.addEventListener('click',function(){
-if(privMsgBottomDivEl.hasAttribute('hidden')){privMsgBottomDivEl.removeAttribute('hidden');privMsgHideButtonEl.textContent='-';privMsgTopRightHidableDivEl.removeAttribute('hidden')}else{
-privMsgSectionEl.setAttribute('hidden','');privMsgBottomDivEl.setAttribute('hidden','');privMsgHideButtonEl.textContent='+';privMsgTopRightHidableDivEl.setAttribute('hidden','')}})
-;privMsgTallerButtonEl.addEventListener('click',function(){const newRows=parseInt(privMsgTextAreaEl.getAttribute('rows'))+5;privMsgTextAreaEl.setAttribute('rows',newRows.toString())})
-;privMsgNormalButtonEl.addEventListener('click',function(){privMsgTextAreaEl.setAttribute('rows','6')});privMsgClearButtonEl.addEventListener('click',function(){privMsgTextAreaEl.value=''
-;privMsgTextAreaEl.setAttribute('rows','6')});document.addEventListener('show-all-divs',function(event){privMsgSectionEl.removeAttribute('hidden')})
-;document.addEventListener('hide-all-divs',function(event){privMsgBottomDivEl.setAttribute('hidden','');privMsgHideButtonEl.textContent='+';privMsgTopRightHidableDivEl.setAttribute('hidden','')
-;privMsgSectionEl.setAttribute('hidden','')});privMsgSendButtonEl.addEventListener('click',function(){_sendPrivMessageToUser(name,privMsgInputAreaEl);privMsgInputAreaEl.focus()
-;resetPmActivityIcon(privMsgIndex);activityIconInhibitTimer=activityIconInhibitTimerValue});privMsgInputAreaEl.addEventListener('input',function(event){
-if(event.inputType==='insertText'&&event.data===null||event.inputType==='insertLineBreak'){stripOneCrLfFromElement(privMsgInputAreaEl);_sendPrivMessageToUser(name,privMsgInputAreaEl)
-;resetPmActivityIcon(privMsgIndex);activityIconInhibitTimer=activityIconInhibitTimerValue}});privMsgSectionEl.addEventListener('click',function(){resetPmActivityIcon(privMsgIndex)
-;activityIconInhibitTimer=activityIconInhibitTimerValue});function updateVisibility(){if(privMsgSectionEl.hasAttribute('beep1-enabled')){privMsgBeep1CBInputEl.checked=true}else{
-privMsgBeep1CBInputEl.checked=false}}privMsgBeep1CBInputEl.addEventListener('click',function(e){if(privMsgSectionEl.hasAttribute('beep1-enabled')){privMsgSectionEl.removeAttribute('beep1-enabled')
-}else{privMsgSectionEl.setAttribute('beep1-enabled','');playBeep3Sound()}updateVisibility()});document.addEventListener('cancel-beep-sounds',function(event){
-privMsgSectionEl.removeAttribute('beep1-enabled')});document.addEventListener('private-message',function(event){function _addText(text){privMsgTextAreaEl.value+=cleanFormatting(text)+'\n'
-;privMsgTextAreaEl.scrollTop=privMsgTextAreaEl.scrollHeight}const parsedMessage=event.detail.parsedMessage;switch(parsedMessage.command){case'PRIVMSG':if(parsedMessage.nick===ircState.nickName){
-if(parsedMessage.params[0].toLowerCase()===name.toLowerCase()){if('isPmCtcpAction'in parsedMessage){_addText(parsedMessage.timestamp+pmNameSpacer+parsedMessage.nick+' '+parsedMessage.params[1])}else{
-_addText(parsedMessage.timestamp+' '+parsedMessage.nick+pmNameSpacer+parsedMessage.params[1])}if(privMsgSectionEl.hasAttribute('beep1-enabled')&&webState.cacheInhibitTimer===0){playBeep3Sound()}
-privMsgSectionEl.removeAttribute('hidden');privMsgBottomDivEl.removeAttribute('hidden');privMsgHideButtonEl.textContent='-';privMsgTopRightHidableDivEl.removeAttribute('hidden')
-;document.getElementById('privMsgMainHiddenDiv').removeAttribute('hidden');document.getElementById('privMsgMainHiddenButton').textContent='-'}}else{
-if(parsedMessage.nick.toLowerCase()===name.toLowerCase()){if('isPmCtcpAction'in parsedMessage){_addText(parsedMessage.timestamp+pmNameSpacer+parsedMessage.nick+' '+parsedMessage.params[1])}else{
-_addText(parsedMessage.timestamp+' '+parsedMessage.nick+pmNameSpacer+parsedMessage.params[1])}if(privMsgSectionEl.hasAttribute('beep1-enabled')&&webState.cacheInhibitTimer===0){playBeep3Sound()}
-privMsgSectionEl.removeAttribute('hidden');privMsgBottomDivEl.removeAttribute('hidden');privMsgHideButtonEl.textContent='-';privMsgTopRightHidableDivEl.removeAttribute('hidden')
-;document.getElementById('privMsgMainHiddenDiv').removeAttribute('hidden');document.getElementById('privMsgMainHiddenButton').textContent='-'
-;if(document.activeElement!==privMsgInputAreaEl&&document.activeElement!==privMsgSendButtonEl&&webState.cacheInhibitTimer===0&&activityIconInhibitTimer===0){setPmActivityIcon(privMsgIndex)}}}break
-;default:}});if(webState.cacheInhibitTimer===0){setPmActivityIcon(privMsgIndex)}document.getElementById('privMsgMainHiddenDiv').removeAttribute('hidden')
+;privMsgTextAreaEl.value+=parsedMessage.timestamp+' '+parsedMessage.nick+pmNameSpacer+cleanFormatting(parsedMessage.params[1])+'\n';if(!webState.cacheReloadInProgress){
+privMsgTextAreaEl.scrollTop=privMsgTextAreaEl.scrollHeight}let activityIconInhibitTimer=0;setInterval(function(){if(activityIconInhibitTimer>0)activityIconInhibitTimer--},1e3)
+;document.addEventListener('erase-before-reload',function(event){privMsgTextAreaEl.value='';privMsgInputAreaEl.value=''});document.addEventListener('cache-reload-done',function(event){
+let markerString='';let timestampString='';if('detail'in event&&'timestamp'in event.detail){timestampString=unixTimestampToHMS(event.detail.timestamp)}if(timestampString){markerString+=timestampString
+}markerString+=' '+cacheReloadString+'\n';privMsgTextAreaEl.value+=markerString;privMsgTextAreaEl.scrollTop=privMsgTextAreaEl.scrollHeight})
+;document.addEventListener('cache-reload-error',function(event){let errorString='\n';let timestampString='';if('detail'in event&&'timestamp'in event.detail){
+timestampString=unixTimestampToHMS(event.detail.timestamp)}if(timestampString){errorString+=timestampString}errorString+=' '+cacheErrorString+'\n\n';privMsgTextAreaEl.value=errorString})
+;document.addEventListener('priv-msg-hide-all',function(event){privMsgBottomDivEl.setAttribute('hidden','');privMsgHideButtonEl.textContent='+';privMsgTopRightHidableDivEl.setAttribute('hidden','')
+;privMsgSectionEl.setAttribute('hidden','')});document.addEventListener('priv-msg-show-all',function(event){privMsgSectionEl.removeAttribute('hidden')})
+;privMsgHideButtonEl.addEventListener('click',function(){if(privMsgBottomDivEl.hasAttribute('hidden')){privMsgBottomDivEl.removeAttribute('hidden');privMsgHideButtonEl.textContent='-'
+;privMsgTopRightHidableDivEl.removeAttribute('hidden')}else{privMsgSectionEl.setAttribute('hidden','');privMsgBottomDivEl.setAttribute('hidden','');privMsgHideButtonEl.textContent='+'
+;privMsgTopRightHidableDivEl.setAttribute('hidden','')}});privMsgTallerButtonEl.addEventListener('click',function(){const newRows=parseInt(privMsgTextAreaEl.getAttribute('rows'))+5
+;privMsgTextAreaEl.setAttribute('rows',newRows.toString())});privMsgNormalButtonEl.addEventListener('click',function(){privMsgTextAreaEl.setAttribute('rows','6')})
+;privMsgClearButtonEl.addEventListener('click',function(){privMsgTextAreaEl.value='';privMsgTextAreaEl.setAttribute('rows','6')});document.addEventListener('show-all-divs',function(event){
+privMsgSectionEl.removeAttribute('hidden')});document.addEventListener('hide-all-divs',function(event){privMsgBottomDivEl.setAttribute('hidden','');privMsgHideButtonEl.textContent='+'
+;privMsgTopRightHidableDivEl.setAttribute('hidden','');privMsgSectionEl.setAttribute('hidden','')});privMsgSendButtonEl.addEventListener('click',function(){
+_sendPrivMessageToUser(name,privMsgInputAreaEl);privMsgInputAreaEl.focus();resetPmActivityIcon(privMsgIndex);activityIconInhibitTimer=activityIconInhibitTimerValue})
+;privMsgInputAreaEl.addEventListener('input',function(event){if(event.inputType==='insertText'&&event.data===null||event.inputType==='insertLineBreak'){stripOneCrLfFromElement(privMsgInputAreaEl)
+;_sendPrivMessageToUser(name,privMsgInputAreaEl);resetPmActivityIcon(privMsgIndex);activityIconInhibitTimer=activityIconInhibitTimerValue}});privMsgSectionEl.addEventListener('click',function(){
+resetPmActivityIcon(privMsgIndex);activityIconInhibitTimer=activityIconInhibitTimerValue});function updateVisibility(){if(privMsgSectionEl.hasAttribute('beep1-enabled')){
+privMsgBeep1CBInputEl.checked=true}else{privMsgBeep1CBInputEl.checked=false}}privMsgBeep1CBInputEl.addEventListener('click',function(e){if(privMsgSectionEl.hasAttribute('beep1-enabled')){
+privMsgSectionEl.removeAttribute('beep1-enabled')}else{privMsgSectionEl.setAttribute('beep1-enabled','');playBeep3Sound()}updateVisibility()})
+;document.addEventListener('cancel-beep-sounds',function(event){privMsgSectionEl.removeAttribute('beep1-enabled')});document.addEventListener('private-message',function(event){function _addText(text){
+privMsgTextAreaEl.value+=cleanFormatting(text)+'\n';if(!webState.cacheReloadInProgress){privMsgTextAreaEl.scrollTop=privMsgTextAreaEl.scrollHeight}}const parsedMessage=event.detail.parsedMessage
+;switch(parsedMessage.command){case'PRIVMSG':if(parsedMessage.nick===ircState.nickName){if(parsedMessage.params[0].toLowerCase()===name.toLowerCase()){if('isPmCtcpAction'in parsedMessage){
+_addText(parsedMessage.timestamp+pmNameSpacer+parsedMessage.nick+' '+parsedMessage.params[1])}else{_addText(parsedMessage.timestamp+' '+parsedMessage.nick+pmNameSpacer+parsedMessage.params[1])}
+if(privMsgSectionEl.hasAttribute('beep1-enabled')&&!webState.cacheReloadInProgress){playBeep3Sound()}privMsgSectionEl.removeAttribute('hidden');privMsgBottomDivEl.removeAttribute('hidden')
+;privMsgHideButtonEl.textContent='-';privMsgTopRightHidableDivEl.removeAttribute('hidden');document.getElementById('privMsgMainHiddenDiv').removeAttribute('hidden')
+;document.getElementById('privMsgMainHiddenButton').textContent='-'}}else{if(parsedMessage.nick.toLowerCase()===name.toLowerCase()){if('isPmCtcpAction'in parsedMessage){
+_addText(parsedMessage.timestamp+pmNameSpacer+parsedMessage.nick+' '+parsedMessage.params[1])}else{_addText(parsedMessage.timestamp+' '+parsedMessage.nick+pmNameSpacer+parsedMessage.params[1])}
+if(privMsgSectionEl.hasAttribute('beep1-enabled')&&!webState.cacheReloadInProgress){playBeep3Sound()}privMsgSectionEl.removeAttribute('hidden');privMsgBottomDivEl.removeAttribute('hidden')
+;privMsgHideButtonEl.textContent='-';privMsgTopRightHidableDivEl.removeAttribute('hidden');document.getElementById('privMsgMainHiddenDiv').removeAttribute('hidden')
+;document.getElementById('privMsgMainHiddenButton').textContent='-'
+;if(document.activeElement!==privMsgInputAreaEl&&document.activeElement!==privMsgSendButtonEl&&!webState.cacheReloadInProgress&&activityIconInhibitTimer===0){setPmActivityIcon(privMsgIndex)}}}break
+;default:}});if(!webState.cacheReloadInProgress){setPmActivityIcon(privMsgIndex)}document.getElementById('privMsgMainHiddenDiv').removeAttribute('hidden')
 ;document.getElementById('privMsgMainHiddenButton').textContent='-';const adjustPMInputToWidowWidth=function(){const mar1=webState.dynamic.commonMargin
 ;const mar2=webState.dynamic.commonMargin+5+webState.dynamic.sendButtonWidthPx;privMsgTextAreaEl.setAttribute('cols',calcInputAreaColSize(mar1))
 ;privMsgInputAreaEl.setAttribute('cols',calcInputAreaColSize(mar2))};window.addEventListener('resize-custom-elements',function(event){if(webState.dynamic.inputAreaCharWidthPx){
@@ -736,12 +747,15 @@ displayRawMessage(cleanFormatting(cleanCtcpDelimiter(event.detail.parsedMessage.
 displayRawMessage(cleanFormatting(cleanCtcpDelimiter(event.detail.parsedMessage.timestamp+' '+'NOTICE '+event.detail.parsedMessage.params[0]+' '+event.detail.parsedMessage.params[1])));break
 ;case'QUIT':{let reason=' ';if(event.detail.parsedMessage.params[0]){reason=event.detail.parsedMessage.params[0]
 ;displayRawMessage(cleanFormatting(cleanCtcpDelimiter(event.detail.parsedMessage.timestamp+' '+'(No channel) '+event.detail.parsedMessage.nick+' has quit ('+reason+')')))}}break;default:
-displayRawMessage(cleanFormatting(cleanCtcpDelimiter(substituteHmsTime(event.detail.message))))}if(webState.cacheInhibitTimer===0){showRawMessageWindow()}})
+displayRawMessage(cleanFormatting(cleanCtcpDelimiter(substituteHmsTime(event.detail.message))))}if(!webState.cacheReloadInProgress){showRawMessageWindow()}})
 ;document.addEventListener('cache-reload-done',function(event){let markerString='';let timestampString='';if('detail'in event&&'timestamp'in event.detail){
 timestampString=unixTimestampToHMS(event.detail.timestamp)}if(timestampString){markerString+=timestampString}markerString+=' '+cacheReloadString+'\n'
 ;document.getElementById('rawMessageDisplay').value+=markerString;document.getElementById('rawMessageDisplay').scrollTop=document.getElementById('rawMessageDisplay').scrollHeight})
-;document.getElementById('rawHiddenElementsButton').addEventListener('click',function(){if(document.getElementById('rawHiddenElements').hasAttribute('hidden')){showRawMessageWindow()}else{
-hideRawMessageWindow()}});document.getElementById('rawClearButton').addEventListener('click',function(){document.getElementById('rawMessageDisplay').value=''
+;document.addEventListener('cache-reload-error',function(event){let errorString='\n';let timestampString='';if('detail'in event&&'timestamp'in event.detail){
+timestampString=unixTimestampToHMS(event.detail.timestamp)}if(timestampString){errorString+=timestampString}errorString+=' '+cacheErrorString+'\n\n'
+;document.getElementById('rawMessageDisplay').value=errorString});document.getElementById('rawHiddenElementsButton').addEventListener('click',function(){
+if(document.getElementById('rawHiddenElements').hasAttribute('hidden')){showRawMessageWindow()}else{hideRawMessageWindow()}})
+;document.getElementById('rawClearButton').addEventListener('click',function(){document.getElementById('rawMessageDisplay').value=''
 ;document.getElementById('rawMessageDisplay').setAttribute('rows','10');document.getElementById('rawMessageInputId').value=''})
 ;document.getElementById('rawTallerButton').addEventListener('click',function(){const newRows=parseInt(document.getElementById('rawMessageDisplay').getAttribute('rows'))+10
 ;document.getElementById('rawMessageDisplay').setAttribute('rows',newRows.toString())});document.getElementById('rawNormalButton').addEventListener('click',function(){
@@ -749,7 +763,7 @@ document.getElementById('rawMessageDisplay').setAttribute('rows','10')});documen
 if(document.getElementById('hiddenDebugDiv').hasAttribute('hidden')){document.getElementById('hiddenDebugDiv').removeAttribute('hidden')
 ;document.getElementById('showDebugButton').textContent='Less...'}else{document.getElementById('hiddenDebugDiv').setAttribute('hidden','')
 ;document.getElementById('variablesDivId').setAttribute('hidden','');document.getElementById('showDebugButton').textContent='More...'}})
-;document.getElementById('loadFromCacheButton').addEventListener('click',function(){document.dispatchEvent(new CustomEvent('update-from-cache',{bubbles:true}))})
+;document.getElementById('loadFromCacheButton').addEventListener('click',function(){if(!webState.cacheReloadInProgress){document.dispatchEvent(new CustomEvent('update-from-cache',{bubbles:true}))}})
 ;document.getElementById('showAllDivsButton').addEventListener('click',function(){document.dispatchEvent(new CustomEvent('show-all-divs',{bubbles:true}))})
 ;document.getElementById('hideAllDivsButton').addEventListener('click',function(){document.dispatchEvent(new CustomEvent('hide-all-divs',{bubbles:true}))})
 ;document.getElementById('variablesButtonId').addEventListener('click',function(){if(document.getElementById('variablesDivId').hasAttribute('hidden')){
@@ -765,24 +779,25 @@ if(document.getElementById('showRawInHexCheckbox').checked){webState.showRawInHe
 ;document.getElementById('showCommsCheckbox').addEventListener('click',function(){if(document.getElementById('showCommsCheckbox').checked){webState.showCommsMessages=true}else{
 webState.showCommsMessages=false}document.dispatchEvent(new CustomEvent('update-from-cache',{bubbles:true}))});document.getElementById('infoOpenCloseButton').addEventListener('click',function(){
 if(document.getElementById('hiddenInfoDiv').hasAttribute('hidden')){document.getElementById('hiddenInfoDiv').removeAttribute('hidden');document.getElementById('infoOpenCloseButton').textContent='-'
-}else{document.getElementById('hiddenInfoDiv').setAttribute('hidden','');document.getElementById('infoOpenCloseButton').textContent='+'}});function updateFromCache(){webState.cacheInhibitTimer=3
-;resetNotActivityIcon();resetPmActivityIcon(-1);resetChanActivityIcon(-1);document.dispatchEvent(new CustomEvent('erase-before-reload',{bubbles:true,detail:{}}))
-;const fetchURL=webServerUrl+'/irc/cache';const fetchOptions={method:'GET',headers:{Accept:'application/json'}};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()
-}else{throw new Error('Fetch status '+response.status+' '+response.statusText)}}).then(responseArray=>{if(Array.isArray(responseArray)&&responseArray.length>0){
-const privMsgSessionEl=document.getElementById('privateMessageContainerDiv');while(privMsgSessionEl.firstChild){privMsgSessionEl.removeChild(privMsgSessionEl.firstChild)}webState.lastPMNick=''
-;webState.activePrivateMessageNicks=[];document.getElementById('noticeMessageDisplay').value='';document.getElementById('wallopsMessageDisplay').value=''
-;document.getElementById('pmNickNameInputId').value='';document.getElementById('newChannelNameInputId').value='';document.getElementById('rawMessageDisplay').value=''
-;document.getElementById('rawMessageInputId').value='';webState.noticeOpen=false;webState.wallopsOpen=false;for(let i=0;i<responseArray.length;i++){if(responseArray[i].length>0){
-_parseBufferMessage(responseArray[i])}}const timestamp=unixTimestamp();document.dispatchEvent(new CustomEvent('cache-reload-done',{bubbles:true,detail:{timestamp:timestamp}}))}}).catch(error=>{
-console.log(error)})}window.addEventListener('update-from-cache',function(event){updateFromCache()});function cacheInhibitTimerTick(){if(webState.cacheInhibitTimer>0)webState.cacheInhibitTimer--}
-webState.cacheInhibitTimer=3;document.getElementById('serverTerminateButton').addEventListener('click',function(){console.log('Requesting backend server to terminate')
-;const fetchURL=webServerUrl+'/terminate';const fetchOptions={method:'POST',headers:{'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify({terminate:'YES'})}
-;fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()}else{throw new Error('Fetch status '+response.status+' '+response.statusText)}}).then(responseJson=>{
-console.log(JSON.stringify(responseJson))}).catch(error=>{showError('Terminate: Unable to connect');console.log(error)})})
-;document.getElementById('eraseCacheButton').addEventListener('click',function(){if(ircState.ircConnected){showError('You must be disconnected from IRC to clear cache.');return}
-document.dispatchEvent(new CustomEvent('erase-before-reload',{bubbles:true,detail:{}}));const fetchURL=webServerUrl+'/irc/erase';const fetchOptions={method:'POST',headers:{
-'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify({erase:'YES'})};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()}else{
-throw new Error('Fetch status '+response.status+' '+response.statusText)}}).then(responseJson=>{if(responseJson.error){showError(responseJson.message)}else{
+}else{document.getElementById('hiddenInfoDiv').setAttribute('hidden','');document.getElementById('infoOpenCloseButton').textContent='+'}});function updateFromCache(){
+if(webState.cacheReloadInProgress){console.log('Attempt cache reload, while previous in progress');return}webState.cacheReloadInProgress=true;resetNotActivityIcon();resetPmActivityIcon(-1)
+;resetChanActivityIcon(-1);document.dispatchEvent(new CustomEvent('erase-before-reload',{bubbles:true,detail:{}}));const fetchURL=webServerUrl+'/irc/cache';const fetchOptions={method:'GET',headers:{
+Accept:'application/json'}};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()}else{throw new Error('Fetch status '+response.status+' '+response.statusText)}
+}).then(responseArray=>{if(Array.isArray(responseArray)&&responseArray.length>0){const privMsgSessionEl=document.getElementById('privateMessageContainerDiv');while(privMsgSessionEl.firstChild){
+privMsgSessionEl.removeChild(privMsgSessionEl.firstChild)}webState.lastPMNick='';webState.activePrivateMessageNicks=[];document.getElementById('noticeMessageDisplay').value=''
+;document.getElementById('wallopsMessageDisplay').value='';document.getElementById('pmNickNameInputId').value='';document.getElementById('newChannelNameInputId').value=''
+;document.getElementById('rawMessageDisplay').value='';document.getElementById('rawMessageInputId').value='';webState.noticeOpen=false;webState.wallopsOpen=false
+;for(let i=0;i<responseArray.length;i++){if(responseArray[i].length>0){_parseBufferMessage(responseArray[i])}}}const timestamp=unixTimestamp()
+;document.dispatchEvent(new CustomEvent('cache-reload-done',{bubbles:true,detail:{timestamp:timestamp}}))}).catch(error=>{const timestamp=unixTimestamp();console.log(error)
+;document.dispatchEvent(new CustomEvent('cache-reload-error',{bubbles:true,detail:{timestamp:timestamp}}))})}window.addEventListener('update-from-cache',function(event){updateFromCache()})
+;window.addEventListener('cache-reload-done',function(event){webState.cacheReloadInProgress=false});window.addEventListener('cache-reload-error',function(event){webState.cacheReloadInProgress=false})
+;document.getElementById('serverTerminateButton').addEventListener('click',function(){console.log('Requesting backend server to terminate');const fetchURL=webServerUrl+'/terminate'
+;const fetchOptions={method:'POST',headers:{'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify({terminate:'YES'})};fetch(fetchURL,fetchOptions).then(response=>{
+if(response.ok){return response.json()}else{throw new Error('Fetch status '+response.status+' '+response.statusText)}}).then(responseJson=>{console.log(JSON.stringify(responseJson))}).catch(error=>{
+showError('Terminate: Unable to connect');console.log(error)})});document.getElementById('eraseCacheButton').addEventListener('click',function(){if(ircState.ircConnected){
+showError('You must be disconnected from IRC to clear cache.');return}document.dispatchEvent(new CustomEvent('erase-before-reload',{bubbles:true,detail:{}}));const fetchURL=webServerUrl+'/irc/erase'
+;const fetchOptions={method:'POST',headers:{'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify({erase:'YES'})};fetch(fetchURL,fetchOptions).then(response=>{
+if(response.ok){return response.json()}else{throw new Error('Fetch status '+response.status+' '+response.statusText)}}).then(responseJson=>{if(responseJson.error){showError(responseJson.message)}else{
 const privMsgSessionEl=document.getElementById('privateMessageContainerDiv');while(privMsgSessionEl.firstChild){privMsgSessionEl.removeChild(privMsgSessionEl.firstChild)}
 document.getElementById('noticeMessageDisplay').value='';document.getElementById('wallopsMessageDisplay').value='';document.getElementById('pmNickNameInputId').value=''
 ;document.getElementById('newChannelNameInputId').value='';document.getElementById('rawMessageDisplay').value='';document.getElementById('rawMessageInputId').value='';webState.privMsgOpen=false
@@ -824,5 +839,4 @@ webState.dynamic.lastClientWidth=webState.dynamic.bodyClientWidth;document.dispa
 ;document.addEventListener('recalcPageWidthButtonId',function(){updatePageMeasurements();calibrateElementSize();document.dispatchEvent(new CustomEvent('resize-custom-elements',{bubbles:true,detail:{}
 }))});updatePageMeasurements();webState.dynamic.lastClientWidth=webState.dynamic.bodyClientWidth;calibrateElementSize();document.dispatchEvent(new CustomEvent('resize-custom-elements',{bubbles:true,
 detail:{}}));setTimeout(function(){calibrateElementSize();document.dispatchEvent(new CustomEvent('resize-custom-elements',{bubbles:true,detail:{}}))},900);setInterval(function(){
-errorTimerTickHandler();heartbeatTimerTickHandler();reconnectTimerTickHandler();beepTimerTick();updateElapsedTimeDisplay();cacheInhibitTimerTick();checkVerticalSliderPageWidth()},1e3)
-;firstWebSocketConnectOnPageLoad();
+errorTimerTickHandler();heartbeatTimerTickHandler();reconnectTimerTickHandler();beepTimerTick();updateElapsedTimeDisplay();checkVerticalSliderPageWidth()},1e3);firstWebSocketConnectOnPageLoad();

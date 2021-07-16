@@ -228,7 +228,9 @@ function createPrivateMessageEl (name, parsedMessage) {
   privMsgTextAreaEl.value += parsedMessage.timestamp + ' ' +
     parsedMessage.nick + pmNameSpacer + cleanFormatting(parsedMessage.params[1]) + '\n';
   // move scroll bar so text is scrolled all the way up
-  privMsgTextAreaEl.scrollTop = privMsgTextAreaEl.scrollHeight;
+  if (!webState.cacheReloadInProgress) {
+    privMsgTextAreaEl.scrollTop = privMsgTextAreaEl.scrollHeight;
+  }
 
   // --------------------------
   // PM specific timers
@@ -260,7 +262,6 @@ function createPrivateMessageEl (name, parsedMessage) {
   // Example:  14:33:02 -----Cache Reload-----
   //
   document.addEventListener('cache-reload-done', function (event) {
-    // console.log('Event cache-reload-done');
     let markerString = '';
     let timestampString = '';
     if (('detail' in event) && ('timestamp' in event.detail)) {
@@ -274,6 +275,19 @@ function createPrivateMessageEl (name, parsedMessage) {
     privMsgTextAreaEl.value += markerString;
     // move scroll bar so text is scrolled all the way up
     privMsgTextAreaEl.scrollTop = privMsgTextAreaEl.scrollHeight;
+  });
+
+  document.addEventListener('cache-reload-error', function (event) {
+    let errorString = '\n';
+    let timestampString = '';
+    if (('detail' in event) && ('timestamp' in event.detail)) {
+      timestampString = unixTimestampToHMS(event.detail.timestamp);
+    }
+    if (timestampString) {
+      errorString += timestampString;
+    }
+    errorString += ' ' + cacheErrorString + '\n\n';
+    privMsgTextAreaEl.value = errorString;
   });
 
   // Hide PM window, Hide PM data section, Hide buttons
@@ -418,7 +432,9 @@ function createPrivateMessageEl (name, parsedMessage) {
       // append text to textarea
       privMsgTextAreaEl.value += cleanFormatting(text) + '\n';
       // move scroll bar so text is scrolled all the way up
-      privMsgTextAreaEl.scrollTop = privMsgTextAreaEl.scrollHeight;
+      if (!webState.cacheReloadInProgress) {
+        privMsgTextAreaEl.scrollTop = privMsgTextAreaEl.scrollHeight;
+      }
     }
     const parsedMessage = event.detail.parsedMessage;
     // console.log('Event private-message: ' + JSON.stringify(parsedMessage, null, 2));
@@ -440,7 +456,7 @@ function createPrivateMessageEl (name, parsedMessage) {
               parsedMessage.nick + pmNameSpacer + parsedMessage.params[1]);
             }
             if (privMsgSectionEl.hasAttribute('beep1-enabled') &&
-              (webState.cacheInhibitTimer === 0)) {
+              (!webState.cacheReloadInProgress)) {
               playBeep3Sound();
             }
             // Upon privMsg message, make sectino visible.
@@ -463,7 +479,7 @@ function createPrivateMessageEl (name, parsedMessage) {
               parsedMessage.nick + pmNameSpacer + parsedMessage.params[1]);
             }
             if (privMsgSectionEl.hasAttribute('beep1-enabled') &&
-              (webState.cacheInhibitTimer === 0)) {
+              (!webState.cacheReloadInProgress)) {
               playBeep3Sound();
             }
             // Upon privMsg message, make sectino visible.
@@ -483,7 +499,7 @@ function createPrivateMessageEl (name, parsedMessage) {
             // then display incoming message activity icon
             if ((document.activeElement !== privMsgInputAreaEl) &&
             (document.activeElement !== privMsgSendButtonEl) &&
-            (webState.cacheInhibitTimer === 0) &&
+            (!webState.cacheReloadInProgress) &&
             (activityIconInhibitTimer === 0)) {
               setPmActivityIcon(privMsgIndex);
             }
@@ -495,7 +511,7 @@ function createPrivateMessageEl (name, parsedMessage) {
   });
 
   // PM to be made visible on opening a new window (except on refresh)
-  if (webState.cacheInhibitTimer === 0) {
+  if (!webState.cacheReloadInProgress) {
     setPmActivityIcon(privMsgIndex);
   }
 

@@ -33,10 +33,10 @@
           Change Log
         </div>
         <p>
-          2021-07-15 (next)
-          In response to intermittent Chrome Forced Reflow violations the code
-          used to dynamically resize textarea elements was re-sequenced to avoid
-          taking element size measurements after changing elements.
+          2021-07-16 (next)
+          Fixed browser Forced Reflow violation caused curing message cache reload.
+          This included inhibit textarea auto scroll duing message cache reload and
+          resequence of cache reload events.
         </p>
         <p>
           2021-07-14 (0.1.19)
