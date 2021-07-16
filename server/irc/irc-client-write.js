@@ -44,6 +44,7 @@
   // ----------------------------------------------------
   const isValidUTF8 = require('utf-8-validate');
   const vars = require('./irc-client-vars');
+  const ircLog = require('./irc-client-log');
 
   const writeSocket = function (socket, message) {
     if (message.length === 0) return;
@@ -84,7 +85,11 @@
             message.split(' ')[1] + ' ' + message.split(' ')[2] + ' ********';
         }
       }
+      // echo the outgoing IRC server message to the browser
       global.sendToBrowser(vars.commandMsgPrefix + filtered + '\n');
+
+      // echo the outgoing IRC message to the log
+      ircLog.writeIrcLog(vars.commandMsgPrefix + filtered);
 
       //
       // Second validate the string before writing to IRC server socket
