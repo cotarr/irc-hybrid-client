@@ -465,9 +465,9 @@ const webStateChannelsIndex=webState.channels.indexOf(name.toLowerCase());if(web
 if(!ircState.channelStates[index].joined){const fetchURL=webServerUrl+'/irc/prune';const fetchOptions={method:'POST',headers:{'Content-type':'application/json',Accept:'application/json'},
 body:JSON.stringify({channel:name})};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()}else{throw new Error('Fetch status '+response.status+' '+response.statusText)}
 }).then(responseJson=>{if(responseJson.error){showError(responseJson.message)}else{_removeChannelFromDom()}}).catch(error=>{console.log(error)})}}else{_removeChannelFromDom()}})
-;channelRefreshButtonEl.addEventListener('click',function(){if(!webState.cacheReloadInProgress){document.dispatchEvent(new CustomEvent('update-from-cache',{bubbles:true}))
-;channelNamesDisplayEl.value='';_sendIrcServerMessage('NAMES '+name)}});channelSendButtonEl.addEventListener('click',function(){_sendTextToChannel(channelIndex,channelInputAreaEl)
-;channelInputAreaEl.focus();resetChanActivityIcon(channelIndex);activityIconInhibitTimer=activityIconInhibitTimerValue});channelInputAreaEl.addEventListener('input',function(event){
+;channelRefreshButtonEl.addEventListener('click',function(){if(!webState.cacheReloadInProgress){document.dispatchEvent(new CustomEvent('update-from-cache',{bubbles:true}))}})
+;channelSendButtonEl.addEventListener('click',function(){_sendTextToChannel(channelIndex,channelInputAreaEl);channelInputAreaEl.focus();resetChanActivityIcon(channelIndex)
+;activityIconInhibitTimer=activityIconInhibitTimerValue});channelInputAreaEl.addEventListener('input',function(event){
 if(event.inputType==='insertText'&&event.data===null||event.inputType==='insertLineBreak'){stripOneCrLfFromElement(channelInputAreaEl);_sendTextToChannel(channelIndex,channelInputAreaEl)
 ;resetChanActivityIcon(channelIndex);activityIconInhibitTimer=activityIconInhibitTimerValue}});channelMainSectionEl.addEventListener('click',function(){resetChanActivityIcon(channelIndex)
 ;activityIconInhibitTimer=activityIconInhibitTimerValue});function updateVisibility(){const index=ircState.channels.indexOf(name.toLowerCase());if(index>=0){if(ircState.channelStates[index].joined){

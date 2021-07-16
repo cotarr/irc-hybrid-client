@@ -507,8 +507,10 @@ function createChannelEl (name) {
       // this forces a global update which will refreesh text area
       document.dispatchEvent(new CustomEvent('update-from-cache', { bubbles: true }));
       // THis will request a new nickname list from IRC server.
-      channelNamesDisplayEl.value = '';
-      _sendIrcServerMessage('NAMES ' + name);
+
+      // 2021-07-16 temporary disable
+      // channelNamesDisplayEl.value = '';
+      // _sendIrcServerMessage('NAMES ' + name);
     }
   });
 
