@@ -341,7 +341,7 @@ sudo certbot certonly --standalone -d abcd.example.com
           While in the project directory, start the web server by typing:
         </p>
 <div class="pre-div"><pre>
-  node bin/www
+node bin/www
 </pre></div>
         <p>
           To access the IRC client from your web browser, append the path
@@ -366,7 +366,7 @@ sudo certbot certonly --standalone -d abcd.example.com
           &quotnode bin/www &amp>> logs/node.log &&quot
         </p>
 
-<div class="install-section-title">11 - Minify and bundle (Optional)</div>
+        <div class="install-section-title">11 - Minify and bundle (Optional)</div>
         <p>
           This section is optional. This repository contains both minified and
           original un-minified files.
@@ -389,6 +389,19 @@ sudo certbot certonly --standalone -d abcd.example.com
           <a href="https://github.com/cotarr/irc-hybrid-client-dev-tools">irc-hybrid-client-dev-tools</a>
           repository.
         </p>
+
+        <div class="install-section-title">12 - Upgrade Procedure</div>
+        <p>
+          This upgrade procedure is for the case where the web server consistes of a
+          cloned git repositiory, copied and edited configuration files, and
+          packages installed with npm ci, then the web server can be upgraded by
+          stopping the server, changing to the repository folder and typing the following:
+        </p>
+<div class="pre-div"><pre>
+git pull
+npm ci
+</pre></div>
+
       </div> <!-- /text-div -->
 
     </div> <!-- outer-div -->
