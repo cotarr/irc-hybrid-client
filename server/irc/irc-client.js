@@ -40,21 +40,23 @@
   const ircWrite = require('./irc-client-write');
   const ircParse = require('./irc-client-parse');
   const ircCommand = require('./irc-client-command');
-
   const ircMessageCache = require('./irc-client-cache');
   const vars = require('./irc-client-vars');
 
   const nodeEnv = process.env.NODE_ENV || 'development';
 
-  // const credentials = JSON.parse(fs.readFileSync('./credentials.json', 'utf8'));
-
   const servers = JSON.parse(fs.readFileSync('./servers.json', 'utf8'));
   if ((!('configVersion' in servers)) || (servers.configVersion !== 1)) {
-    console.log('Error, servers.js wrong configVersion');
+    console.error('Error, servers.js wrong configVersion');
     process.exit(1);
   }
   if ((!('serverArray' in servers)) || (servers.serverArray.length < 1)) {
-    console.log('Error, no server configuration in servers.json');
+    console.error('Error, no server configuration in servers.json');
+    process.exit(1);
+  }
+  // TLS Verify property added 2021-07-17, message to update config file.
+  if (!('verify' in servers.serverArray[0])) {
+    console.error('File: servers.json: missing boolean "verify" property for TLS hostname check.');
     process.exit(1);
   }
 
@@ -76,12 +78,15 @@
   vars.ircState.ircServerHost = servers.serverArray[0].host;
   vars.ircState.ircServerPort = servers.serverArray[0].port;
   vars.ircState.ircTLSEnabled = servers.serverArray[0].tls;
+  vars.ircState.ircTLSVerify = servers.serverArray[0].verify;
   vars.ircServerPassword = servers.serverArray[0].password;
   vars.nsIdentifyNick = servers.serverArray[0].identifyNick;
   vars.nsIdentifyCommand = servers.serverArray[0].identifyCommand;
   // index into servers.json file
   vars.ircState.ircServerIndex = 0;
   vars.ircState.ircServerPrefix = '';
+  // pass on IRC socket TLS info
+  vars.ircState.ircSockInfo = {};
   // List of favorite channels
   vars.ircState.channelList = servers.serverArray[0].channelList;
 
@@ -297,6 +302,65 @@
   //
   // creates socket to IRC server
   const connectIRC = function () {
+    let connectMessage = 'Opening socket to ' + vars.ircState.ircServerName + ' ' +
+      vars.ircState.ircServerHost + ':' + vars.ircState.ircServerPort;
+    if (vars.ircState.ircTLSEnabled) {
+      connectMessage += ' (TLS)';
+    }
+    global.sendToBrowser('UPDATE\nwebServer: ' + connectMessage + '\n');
+    ircLog.writeIrcLog(connectMessage);
+
+    // update later if TLS
+    vars.ircState.ircSockInfo.encrypted = false;
+    vars.ircState.ircSockInfo.verified = false;
+    vars.ircState.ircSockInfo.protocol = '';
+
+    // ---------------------
+    //      Old Socket ?
+    // ---------------------
+    if (ircSocket) {
+      try {
+        // If old socket exist, destroy to be sure not left connected.
+        ircSocket.destroy();
+        ircSocket = null;
+      } catch (err) {
+        // Ingore
+      }
+    }
+
+    // ----------------------------------
+    //          New Socket
+    // ----------------------------------
+    // options Object
+    // ------------------
+    const options = {
+      port: vars.ircState.ircServerPort,
+      host: vars.ircState.ircServerHost
+    };
+    if (vars.ircState.ircTLSEnabled) {
+      options.rejectUnauthorized = vars.ircState.ircTLSVerify;
+      if (vars.ircState.ircTLSVerify) {
+        options.servername = vars.ircState.ircServerHost;
+      }
+      options.minVersion = 'TLSv1.2';
+    }
+    // ------------------------------
+    // Connect request return socket
+    // ------------------------------
+    // If socket wrapped in TLS encryption
+    if (vars.ircState.ircTLSEnabled) {
+      ircSocket = tls.connect(options, function () {
+        ircLog.writeIrcLog('Connected to IRC server ' + vars.ircState.ircServerName + ' ' +
+          vars.ircState.ircServerHost + ':' + vars.ircState.ircServerPort);
+      });
+    } else {
+      // else TCP socket without encryption
+      ircSocket = net.connect(options, function () {
+        ircLog.writeIrcLog('Connected to IRC server ' + vars.ircState.ircServerName + ' ' +
+          vars.ircState.ircServerHost + ':' + vars.ircState.ircServerPort);
+      });
+    }
+
     //
     // Connecting watchdog timer
     //
@@ -322,19 +386,11 @@
       }
     }, vars.ircSocketConnectingTimeout * 1000);
 
-    let connectMessage = 'Opening socket to ' + vars.ircState.ircServerName + ' ' +
-      vars.ircState.ircServerHost + ':' + vars.ircState.ircServerPort;
-    if (vars.ircState.ircTLSEnabled) {
-      connectMessage += ' (TLS)';
-    }
-    global.sendToBrowser('UPDATE\nwebServer: ' + connectMessage + '\n');
-    ircLog.writeIrcLog(connectMessage);
-
-    if (vars.ircState.ircTLSEnabled) {
-      ircSocket = new tls.TLSSocket();
-    } else {
-      ircSocket = new net.Socket();
-    }
+    ircSocket.on('secureConnect', function (e) {
+      vars.ircState.ircSockInfo.encrypted = ircSocket.encrypted;
+      vars.ircState.ircSockInfo.verified = ircSocket.authorized;
+      vars.ircState.ircSockInfo.protocol = ircSocket.getProtocol();
+    });
 
     // --------------------------------------------------
     //   On Connect   (IRC client socket connected)
@@ -427,17 +483,12 @@
       }
       // clear watchdog timer
       if (watchdogTimer) clearTimeout(watchdogTimer);
-      global.sendToBrowser('UPDATE\nwebError: IRC server socket error, connected flags reset\n');
-      ircLog.writeIrcLog('IRC server socket error, connected flags reset');
-    });
-
-    // ----------------------------------
-    // All even listeners are created
-    // Go ahead can connect the socket.
-    // ----------------------------------
-    ircSocket.connect(vars.ircState.ircServerPort, vars.ircState.ircServerHost, function () {
-      ircLog.writeIrcLog('Connected to IRC server ' + vars.ircState.ircServerName + ' ' +
-        vars.ircState.ircServerHost + ':' + vars.ircState.ircServerPort);
+      let errorMessage = 'IRC server socket error';
+      if ('code' in err) {
+        errorMessage += ': ' + err.code;
+      }
+      global.sendToBrowser('UPDATE\nwebError: ' + errorMessage + '\n');
+      ircLog.writeIrcLog(errorMessage);
     });
   }; // connectIRC()
 
@@ -666,6 +717,7 @@
     vars.ircState.ircServerHost = servers.serverArray[vars.ircState.ircServerIndex].host;
     vars.ircState.ircServerPort = servers.serverArray[vars.ircState.ircServerIndex].port;
     vars.ircState.ircTLSEnabled = servers.serverArray[vars.ircState.ircServerIndex].tls;
+    vars.ircState.ircTLSVerify = servers.serverArray[vars.ircState.ircServerIndex].verify;
     vars.ircServerPassword = servers.serverArray[vars.ircState.ircServerIndex].password;
     vars.nsIdentifyNick = servers.serverArray[vars.ircState.ircServerIndex].identifyNick;
     vars.nsIdentifyCommand = servers.serverArray[vars.ircState.ircServerIndex].identifyCommand;

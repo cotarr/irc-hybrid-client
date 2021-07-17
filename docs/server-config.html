@@ -106,16 +106,15 @@
 
         <div class="install-section-title">1 - IRC Server configuration</div>
         <p>
-          There are 5 properties to define a server entry.
+          There are 6 properties to define a server entry.
           The &quotname&quot property can be set to any value.
           It is used to display the name of your selection.
           If you are using a phone, keep &quotname&quot short.
         </p>
         <p>
           At this time there are no provisions to configure a server to
-          auto-connect to IRC on startup. There is no provision to auto-join channels.
-          Reconnecting after a disconnect is available as a global setting and
-          reconnection will be discussed below.
+          auto-connect to IRC on startup.
+          There is no provision to auto-join channels on startup.
         </p>
         <p>
           In this example, an IRC server is configured without TLS encryption.
@@ -125,11 +124,14 @@
   "host": "lion.dal.net",
   "port": 6667,
   "tls": false,
+  "verify": false,
   "password": "",
 </pre></div>
 <p>
   To configure for TLS encryption the &quotport&quot was changed to 6697 and
-  &quottls&quot was set to true
+  &quottls&quot was set to true. If the IRC server hostname should be
+  verified, set &quotverify&quot to true. For number IP addresses,
+  set &quotverify&quot to false.
 </p>
 
 <div class="pre-div"><pre>
@@ -137,6 +139,7 @@
   "host": "lion.dal.net",
   "port": 6697,
   "tls": true,
+  "verify": true,
   "password": "",
 </pre></div>
         <div class="install-section-title">2 - NickServ IDENTIFY</div>
@@ -308,6 +311,7 @@
       "host": "lion.dal.net",
       "port": 6697,
       "tls": true,
+      "verify": true,
       "password": "",
       "identifyNick": "MyNickname",
       "identifyCommand": "PRIVMSG NickServ@services.dal.net :IDENTIFY xxxxxxxx",

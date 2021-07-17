@@ -9,6 +9,7 @@
       "host": "lion.dal.net",
       "port": 6697,
       "tls": true,
+      "verify": true,
       "password": "",
       "identifyNick": "",
       "identifyCommand": "",

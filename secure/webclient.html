@@ -176,9 +176,13 @@ a raw command to the IRC server directly.
             </div>
             <div class="button-div">
               <input type="text" id="ircServerNameInputId" size="10" value="" disabled>
-              <input type="checkbox" id="ircServerTlsCheck" disabled>
-              <span>TLS</span>
               <button id="cycleNextServerButton">Next Server</button>
+            </div>
+            <div class="button-div">
+              <input type="checkbox" id="ircServerTlsEnable" disabled>
+              <span>TLS</span>
+              <input type="checkbox" id="ircServerTlsVerify" disabled>
+              <span>Verify Hostname</span>
             </div>
             <div class="button-div">
               <input type="text" id="ircServerAddrInputId" size="26" value="" disabled>

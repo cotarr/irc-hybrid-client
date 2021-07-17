@@ -141,13 +141,15 @@ const fetchURL=webServerUrl+'/irc/getircstate';const fetchOptions={method:'GET',
 }else{if(response.status===403)window.location.href='/login';throw new Error('Fetch status '+response.status+' '+response.statusText)}}).then(responseJson=>{ircState=responseJson
 ;if(!ircState.ircConnected&&webState.lastIrcServerIndex!==ircState.ircServerIndex){webState.lastIrcServerIndex=ircState.ircServerIndex
 ;document.getElementById('ircServerNameInputId').value=ircState.ircServerName;document.getElementById('ircServerAddrInputId').value=ircState.ircServerHost
-;document.getElementById('ircServerPortInputId').value=ircState.ircServerPort;if(ircState.ircTLSEnabled){document.getElementById('ircServerTlsCheck').setAttribute('checked','')}else{
-document.getElementById('ircServerTlsCheck').removeAttribute('checked')}document.getElementById('nickNameInputId').value=ircState.nickName
+;document.getElementById('ircServerPortInputId').value=ircState.ircServerPort;if(ircState.ircTLSEnabled){document.getElementById('ircServerTlsEnable').setAttribute('checked','')}else{
+document.getElementById('ircServerTlsEnable').removeAttribute('checked')}if(ircState.ircTLSVerify){document.getElementById('ircServerTlsVerify').setAttribute('checked','')}else{
+document.getElementById('ircServerTlsVerify').removeAttribute('checked')}document.getElementById('nickNameInputId').value=ircState.nickName
 ;document.getElementById('userNameInputId').value=ircState.userName;document.getElementById('realNameInputId').value=ircState.realName
 ;document.getElementById('userModeInputId').value=ircState.userMode}if(ircState.ircConnected){document.title='IRC-'+ircState.ircServerName
 ;document.getElementById('ircServerNameInputId').value=ircState.ircServerName;document.getElementById('ircServerAddrInputId').value=ircState.ircServerHost
-;document.getElementById('ircServerPortInputId').value=ircState.ircServerPort;if(ircState.ircTLSEnabled){document.getElementById('ircServerTlsCheck').setAttribute('checked','')}else{
-document.getElementById('ircServerTlsCheck').removeAttribute('checked')}document.getElementById('headerServer').textContent=ircState.ircServerName
+;document.getElementById('ircServerPortInputId').value=ircState.ircServerPort;if(ircState.ircTLSEnabled){document.getElementById('ircServerTlsEnable').setAttribute('checked','')}else{
+document.getElementById('ircServerTlsEnable').removeAttribute('checked')}if(ircState.ircTLSVerify){document.getElementById('ircServerTlsVerify').setAttribute('checked','')}else{
+document.getElementById('ircServerTlsVerify').removeAttribute('checked')}document.getElementById('headerServer').textContent=ircState.ircServerName
 ;document.getElementById('headerUser').textContent=' ('+ircState.nickName+')';document.getElementById('nickNameInputId').value=ircState.nickName
 ;document.getElementById('userNameInputId').value=ircState.userName;document.getElementById('realNameInputId').value=ircState.realName
 ;document.getElementById('userModeInputId').value=ircState.userMode;webState.ircConnecting=false}if(!ircState.ircConnected){setVariablesShowingIRCDisconnected();document.title='irc-hybrid-client'}

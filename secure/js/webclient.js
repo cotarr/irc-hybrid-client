@@ -756,11 +756,15 @@ function getIrcState (callback) {
         document.getElementById('ircServerAddrInputId').value = ircState.ircServerHost;
         document.getElementById('ircServerPortInputId').value = ircState.ircServerPort;
         if (ircState.ircTLSEnabled) {
-          document.getElementById('ircServerTlsCheck').setAttribute('checked', '');
+          document.getElementById('ircServerTlsEnable').setAttribute('checked', '');
         } else {
-          document.getElementById('ircServerTlsCheck').removeAttribute('checked');
+          document.getElementById('ircServerTlsEnable').removeAttribute('checked');
         }
-
+        if (ircState.ircTLSVerify) {
+          document.getElementById('ircServerTlsVerify').setAttribute('checked', '');
+        } else {
+          document.getElementById('ircServerTlsVerify').removeAttribute('checked');
+        }
         document.getElementById('nickNameInputId').value = ircState.nickName;
         document.getElementById('userNameInputId').value = ircState.userName;
         document.getElementById('realNameInputId').value = ircState.realName;
@@ -774,9 +778,14 @@ function getIrcState (callback) {
         document.getElementById('ircServerAddrInputId').value = ircState.ircServerHost;
         document.getElementById('ircServerPortInputId').value = ircState.ircServerPort;
         if (ircState.ircTLSEnabled) {
-          document.getElementById('ircServerTlsCheck').setAttribute('checked', '');
+          document.getElementById('ircServerTlsEnable').setAttribute('checked', '');
         } else {
-          document.getElementById('ircServerTlsCheck').removeAttribute('checked');
+          document.getElementById('ircServerTlsEnable').removeAttribute('checked');
+        }
+        if (ircState.ircTLSVerify) {
+          document.getElementById('ircServerTlsVerify').setAttribute('checked', '');
+        } else {
+          document.getElementById('ircServerTlsVerify').removeAttribute('checked');
         }
         document.getElementById('headerServer').textContent = ircState.ircServerName;
         document.getElementById('headerUser').textContent = ' (' + ircState.nickName + ')';
