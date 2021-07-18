@@ -468,10 +468,8 @@ document.addEventListener('cache-reload-done', function (event) {
   markerString += ' ' + cacheReloadString + '\n';
 
   document.getElementById('rawMessageDisplay').value += markerString;
-  if (!webState.cacheReloadInProgress) {
-    document.getElementById('rawMessageDisplay').scrollTop =
-      document.getElementById('rawMessageDisplay').scrollHeight;
-  }
+  document.getElementById('rawMessageDisplay').scrollTop =
+    document.getElementById('rawMessageDisplay').scrollHeight;
 });
 
 document.addEventListener('cache-reload-error', function (event) {

@@ -754,10 +754,10 @@ displayRawMessage(cleanFormatting(cleanCtcpDelimiter(event.detail.parsedMessage.
 displayRawMessage(cleanFormatting(cleanCtcpDelimiter(substituteHmsTime(event.detail.message))))}if(!webState.cacheReloadInProgress){showRawMessageWindow()}})
 ;document.addEventListener('cache-reload-done',function(event){let markerString='';let timestampString='';if('detail'in event&&'timestamp'in event.detail){
 timestampString=unixTimestampToHMS(event.detail.timestamp)}if(timestampString){markerString+=timestampString}markerString+=' '+cacheReloadString+'\n'
-;document.getElementById('rawMessageDisplay').value+=markerString;if(!webState.cacheReloadInProgress){
-document.getElementById('rawMessageDisplay').scrollTop=document.getElementById('rawMessageDisplay').scrollHeight}});document.addEventListener('cache-reload-error',function(event){let errorString='\n'
-;let timestampString='';if('detail'in event&&'timestamp'in event.detail){timestampString=unixTimestampToHMS(event.detail.timestamp)}if(timestampString){errorString+=timestampString}
-errorString+=' '+cacheErrorString+'\n\n';document.getElementById('rawMessageDisplay').value=errorString});document.getElementById('rawHiddenElementsButton').addEventListener('click',function(){
+;document.getElementById('rawMessageDisplay').value+=markerString;document.getElementById('rawMessageDisplay').scrollTop=document.getElementById('rawMessageDisplay').scrollHeight})
+;document.addEventListener('cache-reload-error',function(event){let errorString='\n';let timestampString='';if('detail'in event&&'timestamp'in event.detail){
+timestampString=unixTimestampToHMS(event.detail.timestamp)}if(timestampString){errorString+=timestampString}errorString+=' '+cacheErrorString+'\n\n'
+;document.getElementById('rawMessageDisplay').value=errorString});document.getElementById('rawHiddenElementsButton').addEventListener('click',function(){
 if(document.getElementById('rawHiddenElements').hasAttribute('hidden')){showRawMessageWindow()}else{hideRawMessageWindow()}})
 ;document.getElementById('rawClearButton').addEventListener('click',function(){document.getElementById('rawMessageDisplay').value=''
 ;document.getElementById('rawMessageDisplay').setAttribute('rows','10');document.getElementById('rawMessageInputId').value=''})
