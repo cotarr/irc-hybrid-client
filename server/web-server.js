@@ -337,12 +337,13 @@ app.post('/irc/wsauth', authorizeOrFail, function (req, res, next) {
 // -------------------------------------------------------
 // Web socket security test
 // Development only.
-// Testing web page: /test2s/test-websocket.html
+// Testing web page: /testws/test-websocket.html
 //
 //   C A U T I O N    N O    A U T H E N T I C A T I O N
 //
 //               Enable only for testing
 // -------------------------------------------------------
+// console.log('******** (debug) /testws route enabled without authorization **********');
 // if (nodeEnv === 'development') {
 //   const testWs = require('./testws/testws');
 //   app.use('/testws', testWs);

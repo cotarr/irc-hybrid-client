@@ -125,6 +125,9 @@
 <div class="pre-div"><pre>
 "webServer: Opening socket to test-server 192.168.1.127:6667"
 </pre></div>
+        <p>
+          A more detail description of web socket use is included near the bottom of this page.
+        </p>
 
         <h1>IRC Client API Routes</h1>
 
@@ -477,6 +480,384 @@ UPDATE
   "terminate": "YES"
 }
 </pre></div>
+
+
+        <div class="desc-title">
+          Websocket Interface
+        </div>
+        <p>
+          In a typical IRC client program, such as mirc or hexchat, the client IRC program
+          establishes a bi-directional TCP network socket connection between the IRC client and the
+          IRC server. The client software sends IRC commands and channel text messages over the
+          TCP socket. The IRC server responds asynchronously with RFC 2812 messages over the
+          TCP network socket.
+        </p>
+        <p>
+          In the irc-hybrid-client program, the backend web server serves as the IRC client.
+          The backend maintains the IRC server TCP socket connection.
+          The backend is capable to maintain a valid IRC user connection independant of the web
+          browser. Therefore, IRC server messages related to connection status, channel
+          membership, and other state is parsed and maintained within the backend server.
+        </p>
+        <p>
+          Although a summary of IRC connection state can be retrieved over the /irc/getircstate API,
+          as described above, the ircState json object does not contain text messages from other users.
+        </p>
+        <p>
+          Independant of the TCP socket connection between the backend and the IRC server,
+          the web browser opens an independant websocket connection to the backend webserver,
+          using ws:// or wss:// protocol standard websocket connections.
+          The websocket passes a stream of utf-8 characters.
+          Each message is delimited by CR,LF end of line characters.
+        </p>
+        <p>
+          All RFC 2812 messages from the web server are passed through the backend and
+          a copy of each message is echoed to the web browser in utf-8 format over the websocket.
+          JavaScript in the web browser parses the messages to identify text messages from
+          other IRC users. User text messages are then displayed as text content in the appropriate windows.
+        </p>
+        <p>
+          The websocket stream also contain command messages intended to initiate browser actions.
+          There are 5 types of command defined in the following table.
+          Each message type begins with a specific prefix string as shown in the first table column.
+        </p>
+        <p>
+          Any message not beginning with a command prefix string is considred to be a valid
+          RFC 2812 IRC server message. Valid RFC 2812 messages are prefixed with a timestamp
+          in IRC_V3 format.
+        </p>
+
+        <table class="table-generic">
+          <tbody>
+            <tr>
+              <th>Prefix</th>
+              <th>Description</th>
+            </tr>
+            <tr>
+              <td>HEARTBEAT</td>
+              <td>
+                The web server will send a HEARTBEAT message over the websocket each
+                10 seconds. It is the responsibility of the web browser javascript
+                to monitor these recurring messages. Absence of the HEARTBEAT messages
+                shows the websocket is no longer actively connected to the web server.
+              </td>
+            </tr>            <tr>
+              <td>UPDATE</td>
+              <td>
+                UPDATE is a command to instruct backend to call /irc/getircstate route in response to a
+                change in the ircState object in the backend. For example, when a
+                person departs an IRC channel, the departing user's nick name is
+                removed from the array of channel membership within the backend ircState object.
+                An UPDATE request is sent to the web browser.
+                In response the UPDATE message, the browser performs an API call to the
+                /irc/getircstate route to obtain a new copy of the ircState object.
+                The ircState object is parsed by the browser and the channel membership
+                name list is updated in the appropriate channel window.
+              </td>
+            </tr>
+            <tr>
+              <td>webServer:</td>
+              <td>
+                Prefix to indicate an informational message from the backend.
+                The webServer messages are primarily intended to show IRC client
+                events that are intended for debugging. The webServer messages are
+                not intended for display to the IRC user.
+              </td>
+            </tr>
+            <tr>
+              <td>webError:</td>
+              <td>
+                Prefix to indicate an error has been detected by the backend while acting
+                as an IRC client program.
+                The expectation is that contents of the error are displayed to the IRC user
+                as a valid error message within the web page.
+              </td>
+            </tr>
+            <tr>
+              <td>--&gt</td>
+              <td>
+                The prefix &quot--&gt&quot is an indicator to specify copies of outgoing messages that are
+                sent from the backend web server to the IRC server.
+                Outgoing messages are echoed verbatum to all connected web browsers.
+                Some IRC commands containing possible passwords may be filtered.
+                Visibility of the exact messages sent to the IRC server can be useful
+                when troubleshooting software errors.
+                These outgoing messages can be viewed in the IRC client Server window
+                by clicking checkboxes for [x]View-Raw and [x]Add-Comms.
+                These are outgoing messages and there is assurance the IRC server accepted them
+                without error. Therefore, these messages should be considered as
+                informational only for debug purposes.
+                Messages starting with &quot--&gt&quot should not be parsed by the browser for content.
+                As shown in the following example,
+                the user +i user mode change should be parsed from the (incoming)
+                &quotMODE&quot IRC message, not the (outgoing) &quot--&gt&quot debug message.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <p>
+          The following example shows a sample of websocket messages.
+        </p>
+<div class="pre-div"><pre>
+HEARTBEAT
+HEARTBEAT
+UPDATE
+webServer: Opening socket to irc.example.com:6667
+webServer: Connected
+webServer: Ready
+--> NICK myNick
+--> USER myUsername 0 * :John Doe
+UPDATE
+@time=2021-07-19T11:56:30.532Z :irc.example.com 001 myNick :Welcome to the Internet Relay Network myNick!~myUsername@192.168.1.182
+@time=2021-07-19T11:56:31.532Z :irc.example.com 002 myNick :Your host is irc.example.com, running version ngircd-25 (x86_64/pc/linux-gnu)
+@time=2021-07-19T11:56:31.532Z :irc.example.com 003 myNick :This server has been started Thu Jul 15 2021 at 18:12:20 (UTC)
+@time=2021-07-19T11:56:31.532Z :irc.example.com 004 myNick irc.example.com ngircd-25 abBcCFiIoqrRswx abehiIklmMnoOPqQrRstvVz
+--> MODE myNick +i
+@time=2021-07-19T11:56:32.533Z :myNick!~myUsername@192.168.1.182 MODE myNick :+i
+UPDATE
+HEARTBEAT
+HEARTBEAT
+</pre></div>
+
+        <div class="desc-title">
+          API Manual Testing
+        </div>
+        <p>
+          Manual testing of the backend web server requires two tools. One to issue
+          http GET and POST methods to the web server. These API requests initiate subesequent
+          RFC 2812 IRC commands which are sent asynchronously to the IRC server.
+          A second tool is required to observe the asynchronous RFC 2812 IRC messages which
+          originate in the IRC server and are passed through the web server and
+          onward to the web browser using the websocket stream connection.
+          The following documentation will explain using Postman to issue API requests.
+          Postman is used in combination with a custom websocket monitoring tool included in the repository.
+        </p>
+        <p>
+          Warning: API requests can cause the web server to initiate new IRC connections or
+          issue IRC commands WITHOUT visibility of the IRC server responses.
+          Therefore, it is recommended to use a dedicated IRC test server.
+          The irc-hybrid-client was developed using a ngircd IRC server
+          available in the Debian 10 apt packages, running in an isolated development enviornment.
+        </p>
+        <h3>1 - Postman API calls</h3>
+        <p>
+          One way to send http requsts to the backend is to use
+          <a href="https://www.postman.com/downloads/">Postman</a>.
+          The irc-hybrid-client github respository includes a Postman collection
+          containing example API calls described above.
+          This program's API debug collection can be imported into Postman from the cloned repository
+          located at
+          &quot/postman/irc-hybrid-client message debug.postman_collection.json&quot.
+        </p>
+        <p>
+          Two additoinal Postman collections are included that allow testing of
+          access restrictions of the API routes and websocket that require authorization.
+          Documentation on authorization testing is available in the README.md which is
+          located in the directory with the exported collections, as well as comments within the
+          Postman collections.
+        </p>
+        <h4>1A - Configuration of irc-hybrid-client for testing</h4>
+        <ul>
+          <li>Suggest delete any postman cookies before running tests.</li>
+          <li>Assign a temporary user/password in the web server for testing.</li>
+          <li>In Postman, create a environment with the variables listed below. Set values to the temporary user/password and server URL.</li>
+          <li>Start the irc-hybrid-client web server</li>
+        </ul>
+        <h4>1B - Postman configuration</h4>
+        <p>
+          Postman settings: General: Automatically follow redirects: OFF
+        </p>
+        <h4>1C Postman Enviornment</h4>
+        <p>
+          Create a postman enviornment and create the following variables.
+        </p>
+        <ul>
+          <li>server_URL</li>
+          <li>server_user1</li>
+          <li>server_password1</li>
+          <li>irc_nickname</li>
+          <li>irc_channel</li>
+          <li>sever_die ("YES" or "NO")</li>
+        </ul>
+        <h4>1D - Obtaining a postman cookie</h4>
+        <p>
+          To get a valid cookie, run selections 7.1, 7.2, and 7.3 from the postman collection.
+          7.1 Will clear previous cookie.
+          7.2 Will request the login form, then extract a login random nonce from the form.
+          7.3 Will issue a login authorization POST request containing username and password
+          from the local environment and the random nonce from 7.2.
+          Steps 7.2 and 7.3 are time critical and must be executed together to avoid
+          time expiration of the random nonce.
+        </p>
+
+        <h4>1E - List of tests</h4>
+        <p>
+          Collection: &quotirc-hybrid-client message debug &quot
+        </p>
+        <ul>
+          <li>7.1-7.3 Login to web sevrver</li>
+          <li>8.1 Selects server index</li>
+          <li>8.3 Connect backend to IRC</li>
+          <li>8.5 JOIN an IRC channel</li>
+          <li>8.7 Send a channel message (PRIVMSG)</li>
+          <li>8.8 PART or leave the channel.</li>
+          <li>8.10 Remove (prune) the channel data from backend.</li>
+          <li>8.12 Retrieve message cache</li>
+          <li>8.13 Disconnect backend from IRC</li>
+          <li>8.14 Clear the message cache.</li>
+          <li>8.16 Terminate (Die) the backend web server.</li>
+        </ul>
+
+        <h4>1F Additional documentation</h4>
+        <p>
+          Additional documentation is available in a README.md file located in the
+          github directory where the postman collections are located. The Postman
+          collection and individual tests may also include test specific documentation.
+        </p>
+
+        <h4>1G - IRC command issuanace</h4>
+        <p>
+          The following screen capture shows an API POST request used to emulate
+          transmission of a user text message to an active IRC channel. The body of the POST request contains a
+          &quotmessage&quot property containing an RFC 2812 formatted message.
+          The IRC message includes the command &quotPRIVMSG&quot, followed by the
+          first IRC argument (channel name), followed by the second IRC argument (text message content)
+          which begins with a colon (:) character, followed by a UTF-8 string terminating
+          in an end-of-line character.
+        </p>
+        <p>
+          The postman response shown below has the response body tab selected.
+          The contents of the response is limited to a boolean error flag.
+          The error condition refers to acceptance
+          of the API request by the web server. As the IRC command is passed to the
+          IRC server, should an IRC server error occur, the IRC server error
+          will appear in the websocket stream, not on the API response.
+        </p>
+        <img src=images/postman-trace.png width="749" height="438"alt="Postman Example">
+        <p>
+          Postman is not capable to view the websocket response.
+          The expected response should be returned to the web browser as stream data containing
+          IRC messages received over the websocket.
+          The example below shows the sample websocket message expected from the above Postman request.
+          The first line is a RFC 2812 formatted IRC message intended to be parsed by the browser
+          in order to add content to the displayed web page.
+          The second line starting with &quot--&gt&quot is a verbatum copy of the outgoing
+          IRC message sent to the IRC server which is intended to be used for debugging purposes only.
+        </p>
+<div class="pre-div"><pre>
+@time=2021-07-19T14:35:37.000Z :myNick!*@* PRIVMSG #test :This is a test message (irc-hybrid-client)
+--> PRIVMSG #test :This is a test message (irc-hybrid-client)
+</div>
+        <p>
+          As a side note, IRC servers do not return outgoing IRC channel text messages back to the IRC client.
+          The irc-hybrid-client supports multiple concurrent browsers connected at the same time.
+          In order to display outgoing messages on all connected browsers,
+          the previous websocket PRIVMSG response was generated by the backend in valid RFC 2812 format,
+          so it could be parsed in the browser, equivalent to incoming PRIVSG messages from other users.
+        </p>
+        <p>
+          The following sections include instruction on methods to view these web socket messages.
+        </p>
+
+        <h3>2 - Browser Websocket Messages (using IRC client)</h3>
+        <p>
+          There are two ways to view websocket stream messages.
+          Websocket messages can be viewed in raw format within the irc-hybrid-client
+          web page. Alternately, a simple html page and javascript file was included
+          as a debug tool to monitor the websocket independant of the IRC client web page.
+        </p>
+        <p>
+          To view websocket messages in the IRC client, first open the irc-hybrid-client web page.
+          Enter the username and password that were setup for postman tests as decribed above.
+          Next, open the Server window, then select the [More...] button.
+        </p>
+        <p>
+          Selection of the [x]View-Raw checkbox will cause the Server window to display
+          raw IRC server messages.
+        </p>
+        <p>
+          Selection of the [x]View-Comms checkbox will add Non-IRC messages to the Server
+          window. These include HEARTBEAT, UPDATE, and other informational messages
+          as described above. View-Comms requres that View-Raw also be selected.
+        </p>
+
+        <img src=images/raw-server-messages.png width="757" height="282"alt="Postman Example">
+
+        <h3>3 - Browser Websocket Messages (custom debug tool)</h3>
+        <p>
+          The irc-hybrid-client github repository contains a custom web page used to
+          test the websocket connection. In order for the session cookies to work properly
+          with the websocket, the websocket must exist on the same web server containing
+          the browser html page and browser javascript. The custom web page is located
+          in the &quotserver/testws&quot folder. It contains 3 files, one each html, js and css.
+          To enable this route and serve these files from the main web server, TEMPORARILY remove comment
+          characters from the following code located in the &quotserver/web-server.js" file.
+          Restart the server after the edit.
+        </p>
+
+<div class="pre-div"><pre>
+// console.log('******** (debug) /testws route enabled without authorization **********');
+// if (nodeEnv === 'development') {
+//   const testWs = require('./testws/testws');
+//   app.use('/testws', testWs);
+// }
+</pre></div>
+
+        <p>
+          Caution: The /testws route does not require authentication and would be publicly
+          visible. Remember to disable the route by replacing the comment characters after testing.
+        </p>
+        <p>
+          It is necessary to obtain a session cookie. Both postman and the web browser each
+          requires it's own cookie. The easiest way to do this is to
+          open the normal login form at the &quot/login&quot route. The login route can be appended to the
+          testing web URL, such as &quothttp://localhost:3000/login". The following window should
+          open.
+        <p>
+
+        <img src=images/web-login.png width="346" height="381"alt="Web login form">
+
+        </p>
+          If your login is successful, the normal IRC client page will open.
+          This page will not be used. Instead, edit the URL in the browser bar and
+          go to the following route: &quot/testws/test-websocket.html&quot. If you are using
+          localhost, it will look something like this, but possibly a different port number,
+          depending on your configuration file.
+        </p>
+
+<div class="pre-div"><pre>
+http://localhost:3000/testws/test-websocket.html
+</pre></div>
+
+        <p>
+          The custom web socket debug page should open.
+          It will look similar to the following example.
+        </p>
+        <p>
+          In order to connect the web socket, first a special http POST request must be issued
+          to schedule the websocket authentication.
+          The current expiration time limit is 10 seconds.
+          Immediately, the browser must open the websocket, either normal (ws://)
+          or with TLS (wss://).
+        </p>
+        <p>
+          To do this, first select the [Sechedule Auth] button, then
+          immediately select the [Connect Websocket] button.
+          If successful, you will see the message: &quotwebsocket: open event fired&quot.
+        </p>
+        <p>
+          Websocket messages appear in the textarea labeled &quotMessages&quot
+        </p>
+        <p>
+          Please remember to disable the &quot/testws&quot route after testing.
+        </p>
+        <p>
+          For additional information about use of the test websocket page to verifiy
+          access restrictions to the web socket, view the README.md file in the
+          &quot server/testws&quot folder.
+        </p>
+
+        <img src=images/websocket-trace.png width="874" height="464"alt="Postman Example">
 
       </div> <!-- /text-div -->
 

@@ -3,7 +3,9 @@
 This is a temporary testing web page.
 
 The purpose of this page is to challenge the authorization
-of the websocket server connection request.
+of the websocket server connection request. This web page can also
+be used in combination with postman to view API responses as described
+in the API section of the /docs.
 
 Caution, when enabled, this test page is publically visible and does not require
 authentication to load the page. Therefore, the route handler

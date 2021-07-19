@@ -14,6 +14,9 @@ changes after inport/export, even if there is no change to the tests.
 
 [cotarr.github.io/irc-hybrid-client/api.html](https://cotarr.github.io/irc-hybrid-client/api.html)
 
+This docs page contains further instructions related to testing of the API
+in combination with the websocket.
+
 # Warning
 
 Running the tests individually can cause the web server to initiate IRC connections and issue
