@@ -32,7 +32,7 @@ userMode:'',userHost:'',channels:[],channelStates:[],progVersion:'0.0.0',progNam
 ;document.getElementById('webConnectIconId').removeAttribute('connecting');document.getElementById('ircConnectIconId').removeAttribute('connecting');const webState={};webState.loginUser={}
 ;webState.webConnectOn=true;webState.webConnected=false;webState.webConnecting=false;webState.ircConnecting=false;webState.websocketCount=0;webState.noticeOpen=false;webState.wallopsOpen=false
 ;webState.viewRawMessages=false;webState.showRawInHex=false;webState.showCommsMessages=false;webState.lastIrcServerIndex=-1;webState.channels=[];webState.channelStates=[];webState.lastPMNick=''
-;webState.activePrivateMessageNicks=[];webState.times={webConnect:0};webState.count={webConnect:0};webState.cacheReloadInProgress=false;webState.dynamic={inputAreaCharWidthPx:null,
+;webState.activePrivateMessageNicks=[];webState.times={webConnect:0};webState.count={webConnect:0,webStateCalls:0};webState.cacheReloadInProgress=false;webState.dynamic={inputAreaCharWidthPx:null,
 inputAreaSideWidthPx:null,sendButtonWidthPx:null,commonMargin:50,lastDevicePixelRatio:1,bodyClientWidth:document.querySelector('body').clientWidth,
 lastClientWidth:document.querySelector('body').clientWidth};if(window.devicePixelRatio){webState.dynamic.lastDevicePixelRatio=window.devicePixelRatio}let webServerUrl='https://'
 ;let webSocketUrl='wss://';if(document.location.protocol==='http:'){webServerUrl='http://';webSocketUrl='ws://'}webServerUrl+=window.location.hostname+':'+window.location.port
@@ -137,9 +137,9 @@ const timePreEl=document.getElementById('elapsedTimeDiv');const now=unixTimestam
 timeStr+='Web Connected: '+toTimeString(now-webState.times.webConnect)+' ('+webState.count.webConnect.toString()+')\n'}else{timeStr+='Web Connected: N/A\n'}if(ircState.ircConnected){
 timeStr+='IRC Connected: '+toTimeString(now-ircState.times.ircConnect)+' ('+ircState.count.ircConnect.toString()+')\n'}else{timeStr+='IRC Connected: N/A\n'}if(webState.webConnected){
 timeStr+='Backend Start: '+toTimeString(now-ircState.times.programRun)}else{timeStr+='Backend Start: N/A'}timePreEl.textContent=timeStr}let lastConnectErrorCount=0;function getIrcState(callback){
-const fetchURL=webServerUrl+'/irc/getircstate';const fetchOptions={method:'GET',headers:{Accept:'application/json'}};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()
-}else{if(response.status===403)window.location.href='/login';throw new Error('Fetch status '+response.status+' '+response.statusText)}}).then(responseJson=>{ircState=responseJson
-;if(!ircState.ircConnected&&webState.lastIrcServerIndex!==ircState.ircServerIndex){webState.lastIrcServerIndex=ircState.ircServerIndex
+webState.count.webStateCalls++;const fetchURL=webServerUrl+'/irc/getircstate';const fetchOptions={method:'GET',headers:{Accept:'application/json'}};fetch(fetchURL,fetchOptions).then(response=>{
+if(response.ok){return response.json()}else{if(response.status===403)window.location.href='/login';throw new Error('Fetch status '+response.status+' '+response.statusText)}}).then(responseJson=>{
+ircState=responseJson;if(!ircState.ircConnected&&webState.lastIrcServerIndex!==ircState.ircServerIndex){webState.lastIrcServerIndex=ircState.ircServerIndex
 ;document.getElementById('ircServerNameInputId').value=ircState.ircServerName;document.getElementById('ircServerAddrInputId').value=ircState.ircServerHost
 ;document.getElementById('ircServerPortInputId').value=ircState.ircServerPort;if(ircState.ircTLSEnabled){document.getElementById('ircServerTlsEnable').setAttribute('checked','')}else{
 document.getElementById('ircServerTlsEnable').removeAttribute('checked')}if(ircState.ircTLSVerify){document.getElementById('ircServerTlsVerify').setAttribute('checked','')}else{
@@ -153,7 +153,7 @@ document.getElementById('ircServerTlsVerify').removeAttribute('checked')}documen
 ;document.getElementById('headerUser').textContent=' ('+ircState.nickName+')';document.getElementById('nickNameInputId').value=ircState.nickName
 ;document.getElementById('userNameInputId').value=ircState.userName;document.getElementById('realNameInputId').value=ircState.realName
 ;document.getElementById('userModeInputId').value=ircState.userMode;webState.ircConnecting=false}if(!ircState.ircConnected){setVariablesShowingIRCDisconnected();document.title='irc-hybrid-client'}
-if(lastConnectErrorCount!==ircState.count.ircConnectError){lastConnectErrorCount=ircState.count.ircConnectError;if(ircState.count.ircConnectError>0){if(!webState.cacheReloadInProgress){
+if(lastConnectErrorCount!==ircState.count.ircConnectError){lastConnectErrorCount=ircState.count.ircConnectError;if(ircState.count.ircConnectError>0){if(webState.count.webStateCalls>1){
 showError('An IRC Server connection error occurred')}}webState.ircConnecting=false}document.dispatchEvent(new CustomEvent('irc-state-changed',{bubbles:true,detail:{}}));updateDivVisibility()
 ;if(!document.getElementById('variablesDivId').hasAttribute('hidden')){
 document.getElementById('variablesPreId').textContent='ircState = '+JSON.stringify(ircState,null,2)+'\n\n'+'webState = '+JSON.stringify(webState,null,2)}
