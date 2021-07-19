@@ -133,7 +133,10 @@ webState.channelStates = [];
 webState.lastPMNick = '';
 webState.activePrivateMessageNicks = [];
 webState.times = { webConnect: 0 };
-webState.count = { webConnect: 0 };
+webState.count = {
+  webConnect: 0,
+  webStateCalls: 0
+};
 webState.cacheReloadInProgress = false;
 
 //
@@ -723,6 +726,8 @@ let lastConnectErrorCount = 0;
 // as well as browser (read only here)
 // --------------------------------------
 function getIrcState (callback) {
+  webState.count.webStateCalls++;
+
   const fetchURL = webServerUrl + '/irc/getircstate';
   const fetchOptions = {
     method: 'GET',
@@ -806,7 +811,8 @@ function getIrcState (callback) {
       if (lastConnectErrorCount !== ircState.count.ircConnectError) {
         lastConnectErrorCount = ircState.count.ircConnectError;
         if (ircState.count.ircConnectError > 0) {
-          if (!webState.cacheReloadInProgress) {
+          // On page refresh, skip legacy IRC errors occurring on the first /irc/getwebstate call
+          if (webState.count.webStateCalls > 1) {
             showError('An IRC Server connection error occurred');
           }
         }

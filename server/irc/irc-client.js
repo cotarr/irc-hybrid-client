@@ -120,7 +120,8 @@
   vars.ircState.times = { programRun: 0, ircConnect: 0 };
   vars.ircState.count = {
     ircConnect: 0,
-    ircConnectError: 0
+    ircConnectError: 0,
+    ircStateCalls: 0
   };
   vars.ircState.websocketCount = 0;
 
@@ -1034,6 +1035,7 @@
   // ---------------------------------------------------
   const getIrcState = function (req, res, next) {
     vars.ircState.websocketCount = global.getWebsocketCount();
+    vars.ircState.count.ircStateCalls++;
     res.json(vars.ircState);
   };
 
