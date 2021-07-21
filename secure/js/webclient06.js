@@ -244,7 +244,9 @@ function createChannelEl (name) {
 
   // zoom button
   const channelZoomButtonEl = document.createElement('button');
-  channelZoomButtonEl.textContent = 'Zoom';
+  const zoomOffText = 'Zoom';
+  const zoomOnText = 'Un-zoom';
+  channelZoomButtonEl.textContent = zoomOffText;
   channelZoomButtonEl.classList.add('channel-button');
 
   // refresh button
@@ -380,15 +382,14 @@ function createChannelEl (name) {
   // Show/Hide button handler
   // -------------------------
   channelHideButtonEl.addEventListener('click', function () {
-    if (channelBottomDivEl.hasAttribute('hidden')) {
-      channelBottomDivEl.removeAttribute('hidden');
-      channelHideButtonEl.textContent = '-';
-      channelTopRightHidableDivEl.removeAttribute('hidden');
+    if (channelMainSectionEl.hasAttribute('opened')) {
+      channelMainSectionEl.removeAttribute('opened');
+      channelMainSectionEl.removeAttribute('zoom');
     } else {
-      channelBottomDivEl.setAttribute('hidden', '');
-      channelHideButtonEl.textContent = '+';
-      channelTopRightHidableDivEl.setAttribute('hidden', '');
+      channelMainSectionEl.setAttribute('opened', '');
+      channelMainSectionEl.removeAttribute('zoom');
     }
+    updateVisibility();
   });
 
   // -------------------------
@@ -548,22 +549,43 @@ function createChannelEl (name) {
   });
 
   function updateVisibility () {
-    // console.log('Event: irc-state-changed (createChannelEl)');
     const index = ircState.channels.indexOf(name.toLowerCase());
     if (index >= 0) {
-      if (ircState.channelStates[index].joined) {
-        channelTopicDivEl.textContent = cleanFormatting(ircState.channelStates[index].topic);
-        channelNamesDisplayEl.removeAttribute('disabled');
-        channelTextAreaEl.removeAttribute('disabled');
-        channelInputAreaEl.removeAttribute('disabled');
-        channelSendButtonEl.removeAttribute('disabled');
+      if (channelMainSectionEl.hasAttribute('opened')) {
+        // show contents below header bar
+        channelBottomDivEl.removeAttribute('hidden');
+        // update show/hide button
+        channelHideButtonEl.textContent = '-';
+        if (ircState.channelStates[index].joined) {
+          channelTopicDivEl.textContent = cleanFormatting(ircState.channelStates[index].topic);
+          channelNamesDisplayEl.removeAttribute('disabled');
+          channelTextAreaEl.removeAttribute('disabled');
+          channelInputAreaEl.removeAttribute('disabled');
+          channelSendButtonEl.removeAttribute('disabled');
 
-        channelJoinButtonEl.setAttribute('hidden', '');
-        channelPruneButtonEl.setAttribute('hidden', '');
-        channelPartButtonEl.removeAttribute('hidden');
-        channelZoomButtonEl.removeAttribute('hidden');
+          channelJoinButtonEl.setAttribute('hidden', '');
+          channelPruneButtonEl.setAttribute('hidden', '');
+          channelPartButtonEl.removeAttribute('hidden');
+        } else {
+          channelNamesDisplayEl.setAttribute('disabled', '');
+          channelTextAreaEl.setAttribute('disabled', '');
+          channelInputAreaEl.setAttribute('disabled', '');
+          channelSendButtonEl.setAttribute('disabled', '');
 
+          channelJoinButtonEl.removeAttribute('hidden');
+          channelPruneButtonEl.removeAttribute('hidden');
+          channelPartButtonEl.setAttribute('hidden', '');
+
+          channelTopicDivEl.removeAttribute('hidden');
+          channelBottomDiv2El.removeAttribute('hidden');
+          channelBottomDiv3El.removeAttribute('hidden');
+          channelBottomDiv4El.removeAttribute('hidden');
+          channelNamesDisplayEl.removeAttribute('hidden');
+        } // not joined
+
+        // common, both joined and not joined, for zoom
         if (channelMainSectionEl.hasAttribute('zoom')) {
+          channelZoomButtonEl.textContent = zoomOnText;
           channelTopicDivEl.setAttribute('hidden', '');
           channelBottomDiv2El.setAttribute('hidden', '');
           channelBottomDiv3El.setAttribute('hidden', '');
@@ -574,59 +596,56 @@ function createChannelEl (name) {
             channelNamesDisplayEl.setAttribute('hidden', '');
           }
         } else {
+          channelZoomButtonEl.textContent = zoomOffText;
           channelTopicDivEl.removeAttribute('hidden');
           channelBottomDiv2El.removeAttribute('hidden');
           channelBottomDiv3El.removeAttribute('hidden');
           channelBottomDiv4El.removeAttribute('hidden');
           channelNamesDisplayEl.removeAttribute('hidden');
         }
+
+        if (channelMainSectionEl.hasAttribute('beep1-enabled')) {
+          channelBeep1CBInputEl.checked = true;
+        } else {
+          channelBeep1CBInputEl.checked = false;
+        }
+        if (channelMainSectionEl.hasAttribute('beep2-enabled')) {
+          channelBeep2CBInputEl.checked = true;
+        } else {
+          channelBeep2CBInputEl.checked = false;
+        }
+        if (channelMainSectionEl.hasAttribute('beep3-enabled')) {
+          channelBeep3CBInputEl.checked = true;
+        } else {
+          channelBeep3CBInputEl.checked = false;
+        }
+        if (channelMainSectionEl.hasAttribute('brief-enabled')) {
+          channelFormatCBInputEl.checked = true;
+        } else {
+          channelFormatCBInputEl.checked = false;
+        }
+        if (channelMainSectionEl.hasAttribute('auto-comp-enabled')) {
+          channelAutoCompCBInputEl.checked = true;
+        } else {
+          channelAutoCompCBInputEl.checked = false;
+        }
       } else {
-        // not joined, cancel zoom
-        channelMainSectionEl.removeAttribute('zoom');
-        channelZoomButtonEl.textContent = 'Zoom';
-
-        channelNamesDisplayEl.setAttribute('disabled', '');
-        channelTextAreaEl.setAttribute('disabled', '');
-        channelInputAreaEl.setAttribute('disabled', '');
-        channelSendButtonEl.setAttribute('disabled', '');
-
-        channelJoinButtonEl.removeAttribute('hidden');
-        channelPruneButtonEl.removeAttribute('hidden');
+        // case of NOT opened
+        channelZoomButtonEl.textContent = zoomOffText;
+        channelBottomDivEl.setAttribute('hidden', '');
+        channelPruneButtonEl.setAttribute('hidden', '');
+        channelJoinButtonEl.setAttribute('hidden', '');
         channelPartButtonEl.setAttribute('hidden', '');
-        channelZoomButtonEl.setAttribute('hidden', '');
-
-        channelTopicDivEl.removeAttribute('hidden');
-        channelBottomDiv2El.removeAttribute('hidden');
-        channelBottomDiv3El.removeAttribute('hidden');
-        channelBottomDiv4El.removeAttribute('hidden');
-        channelNamesDisplayEl.removeAttribute('hidden');
+        channelHideButtonEl.textContent = '+';
       }
-
-      if (channelMainSectionEl.hasAttribute('beep1-enabled')) {
-        channelBeep1CBInputEl.checked = true;
-      } else {
-        channelBeep1CBInputEl.checked = false;
-      }
-      if (channelMainSectionEl.hasAttribute('beep2-enabled')) {
-        channelBeep2CBInputEl.checked = true;
-      } else {
-        channelBeep2CBInputEl.checked = false;
-      }
-      if (channelMainSectionEl.hasAttribute('beep3-enabled')) {
-        channelBeep3CBInputEl.checked = true;
-      } else {
-        channelBeep3CBInputEl.checked = false;
-      }
-      if (channelMainSectionEl.hasAttribute('brief-enabled')) {
-        channelFormatCBInputEl.checked = true;
-      } else {
-        channelFormatCBInputEl.checked = false;
-      }
-      if (channelMainSectionEl.hasAttribute('auto-comp-enabled')) {
-        channelAutoCompCBInputEl.checked = true;
-      } else {
-        channelAutoCompCBInputEl.checked = false;
-      }
+    } else {
+      // Case of index < 0
+      channelZoomButtonEl.textContent = zoomOffText;
+      channelBottomDivEl.setAttribute('hidden', '');
+      channelPruneButtonEl.setAttribute('hidden', '');
+      channelJoinButtonEl.setAttribute('hidden', '');
+      channelPartButtonEl.setAttribute('hidden', '');
+      channelHideButtonEl.textContent = '+';
     }
   } // updateVisibility()
 
@@ -639,21 +658,13 @@ function createChannelEl (name) {
     if (channelMainSectionEl.hasAttribute('zoom')) {
       // Turn off channel zoom
       channelMainSectionEl.removeAttribute('zoom');
-      channelZoomButtonEl.textContent = 'Zoom';
       updateVisibility();
       // scroll text to most recent messages
       channelTextAreaEl.scrollTop = channelTextAreaEl.scrollHeight;
     } else {
-      // Turn on channel zoom
-      channelMainSectionEl.setAttribute('zoom', '');
-      channelZoomButtonEl.textContent = 'No Zoom';
-      updateVisibility();
-      // scroll text to most recent messages
-      channelTextAreaEl.scrollTop = channelTextAreaEl.scrollHeight;
-
       // this will be executed by all other windows.
       // The handler for this window will match zoomEventId
-      // and ignore the request
+      // and handle the zoom for this window as a special case
       document.dispatchEvent(new CustomEvent('hide-all-divs',
         {
           bubbles: true,
@@ -667,11 +678,8 @@ function createChannelEl (name) {
   // show all event
   // ----------------
   document.addEventListener('show-all-divs', function (event) {
-    channelBottomDivEl.removeAttribute('hidden');
-    channelHideButtonEl.textContent = '-';
-    channelTopRightHidableDivEl.removeAttribute('hidden');
     channelMainSectionEl.removeAttribute('zoom');
-    channelZoomButtonEl.textContent = 'Zoom';
+    channelMainSectionEl.setAttribute('opened', '');
     updateVisibility();
   });
   // -----------------------------------------------------------
@@ -684,19 +692,22 @@ function createChannelEl (name) {
       (event.detail.zoom) &&
       (event.detail.zoom.length > 0)) {
       if (event.detail.zoom !== zoomEventId) {
-        channelBottomDivEl.setAttribute('hidden', '');
-        channelHideButtonEl.textContent = '+';
-        channelTopRightHidableDivEl.setAttribute('hidden', '');
+        // case of event id not match, hide
         channelMainSectionEl.removeAttribute('zoom');
-        channelZoomButtonEl.textContent = 'Zoom';
+        channelMainSectionEl.removeAttribute('opened');
         updateVisibility();
+      } else {
+        // case of event id is a match, Turn on channel zoom
+        channelMainSectionEl.setAttribute('zoom', '');
+        channelMainSectionEl.setAttribute('opened', '');
+        updateVisibility();
+        // scroll text to most recent messages
+        channelTextAreaEl.scrollTop = channelTextAreaEl.scrollHeight;
       }
     } else {
-      channelBottomDivEl.setAttribute('hidden', '');
-      channelHideButtonEl.textContent = '+';
-      channelTopRightHidableDivEl.setAttribute('hidden', '');
+      // property not found hide.
       channelMainSectionEl.removeAttribute('zoom');
-      channelZoomButtonEl.textContent = 'Zoom';
+      channelMainSectionEl.removeAttribute('opened');
       updateVisibility();
     }
   });
@@ -778,8 +789,6 @@ function createChannelEl (name) {
     channelMainSectionEl.removeAttribute('brief-enabled');
     channelFormatCBInputEl.checked = false;
   }
-  // show the brief/full setting in checkbox
-  updateVisibility();
 
   // -------------------------
   // AutoComplete checkbox handler
@@ -796,10 +805,8 @@ function createChannelEl (name) {
   // Check if beforeInput event is supported in this browser (part of InputEvent)
   if ((window.InputEvent) && (typeof InputEvent.prototype.getTargetRanges === 'function')) {
     channelMainSectionEl.setAttribute('auto-comp-enabled', '');
-    updateVisibility();
   } else {
     channelMainSectionEl.setAttribute('auto-comp-enabled', '');
-    updateVisibility();
     channelAutoCompCBInputEl.setAttribute('disabled', '');
   }
 
@@ -1098,7 +1105,7 @@ function createChannelEl (name) {
           (!webState.channelStates[webStateIndex].lastJoined)) {
           channelBottomDivEl.removeAttribute('hidden');
           channelHideButtonEl.textContent = '-';
-          channelTopRightHidableDivEl.removeAttribute('hidden');
+          // channelTopRightHidableDivEl.removeAttribute('hidden');
         }
         webState.channelStates[webStateIndex].lastJoined =
           ircState.channelStates[ircStateIndex].joined;
@@ -1364,9 +1371,6 @@ function createChannelEl (name) {
     channelTextAreaEl.value = errorString;
   });
 
-  // set visibility and divs
-  updateVisibility();
-
   // -----------------------------------------------------------
   // Setup textarea elements as dynamically resizable
   // -----------------------------------------------------------
@@ -1414,6 +1418,12 @@ function createChannelEl (name) {
       adjustChannelInputToWidowWidth();
     }
   });
+
+  // Upon creating new channel window, open it unzoomed
+  channelMainSectionEl.setAttribute('opened', '');
+  channelMainSectionEl.removeAttribute('zoom');
+  updateVisibility();
+
   //
   // Resize on creating channel window
   //
