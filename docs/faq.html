@@ -40,6 +40,7 @@
         <a href="#concurrent">Are concurrent connections supported?</a><br>
         <a href="#tracking">Are there any tracking beacons in the code?</a><br>
         <a href="#cookies">Does the program use cookies?</a><br>
+        <a href="#localstorage">What data is stored locally in the web browser?</a><br>
         <div class="faq-spacer"></div>
         <table class="table-generic">
 
@@ -126,7 +127,27 @@
             This is disclosed on the login form. No additional persistent
             identifiers are used.
           </a></td></tr>
-
+          <tr><td><a name="localstorage">
+            <p>
+              Q: What data is stored locally in the web browser?<br>
+            </p>
+            A: The web page uses the web browsers window.localStorage API.
+            The browser localStorage is cleared when the &quotWeb Logout&quot button is
+            activated.
+            The browser localStorage is cleared when the web login userid number
+            does not match the previous userid number.
+            The localStorage data will otherwise persist indefinitely.
+            Local storage should not be preserved when a browser is in incognito mode.
+            <br><br>
+            1) Web userid - The web userid and timestamp are saved to localStorage.
+            The userid is an integer number starting at 1 that is assigned in the credentials.js file.
+            The userid number is used to delete localStorage when a change in userid is detected.
+            The string value of the username is not saved.
+            <br><br>
+            2) IRC channel name - The IRC channel name and time stamp are saved to localStorage
+            when an IRC channel &quotZoom&quot view mode is activated. This data is used
+            to automatically select IRC channel view mode as zoomed when re-opening the web page.
+          </a></td></tr>
         </table>
 
       </div> <!-- /text-div -->

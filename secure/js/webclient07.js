@@ -313,6 +313,7 @@ function createPrivateMessageEl (name, parsedMessage) {
       privMsgBottomDivEl.removeAttribute('hidden');
       privMsgHideButtonEl.textContent = '-';
       privMsgTopRightHidableDivEl.removeAttribute('hidden');
+      clearLastZoom();
     } else {
       privMsgSectionEl.setAttribute('hidden', '');
       privMsgBottomDivEl.setAttribute('hidden', '');
@@ -490,6 +491,9 @@ function createPrivateMessageEl (name, parsedMessage) {
             privMsgBottomDivEl.removeAttribute('hidden');
             privMsgHideButtonEl.textContent = '-';
             privMsgTopRightHidableDivEl.removeAttribute('hidden');
+            if (!webState.cacheReloadInProgress) {
+              clearLastZoom();
+            }
 
             // also show control section div
             document.getElementById('privMsgMainHiddenDiv').removeAttribute('hidden');

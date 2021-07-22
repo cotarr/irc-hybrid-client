@@ -246,8 +246,15 @@ document.getElementById('webLogoutButton').addEventListener('click', function ()
   if (((ircState.ircConnected) && (webState.webConnected)) || (!webState.webConnected)) {
     document.getElementById('logoutConfirmDiv').removeAttribute('hidden');
   } else {
+    // removed user data stored locally.
+    window.localStorage.clear();
     window.location.href = '/logout';
   }
+});
+document.getElementById('confirmedWebLogoutButton').addEventListener('click', function () {
+  // removed user data stored locally.
+  window.localStorage.clear();
+  window.location.href = '/logout';
 });
 
 // -----------------------------------------------------

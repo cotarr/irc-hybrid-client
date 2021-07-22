@@ -548,6 +548,7 @@ document.getElementById('loadFromCacheButton').addEventListener('click', functio
 // Show all divs button
 // -----------------------
 document.getElementById('showAllDivsButton').addEventListener('click', function () {
+  clearLastZoom();
   // Emit event for dynamically generated hidden divs
   document.dispatchEvent(new CustomEvent('show-all-divs', { bubbles: true }));
 });
@@ -556,6 +557,7 @@ document.getElementById('showAllDivsButton').addEventListener('click', function 
 // Hide all divs button
 // -----------------------
 document.getElementById('hideAllDivsButton').addEventListener('click', function () {
+  clearLastZoom();
   // Emit event for dynamically generated hidden divs
   document.dispatchEvent(new CustomEvent('hide-all-divs', { bubbles: true }));
 });

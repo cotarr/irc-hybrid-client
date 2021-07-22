@@ -33,10 +33,21 @@
           Change Log
         </div>
         <p>
-          2021-07-21 (next) {
-            Recode the IRC channel window zoom/unzoom functionality.
+          2021-07-22 (next)
+            Add use of browser localStorage to the program.
+            The web userid and web login timestamp are saved to localStorage.
+            The userid is an integer number starting at 1 that is assigned in the credentials.js file.
+            The userid number is used to delete localStorage when a change in userid is detected.
+            The string value of the username is not saved.
+            <br><br>
+            Recode the IRC channel zoom/unzoom view mode functionality.
             Channel zoom buttons always visible when window collapsed.
-          }
+            When an IRC channel is placed into zoom view mode, the IRC channel name is
+            saved to the browsers localStorage API.
+            When zoom is cancelled, the localStorage channel name is removed.
+            <br><br>
+            When opening the web page, if a previous zoom was active, the browser
+            will open in IRC channel zoom mode.
         </p>
         <p>
           2021-07-19 (0.1.22)

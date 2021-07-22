@@ -90,7 +90,6 @@ function _sendTextToChannel (channelIndex, textAreaEl) {
   textAreaEl.value = '';
 }; // _sendTextToChannel
 
-let zoomIndexNumber = 0;
 const mobileBreakpointPx = 600;
 
 // --------------------------------------------------------
@@ -388,6 +387,7 @@ function createChannelEl (name) {
     } else {
       channelMainSectionEl.setAttribute('opened', '');
       channelMainSectionEl.removeAttribute('zoom');
+      clearLastZoom();
     }
     updateVisibility();
   });
@@ -652,8 +652,6 @@ function createChannelEl (name) {
   // -------------------------
   // Zoom button handler
   // -------------------------
-  zoomIndexNumber++;
-  const zoomEventId = 'chan' + zoomIndexNumber.toString() + 'ZoomId';
   channelZoomButtonEl.addEventListener('click', function () {
     if (channelMainSectionEl.hasAttribute('zoom')) {
       // Turn off channel zoom
@@ -661,16 +659,23 @@ function createChannelEl (name) {
       updateVisibility();
       // scroll text to most recent messages
       channelTextAreaEl.scrollTop = channelTextAreaEl.scrollHeight;
+      // clearLastZoom();
     } else {
       // this will be executed by all other windows.
-      // The handler for this window will match zoomEventId
       // and handle the zoom for this window as a special case
+      const timestamp = unixTimestamp();
+      const lastZoomObj = {
+        timestamp: timestamp,
+        zoomType: 'channel',
+        zoomValue: name.toLowerCase()
+      };
       document.dispatchEvent(new CustomEvent('hide-all-divs',
         {
           bubbles: true,
-          detail: { zoom: zoomEventId }
+          detail: lastZoomObj
         }
       ));
+      window.localStorage.setItem('lastZoom', JSON.stringify(lastZoomObj));
     }
   });
 
@@ -683,33 +688,34 @@ function createChannelEl (name) {
     updateVisibility();
   });
   // -----------------------------------------------------------
-  // hide all event
+  // hide all event, except
   //
-  // If event.detail.zoom === zoomEventId, abort without action
+  // If event.detail.zoomValue === channel name string
   // -----------------------------------------------------------
   document.addEventListener('hide-all-divs', function (event) {
+    // console.log('hide-all-divs ' + JSON.stringify(event.detail, null, 2));
     if ((event.detail) &&
-      (event.detail.zoom) &&
-      (event.detail.zoom.length > 0)) {
-      if (event.detail.zoom !== zoomEventId) {
-        // case of event id not match, hide
-        channelMainSectionEl.removeAttribute('zoom');
-        channelMainSectionEl.removeAttribute('opened');
-        updateVisibility();
-      } else {
-        // case of event id is a match, Turn on channel zoom
-        channelMainSectionEl.setAttribute('zoom', '');
-        channelMainSectionEl.setAttribute('opened', '');
-        updateVisibility();
-        // scroll text to most recent messages
-        channelTextAreaEl.scrollTop = channelTextAreaEl.scrollHeight;
+      (event.detail.zoomType) &&
+      (event.detail.zoomValue) &&
+      (event.detail.zoomType === 'channel') &&
+      (event.detail.zoomValue === name.toLowerCase())) {
+      const index = ircState.channels.indexOf(name.toLowerCase());
+      if (index >= 0) {
+        if (ircState.channelStates[index].joined) {
+          // case of event id is a match, Turn on channel zoom
+          channelMainSectionEl.setAttribute('zoom', '');
+          channelMainSectionEl.setAttribute('opened', '');
+          updateVisibility();
+          // scroll text to most recent messages
+          channelTextAreaEl.scrollTop = channelTextAreaEl.scrollHeight;
+          return;
+        }
       }
-    } else {
-      // property not found hide.
-      channelMainSectionEl.removeAttribute('zoom');
-      channelMainSectionEl.removeAttribute('opened');
-      updateVisibility();
     }
+    // property not found hide.
+    channelMainSectionEl.removeAttribute('zoom');
+    channelMainSectionEl.removeAttribute('opened');
+    updateVisibility();
   });
 
   // -------------------------
@@ -1279,8 +1285,25 @@ function createChannelEl (name) {
             }
           }
           // Upon channel message, make sectino visible.
-          channelBottomDivEl.removeAttribute('hidden');
-          channelHideButtonEl.textContent = '-';
+          let lastZoomObj = null;
+          lastZoomObj = JSON.parse(window.localStorage.getItem('lastZoom'));
+          if ((lastZoomObj) &&
+            (lastZoomObj.zoomType) &&
+            (lastZoomObj.zoomValue) &&
+            (lastZoomObj.zoomType === 'channel') &&
+            (lastZoomObj.zoomValue === name.toLowerCase())) {
+            // Case of match current channel, just make visible, if not
+            // do nothing
+          } else {
+            // Else not this channel
+            // Receiving text in other channel clears last zoom
+            if (!webState.cacheReloadInProgress) {
+              clearLastZoom();
+            }
+          }
+
+          channelMainSectionEl.setAttribute('opened', '');
+          updateVisibility();
 
           // Message activity Icon
           // If focus not <textarea> elment,
@@ -1355,9 +1378,41 @@ function createChannelEl (name) {
       markerString += '\n';
     }
     channelTextAreaEl.value += markerString;
-    // move scroll bar so text is scrolled all the way up
-    channelTextAreaEl.scrollTop = channelTextAreaEl.scrollHeight;
+
+    let lastZoomObj = null;
+    lastZoomObj = JSON.parse(window.localStorage.getItem('lastZoom'));
+    if ((lastZoomObj) &&
+      (lastZoomObj.zoomType) &&
+      (lastZoomObj.zoomValue) &&
+      (lastZoomObj.zoomType === 'channel') &&
+      (lastZoomObj.zoomValue === name.toLowerCase())) {
+      const now = unixTimestamp();
+      if (('timestamp' in lastZoomObj) &&
+        // for now, trying 24 hours as limit to remember zoomed IRC channel.
+        (now - lastZoomObj.timestamp < 86400)) {
+        const newZoomObj = {
+          timestamp: now,
+          zoomType: 'channel',
+          zoomValue: name.toLowerCase()
+        };
+        // Just to be sure the reload is finished, wait 0.1 seconds before zooming
+        setTimeout(function () {
+          console.log('dispatching zoom request event');
+          document.dispatchEvent(new CustomEvent('hide-all-divs',
+            {
+              bubbles: true,
+              detail: newZoomObj
+            }
+          ));
+        }, 100);
+      }
+    } else {
+      // Case of not remembered zoom, just scroll to most recent
+      // move scroll bar so text is scrolled all the way up
+      channelTextAreaEl.scrollTop = channelTextAreaEl.scrollHeight;
+    }
   });
+
   document.addEventListener('cache-reload-error', function (event) {
     let errorString = '\n';
     let timestampString = '';

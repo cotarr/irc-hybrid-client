@@ -281,6 +281,15 @@ function unixTimestamp () {
   return parseInt(now.valueOf() / 1000);
 };
 
+function clearLastZoom () {
+  const now = unixTimestamp();
+  window.localStorage.setItem('lastZoom', JSON.stringify({
+    timestamp: now,
+    zoomType: null,
+    zoomValue: null
+  }));
+}
+
 // --------------------------------------
 // Check if connected, both web and irc
 // 1 = browser connect to web server only

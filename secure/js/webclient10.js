@@ -232,6 +232,29 @@ document.getElementById('eraseCacheButton').addEventListener('click', function (
     });
 });
 
+// ------------------------------------------------------------
+// Retrieve last web userid from local storage
+// If current web userid does not match, clear local data
+// Save current userid to localStorage.
+// Note: userid is an integer number assigned in credentials.js
+// ------------------------------------------------------------
+function detectWebUseridChanged () {
+  let lastLoginUser = null;
+  lastLoginUser = JSON.parse(window.localStorage.getItem('lastLoginUser'));
+  if ((lastLoginUser) &&
+    (lastLoginUser.userid) &&
+    (lastLoginUser.userid !== webState.loginUser.userid)) {
+    console.log('User id changed, clearing local storage');
+    window.localStorage.clear();
+  }
+  const newLoginTimestamp = unixTimestamp();
+  const newLoginUser = {
+    timestamp: newLoginTimestamp,
+    userid: webState.loginUser.userid
+  };
+  window.localStorage.setItem('lastLoginUser', JSON.stringify(newLoginUser));
+} // saveUseridToLocalStorage()
+
 // --------------------------------------------
 // Fetch web login user's name and update top
 // --------------------------------------------
@@ -254,6 +277,7 @@ function updateUsername () {
     })
     .then((responseJson) => {
       webState.loginUser = responseJson;
+      detectWebUseridChanged();
     })
     .catch((error) => {
       console.log(error);
