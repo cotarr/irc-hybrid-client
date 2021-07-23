@@ -558,8 +558,8 @@ document.getElementById('showAllDivsButton').addEventListener('click', function 
 // -----------------------
 document.getElementById('hideAllDivsButton').addEventListener('click', function () {
   clearLastZoom();
-  // Emit event for dynamically generated hidden divs
-  document.dispatchEvent(new CustomEvent('hide-all-divs', { bubbles: true }));
+  // Emit event to command divs to hide, skiping selected zoom div
+  document.dispatchEvent(new CustomEvent('hide-or-zoom', { bubbles: true }));
 });
 
 // -----------------------

@@ -583,8 +583,8 @@ document.addEventListener('show-all-divs', function (event) {
   // document.getElementById('infoOpenCloseButton').textContent = '-';
 });
 
-// -----------------------------------
-// Global event to hide all divs
+// ---------------------------------------------------------
+// Global event to hide all divs with option to skip 1 div (zoom)
 //
 // The event contains a detail.zoom property
 //  of type string that may be used to inhibit hiding
@@ -592,7 +592,7 @@ document.addEventListener('show-all-divs', function (event) {
 // is absent or zero length string, all hideable windows
 // hard hidden
 // -----------------------------------
-document.addEventListener('hide-all-divs', function (event) {
+document.addEventListener('hide-or-zoom', function (event) {
   // console.log(JSON.stringify(event.detail, null, 2));
   // document.getElementById('errorDiv').setAttribute('hidden', '');
   document.getElementById('hideLoginSection').setAttribute('hidden', '');

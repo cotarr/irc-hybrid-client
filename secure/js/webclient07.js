@@ -359,7 +359,7 @@ function createPrivateMessageEl (name, parsedMessage) {
   // hide all event
   // ----------------
   // hide window, data section and buttons.
-  document.addEventListener('hide-all-divs', function (event) {
+  document.addEventListener('hide-or-zoom', function (event) {
     privMsgBottomDivEl.setAttribute('hidden', '');
     privMsgHideButtonEl.textContent = '+';
     privMsgTopRightHidableDivEl.setAttribute('hidden', '');

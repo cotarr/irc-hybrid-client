@@ -669,7 +669,7 @@ function createChannelEl (name) {
         zoomType: 'channel',
         zoomValue: name.toLowerCase()
       };
-      document.dispatchEvent(new CustomEvent('hide-all-divs',
+      document.dispatchEvent(new CustomEvent('hide-or-zoom',
         {
           bubbles: true,
           detail: lastZoomObj
@@ -688,12 +688,12 @@ function createChannelEl (name) {
     updateVisibility();
   });
   // -----------------------------------------------------------
-  // hide all event, except
+  // hide all event, except skipped zoom div
   //
   // If event.detail.zoomValue === channel name string
   // -----------------------------------------------------------
-  document.addEventListener('hide-all-divs', function (event) {
-    // console.log('hide-all-divs ' + JSON.stringify(event.detail, null, 2));
+  document.addEventListener('hide-or-zoom', function (event) {
+    // console.log('hide-or-zoom ' + JSON.stringify(event.detail, null, 2));
     if ((event.detail) &&
       (event.detail.zoomType) &&
       (event.detail.zoomValue) &&
@@ -1476,7 +1476,7 @@ function createChannelEl (name) {
         };
         // Just to be sure the reload is finished, wait 0.1 seconds before zooming
         setTimeout(function () {
-          document.dispatchEvent(new CustomEvent('hide-all-divs',
+          document.dispatchEvent(new CustomEvent('hide-or-zoom',
             {
               bubbles: true,
               detail: newZoomObj

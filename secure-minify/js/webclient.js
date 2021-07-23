@@ -118,7 +118,7 @@ document.getElementById('webConnectIconId').removeAttribute('connected');documen
 ;document.getElementById('privMsgMainHiddenButton').textContent='-';document.getElementById('ircChannelsMainHiddenDiv').removeAttribute('hidden')
 ;document.getElementById('ircChannelsMainHiddenButton').textContent='-';showRawMessageWindow();webState.noticeOpen=true;webState.wallopsOpen=true
 ;document.getElementById('noticeSectionDiv').removeAttribute('hidden');document.getElementById('wallopsSectionDiv').removeAttribute('hidden')})
-;document.addEventListener('hide-all-divs',function(event){document.getElementById('hideLoginSection').setAttribute('hidden','');document.getElementById('hideLoginSectionButton').textContent='+'
+;document.addEventListener('hide-or-zoom',function(event){document.getElementById('hideLoginSection').setAttribute('hidden','');document.getElementById('hideLoginSectionButton').textContent='+'
 ;document.getElementById('privMsgMainHiddenDiv').setAttribute('hidden','');document.getElementById('privMsgMainHiddenButton').textContent='+'
 ;document.getElementById('ircChannelsMainHiddenDiv').setAttribute('hidden','');document.getElementById('ircChannelsMainHiddenButton').textContent='+';hideRawMessageWindow();webState.noticeOpen=false
 ;document.getElementById('noticeSectionDiv').setAttribute('hidden','');webState.wallopsOpen=false;document.getElementById('wallopsSectionDiv').setAttribute('hidden','')
@@ -493,9 +493,9 @@ if(channelMainSectionEl.hasAttribute('auto-comp-enabled')){channelAutoCompCBInpu
 ;channelHideButtonEl.textContent='+'}}else{channelZoomButtonEl.textContent=zoomOffText;channelBottomDivEl.setAttribute('hidden','');channelPruneButtonEl.setAttribute('hidden','')
 ;channelJoinButtonEl.setAttribute('hidden','');channelPartButtonEl.setAttribute('hidden','');channelHideButtonEl.textContent='+'}}channelZoomButtonEl.addEventListener('click',function(){
 if(channelMainSectionEl.hasAttribute('zoom')){channelMainSectionEl.removeAttribute('zoom');updateVisibility();channelTextAreaEl.scrollTop=channelTextAreaEl.scrollHeight}else{
-const timestamp=unixTimestamp();const lastZoomObj={timestamp:timestamp,zoomType:'channel',zoomValue:name.toLowerCase()};document.dispatchEvent(new CustomEvent('hide-all-divs',{bubbles:true,
+const timestamp=unixTimestamp();const lastZoomObj={timestamp:timestamp,zoomType:'channel',zoomValue:name.toLowerCase()};document.dispatchEvent(new CustomEvent('hide-or-zoom',{bubbles:true,
 detail:lastZoomObj}));window.localStorage.setItem('lastZoom',JSON.stringify(lastZoomObj))}});document.addEventListener('show-all-divs',function(event){channelMainSectionEl.removeAttribute('zoom')
-;channelMainSectionEl.setAttribute('opened','');updateVisibility()});document.addEventListener('hide-all-divs',function(event){
+;channelMainSectionEl.setAttribute('opened','');updateVisibility()});document.addEventListener('hide-or-zoom',function(event){
 if(event.detail&&event.detail.zoomType&&event.detail.zoomValue&&event.detail.zoomType==='channel'&&event.detail.zoomValue===name.toLowerCase()){
 const index=ircState.channels.indexOf(name.toLowerCase());if(index>=0){if(ircState.channelStates[index].joined){channelMainSectionEl.setAttribute('zoom','')
 ;channelMainSectionEl.setAttribute('opened','');updateVisibility();channelTextAreaEl.scrollTop=channelTextAreaEl.scrollHeight;return}}}channelMainSectionEl.removeAttribute('zoom')
@@ -602,7 +602,7 @@ let markerString='';let timestampString='';if('detail'in event&&'timestamp'in ev
 ;lastZoomObj=JSON.parse(window.localStorage.getItem('lastZoom'))
 ;if(lastZoomObj&&lastZoomObj.zoomType&&lastZoomObj.zoomValue&&lastZoomObj.zoomType==='channel'&&lastZoomObj.zoomValue===name.toLowerCase()){const now=unixTimestamp()
 ;if('timestamp'in lastZoomObj&&now-lastZoomObj.timestamp<86400){const newZoomObj={timestamp:now,zoomType:'channel',zoomValue:name.toLowerCase()};setTimeout(function(){
-document.dispatchEvent(new CustomEvent('hide-all-divs',{bubbles:true,detail:newZoomObj}))},100)}}else{channelTextAreaEl.scrollTop=channelTextAreaEl.scrollHeight}})
+document.dispatchEvent(new CustomEvent('hide-or-zoom',{bubbles:true,detail:newZoomObj}))},100)}}else{channelTextAreaEl.scrollTop=channelTextAreaEl.scrollHeight}})
 ;document.addEventListener('cache-reload-error',function(event){let errorString='\n';let timestampString='';if('detail'in event&&'timestamp'in event.detail){
 timestampString=unixTimestampToHMS(event.detail.timestamp)}if(timestampString){errorString+=timestampString}errorString+=' '+cacheErrorString+'\n\n';channelTextAreaEl.value=errorString})
 ;const adjustChannelInputToWidowWidth=function(){const mar1=webState.dynamic.commonMargin;const mar2=webState.dynamic.commonMargin+5+webState.dynamic.sendButtonWidthPx
@@ -670,7 +670,7 @@ timestampString=unixTimestampToHMS(event.detail.timestamp)}if(timestampString){e
 ;privMsgTextAreaEl.setAttribute('rows',newRows.toString());privMsgInputAreaEl.setAttribute('rows','3')});privMsgNormalButtonEl.addEventListener('click',function(){
 privMsgTextAreaEl.setAttribute('rows','6');privMsgInputAreaEl.setAttribute('rows','1')});privMsgClearButtonEl.addEventListener('click',function(){privMsgTextAreaEl.value=''
 ;privMsgTextAreaEl.setAttribute('rows','6');privMsgInputAreaEl.setAttribute('rows','1')});document.addEventListener('show-all-divs',function(event){privMsgSectionEl.removeAttribute('hidden')})
-;document.addEventListener('hide-all-divs',function(event){privMsgBottomDivEl.setAttribute('hidden','');privMsgHideButtonEl.textContent='+';privMsgTopRightHidableDivEl.setAttribute('hidden','')
+;document.addEventListener('hide-or-zoom',function(event){privMsgBottomDivEl.setAttribute('hidden','');privMsgHideButtonEl.textContent='+';privMsgTopRightHidableDivEl.setAttribute('hidden','')
 ;privMsgSectionEl.setAttribute('hidden','')});privMsgSendButtonEl.addEventListener('click',function(){_sendPrivMessageToUser(name,privMsgInputAreaEl);privMsgInputAreaEl.focus()
 ;resetPmActivityIcon(privMsgIndex);activityIconInhibitTimer=activityIconInhibitTimerValue});privMsgInputAreaEl.addEventListener('input',function(event){
 if(event.inputType==='insertText'&&event.data===null||event.inputType==='insertLineBreak'){stripOneCrLfFromElement(privMsgInputAreaEl);_sendPrivMessageToUser(name,privMsgInputAreaEl)
@@ -788,7 +788,7 @@ if(document.getElementById('hiddenDebugDiv').hasAttribute('hidden')){document.ge
 ;document.getElementById('variablesDivId').setAttribute('hidden','');document.getElementById('showDebugButton').textContent='More...'}})
 ;document.getElementById('loadFromCacheButton').addEventListener('click',function(){if(!webState.cacheReloadInProgress){document.dispatchEvent(new CustomEvent('update-from-cache',{bubbles:true}))}})
 ;document.getElementById('showAllDivsButton').addEventListener('click',function(){clearLastZoom();document.dispatchEvent(new CustomEvent('show-all-divs',{bubbles:true}))})
-;document.getElementById('hideAllDivsButton').addEventListener('click',function(){clearLastZoom();document.dispatchEvent(new CustomEvent('hide-all-divs',{bubbles:true}))})
+;document.getElementById('hideAllDivsButton').addEventListener('click',function(){clearLastZoom();document.dispatchEvent(new CustomEvent('hide-or-zoom',{bubbles:true}))})
 ;document.getElementById('variablesButtonId').addEventListener('click',function(){if(document.getElementById('variablesDivId').hasAttribute('hidden')){
 document.getElementById('variablesDivId').removeAttribute('hidden')
 ;document.getElementById('variablesPreId').textContent='ircState = '+JSON.stringify(ircState,null,2)+'\n\n'+'webState = '+JSON.stringify(webState,null,2)}else{
