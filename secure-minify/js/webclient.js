@@ -499,24 +499,34 @@ detail:lastZoomObj}));window.localStorage.setItem('lastZoom',JSON.stringify(last
 if(event.detail&&event.detail.zoomType&&event.detail.zoomValue&&event.detail.zoomType==='channel'&&event.detail.zoomValue===name.toLowerCase()){
 const index=ircState.channels.indexOf(name.toLowerCase());if(index>=0){if(ircState.channelStates[index].joined){channelMainSectionEl.setAttribute('zoom','')
 ;channelMainSectionEl.setAttribute('opened','');updateVisibility();channelTextAreaEl.scrollTop=channelTextAreaEl.scrollHeight;return}}}channelMainSectionEl.removeAttribute('zoom')
-;channelMainSectionEl.removeAttribute('opened');updateVisibility()});channelBeep1CBInputEl.addEventListener('click',function(e){if(channelMainSectionEl.hasAttribute('beep1-enabled')){
-channelMainSectionEl.removeAttribute('beep1-enabled')}else{channelMainSectionEl.setAttribute('beep1-enabled','');playBeep1Sound()}updateVisibility()})
-;channelBeep2CBInputEl.addEventListener('click',function(e){if(channelMainSectionEl.hasAttribute('beep2-enabled')){channelMainSectionEl.removeAttribute('beep2-enabled')}else{
-channelMainSectionEl.setAttribute('beep2-enabled','');playBeep1Sound()}updateVisibility()});channelBeep3CBInputEl.addEventListener('click',function(e){
-if(channelMainSectionEl.hasAttribute('beep3-enabled')){channelMainSectionEl.removeAttribute('beep3-enabled')}else{channelMainSectionEl.setAttribute('beep3-enabled','');playBeep2Sound()}
-updateVisibility()});document.addEventListener('cancel-beep-sounds',function(event){channelMainSectionEl.removeAttribute('beep1-enabled');channelMainSectionEl.removeAttribute('beep2-enabled')
-;channelMainSectionEl.removeAttribute('beep3-enabled')});channelFormatCBInputEl.addEventListener('click',function(){if(channelMainSectionEl.hasAttribute('brief-enabled')){
-channelMainSectionEl.removeAttribute('brief-enabled')}else{channelMainSectionEl.setAttribute('brief-enabled','')}document.dispatchEvent(new CustomEvent('update-from-cache',{bubbles:true}))})
-;if(webState.dynamic.bodyClientWidth<mobileBreakpointPx){channelMainSectionEl.setAttribute('brief-enabled','');channelFormatCBInputEl.checked=true}else{
-channelMainSectionEl.removeAttribute('brief-enabled');channelFormatCBInputEl.checked=false}channelAutoCompCBInputEl.addEventListener('click',function(){
-if(channelMainSectionEl.hasAttribute('auto-comp-enabled')){channelMainSectionEl.removeAttribute('auto-comp-enabled')}else{channelMainSectionEl.setAttribute('auto-comp-enabled','')}updateVisibility()})
-;if(window.InputEvent&&typeof InputEvent.prototype.getTargetRanges==='function'){channelMainSectionEl.setAttribute('auto-comp-enabled','')}else{
-channelMainSectionEl.setAttribute('auto-comp-enabled','');channelAutoCompCBInputEl.setAttribute('disabled','')}const _autoCompleteInputElement=function(snippet){let last='';const trailingSpaceKey=32
-;let matchedCommand='';if(autoCompleteCommandList.length>0){for(let i=0;i<autoCompleteCommandList.length;i++){if(autoCompleteCommandList[i].indexOf(snippet.toUpperCase())===0){
-matchedCommand=autoCompleteCommandList[i]}}}let matchedRawCommand='';if(autoCompleteRawCommandList.length>0){for(let i=0;i<autoCompleteRawCommandList.length;i++){
-if(autoCompleteRawCommandList[i].indexOf(snippet.toUpperCase())===0){matchedRawCommand=autoCompleteRawCommandList[i]}}}if(matchedCommand.length>0&&channelInputAreaEl.value===snippet){
-channelInputAreaEl.value=channelInputAreaEl.value.slice(0,channelInputAreaEl.value.length-snippet.length);channelInputAreaEl.value+=matchedCommand
-;channelInputAreaEl.value+=String.fromCharCode(trailingSpaceKey);last=matchedCommand}else if(matchedRawCommand.length>0&&channelInputAreaEl.value.slice(0,7).toUpperCase()==='/QUOTE '){
+;channelMainSectionEl.removeAttribute('opened');updateVisibility()});function updateLocalStorageBeepEnable(){const now=unixTimestamp();const beepEnableObj={timestamp:now,channel:name.toLowerCase(),
+beep1:channelMainSectionEl.hasAttribute('beep1-enabled'),beep2:channelMainSectionEl.hasAttribute('beep2-enabled'),beep3:channelMainSectionEl.hasAttribute('beep3-enabled')};let beepChannelIndex=-1
+;let beepEnableChanArray=null;beepEnableChanArray=JSON.parse(window.localStorage.getItem('beepEnableChanArray'));if(beepEnableChanArray&&Array.isArray(beepEnableChanArray)){
+if(beepEnableChanArray.length>0){for(let i=0;i<beepEnableChanArray.length;i++){if(beepEnableChanArray[i].channel===name.toLowerCase()){beepChannelIndex=i}}}}else{beepEnableChanArray=[]}
+if(beepChannelIndex>=0){beepEnableChanArray[beepChannelIndex]=beepEnableObj}else{beepEnableChanArray.push(beepEnableObj)}
+window.localStorage.setItem('beepEnableChanArray',JSON.stringify(beepEnableChanArray))}function loadBeepEnable(){let beepChannelIndex=-1;let beepEnableChanArray=null
+;beepEnableChanArray=JSON.parse(window.localStorage.getItem('beepEnableChanArray'));if(beepEnableChanArray&&Array.isArray(beepEnableChanArray)){if(beepEnableChanArray.length>0){
+for(let i=0;i<beepEnableChanArray.length;i++){if(beepEnableChanArray[i].channel===name.toLowerCase()){beepChannelIndex=i}}}}if(beepChannelIndex>=0){if(beepEnableChanArray[beepChannelIndex].beep1){
+channelMainSectionEl.setAttribute('beep1-enabled','')}if(beepEnableChanArray[beepChannelIndex].beep2){channelMainSectionEl.setAttribute('beep2-enabled','')}
+if(beepEnableChanArray[beepChannelIndex].beep3){channelMainSectionEl.setAttribute('beep3-enabled','')}}}loadBeepEnable();channelBeep1CBInputEl.addEventListener('click',function(e){
+if(channelMainSectionEl.hasAttribute('beep1-enabled')){channelMainSectionEl.removeAttribute('beep1-enabled')}else{channelMainSectionEl.setAttribute('beep1-enabled','');playBeep1Sound()}
+updateLocalStorageBeepEnable();updateVisibility()});channelBeep2CBInputEl.addEventListener('click',function(e){if(channelMainSectionEl.hasAttribute('beep2-enabled')){
+channelMainSectionEl.removeAttribute('beep2-enabled')}else{channelMainSectionEl.setAttribute('beep2-enabled','');playBeep1Sound()}updateLocalStorageBeepEnable();updateVisibility()})
+;channelBeep3CBInputEl.addEventListener('click',function(e){if(channelMainSectionEl.hasAttribute('beep3-enabled')){channelMainSectionEl.removeAttribute('beep3-enabled')}else{
+channelMainSectionEl.setAttribute('beep3-enabled','');playBeep2Sound()}updateLocalStorageBeepEnable();updateVisibility()});document.addEventListener('cancel-beep-sounds',function(event){
+channelMainSectionEl.removeAttribute('beep1-enabled');channelMainSectionEl.removeAttribute('beep2-enabled');channelMainSectionEl.removeAttribute('beep3-enabled')})
+;channelFormatCBInputEl.addEventListener('click',function(){if(channelMainSectionEl.hasAttribute('brief-enabled')){channelMainSectionEl.removeAttribute('brief-enabled')}else{
+channelMainSectionEl.setAttribute('brief-enabled','')}document.dispatchEvent(new CustomEvent('update-from-cache',{bubbles:true}))});if(webState.dynamic.bodyClientWidth<mobileBreakpointPx){
+channelMainSectionEl.setAttribute('brief-enabled','');channelFormatCBInputEl.checked=true}else{channelMainSectionEl.removeAttribute('brief-enabled');channelFormatCBInputEl.checked=false}
+channelAutoCompCBInputEl.addEventListener('click',function(){if(channelMainSectionEl.hasAttribute('auto-comp-enabled')){channelMainSectionEl.removeAttribute('auto-comp-enabled')}else{
+channelMainSectionEl.setAttribute('auto-comp-enabled','')}updateVisibility()});if(window.InputEvent&&typeof InputEvent.prototype.getTargetRanges==='function'){
+channelMainSectionEl.setAttribute('auto-comp-enabled','')}else{channelMainSectionEl.setAttribute('auto-comp-enabled','');channelAutoCompCBInputEl.setAttribute('disabled','')}
+const _autoCompleteInputElement=function(snippet){let last='';const trailingSpaceKey=32;let matchedCommand='';if(autoCompleteCommandList.length>0){for(let i=0;i<autoCompleteCommandList.length;i++){
+if(autoCompleteCommandList[i].indexOf(snippet.toUpperCase())===0){matchedCommand=autoCompleteCommandList[i]}}}let matchedRawCommand='';if(autoCompleteRawCommandList.length>0){
+for(let i=0;i<autoCompleteRawCommandList.length;i++){if(autoCompleteRawCommandList[i].indexOf(snippet.toUpperCase())===0){matchedRawCommand=autoCompleteRawCommandList[i]}}}
+if(matchedCommand.length>0&&channelInputAreaEl.value===snippet){channelInputAreaEl.value=channelInputAreaEl.value.slice(0,channelInputAreaEl.value.length-snippet.length)
+;channelInputAreaEl.value+=matchedCommand;channelInputAreaEl.value+=String.fromCharCode(trailingSpaceKey);last=matchedCommand
+}else if(matchedRawCommand.length>0&&channelInputAreaEl.value.slice(0,7).toUpperCase()==='/QUOTE '){
 channelInputAreaEl.value=channelInputAreaEl.value.slice(0,channelInputAreaEl.value.length-snippet.length);channelInputAreaEl.value+=matchedRawCommand
 ;channelInputAreaEl.value+=String.fromCharCode(trailingSpaceKey);last=matchedRawCommand}else if(name.toLowerCase().indexOf(snippet.toLowerCase())===0){
 channelInputAreaEl.value=channelInputAreaEl.value.slice(0,channelInputAreaEl.value.length-snippet.length);channelInputAreaEl.value+=name;channelInputAreaEl.value+=String.fromCharCode(trailingSpaceKey)
@@ -592,11 +602,10 @@ let markerString='';let timestampString='';if('detail'in event&&'timestamp'in ev
 ;lastZoomObj=JSON.parse(window.localStorage.getItem('lastZoom'))
 ;if(lastZoomObj&&lastZoomObj.zoomType&&lastZoomObj.zoomValue&&lastZoomObj.zoomType==='channel'&&lastZoomObj.zoomValue===name.toLowerCase()){const now=unixTimestamp()
 ;if('timestamp'in lastZoomObj&&now-lastZoomObj.timestamp<86400){const newZoomObj={timestamp:now,zoomType:'channel',zoomValue:name.toLowerCase()};setTimeout(function(){
-console.log('dispatching zoom request event');document.dispatchEvent(new CustomEvent('hide-all-divs',{bubbles:true,detail:newZoomObj}))},100)}}else{
-channelTextAreaEl.scrollTop=channelTextAreaEl.scrollHeight}});document.addEventListener('cache-reload-error',function(event){let errorString='\n';let timestampString=''
-;if('detail'in event&&'timestamp'in event.detail){timestampString=unixTimestampToHMS(event.detail.timestamp)}if(timestampString){errorString+=timestampString}errorString+=' '+cacheErrorString+'\n\n'
-;channelTextAreaEl.value=errorString});const adjustChannelInputToWidowWidth=function(){const mar1=webState.dynamic.commonMargin
-;const mar2=webState.dynamic.commonMargin+5+webState.dynamic.sendButtonWidthPx
+document.dispatchEvent(new CustomEvent('hide-all-divs',{bubbles:true,detail:newZoomObj}))},100)}}else{channelTextAreaEl.scrollTop=channelTextAreaEl.scrollHeight}})
+;document.addEventListener('cache-reload-error',function(event){let errorString='\n';let timestampString='';if('detail'in event&&'timestamp'in event.detail){
+timestampString=unixTimestampToHMS(event.detail.timestamp)}if(timestampString){errorString+=timestampString}errorString+=' '+cacheErrorString+'\n\n';channelTextAreaEl.value=errorString})
+;const adjustChannelInputToWidowWidth=function(){const mar1=webState.dynamic.commonMargin;const mar2=webState.dynamic.commonMargin+5+webState.dynamic.sendButtonWidthPx
 ;const nicknameListPixelWidth=webState.dynamic.inputAreaSideWidthPx+channelNamesCharWidth*webState.dynamic.inputAreaCharWidthPx;const mar3=webState.dynamic.commonMargin+nicknameListPixelWidth+6
 ;if(webState.dynamic.bodyClientWidth>mobileBreakpointPx){channelTextAreaEl.setAttribute('cols',calcInputAreaColSize(mar3));channelNamesDisplayEl.removeAttribute('hidden')}else{
 channelTextAreaEl.setAttribute('cols',calcInputAreaColSize(mar1));if(channelMainSectionEl.hasAttribute('zoom')){channelNamesDisplayEl.setAttribute('hidden','')}else{

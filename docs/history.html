@@ -34,7 +34,8 @@
         </div>
         <p>
           2021-07-22 (next)
-            Add use of browser localStorage to the program.
+            Storage of data in browser localStorage was added to the program.
+            <br><br>
             The web userid and web login timestamp are saved to localStorage.
             The userid is an integer number starting at 1 that is assigned in the credentials.js file.
             The userid number is used to delete localStorage when a change in userid is detected.
@@ -45,9 +46,11 @@
             When an IRC channel is placed into zoom view mode, the IRC channel name is
             saved to the browsers localStorage API.
             When zoom is cancelled, the localStorage channel name is removed.
-            <br><br>
             When opening the web page, if a previous zoom was active, the browser
             will open in IRC channel zoom mode.
+            <br><br>The audio beep enable status for an IRC channel is saved to localStorage.
+            When reloading the page, matching IRC channels will enable audio beep
+            based on data from previous settings in browser localStorage.
         </p>
         <p>
           2021-07-19 (0.1.22)

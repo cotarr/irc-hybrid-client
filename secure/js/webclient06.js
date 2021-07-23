@@ -718,6 +718,82 @@ function createChannelEl (name) {
     updateVisibility();
   });
 
+  // --------------------------------------------------
+  // Function to update window.localStorage with IRC
+  //       channel beep enabled checkbox state.
+  // Called when checkbox is clicked to enable/disable
+  // --------------------------------------------------
+  function updateLocalStorageBeepEnable () {
+    // new object for channel beep enable status
+    const now = unixTimestamp();
+    const beepEnableObj = {
+      timestamp: now,
+      channel: name.toLowerCase(),
+      beep1: channelMainSectionEl.hasAttribute('beep1-enabled'),
+      beep2: channelMainSectionEl.hasAttribute('beep2-enabled'),
+      beep3: channelMainSectionEl.hasAttribute('beep3-enabled')
+    };
+
+    // Get array of previous IRC channel, each with status object
+    let beepChannelIndex = -1;
+    let beepEnableChanArray = null;
+    beepEnableChanArray = JSON.parse(window.localStorage.getItem('beepEnableChanArray'));
+    if ((beepEnableChanArray) &&
+      (Array.isArray(beepEnableChanArray))) {
+      if (beepEnableChanArray.length > 0) {
+        for (let i = 0; i < beepEnableChanArray.length; i++) {
+          if (beepEnableChanArray[i].channel === name.toLowerCase()) {
+            beepChannelIndex = i;
+          }
+        }
+      }
+    } else {
+      // Array did not exist, create it
+      beepEnableChanArray = [];
+    }
+    if (beepChannelIndex >= 0) {
+      // update previous element
+      beepEnableChanArray[beepChannelIndex] = beepEnableObj;
+    } else {
+      // create new element
+      beepEnableChanArray.push(beepEnableObj);
+    }
+    window.localStorage.setItem('beepEnableChanArray', JSON.stringify(beepEnableChanArray));
+  } // updateLocalStorageBeepEnable()
+
+  // ---------------------------------------------------
+  // For this channel, load web browser local storage
+  // beep enable state.
+  // ---------------------------------------------------
+  function loadBeepEnable () {
+    let beepChannelIndex = -1;
+    let beepEnableChanArray = null;
+    beepEnableChanArray = JSON.parse(window.localStorage.getItem('beepEnableChanArray'));
+    if ((beepEnableChanArray) &&
+      (Array.isArray(beepEnableChanArray))) {
+      if (beepEnableChanArray.length > 0) {
+        for (let i = 0; i < beepEnableChanArray.length; i++) {
+          if (beepEnableChanArray[i].channel === name.toLowerCase()) {
+            beepChannelIndex = i;
+          }
+        }
+      }
+    }
+    if (beepChannelIndex >= 0) {
+      if (beepEnableChanArray[beepChannelIndex].beep1) {
+        channelMainSectionEl.setAttribute('beep1-enabled', '');
+      }
+      if (beepEnableChanArray[beepChannelIndex].beep2) {
+        channelMainSectionEl.setAttribute('beep2-enabled', '');
+      }
+      if (beepEnableChanArray[beepChannelIndex].beep3) {
+        channelMainSectionEl.setAttribute('beep3-enabled', '');
+      }
+    }
+  }
+  // do on creating new channel element
+  loadBeepEnable();
+
   // -------------------------
   // Beep On Message checkbox handler
   // -------------------------
@@ -728,6 +804,7 @@ function createChannelEl (name) {
       channelMainSectionEl.setAttribute('beep1-enabled', '');
       playBeep1Sound();
     }
+    updateLocalStorageBeepEnable();
     updateVisibility();
   });
 
@@ -741,6 +818,7 @@ function createChannelEl (name) {
       channelMainSectionEl.setAttribute('beep2-enabled', '');
       playBeep1Sound();
     }
+    updateLocalStorageBeepEnable();
     updateVisibility();
   });
 
@@ -754,6 +832,7 @@ function createChannelEl (name) {
       channelMainSectionEl.setAttribute('beep3-enabled', '');
       playBeep2Sound();
     }
+    updateLocalStorageBeepEnable();
     updateVisibility();
   });
 
@@ -1397,7 +1476,6 @@ function createChannelEl (name) {
         };
         // Just to be sure the reload is finished, wait 0.1 seconds before zooming
         setTimeout(function () {
-          console.log('dispatching zoom request event');
           document.dispatchEvent(new CustomEvent('hide-all-divs',
             {
               bubbles: true,
