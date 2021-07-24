@@ -136,7 +136,7 @@ function connectButtonHandler () {
 // Route /disconnect
 // ----------------------------------
 function forceDisconnectHandler () {
-  console.log('Disconnect button pressed.');
+  // console.log('Disconnect button pressed.');
   const fetchURL = webServerUrl + '/irc/disconnect';
   const fetchOptions = {
     method: 'POST',
@@ -156,7 +156,7 @@ function forceDisconnectHandler () {
       }
     })
     .then((responseJson) => {
-      console.log(JSON.stringify(responseJson, null, 2));
+      // console.log(JSON.stringify(responseJson, null, 2));
       if (responseJson.error) {
         showError(responseJson.message);
       }

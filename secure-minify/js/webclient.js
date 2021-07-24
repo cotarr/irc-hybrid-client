@@ -214,13 +214,14 @@ timestampString=unixTimestampToHMS(event.detail.timestamp)}if(timestampString){e
 ;if(!webState.cacheReloadInProgress){document.getElementById('rawMessageDisplay').scrollTop=document.getElementById('rawMessageDisplay').scrollHeight}}function displayRawMessageInHex(message){
 const uint8String=new TextEncoder('utf8').encode(message);let hexString='';for(let i=0;i<uint8String.length;i++){hexString+=uint8String[i].toString(16).padStart(2,'0')+' '}displayRawMessage(hexString)
 }function displayFormattedServerMessage(parsedMessage,message){document.dispatchEvent(new CustomEvent('server-message',{bubbles:true,detail:{parsedMessage:parsedMessage,message:message}}))}
-function _parseCtcpMessage(parsedMessage){function _addNoticeText(text){document.getElementById('noticeMessageDisplay').value+=text+'\n';if(!webState.cacheReloadInProgress){
+function _parseCtcpMessage(parsedMessage,message){function _addNoticeText(text){document.getElementById('noticeMessageDisplay').value+=text+'\n';if(!webState.cacheReloadInProgress){
 document.getElementById('noticeMessageDisplay').scrollTop=document.getElementById('noticeMessageDisplay').scrollHeight}}const ctcpDelim=1;const ctcpMessage=parsedMessage.params[1]
 ;const end=ctcpMessage.length-1;if(ctcpMessage.charCodeAt(0)!==1){console.log('_parseCtcpMessage() missing CTCP start delimiter');return}let i=1;let ctcpCommand='';let ctcpRest=''
 ;while(ctcpMessage.charAt(i)!==' '&&i<=end){if(ctcpMessage.charCodeAt(i)!==ctcpDelim){ctcpCommand+=ctcpMessage.charAt(i)}i++}ctcpCommand=ctcpCommand.toUpperCase()
 ;while(ctcpMessage.charAt(i)===' '&&i<=end){i++}while(ctcpMessage.charCodeAt(i)!==ctcpDelim&&i<=end){ctcpRest+=ctcpMessage.charAt(i);i++}if(ctcpCommand==='ACTION'){
-const index=ircState.channels.indexOf(parsedMessage.params[0].toLowerCase());if(index>=0){parsedMessage.params[1]=parsedMessage.nick+' '+ctcpRest;parsedMessage.nick='*'
-;displayChannelMessage(parsedMessage)}else{parsedMessage.params[1]=ctcpRest;parsedMessage.isPmCtcpAction=true;displayPrivateMessage(parsedMessage)}}else{if(parsedMessage.nick===ircState.nickName){
+const chanPrefixIndex=channelPrefixChars.indexOf(parsedMessage.params[0].charAt(0));const index=ircState.channels.indexOf(parsedMessage.params[0].toLowerCase());if(index>=0){
+parsedMessage.params[1]=parsedMessage.nick+' '+ctcpRest;parsedMessage.nick='*';displayChannelMessage(parsedMessage)}else if(chanPrefixIndex>=0){displayFormattedServerMessage(parsedMessage,message)
+}else{parsedMessage.params[1]=ctcpRest;parsedMessage.isPmCtcpAction=true;displayPrivateMessage(parsedMessage)}}else{if(parsedMessage.nick===ircState.nickName){
 if(parsedMessage.command.toUpperCase()==='PRIVMSG'){_addNoticeText(parsedMessage.timestamp+' '+'CTCP 1 Request to '+parsedMessage.params[0]+': '+ctcpCommand+' '+ctcpRest);webState.noticeOpen=true
 }else{let replyContents='';if(parsedMessage.params.length>2){for(let i=2;i<parsedMessage.params.length;i++){if(parsedMessage.params[i].charCodeAt(0)!==ctcpDelim){
 replyContents+=cleanCtcpDelimiter(parsedMessage.params[i]);if(i!==parsedMessage.params.length){replyContents+=' '}}}}
@@ -246,8 +247,8 @@ for(let j=0;j<ircState.channelStates[i].names.length;j++){let checkNick=ircState
 checkNick=checkNick.slice(1,checkNick.length)}if(checkNick===pureNick1)present=true;if(checkNick===pureNick2)present=true}}}}if(present){displayChannelMessage(parsedMessage)}else{
 displayFormattedServerMessage(parsedMessage,message)}}break;case'PART':displayChannelMessage(parsedMessage);break;case'NOTICE':if(!parsedMessage.nick||parsedMessage.nick.length===0){
 if(!webState.viewRawMessages){displayFormattedServerMessage(parsedMessage,message)}}else{const ctcpDelim=1;if(parsedMessage.params[1]===null)parsedMessage.params[1]=''
-;if(parsedMessage.params[1].charCodeAt(0)===ctcpDelim){_parseCtcpMessage(parsedMessage)}else{displayNoticeMessage(parsedMessage)}}break;case'PRIVMSG':{const ctcpDelim=1
-;if(parsedMessage.params[1].charCodeAt(0)===ctcpDelim){_parseCtcpMessage(parsedMessage)}else{const chanPrefixIndex=channelPrefixChars.indexOf(parsedMessage.params[0].charAt(0))
+;if(parsedMessage.params[1].charCodeAt(0)===ctcpDelim){_parseCtcpMessage(parsedMessage,message)}else{displayNoticeMessage(parsedMessage)}}break;case'PRIVMSG':{const ctcpDelim=1
+;if(parsedMessage.params[1].charCodeAt(0)===ctcpDelim){_parseCtcpMessage(parsedMessage,message)}else{const chanPrefixIndex=channelPrefixChars.indexOf(parsedMessage.params[0].charAt(0))
 ;const channelIndex=ircState.channels.indexOf(parsedMessage.params[0].toLowerCase());if(channelIndex>=0){displayChannelMessage(parsedMessage)}else if(chanPrefixIndex>=0){
 displayFormattedServerMessage(parsedMessage,message)}else{displayPrivateMessage(parsedMessage)}}}break;case'QUIT':{let pureNick=parsedMessage.nick.toLowerCase()
 ;if(nicknamePrefixChars.indexOf(pureNick.charAt(0))>=0){pureNick=pureNick.slice(1,pureNick.length)}let present=false;if(ircState.channels.length>0){for(let i=0;i<ircState.channels.length;i++){
@@ -307,13 +308,12 @@ if(document.getElementById('nickNameInputId').value.length<1){showError('Invalid
 ;connectObject.userMode=document.getElementById('userModeInputId').value;const fetchURL=webServerUrl+'/irc/connect';const fetchOptions={method:'POST',headers:{'Content-type':'application/json',
 Accept:'application/json'},body:JSON.stringify(connectObject)};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()}else{
 if(response.status===403)window.location.href='/login';throw new Error('Fetch status '+response.status+' '+response.statusText)}}).then(responseJson=>{if(responseJson.error){
-showError(responseJson.message)}}).catch(error=>{console.log(error)})}function forceDisconnectHandler(){console.log('Disconnect button pressed.');const fetchURL=webServerUrl+'/irc/disconnect'
-;const fetchOptions={method:'POST',headers:{'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify({})};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){
-return response.json()}else{throw new Error('Fetch status '+response.status+' '+response.statusText)}}).then(responseJson=>{console.log(JSON.stringify(responseJson,null,2));if(responseJson.error){
-showError(responseJson.message)}}).catch(error=>{console.log(error)})}document.getElementById('connectButton').addEventListener('click',function(){connectButtonHandler()})
-;document.getElementById('disconnectButton').addEventListener('click',function(){forceDisconnectHandler()});let ircStatusIconTouchDebounce=false
-;document.getElementById('ircConnectIconId').addEventListener('click',function(){if(ircStatusIconTouchDebounce)return;ircStatusIconTouchDebounce=true;setTimeout(function(){
-ircStatusIconTouchDebounce=false},1e3);if(ircState.ircConnected||ircState.ircConnecting||webState.ircConnecting){
+showError(responseJson.message)}}).catch(error=>{console.log(error)})}function forceDisconnectHandler(){const fetchURL=webServerUrl+'/irc/disconnect';const fetchOptions={method:'POST',headers:{
+'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify({})};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()}else{
+throw new Error('Fetch status '+response.status+' '+response.statusText)}}).then(responseJson=>{if(responseJson.error){showError(responseJson.message)}}).catch(error=>{console.log(error)})}
+document.getElementById('connectButton').addEventListener('click',function(){connectButtonHandler()});document.getElementById('disconnectButton').addEventListener('click',function(){
+forceDisconnectHandler()});let ircStatusIconTouchDebounce=false;document.getElementById('ircConnectIconId').addEventListener('click',function(){if(ircStatusIconTouchDebounce)return
+;ircStatusIconTouchDebounce=true;setTimeout(function(){ircStatusIconTouchDebounce=false},1e3);if(ircState.ircConnected||ircState.ircConnecting||webState.ircConnecting){
 if(webState.ircConnecting||ircState.webConnecting||ircState.ircConnected&&!ircState.ircRegistered){webState.ircConnecting=false;forceDisconnectHandler()}else{
 _sendIrcServerMessage('QUIT :'+ircState.progName+' '+ircState.progVersion)}}else{connectButtonHandler()}});document.getElementById('quitButton').addEventListener('click',function(){
 if(webState.ircConnecting||ircState.webConnecting||ircState.ircConnected&&!ircState.ircRegistered){webState.ircConnecting=false;forceDisconnectHandler()

@@ -661,8 +661,11 @@ function displayFormattedServerMessage (parsedMessage, message) {
 // in the backend web server. This parser is
 // for user interactive CTCP requests,
 // primarily ACTION from /ME commands.
+//
+// The "message" argument is used to show
+// entire raw message as a fall back
 // ---------------------------------------------
-function _parseCtcpMessage (parsedMessage) {
+function _parseCtcpMessage (parsedMessage, message) {
   // console.log('_parseCtcpMessage ' + JSON.stringify(parsedMessage, null, 2));
   function _addNoticeText (text) {
     document.getElementById('noticeMessageDisplay').value += text + '\n';
@@ -701,13 +704,20 @@ function _parseCtcpMessage (parsedMessage) {
   //   ACTION
   //
   if (ctcpCommand === 'ACTION') {
+    const chanPrefixIndex = channelPrefixChars.indexOf(parsedMessage.params[0].charAt(0));
     const index = ircState.channels.indexOf(parsedMessage.params[0].toLowerCase());
     if (index >= 0) {
       parsedMessage.params[1] = parsedMessage.nick + ' ' + ctcpRest;
       parsedMessage.nick = '*';
       displayChannelMessage(parsedMessage);
+    } else if (chanPrefixIndex >= 0) {
+      // Case of the first character designates recipient is channel name
+      // but that is no matching active channel,
+      // Therefore, message is in cache buffer, but channel no longer exist
+      // so show the message in the server window.
+      displayFormattedServerMessage(parsedMessage, message);
     } else {
-      // TODO actino sent as regular PM for now
+      // TODO action sent as regular PM for now
       parsedMessage.params[1] = ctcpRest;
       parsedMessage.isPmCtcpAction = true;
       displayPrivateMessage(parsedMessage);
@@ -979,7 +989,7 @@ function _parseBufferMessage (message) {
           if (parsedMessage.params[1] === null) parsedMessage.params[1] = '';
           if (parsedMessage.params[1].charCodeAt(0) === ctcpDelim) {
             // case of CTCP message
-            _parseCtcpMessage(parsedMessage);
+            _parseCtcpMessage(parsedMessage, message);
           } else {
             // case of server, user, and channel notices.
             displayNoticeMessage(parsedMessage);
@@ -992,7 +1002,7 @@ function _parseBufferMessage (message) {
           const ctcpDelim = 1;
           if (parsedMessage.params[1].charCodeAt(0) === ctcpDelim) {
             // case of CTCP message
-            _parseCtcpMessage(parsedMessage);
+            _parseCtcpMessage(parsedMessage, message);
           } else {
             // else not a CTCP message
             const chanPrefixIndex = channelPrefixChars.indexOf(parsedMessage.params[0].charAt(0));
@@ -1001,8 +1011,9 @@ function _parseBufferMessage (message) {
               // Case of channel name found in list of active channel
               displayChannelMessage(parsedMessage);
             } else if (chanPrefixIndex >= 0) {
-              // case of first character show it is channel name
-              // but that is no tan active channel,
+              // Case of the first character designates recipient is channel name
+              // but that is no matching active channel,
+              // Therefore, message is in cache buffer, but channel no longer exist
               // so show the message in the server window.
               displayFormattedServerMessage(parsedMessage, message);
             } else {
