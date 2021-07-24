@@ -205,55 +205,47 @@ function inhibitBeep (seconds) {
 }
 
 const audioPromiseErrorStr =
-  'Browser policy has blocked Audio.play() because user must interact with page first.';
+  'Browser policy has blocked Audio.play() ' +
+  'because user must interact with page or manually play sound first.';
 
 function playBeep1Sound () {
   if (beep1InhibitTimer === 0) {
     // Note: Chrome requires user interact with page before playing media
-    // or a DOMException will be thrown for violating policy
-    // new Audio returns a promise
-    const promise = beep1.play();
-    if (promise) {
-      promise.catch(function (error) {
-        if (error.name === 'NotAllowedError') {
-          console.info('playBeep1Sound() ' + audioPromiseErrorStr);
-        } else {
-          console.error(error);
-        }
-      });
-    }
+    // Chrome on IOS requires manually selecting button to play sound first time.
+    // Else throws a DOMException violating media policy
+    beep1.play().catch(function (error) {
+      if (error.name === 'NotAllowedError') {
+        console.info('playBeep1Sound() ' + audioPromiseErrorStr);
+      } else {
+        console.error(error);
+      }
+    });
     beep1InhibitTimer = 5;
   }
 }
 
 function playBeep2Sound () {
   if (beep2InhibitTimer === 0) {
-    const promise = beep2.play();
-    if (promise) {
-      promise.catch(function (error) {
-        if (error.name === 'NotAllowedError') {
-          // Duplicate: use error message from beep1
-          // console.info('playBeep2Sound() ' + audioPromiseErrorStr);
-        } else {
-          console.error(error);
-        }
-      });
-    }
+    beep2.play().catch(function (error) {
+      if (error.name === 'NotAllowedError') {
+        // Duplicate: use error message from beep1
+        // console.info('playBeep2Sound() ' + audioPromiseErrorStr);
+      } else {
+        console.error(error);
+      }
+    });
     beep2InhibitTimer = 5;
   }
 }
 function playBeep3Sound () {
   if (beep3InhibitTimer === 0) {
-    const promise = beep3.play();
-    if (promise) {
-      promise.catch(function (error) {
-        if (error.name === 'NotAllowedError') {
-          console.info('playBeep3Sound() ' + audioPromiseErrorStr);
-        } else {
-          console.error(error);
-        }
-      });
-    }
+    beep3.play().catch(function (error) {
+      if (error.name === 'NotAllowedError') {
+        console.info('playBeep3Sound() ' + audioPromiseErrorStr);
+      } else {
+        console.error(error);
+      }
+    });
     beep3InhibitTimer = 5;
   }
 }
