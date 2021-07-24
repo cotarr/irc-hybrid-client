@@ -177,6 +177,9 @@ var wsocket = null;
 // -------------------------------------------
 // Default beep sound (Max 1 per 5 seconds)
 // -------------------------------------------
+//
+// new Audio returns a Promise
+//
 // 1300 Hz 0.75 Amplitude 0.250 sec
 const beep1 = new Audio('sounds/short-beep1.mp3');
 // 850 Hz 0.75 Amplitude 0.400 Sec
@@ -201,22 +204,56 @@ function inhibitBeep (seconds) {
   beep3InhibitTimer = seconds;
 }
 
+const audioPromiseErrorStr =
+  'Browser policy has blocked Audio.play() because user must interact with page first.';
+
 function playBeep1Sound () {
   if (beep1InhibitTimer === 0) {
-    beep1.play();
+    // Note: Chrome requires user interact with page before playing media
+    // or a DOMException will be thrown for violating policy
+    // new Audio returns a promise
+    const promise = beep1.play();
+    if (promise) {
+      promise.catch(function (error) {
+        if (error.name === 'NotAllowedError') {
+          console.info('playBeep1Sound() ' + audioPromiseErrorStr);
+        } else {
+          console.error(error);
+        }
+      });
+    }
     beep1InhibitTimer = 5;
   }
 }
 
 function playBeep2Sound () {
   if (beep2InhibitTimer === 0) {
-    beep2.play();
+    const promise = beep2.play();
+    if (promise) {
+      promise.catch(function (error) {
+        if (error.name === 'NotAllowedError') {
+          // Duplicate: use error message from beep1
+          // console.info('playBeep2Sound() ' + audioPromiseErrorStr);
+        } else {
+          console.error(error);
+        }
+      });
+    }
     beep2InhibitTimer = 5;
   }
 }
 function playBeep3Sound () {
   if (beep3InhibitTimer === 0) {
-    beep3.play();
+    const promise = beep3.play();
+    if (promise) {
+      promise.catch(function (error) {
+        if (error.name === 'NotAllowedError') {
+          console.info('playBeep3Sound() ' + audioPromiseErrorStr);
+        } else {
+          console.error(error);
+        }
+      });
+    }
     beep3InhibitTimer = 5;
   }
 }
