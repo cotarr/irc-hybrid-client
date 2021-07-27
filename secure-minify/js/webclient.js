@@ -43,16 +43,16 @@ const audioPromiseErrorStr='Browser policy has blocked Audio.play() '+'because u
 beep1.play().catch(function(error){if(error.name==='NotAllowedError'){console.info('playBeep1Sound() '+audioPromiseErrorStr)}else{console.error(error)}});beep1InhibitTimer=5}}
 function playBeep2Sound(){if(beep2InhibitTimer===0){beep2.play().catch(function(error){if(error.name==='NotAllowedError'){}else{console.error(error)}});beep2InhibitTimer=5}}function playBeep3Sound(){
 if(beep3InhibitTimer===0){beep3.play().catch(function(error){if(error.name==='NotAllowedError'){console.info('playBeep3Sound() '+audioPromiseErrorStr)}else{console.error(error)}});beep3InhibitTimer=5}
-}function userInitiatedAudioPlay(){document.querySelector('body').removeEventListener('click',userInitiatedAudioPlay);let isAnyBeepEnabled=false;let beepEnableChanArray=null
-;beepEnableChanArray=JSON.parse(window.localStorage.getItem('beepEnableChanArray'));if(beepEnableChanArray&&Array.isArray(beepEnableChanArray)){if(beepEnableChanArray.length>0){
-for(let i=0;i<beepEnableChanArray.length;i++){if(beepEnableChanArray[i].beep1)isAnyBeepEnabled=true;if(beepEnableChanArray[i].beep2)isAnyBeepEnabled=true
-;if(beepEnableChanArray[i].beep3)isAnyBeepEnabled=true}}}if(isAnyBeepEnabled){beep1.volume=0;beep2.volume=0;beep3.volume=0;playBeep1Sound();setTimeout(playBeep3Sound,250)
-;setTimeout(playBeep2Sound,500);setTimeout(function(){beep1.volume=1;beep2.volume=1;beep3.volume=1},1e3)}}document.querySelector('body').addEventListener('click',userInitiatedAudioPlay)
-;const errorExpireSeconds=5;let errorRemainSeconds=0;function clearError(){const errorDivEl=document.getElementById('errorDiv');errorDivEl.setAttribute('hidden','')
-;const errorContentDivEl=document.getElementById('errorContentDiv');while(errorContentDivEl.firstChild){errorContentDivEl.removeChild(errorContentDivEl.firstChild)}errorRemainSeconds=0}
-function showError(errorString){const errorDivEl=document.getElementById('errorDiv');errorDivEl.removeAttribute('hidden');const errorContentDivEl=document.getElementById('errorContentDiv')
-;const errorMessageEl=document.createElement('div');errorMessageEl.textContent=errorString||'Error: unknown error (2993)';errorContentDivEl.appendChild(errorMessageEl)
-;errorRemainSeconds=errorExpireSeconds}document.addEventListener('show-error-message',function(event){showError(event.detail.message)})
+}function areBeepsConfigured(){let isAnyBeepEnabled=false;let beepEnableChanArray=null;beepEnableChanArray=JSON.parse(window.localStorage.getItem('beepEnableChanArray'))
+;if(beepEnableChanArray&&Array.isArray(beepEnableChanArray)){if(beepEnableChanArray.length>0){for(let i=0;i<beepEnableChanArray.length;i++){if(beepEnableChanArray[i].beep1)isAnyBeepEnabled=true
+;if(beepEnableChanArray[i].beep2)isAnyBeepEnabled=true;if(beepEnableChanArray[i].beep3)isAnyBeepEnabled=true}}}return isAnyBeepEnabled}function userInitiatedAudioPlay(){
+document.getElementById('enableAudioButton').setAttribute('hidden','');if(areBeepsConfigured()){playBeep1Sound();setTimeout(playBeep3Sound,250);setTimeout(playBeep2Sound,500)
+;setTimeout(function(){},1e3)}}document.getElementById('enableAudioButton').addEventListener('click',userInitiatedAudioPlay);if(areBeepsConfigured()){
+document.getElementById('enableAudioButton').removeAttribute('hidden')}const errorExpireSeconds=5;let errorRemainSeconds=0;function clearError(){const errorDivEl=document.getElementById('errorDiv')
+;errorDivEl.setAttribute('hidden','');const errorContentDivEl=document.getElementById('errorContentDiv');while(errorContentDivEl.firstChild){errorContentDivEl.removeChild(errorContentDivEl.firstChild)
+}errorRemainSeconds=0}function showError(errorString){const errorDivEl=document.getElementById('errorDiv');errorDivEl.removeAttribute('hidden')
+;const errorContentDivEl=document.getElementById('errorContentDiv');const errorMessageEl=document.createElement('div');errorMessageEl.textContent=errorString||'Error: unknown error (2993)'
+;errorContentDivEl.appendChild(errorMessageEl);errorRemainSeconds=errorExpireSeconds}document.addEventListener('show-error-message',function(event){showError(event.detail.message)})
 ;document.getElementById('errorDiv').addEventListener('click',function(){clearError()});function errorTimerTickHandler(){if(errorRemainSeconds>0){errorRemainSeconds--;if(errorRemainSeconds===0){
 clearError()}else{document.getElementById('errorTitle').textContent='Tap to Close ('+errorRemainSeconds.toString()+')'}}}function unixTimestamp(){const now=new Date;return parseInt(now.valueOf()/1e3)}
 function clearLastZoom(){const now=unixTimestamp();window.localStorage.setItem('lastZoom',JSON.stringify({timestamp:now,zoomType:null,zoomValue:null}))}function checkConnect(code){

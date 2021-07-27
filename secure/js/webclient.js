@@ -250,19 +250,12 @@ function playBeep3Sound () {
   }
 }
 
-// ---------------------------------------------------------------------------------------
-// This is to address the case of audio beep previously enabled before page load.
-// The checkbox state for channel beep messages is restored from browser localStorage.
-// However, the browser will not play audio media unless audio is initiated by a user event.
-// The following function is called by a user interaction event.
-// The function plays the audio in direct response to user interaction to enable the audio.
-// This result of this function is to leave channel message beep sounds capable of function.
-// ---------------------------------------------------------------------------------------
-function userInitiatedAudioPlay () {
-  // This event is only needed 1 time, remove event listener after first use.
-  document.querySelector('body').removeEventListener('click', userInitiatedAudioPlay);
-
-  // check if beep enabled in window.localStorage
+//
+// Check if browser localStorage contains
+// at lease 1 enabled audio beep for channel text
+// return true = Enabled
+//
+function areBeepsConfigured () {
   let isAnyBeepEnabled = false;
   let beepEnableChanArray = null;
   beepEnableChanArray = JSON.parse(window.localStorage.getItem('beepEnableChanArray'));
@@ -276,22 +269,34 @@ function userInitiatedAudioPlay () {
       }
     }
   }
-  if (isAnyBeepEnabled) {
-    beep1.volume = 0;
-    beep2.volume = 0;
-    beep3.volume = 0;
+  return isAnyBeepEnabled;
+} // areBeepsConfigured()
+
+// ---------------------------------------------------------------------------------------
+// This is to address the case of audio beep previously enabled before page load.
+// The checkbox state for channel beep messages is restored from browser localStorage.
+// However, the browser will not play audio media unless audio is initiated by a user event.
+// The following function is called by a user interaction event.
+// The function plays the audio in direct response to user interaction to enable the audio.
+// This result of this function is to leave channel message beep sounds capable of function.
+// ---------------------------------------------------------------------------------------
+function userInitiatedAudioPlay () {
+  document.getElementById('enableAudioButton').setAttribute('hidden', '');
+  // check if beep enabled in window.localStorage
+  if (areBeepsConfigured()) {
     playBeep1Sound();
     setTimeout(playBeep3Sound, 250);
     setTimeout(playBeep2Sound, 500);
     setTimeout(function () {
-      beep1.volume = 1;
-      beep2.volume = 1;
-      beep3.volume = 1;
     }, 1000);
   }
 } // userInitiatedAudioPlay()
-// This event listener is only used 1 time, then removed
-document.querySelector('body').addEventListener('click', userInitiatedAudioPlay);
+// click event for buttion in header bar
+document.getElementById('enableAudioButton').addEventListener('click', userInitiatedAudioPlay);
+// Show button to enable sound in case browser localStorage has enabled beeps
+if (areBeepsConfigured()) {
+  document.getElementById('enableAudioButton').removeAttribute('hidden');
+}
 
 // --------------------------
 // Error display functions

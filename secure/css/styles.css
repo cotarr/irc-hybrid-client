@@ -361,3 +361,7 @@ button[disabled] {
 .vh5 {height: 5px;}
 .vh10 {height: 10px;}
 .vh20 {height: 20px;}
+
+#enableAudioButton {
+  background-color: #bbe3fc;
+}
