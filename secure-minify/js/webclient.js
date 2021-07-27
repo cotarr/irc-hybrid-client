@@ -46,13 +46,13 @@ if(beep3InhibitTimer===0){beep3.play().catch(function(error){if(error.name==='No
 }function areBeepsConfigured(){let isAnyBeepEnabled=false;let beepEnableChanArray=null;beepEnableChanArray=JSON.parse(window.localStorage.getItem('beepEnableChanArray'))
 ;if(beepEnableChanArray&&Array.isArray(beepEnableChanArray)){if(beepEnableChanArray.length>0){for(let i=0;i<beepEnableChanArray.length;i++){if(beepEnableChanArray[i].beep1)isAnyBeepEnabled=true
 ;if(beepEnableChanArray[i].beep2)isAnyBeepEnabled=true;if(beepEnableChanArray[i].beep3)isAnyBeepEnabled=true}}}return isAnyBeepEnabled}function userInitiatedAudioPlay(){
-document.getElementById('enableAudioButton').setAttribute('hidden','');if(areBeepsConfigured()){playBeep1Sound();setTimeout(playBeep3Sound,250);setTimeout(playBeep2Sound,500)
-;setTimeout(function(){},1e3)}}document.getElementById('enableAudioButton').addEventListener('click',userInitiatedAudioPlay);if(areBeepsConfigured()){
-document.getElementById('enableAudioButton').removeAttribute('hidden')}const errorExpireSeconds=5;let errorRemainSeconds=0;function clearError(){const errorDivEl=document.getElementById('errorDiv')
-;errorDivEl.setAttribute('hidden','');const errorContentDivEl=document.getElementById('errorContentDiv');while(errorContentDivEl.firstChild){errorContentDivEl.removeChild(errorContentDivEl.firstChild)
-}errorRemainSeconds=0}function showError(errorString){const errorDivEl=document.getElementById('errorDiv');errorDivEl.removeAttribute('hidden')
-;const errorContentDivEl=document.getElementById('errorContentDiv');const errorMessageEl=document.createElement('div');errorMessageEl.textContent=errorString||'Error: unknown error (2993)'
-;errorContentDivEl.appendChild(errorMessageEl);errorRemainSeconds=errorExpireSeconds}document.addEventListener('show-error-message',function(event){showError(event.detail.message)})
+document.getElementById('enableAudioButton').setAttribute('hidden','');if(areBeepsConfigured()){playBeep2Sound();setTimeout(playBeep1Sound,500)}}
+document.getElementById('enableAudioButton').addEventListener('click',userInitiatedAudioPlay);if(areBeepsConfigured()){document.getElementById('enableAudioButton').removeAttribute('hidden')}
+const errorExpireSeconds=5;let errorRemainSeconds=0;function clearError(){const errorDivEl=document.getElementById('errorDiv');errorDivEl.setAttribute('hidden','')
+;const errorContentDivEl=document.getElementById('errorContentDiv');while(errorContentDivEl.firstChild){errorContentDivEl.removeChild(errorContentDivEl.firstChild)}errorRemainSeconds=0}
+function showError(errorString){const errorDivEl=document.getElementById('errorDiv');errorDivEl.removeAttribute('hidden');const errorContentDivEl=document.getElementById('errorContentDiv')
+;const errorMessageEl=document.createElement('div');errorMessageEl.textContent=errorString||'Error: unknown error (2993)';errorContentDivEl.appendChild(errorMessageEl)
+;errorRemainSeconds=errorExpireSeconds}document.addEventListener('show-error-message',function(event){showError(event.detail.message)})
 ;document.getElementById('errorDiv').addEventListener('click',function(){clearError()});function errorTimerTickHandler(){if(errorRemainSeconds>0){errorRemainSeconds--;if(errorRemainSeconds===0){
 clearError()}else{document.getElementById('errorTitle').textContent='Tap to Close ('+errorRemainSeconds.toString()+')'}}}function unixTimestamp(){const now=new Date;return parseInt(now.valueOf()/1e3)}
 function clearLastZoom(){const now=unixTimestamp();window.localStorage.setItem('lastZoom',JSON.stringify({timestamp:now,zoomType:null,zoomValue:null}))}function checkConnect(code){

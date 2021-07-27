@@ -284,11 +284,9 @@ function userInitiatedAudioPlay () {
   document.getElementById('enableAudioButton').setAttribute('hidden', '');
   // check if beep enabled in window.localStorage
   if (areBeepsConfigured()) {
-    playBeep1Sound();
-    setTimeout(playBeep3Sound, 250);
-    setTimeout(playBeep2Sound, 500);
-    setTimeout(function () {
-    }, 1000);
+    playBeep2Sound();
+    setTimeout(playBeep1Sound, 500);
+    // beep3 not included because it is private message and not auto-eabled.
   }
 } // userInitiatedAudioPlay()
 // click event for buttion in header bar
