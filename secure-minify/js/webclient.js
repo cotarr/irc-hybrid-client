@@ -40,19 +40,19 @@ lastClientWidth:document.querySelector('body').clientWidth};if(window.devicePixe
 ;const beep3=new Audio('sounds/short-beep3.mp3');let beep1InhibitTimer=0;let beep2InhibitTimer=0;let beep3InhibitTimer=0;function beepTimerTick(){if(beep1InhibitTimer>0)beep1InhibitTimer--
 ;if(beep2InhibitTimer>0)beep2InhibitTimer--;if(beep3InhibitTimer>0)beep3InhibitTimer--}function inhibitBeep(seconds){beep1InhibitTimer=seconds;beep2InhibitTimer=seconds;beep3InhibitTimer=seconds}
 const audioPromiseErrorStr='Browser policy has blocked Audio.play() '+'because user must interact with page or manually play sound first.';function playBeep1Sound(){if(beep1InhibitTimer===0){
-beep1.play().catch(function(error){if(error.name==='NotAllowedError'){console.info('playBeep1Sound() '+audioPromiseErrorStr)}else{console.error(error)}});beep1InhibitTimer=5}}
-function playBeep2Sound(){if(beep2InhibitTimer===0){beep2.play().catch(function(error){if(error.name==='NotAllowedError'){}else{console.error(error)}});beep2InhibitTimer=5}}function playBeep3Sound(){
-if(beep3InhibitTimer===0){beep3.play().catch(function(error){if(error.name==='NotAllowedError'){console.info('playBeep3Sound() '+audioPromiseErrorStr)}else{console.error(error)}});beep3InhibitTimer=5}
-}function areBeepsConfigured(){let isAnyBeepEnabled=false;let beepEnableChanArray=null;beepEnableChanArray=JSON.parse(window.localStorage.getItem('beepEnableChanArray'))
-;if(beepEnableChanArray&&Array.isArray(beepEnableChanArray)){if(beepEnableChanArray.length>0){for(let i=0;i<beepEnableChanArray.length;i++){if(beepEnableChanArray[i].beep1)isAnyBeepEnabled=true
-;if(beepEnableChanArray[i].beep2)isAnyBeepEnabled=true;if(beepEnableChanArray[i].beep3)isAnyBeepEnabled=true}}}return isAnyBeepEnabled}function userInitiatedAudioPlay(){
-document.getElementById('enableAudioButton').setAttribute('hidden','');if(areBeepsConfigured()){playBeep2Sound();setTimeout(playBeep1Sound,500)}}
-document.getElementById('enableAudioButton').addEventListener('click',userInitiatedAudioPlay);if(areBeepsConfigured()){document.getElementById('enableAudioButton').removeAttribute('hidden')}
-const errorExpireSeconds=5;let errorRemainSeconds=0;function clearError(){const errorDivEl=document.getElementById('errorDiv');errorDivEl.setAttribute('hidden','')
-;const errorContentDivEl=document.getElementById('errorContentDiv');while(errorContentDivEl.firstChild){errorContentDivEl.removeChild(errorContentDivEl.firstChild)}errorRemainSeconds=0}
-function showError(errorString){const errorDivEl=document.getElementById('errorDiv');errorDivEl.removeAttribute('hidden');const errorContentDivEl=document.getElementById('errorContentDiv')
-;const errorMessageEl=document.createElement('div');errorMessageEl.textContent=errorString||'Error: unknown error (2993)';errorContentDivEl.appendChild(errorMessageEl)
-;errorRemainSeconds=errorExpireSeconds}document.addEventListener('show-error-message',function(event){showError(event.detail.message)})
+beep1.play().then(function(){document.getElementById('enableAudioButton').setAttribute('hidden','')}).catch(function(error){if(error.name==='NotAllowedError'){
+console.info('playBeep1Sound() '+audioPromiseErrorStr)}else{console.error(error)}});beep1InhibitTimer=5}}function playBeep2Sound(){if(beep2InhibitTimer===0){beep2.play().catch(function(error){
+if(error.name==='NotAllowedError'){}else{console.error(error)}});beep2InhibitTimer=5}}function playBeep3Sound(){if(beep3InhibitTimer===0){beep3.play().catch(function(error){
+if(error.name==='NotAllowedError'){console.info('playBeep3Sound() '+audioPromiseErrorStr)}else{console.error(error)}});beep3InhibitTimer=5}}function areBeepsConfigured(){let isAnyBeepEnabled=false
+;let beepEnableChanArray=null;beepEnableChanArray=JSON.parse(window.localStorage.getItem('beepEnableChanArray'));if(beepEnableChanArray&&Array.isArray(beepEnableChanArray)){
+if(beepEnableChanArray.length>0){for(let i=0;i<beepEnableChanArray.length;i++){if(beepEnableChanArray[i].beep1)isAnyBeepEnabled=true;if(beepEnableChanArray[i].beep2)isAnyBeepEnabled=true
+;if(beepEnableChanArray[i].beep3)isAnyBeepEnabled=true}}}return isAnyBeepEnabled}function userInitiatedAudioPlay(){document.getElementById('enableAudioButton').setAttribute('hidden','')
+;if(areBeepsConfigured()){playBeep2Sound();setTimeout(playBeep1Sound,500)}}document.getElementById('enableAudioButton').addEventListener('click',userInitiatedAudioPlay);if(areBeepsConfigured()){
+document.getElementById('enableAudioButton').removeAttribute('hidden')}const errorExpireSeconds=5;let errorRemainSeconds=0;function clearError(){const errorDivEl=document.getElementById('errorDiv')
+;errorDivEl.setAttribute('hidden','');const errorContentDivEl=document.getElementById('errorContentDiv');while(errorContentDivEl.firstChild){errorContentDivEl.removeChild(errorContentDivEl.firstChild)
+}errorRemainSeconds=0}function showError(errorString){const errorDivEl=document.getElementById('errorDiv');errorDivEl.removeAttribute('hidden')
+;const errorContentDivEl=document.getElementById('errorContentDiv');const errorMessageEl=document.createElement('div');errorMessageEl.textContent=errorString||'Error: unknown error (2993)'
+;errorContentDivEl.appendChild(errorMessageEl);errorRemainSeconds=errorExpireSeconds}document.addEventListener('show-error-message',function(event){showError(event.detail.message)})
 ;document.getElementById('errorDiv').addEventListener('click',function(){clearError()});function errorTimerTickHandler(){if(errorRemainSeconds>0){errorRemainSeconds--;if(errorRemainSeconds===0){
 clearError()}else{document.getElementById('errorTitle').textContent='Tap to Close ('+errorRemainSeconds.toString()+')'}}}function unixTimestamp(){const now=new Date;return parseInt(now.valueOf()/1e3)}
 function clearLastZoom(){const now=unixTimestamp();window.localStorage.setItem('lastZoom',JSON.stringify({timestamp:now,zoomType:null,zoomValue:null}))}function checkConnect(code){

@@ -213,13 +213,18 @@ function playBeep1Sound () {
     // Note: Chrome requires user interact with page before playing media
     // Chrome on IOS requires manually selecting button to play sound first time.
     // Else throws a DOMException violating media policy
-    beep1.play().catch(function (error) {
-      if (error.name === 'NotAllowedError') {
-        console.info('playBeep1Sound() ' + audioPromiseErrorStr);
-      } else {
-        console.error(error);
-      }
-    });
+    beep1.play()
+      .then(function () {
+        // upon successful play sound, then hide the button
+        document.getElementById('enableAudioButton').setAttribute('hidden', '');
+      })
+      .catch(function (error) {
+        if (error.name === 'NotAllowedError') {
+          console.info('playBeep1Sound() ' + audioPromiseErrorStr);
+        } else {
+          console.error(error);
+        }
+      });
     beep1InhibitTimer = 5;
   }
 }
