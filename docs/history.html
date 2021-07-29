@@ -33,6 +33,16 @@
           Change Log
         </div>
         <p>
+          2021-07-30 (0.1.25)
+          Temporary fix for audio beeps in IRC channel blocked by browser policy.
+          On page load, the browser may block the Audio.play() request pending user interaction.
+          Added new button marked [+Audio] that will appear if the
+          header bar when enabled audio media may be blocked by browser.
+          Selecting buttion will manually play audio, which is detected by browser.
+          This only applies to audio IRC channel beep tone checkboxes.
+          This is an interim fix. A more elegant long term solution is needed.
+        </p>
+        <p>
           2021-07-24 (0.1.24)
             In-progress, debugging IOS audio disabled before user intereaction.
             Fix unresolved promise when audio beep blocked by browser policy.
