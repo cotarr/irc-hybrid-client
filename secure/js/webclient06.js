@@ -675,7 +675,8 @@ function createChannelEl (name) {
           detail: lastZoomObj
         }
       ));
-      window.localStorage.setItem('lastZoom', JSON.stringify(lastZoomObj));
+      // temporary comment debug zoom refresh issue
+      // window.localStorage.setItem('lastZoom', JSON.stringify(lastZoomObj));
     }
   });
 

@@ -364,11 +364,12 @@ function unixTimestamp () {
 
 function clearLastZoom () {
   const now = unixTimestamp();
-  window.localStorage.setItem('lastZoom', JSON.stringify({
-    timestamp: now,
-    zoomType: null,
-    zoomValue: null
-  }));
+  // temporary comment debug zoom refresh issue
+  // window.localStorage.setItem('lastZoom', JSON.stringify({
+  //   timestamp: now,
+  //   zoomType: null,
+  //   zoomValue: null
+  // }));
 }
 
 // --------------------------------------

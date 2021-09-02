@@ -55,10 +55,9 @@ document.getElementById('enableAudioButton').removeAttribute('hidden')}const err
 ;errorContentDivEl.appendChild(errorMessageEl);errorRemainSeconds=errorExpireSeconds}document.addEventListener('show-error-message',function(event){showError(event.detail.message)})
 ;document.getElementById('errorDiv').addEventListener('click',function(){clearError()});function errorTimerTickHandler(){if(errorRemainSeconds>0){errorRemainSeconds--;if(errorRemainSeconds===0){
 clearError()}else{document.getElementById('errorTitle').textContent='Tap to Close ('+errorRemainSeconds.toString()+')'}}}function unixTimestamp(){const now=new Date;return parseInt(now.valueOf()/1e3)}
-function clearLastZoom(){const now=unixTimestamp();window.localStorage.setItem('lastZoom',JSON.stringify({timestamp:now,zoomType:null,zoomValue:null}))}function checkConnect(code){
-if(code>=1&&!webState.webConnected){showError('Error: not connected to web server');return false}if(code>=2&&!ircState.ircConnected){showError('Error: Not connected to IRC server.');return false}
-if(code>=3&&!ircState.ircRegistered){showError('Error: Not connected to IRC server.');return false}return true}function showRawMessageWindow(){
-document.getElementById('rawHiddenElements').removeAttribute('hidden');document.getElementById('rawHiddenElementsButton').textContent='-'
+function clearLastZoom(){const now=unixTimestamp()}function checkConnect(code){if(code>=1&&!webState.webConnected){showError('Error: not connected to web server');return false}
+if(code>=2&&!ircState.ircConnected){showError('Error: Not connected to IRC server.');return false}if(code>=3&&!ircState.ircRegistered){showError('Error: Not connected to IRC server.');return false}
+return true}function showRawMessageWindow(){document.getElementById('rawHiddenElements').removeAttribute('hidden');document.getElementById('rawHiddenElementsButton').textContent='-'
 ;document.getElementById('rawHeadRightButtons').removeAttribute('hidden');if(!webState.cacheReloadInProgress){
 document.getElementById('rawMessageDisplay').scrollTop=document.getElementById('rawMessageDisplay').scrollHeight}}function hideRawMessageWindow(){
 document.getElementById('rawHiddenElements').setAttribute('hidden','');document.getElementById('rawHiddenElementsButton').textContent='+'
@@ -502,8 +501,8 @@ if(channelMainSectionEl.hasAttribute('auto-comp-enabled')){channelAutoCompCBInpu
 ;channelJoinButtonEl.setAttribute('hidden','');channelPartButtonEl.setAttribute('hidden','');channelHideButtonEl.textContent='+'}}channelZoomButtonEl.addEventListener('click',function(){
 if(channelMainSectionEl.hasAttribute('zoom')){channelMainSectionEl.removeAttribute('zoom');updateVisibility();channelTextAreaEl.scrollTop=channelTextAreaEl.scrollHeight}else{
 const timestamp=unixTimestamp();const lastZoomObj={timestamp:timestamp,zoomType:'channel',zoomValue:name.toLowerCase()};document.dispatchEvent(new CustomEvent('hide-or-zoom',{bubbles:true,
-detail:lastZoomObj}));window.localStorage.setItem('lastZoom',JSON.stringify(lastZoomObj))}});document.addEventListener('show-all-divs',function(event){channelMainSectionEl.removeAttribute('zoom')
-;channelMainSectionEl.setAttribute('opened','');updateVisibility()});document.addEventListener('hide-or-zoom',function(event){
+detail:lastZoomObj}))}});document.addEventListener('show-all-divs',function(event){channelMainSectionEl.removeAttribute('zoom');channelMainSectionEl.setAttribute('opened','');updateVisibility()})
+;document.addEventListener('hide-or-zoom',function(event){
 if(event.detail&&event.detail.zoomType&&event.detail.zoomValue&&event.detail.zoomType==='channel'&&event.detail.zoomValue===name.toLowerCase()){
 const index=ircState.channels.indexOf(name.toLowerCase());if(index>=0){if(ircState.channelStates[index].joined){channelMainSectionEl.setAttribute('zoom','')
 ;channelMainSectionEl.setAttribute('opened','');updateVisibility();channelTextAreaEl.scrollTop=channelTextAreaEl.scrollHeight;return}}}channelMainSectionEl.removeAttribute('zoom')
