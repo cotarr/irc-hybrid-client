@@ -205,7 +205,7 @@ const sessionOptions = {
   store: new MemoryStore({
     ttl: sessionExpireAfterMs, // milliseconds
     stale: true, // return expired value before deleting otherwise undefined if false
-    checkPeriod: 864000000 // prune every 24 hours
+    checkPeriod: 86400000 // prune every 24 hours
   }),
   cookie: {
     path: '/',
