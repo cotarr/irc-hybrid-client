@@ -212,7 +212,7 @@ const sessionOptions = {
     maxAge: sessionExpireAfterMs,
     secure: (credentials.tls), // When TLS enabled, require secure cookies
     httpOnly: true,
-    sameSite: 'strict'
+    sameSite: 'Lax'
   },
   proxy: false,
   resave: false, // set to false because memorystore has touch method

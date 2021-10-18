@@ -1,8 +1,6 @@
 #!/usr/bin/env node
 
-// This will set a new login user/password for userid = 1
-// - This is a static password not editable online
-// - It is intended there is only one user for the program
+// This will set a new login user/password
 // - This must be run from the tools folder to find credentials.json
 //
 //
