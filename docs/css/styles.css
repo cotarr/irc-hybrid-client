@@ -2,12 +2,21 @@ body {
     background-color: #e0e0e0;
 }
 .header-div {
-  text-align: center;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  height: 28px;
+  width: 100%;
+  z-index: 4;
+
+  background-color: #54c9ff;
+  border-top: 1px solid black;
+  border-bottom: 1px solid black;
+  font-size: 140%;
   padding-top: 3px;
   padding-bottom: 5px;
   padding-left: 40px;
-  font-size: 140%;
-  background-color: #54c9ff;
+  text-align: center;  
 }
 .footer-div {
   text-align: center;
@@ -18,10 +27,18 @@ body {
   background-color: #54c9ff;
 }
 .outer-div {
+  margin-top: 32px;
+  margin-left: 169px;
   display: flex;
   flex-direction: row;
 /*  align-items: flex-start;
   vertical-align: top; */
+}
+.menu-div-fixed {
+  position: fixed;
+  top: 32px;
+  left: 0px;
+  z-index: 3;
 }
 .menu-div {
   align-self: flex-start;
