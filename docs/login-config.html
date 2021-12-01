@@ -116,7 +116,7 @@
         <p>
           The cookie secret is used to place digital signatures on session cookies.
           These cookies are used to authorize http web requests.
-          The value shown here is only an example, and you should generate your own uniquie
+          The value shown here is only an example, and you should generate your own unique
           randomly generated string of characters.
         </p>
         <p>
@@ -125,17 +125,14 @@
           A value of 86400 seconds will set the login expiration at 24 hours, or once per day.
           Based on the ease of use of browser password managers, 24 hours has worked out
           to a convenient duration.
+          If a rolling cookie is enabled, the expiration date of the cookie is reset
+          each time the page is loaded.
         </p>
         <p>
           If your session expires in the middle of a conversation, a user login page will load.
-          The backend web server will mantain a cache of messages to occur during while disconnected.
+          The backend web server will mantain a cache of messages that occur while disconnected.
           You should be able to continue your conversation after re-authenticating without
           any indication to people in the conversation.
-        </p>
-        <p>
-          As as note, the login session information is stored by the web server in RAM memory,
-          so each time the web server is restarted, the session information is discarded,
-          and the web page will require a new user password entry.
         </p>
         <p>
           The configuration property &quotinstanceNumber&quot is used for the case where multiple
@@ -171,6 +168,49 @@
   "sessionExpireAfterSec": 86400,
   "instanceNumber": 0,
 </pre></div>
+
+        <div class="install-section-title">Session Store (Optional)</div>
+        <p>
+          By default, irc-hybrid-client web server uses Memorystore as a RAM database
+          to hold user's login session. Considering the application is a
+          single user IRC client, memorystore should be adequate for most users.
+          The memorystore includes a memory safe prune function to remove
+          expired sessions preventing a memory leak.
+          The disadvantage of RAM based storage is that when the web server
+          is restarted, such as following a reboot, the current login state
+          is lost. A user login password entry will be required after a
+          server restart. If you are using a password manager, this is not a big deal.
+        </p>
+        <p>
+          If you prefer persistent session storage, the application supports
+          Redis, which is a simple key/value store. It is assumed that
+          redis is running on the same server as the irc-hybrid-client
+          so a non-encrypted TCP connection would be safe.
+          It is manditory that the local firewall protect the redis TCP ports
+          from external internet access. A redis password is not required
+          to access redis locally behind a firewall. The redis prefix
+          sould be set to a unique value if more than one web server is using
+          this instance of redis.
+        </p>
+        <p>
+          If you are not familiar with redis, it is recommended to use the
+          default configuration to use memorystore for session storage.
+        </p>
+        <ul>
+          <li>Install redis from OS package manager, Debian: `apt-get install redis-server`.</li>
+          <li>Customize redis server configuration as needed `/etc/redis/redis.conf`</li>
+          <li>Set local firewall to protect redis TCP port.</li>
+          <li>Enable redis by editing `credentials.json` as follows:</li>
+        </ul>
+<div class="pre-div"><pre>
+  "sessionEnableRedis": true,
+  "sessionRedisPrefix": "irc001:",
+  "sessionRedisPassword": "",
+</pre></div>
+        <p>
+          There is a redis client `redis-cli` that can be used to view or clear the
+          session store.
+        </p>
 
         <div class="install-section-title">Security Contact</div>
         <p>

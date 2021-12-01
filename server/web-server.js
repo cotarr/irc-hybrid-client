@@ -37,7 +37,6 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
-const MemoryStore = require('memorystore')(session);
 const logger = require('morgan');
 const helmet = require('helmet');
 const compression = require('compression');
@@ -200,24 +199,52 @@ app.get('/robots.txt', function (req, res) {
 // express-session configuration object
 //
 const sessionOptions = {
-  secret: cookieSecret,
   name: cookieName, // name also in ws-authorize.js
-  store: new MemoryStore({
-    ttl: sessionExpireAfterMs, // milliseconds
-    stale: true, // return expired value before deleting otherwise undefined if false
-    checkPeriod: 86400000 // prune every 24 hours
-  }),
+  proxy: false,
+  rolling: credentials.sessionRollingCookie || false,
+  resave: false,
+  saveUninitialized: false,
+  secret: cookieSecret,
   cookie: {
     path: '/',
     maxAge: sessionExpireAfterMs,
     secure: (credentials.tls), // When TLS enabled, require secure cookies
     httpOnly: true,
     sameSite: 'Lax'
-  },
-  proxy: false,
-  resave: false, // set to false because memorystore has touch method
-  saveUninitialized: false
+  }
 };
+
+const sessionStore = {};
+if (credentials.sessionEnableRedis) {
+  // redis database queries
+  // list:       KEYS *
+  // view:       GET <key>
+  // Clear all:  FLUSHALL
+  console.log('Using redis for session storage');
+  sessionStore.redis = require('redis');
+  sessionStore.RedisStore = require('connect-redis')(session);
+  const redisClientOptions = {};
+  // must match /etc/redis/redis.conf "requirepass <password>"
+  if ((credentials.sessionRedisPassword) && (credentials.sessionRedisPassword > 0)) {
+    redisClientOptions.password = credentials.sessionRedisPassword;
+  }
+  sessionStore.redisClient = sessionStore.redis.createClient(redisClientOptions);
+  const redisStoreOptions = {
+    client: sessionStore.redisClient,
+    prefix: credentials.sessionRedisPrefix || 'irc:'
+    // redis uses Cookie ttl from session cookie
+  };
+  sessionOptions.store = new sessionStore.RedisStore(redisStoreOptions);
+} else {
+  console.log('Using memorystore for session storage');
+  sessionStore.MemoryStore = require('memorystore')(session);
+  sessionOptions.store = new sessionStore.MemoryStore({
+    // memorystore in milliseconds
+    ttl: sessionExpireAfterMs, // milliseconds
+    stale: true, // return expired value before deleting otherwise undefined if false
+    checkPeriod: 86400000 // prune every 24 hours
+  });
+}
 
 // -----------------------------------------------------------------
 // express-session
