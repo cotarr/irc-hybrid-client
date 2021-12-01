@@ -1,6 +1,6 @@
 {
   "name": "irc-hybrid-client",
-  "version": "0.1.27",
+  "version": "0.1.28",
   "description": "Single user hybrid IRC client using JavaScript front end and Node/Express backend",
   "main": "bin/www",
   "scripts": {
@@ -22,7 +22,7 @@
     "body-parser": "^1.19.0",
     "compression": "^1.7.4",
     "cookie": "^0.4.1",
-    "cookie-parser": "^1.4.5",
+    "cookie-parser": "^1.4.6",
     "cookie-signature": "^1.1.0",
     "express": "^4.17.1",
     "express-session": "^1.17.1",
@@ -30,7 +30,7 @@
     "memorystore": "^1.6.6",
     "morgan": "^1.10.0",
     "utf-8-validate": "^5.0.5",
-    "ws": "^8.2.1"
+    "ws": "^8.3.0"
   },
   "devDependencies": {
     "eslint": "^7.30.0",
