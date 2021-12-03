@@ -45,11 +45,6 @@ const app = express();
 // Irc Client Module
 const ircClient = require('./irc/irc-client');
 
-// Session and User login routes
-const userAuth = require('./middlewares/user-authenticate');
-const authorizeOrLogin = userAuth.authorizeOrLogin;
-const authorizeOrFail = userAuth.authorizeOrFail;
-
 // TLS certificate filenames
 // Web username, password credentials
 const credentials = JSON.parse(fs.readFileSync('./credentials.json', 'utf8'));
@@ -60,6 +55,15 @@ if (credentials.configVersion === 1) {
 if ((!('configVersion' in credentials)) || (credentials.configVersion !== 2)) {
   console.log('Error, credentials.js wrong configVersion');
   process.exit(1);
+}
+
+let userAuth = null;
+if (credentials.enableRemoteLogin) {
+  // Session and User login routes
+  userAuth = require('./middlewares/remote-authenticate');
+} else {
+  // Session and User login routes
+  userAuth = require('./middlewares/user-authenticate');
 }
 
 // Also set cookieName in ws-authorize.js
@@ -256,11 +260,18 @@ app.use('/', session(sessionOptions));
 // ------------------
 // User Login Routes
 // ------------------
-app.get('/login.css', userAuth.loginStyleSheet);
-app.get('/login', userAuth.loginPage);
-app.post('/login-authorize', userAuth.loginAuthorize);
-app.get('/logout', userAuth.logout);
-app.get('/blocked', userAuth.blockedCookies);
+if (credentials.enableRemoteLogin) {
+  app.get('/login', userAuth.loginRedirect);
+  app.get('/login.css', userAuth.loginStyleSheet);
+  app.get('/logout', userAuth.logout);
+  app.get('/blocked', userAuth.blockedCookies);
+} else {
+  app.get('/login.css', userAuth.loginStyleSheet);
+  app.get('/login', userAuth.loginPage);
+  app.post('/login-authorize', userAuth.loginAuthorize);
+  app.get('/logout', userAuth.logout);
+  app.get('/blocked', userAuth.blockedCookies);
+}
 
 //
 // To Terminate remote server
@@ -274,7 +285,7 @@ app.get('/blocked', userAuth.blockedCookies);
 //    "terminate": "YES"
 //  }
 //
-app.post('/terminate', authorizeOrFail, function (req, res, next) {
+app.post('/terminate', userAuth.authorizeOrFail, function (req, res, next) {
   let inputVerifyString = '';
   if (('terminate' in req.body) && (typeof req.body.terminate === 'string')) {
     inputVerifyString = req.body.terminate;
@@ -307,7 +318,7 @@ app.post('/terminate', authorizeOrFail, function (req, res, next) {
 });
 
 // Route used to verify cookie not expired before reconnecting
-app.get('/secure', authorizeOrFail, (req, res) => res.json({ secure: 'ok' }));
+app.get('/secure', userAuth.authorizeOrFail, (req, res) => res.json({ secure: 'ok' }));
 
 // -----------------------------------------
 //          Websocket Auth
@@ -338,7 +349,7 @@ app.get('/secure', authorizeOrFail, (req, res) => res.json({ secure: 'ok' }));
 // Data stored globally, time expiration 10 seconds.
 //
 // -----------------------------------------
-app.post('/irc/wsauth', authorizeOrFail, function (req, res, next) {
+app.post('/irc/wsauth', userAuth.authorizeOrFail, function (req, res, next) {
   global.webSocketAuth = {
     expire: 0,
     cookie: ''
@@ -383,28 +394,28 @@ app.post('/irc/wsauth', authorizeOrFail, function (req, res, next) {
 // Route:  /userinfo
 //
 // ----------------
-app.get('/userinfo', authorizeOrFail, userAuth.getUserInfo);
+app.get('/userinfo', userAuth.authorizeOrFail, userAuth.getUserInfo);
 
 // ---------------------------------------
 // IRC client API routes served to browser
 // ---------------------------------------
-app.post('/irc/server', authorizeOrFail, ircClient.serverHandler);
-app.post('/irc/connect', authorizeOrFail, ircClient.connectHandler);
-app.post('/irc/disconnect', authorizeOrFail, ircClient.disconnectHandler);
-app.post('/irc/message', authorizeOrFail, ircClient.messageHandler);
-app.get('/irc/getircstate', authorizeOrFail, ircClient.getIrcState);
-app.get('/irc/cache', authorizeOrFail, ircClient.getCache);
-app.post('/irc/prune', authorizeOrFail, ircClient.pruneChannel);
-app.post('/irc/erase', authorizeOrFail, ircClient.eraseCache);
-app.get('/irc/test1', authorizeOrFail, ircClient.test1Handler);
-app.get('/irc/test2', authorizeOrFail, ircClient.test2Handler);
+app.post('/irc/server', userAuth.authorizeOrFail, ircClient.serverHandler);
+app.post('/irc/connect', userAuth.authorizeOrFail, ircClient.connectHandler);
+app.post('/irc/disconnect', userAuth.authorizeOrFail, ircClient.disconnectHandler);
+app.post('/irc/message', userAuth.authorizeOrFail, ircClient.messageHandler);
+app.get('/irc/getircstate', userAuth.authorizeOrFail, ircClient.getIrcState);
+app.get('/irc/cache', userAuth.authorizeOrFail, ircClient.getCache);
+app.post('/irc/prune', userAuth.authorizeOrFail, ircClient.pruneChannel);
+app.post('/irc/erase', userAuth.authorizeOrFail, ircClient.eraseCache);
+app.get('/irc/test1', userAuth.authorizeOrFail, ircClient.test1Handler);
+app.get('/irc/test2', userAuth.authorizeOrFail, ircClient.test2Handler);
 
 // -------------------------------
 // Login redirect for main html file
 // all other static files return 403
 // if unauthorized
 // -------------------------------
-app.get('/irc/webclient.html', authorizeOrLogin, function (req, res, next) {
+app.get('/irc/webclient.html', userAuth.authorizeOrLogin, function (req, res, next) {
   next();
 });
 
@@ -419,7 +430,7 @@ let secureDir = path.join(__dirname, '../secure');
 if (nodeEnv === 'production') secureDir = path.join(__dirname, '../secure-minify');
 
 console.log('Serving files from: ' + secureDir);
-app.use('/irc', authorizeOrFail, express.static(secureDir));
+app.use('/irc', userAuth.authorizeOrFail, express.static(secureDir));
 
 // ---------------------------------
 //    E R R O R   H A N D L E R S
