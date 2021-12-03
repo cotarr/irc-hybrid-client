@@ -136,6 +136,9 @@
         if (req.session.sessionAuth.sessionExpireTimeSec) {
           if (timeNowSeconds < req.session.sessionAuth.sessionExpireTimeSec) {
             authorized = true;
+            if (credentials.sessionRollingCookie) {
+              req.session.sessionAuth.sessionExpireTimeSec = timeNowSeconds + sessionExpireAfterSec;
+            }
           }
         }
       }
@@ -431,6 +434,11 @@
       user = req.session.sessionAuth.user;
     }
     if (req.session) {
+      let cookieName = 'irc-hybrid-client';
+      if (('instanceNumber' in credentials) && (Number.isInteger(credentials.instanceNumber)) &&
+        (credentials.instanceNumber >= 0) && (credentials.instanceNumber < 100)) {
+        cookieName = 'irc-hybrid-client-' + credentials.instanceNumber.toString();
+      }
       const cookieOptions = {
         maxAge: req.session.cookie.originalMaxAge,
         expires: req.session.cookie.expires,
@@ -445,7 +453,7 @@
         }
       });
       // this clears cookie contents, but not clear cookie
-      res.clearCookie('irc-hybrid-client', cookieOptions);
+      res.clearCookie(cookieName, cookieOptions);
     }
     let tempHtml = 'Browser was not logged in.';
     if (user) {

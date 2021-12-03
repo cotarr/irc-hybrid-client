@@ -66,7 +66,7 @@ if (credentials.enableRemoteLogin) {
   userAuth = require('./middlewares/user-authenticate');
 }
 
-// Also set cookieName in ws-authorize.js
+// Also set cookieName in ws-authorize.js and user-authenticate
 let cookieName = 'irc-hybrid-client';
 if (('instanceNumber' in credentials) && (Number.isInteger(credentials.instanceNumber)) &&
   (credentials.instanceNumber >= 0) && (credentials.instanceNumber < 100)) {
