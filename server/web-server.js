@@ -62,7 +62,7 @@ if ((!('configVersion' in credentials)) || (credentials.configVersion !== 2)) {
   process.exit(1);
 }
 
-// Also set cookieName in ws-authorize.js
+// Also set cookieName in ws-authorize.js and user-authenticate
 let cookieName = 'irc-hybrid-client';
 if (('instanceNumber' in credentials) && (Number.isInteger(credentials.instanceNumber)) &&
   (credentials.instanceNumber >= 0) && (credentials.instanceNumber < 100)) {
