@@ -21,7 +21,22 @@
 // SOFTWARE.
 // -----------------------------------------------------------------------------
 //
-// Optional remote login using custom Oauth 2.0
+// Optional remote login using custom Oauth 2.0 Server
+//
+// This file is not required when irc-hybrid-client is used with
+// the default configuration of internal user password login.
+//
+// The file credentials.json should something similar to the following
+//   {
+//     "enableRemoteLogin": true,
+//     "remoteAuthHost": "http://127.0.0.1:3500",
+//     "remoteCallbackHost": "http://localhost:3003",
+//     "remoteClientId": "irc_client_id",
+//     "remoteClientSecret": "irc_client_secret_TO_BE_CHANGED",
+//     "remoteScope": "irc_001.irc"
+// }
+//
+// In credentials.json file, user array is not required. --> "loginUsers": []
 //
 // -----------------------------------------------------------------------------
 
@@ -31,6 +46,7 @@
   // node native modules
   const fs = require('fs');
   const path = require('path');
+  const fetch = require('node-fetch');
 
   const credentials = JSON.parse(fs.readFileSync('./credentials.json', 'utf8'));
 
@@ -124,6 +140,9 @@
         if (req.session.sessionAuth.sessionExpireTimeSec) {
           if (timeNowSeconds < req.session.sessionAuth.sessionExpireTimeSec) {
             authorized = true;
+            if (credentials.sessionRollingCookie) {
+              req.session.sessionAuth.sessionExpireTimeSec = timeNowSeconds + sessionExpireAfterSec;
+            }
           }
         }
       }
@@ -181,25 +200,210 @@
 
   // ---------------------------
   // Route: GET /login route
+  //
+  // Redirect (302) to authorization server
+  // There, user will be presented with login form
   // ---------------------------
   const loginRedirect = function (req, res, next) {
-    const timeNowSeconds = Math.floor(Date.now() / 1000);
-    // ------------------------
-    // Authorize the user
-    // ------------------------
-    _initSession(req);
-    req.session.sessionAuth.authorized = true;
-    req.session.sessionAuth.user = 'user1';
-    req.session.sessionAuth.name = 'user1';
-    req.session.sessionAuth.userid = 'user1';
-    req.session.sessionAuth.sessionExpireTimeSec = timeNowSeconds + sessionExpireAfterSec;
-    // add to log file
-    //
-    customLog(req, 'Login ' + req.session.sessionAuth.user);
-    // -------------------------------------------------
-    // Redirect to landing page after successful login
-    // -------------------------------------------------
-    res.redirect('/irc/webclient.html');
+    res.redirect(
+      credentials.remoteAuthHost +
+      '/dialog/authorize?' +
+      'redirect_uri=' + credentials.remoteCallbackHost + '/login/callback' + '&' +
+      'response_type=code&' +
+      'client_id=' + credentials.remoteClientId + '&' +
+      'scope=' + credentials.remoteScope);
+  };
+
+  //
+  //
+  // ----------------------------------------
+  // Internal functions for promise chain
+  // ----------------------------------------
+  //
+  // ------------------------------------------------------
+  // Validate that required properties exist after
+  // exchanging authorization code for new access token
+  // ------------------------------------------------------
+  const _validateTokenResponse = function (tokenResponse) {
+    return new Promise(function (resolve, reject) {
+      if (('token_type' in tokenResponse) && (tokenResponse.token_type === 'Bearer') &&
+        ('grant_type' in tokenResponse) && (tokenResponse.grant_type === 'authorization_code') &&
+        ('expires_in' in tokenResponse) && (parseInt(tokenResponse.expires_in) > 0) &&
+        ('access_token' in tokenResponse) && (typeof tokenResponse.access_token === 'string') &&
+        (tokenResponse.access_token.length > 0)) {
+        resolve(tokenResponse);
+      } else {
+        const err = new Error('Error parsing authorization_code response');
+        console.log(err.message);
+        reject(err);
+      }
+    });
+  };
+
+  // ------------------------------------------------------
+  // Compare scope of decoded access_token to configured scope
+  // for access to the IRC server.
+  // Return 403 Forbidden if scope is insufficient
+  // ------------------------------------------------------
+  const _authorizeTokenScope = function (res, tokenMetaData) {
+    return new Promise(function (resolve, reject) {
+      if (('active' in tokenMetaData) && (tokenMetaData.active === true) &&
+        ('scope' in tokenMetaData) && (Array.isArray(tokenMetaData.scope))) {
+        if (tokenMetaData.scope.indexOf(credentials.remoteScope) >= 0) {
+          resolve(tokenMetaData);
+        } else {
+          return res.status(403).send(
+            'Forbidden - User access_token insufficient scope. (Expect scope: ' +
+            credentials.remoteScope + ')');
+        }
+      } else {
+        const err = new Error('Error parsing introspect response meta-data');
+        console.log(err.message);
+        reject(err);
+      }
+    });
+  };
+
+  // -------------------------------------------------------------------
+  // After all authentication is complete, mark session as authorized.
+  // -------------------------------------------------------------------
+  const _setSessionAuthorized = function (req, res, tokenMetaData) {
+    return new Promise(function (resolve, reject) {
+      const timeNowSeconds = Math.floor(Date.now() / 1000);
+      _initSession(req);
+      req.session.sessionAuth.authorized = true;
+      req.session.sessionAuth.user = tokenMetaData.user.username;
+      req.session.sessionAuth.name = tokenMetaData.user.name;
+      req.session.sessionAuth.userid = tokenMetaData.user.id;
+      req.session.sessionAuth.sessionExpireTimeSec = timeNowSeconds + sessionExpireAfterSec;
+      //
+      // add to log file
+      //
+      customLog(req, 'Login ' + req.session.sessionAuth.user);
+      //
+      // Redirect to landing page after successful login
+      //
+      return res.redirect('/irc/webclient.html');
+    });
+  };
+
+  // -----------------------------------------------------------------------
+  // Submit the user's access_token to the authorization server
+  // introspect route to validate token signature.
+  // The authorization server will return the user's access_token meta-dat.
+  //
+  // Returns promise
+  // -----------------------------------------------------------------------
+  const _introspectAccessToken = function (responseObj, code) {
+    // OAuth2 authorization server
+    const fetchUrl = credentials.remoteAuthHost + '/oauth/introspect';
+
+    const body = {
+      access_token: responseObj.access_token,
+      client_id: credentials.remoteClientId,
+      client_secret: credentials.remoteClientSecret
+    };
+
+    const fetchOptions = {
+      method: 'POST',
+      timeout: 5000,
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json'
+      },
+      body: JSON.stringify(body)
+    };
+
+    // Return Promise
+    return fetch(fetchUrl, fetchOptions)
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error('Fetch status ' + response.status + ' ' +
+          fetchOptions.method + ' ' + fetchUrl);
+        }
+      })
+      .then((introspectResponse) => {
+        console.log('interspectResponse ', introspectResponse);
+        return introspectResponse;
+      });
+  };
+
+  // ---------------------------------------------------------------
+  // Exchange authorization code for a new
+  // new access token from Oauth 2.0 authorization server
+  //
+  // Returns promise
+  // ---------------------------------------------------------------
+  const _fetchNewAccessToken = function (code) {
+    // OAuth2 authorization server
+    const fetchUrl = credentials.remoteAuthHost + '/oauth/token';
+
+    const body = {
+      code: code,
+      redirect_uri: credentials.remoteCallbackHost + '/login/callback',
+      client_id: credentials.remoteClientId,
+      client_secret: credentials.remoteClientSecret,
+      grant_type: 'authorization_code'
+    };
+
+    const fetchOptions = {
+      method: 'POST',
+      timeout: 5000,
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json'
+      },
+      body: JSON.stringify(body)
+    };
+
+    // Return Promise
+    return fetch(fetchUrl, fetchOptions)
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error('Fetch status ' + response.status + ' ' +
+          fetchOptions.method + ' ' + fetchUrl);
+        }
+      })
+      .then((tokenResponse) => {
+        console.log(tokenResponse);
+        return tokenResponse;
+      });
+  };
+
+  // -------------------------------------------------------------------------------
+  // Route handler for /login/callback
+  //
+  // The browser will redirect to here with the Oauth 2.0 authorization code
+  // as a query parameter in the url.
+  //
+  // 1) Perform fetch request to exchange authorizaton code for a new access_token
+  // 2) Validate the token request response object
+  // 3) Perform fetch request to validate token and obtain user's token meta-data
+  // 4) Validate that user's token scope is sufficient to use irc-hybrid-client
+  // 5) Redirect to single page application at /irc/webclient.html
+  // -------------------------------------------------------------------------------
+  const exchangeAuthCode = function (req, res, next) {
+    // Calling fetchNewAccessToken returns promise
+    _fetchNewAccessToken(req.query.code)
+      .then(function (tokenResponse) {
+        return _validateTokenResponse(tokenResponse);
+      })
+      .then(function (tokenResponse) {
+        return _introspectAccessToken(tokenResponse);
+      })
+      .then(function (tokenMetaData) {
+        return _authorizeTokenScope(res, tokenMetaData);
+      })
+      .then(function (tokenMetaData) {
+        return _setSessionAuthorized(req, res, tokenMetaData);
+      })
+      .catch(function (err) {
+        return next(err.message || err);
+      });
   };
 
   // ---------------------------
@@ -213,6 +417,11 @@
       user = req.session.sessionAuth.user;
     }
     if (req.session) {
+      let cookieName = 'irc-hybrid-client';
+      if (('instanceNumber' in credentials) && (Number.isInteger(credentials.instanceNumber)) &&
+        (credentials.instanceNumber >= 0) && (credentials.instanceNumber < 100)) {
+        cookieName = 'irc-hybrid-client-' + credentials.instanceNumber.toString();
+      }
       const cookieOptions = {
         maxAge: req.session.cookie.originalMaxAge,
         expires: req.session.cookie.expires,
@@ -227,7 +436,7 @@
         }
       });
       // this clears cookie contents, but not clear cookie
-      res.clearCookie('irc-hybrid-client', cookieOptions);
+      res.clearCookie(cookieName, cookieOptions);
     }
     let tempHtml = 'Browser was not logged in.';
     if (user) {
@@ -269,6 +478,7 @@
 
   module.exports = {
     loginRedirect: loginRedirect,
+    exchangeAuthCode: exchangeAuthCode,
     logout: logout,
     authorizeOrLogin: authorizeOrLogin,
     authorizeOrFail: authorizeOrFail,

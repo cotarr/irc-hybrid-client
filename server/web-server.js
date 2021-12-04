@@ -66,7 +66,7 @@ if (credentials.enableRemoteLogin) {
   userAuth = require('./middlewares/user-authenticate');
 }
 
-// Also set cookieName in ws-authorize.js and user-authenticate
+// Also set cookieName in ws-authorize.js, user-authenticate and remote-authenticate.js
 let cookieName = 'irc-hybrid-client';
 if (('instanceNumber' in credentials) && (Number.isInteger(credentials.instanceNumber)) &&
   (credentials.instanceNumber >= 0) && (credentials.instanceNumber < 100)) {
@@ -262,6 +262,7 @@ app.use('/', session(sessionOptions));
 // ------------------
 if (credentials.enableRemoteLogin) {
   app.get('/login', userAuth.loginRedirect);
+  app.get('/login/callback', userAuth.exchangeAuthCode);
   app.get('/login.css', userAuth.loginStyleSheet);
   app.get('/logout', userAuth.logout);
   app.get('/blocked', userAuth.blockedCookies);
