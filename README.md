@@ -1,3 +1,33 @@
+# CUSTOM BRANCH NOTES
+
+This git branch `remote-login-draft` includes optional remote user login capability.
+
+Unauthenticated users are issued a redirect (302) to a remote
+authorization server for user password entry.
+The authorization server redirects back to the IRC client (web server)
+where the IRC client exchanges an authorizaton code for an access_token.
+The access_token is submitted to the authorizaton server to 
+validate the token and obtain user meta-data, such as name and username.
+The access_token is no longer needed and not saved to the session.
+The user's session is marked as authorized until the expiration of the cookie.
+The browser will then load the irc-hybrid-client (IRC web client) to the browser.
+The configuration is hard coded for a specific custom implementation of
+Oauth 2.0. See: `middlewares/remote-authenticate.js`
+
+This is in early stages of debug. 
+There are no additions to /docs at this time.
+This branch is draft and may be deleted without notice.
+
+Custom files for this branch:
+
+```
+middlewares/remote-authenticate.js
+web-server.js
+package.json (added node-fetch)
+```
+
+End of  ----- CUSTOM BRANCH NOTES -----
+
 # irc-hybrid-client
 
 Single user hybrid IRC client using JavaScript frontend and Node.js/Express backend.

@@ -57,6 +57,10 @@ if ((!('configVersion' in credentials)) || (credentials.configVersion !== 2)) {
   process.exit(1);
 }
 
+//
+// Load optional DRAFT middle for remote authorization
+// See middlewares/remote-authentication.js
+//
 let userAuth = null;
 if (credentials.enableRemoteLogin) {
   // Session and User login routes
@@ -261,12 +265,20 @@ app.use('/', session(sessionOptions));
 // User Login Routes
 // ------------------
 if (credentials.enableRemoteLogin) {
+  //
+  // First part is optional remote user password login.
+  // DRAFT, in debug, see: middlewares/remote-authenticate.js
+  //
   app.get('/login', userAuth.loginRedirect);
   app.get('/login/callback', userAuth.exchangeAuthCode);
   app.get('/login.css', userAuth.loginStyleSheet);
   app.get('/logout', userAuth.logout);
   app.get('/blocked', userAuth.blockedCookies);
 } else {
+  //
+  // This is the normal built in user password login as found
+  // in the master branch (the default)
+  //
   app.get('/login.css', userAuth.loginStyleSheet);
   app.get('/login', userAuth.loginPage);
   app.post('/login-authorize', userAuth.loginAuthorize);

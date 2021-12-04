@@ -172,6 +172,7 @@
   // ----------------------
   // Route: GET /blocked
   // ----------------------
+  // TODO blocked cookies not detected in this branch.
   const blockedCookies = function (req, res, next) {
     res.send(blockedCookieFragment);
   };
@@ -226,7 +227,8 @@
   // ------------------------------------------------------
   const _validateTokenResponse = function (tokenResponse) {
     return new Promise(function (resolve, reject) {
-      if (('token_type' in tokenResponse) && (tokenResponse.token_type === 'Bearer') &&
+      if ((!(tokenResponse == null)) &&
+        ('token_type' in tokenResponse) && (tokenResponse.token_type === 'Bearer') &&
         ('grant_type' in tokenResponse) && (tokenResponse.grant_type === 'authorization_code') &&
         ('expires_in' in tokenResponse) && (parseInt(tokenResponse.expires_in) > 0) &&
         ('access_token' in tokenResponse) && (typeof tokenResponse.access_token === 'string') &&
@@ -247,7 +249,8 @@
   // ------------------------------------------------------
   const _authorizeTokenScope = function (res, tokenMetaData) {
     return new Promise(function (resolve, reject) {
-      if (('active' in tokenMetaData) && (tokenMetaData.active === true) &&
+      if ((!(tokenMetaData == null)) &&
+        ('active' in tokenMetaData) && (tokenMetaData.active === true) &&
         ('scope' in tokenMetaData) && (Array.isArray(tokenMetaData.scope))) {
         if (tokenMetaData.scope.indexOf(credentials.remoteScope) >= 0) {
           resolve(tokenMetaData);
@@ -287,6 +290,10 @@
     });
   };
 
+  // -------------------------------------------------
+  // Network fetch functions to authorization server
+  // -------------------------------------------------
+
   // -----------------------------------------------------------------------
   // Submit the user's access_token to the authorization server
   // introspect route to validate token signature.
@@ -325,7 +332,7 @@
         }
       })
       .then((introspectResponse) => {
-        console.log('interspectResponse ', introspectResponse);
+        // console.log('interspectResponse ', introspectResponse);
         return introspectResponse;
       });
   };
@@ -369,19 +376,19 @@
         }
       })
       .then((tokenResponse) => {
-        console.log(tokenResponse);
+        // console.log(tokenResponse);
         return tokenResponse;
       });
   };
 
   // -------------------------------------------------------------------------------
-  // Route handler for /login/callback
+  // Route handler for GET /login/callback
   //
   // The browser will redirect to here with the Oauth 2.0 authorization code
-  // as a query parameter in the url.
+  // as a query parameter in the url. (Example: /login/callback?code=xxxxxxx)
   //
   // 1) Perform fetch request to exchange authorizaton code for a new access_token
-  // 2) Validate the token request response object
+  // 2) Validate the token request response object required parameters
   // 3) Perform fetch request to validate token and obtain user's token meta-data
   // 4) Validate that user's token scope is sufficient to use irc-hybrid-client
   // 5) Redirect to single page application at /irc/webclient.html
@@ -440,7 +447,17 @@
     }
     let tempHtml = 'Browser was not logged in.';
     if (user) {
-      tempHtml = '' + user + ' successfully logged out.\n';
+      tempHtml =
+        'Logout successful for user ' + user +
+        ' on the web server at ' +
+        credentials.remoteCallbackHost + '.' +
+        '<br><br>' +
+        'You may still be logged in to the authorization server at ' +
+        credentials.remoteAuthHost + '. ' +
+        'You may remove your authoriztion server login by visiting the link at: ' +
+        '<a href="' + credentials.remoteAuthHost + '/logout">' +
+        credentials.remoteAuthHost + '/logout</a>. ' +
+        '<a href="' + credentials.remoteAuthHost + '/logout"><button>Auth Logout</button></a>';
     }
     res.send(logoutHtmlTop + tempHtml + logoutHtmlBottom);
   };
