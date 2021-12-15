@@ -32,11 +32,11 @@ the API requests individually, it is recommended to use a dedicated IRC test ser
 
 # Postman Enviornment Varialbes
 
-- server_URL (Example: "http://localhost:3003")
-- server_user1
-- server_password1
-- irc_nickname
-- irc_channel
+- server_URL       (Example: "http://localhost:3003")
+- server_user1     (Example: "user1")
+- server_password1 (Example: "mysecret")
+- irc_nickname     (Example: "myNick")
+- irc_channel      (Example: "#test")
 - sever_die ("YES" or "NO")
 
 # Postman config
@@ -44,11 +44,14 @@ the API requests individually, it is recommended to use a dedicated IRC test ser
 
 # Setup
 * There are three collections:
-  * API authorization testing.
-  * Websocket authorization testing.
-  * Manual debug of POST requests.
+  * File: `postman/irc-hybrid-client API auth tests.postman_collection.json`
+  * File: `postman/irc-hybrid-client websocket auth tests.postman_collection.json`
+  * File: `postman/irc-hybrid-client message debug.postman_collection.json`
+* There is one environment
+  * File `postman/irc-hybrid-client.postman_environment.json`
 * Assign a temporary user/password in the web server for testing.
-* In Postman, create a environment with the variables listed above. Set values to the temporary user/password and server URL.
+* In Postman, import enviornment above, or create a environment with the variables listed above.
+* Set values to the temporary user/password and server URL.
 * Suggest manual delete irc-hybrid-client cookie from postman before running tests.
 * The tests are time dependent so it is recommended to run the entire collection using the runner.
 
