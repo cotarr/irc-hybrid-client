@@ -44,7 +44,7 @@
 			"response": []
 		},
 		{
-			"name": "5.2 /login get valid nonce",
+			"name": "5.2 /login (get nonce, csrfToken)",
 			"event": [
 				{
 					"listen": "test",
@@ -87,12 +87,27 @@
 							"    pm.expect(parsedNonce).to.have.lengthOf.above(1);",
 							"});",
 							"",
+							"pm.test(\"Extract CSRF token to global variables\", function () {",
+							"    let body = pm.response.text();",
+							"    let bodyArray = body.split('\\n');",
+							"    let csrfToken = '';",
+							"    for (let i = 0; i < bodyArray.length; i++) {",
+							"        let splitByQuote = bodyArray[i].split('\"');",
+							"        if ((splitByQuote.length === 7) && (splitByQuote[3] === '_csrf')) {",
+							"            csrfToken = splitByQuote[5];",
+							"        }",
+							"    } // next i",
+							"    console.log('/login has set global variable csrf_token to: ', csrfToken);",
+							"    pm.globals.set('csrf_token', csrfToken);",
+							"});",
+							"",
+							"",
 							"pm.test(\"Has header to set cookie\", function () {",
 							"    pm.response.to.have.header(\"Set-Cookie\");",
 							"});",
 							"",
 							"pm.test(\"Has received cookie\", function() {",
-							"    pm.expect(pm.cookies.has('irc-hybrid-client')).to.be.true; ",
+							"    pm.expect(pm.cookies.has('irc-hybrid-client-0')).to.be.true; ",
 							"});",
 							"",
 							"pm.test(\"Response has body\", function () {",
@@ -144,7 +159,7 @@
 							"});",
 							"",
 							"pm.test(\"Has received cookie\", function() {",
-							"    pm.expect(pm.cookies.has('irc-hybrid-client')).to.be.true; ",
+							"    pm.expect(pm.cookies.has('irc-hybrid-client-0')).to.be.true; ",
 							"});",
 							""
 						],
@@ -175,6 +190,11 @@
 						{
 							"key": "password",
 							"value": "{{server_password1}}",
+							"type": "text"
+						},
+						{
+							"key": "_csrf",
+							"value": "{{csrf_token}}",
 							"type": "text"
 						}
 					]
@@ -225,6 +245,11 @@
 						"key": "Content-Type",
 						"type": "text",
 						"value": "application/json"
+					},
+					{
+						"key": "CSRF-Token",
+						"value": "{{csrf_token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -295,6 +320,11 @@
 						"value": "websocket",
 						"description": "For upgrade to websocket",
 						"type": "text"
+					},
+					{
+						"key": "CSRF-Token",
+						"value": "{{csrf_token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -348,6 +378,11 @@
 						"key": "Content-Type",
 						"type": "text",
 						"value": "application/json"
+					},
+					{
+						"key": "CSRF-Token",
+						"value": "{{csrf_token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -455,12 +490,26 @@
 							"    pm.expect(parsedNonce).to.have.lengthOf.above(1);",
 							"});",
 							"",
+							"pm.test(\"Extract CSRF token to global variables\", function () {",
+							"    let body = pm.response.text();",
+							"    let bodyArray = body.split('\\n');",
+							"    let csrfToken = '';",
+							"    for (let i = 0; i < bodyArray.length; i++) {",
+							"        let splitByQuote = bodyArray[i].split('\"');",
+							"        if ((splitByQuote.length === 7) && (splitByQuote[3] === '_csrf')) {",
+							"            csrfToken = splitByQuote[5];",
+							"        }",
+							"    } // next i",
+							"    console.log('/login has set global variable csrf_token to: ', csrfToken);",
+							"    pm.globals.set('csrf_token', csrfToken);",
+							"});",
+							"",
 							"pm.test(\"Has header to set cookie\", function () {",
 							"    pm.response.to.have.header(\"Set-Cookie\");",
 							"});",
 							"",
 							"pm.test(\"Has received cookie\", function() {",
-							"    pm.expect(pm.cookies.has('irc-hybrid-client')).to.be.true; ",
+							"    pm.expect(pm.cookies.has('irc-hybrid-client-0')).to.be.true; ",
 							"});",
 							"",
 							"pm.test(\"Response has body\", function () {",
@@ -512,7 +561,7 @@
 							"});",
 							"",
 							"pm.test(\"Has received cookie\", function() {",
-							"    pm.expect(pm.cookies.has('irc-hybrid-client')).to.be.true; ",
+							"    pm.expect(pm.cookies.has('irc-hybrid-client-0')).to.be.true; ",
 							"});",
 							""
 						],
@@ -543,6 +592,11 @@
 						{
 							"key": "password",
 							"value": "{{server_password1}}",
+							"type": "text"
+						},
+						{
+							"key": "_csrf",
+							"value": "{{csrf_token}}",
 							"type": "text"
 						}
 					]
