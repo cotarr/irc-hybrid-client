@@ -41,6 +41,7 @@ document.getElementById('cycleNextServerButton').addEventListener('click', funct
   const fetchOptions = {
     method: 'POST',
     headers: {
+      'CSRF-Token': csrfToken,
       'Content-type': 'application/json',
       Accept: 'application/json'
     },
@@ -103,6 +104,7 @@ function connectButtonHandler () {
   const fetchOptions = {
     method: 'POST',
     headers: {
+      'CSRF-Token': csrfToken,
       'Content-type': 'application/json',
       Accept: 'application/json'
     },
@@ -141,6 +143,7 @@ function forceDisconnectHandler () {
   const fetchOptions = {
     method: 'POST',
     headers: {
+      'CSRF-Token': csrfToken,
       'Content-type': 'application/json',
       Accept: 'application/json'
     },

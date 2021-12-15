@@ -40,6 +40,8 @@ const session = require('express-session');
 const logger = require('morgan');
 const helmet = require('helmet');
 const compression = require('compression');
+const csrf = require('csurf');
+const csrfProtection = csrf({ cookie: false });
 const app = express();
 
 // Irc Client Module
@@ -264,6 +266,7 @@ app.use('/', session(sessionOptions));
 // ------------------
 // User Login Routes
 // ------------------
+
 if (credentials.enableRemoteLogin) {
   //
   // First part is optional remote user password login.
@@ -281,7 +284,7 @@ if (credentials.enableRemoteLogin) {
   //
   app.get('/login.css', userAuth.loginStyleSheet);
   app.get('/login', userAuth.loginPage);
-  app.post('/login-authorize', userAuth.loginAuthorize);
+  app.post('/login-authorize', csrfProtection, userAuth.loginAuthorize);
   app.get('/logout', userAuth.logout);
   app.get('/blocked', userAuth.blockedCookies);
 }
@@ -298,7 +301,7 @@ if (credentials.enableRemoteLogin) {
 //    "terminate": "YES"
 //  }
 //
-app.post('/terminate', userAuth.authorizeOrFail, function (req, res, next) {
+app.post('/terminate', userAuth.authorizeOrFail, csrfProtection, function (req, res, next) {
   let inputVerifyString = '';
   if (('terminate' in req.body) && (typeof req.body.terminate === 'string')) {
     inputVerifyString = req.body.terminate;
@@ -362,7 +365,7 @@ app.get('/secure', userAuth.authorizeOrFail, (req, res) => res.json({ secure: 'o
 // Data stored globally, time expiration 10 seconds.
 //
 // -----------------------------------------
-app.post('/irc/wsauth', userAuth.authorizeOrFail, function (req, res, next) {
+app.post('/irc/wsauth', userAuth.authorizeOrFail, csrfProtection, function (req, res, next) {
   global.webSocketAuth = {
     expire: 0,
     cookie: ''
@@ -412,25 +415,37 @@ app.get('/userinfo', userAuth.authorizeOrFail, userAuth.getUserInfo);
 // ---------------------------------------
 // IRC client API routes served to browser
 // ---------------------------------------
-app.post('/irc/server', userAuth.authorizeOrFail, ircClient.serverHandler);
-app.post('/irc/connect', userAuth.authorizeOrFail, ircClient.connectHandler);
-app.post('/irc/disconnect', userAuth.authorizeOrFail, ircClient.disconnectHandler);
-app.post('/irc/message', userAuth.authorizeOrFail, ircClient.messageHandler);
+app.post('/irc/server', userAuth.authorizeOrFail, csrfProtection, ircClient.serverHandler);
+app.post('/irc/connect', userAuth.authorizeOrFail, csrfProtection, ircClient.connectHandler);
+app.post('/irc/disconnect', userAuth.authorizeOrFail, csrfProtection, ircClient.disconnectHandler);
+app.post('/irc/message', userAuth.authorizeOrFail, csrfProtection, ircClient.messageHandler);
 app.get('/irc/getircstate', userAuth.authorizeOrFail, ircClient.getIrcState);
 app.get('/irc/cache', userAuth.authorizeOrFail, ircClient.getCache);
-app.post('/irc/prune', userAuth.authorizeOrFail, ircClient.pruneChannel);
-app.post('/irc/erase', userAuth.authorizeOrFail, ircClient.eraseCache);
+app.post('/irc/prune', userAuth.authorizeOrFail, csrfProtection, ircClient.pruneChannel);
+app.post('/irc/erase', userAuth.authorizeOrFail, csrfProtection, ircClient.eraseCache);
 app.get('/irc/test1', userAuth.authorizeOrFail, ircClient.test1Handler);
 app.get('/irc/test2', userAuth.authorizeOrFail, ircClient.test2Handler);
 
 // -------------------------------
-// Login redirect for main html file
-// all other static files return 403
-// if unauthorized
+// If unauthorized, redirect to /login for main html file /irc/webclient.html.
+// Else, past this point, all other static files return 403 if unauthorized
 // -------------------------------
-app.get('/irc/webclient.html', userAuth.authorizeOrLogin, function (req, res, next) {
-  next();
-});
+// Read contents of main web page for /irc/webclient.html and
+// substitute CSRF token into meta tag for csurf middleware
+// -------------------------------
+let webclientHtml;
+if (nodeEnv === 'production') {
+  webclientHtml = fs.readFileSync('./secure-minify/webclient.html', 'utf8');
+} else {
+  webclientHtml = fs.readFileSync('./secure/webclient.html', 'utf8');
+}
+app.get('/irc/webclient.html',
+  userAuth.authorizeOrLogin,
+  csrfProtection,
+  function (req, res, next) {
+    return res.send(webclientHtml.replace('{{csrfToken}}', req.csrfToken()));
+  }
+);
 
 // -------------------------------
 // Web server for static files

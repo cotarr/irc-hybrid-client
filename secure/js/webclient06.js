@@ -465,6 +465,7 @@ function createChannelEl (name) {
         const fetchOptions = {
           method: 'POST',
           headers: {
+            'CSRF-Token': csrfToken,
             'Content-type': 'application/json',
             Accept: 'application/json'
           },

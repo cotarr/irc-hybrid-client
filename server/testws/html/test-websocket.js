@@ -29,6 +29,9 @@
 
 'use strict';
 
+// CSRF token needed by /irc/wsauth route
+const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
 // -------------------------------
 // Build URL from page location
 // -------------------------------
@@ -64,6 +67,7 @@ function initWebSocketAuth () {
   const fetchOptions = {
     method: 'POST',
     headers: {
+      'CSRF-Token': csrfToken,
       'Content-type': 'application/json',
       Accept: 'application/json'
     },

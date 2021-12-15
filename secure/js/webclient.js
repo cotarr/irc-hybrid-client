@@ -52,6 +52,8 @@ const pmNameSpacer = ' - ';
 const activityIconInhibitTimerValue = 10;
 const cacheReloadString = '-----IRC Cache Reload-----';
 const cacheErrorString = '-----IRC Cache Error-----';
+// CSRF token to be included with POST requests
+const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
 // ----------------------------------------------------------
 // Do not edit ircState contents from within browser.

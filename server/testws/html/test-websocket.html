@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1.0">
+    <meta name="csrf-token" content="{{csrfToken}}">
     <link rel="stylesheet" href="/testws/test-websocket.css">
     <script src="/testws/test-websocket.js" defer></script>
 
@@ -48,7 +49,7 @@
     </div>
     <h2>Recommend Two Tests</h2>
     <ul>
-      <li>Schedule Auth fails without cookie (no login)</li>
+      <li>Schedule Auth fails without cookie (no login) or altered csrfToken</li>
       <li>Connect Websocket fails without Schedule Auth</li>
     </ul>
 

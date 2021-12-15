@@ -149,6 +149,7 @@ document.getElementById('serverTerminateButton').addEventListener('click', funct
   const fetchOptions = {
     method: 'POST',
     headers: {
+      'CSRF-Token': csrfToken,
       'Content-type': 'application/json',
       Accept: 'application/json'
     },
@@ -192,6 +193,7 @@ document.getElementById('eraseCacheButton').addEventListener('click', function (
   const fetchOptions = {
     method: 'POST',
     headers: {
+      'CSRF-Token': csrfToken,
       'Content-type': 'application/json',
       Accept: 'application/json'
     },
@@ -376,7 +378,7 @@ document.getElementById('test4Button').addEventListener('click', function () {
   console.log('Test 4 button pressed.');
 
   // ---------------------------------
-  console.log('Test 4 getIrcState()');
+  // console.log('Test 4 getIrcState()');
   getIrcState();
   // ---------------------------------
 });

@@ -53,6 +53,7 @@ function initWebSocketAuth (callback) {
   const fetchOptions = {
     method: 'POST',
     headers: {
+      'CSRF-Token': csrfToken,
       'Content-type': 'application/json',
       Accept: 'application/json'
     },
@@ -235,6 +236,7 @@ function _sendIrcServerMessage (message) {
   const fetchOptions = {
     method: 'POST',
     headers: {
+      'CSRF-Token': csrfToken,
       'Content-type': 'application/json',
       Accept: 'application/json'
     },

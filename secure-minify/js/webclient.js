@@ -25,34 +25,35 @@ SOFTWARE.
 'use strict';
 
 const channelPrefixChars='@#+!';const nicknamePrefixChars='~&@%+';const nickChannelSpacer=' | ';const pmNameSpacer=' - ';const activityIconInhibitTimerValue=10
-;const cacheReloadString='-----IRC Cache Reload-----';const cacheErrorString='-----IRC Cache Error-----';var ircState={ircConnectOn:false,ircConnecting:false,ircConnected:false,ircRegistered:false,
-ircIsAway:false,ircAutoReconnect:false,ircServerName:'',ircServerHost:'',ircServerPort:6667,ircTLSEnabled:false,ircServerIndex:0,ircServerPrefix:'',channelList:[],nickName:'',userName:'',realName:'',
-userMode:'',userHost:'',channels:[],channelStates:[],progVersion:'0.0.0',progName:'',times:{programRun:0,ircConnect:0},count:{ircConnect:0,ircConnectError:0},websocketCount:0}
-;document.getElementById('webConnectIconId').removeAttribute('connected');document.getElementById('ircConnectIconId').removeAttribute('connected')
-;document.getElementById('webConnectIconId').removeAttribute('connecting');document.getElementById('ircConnectIconId').removeAttribute('connecting');const webState={};webState.loginUser={}
-;webState.webConnectOn=true;webState.webConnected=false;webState.webConnecting=false;webState.ircConnecting=false;webState.websocketCount=0;webState.noticeOpen=false;webState.wallopsOpen=false
-;webState.viewRawMessages=false;webState.showRawInHex=false;webState.showCommsMessages=false;webState.lastIrcServerIndex=-1;webState.channels=[];webState.channelStates=[];webState.lastPMNick=''
-;webState.activePrivateMessageNicks=[];webState.times={webConnect:0};webState.count={webConnect:0,webStateCalls:0};webState.cacheReloadInProgress=false;webState.dynamic={inputAreaCharWidthPx:null,
-inputAreaSideWidthPx:null,sendButtonWidthPx:null,commonMargin:50,lastDevicePixelRatio:1,bodyClientWidth:document.querySelector('body').clientWidth,
-lastClientWidth:document.querySelector('body').clientWidth};if(window.devicePixelRatio){webState.dynamic.lastDevicePixelRatio=window.devicePixelRatio}let webServerUrl='https://'
-;let webSocketUrl='wss://';if(document.location.protocol==='http:'){webServerUrl='http://';webSocketUrl='ws://'}webServerUrl+=window.location.hostname+':'+window.location.port
-;webSocketUrl+=window.location.hostname+':'+window.location.port;var wsocket=null;const beep1=new Audio('sounds/short-beep1.mp3');const beep2=new Audio('sounds/short-beep2.mp3')
-;const beep3=new Audio('sounds/short-beep3.mp3');let beep1InhibitTimer=0;let beep2InhibitTimer=0;let beep3InhibitTimer=0;function beepTimerTick(){if(beep1InhibitTimer>0)beep1InhibitTimer--
-;if(beep2InhibitTimer>0)beep2InhibitTimer--;if(beep3InhibitTimer>0)beep3InhibitTimer--}function inhibitBeep(seconds){beep1InhibitTimer=seconds;beep2InhibitTimer=seconds;beep3InhibitTimer=seconds}
-const audioPromiseErrorStr='Browser policy has blocked Audio.play() '+'because user must interact with page or manually play sound first.';function playBeep1Sound(){if(beep1InhibitTimer===0){
-beep1.play().then(function(){document.getElementById('enableAudioButton').setAttribute('hidden','')}).catch(function(error){if(error.name==='NotAllowedError'){
-console.info('playBeep1Sound() '+audioPromiseErrorStr)}else{console.error(error)}});beep1InhibitTimer=5}}function playBeep2Sound(){if(beep2InhibitTimer===0){beep2.play().catch(function(error){
-if(error.name==='NotAllowedError'){}else{console.error(error)}});beep2InhibitTimer=5}}function playBeep3Sound(){if(beep3InhibitTimer===0){beep3.play().catch(function(error){
-if(error.name==='NotAllowedError'){console.info('playBeep3Sound() '+audioPromiseErrorStr)}else{console.error(error)}});beep3InhibitTimer=5}}function areBeepsConfigured(){let isAnyBeepEnabled=false
-;let beepEnableChanArray=null;beepEnableChanArray=JSON.parse(window.localStorage.getItem('beepEnableChanArray'));if(beepEnableChanArray&&Array.isArray(beepEnableChanArray)){
-if(beepEnableChanArray.length>0){for(let i=0;i<beepEnableChanArray.length;i++){if(beepEnableChanArray[i].beep1)isAnyBeepEnabled=true;if(beepEnableChanArray[i].beep2)isAnyBeepEnabled=true
-;if(beepEnableChanArray[i].beep3)isAnyBeepEnabled=true}}}return isAnyBeepEnabled}function userInitiatedAudioPlay(){document.getElementById('enableAudioButton').setAttribute('hidden','')
-;if(areBeepsConfigured()){playBeep2Sound();setTimeout(playBeep1Sound,500)}}document.getElementById('enableAudioButton').addEventListener('click',userInitiatedAudioPlay);if(areBeepsConfigured()){
-document.getElementById('enableAudioButton').removeAttribute('hidden')}const errorExpireSeconds=5;let errorRemainSeconds=0;function clearError(){const errorDivEl=document.getElementById('errorDiv')
-;errorDivEl.setAttribute('hidden','');const errorContentDivEl=document.getElementById('errorContentDiv');while(errorContentDivEl.firstChild){errorContentDivEl.removeChild(errorContentDivEl.firstChild)
-}errorRemainSeconds=0}function showError(errorString){const errorDivEl=document.getElementById('errorDiv');errorDivEl.removeAttribute('hidden')
-;const errorContentDivEl=document.getElementById('errorContentDiv');const errorMessageEl=document.createElement('div');errorMessageEl.textContent=errorString||'Error: unknown error (2993)'
-;errorContentDivEl.appendChild(errorMessageEl);errorRemainSeconds=errorExpireSeconds}document.addEventListener('show-error-message',function(event){showError(event.detail.message)})
+;const cacheReloadString='-----IRC Cache Reload-----';const cacheErrorString='-----IRC Cache Error-----';const csrfToken=document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+;var ircState={ircConnectOn:false,ircConnecting:false,ircConnected:false,ircRegistered:false,ircIsAway:false,ircAutoReconnect:false,ircServerName:'',ircServerHost:'',ircServerPort:6667,
+ircTLSEnabled:false,ircServerIndex:0,ircServerPrefix:'',channelList:[],nickName:'',userName:'',realName:'',userMode:'',userHost:'',channels:[],channelStates:[],progVersion:'0.0.0',progName:'',times:{
+programRun:0,ircConnect:0},count:{ircConnect:0,ircConnectError:0},websocketCount:0};document.getElementById('webConnectIconId').removeAttribute('connected')
+;document.getElementById('ircConnectIconId').removeAttribute('connected');document.getElementById('webConnectIconId').removeAttribute('connecting')
+;document.getElementById('ircConnectIconId').removeAttribute('connecting');const webState={};webState.loginUser={};webState.webConnectOn=true;webState.webConnected=false;webState.webConnecting=false
+;webState.ircConnecting=false;webState.websocketCount=0;webState.noticeOpen=false;webState.wallopsOpen=false;webState.viewRawMessages=false;webState.showRawInHex=false;webState.showCommsMessages=false
+;webState.lastIrcServerIndex=-1;webState.channels=[];webState.channelStates=[];webState.lastPMNick='';webState.activePrivateMessageNicks=[];webState.times={webConnect:0};webState.count={webConnect:0,
+webStateCalls:0};webState.cacheReloadInProgress=false;webState.dynamic={inputAreaCharWidthPx:null,inputAreaSideWidthPx:null,sendButtonWidthPx:null,commonMargin:50,lastDevicePixelRatio:1,
+bodyClientWidth:document.querySelector('body').clientWidth,lastClientWidth:document.querySelector('body').clientWidth};if(window.devicePixelRatio){
+webState.dynamic.lastDevicePixelRatio=window.devicePixelRatio}let webServerUrl='https://';let webSocketUrl='wss://';if(document.location.protocol==='http:'){webServerUrl='http://';webSocketUrl='ws://'
+}webServerUrl+=window.location.hostname+':'+window.location.port;webSocketUrl+=window.location.hostname+':'+window.location.port;var wsocket=null;const beep1=new Audio('sounds/short-beep1.mp3')
+;const beep2=new Audio('sounds/short-beep2.mp3');const beep3=new Audio('sounds/short-beep3.mp3');let beep1InhibitTimer=0;let beep2InhibitTimer=0;let beep3InhibitTimer=0;function beepTimerTick(){
+if(beep1InhibitTimer>0)beep1InhibitTimer--;if(beep2InhibitTimer>0)beep2InhibitTimer--;if(beep3InhibitTimer>0)beep3InhibitTimer--}function inhibitBeep(seconds){beep1InhibitTimer=seconds
+;beep2InhibitTimer=seconds;beep3InhibitTimer=seconds}const audioPromiseErrorStr='Browser policy has blocked Audio.play() '+'because user must interact with page or manually play sound first.'
+;function playBeep1Sound(){if(beep1InhibitTimer===0){beep1.play().then(function(){document.getElementById('enableAudioButton').setAttribute('hidden','')}).catch(function(error){
+if(error.name==='NotAllowedError'){console.info('playBeep1Sound() '+audioPromiseErrorStr)}else{console.error(error)}});beep1InhibitTimer=5}}function playBeep2Sound(){if(beep2InhibitTimer===0){
+beep2.play().catch(function(error){if(error.name==='NotAllowedError'){}else{console.error(error)}});beep2InhibitTimer=5}}function playBeep3Sound(){if(beep3InhibitTimer===0){
+beep3.play().catch(function(error){if(error.name==='NotAllowedError'){console.info('playBeep3Sound() '+audioPromiseErrorStr)}else{console.error(error)}});beep3InhibitTimer=5}}
+function areBeepsConfigured(){let isAnyBeepEnabled=false;let beepEnableChanArray=null;beepEnableChanArray=JSON.parse(window.localStorage.getItem('beepEnableChanArray'))
+;if(beepEnableChanArray&&Array.isArray(beepEnableChanArray)){if(beepEnableChanArray.length>0){for(let i=0;i<beepEnableChanArray.length;i++){if(beepEnableChanArray[i].beep1)isAnyBeepEnabled=true
+;if(beepEnableChanArray[i].beep2)isAnyBeepEnabled=true;if(beepEnableChanArray[i].beep3)isAnyBeepEnabled=true}}}return isAnyBeepEnabled}function userInitiatedAudioPlay(){
+document.getElementById('enableAudioButton').setAttribute('hidden','');if(areBeepsConfigured()){playBeep2Sound();setTimeout(playBeep1Sound,500)}}
+document.getElementById('enableAudioButton').addEventListener('click',userInitiatedAudioPlay);if(areBeepsConfigured()){document.getElementById('enableAudioButton').removeAttribute('hidden')}
+const errorExpireSeconds=5;let errorRemainSeconds=0;function clearError(){const errorDivEl=document.getElementById('errorDiv');errorDivEl.setAttribute('hidden','')
+;const errorContentDivEl=document.getElementById('errorContentDiv');while(errorContentDivEl.firstChild){errorContentDivEl.removeChild(errorContentDivEl.firstChild)}errorRemainSeconds=0}
+function showError(errorString){const errorDivEl=document.getElementById('errorDiv');errorDivEl.removeAttribute('hidden');const errorContentDivEl=document.getElementById('errorContentDiv')
+;const errorMessageEl=document.createElement('div');errorMessageEl.textContent=errorString||'Error: unknown error (2993)';errorContentDivEl.appendChild(errorMessageEl)
+;errorRemainSeconds=errorExpireSeconds}document.addEventListener('show-error-message',function(event){showError(event.detail.message)})
 ;document.getElementById('errorDiv').addEventListener('click',function(){clearError()});function errorTimerTickHandler(){if(errorRemainSeconds>0){errorRemainSeconds--;if(errorRemainSeconds===0){
 clearError()}else{document.getElementById('errorTitle').textContent='Tap to Close ('+errorRemainSeconds.toString()+')'}}}function unixTimestamp(){const now=new Date;return parseInt(now.valueOf()/1e3)}
 function clearLastZoom(){const now=unixTimestamp()}function checkConnect(code){if(code>=1&&!webState.webConnected){showError('Error: not connected to web server');return false}
@@ -263,10 +264,10 @@ if(ircState.channelStates[i].joined&&ircState.channelStates[i].names.length>0){f
 ;if(nicknamePrefixChars.indexOf(checkNick.charAt(0))>=0){checkNick=checkNick.slice(1,checkNick.length)}if(checkNick===pureNick)present=true}}}}if(present){displayChannelMessage(parsedMessage)}else{
 displayFormattedServerMessage(parsedMessage,message)}}break;case'TOPIC':if(channelPrefixChars.indexOf(parsedMessage.params[0].charAt(0))>=0){displayChannelMessage(parsedMessage)}else{
 console.log('Error message TOPIC to unknown channel')}break;case'WALLOPS':displayWallopsMessage(parsedMessage);break;default:}}}function initWebSocketAuth(callback){
-const fetchURL=webServerUrl+'/irc/wsauth';const fetchOptions={method:'POST',headers:{'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify({purpose:'websocket-auth'})}
-;fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()}else{throw new Error('Fetch status '+response.status+' '+response.statusText)}}).then(responseJson=>{if(callback){
-callback(null,ircState)}}).catch(error=>{console.log(error);webState.webConnected=false;webState.webConnecting=false;updateDivVisibility();if(callback){callback(error,{})}})}
-function connectWebSocket(){wsocket=new WebSocket(webSocketUrl+'/irc/ws');webState.websocketCount++;wsocket.addEventListener('open',function(event){webState.webConnected=true
+const fetchURL=webServerUrl+'/irc/wsauth';const fetchOptions={method:'POST',headers:{'CSRF-Token':csrfToken,'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify({
+purpose:'websocket-auth'})};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()}else{throw new Error('Fetch status '+response.status+' '+response.statusText)}
+}).then(responseJson=>{if(callback){callback(null,ircState)}}).catch(error=>{console.log(error);webState.webConnected=false;webState.webConnecting=false;updateDivVisibility();if(callback){
+callback(error,{})}})}function connectWebSocket(){wsocket=new WebSocket(webSocketUrl+'/irc/ws');webState.websocketCount++;wsocket.addEventListener('open',function(event){webState.webConnected=true
 ;webState.webConnecting=false;webState.times.webConnect=unixTimestamp();webState.count.webConnect++;resetHeartbeatTimer();updateDivVisibility();getIrcState(function(err,data){if(!err){
 document.dispatchEvent(new CustomEvent('update-from-cache',{bubbles:true}))}})});wsocket.addEventListener('close',function(event){if(webState.websocketCount>0){webState.websocketCount--
 ;if(webState.websocketCount===0){if(webState.webConnected){if('code'in event&&event.code===3001){document.getElementById('reconnectStatusDiv').textContent+='Web page disconnected at user request\n'
@@ -277,7 +278,7 @@ document.dispatchEvent(new CustomEvent('update-from-cache',{bubbles:true}))}})})
 ;const len=data.length;if(len===0)return;let index=0;let count=0;for(let i=0;i<len;i++){const charCode=data.charCodeAt(i);if(charCode!==10&&charCode!==13){count=count+1}else{if(count>0){
 const message=data.slice(index,index+count);_parseBufferMessage(message)}index=i+1;count=0}}if(count>0){previousBufferFragment=data.slice(index,index+count)}}
 wsocket.addEventListener('message',function(event){parseStreamBuffer(event.data)})}function _sendIrcServerMessage(message){if(!checkConnect(3))return;const body={message:message}
-;const fetchURL=webServerUrl+'/irc/message';const fetchOptions={method:'POST',headers:{'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify(body)}
+;const fetchURL=webServerUrl+'/irc/message';const fetchOptions={method:'POST',headers:{'CSRF-Token':csrfToken,'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify(body)}
 ;fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()}else{if(response.status===403)window.location.href='/login'
 ;throw new Error('Fetch status '+response.status+' '+response.statusText)}}).then(responseJson=>{if(responseJson.error){showError(responseJson.message)}}).catch(error=>{showError(error.toString())
 ;console.log(error)})}function reconnectWebSocketAfterDisconnect(){const statusURL=webServerUrl+'/status';const secureStatusURL=webServerUrl+'/secure';const fetchOptions={method:'GET',headers:{
@@ -306,17 +307,17 @@ webState.webConnecting=true;updateDivVisibility();wsReconnectTimer=0;wsReconnect
 document.getElementById('reconnectStatusDiv').textContent+='Reconnect disabled\n'}}else{if(wsReconnectTimer>15){webState.webConnecting=true;updateDivVisibility();wsReconnectTimer=0
 ;wsReconnectCounter++;document.getElementById('reconnectStatusDiv').textContent+='Reconnect to web server initiated (Timer-3)\n';reconnectWebSocketAfterDisconnect()}}}
 document.getElementById('cycleNextServerButton').addEventListener('click',function(){if(ircState.ircConnected){showError('Can not change servers while connected');return}
-const fetchURL=webServerUrl+'/irc/server';const fetchOptions={method:'POST',headers:{'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify({index:-1})}
-;fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()}else{throw new Error('Fetch status '+response.status+' '+response.statusText)}}).then(responseJson=>{
+const fetchURL=webServerUrl+'/irc/server';const fetchOptions={method:'POST',headers:{'CSRF-Token':csrfToken,'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify({index:-1})
+};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()}else{throw new Error('Fetch status '+response.status+' '+response.statusText)}}).then(responseJson=>{
 if(responseJson.error){showError(responseJson.message)}else{webState.lastIrcServerIndex=-1}}).catch(error=>{console.log(error);showError(error.toString())})});function connectButtonHandler(){
 if(!checkConnect(1))return;if(ircState.ircConnected||ircState.ircConnecting||webState.ircConnecting){showError('Error: Already connected to IRC server');return}
 if(document.getElementById('nickNameInputId').value.length<1){showError('Invalid nick name.');return}webState.ircConnecting=true;const connectObject={}
 ;connectObject.nickName=document.getElementById('nickNameInputId').value;connectObject.realName=document.getElementById('realNameInputId').value
-;connectObject.userMode=document.getElementById('userModeInputId').value;const fetchURL=webServerUrl+'/irc/connect';const fetchOptions={method:'POST',headers:{'Content-type':'application/json',
-Accept:'application/json'},body:JSON.stringify(connectObject)};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()}else{
+;connectObject.userMode=document.getElementById('userModeInputId').value;const fetchURL=webServerUrl+'/irc/connect';const fetchOptions={method:'POST',headers:{'CSRF-Token':csrfToken,
+'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify(connectObject)};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()}else{
 if(response.status===403)window.location.href='/login';throw new Error('Fetch status '+response.status+' '+response.statusText)}}).then(responseJson=>{if(responseJson.error){
 showError(responseJson.message)}}).catch(error=>{console.log(error)})}function forceDisconnectHandler(){const fetchURL=webServerUrl+'/irc/disconnect';const fetchOptions={method:'POST',headers:{
-'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify({})};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()}else{
+'CSRF-Token':csrfToken,'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify({})};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()}else{
 throw new Error('Fetch status '+response.status+' '+response.statusText)}}).then(responseJson=>{if(responseJson.error){showError(responseJson.message)}}).catch(error=>{console.log(error)})}
 document.getElementById('connectButton').addEventListener('click',function(){connectButtonHandler()});document.getElementById('disconnectButton').addEventListener('click',function(){
 forceDisconnectHandler()});let ircStatusIconTouchDebounce=false;document.getElementById('ircConnectIconId').addEventListener('click',function(){if(ircStatusIconTouchDebounce)return
@@ -473,12 +474,12 @@ const newRows=parseInt(channelTextAreaEl.getAttribute('rows'))+10;channelTextAre
 const message='PART '+name+' :'+ircState.progName+' '+ircState.progVersion;_sendIrcServerMessage(message)});channelPruneButtonEl.addEventListener('click',function(){function _removeChannelFromDom(){
 const webStateChannelsIndex=webState.channels.indexOf(name.toLowerCase());if(webStateChannelsIndex>=0){webState.channels.splice(webStateChannelsIndex,1)
 ;webState.channelStates.splice(webStateChannelsIndex,1)}channelContainerDivEl.removeChild(channelMainSectionEl)}const index=ircState.channels.indexOf(name.toLowerCase());if(index>=0){
-if(!ircState.channelStates[index].joined){const fetchURL=webServerUrl+'/irc/prune';const fetchOptions={method:'POST',headers:{'Content-type':'application/json',Accept:'application/json'},
-body:JSON.stringify({channel:name})};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()}else{throw new Error('Fetch status '+response.status+' '+response.statusText)}
-}).then(responseJson=>{if(responseJson.error){showError(responseJson.message)}else{_removeChannelFromDom()}}).catch(error=>{console.log(error)})}}else{_removeChannelFromDom()}})
-;channelRefreshButtonEl.addEventListener('click',function(){if(!webState.cacheReloadInProgress){document.dispatchEvent(new CustomEvent('update-from-cache',{bubbles:true}))}})
-;channelSendButtonEl.addEventListener('click',function(){_sendTextToChannel(channelIndex,channelInputAreaEl);channelInputAreaEl.focus();resetChanActivityIcon(channelIndex)
-;activityIconInhibitTimer=activityIconInhibitTimerValue});channelInputAreaEl.addEventListener('input',function(event){
+if(!ircState.channelStates[index].joined){const fetchURL=webServerUrl+'/irc/prune';const fetchOptions={method:'POST',headers:{'CSRF-Token':csrfToken,'Content-type':'application/json',
+Accept:'application/json'},body:JSON.stringify({channel:name})};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()}else{
+throw new Error('Fetch status '+response.status+' '+response.statusText)}}).then(responseJson=>{if(responseJson.error){showError(responseJson.message)}else{_removeChannelFromDom()}}).catch(error=>{
+console.log(error)})}}else{_removeChannelFromDom()}});channelRefreshButtonEl.addEventListener('click',function(){if(!webState.cacheReloadInProgress){
+document.dispatchEvent(new CustomEvent('update-from-cache',{bubbles:true}))}});channelSendButtonEl.addEventListener('click',function(){_sendTextToChannel(channelIndex,channelInputAreaEl)
+;channelInputAreaEl.focus();resetChanActivityIcon(channelIndex);activityIconInhibitTimer=activityIconInhibitTimerValue});channelInputAreaEl.addEventListener('input',function(event){
 if(event.inputType==='insertText'&&event.data===null||event.inputType==='insertLineBreak'){stripOneCrLfFromElement(channelInputAreaEl);_sendTextToChannel(channelIndex,channelInputAreaEl)
 ;resetChanActivityIcon(channelIndex);activityIconInhibitTimer=activityIconInhibitTimerValue}});channelMainSectionEl.addEventListener('click',function(){resetChanActivityIcon(channelIndex)
 ;activityIconInhibitTimer=activityIconInhibitTimerValue});function updateVisibility(){const index=ircState.channels.indexOf(name.toLowerCase());if(index>=0){
@@ -822,12 +823,13 @@ privMsgSessionEl.removeChild(privMsgSessionEl.firstChild)}webState.lastPMNick=''
 ;document.dispatchEvent(new CustomEvent('cache-reload-error',{bubbles:true,detail:{timestamp:timestamp}}))})}window.addEventListener('update-from-cache',function(event){updateFromCache()})
 ;window.addEventListener('cache-reload-done',function(event){webState.cacheReloadInProgress=false});window.addEventListener('cache-reload-error',function(event){webState.cacheReloadInProgress=false})
 ;document.getElementById('serverTerminateButton').addEventListener('click',function(){console.log('Requesting backend server to terminate');const fetchURL=webServerUrl+'/terminate'
-;const fetchOptions={method:'POST',headers:{'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify({terminate:'YES'})};fetch(fetchURL,fetchOptions).then(response=>{
-if(response.ok){return response.json()}else{throw new Error('Fetch status '+response.status+' '+response.statusText)}}).then(responseJson=>{console.log(JSON.stringify(responseJson))}).catch(error=>{
-showError('Terminate: Unable to connect');console.log(error)})});document.getElementById('eraseCacheButton').addEventListener('click',function(){if(ircState.ircConnected){
-showError('You must be disconnected from IRC to clear cache.');return}document.dispatchEvent(new CustomEvent('erase-before-reload',{bubbles:true,detail:{}}));const fetchURL=webServerUrl+'/irc/erase'
-;const fetchOptions={method:'POST',headers:{'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify({erase:'YES'})};fetch(fetchURL,fetchOptions).then(response=>{
-if(response.ok){return response.json()}else{throw new Error('Fetch status '+response.status+' '+response.statusText)}}).then(responseJson=>{if(responseJson.error){showError(responseJson.message)}else{
+;const fetchOptions={method:'POST',headers:{'CSRF-Token':csrfToken,'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify({terminate:'YES'})}
+;fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()}else{throw new Error('Fetch status '+response.status+' '+response.statusText)}}).then(responseJson=>{
+console.log(JSON.stringify(responseJson))}).catch(error=>{showError('Terminate: Unable to connect');console.log(error)})})
+;document.getElementById('eraseCacheButton').addEventListener('click',function(){if(ircState.ircConnected){showError('You must be disconnected from IRC to clear cache.');return}
+document.dispatchEvent(new CustomEvent('erase-before-reload',{bubbles:true,detail:{}}));const fetchURL=webServerUrl+'/irc/erase';const fetchOptions={method:'POST',headers:{'CSRF-Token':csrfToken,
+'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify({erase:'YES'})};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()}else{
+throw new Error('Fetch status '+response.status+' '+response.statusText)}}).then(responseJson=>{if(responseJson.error){showError(responseJson.message)}else{
 const privMsgSessionEl=document.getElementById('privateMessageContainerDiv');while(privMsgSessionEl.firstChild){privMsgSessionEl.removeChild(privMsgSessionEl.firstChild)}
 document.getElementById('noticeMessageDisplay').value='';document.getElementById('wallopsMessageDisplay').value='';document.getElementById('pmNickNameInputId').value=''
 ;document.getElementById('newChannelNameInputId').value='';document.getElementById('rawMessageDisplay').value='';document.getElementById('rawMessageInputId').value='';webState.privMsgOpen=false
@@ -847,7 +849,7 @@ Accept:'application/json'}};fetch(fetchURL,fetchOptions).then(response=>{if(resp
 }}).catch(error=>{console.log(error);if(error)showError(error.toString())})});document.getElementById('test2ButtonDesc').textContent='Emulate IRC ping timeout'
 ;document.getElementById('test3Button').addEventListener('click',function(){console.log('Test 3 button pressed.');console.log('Test 3 button: expire heart beat timer')
 ;heartbeatUpCounter=heartbeatExpirationTimeSeconds-1});document.getElementById('test3ButtonDesc').textContent='Emulate websocket timeout'
-;document.getElementById('test4Button').addEventListener('click',function(){console.log('Test 4 button pressed.');console.log('Test 4 getIrcState()');getIrcState()})
+;document.getElementById('test4Button').addEventListener('click',function(){console.log('Test 4 button pressed.');getIrcState()})
 ;document.getElementById('test4ButtonDesc').textContent='Call getIrcState()';const updatePageMeasurements=function(){
 webState.dynamic.bodyClientWidth=document.querySelector('body').clientWidth.toString();if(!webState.watch)webState.watch={};webState.watch.innerHeight=window.innerHeight.toString()+'px'
 ;webState.watch.innerWidth=window.innerWidth.toString()+'px';webState.watch.bodyClientWidth=webState.dynamic.bodyClientWidth.toString()+'px';webState.watch.devicePixelRatio=window.devicePixelRatio}
