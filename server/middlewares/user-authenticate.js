@@ -384,6 +384,9 @@
     '<form action="/login-authorize';
   const loginFormFragment2 =
     '" method="post">\n' +
+    '<input type="hidden" name="_csrf" value="';
+  const loginFormFragment3 =
+    '"></input>\n' +
     '<label for="user"><strong>User-id</strong></label>\n' +
     '<input type="text" name="user" autocomplete="username" required><br>\n' +
     '<label for="password"><strong>Password</strong></label>\n' +
@@ -416,9 +419,14 @@
       const loginNonce = generateRandomNonce(8);
       req.session.sessionAuth.loginNonce = loginNonce;
       req.session.sessionAuth.loginExpireTimeSec = timeNowSeconds + 60;
+      // The csrfToken is added to req object in web-server.js using csurf middleware.
       // res.set('Cache-Control', 'no-store');
       return res.send(loginHtmlTop +
-        loginFormFragment1 + '?nonce=' + loginNonce + loginFormFragment2 +
+        loginFormFragment1 +
+        '?nonce=' + loginNonce +
+        loginFormFragment2 +
+        req.csrfToken() +
+        loginFormFragment3 +
         warningDiv + loginHtmlBottom);
     }
   };

@@ -10,18 +10,20 @@
 (function () {
   'use strict';
 
+  const fs = require('fs');
   const path = require('path');
+  const csrf = require('csurf');
+  const csrfProtection = csrf({ cookie: false });
   const express = require('express');
   const router = express.Router();
 
   const testFolder = path.join(__dirname, 'html/');
 
-  router.get('/test-websocket.html', function (req, res, next) {
-    res.sendFile(testFolder + 'test-websocket.html', function (err) {
-      if (err) {
-        next(err);
-      }
-    });
+  const testWebsocketHtml = fs.readFileSync(testFolder + 'test-websocket.html', 'utf8');
+
+  // it is necessary to insert csrfToken to be accepted by the /irc/wsauth route.
+  router.get('/test-websocket.html', csrfProtection, function (req, res, next) {
+    res.send(testWebsocketHtml.replace('{{csrfToken}}', req.csrfToken()));
   });
 
   router.get('/test-websocket.js', function (req, res, next) {
