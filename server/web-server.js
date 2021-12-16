@@ -283,7 +283,7 @@ if (credentials.enableRemoteLogin) {
   // in the master branch (the default)
   //
   app.get('/login.css', userAuth.loginStyleSheet);
-  app.get('/login', userAuth.loginPage);
+  app.get('/login', csrfProtection, userAuth.loginPage);
   app.post('/login-authorize', csrfProtection, userAuth.loginAuthorize);
   app.get('/logout', userAuth.logout);
   app.get('/blocked', userAuth.blockedCookies);
