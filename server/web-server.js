@@ -130,13 +130,74 @@ if (nodeEnv === 'development') {
   }));
 }
 
-//
-// clean headers
-//
+// ------------------------------
+// Content Security Policy (CSP)
+// ------------------------------
+// -- Helmet CSP defaults v4.6.0 --
+// default-src 'self';
+// base-uri 'self';
+// block-all-mixed-content;
+// font-src 'self' https: data:;
+// frame-ancestors 'self';
+// img-src 'self' data:;
+// object-src 'none';
+// script-src 'self';
+// script-src-attr 'none';
+// style-src 'self' https: 'unsafe-inline';
+// upgrade-insecure-requests
+// ------------------------------
+const contentSecurityPolicy = {
+  // No fallback to helmet default CSP
+  useDefaults: false,
+  // Custom CSP
+  directives: {
+    defaultSrc: ["'none'"],
+    baseUri: ["'self'"],
+    scriptSrc: ["'self'"],
+    styleSrc: ["'self'"],
+    mediaSrc: ["'self'"],
+    frameAncestors: ["'none'"],
+    imgSrc: ["'self'"]
+  },
+  // Option to disable CSP while showing errors in console log.
+  reportOnly: false
+};
+// When using internal user login a <form> submission is required for password entry
+if (credentials.enableRemoteLogin) {
+  contentSecurityPolicy.directives.formAction = ["'none'"];
+} else {
+  contentSecurityPolicy.directives.formAction = ["'self'"];
+}
+// API calls require "connect-src 'self'"
+// IOS Safari also needs "wss:" in connect-src to connect websocket
+// Chrome and Firefox seem to require only: "connect-source 'self'"
+if (credentials.tls) {
+  contentSecurityPolicy.directives.connectSrc = ["'self'", 'wss:'];
+} else {
+  contentSecurityPolicy.directives.connectSrc = ["'self'", 'ws:'];
+}
+// ----------------------------------------
+// HTTP Security Headers
+// ----------------------------------------
+// -- Helmet Default headers v4.6.0 --
+// X-DNS-Prefetch-Control off
+// Expect-CT max-age=0
+// X-Frame-Options SAMEORIGIN
+// Strict-Transport-Security max-age=15552000; includeSubDomains
+// X-Download-Options noopen
+// X-Content-Type-Options nosniff
+// X-Permitted-Cross-Domain-Policies none
+// Referrer-Policy no-referrer
+// X-XSS-Protection 0
+// ----------------------------------------
+
+// ----------------------------------------
 app.use(helmet({
-  hidePoweredBy: false
+  frameguard: { action: 'deny' },
+  hidePoweredBy: false,
+  referrerPolicy: { policy: 'no-referrer' },
+  contentSecurityPolicy: contentSecurityPolicy
 }));
-app.use(helmet.referrerPolicy({ policy: 'no-referrer' }));
 
 // ------------------------------------------------
 // test error, check for stack dump on production
@@ -150,23 +211,6 @@ app.use(helmet.referrerPolicy({ policy: 'no-referrer' }));
 //   /status    Is the server alive?
 //
 app.get('/status', (req, res) => res.json({ status: 'ok' }));
-
-// ----------------------------------------
-// CSP Content Security Policy
-// ----------------------------------------
-/* eslint-disable quotes */
-app.use(helmet.contentSecurityPolicy({
-  directives:
-    {
-      defaultSrc: ["'none'"],
-      scriptSrc: ["'self'"],
-      connectSrc: ["'self'", "ws:", "wss:"],
-      styleSrc: ["'self'"],
-      mediaSrc: ["'self'"],
-      imgSrc: ["'self'"]
-    }
-}));
-/* eslint-enable quotes */
 
 //
 // security.txt security notification contact
@@ -195,6 +239,11 @@ app.get('/robots.txt', function (req, res) {
   res.send(
     'User-agent: *\n' +
     'Disallow: /\n');
+});
+
+// Return status 204 Empty Response for icon
+app.get('/favicon.ico', function (req, res, next) {
+  res.status(204).send(null);
 });
 
 //
