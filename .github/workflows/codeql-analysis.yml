@@ -20,6 +20,10 @@ on:
   schedule:
     - cron: '30 13 * * 5'
 
+paths:
+  - secure/js
+  - server
+
 jobs:
   analyze:
     name: Analyze
@@ -29,13 +33,6 @@ jobs:
       contents: read
       security-events: write
 
-    paths:
-      - secure/js
-      - server
-
-    paths-ignore:
-      - server/fragments
-      - server/testws
 
     strategy:
       fail-fast: false
