@@ -20,6 +20,15 @@ on:
   schedule:
     - cron: '30 13 * * 5'
 
+paths:
+  - bin/www
+  - secure/js
+  - server
+
+paths-ignore:
+  - server/fragments
+  - server/testws
+
 jobs:
   analyze:
     name: Analyze
