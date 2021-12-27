@@ -29,6 +29,14 @@ jobs:
       contents: read
       security-events: write
 
+    paths:
+      - secure/js
+      - server
+
+    paths-ignore:
+      - server/fragments
+      - server/testws
+
     strategy:
       fail-fast: false
       matrix:
@@ -69,11 +77,3 @@ jobs:
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
-
-paths:
-  - secure/js
-  - server
-
-paths-ignore:
-  - server/fragments
-  - server/testws
