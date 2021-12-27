@@ -20,11 +20,12 @@ on:
   schedule:
     - cron: '30 13 * * 5'
 
-paths:
-  - secure/js
-  - server
 
 jobs:
+  paths:
+    - secure/js 
+    - server
+
   analyze:
     name: Analyze
     runs-on: ubuntu-latest
