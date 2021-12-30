@@ -37,8 +37,8 @@
         <div class="install-section-title">Copy example configuration</div>
         <p>
           The git repository includes an example configuration file
-          named &quotexample-credentials.json&quot. The first step
-          is to make a copy of this file to &quotcredentials.json&quot.
+          named &quot;example-credentials.json&quot;. The first step
+          is to make a copy of this file to &quot;credentials.json&quot;.
           If you are on a multi user system you may optionally
           change permissions.
         </p>
@@ -71,7 +71,7 @@
           <a href="installation.html">installation</a> section.
         </p>
         <p>
-          Since it is recommended to run this program in a non-privledged
+          Since it is recommended to run this program in a non-privileged
           account, it may be necessary to make
           a copy of the certificate files in a local folder
           where the web server will have read access. It is NOT recommended
@@ -101,7 +101,7 @@
         <p>
           Set the web server listen port to the desired port number for the web server.
           For security reasons, this program should be run as a
-          non-preiledged user using a non-privileged ports 1024 or greater.
+          non-privileged user using a non-privileged ports 1024 or greater.
         </p>
         <p>
           If you prefer to use restricted port 443 for your webserver, it would be recommended
@@ -130,14 +130,14 @@
         </p>
         <p>
           If your session expires in the middle of a conversation, a user login page will load.
-          The backend web server will mantain a cache of messages that occur while disconnected.
+          The backend web server will maintain a cache of messages that occur while disconnected.
           You should be able to continue your conversation after re-authenticating without
           any indication to people in the conversation.
         </p>
         <p>
-          The configuration property &quotinstanceNumber&quot is used for the case where multiple
+          The configuration property &quot;instanceNumber&quot; is used for the case where multiple
           instances are running, using the same host name, but using different port numbers.
-          In the case where a web browser is connected simultaneiously to two server instances
+          In the case where a web browser is connected simultaneously to two server instances
           with same host name and the same cookie name,
           login of one session would likely disconnect the other session due
           to replacement of the browser session cookie of the same cookie name.
@@ -186,10 +186,10 @@
           Redis, which is a simple key/value store. It is assumed that
           redis is running on the same server as the irc-hybrid-client
           so a non-encrypted TCP connection would be safe.
-          It is manditory that the local firewall protect the redis TCP ports
+          It is mandatory that the local firewall protect the redis TCP ports
           from external internet access. A redis password is not required
           to access redis locally behind a firewall. The redis prefix
-          sould be set to a unique value if more than one web server is using
+          should be set to a unique value if more than one web server is using
           this instance of redis.
         </p>
         <p>
@@ -272,14 +272,14 @@
           not be possible to remotely modify the password file, or any of
           the server configuration. Should the account password become compromised,
           the web interface allows remote shutdown of the server. This would protect
-          it until a new password were set using the ssh termianl.
+          it until a new password were set using the ssh terminal.
         </p>
         <p>
           A brief note about syntax. The credentials.json file represents a JSON structured data object.
-          JSON syntax must be exact, with matching curley braces and proper use of commas.
+          JSON syntax must be exact, with matching curly braces and proper use of commas.
           The credentials.json file includes a loginUsers property.
           The square brackets [ ] define a javascript array.
-          Each of the curley braces { } within the array is a javascript object
+          Each of the curly braces { } within the array is a javascript object
           used to define an individual user.
           The user object contains 4 properties listed as key/value pairs.
           Note the use of double quotes and commas between key/value pairs except the last has no comma.
@@ -301,8 +301,8 @@ node updateAuthForUser_1.js
 </pre></div>
         <p>
           This will start an interactive session.
-          In this example, the &quotuser&quot was set to <blue-example>user1</blue-example>.
-          The &quotname&quot was allowed to default to the
+          In this example, the &quot;user&quot; was set to <blue-example>user1</blue-example>.
+          The &quot;name&quot; was allowed to default to the
           same value as the user.
           In this example, the password was set to
           <blue-example>zuwa79xoJxLJ</blue-example>.
@@ -366,6 +366,224 @@ cd ..
           copy/paste the entire javascript object as an additional javascript object in the array.
           Use care to maintain valid JSON format with commas and braces.
         </p>
+
+        <div class="desc-title">
+          Optional Remote Login
+        </div>
+        <p>
+          The irc-hybrid-client is intended to run as a stand alone web server where a web browser 
+          can authenticate using a password entry form that is integral to the application.
+          This is the default configuration as described in the sections above.
+        </p>
+        <p>
+          As an optional alternative, the irc-hybrid-client can be 
+          configured to use a remote authentication server.
+          The intended purpose is to allow a single user account to grant access to multiple 
+          servers on a home network. This would allow a user to gain access to several instances 
+          of irc-hybrid-client. This may be useful if multiple irc-hybrid-client instances are
+          run concurrently while connected to different IRC networks.
+        </p>
+        <p>
+          An independent authorization server (<a href="https://github.com/cotarr/collab-auth">collab-auth</a>)
+          was written in parallel with this irc-hybrid-client project. 
+          It uses a custom implementation of Oauth 2.0. 
+        </p>
+        <p>
+          In general terms, the authorization workflow will operate as follows: 
+          When a user attempts to load the irc-hybrid-client web page without a valid 
+          login cookie, the user's browser will be redirected to the authorization 
+          server. The user will authenticate their identity by entry of username and password.
+          The user's web browser will then be redirected back to the irc-hybrid-client  
+          with a temporary authorization code. The irc-hybrid-client will submit the 
+          code to the authorization server. A new Oauth 2.0 access token will be created and 
+          returned to the irc-hybrid-client web server. The irc-hybrid-client server will then
+          validate and decode the token by sending the token to the authorization server, which 
+          will return token meta-data to the irc-hybrid-client. The irc-hybrid-client 
+          will extract a list of scope values from the token meta-data, and compare the token scopes 
+          to the list of scopes in the irc-hybrid-client configuration. If the users token 
+          is successfully validated and at least 1 matching scope found, the user's 
+          cookie will then be designated as authorized.
+          The IRC page will then load, and the user can participate on IRC.
+        </p>
+        <div class="install-section-title">Prerequisites</div>
+          <p>
+            The following items are required. These are beyond the scope of these instructions, so
+            it is assumed you are familiar with this type of web site setup.
+          </p>
+          <ul>
+            <li>
+              To avoid cookie overlap, different domain names should be created for 
+              the authorization server each irc-hybrid-client instance, such as: 
+              auth.example.com, irc1.example.com an irc2.example.com.
+            </li>
+            <li>
+              If more than 1 irc-hybrid-client is installed on the same physical 
+              computer, each irc-hybrid-client must use a different network port number.
+            </li>
+            <li>
+              The collab-auth authorization server must be installed, 
+              running and tested. (<a href="https://cotarr.github.io/collab-auth/">Documentation</a>)
+            </li>
+          </ul>
+        <p>
+        </p>
+
+        <div class="install-section-title">Scope definitions</div>
+        <p>
+          The <i>Scope</i> value is the primary determiner to specify if a given user will have 
+          access to a specific irc-hybrid-client instance.
+        </p>
+        <p>
+          The irc-hybrid-client configuration will contain a single scope or multiple scope values in the
+          &quot;remoteScope&quot; property of the credentials.json file. When more than one 
+          irc-hybrid-client is running at the same time, different scope values will determine 
+          which user can access which irc-hybrid-client instance.
+        </p>
+        <p>
+          In order for a irc-hybrid-client scope to be valid, it must be listed as one of the scopes in the &quot;allowedScope&quot; list 
+          of the irc-hybrid-client's client credentials for the authorization server.
+        </p>
+        <p>
+          An authorization server user account will also have one or more scopes listed in the user's &quot;role&quot;.
+          In order to gain access to an irc-hybrid-client, at least one of the user's role entries must match an entry 
+          in the irc-hybrid-client configuration.
+        </p>
+        <p>
+          In the case where there is only 1 user and 1 irc-hybrid-client, then a single scope value may be used in 
+          the user's role, the client's allowedScope, and the irc-hybrid-client remoteScope.
+        </p>
+
+        <div class="install-section-title">Client Account Configuration</div>
+        <p>
+          Under Oauth 2.0, &quot;client&quot; credentials are assigned to a web server or other network resource.
+          The purpose of client credentials is to grant permission to the web server to interact with the authorization server.
+        </p>
+        <p>
+          clientId/clientSecret: Each client account will need a unique client id and client secret. The clientId and
+          client secret are used to authenticate an instance of irc-hybrid-client to the authentication server.
+          One client credential can be used on multiple irc-hybrid-clients or one unique client can be 
+          created for each irc-hybrid-client, depending on the complexity of the overall setup.
+        </p>
+        <p>
+          allowedScope: The first scope value <blue-example>&quot;auth.token&quot;</blue-example> is always required. It is a 
+          standard value that is used to grant the irc-hybrid-client permission 
+          to request access tokens from the authentication server.
+          This is followed by a comma separated list of unique scope values.
+          The list must include the sum of all scope values 
+          used in all irc-hybrid-clients that share the client credentials.
+          This can be thought of as a list of possible scopes that irc-hybrid-clients are allowed to use.
+        </p>
+        <p>
+          allowedRedirectIRI: The Oauth 2.0 authentication workflow includes a browser redirect to the 
+          URL address of the authorization server. After user authentication, the authentication server
+          will redirect the user's browser back to the URL address of the specific irc-hybrid-client server that 
+          had initiated the authentication workflow.
+          In order to prevent malicious redirects, the authorization server will only allow a login callback
+          to a redirectURI that is listed in a list of allowedRedirectURI in the client credentials.
+          During the authentication workflow, the authorization server
+          will reject any redirect with a callback addresses that is not an exact match in this list.
+        </p>
+
+        <table class="account-table" border="1" cellpadding="5px">
+          <tr><th>Key Name</th><th>Example</th><th>Description</th></tr>
+          <tr><td>name</td><td>irc-hybrid-client 1</td><td>Account Descriptive Name</td></tr>
+          <tr><td>clientId</td><td><yellow-example>irc_client_1</yellow-example></td><td>Unique ID value (similar to username)</td></tr>
+          <tr><td>clientSecret</td><td>xxxxxxxxxxxxxxxxxxxxxxxx</td><td>Recommend auto generate random string</td></tr>
+          <tr><td>trustedClient</td><td>No</td><td>Oauth 2.0 decision dialog flag (no)</td></tr>
+          <tr><td>allowedScope</td><td><blue-example>auth.token,</blue-example> irc.demo1, irc.test, <yellow-example>irc.all</yellow-example><td>List of scopes delilmieted by comma-space</td></tr>
+          <tr><td>allowedRedirectURI</td><td>http://localhost:3003/login/callback, http://localhost:4210/login/callback</td><td>Server URL + &quot;/login/callback&quot;</td></tr>
+        </table>
+
+        <div class="install-section-title">User Account Configuration</div>
+        <p>
+          Administration of user accounts is explained in the collab-auth 
+          <a href="https://cotarr.github.io/collab-auth/">documentation</a>.
+          For a user to be granted access to a specific irc-hybrid-client instance,
+          the role of the user account must include one of the remoteScope values 
+          from the irc-hybrid-client configuration.
+        </p>
+        <p>
+          Create a new user account, or edit an existing user account.
+          In the field marked &quot;role&quot; add one or more scope designations 
+          from the irc-hybrid-client configuration. 
+          In this case, <yellow-example>irc.all</yellow-example> is used.
+        </p>
+        <table class="account-table" border="1" cellpadding="5px">
+          <tr><td>Number</td></td><td>1</td></tr>
+          <tr><td>Username</td><td>bob</td></tr>
+          <tr><td>Password</td><td>xxxxxxxxxxxx</td></tr>
+          <tr><td>Name</td><td>Bob Smith</td></tr>
+          <tr><td>Login Disabled</td><td>false</td></tr>
+          <tr><td>Role</td><td>user.password, <yellow-example>irc.all</yellow-example></td></tr>
+        </table>
+
+        <div class="install-section-title">irc-hybrid-client Configuration</div>
+        <p>
+          For a specific instance of irc-hybrid-client, the configuration is located 
+          in the &quot;credentials.json&quot; file in the root of the repository.
+          This is a JSON formatted file. Any JSON syntax errors will prevent the 
+          irc-hybrid-client from starting. This file is discussed in detail 
+          in the upper part of this page. Only the properties related to remote login 
+          will be discussed in this section.
+        </p>
+        <p>
+          loginUsers: The loginUsers property is an array of user login definitions that is
+          used by the internal authentication system (local login). When using remote login,
+          the definition of local users is not required and may be an empty array as shown below.
+          If you want to switch back and forth between local login and remote login, 
+          you may leave the loginUser array in the configuration.
+          The user definitions specified here will not be functional when remote login is enabled.
+          If present, the users definitions will not impact remote login.
+
+        </p>
+        <p>
+          enableRemoteLogin: The enableRemoteLogin is a boolean flag. If the property does not exist 
+          or the enableRemoteLogin property is false, the default internal login will be enabled.
+          When set to true, remote login is enabled.
+        </p>
+        <p>
+          Hostnames must specify http or https. When using non-standard port numbers, 
+          the port should be specified. With TLS standard port 443 the port may be omitted.
+        </p>
+        <p>
+          clientId/clientSecret: The clientId and clientSecret must exactly match the 
+          client credentials as defined in the authorization server client account.
+          Take precautions to protect the client credentials from accidental disclosure
+          as this could grant unauthorized access to the authorization server. 
+        </p>
+        <p>
+          remoteScope: The remoteScope property may be a single string, or it may be an 
+          array of strings. Any authenticated user may access an instance of irc-hybrid-client
+          if one of the remoteScope values here is an exact match to at least one of the 
+          scopes defined in the user's role.
+        </p>
+
+<div class="pre-div"><pre>
+  {
+    ...
+    
+    "loginUsers": [ ],
+    "enableRemoteLogin": true,
+    "remoteAuthHost": "http://127.0.0.1:3500",
+    "remoteCallbackHost": "http://localhost:3003",
+    "remoteClientId": <yellow-example>irc_client_1</yellow-example>,
+    "remoteClientSecret": "xxxxxxxxxxxxxxxxxxxxxxxx",
+    "remoteScope": [
+      <yellow-example>"irc.all"</yellow-example>,
+      irc.demo1
+    ]
+  }
+  </pre></div>    
+
+      <div class="install-section-title">Other Oauth Providers</div>
+
+      <p>
+        It is unlikely that irc-hybrid-client will work with other generic 
+        Oauth 2.0 providers without modification to the middlewares/remote-authentication.js 
+        javascript file. Both irc-hybrid-client and collab-auth were written concurrently
+        by the same author.
+      </p>
+
       </div> <!-- /text-div -->
 
     </div> <!-- outer-div -->
