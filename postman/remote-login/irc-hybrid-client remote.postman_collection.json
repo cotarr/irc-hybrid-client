@@ -1,0 +1,747 @@
+{
+	"info": {
+		"name": "irc-hybrid-client remote",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "(clear global variables)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Unset global variables\", function () {",
+							"    pm.globals.unset('transaction_id');",
+							"    pm.globals.unset('auth_code');",
+							"    pm.globals.unset('access_token');",
+							"    pm.globals.unset('refresh_token');",
+							"    pm.globals.unset('csrf_token');",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{auth_host}}/status",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"status"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "(auth-0) /logout",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{auth_host}}/logout",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"logout"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/logout (irc)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{server_URL}}/logout",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"logout"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/irc/webclient.html (irc)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 302\", function () {",
+							"    pm.response.to.have.status(302);",
+							"});",
+							"",
+							"pm.test(\"Redirect address is /login\", function () {",
+							"    let location = pm.response.headers.get('Location');",
+							"    location = location.split('?')[0];",
+							"    pm.expect(location).to.equal('/login');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{server_URL}}/irc/webclient.html",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"webclient.html"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/login (irc)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 302\", function () {",
+							"    pm.response.to.have.status(302);",
+							"});",
+							"",
+							"pm.test(\"Redirect address is /login\", function () {",
+							"    let location = pm.response.headers.get('Location');",
+							"    if (location.indexOf('/dialog/authorize') < 0) {",
+							"        throw new Error('A \"/dialog/authorize\" redirect not found in location header.')",
+							"    }",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{server_URL}}/login",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "(auth-1) /dialog/authorize 1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//",
+							"// Test for /dialog/authorize",
+							"//",
+							"// 1) Accept 302 redirect /login if cookie/sesson not logged in",
+							"// 2) Accept 302 redirect to callbaack with auth code if authorized with trusted client",
+							"//       - parse authorizaton code to global variable",
+							"// 3) Accept 200 decision dialog page if authorized with untrusted client",
+							"//       - parse transaction code",
+							"// --------------------------------------------------------------------------",
+							"pm.test(\"/dialog/authorise response analysis\", function () {",
+							"    pm.globals.set('auth_code', '');",
+							"    pm.globals.set('transaction_id', '');",
+							"",
+							"    if (pm.response.code === 302) {",
+							"        // If 302 redirect, must have location header",
+							"        let location = pm.response.headers.get('Location');",
+							"        if (location) {",
+							"            let urlQueryPart = location.split('?')[1];",
+							"            if (urlQueryPart) {",
+							"                let queryKey = urlQueryPart.split('=')[0];",
+							"                if (queryKey === 'code') {",
+							"                    let authCode = urlQueryPart.split('=')[1];",
+							"                    pm.globals.set('auth_code', authCode)",
+							"                    postman.setNextRequest('/oauth/token (auth code)')",
+							"                } else {",
+							"                    throw new Error('Redirect has URL query without \"code\" as first property');",
+							"                }",
+							"            } else {",
+							"                // case of no query parameters in URL, must be /login request",
+							"                pm.expect(location).to.equal('/login')",
+							"            }",
+							"        } else {",
+							"            throw new Error('302 redirect without location header');",
+							"        }",
+							"    } else if (pm.response.code === 200) {",
+							"        if (pm.response.text().indexOf('<title>Resource Decision</title>') >= 0) {",
+							"            let arrayOfQuotedStrings = pm.response.text().split('\\\"')",
+							"            let transactionIdIndex = arrayOfQuotedStrings.indexOf('transaction_id');",
+							"            if (transactionIdIndex > 0) {",
+							"                let transactionIdValue = arrayOfQuotedStrings[transactionIdIndex + 4];",
+							"                pm.globals.set('transaction_id', transactionIdValue);",
+							"            } else {",
+							"                throw new Error('transaction_id not found in decision dialog html file');",
+							"            }",
+							"            let csrfTokenIndex = arrayOfQuotedStrings.indexOf('_csrf');",
+							"            if (csrfTokenIndex > 0) {",
+							"                let csrfTokenValue = arrayOfQuotedStrings[csrfTokenIndex + 2];",
+							"                pm.globals.set('csrf_token', csrfTokenValue);",
+							"            } else {",
+							"                throw new Error('csrf token not found in decision dialog html file');",
+							"            }",
+							"            postman.setNextRequest('(auth-5) /dialog/authorize/decision (untrusted)')",
+							"        } else {",
+							"            throw new Error('Decision dialog not found in 200 response');",
+							"        }",
+							"    } else {",
+							"        throw new Error('/dialog/authorize not an expected response');",
+							"    }",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{auth_host}}/dialog/authorize?redirect_uri={{redirect_uri}}&response_type=code&client_id={{client_id}}&scope={{scopes}}",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"dialog",
+						"authorize"
+					],
+					"query": [
+						{
+							"key": "redirect_uri",
+							"value": "{{redirect_uri}}"
+						},
+						{
+							"key": "response_type",
+							"value": "code"
+						},
+						{
+							"key": "client_id",
+							"value": "{{client_id}}"
+						},
+						{
+							"key": "scope",
+							"value": "{{scopes}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "(auth-2) /login (form, csrfToken)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Extract CSRF token to global variables\", function () {",
+							"    let body = pm.response.text();",
+							"    let bodyArray = body.split('\\n');",
+							"    let csrfToken = '';",
+							"    for (let i = 0; i < bodyArray.length; i++) {",
+							"        let splitByQuote = bodyArray[i].split('\"');",
+							"        if ((splitByQuote.length === 7) && (splitByQuote[3] === '_csrf')) {",
+							"            csrfToken = splitByQuote[5];",
+							"        }",
+							"    } // next i",
+							"    // console.log('csrf_token: ', csrfToken);",
+							"    if (csrfToken) {",
+							"        pm.globals.set('csrf_token', csrfToken);",
+							"    } else {",
+							"        throw new Error('A csrf token was not found in html form');",
+							"    }",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "text/html",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{auth_host}}/login",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "(auth-3) login (username, password)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 302\", function () {",
+							"    pm.response.to.have.status(302);",
+							"});",
+							"",
+							"pm.test(\"Redirect address is /dialog/authorize\", function () {",
+							"    let location = pm.response.headers.get('Location');",
+							"    if (location) {",
+							"        location = location.split('?')[0];",
+							"        pm.expect(location).to.equal('/dialog/authorize');",
+							"    } else {",
+							"        throw new Error('Location header not found in 302 redirect')",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "{{user_username}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{user_password}}",
+							"type": "text"
+						},
+						{
+							"key": "_csrf",
+							"value": "{{csrf_token}}",
+							"type": "text"
+						}
+					],
+					"options": {
+						"raw": {
+							"language": "xml"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{auth_host}}/login",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "(auth-4) /dialog/authorize 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//",
+							"// Test for /dialog/authorize",
+							"//",
+							"// 1) Accept 302 redirect /login if cookie/sesson not logged in",
+							"// 2) Accept 302 redirect to callbaack with auth code if authorized with trusted client",
+							"//       - parse authorizaton code to global variable",
+							"// 3) Accept 200 decision dialog page if authorized with untrusted client",
+							"//       - parse transaction code",
+							"// --------------------------------------------------------------------------",
+							"pm.test(\"/dialog/authorise response analysis\", function () {",
+							"    pm.globals.set('auth_code', '');",
+							"    pm.globals.set('transaction_id', '');",
+							"",
+							"    if (pm.response.code === 302) {",
+							"        // If 302 redirect, must have location header",
+							"        let location = pm.response.headers.get('Location');",
+							"        if (location) {",
+							"            let urlQueryPart = location.split('?')[1];",
+							"            if (urlQueryPart) {",
+							"                let queryKey = urlQueryPart.split('=')[0];",
+							"                if (queryKey === 'code') {",
+							"                    let authCode = urlQueryPart.split('=')[1];",
+							"                    pm.globals.set('auth_code', authCode)",
+							"                    postman.setNextRequest('/oauth/token (auth code)')",
+							"                } else {",
+							"                    throw new Error('Redirect has URL query without \"code\" as first property');",
+							"                }",
+							"            } else {",
+							"                // case of no query parameters in URL, must be /login request",
+							"                pm.expect(location).to.equal('/login')",
+							"            }",
+							"        } else {",
+							"            throw new Error('302 redirect without location header');",
+							"        }",
+							"    } else if (pm.response.code === 200) {",
+							"        if (pm.response.text().indexOf('<title>Resource Decision</title>') >= 0) {",
+							"            let arrayOfQuotedStrings = pm.response.text().split('\\\"')",
+							"            let transactionIdIndex = arrayOfQuotedStrings.indexOf('transaction_id');",
+							"            if (transactionIdIndex > 0) {",
+							"                let transactionIdValue = arrayOfQuotedStrings[transactionIdIndex + 4];",
+							"                pm.globals.set('transaction_id', transactionIdValue);",
+							"            } else {",
+							"                throw new Error('transaction_id not found in decision dialog html file');",
+							"            }",
+							"            let csrfTokenIndex = arrayOfQuotedStrings.indexOf('_csrf');",
+							"            if (csrfTokenIndex > 0) {",
+							"                let csrfTokenValue = arrayOfQuotedStrings[csrfTokenIndex + 2];",
+							"                pm.globals.set('csrf_token', csrfTokenValue);",
+							"            } else {",
+							"                throw new Error('csrf token not found in decision dialog html file');",
+							"            }",
+							"            postman.setNextRequest('(auth-5) /dialog/authorize/decision (untrusted)')",
+							"        } else {",
+							"            throw new Error('Decision dialog not found in 200 response');",
+							"        }",
+							"    } else {",
+							"        throw new Error('/dialog/authorize not an expected response');",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "text/html",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{auth_host}}/dialog/authorize?redirect_uri={{redirect_uri}}&response_type=code&client_id={{client_id}}&scope={{scopes}}",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"dialog",
+						"authorize"
+					],
+					"query": [
+						{
+							"key": "redirect_uri",
+							"value": "{{redirect_uri}}"
+						},
+						{
+							"key": "response_type",
+							"value": "code"
+						},
+						{
+							"key": "client_id",
+							"value": "{{client_id}}"
+						},
+						{
+							"key": "scope",
+							"value": "{{scopes}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "(auth-5) /dialog/authorize/decision (untrusted)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 302\", function () {",
+							"    pm.response.to.have.status(302);",
+							"});",
+							"",
+							"pm.test(\"Extract authorization code from redirect URI\", function () {",
+							"    pm.globals.set('auth_code', '');",
+							"    let authCode = null;",
+							"    let location = pm.response.headers.get('Location');",
+							"    if (location) {",
+							"            let urlQueryPart = location.split('?')[1];",
+							"            if (urlQueryPart) {",
+							"                let queryKey = urlQueryPart.split('=')[0];",
+							"                if (queryKey === 'code') {",
+							"                    let authCode = urlQueryPart.split('=')[1];",
+							"                    pm.globals.set('auth_code', authCode)",
+							"                } else {",
+							"                    throw new Error('Callback redirect has URL query without \"code\" as first property');",
+							"                }",
+							"            } else {",
+							"                throw new Error('Callback redirect without query parameters')",
+							"            }",
+							"",
+							"    } else {",
+							"        throw new Error('Location header not found in redirect ')",
+							"    }",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "transaction_id",
+							"value": "{{transaction_id}}",
+							"type": "text"
+						},
+						{
+							"key": "_csrf",
+							"value": "{{csrf_token}}",
+							"type": "text"
+						}
+					],
+					"options": {
+						"raw": {
+							"language": "xml"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{auth_host}}/dialog/authorize/decision",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"dialog",
+						"authorize",
+						"decision"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/oauth/token (auth code)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 302\", function () {",
+							"    pm.response.to.have.status(302);",
+							"});",
+							"",
+							"pm.test(\"Redirect address is /irc/webclient.html\", function () {",
+							"    let location = pm.response.headers.get('Location');",
+							"    location = location.split('?')[0];",
+							"    pm.expect(location).to.equal('/irc/webclient.html');",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{server_URL}}/login/callback?code={{auth_code}}",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"login",
+						"callback"
+					],
+					"query": [
+						{
+							"key": "code",
+							"value": "{{auth_code}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/irc/webclient.html (with cookie)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Body matches string\", function () {",
+							"    pm.expect(pm.response.text()).to.include('<title>irc-hybrid-client</title>');",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{server_URL}}/irc/webclient.html",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"webclient.html"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "(clear global variables)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Unset global variables\", function () {",
+							"    pm.globals.unset('transaction_id');",
+							"    pm.globals.unset('auth_code');",
+							"    pm.globals.unset('access_token');",
+							"    pm.globals.unset('refresh_token');",
+							"    pm.globals.unset('csrf_token');",
+							"    pm.globals.unset('testUsername');   ",
+							"    pm.globals.unset('testUserNumber');",
+							"    pm.globals.unset('testUserNumber');",
+							"    pm.globals.unset('createdUserUuid');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{auth_host}}/status",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"status"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

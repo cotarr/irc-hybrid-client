@@ -116,3 +116,10 @@ If the tests are executed in order, the follow will be exercised:
 * 8.13 Disconnect backend from IRC
 * 8.14 Clear the message cache.
 * 8.16 Terminate (Die) the backend web server.
+
+# Remote Login Collection
+
+Remote login is an optional irc-hybrid-client configuration 
+that can use a remote Oauth 2.0 authorization server. 
+Remote login postman exports are in a separate folder `postman/remote-login/`.
+See:  postman/remote-login/README.md
