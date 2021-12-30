@@ -23,7 +23,7 @@
 //
 // Optional remote login using custom Oauth 2.0 Server
 //
-// This file is not required when irc-hybrid-client is used with
+// This properties are not required when irc-hybrid-client is used with
 // the default configuration of internal user password login.
 //
 // The file credentials.json should something similar to the following
@@ -33,8 +33,17 @@
 //     "remoteCallbackHost": "http://localhost:3003",
 //     "remoteClientId": "irc_client_id",
 //     "remoteClientSecret": "irc_client_secret_TO_BE_CHANGED",
-//     "remoteScope": "irc_001.irc"
-// }
+//     "remoteScope": "irc.scope1"
+//   }
+//
+// The remoteScope can be either a single string (above) or an array of stings (below)
+//  {
+//    "remoteScope": [
+//      "irc.scope1",
+//      "irc.scope2"
+//    ]
+//  }
+//
 //
 // In credentials.json file, user array is not required. --> "loginUsers": []
 //
@@ -203,16 +212,36 @@
   // Route: GET /login route
   //
   // Redirect (302) to authorization server
-  // There, user will be presented with login form
+  // There, the user will be presented with login form
+  //
+  // Example of part part of redirect (line wrapped):
+  // /dialog/authorize?redirect_uri=http://localhost:3003/login/callback&
+  //     response_type=code&client_id=irc_client&scope=irc.scope1%20irc.scope2
   // ---------------------------
   const loginRedirect = function (req, res, next) {
+    let scopeString = '';
+    // Case 1, remoteScope is single string
+    if (typeof credentials.remoteScope === 'string') {
+      scopeString = credentials.remoteScope;
+    }
+    // Case 2, remoteScope is array of strings
+    if ((Array.isArray(credentials.remoteScope)) && (credentials.remoteScope.length > 0)) {
+      for (let i = 0; i < credentials.remoteScope.length; i++) {
+        if (i > 0) {
+          // Delimit with escaped space characters
+          scopeString += '%20' + credentials.remoteScope[i];
+        } else {
+          scopeString += credentials.remoteScope[i];
+        }
+      }
+    }
     res.redirect(
       credentials.remoteAuthHost +
       '/dialog/authorize?' +
       'redirect_uri=' + credentials.remoteCallbackHost + '/login/callback' + '&' +
       'response_type=code&' +
       'client_id=' + credentials.remoteClientId + '&' +
-      'scope=' + credentials.remoteScope);
+      'scope=' + scopeString);
   };
 
   //
@@ -244,20 +273,35 @@
 
   // ------------------------------------------------------
   // Compare scope of decoded access_token to configured scope
-  // for access to the IRC server.
+  // to grant the user access to the IRC server.
+  // At minimum, one scope from each must match.
   // Return 403 Forbidden if scope is insufficient
   // ------------------------------------------------------
   const _authorizeTokenScope = function (res, tokenMetaData) {
+    // console.log('tokenMetaData.scope ', tokenMetaData.scope);
+    // console.log('credentials.remoteScope ', credentials.remoteScope);
     return new Promise(function (resolve, reject) {
       if ((!(tokenMetaData == null)) &&
         ('active' in tokenMetaData) && (tokenMetaData.active === true) &&
         ('scope' in tokenMetaData) && (Array.isArray(tokenMetaData.scope))) {
-        if (tokenMetaData.scope.indexOf(credentials.remoteScope) >= 0) {
+        let scopeFound = false;
+        // Case 1 remoteScope is type String
+        if (typeof credentials.remoteScope === 'string') {
+          if (tokenMetaData.scope.indexOf(credentials.remoteScope) >= 0) {
+            scopeFound = true;
+          }
+          // Case 2, remoteScope is Array of Strings
+        } else if (Array.isArray(credentials.remoteScope)) {
+          credentials.remoteScope.forEach(function (scopeString) {
+            if (tokenMetaData.scope.indexOf(scopeString) >= 0) {
+              scopeFound = true;
+            }
+          });
+        }
+        if (scopeFound) {
           resolve(tokenMetaData);
         } else {
-          return res.status(403).send(
-            'Forbidden - User access_token insufficient scope. (Expect scope: ' +
-            credentials.remoteScope + ')');
+          return res.status(403).send('Forbidden - User access_token insufficient scope.');
         }
       } else {
         const err = new Error('Error parsing introspect response meta-data');
