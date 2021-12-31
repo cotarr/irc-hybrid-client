@@ -34,13 +34,30 @@
         <div class="desc-title">
           Change Log
         </div>
+          (next) 
+          This upgrade adds optional remote login capability using an external authorization server
+          <a href="https://github.com/cotarr/collab-auth">collab-auth</a>
+          Although there are significant changes to the authorization middleware, 
+          the functionality of the default local login (password entry) should not be impacted.
+          To continue using local login no configuration changes are needed.
+          Developed in branch remote-login-draft 2021-12-03 from v0.1.29 and merged back to master 
+          2021-12-31.
+        <p>
+          Added module server/middlewares/remote-authenticate.js.
+          In web-server.js, rewrite all authorization middleware 
+          functions to make them selectable between local login and remote login. 
+          Update /docs to include remote login setup.
+          Added node-fetch 2.x to package.json, used for fetching access_tokens. 
+          Update example-credentials.json
+          Add new Postman collection and environment for remote login workflow.
+        </p>
         <p>
           2021-12-18 (0.1.32)
           Update security headers and CSP (Content security policy)
         </p>
         <p>
           2021-12-15 (0.1.31)
-          Added csurf middleware for CSRF protecton on POST routes.
+          Added csurf middleware for CSRF protection on POST routes.
           Bugfix wrong cookie name in user-authenticate.js.
           Bugfix fixed expiration of rolling cookie.
         </p>
@@ -70,7 +87,7 @@
           On page load, the browser may block the Audio.play() request pending user interaction.
           Added new button marked [+Audio] that will appear if the
           header bar when enabled audio media may be blocked by browser.
-          Selecting buttion will manually play audio, which is detected by browser.
+          Selecting button will manually play audio, which is detected by browser.
           This only applies to audio IRC channel beep tone checkboxes.
           This is an interim fix. A more elegant long term solution is needed.
         </p>
@@ -107,7 +124,7 @@
         </p>
         <p>
           2021-07-17 (0.1.21)
-          Added server configuration property &quotverify&quot to indicate
+          Added server configuration property &quot;verify&quot; to indicate
           if the IRC server hostname should be verified for TLS connections.
           <yellow-example>
           This change will require update of servers.json configuration files
@@ -120,8 +137,8 @@
           Taller buttons increase height of input to 3 lines for channel and PM.
           Fixed outgoing IRC messages not added to irc.log.
           Fixed browser Forced Reflow violation caused during message cache reload.
-          This included inhibit textarea auto scroll duing message cache reload and
-          resequence of cache reload events.
+          This included inhibit textarea auto scroll during message cache reload and
+          re-sequence of cache reload events.
         </p>
         <p>
           2021-07-14 (0.1.19)
@@ -151,8 +168,8 @@
         <p>
           2021-07-10 (0.1.15)
           Add autocomplete attributes to user login form.
-          Recode dynamic resizing of textarea elements to accommodte changes in browser zoom
-          and pressence of vertical slider after window hide/visible updates.
+          Recode dynamic resizing of textarea elements to accommodate changes in browser zoom
+          and presence of vertical slider after window hide/visible updates.
         </p>
         <p>
           2021-07-0-08 (0.1.14)
@@ -221,7 +238,7 @@
           2021-05-28 (0.1.5)
           Fixed server crash in websocket upgrade request.
           Fixed uninitialized textarea after browser back arrow.
-          Remove extraneous trailing spacein text command parser.
+          Remove extraneous trailing space in text command parser.
           Auto-close server message window on page reload when in channel.
         </p>
         <p>
@@ -234,7 +251,7 @@
         </p>
         <p>
           2021-05-20 (0.1.3)
-          Fixed hardcodeded file path for PID file causing crash at startup.
+          Fixed hardcoded file path for PID file causing crash at startup.
           Update express-session version.
           Fix null in wallops from dalnet services server.
           Improve display format of WALLOPS and NOTICE message.
