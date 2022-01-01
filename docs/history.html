@@ -34,6 +34,13 @@
         <div class="desc-title">
           Change Log
         </div>
+        <p>
+          (next) 2022-01-01
+          Added:
+          remote-authorize.js Added input validation to query parameters
+          for GET /login/callback?code=xxxx
+        </p>
+        <p>
           2021-12-31 (v0.1.33) 
           This upgrade adds optional remote login capability using an external authorization server
           <a href="https://github.com/cotarr/collab-auth">collab-auth</a>
@@ -42,6 +49,7 @@
           To continue using local login no configuration changes are needed.
           Developed in branch remote-login-draft 2021-12-03 from v0.1.29 and merged back to master 
           as v0.1.33 2021-12-31.
+        </p>
         <p>
           Added module server/middlewares/remote-authenticate.js.
           In web-server.js, rewrite all authorization middleware 

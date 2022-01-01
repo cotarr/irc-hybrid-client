@@ -249,7 +249,43 @@
   // ----------------------------------------
   // Internal functions for promise chain
   // ----------------------------------------
+
+  // ---------------------------------------------------------
+  // Validate input for url query parameters
+  // and extract Oauth 2.0 authorization code
   //
+  // This is the first call in the promise chain
+  //
+  // GET /login/callback?code=xxxxxxxx
+  //
+  // Success: returns promise resolving to authorization code
+  // Validation failure: generate response status 400 bad request
+  // Otherwise internal server error.
+  // ---------------------------------------------------------
+  const _extractCallbackAuthCode = function (req, res) {
+    return new Promise(function (resolve, reject) {
+      if (req.query) {
+        // query input validation
+        if ((typeof req.query === 'object') &&
+          (Object.keys(req.query).length === 1) &&
+          ('code' in req.query) &&
+          (typeof req.query.code === 'string') &&
+          (req.query.code.length > 0) &&
+          (req.query.code.length < 80)) {
+          // Extract Oauth 2.0 authorization code
+          resolve(req.query.code);
+        } else {
+          console.log('Error: _extractCallbackAuthCode() req.query failed input validation');
+          return res.status(400).send('Bad Request');
+        }
+      } else {
+        const err = new Error('query param not found in req object');
+        console.log(err.message);
+        reject(err);
+      }
+    });
+  };
+
   // ------------------------------------------------------
   // Validate that required properties exist after
   // exchanging authorization code for new access token
@@ -431,15 +467,19 @@
   // The browser will redirect to here with the Oauth 2.0 authorization code
   // as a query parameter in the url. (Example: /login/callback?code=xxxxxxx)
   //
-  // 1) Perform fetch request to exchange authorizaton code for a new access_token
-  // 2) Validate the token request response object required parameters
-  // 3) Perform fetch request to validate token and obtain user's token meta-data
-  // 4) Validate that user's token scope is sufficient to use irc-hybrid-client
-  // 5) Redirect to single page application at /irc/webclient.html
+  // 1) Input validation on GET /login/callback, then extract authorization code
+  // 2) Perform fetch request to exchange authorization code for a new access_token
+  // 3) Validate the token request response object required parameters
+  // 4) Perform fetch request to validate token and obtain user's token meta-data
+  // 5) Validate that user's token scope is sufficient to use irc-hybrid-client
+  // 6) Redirect to single page application at /irc/webclient.html
   // -------------------------------------------------------------------------------
   const exchangeAuthCode = function (req, res, next) {
-    // Calling fetchNewAccessToken returns promise
-    _fetchNewAccessToken(req.query.code)
+    // Calling _extractCallbackAuthCode returns promise
+    _extractCallbackAuthCode(req, res)
+      .then(function (authCode) {
+        return _fetchNewAccessToken(authCode);
+      })
       .then(function (tokenResponse) {
         return _validateTokenResponse(tokenResponse);
       })
