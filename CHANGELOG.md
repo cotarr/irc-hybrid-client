@@ -6,15 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Untagged 2022-01-01
+## [v0.1.34](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.1.34) 2022-01-01
 
-The history tab of the /docs was removed and added to base repository as CHANGELOG.md
+The history tab from the /docs was removed and added to base repository as CHANGELOG.md
 
 ### Added
 
 * remote-authorize.js Added input validation to query parameters for GET /login/callback?code=xxxx
-
-
 
 ## [v0.1.33](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.1.33) 2021-12-31
 
