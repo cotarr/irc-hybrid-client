@@ -34,7 +34,6 @@ const fs = require('fs');
 
 // express packages
 const express = require('express');
-const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const logger = require('morgan');
@@ -93,8 +92,8 @@ const sessionExpireAfterMs = 1000 * sessionExpireAfterSec;
 
 const nodeEnv = process.env.NODE_ENV || 'development';
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 // cookieParser is not required for express-session
 // cookieParser used for user-authenticate.js cookie enabled in browser
 // cookieParser used for ws-server /irc/wsauth route cookie match

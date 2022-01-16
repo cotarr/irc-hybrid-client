@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
+## Untagged 2022-01-16
+
+### Changed
+
+* web-server.js - Remove package bodyparser, instead use express.json() and express.urlencoded()
+* Upgrade packages express@4.17.2, express-session@1.17.2, node-fetch@2.6.7, utf-8-validate@5.0.8, ws@8.4.2
+
 ## [v0.1.34](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.1.34) 2022-01-01
 
 The history tab from the /docs was removed and added to base repository as CHANGELOG.md
