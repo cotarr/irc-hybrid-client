@@ -1,3 +1,15 @@
+# BRANCH NOTES: branch socks5-proxy
+
+This is a git branch for proof of concept.
+
+This will use npm package socks5-client to provide remote 
+socket connection to a socks5 proxy.
+Development is using Debian 10 with apt package dante-server v1.4.2
+as the remote socks5 server.
+For TLS connections, first a socks5 socket will be opened, then
+the open socket will be passed into NodeJs tls.connect() 
+which should return a TLS encrypted socket. 
+
 # irc-hybrid-client
 
 Single user hybrid IRC client using JavaScript frontend and Node.js/Express backend.
