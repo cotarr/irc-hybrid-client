@@ -80,6 +80,13 @@
   vars.ircState.ircTLSEnabled = servers.serverArray[0].tls;
   vars.ircState.ircTLSVerify = servers.serverArray[0].verify;
   vars.ircServerPassword = servers.serverArray[0].password;
+
+  vars.ircState.socksEnabled = servers.serverArray[0].socksEnabled || false;
+  vars.socksHost = servers.serverArray[0].socksHost || '';
+  vars.socksPort = servers.serverArray[0].socksPort || 1080;
+  vars.socksUsername = servers.serverArray[0].socksUsername || '';
+  vars.socksPassword = servers.serverArray[0].socksPassword || '';
+
   vars.nsIdentifyNick = servers.serverArray[0].identifyNick;
   vars.nsIdentifyCommand = servers.serverArray[0].identifyCommand;
   // index into servers.json file
@@ -720,6 +727,15 @@
     vars.ircState.ircTLSEnabled = servers.serverArray[vars.ircState.ircServerIndex].tls;
     vars.ircState.ircTLSVerify = servers.serverArray[vars.ircState.ircServerIndex].verify;
     vars.ircServerPassword = servers.serverArray[vars.ircState.ircServerIndex].password;
+
+    // For backward compatibility with credentials.json, the socks5 variables use defaults.
+    vars.ircState.socksEnabled =
+      servers.serverArray[vars.ircState.ircServerIndex].socksEnabled || false;
+    vars.socksHost = servers.serverArray[vars.ircState.ircServerIndex].socksHost || '';
+    vars.socksPort = servers.serverArray[vars.ircState.ircServerIndex].socksPort || 1080;
+    vars.socksUsername = servers.serverArray[vars.ircState.ircServerIndex].socksUsername || '';
+    vars.socksPassword = servers.serverArray[vars.ircState.ircServerIndex].socksPassword || '';
+
     vars.nsIdentifyNick = servers.serverArray[vars.ircState.ircServerIndex].identifyNick;
     vars.nsIdentifyCommand = servers.serverArray[vars.ircState.ircServerIndex].identifyCommand;
     vars.ircState.channelList = servers.serverArray[vars.ircState.ircServerIndex].channelList;

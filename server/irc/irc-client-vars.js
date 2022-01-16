@@ -41,6 +41,14 @@
   // ircState hold main IRC state variables visible to browser and backend
   const ircState = {};
   let ircServerPassword = null;
+
+  // Socks5 proxy variables are not included in ircState object to keep proxy
+  // connection credentials private from web browser.
+  let socksHost = null;
+  let socksPort = null;
+  let socksUsername = null;
+  let socksPassword = null;
+
   let nsIdentifyNick = null;
   let nsIdentifyCommand = null;
 
@@ -91,6 +99,10 @@
     excludedCommands: excludedCommands,
     ircState: ircState,
     ircServerPassword: ircServerPassword,
+    socksHost: socksHost,
+    socksPort: socksPort,
+    socksUsername: socksUsername,
+    socksPassword: socksPassword,
     nsIdentifyNick: nsIdentifyNick,
     nsIdentifyCommand: nsIdentifyCommand,
     nickNameLength: nickNameLength,
