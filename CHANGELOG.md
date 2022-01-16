@@ -12,6 +12,7 @@ and this project adheres to
 ### Changed
 
 * web-server.js - Remove package bodyparser, instead use express.json() and express.urlencoded()
+* web-server.js - Upgrade helmet from v4 to v5.0.1, changes to match new version
 * Upgrade packages express@4.17.2, express-session@1.17.2, node-fetch@2.6.7, utf-8-validate@5.0.8, ws@8.4.2
 
 ## [v0.1.34](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.1.34) 2022-01-01
