@@ -336,168 +336,176 @@
       }
     }
 
-    // ----------------------------------
-    //          New Socket
-    // ----------------------------------
-    // options Object
-    // ------------------
-    const options = {
-      port: vars.ircState.ircServerPort,
-      host: vars.ircState.ircServerHost
-    };
-    if (vars.ircState.ircTLSEnabled) {
-      options.rejectUnauthorized = vars.ircState.ircTLSVerify;
-      if (vars.ircState.ircTLSVerify) {
-        options.servername = vars.ircState.ircServerHost;
-      }
-      options.minVersion = 'TLSv1.2';
-    }
-    // ------------------------------
-    // Connect request return socket
-    // ------------------------------
-    // If socket wrapped in TLS encryption
-    if (vars.ircState.ircTLSEnabled) {
-      ircSocket = tls.connect(options, function () {
-        ircLog.writeIrcLog('Connected to IRC server ' + vars.ircState.ircServerName + ' ' +
-          vars.ircState.ircServerHost + ':' + vars.ircState.ircServerPort);
-      });
-    } else {
-      // else TCP socket without encryption
-      ircSocket = net.connect(options, function () {
-        ircLog.writeIrcLog('Connected to IRC server ' + vars.ircState.ircServerName + ' ' +
-          vars.ircState.ircServerHost + ':' + vars.ircState.ircServerPort);
-      });
-    }
+    //
+    // Internal function to create IRC socket event listeners
+    //
+    function _createIrcSocketEventListeners (newIrcSocket) {
+      //
+      // Connecting watchdog timer
+      //
+      // Note: Timer does not detect failure to register with IRC server
+      //       Timer is cleared where possible in case multiple manual connects in a row.
+      //
+      const watchdogTimer = setTimeout(function () {
+        if (vars.ircState.ircConnecting) {
+          // console.log('Connecting watchdog detect timeout error');
+          if (newIrcSocket) {
+            newIrcSocket.destroy();
+          }
+          // signal browser to show an error
+          vars.ircState.count.ircConnectError++;
 
-    //
-    // Connecting watchdog timer
-    //
-    // Note: Timer does not detect failure to register with IRC server
-    //       Timer is cleared where possible in case multiple manual connects in a row.
-    //
-    const watchdogTimer = setTimeout(function () {
-      if (vars.ircState.ircConnecting) {
-        // console.log('Connecting watchdog detect timeout error');
-        if (ircSocket) {
-          ircSocket.destroy();
+          vars.ircState.ircServerPrefix = '';
+          vars.ircState.ircConnecting = false;
+          vars.ircState.ircConnected = false;
+          vars.ircState.ircRegistered = false;
+          vars.ircState.ircIsAway = false;
+          global.sendToBrowser('UPDATE\nwebError: IRC server timeout while connecting\n');
+          ircLog.writeIrcLog('IRC server timeout while connecting');
         }
-        // signal browser to show an error
-        vars.ircState.count.ircConnectError++;
+      }, vars.ircSocketConnectingTimeout * 1000);
 
+      newIrcSocket.on('secureConnect', function (e) {
+        vars.ircState.ircSockInfo.encrypted = newIrcSocket.encrypted;
+        vars.ircState.ircSockInfo.verified = newIrcSocket.authorized;
+        vars.ircState.ircSockInfo.protocol = newIrcSocket.getProtocol();
+      });
+
+      // --------------------------------------------------
+      //   On Connect   (IRC client socket connected)
+      // --------------------------------------------------
+      newIrcSocket.on('connect', function () {
+        // console.log('Event: connect');
+        // clear watchdog timer
+        if (watchdogTimer) clearTimeout(watchdogTimer);
+        global.sendToBrowser('webServer: Connected\n');
+        ircLog.writeIrcLog('IRC server connected');
+      });
+
+      // -----------
+      //  On Ready
+      // -----------
+      newIrcSocket.on('ready', function () {
+        // console.log('Event: ready');
+        _readyEventHandler(newIrcSocket);
+      }); // newIrcSocket.on('ready'
+
+      // -----------
+      // ON Data
+      // -----------
+      newIrcSocket.on('data', function (data) {
+        vars.activityWatchdogTimerSeconds = 0;
+        extractMessagesFromStream(newIrcSocket, data);
+      });
+
+      // -------------------------------------------
+      //   On Close    (IRC client socket closed)
+      // -------------------------------------------
+      newIrcSocket.on('close', function (hadError) {
+        // console.log('Event: socket.close, hadError=' + hadError +
+        //   ' destroyed=' + newIrcSocket.destroyed);
+        if (((vars.ircState.ircConnectOn) && (vars.ircState.ircConnected)) ||
+          (vars.ircState.ircConnecting)) {
+          // signal browser to show an error
+          vars.ircState.count.ircConnectError++;
+        }
         vars.ircState.ircServerPrefix = '';
         vars.ircState.ircConnecting = false;
         vars.ircState.ircConnected = false;
         vars.ircState.ircRegistered = false;
         vars.ircState.ircIsAway = false;
-        global.sendToBrowser('UPDATE\nwebError: IRC server timeout while connecting\n');
-        ircLog.writeIrcLog('IRC server timeout while connecting');
-      }
-    }, vars.ircSocketConnectingTimeout * 1000);
-
-    ircSocket.on('secureConnect', function (e) {
-      vars.ircState.ircSockInfo.encrypted = ircSocket.encrypted;
-      vars.ircState.ircSockInfo.verified = ircSocket.authorized;
-      vars.ircState.ircSockInfo.protocol = ircSocket.getProtocol();
-    });
-
-    // --------------------------------------------------
-    //   On Connect   (IRC client socket connected)
-    // --------------------------------------------------
-    ircSocket.on('connect', function () {
-      // console.log('Event: connect');
-      // clear watchdog timer
-      if (watchdogTimer) clearTimeout(watchdogTimer);
-      global.sendToBrowser('webServer: Connected\n');
-      ircLog.writeIrcLog('IRC server connected');
-    });
-
-    // -----------
-    //  On Ready
-    // -----------
-    ircSocket.on('ready', function () {
-      // console.log('Event: ready');
-      _readyEventHandler(ircSocket);
-    }); // ircSocket.on('ready'
-
-    // -----------
-    // ON Data
-    // -----------
-    ircSocket.on('data', function (data) {
-      vars.activityWatchdogTimerSeconds = 0;
-      extractMessagesFromStream(ircSocket, data);
-    });
-
-    // -------------------------------------------
-    //   On Close    (IRC client socket closed)
-    // -------------------------------------------
-    ircSocket.on('close', function (hadError) {
-      // console.log('Event: socket.close, hadError=' + hadError +
-      //   ' destroyed=' + ircSocket.destroyed);
-      if (((vars.ircState.ircConnectOn) && (vars.ircState.ircConnected)) ||
-        (vars.ircState.ircConnecting)) {
-        // signal browser to show an error
-        vars.ircState.count.ircConnectError++;
-      }
-      vars.ircState.ircServerPrefix = '';
-      vars.ircState.ircConnecting = false;
-      vars.ircState.ircConnected = false;
-      vars.ircState.ircRegistered = false;
-      vars.ircState.ircIsAway = false;
-      // is auto enabled?
-      if (vars.ircState.ircAutoReconnect) {
-        // and client requested a connection, and has achieved at least 1 previously
-        if ((vars.ircState.ircConnectOn) && (vars.ircState.count.ircConnect > 0)) {
-          if (vars.ircServerReconnectTimerSeconds === 0) vars.ircServerReconnectTimerSeconds = 1;
-          onDisconnectGrabState();
+        // is auto enabled?
+        if (vars.ircState.ircAutoReconnect) {
+          // and client requested a connection, and has achieved at least 1 previously
+          if ((vars.ircState.ircConnectOn) && (vars.ircState.count.ircConnect > 0)) {
+            if (vars.ircServerReconnectTimerSeconds === 0) vars.ircServerReconnectTimerSeconds = 1;
+            onDisconnectGrabState();
+          }
         }
-      }
-      // clear watchdog timer
-      if (watchdogTimer) clearTimeout(watchdogTimer);
-      if (hadError) {
-        global.sendToBrowser('UPDATE\nwebError: Socket to IRC server closed, hadError: ' +
-          hadError.toString() + '\n');
-        ircLog.writeIrcLog('Socket to IRC server closed, hadError: ' + hadError.toString());
-      } else {
-        global.sendToBrowser('UPDATE\nwebServer: Socket to IRC server closed, hadError: ' +
-          hadError.toString() + '\n');
-        ircLog.writeIrcLog('Socket to IRC server closed, hadError: ' + hadError.toString());
-      }
-    });
-
-    // --------------------------
-    //   On Error   (IRC client socket)
-    // --------------------------
-    ircSocket.on('error', function (err) {
-      if (err) {
-        // console.log('Event: socket.error ' + err.toString());
-        // console.log(err);
-      }
-      if ((vars.ircState.ircConnected) || (vars.ircState.ircConnecting)) {
-        // signal browser to show an error
-        vars.ircState.count.ircConnectError++;
-      }
-      vars.ircState.ircServerPrefix = '';
-      vars.ircState.ircConnecting = false;
-      vars.ircState.ircConnected = false;
-      vars.ircState.ircRegistered = false;
-      vars.ircState.ircIsAway = false;
-      // is auto enabled?
-      if (vars.ircState.ircAutoReconnect) {
-        // and client requested a connection, and has achieved at least 1 previously
-        if ((vars.ircState.ircConnectOn) && (vars.ircState.count.ircConnect > 0)) {
-          onDisconnectGrabState();
-          if (vars.ircServerReconnectTimerSeconds === 0) vars.ircServerReconnectTimerSeconds = 1;
+        // clear watchdog timer
+        if (watchdogTimer) clearTimeout(watchdogTimer);
+        if (hadError) {
+          global.sendToBrowser('UPDATE\nwebError: Socket to IRC server closed, hadError: ' +
+            hadError.toString() + '\n');
+          ircLog.writeIrcLog('Socket to IRC server closed, hadError: ' + hadError.toString());
+        } else {
+          global.sendToBrowser('UPDATE\nwebServer: Socket to IRC server closed, hadError: ' +
+            hadError.toString() + '\n');
+          ircLog.writeIrcLog('Socket to IRC server closed, hadError: ' + hadError.toString());
         }
+      });
+
+      // --------------------------
+      //   On Error   (IRC client socket)
+      // --------------------------
+      newIrcSocket.on('error', function (err) {
+        if (err) {
+          // console.log('Event: socket.error ' + err.toString());
+          // console.log(err);
+        }
+        if ((vars.ircState.ircConnected) || (vars.ircState.ircConnecting)) {
+          // signal browser to show an error
+          vars.ircState.count.ircConnectError++;
+        }
+        vars.ircState.ircServerPrefix = '';
+        vars.ircState.ircConnecting = false;
+        vars.ircState.ircConnected = false;
+        vars.ircState.ircRegistered = false;
+        vars.ircState.ircIsAway = false;
+        // is auto enabled?
+        if (vars.ircState.ircAutoReconnect) {
+          // and client requested a connection, and has achieved at least 1 previously
+          if ((vars.ircState.ircConnectOn) && (vars.ircState.count.ircConnect > 0)) {
+            onDisconnectGrabState();
+            if (vars.ircServerReconnectTimerSeconds === 0) vars.ircServerReconnectTimerSeconds = 1;
+          }
+        }
+        // clear watchdog timer
+        if (watchdogTimer) clearTimeout(watchdogTimer);
+        let errorMessage = 'IRC server socket error';
+        if ('code' in err) {
+          errorMessage += ': ' + err.code;
+        }
+        global.sendToBrowser('UPDATE\nwebError: ' + errorMessage + '\n');
+        ircLog.writeIrcLog(errorMessage);
+      });
+    } // createIrcSocketEventListeners()
+
+    // ----------------------------------
+    //       Create New IRC Socket
+    // Once created, call pervious function
+    // to create event listeners on the new
+    // TCP socket.
+    // ----------------------------------
+
+    // --------------------------------------------------------------------------
+    // Case 1 of 4 - TCP connection to IRC server with NodeJs module net.socket
+    // --------------------------------------------------------------------------
+    if ((!vars.ircState.ircTLSEnabled) && (!vars.ircState.socksEnabled)) {
+      const options = {
+        port: vars.ircState.ircServerPort,
+        host: vars.ircState.ircServerHost
+      };
+      ircSocket = net.connect(options, function () {
+        ircLog.writeIrcLog('Connected to IRC server ' + vars.ircState.ircServerName + ' ' +
+          vars.ircState.ircServerHost + ':' + vars.ircState.ircServerPort);
+      });
+      _createIrcSocketEventListeners(ircSocket);
+    } else if ((vars.ircState.ircTLSEnabled) && (!vars.ircState.socksEnabled)) {
+      const options = {
+        port: vars.ircState.ircServerPort,
+        host: vars.ircState.ircServerHost
+      };
+      options.rejectUnauthorized = vars.ircState.ircTLSVerify;
+      if (vars.ircState.ircTLSVerify) {
+        options.servername = vars.ircState.ircServerHost;
       }
-      // clear watchdog timer
-      if (watchdogTimer) clearTimeout(watchdogTimer);
-      let errorMessage = 'IRC server socket error';
-      if ('code' in err) {
-        errorMessage += ': ' + err.code;
-      }
-      global.sendToBrowser('UPDATE\nwebError: ' + errorMessage + '\n');
-      ircLog.writeIrcLog(errorMessage);
-    });
+      ircSocket = tls.connect(options, function () {
+        ircLog.writeIrcLog('Connected to IRC server ' + vars.ircState.ircServerName + ' ' +
+          vars.ircState.ircServerHost + ':' + vars.ircState.ircServerPort);
+      });
+      _createIrcSocketEventListeners(ircSocket);
+    }
   }; // connectIRC()
 
   // --------------------------------------------------------------------------
