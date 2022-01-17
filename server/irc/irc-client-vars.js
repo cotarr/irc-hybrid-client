@@ -43,8 +43,8 @@
   let ircServerPassword = null;
 
   // Socks5 proxy variables
-  let socks5Username = null;
-  let socks5Password = null;
+  let socks5Username = '';
+  let socks5Password = '';
 
   let nsIdentifyNick = null;
   let nsIdentifyCommand = null;

@@ -33,6 +33,7 @@
   const tls = require('tls');
   const fs = require('fs');
   const isValidUTF8 = require('utf-8-validate');
+  const socks5 = require('socks5-client');
 
   // log module loaded first to create /logs folder if needed.
   const ircLog = require('./irc-client-log');
@@ -148,7 +149,7 @@
   vars.ircState.enableSocks5Proxy = credentials.enableSocks5Proxy || false;
   if (vars.ircState.enableSocks5Proxy) {
     vars.ircState.socks5Host = credentials.socks5Host || '';
-    vars.ircState.socks5Port = credentials.socks5Port || 1080;
+    vars.ircState.socks5Port = parseInt(credentials.socks5Port || '1080');
     if ((credentials.socks5Username) && (credentials.socks5Username.length > 0) &&
       (credentials.socks5Password) && (credentials.socks5Password.length > 0)) {
       vars.socks5Username = credentials.socks5Username || '';
@@ -220,7 +221,7 @@
   //      R e g i s t e r   w i t h   I R C
   //
   // -------------------------------------------
-  const _readyEventHandler = function (socket) {
+  const _connectEventHandler = function (socket) {
     global.sendToBrowser('webServer: Ready\n');
     setTimeout(function () {
       // check state, if error occurred this will be false.
@@ -249,7 +250,7 @@
       vars.ircState.channels = [];
       vars.ircState.channelStates = [];
     }, 500);
-  }; // _readyEventHandler
+  }; // _connectEventHandler
 
   // -------------------------------------------------------------------------
   // Process Buffer object from socket stream
@@ -341,15 +342,25 @@
   //   setup socket event handlers, and connect the socket.
   // -------------------------------------------------------
   //
-  // Placeholder variable to hold socket
+  // This is the socket for connection to IRC server (placeholder)
   let ircSocket = null;
+  // socks5Socket is used only for TLS over Socks5 (placeholder)
+  let socks5Socket = null;
+
   //
-  // creates socket to IRC server
+  // Primary function to create socket to IRC server
+  //
+  // Called by POST /irc/connect route handler and reconnect timers
+  //
   const connectIRC = function () {
     let connectMessage = 'Opening socket to ' + vars.ircState.ircServerName + ' ' +
       vars.ircState.ircServerHost + ':' + vars.ircState.ircServerPort;
     if (vars.ircState.ircTLSEnabled) {
       connectMessage += ' (TLS)';
+    }
+    if (vars.ircState.enableSocks5Proxy) {
+      connectMessage += ' (Socks5 Proxy: ' +
+        vars.ircState.socks5Host + ':' + vars.ircState.socks5Port + ')';
     }
     global.sendToBrowser('UPDATE\nwebServer: ' + connectMessage + '\n');
     ircLog.writeIrcLog(connectMessage);
@@ -371,6 +382,20 @@
         // Ingore
       }
     }
+
+    // --------------------------------------------------------------------------------------
+    // Event table
+    //              socks5Socket  socks5Socket
+    //              (TLS wrapper) (TlS wrapper) ircSocket  ircSocket     ircSocket ircSocket
+    //                connect        error       connect  secureConnect    close     error
+    // TCP                                          X                        X         X
+    // TCP+TLS                                                 X             X         X
+    // Socks5                                       X                        X         X
+    // Socks5+TLS        X             X                       X             X         X
+    //
+    // Notes: Double 'error' events can be fired for Socks5+TLS due to TLS as wrapper socket
+    //        Double 'close' events can be fired for Socks5+TLS due to TLS as wrapper socket
+    // --------------------------------------------------------------------------------------
 
     //
     // Internal function to create IRC socket event listeners
@@ -401,30 +426,39 @@
         }
       }, vars.ircSocketConnectingTimeout * 1000);
 
+      // -------------------------------------------------
+      // On secure Connect - This event applies to TLS
+      //        encrypted connected, both TCP and Socks5
+      // -------------------------------------------------
       newIrcSocket.on('secureConnect', function (e) {
+        console.log('Event: secureConnect');
         vars.ircState.ircSockInfo.encrypted = newIrcSocket.encrypted;
         vars.ircState.ircSockInfo.verified = newIrcSocket.authorized;
         vars.ircState.ircSockInfo.protocol = newIrcSocket.getProtocol();
+        if (vars.ircState.ircTLSEnabled) {
+          // clear watchdog timer
+          if (watchdogTimer) clearTimeout(watchdogTimer);
+          global.sendToBrowser('webServer: Connected (TLS)\n');
+          ircLog.writeIrcLog('Connected to IRC server ' + vars.ircState.ircServerName + ' ' +
+            vars.ircState.ircServerHost + ':' + vars.ircState.ircServerPort);
+          _connectEventHandler(newIrcSocket);
+        }
       });
 
       // --------------------------------------------------
       //   On Connect   (IRC client socket connected)
       // --------------------------------------------------
       newIrcSocket.on('connect', function () {
-        // console.log('Event: connect');
-        // clear watchdog timer
-        if (watchdogTimer) clearTimeout(watchdogTimer);
-        global.sendToBrowser('webServer: Connected\n');
-        ircLog.writeIrcLog('IRC server connected');
+        console.log('Event ircSocket: connect');
+        if (!vars.ircState.ircTLSEnabled) {
+          // clear watchdog timer
+          if (watchdogTimer) clearTimeout(watchdogTimer);
+          global.sendToBrowser('webServer: Connected\n');
+          ircLog.writeIrcLog('Connected to IRC server ' + vars.ircState.ircServerName + ' ' +
+            vars.ircState.ircServerHost + ':' + vars.ircState.ircServerPort);
+          _connectEventHandler(newIrcSocket);
+        }
       });
-
-      // -----------
-      //  On Ready
-      // -----------
-      newIrcSocket.on('ready', function () {
-        // console.log('Event: ready');
-        _readyEventHandler(newIrcSocket);
-      }); // newIrcSocket.on('ready'
 
       // -----------
       // ON Data
@@ -438,8 +472,7 @@
       //   On Close    (IRC client socket closed)
       // -------------------------------------------
       newIrcSocket.on('close', function (hadError) {
-        // console.log('Event: socket.close, hadError=' + hadError +
-        //   ' destroyed=' + newIrcSocket.destroyed);
+        console.log('Event ircSocket: close, hadError=' + hadError);
         if (((vars.ircState.ircConnectOn) && (vars.ircState.ircConnected)) ||
           (vars.ircState.ircConnecting)) {
           // signal browser to show an error
@@ -476,7 +509,7 @@
       // --------------------------
       newIrcSocket.on('error', function (err) {
         if (err) {
-          // console.log('Event: socket.error ' + err.toString());
+          console.log('Event ircSocket: error ' + err.toString());
           // console.log(err);
         }
         if ((vars.ircState.ircConnected) || (vars.ircState.ircConnecting)) {
@@ -498,9 +531,12 @@
         }
         // clear watchdog timer
         if (watchdogTimer) clearTimeout(watchdogTimer);
+
         let errorMessage = 'IRC server socket error';
         if ('code' in err) {
           errorMessage += ': ' + err.code;
+        } else if ('message' in err) {
+          errorMessage += ': ' + err.message;
         }
         global.sendToBrowser('UPDATE\nwebError: ' + errorMessage + '\n');
         ircLog.writeIrcLog(errorMessage);
@@ -509,26 +545,25 @@
 
     // ----------------------------------
     //       Create New IRC Socket
-    // Once created, call pervious function
+    // Once created, call previous function
     // to create event listeners on the new
     // TCP socket.
+    //
+    // There are 4 different cases
     // ----------------------------------
 
-    if ((!vars.ircState.ircTLSEnabled) && (!vars.ircState.socksEnabled)) {
+    if ((!vars.ircState.ircTLSEnabled) && (!vars.ircState.enableSocks5Proxy)) {
       // --------------------------------------------------------------------------
       // Case 1 of 4 - TCP connection to IRC server with NodeJs module
-      //               "net" using method net.connect
+      //               "net" using method net.connect()
       // --------------------------------------------------------------------------
       const options = {
         port: vars.ircState.ircServerPort,
         host: vars.ircState.ircServerHost
       };
-      ircSocket = net.connect(options, function () {
-        ircLog.writeIrcLog('Connected to IRC server ' + vars.ircState.ircServerName + ' ' +
-          vars.ircState.ircServerHost + ':' + vars.ircState.ircServerPort);
-      });
+      ircSocket = net.connect(options);
       _createIrcSocketEventListeners(ircSocket);
-    } else if ((vars.ircState.ircTLSEnabled) && (!vars.ircState.socksEnabled)) {
+    } else if ((vars.ircState.ircTLSEnabled) && (!vars.ircState.enableSocks5Proxy)) {
       // --------------------------------------------------------------------------
       // Case 2 of 4 - TLS encrypted connection to IRC server with NodeJs
       //               "tls" module calling tls.connect()
@@ -541,28 +576,132 @@
       if (vars.ircState.ircTLSVerify) {
         options.servername = vars.ircState.ircServerHost;
       }
-      ircSocket = tls.connect(options, function () {
-        ircLog.writeIrcLog('Connected to IRC server ' + vars.ircState.ircServerName + ' ' +
-          vars.ircState.ircServerHost + ':' + vars.ircState.ircServerPort);
-      });
+      ircSocket = tls.connect(options);
       _createIrcSocketEventListeners(ircSocket);
-    } else if ((!vars.ircState.ircTLSEnabled) && (vars.ircState.socksEnabled)) {
+    } else if ((!vars.ircState.ircTLSEnabled) && (vars.ircState.enableSocks5Proxy)) {
       // --------------------------------------------------------------------------
       // Case 3 of 4 - TCP connection to socks5 proxy using npm module
       //               "socks5-client" calling method socks5.createConnection()
       // --------------------------------------------------------------------------
-      console.log('case 3 of 4 - Error code not written yet');
-      process.exit(1);
-    } else if ((vars.ircState.ircTLSEnabled) && (vars.ircState.socksEnabled)) {
+      //
+      const options = {
+        port: vars.ircState.ircServerPort,
+        host: vars.ircState.ircServerHost,
+        socksPort: vars.ircState.socks5Port,
+        socksHost: vars.ircState.socks5Host
+      };
+      if ((vars.socks5Username.length > 0) &&
+        (vars.socks5Username.length > 0)) {
+        options.socksUsername = vars.socks5Username;
+        options.socksPassword = vars.socks5Password;
+      }
+      ircSocket = socks5.createConnection(options);
+      _createIrcSocketEventListeners(ircSocket);
+    } else if ((vars.ircState.ircTLSEnabled) && (vars.ircState.enableSocks5Proxy)) {
       // --------------------------------------------------------------------------
       // Case 4 of 4 - TCP connection to socks5 proxy using npm module
       //               "socks5-client" calling method socks5.createConnection()
       //               Then, pass newly created socks5 socket to NodeJs
       //               'tls' module and passing the new socket into
       //               tls.connect() to return a TLS encrypted socks5 socket.
+      //
+      //               i.e. this is socket within a socket
       // --------------------------------------------------------------------------
-      console.log('case 4 of 4 - Error code not written yet');
-      process.exit(1);
+
+      const socks5Options = {
+        port: vars.ircState.ircServerPort,
+        host: vars.ircState.ircServerHost,
+        socksPort: vars.ircState.socks5Port,
+        socksHost: vars.ircState.socks5Host
+      };
+      if ((vars.socks5Username.length > 0) &&
+        (vars.socks5Username.length > 0)) {
+        socks5Options.socksUsername = vars.socks5Username;
+        socks5Options.socksPassword = vars.socks5Password;
+      }
+
+      const tlsOptions = {
+        socket: null,
+        servername: 'door4.cotarr.net',
+        rejectUnauthorized: vars.ircState.ircTLSVerify,
+        minVersion: 'TLSv1.2'
+      };
+      if (tlsOptions.rejectUnauthorized) {
+        tlsOptions.servername = vars.ircState.ircServerHost;
+      }
+
+      // Old Socket? Then destroy it
+      if (ircSocket) {
+        try {
+          // If old socket exist, destroy to be sure not left connected.
+          ircSocket.destroy();
+          ircSocket = null;
+        } catch (err) {
+          // Ignore
+        }
+      }
+
+      // This creates a new non-encrypted socket, then connects the socket to Socks5 proxy
+      // The newly connected socket will be passed to the TLS module as an options property
+      socks5Socket = socks5.createConnection(socks5Options);
+      // Add event listener for socks5 proxy connect event
+      // When event fires, the socket is open and can be passed into TLS module
+      socks5Socket.on('connect', () => {
+        console.log('Event socks5Socket: connect');
+        // Pass the open socket into the TLS module as an options property
+        tlsOptions.socket = socks5Socket;
+        // tls.connect() performs TLS handshake, then returns an encrypted
+        //     socket as a TLS wrapper socket
+        ircSocket = tls.connect(tlsOptions);
+        // Add event listeners to new TLS socket
+        _createIrcSocketEventListeners(ircSocket);
+      });
+
+      // debugging...
+      socks5Socket.on('close', () => {
+        console.log('Event socks5Socket: close');
+      });
+
+      // Note: this error applies to non-encrypted socks5 sockets.
+      // However, should the TLS socket error occur, this event will also fire.
+      // In the case of a socks5 socket error before TLS is connected, only 1 error will fire.
+      socks5Socket.on('error', (err) => {
+        if (err) {
+          console.log('Event socks5Socket: error ' + err.toString());
+          // console.log(err);
+        }
+        if ((vars.ircState.ircConnected) || (vars.ircState.ircConnecting)) {
+          // signal browser to show an error
+          vars.ircState.count.ircConnectError++;
+        }
+        vars.ircState.ircServerPrefix = '';
+        vars.ircState.ircConnecting = false;
+        vars.ircState.ircConnected = false;
+        vars.ircState.ircRegistered = false;
+        vars.ircState.ircIsAway = false;
+        // is auto enabled?
+        if (vars.ircState.ircAutoReconnect) {
+          // and client requested a connection, and has achieved at least 1 previously
+          if ((vars.ircState.ircConnectOn) && (vars.ircState.count.ircConnect > 0)) {
+            onDisconnectGrabState();
+            if (vars.ircServerReconnectTimerSeconds === 0) vars.ircServerReconnectTimerSeconds = 1;
+          }
+        }
+
+        // // clear watchdog timer
+        // The watchdog timer is outside of _createIrcSocketEventListeners() function
+        // so the watchdog timer not in scope of namespace here --> commented out
+        // if (watchdogTimer) clearTimeout(watchdogTimer);
+
+        let errorMessage = 'socks5 proxy socket error';
+        if ('code' in err) {
+          errorMessage += ': ' + err.code;
+        } else if ('message' in err) {
+          errorMessage += ': ' + err.message;
+        }
+        global.sendToBrowser('UPDATE\nwebError: ' + errorMessage + '\n');
+        ircLog.writeIrcLog(errorMessage);
+      });
     }
   }; // connectIRC()
 

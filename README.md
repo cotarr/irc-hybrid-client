@@ -3,7 +3,7 @@
 This is a git branch for proof of concept.
 
 This will use npm package socks5-client to provide remote 
-socket connection to a socks5 proxy.
+socket connection to the IRC server using a socks5 proxy.
 Development is using Debian 10 with apt package dante-server v1.4.2
 as the remote socks5 server.
 For TLS connections, first a socks5 socket will be opened, then
@@ -12,17 +12,24 @@ which should return a TLS encrypted socket.
 
 NodeJs code modified: irc-client-vars.js irc-client.js
 
-To be backward compatible with older credentials.json files
-socks5 client will be disabled without error message in the
+To be backward compatible with older credentials.json files,
+the socks5 client will be disabled without error message in the
 case that socks5 configuration properties are omitted.
 
-credentials.json 
+### Status
+
+* Debug in progress, not ready to merge
+* TODO update /docs
+
+### Configuration
+
+* configuration in credentials.json
 
 Option 1: socks5 client disabled (automatically disabled if property omitted)
 
 ```json
 {
-  enableSocks5Proxy: false
+  "enableSocks5Proxy": false
 }
 ```
 
@@ -30,9 +37,9 @@ Option 2: socks5 client unauthenticated
 
 ```json
 {
-  enableSocks5Proxy: true,
-  socks5Host: '192.168.0.1',
-  socks5Port: '1080'
+  "enableSocks5Proxy": true,
+  "socks5Host": "192.168.0.1",
+  "socks5Port": 1080
 }
 ```
 
@@ -40,11 +47,11 @@ Option 3: socks5 client requires password authentication
 
 ```json
 {
-  enableSocks5Proxy: true,
-  socks5Host: '192.168.0.1',
-  socks5Port: '1080',
-  socksUsername: 'user1',
-  socksPassword: 'xxxxxxxx'
+  "enableSocks5Proxy": true,
+  "socks5Host": "192.168.0.1",
+  "socks5Port": 1080,
+  "socksUsername": "user1",
+  "socksPassword": "xxxxxxxx"
 }  
 ```
 

@@ -7,12 +7,41 @@ and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## Untagged 2021-01-17 
+
+### Status
+
+* Debug in progress, not ready to merge
+
+### Feature update
+
+Functionality has been added to use a socks5 proxy for IRC server connections, 
+including both non-encrypted and TLS encrypted proxy connections over socks5
+### Changed
+
+* server/irc-client.js - Major recode of function connectIRC() to implement socks5 proxy support.
+  * Case 1 - Standard TCP socket for connect to IRC server
+  * Case 2 - TLS encrypted socket for connect to IRC server
+  * Case 3 - Socks5 proxy for connect remote socket to IRC server, no encryption
+  * Case 4 - Socks5 proxy to IRC server, wrapped in TLS encryption 
+  * Update socket event listeners, error handlers, logging, and auto-reconnect features
+  * Rename function _readyEventHandler to _connectEventHandler (socket ready event eliminated)
+
+### Added
+
+* sample-credentials.json - Added property: enableSocks5Proxy: false 
+* server/irc-client-vars.js - Add new global variables: socks5Username, socks5Password
+* server/irc.client.js - Added parse of socks5 configuration from credentials.js file.
+  * For backward compatibility, new properties are optional (Socks5 disabled without config)
+  * Added multiple socks5 properties to ircState object
+
+
 ## [v0.1.35](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.1.35) 2022-01-16
 
 ### Changed
 
-* web-server.js - Remove package body-parser (deprecated), instead use express.json() and express.urlencoded()
-* web-server.js - Upgrade helmet from v4 to v5.0.1, changes to match new version
+* server/web-server.js - Remove package body-parser (deprecated), instead use express.json() and express.urlencoded()
+* server/web-server.js - Upgrade helmet from v4 to v5.0.1, changes to match new version
 * Upgrade packages express@4.17.2, express-session@1.17.2, node-fetch@2.6.7, utf-8-validate@5.0.8, ws@8.4.2
 
 ## [v0.1.34](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.1.34) 2022-01-01
