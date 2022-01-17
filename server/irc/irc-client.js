@@ -515,7 +515,8 @@
       // Case 3 of 4 - TCP connection to socks5 proxy using npm module
       //               "socks5-client" calling method socks5.createConnection()
       // --------------------------------------------------------------------------
-      throw new Error('socks5 socket not written yet');
+      console.log('case 3 of 4 - Error code not written yet');
+      process.exit(1);
     } else if ((vars.ircState.ircTLSEnabled) && (vars.ircState.socksEnabled)) {
       // --------------------------------------------------------------------------
       // Case 4 of 4 - TCP connection to socks5 proxy using npm module
@@ -524,7 +525,8 @@
       //               'tls' module and passing the new socket into
       //               tls.connect() to return a TLS encrypted socks5 socket.
       // --------------------------------------------------------------------------
-      throw new Error('TLS encrypted socks5 socket not written yet');
+      console.log('case 4 of 4 - Error code not written yet');
+      process.exit(1);
     }
   }; // connectIRC()
 
