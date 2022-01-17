@@ -478,10 +478,11 @@
     // TCP socket.
     // ----------------------------------
 
-    // --------------------------------------------------------------------------
-    // Case 1 of 4 - TCP connection to IRC server with NodeJs module net.socket
-    // --------------------------------------------------------------------------
     if ((!vars.ircState.ircTLSEnabled) && (!vars.ircState.socksEnabled)) {
+      // --------------------------------------------------------------------------
+      // Case 1 of 4 - TCP connection to IRC server with NodeJs module
+      //               "net" using method net.connect
+      // --------------------------------------------------------------------------
       const options = {
         port: vars.ircState.ircServerPort,
         host: vars.ircState.ircServerHost
@@ -492,6 +493,10 @@
       });
       _createIrcSocketEventListeners(ircSocket);
     } else if ((vars.ircState.ircTLSEnabled) && (!vars.ircState.socksEnabled)) {
+      // --------------------------------------------------------------------------
+      // Case 2 of 4 - TLS encrypted connection to IRC server with NodeJs
+      //               "tls" module calling tls.connect()
+      // --------------------------------------------------------------------------
       const options = {
         port: vars.ircState.ircServerPort,
         host: vars.ircState.ircServerHost
@@ -505,6 +510,21 @@
           vars.ircState.ircServerHost + ':' + vars.ircState.ircServerPort);
       });
       _createIrcSocketEventListeners(ircSocket);
+    } else if ((!vars.ircState.ircTLSEnabled) && (vars.ircState.socksEnabled)) {
+      // --------------------------------------------------------------------------
+      // Case 3 of 4 - TCP connection to socks5 proxy using npm module
+      //               "socks5-client" calling method socks5.createConnection()
+      // --------------------------------------------------------------------------
+      throw new Error('socks5 socket not written yet');
+    } else if ((vars.ircState.ircTLSEnabled) && (vars.ircState.socksEnabled)) {
+      // --------------------------------------------------------------------------
+      // Case 4 of 4 - TCP connection to socks5 proxy using npm module
+      //               "socks5-client" calling method socks5.createConnection()
+      //               Then, pass newly created socks5 socket to NodeJs
+      //               'tls' module and passing the new socket into
+      //               tls.connect() to return a TLS encrypted socks5 socket.
+      // --------------------------------------------------------------------------
+      throw new Error('TLS encrypted socks5 socket not written yet');
     }
   }; // connectIRC()
 
