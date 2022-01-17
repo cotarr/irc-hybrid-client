@@ -10,6 +10,46 @@ For TLS connections, first a socks5 socket will be opened, then
 the open socket will be passed into NodeJs tls.connect() 
 which should return a TLS encrypted socket. 
 
+NodeJs code modified: irc-client-vars.js irc-client.js
+
+To be backward compatible with older credentials.json files
+socks5 client will be disabled without error message in the
+case that socks5 configuration properties are omitted.
+
+credentials.json 
+
+Option 1: socks5 client disabled (automatically disabled if property omitted)
+
+```json
+{
+  enableSocks5Proxy: false
+}
+```
+
+Option 2: socks5 client unauthenticated
+
+```json
+{
+  enableSocks5Proxy: true,
+  socks5Host: '192.168.0.1',
+  socks5Port: '1080'
+}
+```
+
+Option 3: socks5 client requires password authentication
+
+```json
+{
+  enableSocks5Proxy: true,
+  socks5Host: '192.168.0.1',
+  socks5Port: '1080',
+  socksUsername: 'user1',
+  socksPassword: 'xxxxxxxx'
+}  
+```
+
+--------------- END BRANCH NOTES -------------
+
 # irc-hybrid-client
 
 Single user hybrid IRC client using JavaScript frontend and Node.js/Express backend.

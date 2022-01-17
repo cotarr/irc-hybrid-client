@@ -80,13 +80,6 @@
   vars.ircState.ircTLSEnabled = servers.serverArray[0].tls;
   vars.ircState.ircTLSVerify = servers.serverArray[0].verify;
   vars.ircServerPassword = servers.serverArray[0].password;
-
-  vars.ircState.socksEnabled = servers.serverArray[0].socksEnabled || false;
-  vars.socksHost = servers.serverArray[0].socksHost || '';
-  vars.socksPort = servers.serverArray[0].socksPort || 1080;
-  vars.socksUsername = servers.serverArray[0].socksUsername || '';
-  vars.socksPassword = servers.serverArray[0].socksPassword || '';
-
   vars.nsIdentifyNick = servers.serverArray[0].identifyNick;
   vars.nsIdentifyCommand = servers.serverArray[0].identifyCommand;
   // index into servers.json file
@@ -119,6 +112,49 @@
   //   kicked: false
   // }
   vars.ircState.channelStates = [];
+
+  // --------------------------------------------------
+  // Optional - Connect to IRC using socks5 client
+  //
+  // To be backward compatible with older credentials.json files
+  // socks5 client will be disabled without error message in the
+  // case that socks5 configuration properties are omitted.
+  //
+  // credentials.json socks5 properties
+  //
+  // Option 1: socks5 client disabled (automatically disabled if property omitted)
+  // {
+  //   enableSocks5Proxy: false
+  // }
+  //
+  // Option 2: socks5 client unauthenticated
+  //
+  // {
+  //   enableSocks5Proxy: true,
+  //   socks5Host: '192.168.0.1',
+  //   socks5Port: '1080'
+  // }
+  //
+  // Option 3: socks5 client requires password authentication
+  // {
+  //   enableSocks5Proxy: true,
+  //   socks5Host: '192.168.0.1',
+  //   socks5Port: '1080',
+  //   socksUsername: 'user1',
+  //   socksPassword: 'xxxxxxxx'
+  // }
+  //
+  const credentials = JSON.parse(fs.readFileSync('./credentials.json', 'utf8'));
+  vars.ircState.enableSocks5Proxy = credentials.enableSocks5Proxy || false;
+  if (vars.ircState.enableSocks5Proxy) {
+    vars.ircState.socks5Host = credentials.socks5Host || '';
+    vars.ircState.socks5Port = credentials.socks5Port || 1080;
+    if ((credentials.socks5Username) && (credentials.socks5Username.length > 0) &&
+      (credentials.socks5Password) && (credentials.socks5Password.length > 0)) {
+      vars.socks5Username = credentials.socks5Username || '';
+      vars.socks5Password = credentials.socks5Password || '';
+    };
+  };
 
   // get name and version number from npm package.json
   vars.ircState.progVersion = require('../../package.json').version;
@@ -757,15 +793,6 @@
     vars.ircState.ircTLSEnabled = servers.serverArray[vars.ircState.ircServerIndex].tls;
     vars.ircState.ircTLSVerify = servers.serverArray[vars.ircState.ircServerIndex].verify;
     vars.ircServerPassword = servers.serverArray[vars.ircState.ircServerIndex].password;
-
-    // For backward compatibility with credentials.json, the socks5 variables use defaults.
-    vars.ircState.socksEnabled =
-      servers.serverArray[vars.ircState.ircServerIndex].socksEnabled || false;
-    vars.socksHost = servers.serverArray[vars.ircState.ircServerIndex].socksHost || '';
-    vars.socksPort = servers.serverArray[vars.ircState.ircServerIndex].socksPort || 1080;
-    vars.socksUsername = servers.serverArray[vars.ircState.ircServerIndex].socksUsername || '';
-    vars.socksPassword = servers.serverArray[vars.ircState.ircServerIndex].socksPassword || '';
-
     vars.nsIdentifyNick = servers.serverArray[vars.ircState.ircServerIndex].identifyNick;
     vars.nsIdentifyCommand = servers.serverArray[vars.ircState.ircServerIndex].identifyCommand;
     vars.ircState.channelList = servers.serverArray[vars.ircState.ircServerIndex].channelList;
