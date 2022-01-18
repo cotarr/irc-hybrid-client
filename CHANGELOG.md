@@ -19,7 +19,7 @@ Functionality has been added to use a socks5 proxy for IRC server connections,
 including both non-encrypted and TLS encrypted proxy connections over socks5
 ### Changed
 
-* server/irc-client.js - Major recode of function connectIRC() to implement socks5 proxy support.
+* server/irc/irc-client.js - Major recode of function connectIRC() to implement socks5 proxy support.
   * Case 1 - Standard TCP socket for connect to IRC server
   * Case 2 - TLS encrypted socket for connect to IRC server
   * Case 3 - Socks5 proxy for connect remote socket to IRC server, no encryption
@@ -30,10 +30,13 @@ including both non-encrypted and TLS encrypted proxy connections over socks5
 ### Added
 
 * sample-credentials.json - Added property: enableSocks5Proxy: false 
-* server/irc-client-vars.js - Add new global variables: socks5Username, socks5Password
-* server/irc.client.js - Added parse of socks5 configuration from credentials.js file.
+* server/irc/irc-client-vars.js - Add new global variables: socks5Username, socks5Password
+* server/irc/irc.client.js - Added parse of socks5 configuration from credentials.js file.
   * For backward compatibility, new properties are optional (Socks5 disabled without config)
   * Added multiple socks5 properties to ircState object
+* secure/webclient.html - Add checkbox and input elements for socks5 state
+* secure/js/webclient.js - Code to update sock5 enabled state, address, and port (read only)
+
 
 
 ## [v0.1.35](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.1.35) 2022-01-16

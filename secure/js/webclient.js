@@ -863,6 +863,18 @@ function getIrcState (callback) {
         } else {
           document.getElementById('ircServerTlsVerify').removeAttribute('checked');
         }
+        if (ircState.enableSocks5Proxy) {
+          document.getElementById('socks5HidableDiv').removeAttribute('hidden');
+          document.getElementById('socks5EnabledCheckbox').setAttribute('disabled', '');
+          document.getElementById('socks5EnabledCheckbox').setAttribute('checked', '');
+          document.getElementById('socks5AddrInputId').value = ircState.socks5Host;
+          document.getElementById('socks5PortInputId').value = ircState.socks5Port;
+        } else {
+          document.getElementById('socks5HidableDiv').setAttribute('hidden', '');
+          document.getElementById('socks5EnabledCheckbox').removeAttribute('checked');
+          document.getElementById('socks5AddrInputId').value = '';
+          document.getElementById('socks5PortInputId').value = '';
+        }
         document.getElementById('nickNameInputId').value = ircState.nickName;
         document.getElementById('userNameInputId').value = ircState.userName;
         document.getElementById('realNameInputId').value = ircState.realName;
@@ -884,6 +896,18 @@ function getIrcState (callback) {
           document.getElementById('ircServerTlsVerify').setAttribute('checked', '');
         } else {
           document.getElementById('ircServerTlsVerify').removeAttribute('checked');
+        }
+        if (ircState.enableSocks5Proxy) {
+          document.getElementById('socks5HidableDiv').removeAttribute('hidden');
+          document.getElementById('socks5EnabledCheckbox').setAttribute('disabled', '');
+          document.getElementById('socks5EnabledCheckbox').setAttribute('checked', '');
+          document.getElementById('socks5AddrInputId').value = ircState.socks5Host;
+          document.getElementById('socks5PortInputId').value = ircState.socks5Port;
+        } else {
+          document.getElementById('socks5HidableDiv').setAttribute('hidden', '');
+          document.getElementById('socks5EnabledCheckbox').removeAttribute('checked');
+          document.getElementById('socks5AddrInputId').value = '';
+          document.getElementById('socks5PortInputId').value = '';
         }
         document.getElementById('headerServer').textContent = ircState.ircServerName;
         document.getElementById('headerUser').textContent = ' (' + ircState.nickName + ')';

@@ -213,6 +213,17 @@ a raw command to the IRC server directly.
               <button id=setAwayButton>Away</button>
               <button id=setBackButton>Back</button>
             </div>
+            <div id="socks5HidableDiv">
+              <div class="button-div">
+                <input type="checkbox" id="socks5EnabledCheckbox" disabled>
+                <span>Connect using socks5 proxy</span>
+              </div>
+              <div class="button-div">
+                <input type="text" id="socks5AddrInputId" size="26" value="" disabled>
+                <span>:</span>
+                <input type="text" id="socks5PortInputId" size="4" value="" disabled>
+              </div>
+            </div>
             <div class="vh10"></div>
             <div class="button-div">
               <button id="connectButton">Connect IRC</button>
