@@ -190,6 +190,8 @@ npx eslint secure/js/*.js
 # Lint server JavaScript
 npx eslint server/*/*.js server/*.js bin/www
 
+# Run both as npm script
+npm run lint
 ```
 
 ### Optional remote login

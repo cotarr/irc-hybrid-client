@@ -4,6 +4,7 @@
   "description": "Single user hybrid IRC client using JavaScript front end and Node/Express backend",
   "main": "bin/www",
   "scripts": {
+    "lint": "npx eslint secure/js/*.js server/*/*.js server/*.js bin/www",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "bin/www"
   },
