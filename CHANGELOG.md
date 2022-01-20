@@ -7,16 +7,13 @@ and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## Untagged 2021-01-17 
-
-### Status
-
-* Debug in progress, not ready to merge
+## [v0.1.36](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.1.36) 2022-01-20
 
 ### Feature update
 
-Functionality has been added to use a socks5 proxy for IRC server connections, 
-including both non-encrypted and TLS encrypted proxy connections over socks5
+In v0.1.36 functionality has been added to use a socks5 proxy for IRC server connections, 
+including both non-encrypted and TLS encrypted proxy connections over socks5.
+
 ### Changed
 
 * server/irc/irc-client.js - Major recode of function connectIRC() to implement socks5 proxy support.
@@ -26,6 +23,7 @@ including both non-encrypted and TLS encrypted proxy connections over socks5
   * Case 4 - Socks5 proxy to IRC server, wrapped in TLS encryption 
   * Update socket event listeners, error handlers, logging, and auto-reconnect features
   * Rename function _readyEventHandler to _connectEventHandler (socket ready event eliminated)
+  * Update /docs/login-config.html
 
 ### Added
 
@@ -36,8 +34,6 @@ including both non-encrypted and TLS encrypted proxy connections over socks5
   * Added multiple socks5 properties to ircState object
 * secure/webclient.html - Add checkbox and input elements for socks5 state
 * secure/js/webclient.js - Code to update sock5 enabled state, address, and port (read only)
-
-
 
 ## [v0.1.35](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.1.35) 2022-01-16
 
