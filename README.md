@@ -1,62 +1,3 @@
-# BRANCH NOTES: branch socks5-proxy
-
-This is a git branch for proof of concept.
-
-This will use npm package socks5-client to provide remote 
-socket connection to the IRC server using a socks5 proxy.
-Development is using Debian 10 with apt package dante-server v1.4.2
-as the remote socks5 server.
-For TLS connections, first a socks5 socket will be opened, then
-the open socket will be passed into NodeJs tls.connect() 
-which should return a TLS encrypted socket. 
-
-NodeJs code modified: irc-client-vars.js irc-client.js
-
-To be backward compatible with older credentials.json files,
-the socks5 client will be disabled without error message in the
-case that socks5 configuration properties are omitted.
-
-### Status
-
-* Debug in progress, not ready to merge
-* TODO update /docs
-
-### Configuration
-
-* configuration in credentials.json
-
-Option 1: socks5 client disabled (automatically disabled if property omitted)
-
-```json
-{
-  "enableSocks5Proxy": false
-}
-```
-
-Option 2: socks5 client unauthenticated
-
-```json
-{
-  "enableSocks5Proxy": true,
-  "socks5Host": "192.168.0.1",
-  "socks5Port": 1080
-}
-```
-
-Option 3: socks5 client requires password authentication
-
-```json
-{
-  "enableSocks5Proxy": true,
-  "socks5Host": "192.168.0.1",
-  "socks5Port": 1080,
-  "socksUsername": "user1",
-  "socksPassword": "xxxxxxxx"
-}  
-```
-
---------------- END BRANCH NOTES -------------
-
 # irc-hybrid-client
 
 Single user hybrid IRC client using JavaScript frontend and Node.js/Express backend.
@@ -147,6 +88,17 @@ node bin/www
 # route on web page: /irc/webclient.html
 ```
 
+### Changes to configuration
+
+The program configuration is contained in the JSON file `credentials.json`
+located in the base repository folder. The list of IRC servers and 
+related connection information is stored in the JSON file `servers.json`.
+Changes to program configuration or changes to the IRC server list 
+are performed by manually editing these 2 JSON files in a linux terminal,
+then restarting the server. 
+Detailed configuration instructions are provided in the 
+[documentation](https://cotarr.github.io/irc-hybrid-client).
+
 ### Minify and bundle for deployment
 
 This section is optional. This repository contains both minified and
@@ -181,18 +133,11 @@ browser tabs for simultaneous connection to different IRC networks.
 [login configuration docs](https://cotarr.github.io/irc-hybrid-client/login-config.html)
 for information on use of the instanceNumber property.
 
-### eslint
+### Optional socks5 proxy support 
 
-```
-# Lint browser JavaScript
-npx eslint secure/js/*.js
-
-# Lint server JavaScript
-npx eslint server/*/*.js server/*.js bin/www
-
-# Run both as npm script
-npm run lint
-```
+The program includes limited support for socks5 proxy connections. See the
+[login config](https://cotarr.github.io/irc-hybrid-client/login-config.html)
+page of the irc-hybrid-client documentation for information.
 
 ### Optional remote login
 
@@ -207,3 +152,15 @@ Only collab-auth is supported. Other generic Oauth 2.0 providers are not support
 
 The default irc-hybrid-client configuration uses stand alone internal user authentication by password entry.
 
+### eslint
+
+```
+# Lint browser JavaScript
+npx eslint secure/js/*.js
+
+# Lint server JavaScript
+npx eslint server/*/*.js server/*.js bin/www
+
+# Run both as npm script
+npm run lint
+```

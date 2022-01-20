@@ -163,6 +163,9 @@ th, td {
 .websocket-table {
   margin-left: 60px;
 }
+.vh-20 {
+  height: 20px;
+}
 blue-example {
   background-color: #40e6ff;
 }

@@ -366,9 +366,70 @@ cd ..
           Use care to maintain valid JSON format with commas and braces.
         </p>
 
+        <div class="vh-20"></div>
+        <div class="desc-title">
+          Optional Socks5 Proxy Support
+        </div>
+        <p>
+          In normal operation, the irc-hybrid-client web server will establish a direct TCP socket 
+          connection to the IRC server. Some users have dynamic IP addresses that change frequently.
+          This can present difficulties when using an IRC client's IP address to authenticate 
+          user identity with services like NickServ and ChanServ.
+          Some isolated network firewall configurations require a proxy server for internet access.
+          Other users may be concerned about exposing their IP address for privacy or security reasons. 
+          One solution to this issue is to use an intermediate
+          <a href="https://en.wikipedia.org/wiki/SOCKS">socks5</a> proxy server.
+          In this case, the connection to the IRC server will originate from the 
+          remote IP address of the socks5 proxy server.
+          The socks5 proxy concept involves a simple network address replacement. 
+          Therefore, socks5 connections themselves are not protected by encryption.
+          The irc-hybrid-client supports TLS between IRC client and IRC server inside of socks5.
+        </p>
+        <p>
+          To enable use of a remote socks5 proxy server without authentication,
+          update the credentials.json file as in the following example, changing address and port.
+        </p>
+
+<div class="pre-div"><pre>
+{
+  "enableSocks5Proxy": true,
+  "socks5Host": "192.168.0.1",
+  "socks5Port": 1080
+}
+</pre></div>
+
+        <p>
+          To enable use of a remote socks5 proxy server with password authentication,
+          update the credentials.json file as in the following example.
+          Note:  This can expose socks5 authentication passwords in plain text.
+          This issue can be addressed by passing the socks5 connection through a TLS
+          encrypted VPN tunnel.
+        </p>
+
+<div class="pre-div"><pre>
+{
+  "enableSocks5Proxy": true,
+  "socks5Host": "192.168.0.1",
+  "socks5Port": 1080,
+  "socks5Username": "user1",
+  "socks5Password": "xxxxxxxx"
+} 
+</pre></div>
+
+        <p>
+          Socks5 support was debugged using the dante-server apt package in Debian 10
+          using danted.conf configuration set to &quot;socksmethod: none&quot; (Not authenticated)
+          and &quot;socksmethod: username&quot; (password authentication).
+          Other authentication methods are not supported.
+          Socks5 socket connections are handled internally using the npm package 
+          <a href="https://github.com/mattcg/socks5-client">socks5-client</a>.
+        </p>
+
+        <div class="vh-20"></div>
         <div class="desc-title">
           Optional Remote Login
         </div>
+
         <p>
           The irc-hybrid-client is intended to run as a stand alone web server where a web browser 
           can authenticate using a password entry form that is integral to the application.

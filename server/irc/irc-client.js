@@ -141,8 +141,8 @@
   //   enableSocks5Proxy: true,
   //   socks5Host: '192.168.0.1',
   //   socks5Port: '1080',
-  //   socksUsername: 'user1',
-  //   socksPassword: 'xxxxxxxx'
+  //   socks5Username: 'user1',
+  //   socks5Password: 'xxxxxxxx'
   // }
   //
   const credentials = JSON.parse(fs.readFileSync('./credentials.json', 'utf8'));
