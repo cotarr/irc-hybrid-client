@@ -7,6 +7,29 @@ and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [v0.1.37](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.1.37) 2022-01-22
+
+### Fixed
+
+Issue: When using socks5 proxy, during auto-reconnect after IRC server disconnect,
+with recurring errors, the browser page could become stuck, 
+with buttons grayed and disabled, unable to clear the error.
+This is caused by browser receiving socket connection events out of order.
+This was addressed by adding a timer so the web server will send the browser
+a second UPDATE message to insure state variables in browser are up to date.
+These were all server changes, no browser code was changed.
+
+* server/irc/irc-client.js - Multiple changes:
+  - On IRC server socket error, added timer to send 1 additional UPDATE request message to browser
+  - On various errors, if socks5 proxy socket exists then call Socket.destroy()
+  - On various errors, when socket errors occur without previous successfully connect at least 1 time, re-connect is aborted.
+  - Function disconnectHandler(), used with Force Disconnect button, did not properly set state variables if socket already closed.
+
+### Changed
+
+* server/irc/irc-client.js - Removed multiple debug console.log() previously left in code.
+* Improve socket connect logging messages.
+
 ## [v0.1.36](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.1.36) 2022-01-20
 
 ### Feature update

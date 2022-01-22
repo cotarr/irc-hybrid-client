@@ -6,6 +6,8 @@ Documentation: https://cotarr.github.io/irc-hybrid-client
 
 Screen capture images are available in the [documentation](https://cotarr.github.io/irc-hybrid-client)
 
+[ChangeLog.md](https://github.com/cotarr/irc-hybrid-client/blob/master/CHANGELOG.md)
+
 ### Project Status (Work in Progress)
 
 This project is still under development and changes frequently.
