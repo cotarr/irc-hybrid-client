@@ -7,6 +7,11 @@ and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## Untagged changes
+
+- Update eslint to clear npm outdated warnings.
+- Update helmet v5.0.2
+
 ## [v0.1.37](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.1.37) 2022-01-22
 
 ### Fixed
