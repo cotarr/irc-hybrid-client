@@ -9,6 +9,13 @@ and this project adheres to
 
 ## Untagged changes
 
+### Fixed
+
+* server/irc/irc-client-parse.js - Fixed server TypeError caused when receiving empty string for channel `"PRIVMSG #Channel :\r\n"`
+* server/irc/irc-client-parse.js - Fixed server TypeError caused receiving empty string to unset channel `"TOPIC #Channel :\r\n"`
+* secure/js/webclient06.js - In Browser, fixed display of "null" when channel topic is cleared.
+### Changed
+
 - Update eslint to clear npm outdated warnings.
 - Update helmet v5.0.2
 

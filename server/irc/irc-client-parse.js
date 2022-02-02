@@ -576,10 +576,16 @@
           const index = vars.ircState.channels.indexOf(channelName);
           if (index >= 0) {
             // case of already exist
-            vars.ircState.channelStates[index].topic = parsedMessage.params[2];
+            if ((parsedMessage.params.length > 2) && (!(parsedMessage.params[2] == null))) {
+              // case of new topic provided
+              vars.ircState.channelStates[index].topic = parsedMessage.params[2];
+            } else {
+              // case of channel is empty string, clear previous topic
+              vars.ircState.channelStates[index].topic = '';
+            }
             tellBrowserToRequestState();
           } else {
-            console.log('Error message 332 for non-existant channel');
+            console.log('Error message 332 for non-existent channel');
           }
         }
         break;
@@ -799,7 +805,7 @@
         }
         break;
       case 'PRIVMSG':
-        {
+        if ((parsedMessage.params.length > 1) && (!(parsedMessage.params[1] == null))) {
           // check for CTCP message
           const ctcpDelim = 1;
           if (parsedMessage.params[1].charCodeAt(0) === ctcpDelim) {

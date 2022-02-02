@@ -609,8 +609,9 @@ channelMainSectionEl.setAttribute('opened','');updateVisibility()
 ;if(document.activeElement!==channelInputAreaEl&&document.activeElement!==channelSendButtonEl&&!webState.cacheReloadInProgress&&activityIconInhibitTimer===0){setChanActivityIcon(channelIndex)}}break
 ;case'QUIT':if(_isNickInChannel(parsedMessage.nick,name)){let reason=' ';if(parsedMessage.params[0])reason=parsedMessage.params[0];if(channelMainSectionEl.hasAttribute('brief-enabled')){
 _addText(parsedMessage.timestamp,'*',parsedMessage.nick+' has quit')}else{_addText(parsedMessage.timestamp,'*',parsedMessage.nick+' ('+parsedMessage.host+') has quit '+'('+reason+')')}}break
-;case'TOPIC':if(parsedMessage.params[0].toLowerCase()===name.toLowerCase()){
-_addText(parsedMessage.timestamp,'*','Topic for '+parsedMessage.params[0]+' changed to "'+parsedMessage.params[1]+'" by '+parsedMessage.nick)}break;default:}})
+;case'TOPIC':if(parsedMessage.params[0].toLowerCase()===name.toLowerCase()){const newTopic=parsedMessage.params[1];if(newTopic==null){
+_addText(parsedMessage.timestamp,'*','Topic for '+parsedMessage.params[0]+' has been unset by "'+parsedMessage.nick)}else{
+_addText(parsedMessage.timestamp,'*','Topic for '+parsedMessage.params[0]+' changed to "'+newTopic+'" by '+parsedMessage.nick)}}break;default:}})
 ;document.addEventListener('erase-before-reload',function(event){channelTextAreaEl.value='';channelInputAreaEl.value=''});document.addEventListener('cache-reload-done',function(event){
 let markerString='';let timestampString='';if('detail'in event&&'timestamp'in event.detail){timestampString=unixTimestampToHMS(event.detail.timestamp)}if(timestampString){markerString+=timestampString
 }markerString+=' '+cacheReloadString+'\n';if(channelMainSectionEl.hasAttribute('brief-enabled')){markerString+='\n'}channelTextAreaEl.value+=markerString;let lastZoomObj=null

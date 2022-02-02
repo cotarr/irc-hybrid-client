@@ -1424,10 +1424,18 @@ function createChannelEl (name) {
         break;
       case 'TOPIC':
         if (parsedMessage.params[0].toLowerCase() === name.toLowerCase()) {
-          _addText(parsedMessage.timestamp,
-            '*',
-            'Topic for ' + parsedMessage.params[0] + ' changed to "' +
-            parsedMessage.params[1] + '" by ' + parsedMessage.nick);
+          const newTopic = parsedMessage.params[1];
+          if (newTopic == null) {
+            _addText(parsedMessage.timestamp,
+              '*',
+              'Topic for ' + parsedMessage.params[0] + ' has been unset by "' +
+              parsedMessage.nick);
+          } else {
+            _addText(parsedMessage.timestamp,
+              '*',
+              'Topic for ' + parsedMessage.params[0] + ' changed to "' +
+              newTopic + '" by ' + parsedMessage.nick);
+          }
         }
         break;
       default:
