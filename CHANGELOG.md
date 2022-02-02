@@ -7,16 +7,15 @@ and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## Untagged changes
+## [v0.1.38](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.1.38) 2022-02-02
 
 ### Fixed
 
 * server/irc/irc-client-parse.js - Fixed server TypeError caused when receiving empty string for channel `"PRIVMSG #Channel :\r\n"`
-* server/irc/irc-client-parse.js - Fixed server TypeError caused receiving empty string to unset channel `"TOPIC #Channel :\r\n"`
+* server/irc/irc-client-parse.js - Fixed server TypeError caused receiving empty string to set channel topic `"TOPIC #Channel :\r\n"`
 * secure/js/webclient06.js - In Browser, fixed display of "null" when channel topic is cleared.
 ### Changed
 
-- Update eslint to clear npm outdated warnings.
 - Update helmet v5.0.2
 
 ## [v0.1.37](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.1.37) 2022-01-22
