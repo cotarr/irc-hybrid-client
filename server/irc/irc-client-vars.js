@@ -60,7 +60,23 @@
   const commandMsgPrefix = '--> ';
 
   // IRC server reconnect when timer matches (time in seconds)
-  const ircServerReconnectIntervals = [10, 60, 120, 180, 300, 600, 900];
+  // Schedule times are up to 4 hours
+  const ircServerReconnectIntervals = [
+    10,
+    60,
+    120,
+    180,
+    300,
+    600,
+    900,
+    1800,
+    2700,
+    3600,
+    5400,
+    7200,
+    10080,
+    14400
+  ];
   let ircServerReconnectTimerSeconds = 0;
   let ircServerReconnectChannelString = '';
   let ircServerReconnectAwayString = '';
