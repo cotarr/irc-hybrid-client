@@ -9,7 +9,7 @@ module.exports = {
     'standard'
   ],
   parserOptions: {
-    ecmaVersion: 12
+    ecmaVersion: 'latest'
   },
   // Customize eslint standard style definitions
   rules: {
