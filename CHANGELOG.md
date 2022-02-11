@@ -17,6 +17,7 @@ and this project adheres to
 
 * server/irc/irc-client.js - Abort auto-reconnect after all scheduled attempts have failed.
 * server/irc/irc-client-vars.js - Extend auto-reconnect schedule up to 4 hours.
+* Upgrade npm packages: connect-redis, cookie, memorystore, ws
 * Upgrade eslint dev dependency to newer version
 
 ## [v0.1.38](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.1.38) 2022-02-02
