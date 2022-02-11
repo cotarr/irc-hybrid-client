@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Next 2022-02-11
+
+### Fixed
+
+* server/irc/irc-client.js - Fix bug, during auto-reconnect, the list of irc channels was being cleared causing channels to be not re-joined after disconnect.
+* server/irc/irc-client-parse.js - Clear list of previous channels after auto re-join channels after disconnect.
+
+### Changed
+
+* server/irc/irc-client.js - Abort auto-reconnect after all scheduled attempts have failed.
 
 ## [v0.1.38](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.1.38) 2022-02-02
 

@@ -526,6 +526,7 @@
                   (vars.ircState.count.ircConnect > 0)) {
                   if (vars.ircServerReconnectChannelString.length > 0) {
                     ircWrite.writeSocket(socket, 'JOIN ' + vars.ircServerReconnectChannelString);
+                    vars.ircServerReconnectChannelString = '';
                   }
                 }
               }, 2500);
@@ -644,6 +645,7 @@
           vars.ircState.ircConnected = false;
           vars.ircState.ircRegistered = false;
           vars.ircState.ircIsAway = false;
+          vars.ircServerReconnectChannelString = '';
           tellBrowserToRequestState();
         }
         break;
@@ -698,6 +700,7 @@
             // ----------------------------------
             if (abortFlag) {
               vars.ircState.ircConnectOn = false;
+              vars.ircServerReconnectChannelString = '';
             }
           }
         } else {

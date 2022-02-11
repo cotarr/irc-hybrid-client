@@ -201,9 +201,9 @@
   // NOTE: does not support channel passwords
   // -----------------------------------------------------
   const onDisconnectGrabState = function () {
-    vars.ircServerReconnectChannelString = '';
-    vars.ircServerReconnectAwayString = '';
-    if (vars.ircState.channels.length > 0) {
+    if ((vars.ircState.channels.length > 0) &&
+    (vars.ircServerReconnectChannelString.length === 0)) {
+      vars.ircServerReconnectChannelString = '';
       for (let i = 0; i < vars.ircState.channels.length; i++) {
         if (vars.ircState.channelStates[i].joined) {
           if (i < 5) {
@@ -213,6 +213,8 @@
         }
       } // next i
     }
+    // TODO remember away string and set upon reconnect
+    vars.ircServerReconnectAwayString = '';
   }; // onDisconnectGrabState()
 
   // -------------------------------------------
@@ -238,7 +240,7 @@
         tellBrowserToRequestState();
         // Timer for TLS connect delay
       } else {
-        // case of error handler reset ircConnecting before timer expired (TLS error probgably)
+        // case of error handler reset ircConnecting before timer expired (TLS error probably)
         vars.ircState.ircServerPrefix = '';
         vars.ircState.ircConnecting = false;
         vars.ircState.ircConnected = false;
@@ -484,19 +486,21 @@
           // signal browser to show an error
           vars.ircState.count.ircConnectError++;
         }
+        // is auto enabled?
+        if (vars.ircState.ircAutoReconnect) {
+          // and client requested a connection, and has achieved at least 1 previously
+          if ((vars.ircState.ircConnectOn) && (vars.ircState.count.ircConnect > 0)) {
+            if (vars.ircServerReconnectTimerSeconds === 0) {
+              vars.ircServerReconnectTimerSeconds = 1;
+            }
+            onDisconnectGrabState();
+          }
+        }
         vars.ircState.ircServerPrefix = '';
         vars.ircState.ircConnecting = false;
         vars.ircState.ircConnected = false;
         vars.ircState.ircRegistered = false;
         vars.ircState.ircIsAway = false;
-        // is auto enabled?
-        if (vars.ircState.ircAutoReconnect) {
-          // and client requested a connection, and has achieved at least 1 previously
-          if ((vars.ircState.ircConnectOn) && (vars.ircState.count.ircConnect > 0)) {
-            if (vars.ircServerReconnectTimerSeconds === 0) vars.ircServerReconnectTimerSeconds = 1;
-            onDisconnectGrabState();
-          }
-        }
         // clear watchdog timer
         if (watchdogTimer) clearTimeout(watchdogTimer);
         if (hadError) {
@@ -522,19 +526,21 @@
           // signal browser to show an error
           vars.ircState.count.ircConnectError++;
         }
+        // is auto enabled?
+        if (vars.ircState.ircAutoReconnect) {
+          // and client requested a connection, and has achieved at least 1 previously
+          if ((vars.ircState.ircConnectOn) && (vars.ircState.count.ircConnect > 0)) {
+            if (vars.ircServerReconnectTimerSeconds === 0) {
+              vars.ircServerReconnectTimerSeconds = 1;
+            }
+            onDisconnectGrabState();
+          }
+        }
         vars.ircState.ircServerPrefix = '';
         vars.ircState.ircConnecting = false;
         vars.ircState.ircConnected = false;
         vars.ircState.ircRegistered = false;
         vars.ircState.ircIsAway = false;
-        // is auto enabled?
-        if (vars.ircState.ircAutoReconnect) {
-          // and client requested a connection, and has achieved at least 1 previously
-          if ((vars.ircState.ircConnectOn) && (vars.ircState.count.ircConnect > 0)) {
-            onDisconnectGrabState();
-            if (vars.ircServerReconnectTimerSeconds === 0) vars.ircServerReconnectTimerSeconds = 1;
-          }
-        }
         if ((vars.ircState.ircConnectOn) && (vars.ircState.count.ircConnect === 0)) {
           // Case of socket error when not previously connected, cancel auto-connect
           vars.ircState.ircConnectOn = false;
@@ -696,20 +702,21 @@
           // signal browser to show an error
           vars.ircState.count.ircConnectError++;
         }
+        // is auto enabled?
+        if (vars.ircState.ircAutoReconnect) {
+          // and client requested a connection, and has achieved at least 1 previously
+          if ((vars.ircState.ircConnectOn) && (vars.ircState.count.ircConnect > 0)) {
+            if (vars.ircServerReconnectTimerSeconds === 0) {
+              vars.ircServerReconnectTimerSeconds = 1;
+            }
+            onDisconnectGrabState();
+          }
+        }
         vars.ircState.ircServerPrefix = '';
         vars.ircState.ircConnecting = false;
         vars.ircState.ircConnected = false;
         vars.ircState.ircRegistered = false;
         vars.ircState.ircIsAway = false;
-        // is auto enabled?
-        if (vars.ircState.ircAutoReconnect) {
-          // and client requested a connection, and has achieved at least 1 previously
-          if ((vars.ircState.ircConnectOn) && (vars.ircState.count.ircConnect > 0)) {
-            onDisconnectGrabState();
-            if (vars.ircServerReconnectTimerSeconds === 0) vars.ircServerReconnectTimerSeconds = 1;
-          }
-        }
-
         if ((vars.ircState.ircConnectOn) && (vars.ircState.count.ircConnect === 0)) {
           // Case of socket error when not previously connected, cancel auto-connect
           vars.ircState.ircConnectOn = false;
@@ -783,9 +790,121 @@
   //     I R C   R e c o n n e c t   H a n d l e r
   //
   // In order to restart, a selected IRC server must have
-  // previously achieved a successful connection.
-  // Successful connections will increment a counter
+  // previously achieved a successful connection at least once.
+  // Successful connections will increment a counter for this purpose
+  //
+  // Variable rcServerReconnectTimerSeconds is a counter
+  // that increments value 1 per second if greater than zero.
+  // It is used to determine if restart is active ( > 0 )
   // ------------------------------------------------------
+  // Example of state variables during reconnect after error
+  //
+  //   A --- ircState.ircConnectOn
+  //   B --- ircState.ircConnecting
+  //   C --- ircState.ircConnected
+  //   D --- ircState.ircRegistered
+  //   E --- ircServerReconnectTimerSeconds (if > 0, then increments 1 per second)
+
+  //   A  B  C  D  E  Case of direct connect port 6667 (no TLS) and stop IRC server, then restart
+  //  ----------------
+  //   F  F  F  F  0  - Load NodeJs files
+  //   T  T  F  F  0  - Function: connectIRC()
+  //   T  T  F  F  0  - Event: on connect
+  //   T  F  T  F  0  - Function:_connectEventHandler
+  //   T  F  T  T  0  - Event: IRC message 001 from IRC server
+  //   T  F  F  F  1  - Event: on close
+  //   T  T  F  F  10 - Function: connectIRC()
+  //   T  F  F  F  10 - Event: on error
+  //   T  F  F  F  10 - Event: on close
+  //   T  T  F  F  60 - Function: connectIRC()
+  //   T  T  F  F  60 - Event: on connect
+  //   T  F  T  F  60 - Function: _connectEventHandler
+  //   T  F  T  T  60 - Event: IRC message 001 from IRC server
+  //   T  F  T  T  0  - Function: ircServerReconnectTimerTick()
+
+  //   A  B  C  D  E  Case socks5 proxy to port 6667 (no TLS) and stop IRC server, then restart
+  //                  Also stop Socks5 proxy and restart, the events are the same.
+  //  ----------------
+  //   F  F  F  F  0  - Load NodeJs files
+  //   T  T  F  F  0  - Function: connectIRC()
+  //   T  T  F  F  0  - Event: on connect
+  //   T  F  T  F  0  - Function:_connectEventHandler
+  //   T  F  T  T  0  - Event: IRC message 001 from IRC server
+  //   T  F  F  F  1  - Event: on close
+  //   T  T  F  F  10 - Function: connectIRC()
+  //   T  F  F  F  10 - Event: on error
+  //   T  T  F  F  60 - Function: connectIRC()
+  //   T  T  F  F  60 - Event: on connect
+  //   T  F  T  F  60 - Function: _connectEventHandler
+  //   T  F  T  T  60 - Event: IRC message 001 from IRC server
+  //   T  F  T  T  0  - Function: ircServerReconnectTimerTick()
+
+  //   A  B  C  D  E  Case of TLS connect using socks5 proxy, then stop IRC server, then restart
+  //  ----------------
+  //   F  F  F  F  0  - Load NodeJs files
+  //   T  T  F  F  0  - Function: connectIRC()
+  //   T  T  F  F  0  - Event: socks5 on connect
+  //   T  T  F  F  0  - Event: on secureConnect
+  //   T  F  T  F  0  - Function:_connectEventHandler
+  //   T  F  T  T  0  - Event: IRC message 001 from IRC server
+  //   T  F  F  F  1  - Event: on close
+  //   T  T  F  F  10 - Function: connectIRC()
+  //   T  F  F  F  10 - Event: socks5 on error
+  //   T  T  F  F  60 - Function: connectIRC()
+  //   T  T  F  F  60 - Event: socks5 on connect
+  //   T  T  F  F  60 - Event: on secureConnect
+  //   T  F  T  F  60 - Function: _connectEventHandler
+  //   T  F  T  T  60 - Event: IRC message 001 from IRC server
+  //   T  F  T  T  0  - Function: ircServerReconnectTimerTick()
+
+  //   A  B  C  D  E  Case of TLS connect using socks5 proxy, then stop socks5 proxy, then restart
+  //  ----------------
+  //   F  F  F  F  0  - Load NodeJs files
+  //   T  T  F  F  0  - Function: connectIRC()
+  //   T  T  F  F  0  - Event: socks5 on connect
+  //   T  T  F  F  0  - Event: on secureConnect
+  //   T  F  T  F  0  - Function:_connectEventHandler
+  //   T  F  T  T  0  - Event: IRC message 001 from IRC server
+  //   T  F  F  F  1  - Event: socks5 on error
+  //   T  F  F  F  1  - Event: on error
+  //   T  F  F  F  1  - Event: on close
+  //   T  T  F  F  10 - Function: connectIRC()
+  //   T  F  F  F  10 - Event: socks5 on error
+  //   T  T  F  F  60 - Function: connectIRC()
+  //   T  T  F  F  60 - Event: socks5 on connect
+  //   T  T  F  F  60 - Event: on secureConnect
+  //   T  F  T  F  60 - Function: _connectEventHandler
+  //   T  F  T  T  60 - Event: IRC message 001 from IRC server
+  //   T  F  T  T  0  - Function: ircServerReconnectTimerTick()
+
+  //
+  //   A  B  C  D  E  Case of TLS connect without socks5, then stop IRC server, then restart
+  //  ----------------
+  //   F  F  F  F  0  - Load NodeJs files
+  //   T  T  F  F  0  - Function: connectIRC()
+  //   T  T  F  F  0  - Event: on connect
+  //   T  T  F  F  0  - Event: on secureConnect
+  //   T  F  T  F  0  - Function:_connectEventHandler
+  //   T  F  T  T  0  - Event: IRC message 001 from IRC server
+  //   T  F  F  F  1  - Event: on close
+  //   T  T  F  F  10 - Function: connectIRC()
+  //   T  F  F  F  10 - Event: on error
+  //   T  F  F  F  10 - Event: on close
+  //   T  T  F  F  60 - Function: connectIRC()
+  //   T  T  F  F  60 - Event: on connect
+  //   T  T  F  F  60 - Event: on secureConnect
+  //   T  F  T  F  60 - Function: _connectEventHandler
+  //   T  F  T  T  60 - Event: IRC message 001 from IRC server
+  //   T  F  T  T  0  - Function: ircServerReconnectTimerTick()
+  //
+  // ------------------------------------------------------
+
+  // Maximum time allowed to reconnect
+  const ircServerReconnectMaxLimit =
+    vars.ircServerReconnectIntervals[vars.ircServerReconnectIntervals.length - 1] +
+    vars.ircSocketConnectingTimeout;
+
+  // Timer service routine
   const ircServerReconnectTimerTick = function () {
     // timer not active, abort
     if (vars.ircServerReconnectTimerSeconds === 0) return;
@@ -798,6 +917,7 @@
     // connect not requested, or auto-reconnect not requested
     if ((!vars.ircState.ircConnectOn) || (!vars.ircState.ircAutoReconnect)) {
       vars.ircServerReconnectTimerSeconds = 0;
+      vars.ircServerReconnectChannelString = '';
       return;
     }
 
@@ -809,6 +929,30 @@
 
     // Increment the counter (timer in seconds)
     vars.ircServerReconnectTimerSeconds++;
+
+    // Check maximum time, abort if exceeded
+    if (vars.ircServerReconnectTimerSeconds > ircServerReconnectMaxLimit) {
+      // cancel reconnect timer
+      vars.ircState.ircConnectOn = false;
+      vars.ircServerReconnectTimerSeconds = 0;
+      vars.ircServerReconnectChannelString = '';
+      vars.ircServerReconnectAwayString = '';
+      global.sendToBrowser('webServer: Auto-reconnect maximum time exceeded\n');
+      ircLog.writeIrcLog('Auto-reconnect maximum time exceeded');
+      if (ircSocket) {
+        ircSocket.destroy();
+      }
+      if (socks5Socket) {
+        socks5Socket.destroy();
+      }
+      vars.ircState.ircServerPrefix = '';
+      vars.ircState.ircConnecting = false;
+      vars.ircState.ircConnected = false;
+      vars.ircState.ircRegistered = false;
+      vars.ircState.ircIsAway = false;
+      tellBrowserToRequestState();
+      return;
+    }
 
     // console.log('tick ' + vars.ircServerReconnectTimerSeconds + ' ' +
     //   vars.ircState.count.ircConnect + ' ' + vars.ircState.count.ircConnectError);
