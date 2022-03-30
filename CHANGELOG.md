@@ -11,6 +11,7 @@ and this project adheres to
 ### Changed
 
 - npm audit fix - minimist 1.2.5 to 1.2.6 to fix github dependabot advisory for polluted prototype
+- package.json - Update connect-redis 6.1.3 bug fix to 6.1.2
 
 ## [v0.1.40](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.1.40) 2022-03-17
 
