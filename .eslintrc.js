@@ -9,9 +9,8 @@ module.exports = {
     'standard'
   ],
   parserOptions: {
-    ecmaVersion: 'latest'
+    ecmaVersion: 12
   },
-  // Customize eslint standard style definitions
   rules: {
     // Require parenthesis around arrow function argument
     'arrow-parens': 'error',
