@@ -74,6 +74,7 @@
   vars.ircState.ircIsAway = false;
 
   vars.ircState.ircAutoReconnect = servers.ircAutoReconnect;
+  vars.ircState.lastPing = '0.000';
 
   vars.ircState.ircServerName = servers.serverArray[0].name;
   vars.ircState.ircServerHost = servers.serverArray[0].host;
@@ -1016,14 +1017,46 @@
   // ----------------------------------
   const clientToServerPingTimerTick = function () {
     if ((vars.ircState.ircConnected) && (vars.ircState.ircRegistered)) {
-      vars.clientToServerPingTimerSeconds++;
+      vars.clientToServerPingSendTimer++;
+      if (vars.clientToServerPingResponseTimer > 0) {
+        vars.clientToServerPingResponseTimer++;
+        if (vars.clientToServerPingResponseTimer > vars.clientToServerPingTimeout) {
+          // stop timer
+          vars.clientToServerPingResponseTimer = 0;
+          // IRC server not responding, handle as disconnect
+          if (ircSocket) {
+            ircSocket.destroy();
+          }
+          if (socks5Socket) {
+            socks5Socket.destroy();
+          }
+          // signal browser to show an error
+          vars.ircState.count.ircConnectError++;
+
+          vars.ircState.ircServerPrefix = '';
+          vars.ircState.ircConnecting = false;
+          vars.ircState.ircConnected = false;
+          vars.ircState.ircRegistered = false;
+          vars.ircState.ircIsAway = false;
+          global.sendToBrowser('UPDATE\nwebError: IRC server not responding to client PING\n');
+          ircLog.writeIrcLog('IRC server not responding to client PING');
+        }
+      }
     } else {
-      vars.clientToServerPingTimerSeconds = 0;
+      vars.clientToServerPingSendTimer = 0;
+      vars.clientToServerPingResponseTimer = 0;
+      vars.clientToServerPingTimestampMs = 0;
+      vars.ircState.lastPing = '0.000';
     }
     if ((vars.ircState.ircConnected) && (vars.ircState.ircRegistered) &&
       (vars.ircState.ircServerPrefix.length > 0) &&
-      (vars.clientToServerPingTimerSeconds >= vars.clientToServerPingInterval)) {
-      vars.clientToServerPingTimerSeconds = 0;
+      (vars.clientToServerPingSendTimer >= vars.clientToServerPingInterval)) {
+      vars.clientToServerPingSendTimer = 0;
+      // 0 = disabled, >=1 is counting up 1 per second, set to 1 to start
+      vars.clientToServerPingResponseTimer = 1;
+      // Timestamp is system time in milliseconds
+      const now = new Date();
+      vars.clientToServerPingTimestampMs = now.getTime();
       //
       // PING and PONG are special cases.
       // To avoid overflow of the message cache, the PING, PONG are sent to raw socket
@@ -1035,7 +1068,10 @@
       // 512 btye maximum size from RFC 2812 2.3 Messages
       if (outBuffer.length <= 512) {
         ircSocket.write(outBuffer, 'utf8');
-        global.sendToBrowser(vars.commandMsgPrefix + outBuffer.toString('utf8'));
+        // Show PING in browser unless client-to-server PING is filtered.
+        if (vars.excludedCommands.indexOf('PING') < 0) {
+          global.sendToBrowser(vars.commandMsgPrefix + outBuffer.toString('utf8'));
+        }
       }
     }
   }; // clientToServerPingTimerTick()
@@ -1667,7 +1703,7 @@
   const test2Handler = function (req, res, next) {
     // -------- test code here -----------------
     // emulate ping timeout of IRC server (for test auto reconnect)
-    vars.activityWatchdogTimerSeconds = 1000;
+    vars.clientToServerPingResponseTimer = vars.clientToServerPingTimeout - 2;
     res.json({
       error: false,
       message: 'Emulating IRC server ping timeout'

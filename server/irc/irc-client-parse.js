@@ -431,6 +431,8 @@
     // Unless for debug when PING, PONG removed from excludedCommands array
     // which makes PING and PONG visible to browser and inserted into message cache
     //
+    // Server-to-client PING command
+    //
     if (parsedMessage.command === 'PING') {
       const outBuffer = Buffer.from('PONG ' + parsedMessage.params[0] + '\r\n', 'utf8');
       // 512 btye maximum size from RFC 2812 2.3 Messages
@@ -447,11 +449,32 @@
             Buffer.from('\r\n')
           ]));
         }
-        global.sendToBrowser(vars.commandMsgPrefix + outBuffer.toString('utf8'));
+        // Show PONG in browser unless server-to-client PONG is filtered
+        if (vars.excludedCommands.indexOf('PONG') < 0) {
+          global.sendToBrowser(vars.commandMsgPrefix + outBuffer.toString('utf8'));
+        }
       } else {
         console.log('Error, send buffer exceeds 512 character limit.');
       }
       return;
+    }
+    //
+    // PONG response handler for client-to-server PING request
+    //
+    if (parsedMessage.command === 'PONG') {
+      // Reset the timeout timer
+      // 0 = timer disabled
+      vars.clientToServerPingResponseTimer = 0;
+      // Compute elapsed time in seconds
+      const now = new Date();
+      const nowMs = now.getTime();
+      if (vars.clientToServerPingTimestampMs > 0) {
+        vars.ircState.lastPing =
+          ((nowMs - vars.clientToServerPingTimestampMs) / 1000).toFixed(3);
+        global.sendToBrowser('LAG=' + vars.ircState.lastPing + '\r\n');
+      } else {
+        vars.ircState.lastPing = '0.000';
+      }
     }
     //
     // Filter...

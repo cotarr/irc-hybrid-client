@@ -81,7 +81,7 @@
   let ircServerReconnectChannelString = '';
   let ircServerReconnectAwayString = '';
 
-  // Time inseconds
+  // Time in seconds
   const ircSocketConnectingTimeout = 10;
   const ircRegistrationTimeout = 30;
 
@@ -90,8 +90,13 @@
   const activityWatchdogTimerLimit = 300;
 
   // Time in seconds
-  let clientToServerPingTimer = 0;
+  let clientToServerPingSendTimer = 0;
+  let clientToServerPingResponseTimer = 0;
   const clientToServerPingInterval = 60;
+  const clientToServerPingTimeout = 30;
+
+  // Time in milliseconds
+  let clientToServerPingTimestampMs = 0;
 
   // used by JavaScript built in toLocaleString(locales, options.timeZone)
   let ctcpTimeLocale = ['en-US', 'UTC'];
@@ -131,8 +136,11 @@
     ircRegistrationTimeout: ircRegistrationTimeout,
     activityWatchdogTimerSeconds: activityWatchdogTimerSeconds,
     activityWatchdogTimerLimit: activityWatchdogTimerLimit,
-    clientToServerPingTimer: clientToServerPingTimer,
+    clientToServerPingSendTimer: clientToServerPingSendTimer,
+    clientToServerPingResponseTimer: clientToServerPingResponseTimer,
+    clientToServerPingTimestampMs: clientToServerPingTimestampMs,
     clientToServerPingInterval: clientToServerPingInterval,
+    clientToServerPingTimeout: clientToServerPingTimeout,
     ctcpTimeLocale: ctcpTimeLocale,
     timestamp: timestamp,
     unixTimestamp: unixTimestamp

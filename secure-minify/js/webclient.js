@@ -245,12 +245,12 @@ if(parsedMessage.command.toUpperCase()==='PRIVMSG'){_addNoticeText(parsedMessage
 _addNoticeText(parsedMessage.timestamp+' '+'CTCP 4 Reply from '+parsedMessage.nick+': '+ctcpCommand+' '+ctcpRest);webState.noticeOpen=true}}updateDivVisibility()}}
 const ircMessageCommandDisplayFilter=['331','332','333','353','366','JOIN','KICK','MODE','NICK','NOTICE','PART','PING','PONG','PRIVMSG','QUIT','TOPIC','WALLOPS'];function _parseBufferMessage(message){
 if(message==='HEARTBEAT'){onHeartbeatReceived();if(webState.showCommsMessages){displayRawMessage('HEARTBEAT')}}else if(message==='UPDATE'){getIrcState();if(webState.showCommsMessages){
-displayRawMessage('UPDATE')}}else{function _showNotExpiredError(errStr){const timeNow=new Date;const timeNowSeconds=parseInt(timeNow/1e3)
-;const timeMessageSeconds=timestampToUnixSeconds(message.split(' ')[0]);if(timeNowSeconds-timeMessageSeconds<errorExpireSeconds){showError(errStr)}}if(message.split(' ')[0]==='--\x3e'){
-if(webState.showCommsMessages)displayRawMessage(message);return}if(message.split(' ')[0]==='webServer:'){if(webState.showCommsMessages)displayRawMessage(message);return}
-if(message.split(' ')[0]==='webError:'){if(webState.showCommsMessages)displayRawMessage(message);if(message.length>10)showError(message.slice(10));return}const parsedMessage=_parseIrcMessage(message)
-;if(webState.viewRawMessages){if(webState.showRawInHex)displayRawMessageInHex(message);displayRawMessage(message)}else{
-if(ircMessageCommandDisplayFilter.indexOf(parsedMessage.command.toUpperCase())<0){displayFormattedServerMessage(parsedMessage,message)}}
+displayRawMessage('UPDATE')}}else if(message.startsWith('LAG=')&&message.length===9){if(webState.showCommsMessages){displayRawMessage(message)}}else{function _showNotExpiredError(errStr){
+const timeNow=new Date;const timeNowSeconds=parseInt(timeNow/1e3);const timeMessageSeconds=timestampToUnixSeconds(message.split(' ')[0]);if(timeNowSeconds-timeMessageSeconds<errorExpireSeconds){
+showError(errStr)}}if(message.split(' ')[0]==='--\x3e'){if(webState.showCommsMessages)displayRawMessage(message);return}if(message.split(' ')[0]==='webServer:'){
+if(webState.showCommsMessages)displayRawMessage(message);return}if(message.split(' ')[0]==='webError:'){if(webState.showCommsMessages)displayRawMessage(message)
+;if(message.length>10)showError(message.slice(10));return}const parsedMessage=_parseIrcMessage(message);if(webState.viewRawMessages){if(webState.showRawInHex)displayRawMessageInHex(message)
+;displayRawMessage(message)}else{if(ircMessageCommandDisplayFilter.indexOf(parsedMessage.command.toUpperCase())<0){displayFormattedServerMessage(parsedMessage,message)}}
 if(parseInt(parsedMessage.command)>=400&&parseInt(parsedMessage.command)<500){_showNotExpiredError(message.slice(12,message.length))}switch(parsedMessage.command){case'ERROR':
 if(!ircState.ircRegistered&&parsedMessage.params.length===1){if(!webState.cacheReloadInProgress){showError('ERROR '+parsedMessage.params[0])}}break;case'KICK':displayChannelMessage(parsedMessage)
 ;break;case'JOIN':displayChannelMessage(parsedMessage);break;case'MODE':if(parsedMessage.params[0]===ircState.nickName){if(!webState.viewRawMessages){

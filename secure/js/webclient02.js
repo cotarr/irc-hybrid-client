@@ -784,6 +784,8 @@ function _parseCtcpMessage (parsedMessage, message) {
 // This filter is to avoid duplication of messages
 // in the server window for case of alternate display
 //
+// This does not filter from View-Raw display
+//
 // Format: simple Array of strings
 // -------------------------------------------------------------
 const ircMessageCommandDisplayFilter = [
@@ -833,6 +835,11 @@ function _parseBufferMessage (message) {
     getIrcState();
     if (webState.showCommsMessages) {
       displayRawMessage('UPDATE');
+    }
+  } else if ((message.startsWith('LAG=')) && (message.length === 9)) {
+    // Example message: 'LAG=1.234'
+    if (webState.showCommsMessages) {
+      displayRawMessage(message);
     }
   } else {
     // 3) Else, this is IRC message to be parsed for IRC browser user.
