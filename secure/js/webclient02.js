@@ -841,6 +841,18 @@ function _parseBufferMessage (message) {
     if (webState.showCommsMessages) {
       displayRawMessage(message);
     }
+    const pingStr = message.split('=')[1];
+    let pingFloat = null;
+    try {
+      pingFloat = parseFloat(pingStr);
+    } catch (err) {
+      pingFloat = null;
+    };
+    if ((pingFloat) && (typeof pingFloat === 'number')) {
+      webState.lag.last = pingFloat;
+      if (pingFloat < webState.lag.min) webState.lag.min = pingFloat;
+      if (pingFloat > webState.lag.max) webState.lag.max = pingFloat;
+    }
   } else {
     // 3) Else, this is IRC message to be parsed for IRC browser user.
 

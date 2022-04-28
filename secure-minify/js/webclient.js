@@ -26,15 +26,15 @@ SOFTWARE.
 
 const channelPrefixChars='@#+!';const nicknamePrefixChars='~&@%+';const nickChannelSpacer=' | ';const pmNameSpacer=' - ';const activityIconInhibitTimerValue=10
 ;const cacheReloadString='-----IRC Cache Reload-----';const cacheErrorString='-----IRC Cache Error-----';const csrfToken=document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-;var ircState={ircConnectOn:false,ircConnecting:false,ircConnected:false,ircRegistered:false,ircIsAway:false,ircAutoReconnect:false,ircServerName:'',ircServerHost:'',ircServerPort:6667,
-ircTLSEnabled:false,ircServerIndex:0,ircServerPrefix:'',channelList:[],nickName:'',userName:'',realName:'',userMode:'',userHost:'',channels:[],channelStates:[],progVersion:'0.0.0',progName:'',times:{
-programRun:0,ircConnect:0},count:{ircConnect:0,ircConnectError:0},websocketCount:0};document.getElementById('webConnectIconId').removeAttribute('connected')
+;var ircState={ircConnectOn:false,ircConnecting:false,ircConnected:false,ircRegistered:false,ircIsAway:false,ircAutoReconnect:false,lastPing:'0.000',ircServerName:'',ircServerHost:'',
+ircServerPort:6667,ircTLSEnabled:false,ircServerIndex:0,ircServerPrefix:'',channelList:[],nickName:'',userName:'',realName:'',userMode:'',userHost:'',channels:[],channelStates:[],progVersion:'0.0.0',
+progName:'',times:{programRun:0,ircConnect:0},count:{ircConnect:0,ircConnectError:0},websocketCount:0};document.getElementById('webConnectIconId').removeAttribute('connected')
 ;document.getElementById('ircConnectIconId').removeAttribute('connected');document.getElementById('webConnectIconId').removeAttribute('connecting')
 ;document.getElementById('ircConnectIconId').removeAttribute('connecting');const webState={};webState.loginUser={};webState.webConnectOn=true;webState.webConnected=false;webState.webConnecting=false
 ;webState.ircConnecting=false;webState.websocketCount=0;webState.noticeOpen=false;webState.wallopsOpen=false;webState.viewRawMessages=false;webState.showRawInHex=false;webState.showCommsMessages=false
 ;webState.lastIrcServerIndex=-1;webState.channels=[];webState.channelStates=[];webState.lastPMNick='';webState.activePrivateMessageNicks=[];webState.times={webConnect:0};webState.count={webConnect:0,
-webStateCalls:0};webState.cacheReloadInProgress=false;webState.dynamic={inputAreaCharWidthPx:null,inputAreaSideWidthPx:null,sendButtonWidthPx:null,commonMargin:50,lastDevicePixelRatio:1,
-bodyClientWidth:document.querySelector('body').clientWidth,lastClientWidth:document.querySelector('body').clientWidth};if(window.devicePixelRatio){
+webStateCalls:0};webState.cacheReloadInProgress=false;webState.lag={last:0,min:9999,max:0};webState.dynamic={inputAreaCharWidthPx:null,inputAreaSideWidthPx:null,sendButtonWidthPx:null,commonMargin:50,
+lastDevicePixelRatio:1,bodyClientWidth:document.querySelector('body').clientWidth,lastClientWidth:document.querySelector('body').clientWidth};if(window.devicePixelRatio){
 webState.dynamic.lastDevicePixelRatio=window.devicePixelRatio}let webServerUrl='https://';let webSocketUrl='wss://';if(document.location.protocol==='http:'){webServerUrl='http://';webSocketUrl='ws://'
 }webServerUrl+=window.location.hostname+':'+window.location.port;webSocketUrl+=window.location.hostname+':'+window.location.port;var wsocket=null;const beep1=new Audio('sounds/short-beep1.mp3')
 ;const beep2=new Audio('sounds/short-beep2.mp3');const beep3=new Audio('sounds/short-beep3.mp3');let beep1InhibitTimer=0;let beep2InhibitTimer=0;let beep3InhibitTimer=0;function beepTimerTick(){
@@ -133,8 +133,8 @@ document.getElementById('webConnectIconId').removeAttribute('connected');documen
 ;document.getElementById('hiddenInfoDiv').setAttribute('hidden','');document.getElementById('infoOpenCloseButton').textContent='+'});function setVariablesShowingIRCDisconnected(){
 document.getElementById('headerUser').textContent='';document.getElementById('headerServer').textContent='';document.dispatchEvent(new CustomEvent('cancel-beep-sounds',{bubbles:true}))
 ;const channelContainerDivEl=document.getElementById('channelContainerDiv');while(channelContainerDivEl.firstChild){channelContainerDivEl.removeChild(channelContainerDivEl.firstChild)}
-webState.channels=[];webState.channelStates=[]}const heartbeatExpirationTimeSeconds=15;let heartbeatUpCounter=0;function resetHeartbeatTimer(){heartbeatUpCounter=0}function onHeartbeatReceived(){
-heartbeatUpCounter=0}function heartbeatTimerTickHandler(){heartbeatUpCounter++;if(webState.webConnected){if(heartbeatUpCounter>heartbeatExpirationTimeSeconds+1){
+webState.channels=[];webState.channelStates=[];webState.lag={last:0,min:9999,max:0}}const heartbeatExpirationTimeSeconds=15;let heartbeatUpCounter=0;function resetHeartbeatTimer(){heartbeatUpCounter=0
+}function onHeartbeatReceived(){heartbeatUpCounter=0}function heartbeatTimerTickHandler(){heartbeatUpCounter++;if(webState.webConnected){if(heartbeatUpCounter>heartbeatExpirationTimeSeconds+1){
 console.log('HEARTBEAT timeout + 2 seconds, socket unresponsive, forcing disconnect')
 ;document.getElementById('reconnectStatusDiv').textContent+='Web socket connection timeout, socket unresponsive, force disconnect\n';webState.webConnected=false;webState.webConnecting=false
 ;setVariablesShowingIRCDisconnected();updateDivVisibility()}else if(heartbeatUpCounter===heartbeatExpirationTimeSeconds){console.log('HEARTBEAT timeout + 0 seconds , attempting to closing socket')
@@ -145,10 +145,12 @@ function updateElapsedTimeDisplay(){function toTimeString(seconds){let remainSec
 const timePreEl=document.getElementById('elapsedTimeDiv');const now=unixTimestamp();let timeStr='';if(webState.webConnected){
 timeStr+='Web Connected: '+toTimeString(now-webState.times.webConnect)+' ('+webState.count.webConnect.toString()+')\n'}else{timeStr+='Web Connected: N/A\n'}if(ircState.ircConnected){
 timeStr+='IRC Connected: '+toTimeString(now-ircState.times.ircConnect)+' ('+ircState.count.ircConnect.toString()+')\n'}else{timeStr+='IRC Connected: N/A\n'}if(webState.webConnected){
-timeStr+='Backend Start: '+toTimeString(now-ircState.times.programRun)}else{timeStr+='Backend Start: N/A'}timePreEl.textContent=timeStr}let lastConnectErrorCount=0;function getIrcState(callback){
-webState.count.webStateCalls++;const fetchURL=webServerUrl+'/irc/getircstate';const fetchOptions={method:'GET',headers:{Accept:'application/json'}};fetch(fetchURL,fetchOptions).then(response=>{
-if(response.ok){return response.json()}else{if(response.status===403)window.location.href='/login';throw new Error('Fetch status '+response.status+' '+response.statusText)}}).then(responseJson=>{
-ircState=responseJson;if(!ircState.ircConnected&&webState.lastIrcServerIndex!==ircState.ircServerIndex){webState.lastIrcServerIndex=ircState.ircServerIndex
+timeStr+='Backend Start: '+toTimeString(now-ircState.times.programRun)+'\n'}else{timeStr+='Backend Start: N/A\n'}if(ircState.ircConnected&&webState.lag.min<9998){
+timeStr+='IRC Lag: '+webState.lag.last.toFixed(3)+' Min: '+webState.lag.min.toFixed(3)+' Max: '+webState.lag.max.toFixed(3)}else{timeStr+='IRC Lag: (Waiting next ping)'}timePreEl.textContent=timeStr}
+let lastConnectErrorCount=0;function getIrcState(callback){webState.count.webStateCalls++;const fetchURL=webServerUrl+'/irc/getircstate';const fetchOptions={method:'GET',headers:{
+Accept:'application/json'}};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()}else{if(response.status===403)window.location.href='/login'
+;throw new Error('Fetch status '+response.status+' '+response.statusText)}}).then(responseJson=>{ircState=responseJson
+;if(!ircState.ircConnected&&webState.lastIrcServerIndex!==ircState.ircServerIndex){webState.lastIrcServerIndex=ircState.ircServerIndex
 ;document.getElementById('ircServerNameInputId').value=ircState.ircServerName;document.getElementById('ircServerAddrInputId').value=ircState.ircServerHost
 ;document.getElementById('ircServerPortInputId').value=ircState.ircServerPort;if(ircState.ircTLSEnabled){document.getElementById('ircServerTlsEnable').setAttribute('checked','')}else{
 document.getElementById('ircServerTlsEnable').removeAttribute('checked')}if(ircState.ircTLSVerify){document.getElementById('ircServerTlsVerify').setAttribute('checked','')}else{
@@ -245,12 +247,14 @@ if(parsedMessage.command.toUpperCase()==='PRIVMSG'){_addNoticeText(parsedMessage
 _addNoticeText(parsedMessage.timestamp+' '+'CTCP 4 Reply from '+parsedMessage.nick+': '+ctcpCommand+' '+ctcpRest);webState.noticeOpen=true}}updateDivVisibility()}}
 const ircMessageCommandDisplayFilter=['331','332','333','353','366','JOIN','KICK','MODE','NICK','NOTICE','PART','PING','PONG','PRIVMSG','QUIT','TOPIC','WALLOPS'];function _parseBufferMessage(message){
 if(message==='HEARTBEAT'){onHeartbeatReceived();if(webState.showCommsMessages){displayRawMessage('HEARTBEAT')}}else if(message==='UPDATE'){getIrcState();if(webState.showCommsMessages){
-displayRawMessage('UPDATE')}}else if(message.startsWith('LAG=')&&message.length===9){if(webState.showCommsMessages){displayRawMessage(message)}}else{function _showNotExpiredError(errStr){
-const timeNow=new Date;const timeNowSeconds=parseInt(timeNow/1e3);const timeMessageSeconds=timestampToUnixSeconds(message.split(' ')[0]);if(timeNowSeconds-timeMessageSeconds<errorExpireSeconds){
-showError(errStr)}}if(message.split(' ')[0]==='--\x3e'){if(webState.showCommsMessages)displayRawMessage(message);return}if(message.split(' ')[0]==='webServer:'){
-if(webState.showCommsMessages)displayRawMessage(message);return}if(message.split(' ')[0]==='webError:'){if(webState.showCommsMessages)displayRawMessage(message)
-;if(message.length>10)showError(message.slice(10));return}const parsedMessage=_parseIrcMessage(message);if(webState.viewRawMessages){if(webState.showRawInHex)displayRawMessageInHex(message)
-;displayRawMessage(message)}else{if(ircMessageCommandDisplayFilter.indexOf(parsedMessage.command.toUpperCase())<0){displayFormattedServerMessage(parsedMessage,message)}}
+displayRawMessage('UPDATE')}}else if(message.startsWith('LAG=')&&message.length===9){if(webState.showCommsMessages){displayRawMessage(message)}const pingStr=message.split('=')[1];let pingFloat=null
+;try{pingFloat=parseFloat(pingStr)}catch(err){pingFloat=null}if(pingFloat&&typeof pingFloat==='number'){webState.lag.last=pingFloat;if(pingFloat<webState.lag.min)webState.lag.min=pingFloat
+;if(pingFloat>webState.lag.max)webState.lag.max=pingFloat}}else{function _showNotExpiredError(errStr){const timeNow=new Date;const timeNowSeconds=parseInt(timeNow/1e3)
+;const timeMessageSeconds=timestampToUnixSeconds(message.split(' ')[0]);if(timeNowSeconds-timeMessageSeconds<errorExpireSeconds){showError(errStr)}}if(message.split(' ')[0]==='--\x3e'){
+if(webState.showCommsMessages)displayRawMessage(message);return}if(message.split(' ')[0]==='webServer:'){if(webState.showCommsMessages)displayRawMessage(message);return}
+if(message.split(' ')[0]==='webError:'){if(webState.showCommsMessages)displayRawMessage(message);if(message.length>10)showError(message.slice(10));return}const parsedMessage=_parseIrcMessage(message)
+;if(webState.viewRawMessages){if(webState.showRawInHex)displayRawMessageInHex(message);displayRawMessage(message)}else{
+if(ircMessageCommandDisplayFilter.indexOf(parsedMessage.command.toUpperCase())<0){displayFormattedServerMessage(parsedMessage,message)}}
 if(parseInt(parsedMessage.command)>=400&&parseInt(parsedMessage.command)<500){_showNotExpiredError(message.slice(12,message.length))}switch(parsedMessage.command){case'ERROR':
 if(!ircState.ircRegistered&&parsedMessage.params.length===1){if(!webState.cacheReloadInProgress){showError('ERROR '+parsedMessage.params[0])}}break;case'KICK':displayChannelMessage(parsedMessage)
 ;break;case'JOIN':displayChannelMessage(parsedMessage);break;case'MODE':if(parsedMessage.params[0]===ircState.nickName){if(!webState.viewRawMessages){

@@ -12,10 +12,12 @@ and this project adheres to
 ### Added
 
 - Added: New "PONG" response handler for client-to-server PING requests. IRC server lag time is determined. If the lag is over a specified limit, it is treated as a disconnect. The lag value is added to the ircState object as a string. Lag time is sent to the browser through the socket stream using string format: "LAG=1.234\r\n".
+
 - server/irc-client-vars.js - Additional timer variables added for client PING.
 - server/irc-client-parse.js - Add new PONG message handler, measure lag, send to browser.
-- server/irc.client.js - Modify client-to-server PING timer tick handler to detect client to server ping timeout and initialize timestamps for new PING messages.
-- secure/js/webclient02.js - Parse "LAG=x.xxx" message from socket stream and show on raw message display. Integration of lag data to web page will be added in future commit.
+- server/irc.client.js - Modify client-to-server PING timer tick handler to detect client-to-server timeout and initialize timestamps for new PING messages.
+- secure/js/webclient02.js - Parse "LAG=x.xxx" message from socket stream. Show on raw message display. Save value, minimum, maximum in webState object.
+- secure/js/webclient.js - Additional timer properties added in webState. Display IRC server lag, minimum, maximum in server panel, press more button to see. Tracking of minimum and maximum are local to browser.
 
 ## [v0.1.42](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.1.42) 2022-03-31
 

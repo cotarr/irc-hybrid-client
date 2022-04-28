@@ -73,6 +73,7 @@ var ircState = {
   ircRegistered: false,
   ircIsAway: false,
   ircAutoReconnect: false,
+  lastPing: '0.000',
 
   ircServerName: '',
   ircServerHost: '',
@@ -140,6 +141,15 @@ webState.count = {
   webStateCalls: 0
 };
 webState.cacheReloadInProgress = false;
+
+//
+// Ping statistics
+//
+webState.lag = {
+  last: 0,
+  min: 9999,
+  max: 0
+};
 
 //
 // dynamic page layout, these values overwritten dynamically
@@ -713,6 +723,15 @@ function setVariablesShowingIRCDisconnected () {
   webState.channelStates = [];
   // Note PM area arrays managed during reload instead of Disconnect
   // This is because they are not in ircState and there managed in the browser.
+
+  //
+  // Reset ping statistics
+  //
+  webState.lag = {
+    last: 0,
+    min: 9999,
+    max: 0
+  };
 };
 
 // ------------------------------------------------------------------------------
@@ -803,9 +822,16 @@ function updateElapsedTimeDisplay () {
     timeStr += 'IRC Connected: N/A\n';
   }
   if (webState.webConnected) {
-    timeStr += 'Backend Start: ' + toTimeString(now - ircState.times.programRun);
+    timeStr += 'Backend Start: ' + toTimeString(now - ircState.times.programRun) + '\n';
   } else {
-    timeStr += 'Backend Start: N/A';
+    timeStr += 'Backend Start: N/A\n';
+  }
+  if ((ircState.ircConnected) && (webState.lag.min < 9998)) {
+    timeStr += 'IRC Lag: ' + webState.lag.last.toFixed(3) +
+      ' Min: ' + webState.lag.min.toFixed(3) +
+      ' Max: ' + webState.lag.max.toFixed(3);
+  } else {
+    timeStr += 'IRC Lag: (Waiting next ping)';
   }
   timePreEl.textContent = timeStr;
 }
