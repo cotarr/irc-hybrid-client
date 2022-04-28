@@ -40,9 +40,9 @@
           Generally, the browser communication is split. Messages from the web server to browser
           are passed over the websocket as RFC 2812 IRC server messages.
           In the reverse direction, no messages are passed from the browser to web server over the websocket.
-          All messages from browser to web server are passed over web API using POST and GET requests.
+          All messages from the browser to the web server are passed over a web API using POST and GET requests.
           More specifically, IRC server messages (such as PRIVMSG) are passed over
-          the /irc/message route as UTF-8 strings as a POST web API request.
+          the /irc/message route as UTF-8 strings using a POST web API request.
           Information related to the state of the IRC connection and channel membership
           are retrieved as needed by issuing a GET request to the web API.
         </p>
@@ -61,7 +61,7 @@
         </p>
 
         <p>
-          General state errors, such as &quotIRC Server not connected&quot are returned
+          General state errors, such as &quot;IRC Server not connected&quot; are returned
           within API response body with status 200 and description of the error as a JSON object.
         </p>
 
@@ -71,7 +71,7 @@
 
         <p>
           Network connection errors occurring with the IRC server connection between NodeJs backend and IRC server
-          are returned in the websocket stream prefixed with the string value &quotwebError: &quot.
+          are returned in the websocket stream prefixed with the string value &quot;webError: &quot;.
         </p>
 
         <p>
@@ -99,8 +99,8 @@
 }
 </pre></div>
         <p>
-          Websocket IRC server messages are formed by prepending a timestamp in front of
-          of verbatum RFC 2812 IRC server message delimited by end-of-line characters.
+          Websocket IRC server messages are formed by prefixing a timestamp in front of
+          of verbatim RFC 2812 IRC server message delimited by end-of-line characters.
           Due to the nature of a text stream buffered I/O, it is possible that
           the one buffer of stream data could contain multiple IRC messages or that a single
           IRC message could be split, half arriving in one buffer and half in the next buffer.
@@ -114,7 +114,7 @@
 
         <p>
           Example Websocket Message (generic) for a network connection error being
-          returned asychronously over websocket stream:
+          returned asynchronously over websocket stream:
         </p>
 <div class="pre-div"><pre>
 "webError: IRC server timeout while connecting"
@@ -127,7 +127,7 @@
 "webServer: Opening socket to test-server 192.168.1.127:6667"
 </pre></div>
         <p>
-          A more detail description of web socket use is included near the bottom of this page.
+          A more detail description of web socket usage is included near the bottom of this page.
         </p>
 
         <h1>IRC Client API Routes</h1>
@@ -137,15 +137,15 @@
         <p>
           The backend NodeJs web server maintains a list of available IRC servers.
           This list is loaded from a configuration file and is not editable from the browser.
-          Calls to /irc/server shall include an &quotindex&quot property of type integer
+          Calls to /irc/server shall include an &quot;index&quot; property of type integer
           that is used to select a specific server.
           A value of -1 is used to rotate to the next server in the configuration.
         </p>
 
         <p>
-          When the web server configuration changes to a different server,
+          When the web server configuration changes to index a different IRC server,
           an "UPDATE" command is sent to the browser over the websocket stream.
-          Upon receipt of the UPDATE request, the browser should perform a GET request /irc/getircstate.
+          Upon receipt of the UPDATE request, the browser should perform a GET request to route /irc/getircstate.
           The getircstate response contains updated server configuration in JSON format.
           (see getircstate below)
         </p>
@@ -176,7 +176,7 @@
 
         <p>
           Calls to the connect API are used to request the backend NodeJs web server
-          to initiate an IRC server client connection.
+          to initiate an IRC client connection to the IRC server.
           The nickName and realName are required properties of type UTF-8 string.
           The IRC user name (identd alternate user) is not editable from the browser and
           therefore excluded from this schema.
@@ -185,11 +185,11 @@
 
         <p>
           Connection to an IRC server involves several steps, such as opening a TCP socket,
-          sending commands to set nickname, and other IRC formation. As the connection is
+          sending commands to set nickname and other IRC formation. As the connection is
           established, the irc state object located in the web server is updated.
           Each time the state changes, an "UPDATE" command is sent to the browser
           over the web socket stream.
-          Upon receipt of the UPDATE request, the browser should perform a GET request /irc/getircstate
+          Upon receipt of the UPDATE request, the browser should perform a GET request to route /irc/getircstate
           and update the user interface from information returned in the state object.
           (see getircstate below)
         </p>
@@ -225,7 +225,7 @@
           to the NodeJs backend server for re-transmission to the IRC server.
         </p>
         <p>
-          The request body should contain a &quotmessage&quot property of type UTF-8 string
+          The request body should contain a &quot;message&quot; property of type UTF-8 string
           containing the RFC 2812 IRC message.
           Multiple messages are not allowed. The end-of-line characters should not be included.
         </p>
@@ -234,7 +234,7 @@
           Assuming the IRC command is accepted by the IRC server, the IRC response is
           sent to the browser via the websocket stream as a standard RFC 2812 IRC message.
           These messages are UTF-8 text and delimited by return and end-of-line
-          characters 0x10 and 0x13 (&quot&#92;r&#92;n&quot). See RFC 2812 for specification of these messages.
+          characters 0x10 and 0x13 (&quot;&#92;r&#92;n&quot;). See RFC 2812 for specification of these messages.
         </p>
 
         <p>
@@ -243,7 +243,7 @@
           Some commands, such as PRIVMSG may not cause a state change.
           Each time the state changes, an "UPDATE" command is sent to the browser
           over the web socket stream.
-          Upon receipt of the UPDATE request, the browser should perform a GET request /irc/getircstate
+          Upon receipt of the UPDATE request, the browser should perform a GET request to route /irc/getircstate
           and update the user interface from information returned in the state object.
           (see getircstate below)
         </p>
@@ -270,7 +270,7 @@
 }
 </pre></div>
 
-<p>Websocket Respose (IRC server PRIVMSG message in stream)</p>
+<p>Websocket Response (IRC server PRIVMSG message in stream)</p>
 <div class="pre-div"><pre>
 @time=2021-06-18T20:09:38.944Z :myNickName!*@* PRIVMSG #test :hello, how are you
 </pre></div>
@@ -292,12 +292,12 @@ by sending invalid server name with TIME request.</p>
 
         <p>
           The actual IRC client is located within the NodeJs backend web server.
-          Calls to /irc/getircstate will retrieve a JSON object containing
+          API calls to route /irc/getircstate will retrieve a JSON object containing
           all relevant state information for the IRC client connection and IRC channel membership.
         </p>
 
         <p>
-          The web browser should listen for websocket stream message containing a string matching &quotUPDATE&quot.
+          The web browser should listen for websocket stream message containing a string matching &quot;UPDATE&quot;.
           When an UPDATE is received as a single line message delimited by 0x10,0x13, (...&#92;r&#92;nUPDATE&#92;r&#92;n...)
           the browser javascript should fetch a GET request to the /irc/getircstate route.
           The browser should then parse the state object for change and update the user interface as needed.
@@ -325,7 +325,7 @@ UPDATE
 
         <p>
           The browser should act on the UPDATE command by obtaining a new state object
-          which contains an updated array containing channel member nickanmes.
+          which contains an updated array containing channel member nicknames.
         </p>
 
 <p>API response to GET /irc/getircstate</p>
@@ -337,6 +337,7 @@ UPDATE
     "ircRegistered": true,
     "ircIsAway": false,
     "ircAutoReconnect": true,
+    "lastPing": "0.022",
     "ircServerName": "freenode",
     "ircServerHost": "chat.freenode.net",
     "ircServerPort": 7000,
@@ -390,7 +391,7 @@ UPDATE
         <p>
           This is used to remove a non-joined IRC channel from the active channel list.
           Trying to prune a channel while present in the channel will cause an error.
-          The request body shall contain the property &quotchannel&quot of type string
+          The request body shall contain the property &quot;channel&quot; of type string
           containing the channel name.
         </p>
 
@@ -441,7 +442,7 @@ UPDATE
         <p>
           This API is used to delete the contents of the message cache.
           The web server client must be disconnected from IRC to clear the cache.
-          A confirmation flag of type boolen is required in an &quoterase&quot property
+          A confirmation flag of type boolean is required in an &quot;erase&quot; property
           in the POST body.
         </p>
 
@@ -458,7 +459,7 @@ UPDATE
         <p>
           This is an emergency function used to forcibly close the socket to the IRC server.
           In routine operation, IRC connections should be closed by sending
-          an RFC 2812 &quotQUIT&quot command to the web server for
+          an RFC 2812 &quot;QUIT&quot; command to the web server for
           re-transmission to the IRC server as a normal IRC command.
           The body of the request should contain an empty JSON object "{}".
         </p>
@@ -471,8 +472,8 @@ UPDATE
 
         <h3>POST /terminate</h3>
 
-        This is essentially sending a hard "die" function to forcibly shutdown the NodeJs web server.
-        A confirmation flag of type boolen is required in an &quotterminate&quot property
+        This is essentially a &quot;die&quot; function to forcibly shutdown the NodeJs web server.
+        A confirmation flag of type boolean is required in a &quot;terminate&quot; property
         in the POST body.
 
 <p>POST Example body:</p>
@@ -496,7 +497,7 @@ UPDATE
         <p>
           In the irc-hybrid-client program, the backend web server serves as the IRC client.
           The backend maintains the IRC server TCP socket connection.
-          The backend is capable to maintain a valid IRC user connection independant of the web
+          The backend is capable to maintain a valid IRC user connection independent of the web
           browser. Therefore, IRC server messages related to connection status, channel
           membership, and other state is parsed and maintained within the backend server.
         </p>
@@ -505,25 +506,30 @@ UPDATE
           as described above, the ircState json object does not contain text messages from other users.
         </p>
         <p>
-          Independant of the TCP socket connection between the backend and the IRC server,
-          the web browser opens an independant websocket connection to the backend webserver,
+          Independent of the TCP socket connection between the backend and the IRC server,
+          the web browser opens an independent websocket connection to the backend webserver,
           using ws:// or wss:// protocol standard websocket connections.
           The websocket passes a stream of utf-8 characters.
-          Each message is delimited by CR,LF end of line characters.
+          Each message is delimited by CR,LF end of line characters (&quot;\r\n&quot;).
         </p>
         <p>
-          All RFC 2812 messages from the web server are passed through the backend and
-          a copy of each message is echoed to the web browser in utf-8 format over the websocket.
+          All RFC 2812 messages from the web server are passed through the backend.
+          A copy of each message is echoed to the web browser in utf-8 format over the websocket.
           JavaScript in the web browser parses the messages to identify text messages from
           other IRC users. User text messages are then displayed as text content in the appropriate windows.
         </p>
         <p>
+          The backend contains list of excluded commands in an array &quot;excludedCommands = [&quot;PING&quot;, &quot;PONG&quot;].
+          Messages between the backend and the IRC server that contain PING or PONG commands are not sent to the browser.
+          This is to avoid scrolling valid messages out of the 100 line message buffer.
+        </p>
+        <p>
           The websocket stream also contain command messages intended to initiate browser actions.
-          There are 5 types of command defined in the following table.
+          There are 6 types of command defined in the following table.
           Each message type begins with a specific prefix string as shown in the first table column.
         </p>
         <p>
-          Any message not beginning with a command prefix string is considred to be a valid
+          Any message not beginning with a command prefix string is considered to be a valid
           RFC 2812 IRC server message. Valid RFC 2812 messages are prefixed with a timestamp
           in IRC_V3 format.
         </p>
@@ -542,10 +548,11 @@ UPDATE
                 to monitor these recurring messages. Absence of the HEARTBEAT messages
                 shows the websocket is no longer actively connected to the web server.
               </td>
-            </tr>            <tr>
+            </tr>
+            <tr>
               <td>UPDATE</td>
               <td>
-                UPDATE is a command to instruct backend to call /irc/getircstate route in response to a
+                UPDATE is a command to instruct the browser to call route /irc/getircstate in response to a
                 change in the ircState object in the backend. For example, when a
                 person departs an IRC channel, the departing user's nick name is
                 removed from the array of channel membership within the backend ircState object.
@@ -554,6 +561,15 @@ UPDATE
                 /irc/getircstate route to obtain a new copy of the ircState object.
                 The ircState object is parsed by the browser and the channel membership
                 name list is updated in the appropriate channel window.
+              </td>
+            </tr>
+            <tr>
+              <td>LAG=0.001</td>
+              <td>
+                Each time the backend IRC client sends a PING command to the IRC server, 
+                the delay time for the server PONG response is measured.
+                The time value in seconds is sent to the browser over the websocket 
+                using a message as a string in the following format: "LAG=x.xxx\r\n".
               </td>
             </tr>
             <tr>
@@ -575,23 +591,22 @@ UPDATE
               </td>
             </tr>
             <tr>
-              <td>--&gt</td>
+              <td>--&gt;</td>
               <td>
-                The prefix &quot--&gt&quot is an indicator to specify copies of outgoing messages that are
+                The prefix &quot;--&gt;&quot; is an indicator to specify copies of outgoing messages that are
                 sent from the backend web server to the IRC server.
-                Outgoing messages are echoed verbatum to all connected web browsers.
+                Outgoing messages are echoed verbatim to all connected web browsers.
                 Some IRC commands containing possible passwords may be filtered.
                 Visibility of the exact messages sent to the IRC server can be useful
                 when troubleshooting software errors.
                 These outgoing messages can be viewed in the IRC client Server window
                 by clicking checkboxes for [x]View-Raw and [x]Add-Comms.
-                These are outgoing messages and there is assurance the IRC server accepted them
-                without error. Therefore, these messages should be considered as
-                informational only for debug purposes.
-                Messages starting with &quot--&gt&quot should not be parsed by the browser for content.
+                These are outgoing messages. There is assurance the IRC server accepted them without error.
+                Therefore, these messages should be considered as informational only for debug purposes.
+                Messages starting with &quot;--&gt;&quot; should not be parsed by the browser for content.
                 As shown in the following example,
                 the user +i user mode change should be parsed from the (incoming)
-                &quotMODE&quot IRC message, not the (outgoing) &quot--&gt&quot debug message.
+                &quot;MODE&quot; IRC message, not the (outgoing) &quot;--&gt;&quot; debug message.
               </td>
             </tr>
           </tbody>
@@ -618,6 +633,8 @@ UPDATE
 UPDATE
 HEARTBEAT
 HEARTBEAT
+LAG=0.023
+HEARTBEAT
 </pre></div>
 
         <div class="desc-title">
@@ -625,7 +642,7 @@ HEARTBEAT
         </div>
         <p>
           Manual testing of the backend web server requires two tools. One to issue
-          http GET and POST methods to the web server. These API requests initiate subesequent
+          http GET and POST methods to the web server. These API requests initiate subsequent
           RFC 2812 IRC commands which are sent asynchronously to the IRC server.
           A second tool is required to observe the asynchronous RFC 2812 IRC messages which
           originate in the IRC server and are passed through the web server and
@@ -638,21 +655,21 @@ HEARTBEAT
           issue IRC commands WITHOUT visibility of the IRC server responses.
           Therefore, it is recommended to use a dedicated IRC test server.
           The irc-hybrid-client was developed using a ngircd IRC server
-          available in the Debian 10 apt packages, running in an isolated development enviornment.
+          available in the Debian 10 apt packages, running in an isolated development environment.
         </p>
         <h3>1 - Postman API calls</h3>
         <p>
-          One way to send http requsts to the backend is to use
+          One way to send http requests to the backend is to use
           <a href="https://www.postman.com/downloads/">Postman</a>.
-          The irc-hybrid-client github respository includes a Postman collection
+          The irc-hybrid-client github repository includes a Postman collection
           containing example API calls described above.
           This program's API debug collection can be imported into Postman from the cloned repository
           located at
-          &quot/postman/irc-hybrid-client message debug.postman_collection.json&quot.
+          &quot;/postman/irc-hybrid-client message debug.postman_collection.json&quot;.
         </p>
         <p>
-          Two additoinal Postman collections are included that allow testing of
-          access restrictions of the API routes and websocket that require authorization.
+          Two additional Postman collections are included that allow testing of
+          access restrictions of the API routes and testing of websocket authorization.
           Documentation on authorization testing is available in the README.md which is
           located in the directory with the exported collections, as well as comments within the
           Postman collections.
@@ -668,9 +685,9 @@ HEARTBEAT
         <p>
           Postman settings: General: Automatically follow redirects: OFF
         </p>
-        <h4>1C Postman Enviornment</h4>
+        <h4>1C Postman Environment</h4>
         <p>
-          Create a postman enviornment and create the following variables.
+          Create a postman environment and create the following variables.
         </p>
         <ul>
           <li>server_URL</li>
@@ -693,10 +710,10 @@ HEARTBEAT
 
         <h4>1E - List of tests</h4>
         <p>
-          Collection: &quotirc-hybrid-client message debug &quot
+          Collection: &quot;irc-hybrid-client message debug &quot;
         </p>
         <ul>
-          <li>7.1-7.3 Login to web sevrver</li>
+          <li>7.1-7.3 Login to web server</li>
           <li>8.1 Selects server index</li>
           <li>8.3 Connect backend to IRC</li>
           <li>8.5 JOIN an IRC channel</li>
@@ -716,12 +733,12 @@ HEARTBEAT
           collection and individual tests may also include test specific documentation.
         </p>
 
-        <h4>1G - IRC command issuanace</h4>
+        <h4>1G - IRC command issuance</h4>
         <p>
           The following screen capture shows an API POST request used to emulate
           transmission of a user text message to an active IRC channel. The body of the POST request contains a
-          &quotmessage&quot property containing an RFC 2812 formatted message.
-          The IRC message includes the command &quotPRIVMSG&quot, followed by the
+          &quot;message&quot; property containing an RFC 2812 formatted message.
+          The IRC message includes the command &quot;PRIVMSG&quot;, followed by the
           first IRC argument (channel name), followed by the second IRC argument (text message content)
           which begins with a colon (:) character, followed by a UTF-8 string terminating
           in an end-of-line character.
@@ -742,7 +759,7 @@ HEARTBEAT
           The example below shows the sample websocket message expected from the above Postman request.
           The first line is a RFC 2812 formatted IRC message intended to be parsed by the browser
           in order to add content to the displayed web page.
-          The second line starting with &quot--&gt&quot is a verbatum copy of the outgoing
+          The second line starting with &quot;--&gt;&quot; is a verbatim copy of the outgoing
           IRC message sent to the IRC server which is intended to be used for debugging purposes only.
         </p>
 <div class="pre-div"><pre>
@@ -765,11 +782,11 @@ HEARTBEAT
           There are two ways to view websocket stream messages.
           Websocket messages can be viewed in raw format within the irc-hybrid-client
           web page. Alternately, a simple html page and javascript file was included
-          as a debug tool to monitor the websocket independant of the IRC client web page.
+          as a debug tool to monitor the websocket independent of the IRC client web page.
         </p>
         <p>
           To view websocket messages in the IRC client, first open the irc-hybrid-client web page.
-          Enter the username and password that were setup for postman tests as decribed above.
+          Enter the username and password that were setup for postman tests as described above.
           Next, open the Server window, then select the [More...] button.
         </p>
         <p>
@@ -779,7 +796,7 @@ HEARTBEAT
         <p>
           Selection of the [x]View-Comms checkbox will add Non-IRC messages to the Server
           window. These include HEARTBEAT, UPDATE, and other informational messages
-          as described above. View-Comms requres that View-Raw also be selected.
+          as described above. View-Comms requires that View-Raw also be selected.
         </p>
 
         <img src=images/raw-server-messages.png width="757" height="282"alt="Postman Example">
@@ -790,9 +807,9 @@ HEARTBEAT
           test the websocket connection. In order for the session cookies to work properly
           with the websocket, the websocket must exist on the same web server containing
           the browser html page and browser javascript. The custom web page is located
-          in the &quotserver/testws&quot folder. It contains 3 files, one each html, js and css.
+          in the &quot;server/testws&quot; folder. It contains 3 files, one each html, js and css.
           To enable this route and serve these files from the main web server, TEMPORARILY remove comment
-          characters from the following code located in the &quotserver/web-server.js" file.
+          characters from the following code located in the &quot;server/web-server.js" file.
           Restart the server after the edit.
         </p>
 
@@ -811,8 +828,8 @@ HEARTBEAT
         <p>
           It is necessary to obtain a session cookie. Both postman and the web browser each
           requires it's own cookie. The easiest way to do this is to
-          open the normal login form at the &quot/login&quot route. The login route can be appended to the
-          testing web URL, such as &quothttp://localhost:3000/login". The following window should
+          open the normal login form at the &quot;/login&quot; route. The login route can be appended to the
+          testing web URL, such as &quot;http://localhost:3000/login". The following window should
           open.
         <p>
 
@@ -821,7 +838,7 @@ HEARTBEAT
         </p>
           If your login is successful, the normal IRC client page will open.
           This page will not be used. Instead, edit the URL in the browser bar and
-          go to the following route: &quot/testws/test-websocket.html&quot. If you are using
+          go to the following route: &quot;/testws/test-websocket.html&quot;. If you are using
           localhost, it will look something like this, but possibly a different port number,
           depending on your configuration file.
         </p>
@@ -842,20 +859,20 @@ http://localhost:3000/testws/test-websocket.html
           or with TLS (wss://).
         </p>
         <p>
-          To do this, first select the [Sechedule Auth] button, then
+          To do this, first select the [Schedule Auth] button, then
           immediately select the [Connect Websocket] button.
-          If successful, you will see the message: &quotwebsocket: open event fired&quot.
+          If successful, you will see the message: &quot;websocket: open event fired&quot;.
         </p>
         <p>
-          Websocket messages appear in the textarea labeled &quotMessages&quot
+          Websocket messages appear in the textarea labeled &quot;Messages&quot;
         </p>
         <p>
-          Please remember to disable the &quot/testws&quot route after testing.
+          Please remember to disable the &quot;/testws&quot; route after testing.
         </p>
         <p>
           For additional information about use of the test websocket page to verifiy
           access restrictions to the web socket, view the README.md file in the
-          &quot server/testws&quot folder.
+          &quot; server/testws&quot; folder.
         </p>
 
         <img src=images/websocket-trace.png width="874" height="464"alt="Postman Example">
