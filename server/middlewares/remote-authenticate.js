@@ -250,11 +250,30 @@
   // Internal functions for promise chain
   // ----------------------------------------
 
+  // Function will regenerate a new session and cookie
+  // Returns Promise resolving to null
+  // Throws error if unable to regnerate and rejects promise
+  //
+  // It is a general security practice to update session upon change in permission.
+  //
+  const _regenerateSessionCookie = function (req) {
+    return new Promise(
+      (resolve, reject) => {
+        req.session.regenerate(function (err) {
+          if (err) {
+            reject(err);
+          } else {
+            // return value not used
+            resolve(null);
+          };
+        });
+      }
+    );
+  };
+
   // ---------------------------------------------------------
   // Validate input for url query parameters
   // and extract Oauth 2.0 authorization code
-  //
-  // This is the first call in the promise chain
   //
   // GET /login/callback?code=xxxxxxxx
   //
@@ -467,16 +486,20 @@
   // The browser will redirect to here with the Oauth 2.0 authorization code
   // as a query parameter in the url. (Example: /login/callback?code=xxxxxxx)
   //
-  // 1) Input validation on GET /login/callback, then extract authorization code
-  // 2) Perform fetch request to exchange authorization code for a new access_token
-  // 3) Validate the token request response object required parameters
-  // 4) Perform fetch request to validate token and obtain user's token meta-data
-  // 5) Validate that user's token scope is sufficient to use irc-hybrid-client
-  // 6) Redirect to single page application at /irc/webclient.html
+  // 1) Regenerate a new session and cookie (security)
+  // 2) Input validation on GET /login/callback, then extract authorization code
+  // 3) Perform fetch request to exchange authorization code for a new access_token
+  // 4) Validate the token request response object required parameters
+  // 5) Perform fetch request to validate token and obtain user's token meta-data
+  // 6) Validate that user's token scope is sufficient to use irc-hybrid-client
+  // 7) Redirect to single page application at /irc/webclient.html
   // -------------------------------------------------------------------------------
   const exchangeAuthCode = function (req, res, next) {
-    // Calling _extractCallbackAuthCode returns promise
-    _extractCallbackAuthCode(req, res)
+    // Calling _regenerateSessionCookie returns promise
+    _regenerateSessionCookie(req)
+      .then(function () {
+        return _extractCallbackAuthCode(req, res);
+      })
       .then(function (authCode) {
         return _fetchNewAccessToken(authCode);
       })

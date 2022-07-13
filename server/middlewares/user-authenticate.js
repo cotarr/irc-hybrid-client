@@ -256,127 +256,145 @@
     // console.log('query ' + JSON.stringify(req.query));
     // console.log('auth cookies ' + JSON.stringify(req.signedCookies, null, 2));
     //
-    // wrap in try to catch errors
-    // if (true) {
-    try {
-      // Check if browser cookies enabled and a session has been establised.
-      if ((req.signedCookies) && (req.session) && (req.session.sessionAuth)) {
-      // remove previous credentials if there are any
-        _removeAuthorizationFromSession(req);
-        const timeNowSeconds = Math.floor(Date.now() / 1000);
-        // make sure all expected data has been supplied, else bad request error
-        let inputNonce = '';
-        let inputUser = '';
-        let inputPassword = '';
-        if (('query' in req) && ('nonce' in req.query) &&
-          (typeof req.query.nonce === 'string')) {
-          inputNonce = req.query.nonce.toString('utf8');
-        }
-        if (('body' in req) && ('user' in req.body) &&
-          (typeof req.body.user === 'string')) {
-          inputUser = req.body.user.toString('utf8');
-        }
-        if (('body' in req) && ('password' in req.body) &&
-          (typeof req.body.password === 'string')) {
-          inputPassword = req.body.password.toString('utf8');
-        }
-        // Unicode characters can be up to 4 bytes, bcrypt has maximum input 72 characters.
-        const uint8PasswordArray = new TextEncoder('utf8').encode(inputPassword);
-        if ((inputNonce.length > 1) &&
-          (inputNonce.length <= 16) &&
-          (inputUser.length > 0) &&
-          (inputUser.length <= 16) &&
-          // 72 bytes, not unicode characters
-          (uint8PasswordArray.length <= 72) &&
-          (inputPassword.length > 0)) {
-          //
-          // Query user array to find index to matching user.
-          //
-          const postedUser = sanatizeString(inputUser);
-          let userIndex = -1;
-          for (let i = 0; i < userArray.length; i++) {
-            if (userArray[i].user === postedUser) {
-              userIndex = i;
-            }
-          } // next i
-          if (userIndex < 0) {
-            // username not found, login fail
-            customLog(req, 'Bad login user id unknown');
-            _removeLoginNonceFromSession(req);
-            req.session.sessionAuth.previousFailTimeSec = timeNowSeconds;
-            return res.redirect('/login');
-          }
-
-          if ((!(req.session.sessionAuth.loginNonce)) ||
-            (!(safeCompare(inputNonce, req.session.sessionAuth.loginNonce)))) {
-            customLog(req, 'Bad login nonce invalid');
-            _removeLoginNonceFromSession(req);
-            // failTime used to append error message of past login fail attempt
-            req.session.sessionAuth.previousFailTimeSec = timeNowSeconds;
-            return res.redirect('/login');
-          }
-
-          if ((!(req.session.sessionAuth.loginExpireTimeSec)) ||
-            (timeNowSeconds >= req.session.sessionAuth.loginExpireTimeSec)) {
-            customLog(req, 'Bad login time limit exceeded');
-            _removeLoginNonceFromSession(req);
-            // failTime used to append error message of past login fail attempt
-            req.session.sessionAuth.previousFailTimeSec = timeNowSeconds;
-            return res.redirect('/login');
-          }
-
-          //
-          // Check bcrypt salted hash to see if it matches
-          //
-          if (bcrypt.compareSync(inputPassword, userArray[userIndex].hash)) {
-            // ------------------------
-            // Authorize the user
-            // ------------------------
-            _initSession(req);
-            req.session.sessionAuth.authorized = true;
-            req.session.sessionAuth.user = userArray[userIndex].user;
-            req.session.sessionAuth.name = userArray[userIndex].name;
-            req.session.sessionAuth.userid = userArray[userIndex].userid;
-            // req.session.sessionAuth.scopes = userArray[userIndex].scopes;
-            req.session.sessionAuth.sessionExpireTimeSec = timeNowSeconds + sessionExpireAfterSec;
-            _removeLoginNonceFromSession(req);
-            //
-            // add to log file
-            //
-            customLog(req, 'Login ' + req.session.sessionAuth.user);
-            // -------------------------------------------------
-            // Redirect to landing page after successful login
-            // -------------------------------------------------
-            res.redirect('/irc/webclient.html');
-          } else {
-            // Else, login fail by content
-            customLog(req, 'Bad login password mismatch');
-            _removeLoginNonceFromSession(req);
-            // failTime used to append error message of past login fail attempt
-            req.session.sessionAuth.previousFailTimeSec = timeNowSeconds;
-            return res.redirect('/login');
-          }
-        } else {
-          // Else, login fail due to data format presented, Status 400 Bad request
-          customLog(req, 'Bad login malformed request');
-          _removeLoginNonceFromSession(req);
-          return res.status(400).send('400 Bad Request');
-        }
-      } else {
-        customLog(req, 'Bad login no session cookie');
-        // case of user's cookies are blocked
-        return res.redirect('/blocked');
-      } // cookie enable check
-    } catch (error) {
-      customLog(req, 'Bad login try catch error during login');
-      console.log('Try catch error during login ' + error);
-      const err = new Error('Internal Server Error');
-      err.status = 500;
-      if (nodeEnv === 'development') {
-        err.errors = '' + error;
-      }
-      next(err);
+    // It is a general security practice to update session upon change in permission.
+    // Copy existing session properties to new session
+    const csrfSecret = req.session.csrfSecret;
+    let sessionAuth = null;
+    if ((req.session.sessionAuth) && (typeof req.session.sessionAuth === 'object')) {
+      // deep copy object so obsolete session does not have reference for garbage collection
+      sessionAuth = JSON.parse(JSON.stringify(req.session.sessionAuth));
     }
+    // new replacement session valid within scope of callback function
+    req.session.regenerate(function (err) {
+      if (err) {
+        return next(err);
+      } else {
+        // restore session porperties from previous session
+        req.session.csrfSecret = csrfSecret;
+        req.session.sessionAuth = sessionAuth;
+        // wrap in try to catch errors
+        try {
+          // Check if browser cookies enabled and a session has been establised.
+          if ((req.signedCookies) && (req.session) && (req.session.sessionAuth)) {
+          // remove previous credentials if there are any
+            _removeAuthorizationFromSession(req);
+            const timeNowSeconds = Math.floor(Date.now() / 1000);
+            // make sure all expected data has been supplied, else bad request error
+            let inputNonce = '';
+            let inputUser = '';
+            let inputPassword = '';
+            if (('query' in req) && ('nonce' in req.query) &&
+              (typeof req.query.nonce === 'string')) {
+              inputNonce = req.query.nonce.toString('utf8');
+            }
+            if (('body' in req) && ('user' in req.body) &&
+              (typeof req.body.user === 'string')) {
+              inputUser = req.body.user.toString('utf8');
+            }
+            if (('body' in req) && ('password' in req.body) &&
+              (typeof req.body.password === 'string')) {
+              inputPassword = req.body.password.toString('utf8');
+            }
+            // Unicode characters can be up to 4 bytes, bcrypt has maximum input 72 characters.
+            const uint8PasswordArray = new TextEncoder('utf8').encode(inputPassword);
+            if ((inputNonce.length > 1) &&
+              (inputNonce.length <= 16) &&
+              (inputUser.length > 0) &&
+              (inputUser.length <= 16) &&
+              // 72 bytes, not unicode characters
+              (uint8PasswordArray.length <= 72) &&
+              (inputPassword.length > 0)) {
+              //
+              // Query user array to find index to matching user.
+              //
+              const postedUser = sanatizeString(inputUser);
+              let userIndex = -1;
+              for (let i = 0; i < userArray.length; i++) {
+                if (userArray[i].user === postedUser) {
+                  userIndex = i;
+                }
+              } // next i
+              if (userIndex < 0) {
+                // username not found, login fail
+                customLog(req, 'Bad login user id unknown');
+                _removeLoginNonceFromSession(req);
+                req.session.sessionAuth.previousFailTimeSec = timeNowSeconds;
+                return res.redirect('/login');
+              }
+
+              if ((!(req.session.sessionAuth.loginNonce)) ||
+                (!(safeCompare(inputNonce, req.session.sessionAuth.loginNonce)))) {
+                customLog(req, 'Bad login nonce invalid');
+                _removeLoginNonceFromSession(req);
+                // failTime used to append error message of past login fail attempt
+                req.session.sessionAuth.previousFailTimeSec = timeNowSeconds;
+                return res.redirect('/login');
+              }
+
+              if ((!(req.session.sessionAuth.loginExpireTimeSec)) ||
+                (timeNowSeconds >= req.session.sessionAuth.loginExpireTimeSec)) {
+                customLog(req, 'Bad login time limit exceeded');
+                _removeLoginNonceFromSession(req);
+                // failTime used to append error message of past login fail attempt
+                req.session.sessionAuth.previousFailTimeSec = timeNowSeconds;
+                return res.redirect('/login');
+              }
+
+              //
+              // Check bcrypt salted hash to see if it matches
+              //
+              if (bcrypt.compareSync(inputPassword, userArray[userIndex].hash)) {
+                // ------------------------
+                // Authorize the user
+                // ------------------------
+                _initSession(req);
+                req.session.sessionAuth.authorized = true;
+                req.session.sessionAuth.user = userArray[userIndex].user;
+                req.session.sessionAuth.name = userArray[userIndex].name;
+                req.session.sessionAuth.userid = userArray[userIndex].userid;
+                // req.session.sessionAuth.scopes = userArray[userIndex].scopes;
+                req.session.sessionAuth.sessionExpireTimeSec =
+                  timeNowSeconds + sessionExpireAfterSec;
+                _removeLoginNonceFromSession(req);
+                //
+                // add to log file
+                //
+                customLog(req, 'Login ' + req.session.sessionAuth.user);
+                // -------------------------------------------------
+                // Redirect to landing page after successful login
+                // -------------------------------------------------
+                res.redirect('/irc/webclient.html');
+              } else {
+                // Else, login fail by content
+                customLog(req, 'Bad login password mismatch');
+                _removeLoginNonceFromSession(req);
+                // failTime used to append error message of past login fail attempt
+                req.session.sessionAuth.previousFailTimeSec = timeNowSeconds;
+                return res.redirect('/login');
+              }
+            } else {
+              // Else, login fail due to data format presented, Status 400 Bad request
+              customLog(req, 'Bad login malformed request');
+              _removeLoginNonceFromSession(req);
+              return res.status(400).send('400 Bad Request');
+            }
+          } else {
+            customLog(req, 'Bad login no session cookie');
+            // case of user's cookies are blocked
+            return res.redirect('/blocked');
+          } // cookie enable check
+        } catch (error) {
+          customLog(req, 'Bad login try catch error during login');
+          console.log('Try catch error during login ' + error);
+          const err = new Error('Internal Server Error');
+          err.status = 500;
+          if (nodeEnv === 'development') {
+            err.errors = '' + error;
+          }
+          next(err);
+        }
+      } // !err
+    }); // regenerate session
   }; // loginAuthorize()
 
   const loginFormFragment1 =

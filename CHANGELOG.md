@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Next 2022-07-13
+
+### Changed
+
+- server/middlewares/remote-authenticate.js - When using remote auth, authorization callback generates a new session
+- server/middlewares/user-authentication.js - When using local auth, submission of user password generates a new session
+
+Discussion: this is a security enhancement. It is a recommended practice to generate new session upon change in user permissions.
+This can mitigate the risk of session fixation attack.
 
 ## [v0.1.43](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.1.43) 2022-04-28
 
