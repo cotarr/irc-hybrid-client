@@ -16,6 +16,11 @@ and this project adheres to
 Discussion: this is a security enhancement. It is a recommended practice to generate new session upon change in user permissions.
 This can mitigate the risk of session fixation attack.
 
+### Changed
+
+- package.json - update express 4.17.3 to 4.18.1, express-session 1.17.1 to 1.17.3
+- package.json - update helmet 5.0.2 to 5.1.0, ws 8.5.0 to 8.8.0
+
 ## [v0.1.43](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.1.43) 2022-04-28
 
 ### Added
