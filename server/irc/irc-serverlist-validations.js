@@ -59,10 +59,59 @@
     handleValidationError
   ]; // list
 
+  // ----------------------------
+  // DELETE (destroy) (URL query selectors)
+  // ----------------------------
+
+  const destroy = [
+    //
+    // Validate extrneous keys
+    //
+    function (req, res, next) {
+      checkExtraneousKeys(req, [
+        'index'
+      ], 'query');
+      next();
+    },
+    function (req, res, next) {
+      checkExtraneousKeys(req, [
+        'index'
+      ], 'body');
+      next();
+    },
+    //
+    // Validate required keys
+    //
+
+    //
+    // Validate forbidden keys
+    //
+
+    //
+    // validate input
+    //
+    query('index', 'Invalid integer value').optional()
+      .isWhitelisted('0123456789'),
+    query('index', 'Invalid integer value').optional()
+      .isInt(),
+    query('index', 'Invalid integer value').optional()
+      .isInt(),
+    //
+    // sanitize input
+    //
+    query(['index']).optional()
+      .toInt(),
+    body(['index']).optional()
+      .toInt(),
+    //
+    // On error return status 422 Unprocessable Entity
+    //
+    handleValidationError
+  ]; // list
   module.exports = {
-    list: list
+    list: list,
     // create: create,
     // update: update,
-    // destroy: destroy
+    destroy: destroy
   };
 })();

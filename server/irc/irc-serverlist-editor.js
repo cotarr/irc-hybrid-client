@@ -38,8 +38,8 @@
   let editLock = false;
   let editLockTimer = 0;
 
-  const _setEditLock = function (value) {
-    if (value) {
+  const _setEditLock = function (lockValue) {
+    if (lockValue) {
       editLock = true;
       editLockTimer = 3600;
     } else {
@@ -51,8 +51,8 @@
   //
   // Editlock timer (seconds)
   //
-  setTimeout(function () {
-    console.log('editLock ', editLock, ' editLockTimer ', editLockTimer);
+  setInterval(function () {
+    // console.log('editLock ', editLock, ' editLockTimer ', editLockTimer);
     if (editLockTimer === 1) {
       editLock = false;
       editLockTimer = 0;
@@ -70,13 +70,14 @@
   const setReadLock = function (req, chainObject) {
     return new Promise(function (resolve, reject) {
       if (('query' in req) && ('index' in req.query) &&
-        ('lock' in req.query)) {
+      ('lock' in req.query)) {
         if (editLock) {
-          if (req.query.lock === 1) {
+          // Case of editLock === true
+          if (parseInt(req.query.lock) === 1) {
             const err = new Error('Lock already set');
             err.status = 409; // Status 409 = Conflict
             reject(err);
-          } else if (req.query.lock === 0) {
+          } else if (parseInt(req.query.lock) === 0) {
             _setEditLock(false);
             resolve(chainObject);
           } else {
@@ -85,10 +86,11 @@
             reject(err);
           }
         } else {
-          if (req.query.lock === 1) {
-            _setEditLock(false);
+          // Case of editLock === false
+          if (parseInt(req.query.lock) === 1) {
+            _setEditLock(true);
             resolve(chainObject);
-          } else if (req.query.lock === 0) {
+          } else if (parseInt(req.query.lock) === 0) {
             resolve(chainObject);
           } else {
             const err = new Error('Lock allowed values 0 or 1');
