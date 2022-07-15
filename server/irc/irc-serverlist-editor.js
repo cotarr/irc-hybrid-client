@@ -34,47 +34,71 @@
 
   // const nodeEnv = process.env.NODE_ENV || 'development';
 
-  // editlock must be set to true to accept POST, PATCH or DELETE methods.
-  let editlock = false;
+  // editLock must be set to true to accept POST, PATCH or DELETE methods.
+  let editLock = false;
+  let editLockTimer = 0;
+
+  const _setEditLock = function (value) {
+    if (value) {
+      editLock = true;
+      editLockTimer = 3600;
+    } else {
+      editLock = false;
+      editLockTimer = 0;
+    }
+  };
 
   //
-  // Parse query params for: GET /irc/serverlist?index=0&editlock=1
-  // requies either no query params, or both 'index' and 'editlock'
-  // sets variable editlock
+  // Editlock timer (seconds)
+  //
+  setTimeout(function () {
+    console.log('editLock ', editLock, ' editLockTimer ', editLockTimer);
+    if (editLockTimer === 1) {
+      editLock = false;
+      editLockTimer = 0;
+    }
+    if (editLockTimer > 0) editLockTimer--;
+  }, 1000);
+
+  //
+  // Parse query params for: GET /irc/serverlist?index=0&lock=1
+  // requies either no query params, or both 'index' and 'lock'
+  // sets variable editLock
+  // Some input validation is reduncant to express-validator checks.
   // returns Promise resolving to chainObject
   //
-  const setReadEditLock = function (req, chainObject) {
+  const setReadLock = function (req, chainObject) {
     return new Promise(function (resolve, reject) {
       if (('query' in req) && ('index' in req.query) &&
-        ('editlock' in req.query)) {
-        if (editlock) {
-          if (req.query.editlock === '1') {
-            const err = new Error('Editlock already set');
+        ('lock' in req.query)) {
+        if (editLock) {
+          if (req.query.lock === 1) {
+            const err = new Error('Lock already set');
             err.status = 409; // Status 409 = Conflict
             reject(err);
-          } else if (req.query.editlock === '0') {
-            editlock = false;
+          } else if (req.query.lock === 0) {
+            _setEditLock(false);
             resolve(chainObject);
           } else {
-            const err = new Error('Editlock allowed values 0 or 1');
+            const err = new Error('Lock allowed values 0 or 1');
             err.status = 400;
             reject(err);
           }
         } else {
-          if (req.query.editlock === '1') {
-            editlock = true;
+          if (req.query.lock === 1) {
+            _setEditLock(false);
             resolve(chainObject);
-          } else if (req.query.editlock === '0') {
+          } else if (req.query.lock === 0) {
             resolve(chainObject);
           } else {
-            const err = new Error('Editlock allowed values 0 or 1');
+            const err = new Error('Lock allowed values 0 or 1');
             err.status = 400;
             reject(err);
           }
         }
       } else if (('query' in req) && (!('index' in req.query)) &&
-        ('editlock' in req.query)) {
-        const err = new Error('editlock requires param: index');
+        ('lock' in req.query)) {
+        const err = new Error('lock requires param: index');
         err.status = 400;
         reject(err);
       } else {
@@ -84,13 +108,13 @@
   };
 
   //
-  // Verify editlock is true before modification of records
-  // If successful remove editlock by set to false
+  // Verify editLock is true before modification of records
+  // If successful remove editLock by set to false
   // Returns Promise resolving to chainObject
   //
-  const requireEditLock = function (chainObject) {
-    if (editlock) {
-      editlock = false;
+  const requireLock = function (chainObject) {
+    if (editLock) {
+      _setEditLock(false);
       return Promise.resolve(chainObject);
     } else {
       const err = new Error('Attempt to modify unlocked record');
@@ -160,7 +184,7 @@
   // serverArray is added to the chainObject
   // Returns Promise resolving to chain Object.
   //
-  const parseServerArray = function (chainObject) {
+  const serializeElements = function (chainObject) {
     return new Promise(function (resolve, reject) {
       if ((chainObject) && ('serversFile' in chainObject) &&
         ('serverArray' in chainObject.serversFile)) {
@@ -210,7 +234,7 @@
   //
   // GET /irc/serverlist                     Array of all configured server
   // GET /irc/serverlist?index=0             One server at index
-  // GET /irc/serverlist?index=0&editlock=1  One server at index, set editlock
+  // GET /irc/serverlist?index=0&lock=1  One server at index, set editLock
   // This is intended to be the last function in the promise chain.
   //
   const returnServerList = function (req, res, next, chainObject) {
@@ -280,7 +304,7 @@
   // Removes a specified IRC server from serverArray
   // Returns Promise resolving to chainObject
   //
-  const removeDeletedServerFromArray = function (req, chainObject) {
+  const deleteArrayElement = function (req, chainObject) {
     return new Promise(function (resolve, reject) {
       const index = parseInt(req.query.index);
       if (index < chainObject.serversFile.serverArray.length) {
@@ -297,12 +321,12 @@
   // --------------------------------------------------
   // GET /irc/serverlist route handler
   // --------------------------------------------------
-  const getIrcServer = function (req, res, next) {
+  const listServerlist = function (req, res, next) {
     const chainObject = {};
     requireIrcNotConnected(chainObject)
-      .then((chainObject) => setReadEditLock(req, chainObject))
+      .then((chainObject) => setReadLock(req, chainObject))
       .then((chainObject) => readServersFile(chainObject))
-      .then((chainObject) => parseServerArray(chainObject))
+      .then((chainObject) => serializeElements(chainObject))
       .then((chainObject) => returnServerList(req, res, next, chainObject))
       .catch((err) => next(err));
   };
@@ -310,36 +334,36 @@
   // --------------------------------------------------
   // POST /irc/serverlist route handler
   // --------------------------------------------------
-  const createIrcServer = function (req, res, next) {
+  const createServerlist = function (req, res, next) {
     res.status(405).send('Method not written yet');
   };
 
   // --------------------------------------------------
   // PATCH /irc/serverlist route handler
   // --------------------------------------------------
-  const modifyIrcServer = function (req, res, next) {
+  const updateServerlist = function (req, res, next) {
     res.status(405).send('Method not written yet');
   };
 
   // --------------------------------------------------
   // DELETE /irc/serverlist route handler
   // --------------------------------------------------
-  const deleteIrcServer = function (req, res, next) {
+  const deleteServerlist = function (req, res, next) {
     const chainObject = {};
     requireIrcNotConnected(chainObject)
-      .then((chainObject) => requireEditLock(chainObject))
+      .then((chainObject) => requireLock(chainObject))
       .then((chainObject) => matchIndex(req, chainObject))
       .then((chainObject) => readServersFile(chainObject))
-      .then((chainObject) => removeDeletedServerFromArray(req, chainObject))
+      .then((chainObject) => deleteArrayElement(req, chainObject))
       .then((chainObject) => writeServersFile(chainObject))
       .then((chainObject) => returnOkStatus(res, chainObject))
       .catch((err) => next(err));
   };
 
   module.exports = {
-    getIrcServer: getIrcServer,
-    createIrcServer: createIrcServer,
-    modifyIrcServer: modifyIrcServer,
-    deleteIrcServer: deleteIrcServer
+    list: listServerlist,
+    create: createServerlist,
+    update: updateServerlist,
+    delete: deleteServerlist
   };
 }());

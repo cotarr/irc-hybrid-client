@@ -45,6 +45,7 @@ const app = express();
 
 // Irc Client Module
 const ircClient = require('./irc/irc-client');
+const ircServerListvalidations = require('./irc/irc-serverlist-validations');
 const ircServerListEditor = require('./irc/irc-serverlist-editor');
 
 // TLS certificate filenames
@@ -484,16 +485,17 @@ app.get('/irc/test2', userAuth.authorizeOrFail, ircClient.test2Handler);
 
 app.get('/irc/serverlist',
   // userAuth.authorizeOrFail,
-  ircServerListEditor.getIrcServer);
+  ircServerListvalidations.list,
+  ircServerListEditor.list);
 app.post('/irc/serverlist',
   // userAuth.authorizeOrFail, csrfProtection,
-  ircServerListEditor.createIrcServer);
+  ircServerListEditor.create);
 app.patch('/irc/serverlist',
   // userAuth.authorizeOrFail, csrfProtection,
-  ircServerListEditor.modifyIrcServer);
+  ircServerListEditor.update);
 app.delete('/irc/serverlist',
   // userAuth.authorizeOrFail, csrfProtection,
-  ircServerListEditor.deleteIrcServer);
+  ircServerListEditor.delete);
 console.log('\n * * * ROUTE AUTH DISABLED FOR DEBUGGING * * *\n');
 
 // -------------------------------
