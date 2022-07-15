@@ -75,14 +75,31 @@
     },
     function (req, res, next) {
       checkExtraneousKeys(req, [
-        'index'
+        'index',
+        'name',
+        'host',
+        'port',
+        'tls',
+        'verify',
+        'password',
+        'identifyNick',
+        'identifyCommand',
+        'nick',
+        'user',
+        'real',
+        'modes',
+        'channelList'
       ], 'body');
       next();
     },
     //
     // Validate required keys
     //
-
+    query('index', 'is required URL query param')
+      .exists(),
+    query('index', 'is required body param')
+      .exists(),
+    //
     //
     // Validate forbidden keys
     //
@@ -96,6 +113,13 @@
       .isInt(),
     query('index', 'Invalid integer value').optional()
       .isInt(),
+    query('index').optional()
+      .custom(function (value, { req }) {
+        if (parseInt(req.query.index) !== parseInt(req.body.index)) {
+          throw new Error('Values not match: query index, body index');
+        }
+        return true;
+      }),
     //
     // sanitize input
     //

@@ -119,7 +119,7 @@
       _setEditLock(false);
       return Promise.resolve(chainObject);
     } else {
-      const err = new Error('Attempt to modify unlocked record');
+      const err = new Error('Attempt to modify unlocked data table');
       err.status = 409; // Status 409 = Conflict
       return Promise.reject(err);
     }
@@ -203,7 +203,7 @@
             tempServer.tls = chainObject.serversFile.serverArray[i].tls;
             tempServer.verify = chainObject.serversFile.serverArray[i].verify;
             tempServer.password = chainObject.serversFile.serverArray[i].password;
-            tempServer.identifyNice = chainObject.serversFile.serverArray[i].identifyNick;
+            tempServer.identifyNick = chainObject.serversFile.serverArray[i].identifyNick;
             tempServer.identifyCommand = chainObject.serversFile.serverArray[i].identifyCommand;
             tempServer.nick = chainObject.serversFile.serverArray[i].nick;
             tempServer.user = chainObject.serversFile.serverArray[i].user;
@@ -262,6 +262,7 @@
   // For http methods that modify IRC server definitions
   // This function will match the query parameter index value
   // to the index value in the body of the http request.
+  // Check may be redundant to express-validator input validation
   //
   // Returns Promise resolving to unmodified chainObject
   //
@@ -298,8 +299,17 @@
   // that modify a IRC server record (POST, PATCH, DELETE)
   // This is intended to be the last function in the promise chain.
   //
-  const returnOkStatus = function (res, chainObject) {
-    res.send();
+  const returnStatus = function (req, res, chainObject) {
+    const responseJson = {
+      status: 'success',
+      method: req.method
+    };
+    console.log(req.query);
+    if (('query' in req) && ('index' in req.query)) responseJson.index = parseInt(req.query.index);
+    if (req.method === 'POST') responseJson.index = chainObject.serversFile.serverArray.length;
+    if (chainObject.resultStatus) responseJson.status = chainObject.resultStatus;
+    if (chainObject.resultComment) responseJson.comment = chainObject.resultComment;
+    res.json(responseJson);
   };
 
   //
@@ -338,6 +348,13 @@
   // --------------------------------------------------
   const createServerlist = function (req, res, next) {
     res.status(405).send('Method not written yet');
+
+    // const chainObject = {};
+    // requireIrcNotConnected(chainObject)
+    //   .then((chainObject) => requireLock(chainObject))
+    //   .then((chainObject) => readServersFile(chainObject))
+    //   .then((chainObject) => returnStatus(req, res, chainObject))
+    //   .catch((err) => next(err));
   };
 
   // --------------------------------------------------
@@ -350,7 +367,7 @@
   // --------------------------------------------------
   // DELETE /irc/serverlist route handler
   // --------------------------------------------------
-  const deleteServerlist = function (req, res, next) {
+  const destroyServerList = function (req, res, next) {
     const chainObject = {};
     requireIrcNotConnected(chainObject)
       .then((chainObject) => requireLock(chainObject))
@@ -358,7 +375,7 @@
       .then((chainObject) => readServersFile(chainObject))
       .then((chainObject) => deleteArrayElement(req, chainObject))
       .then((chainObject) => writeServersFile(chainObject))
-      .then((chainObject) => returnOkStatus(res, chainObject))
+      .then((chainObject) => returnStatus(req, res, chainObject))
       .catch((err) => next(err));
   };
 
@@ -366,6 +383,6 @@
     list: listServerlist,
     create: createServerlist,
     update: updateServerlist,
-    delete: deleteServerlist
+    destroy: destroyServerList
   };
 }());

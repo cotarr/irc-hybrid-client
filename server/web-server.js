@@ -484,19 +484,20 @@ app.get('/irc/test1', userAuth.authorizeOrFail, ircClient.test1Handler);
 app.get('/irc/test2', userAuth.authorizeOrFail, ircClient.test2Handler);
 
 app.get('/irc/serverlist',
-  // userAuth.authorizeOrFail,
+  userAuth.authorizeOrFail,
   ircServerListvalidations.list,
   ircServerListEditor.list);
 app.post('/irc/serverlist',
-  // userAuth.authorizeOrFail, csrfProtection,
+  userAuth.authorizeOrFail, csrfProtection,
   ircServerListEditor.create);
 app.patch('/irc/serverlist',
-  // userAuth.authorizeOrFail, csrfProtection,
+  userAuth.authorizeOrFail, csrfProtection,
   ircServerListEditor.update);
 app.delete('/irc/serverlist',
-  // userAuth.authorizeOrFail, csrfProtection,
-  ircServerListEditor.delete);
-console.log('\n * * * ROUTE AUTH DISABLED FOR DEBUGGING * * *\n');
+  userAuth.authorizeOrFail, csrfProtection,
+  ircServerListvalidations.destroy,
+  ircServerListEditor.destroy);
+// console.log('\n * * * ROUTE AUTH DISABLED FOR DEBUGGING * * *\n');
 
 // -------------------------------
 // If unauthorized, redirect to /login for main html file /irc/webclient.html.
