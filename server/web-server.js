@@ -45,6 +45,7 @@ const app = express();
 
 // Irc Client Module
 const ircClient = require('./irc/irc-client');
+const ircServerListEditor = require('./irc/irc-serverlist-editor');
 
 // TLS certificate filenames
 // Web username, password credentials
@@ -480,6 +481,20 @@ app.post('/irc/prune', userAuth.authorizeOrFail, csrfProtection, ircClient.prune
 app.post('/irc/erase', userAuth.authorizeOrFail, csrfProtection, ircClient.eraseCache);
 app.get('/irc/test1', userAuth.authorizeOrFail, ircClient.test1Handler);
 app.get('/irc/test2', userAuth.authorizeOrFail, ircClient.test2Handler);
+
+app.get('/irc/serverlist',
+  // userAuth.authorizeOrFail,
+  ircServerListEditor.getIrcServer);
+app.post('/irc/serverlist',
+  // userAuth.authorizeOrFail, csrfProtection,
+  ircServerListEditor.createIrcServer);
+app.patch('/irc/serverlist',
+  // userAuth.authorizeOrFail, csrfProtection,
+  ircServerListEditor.modifyIrcServer);
+app.delete('/irc/serverlist',
+  // userAuth.authorizeOrFail, csrfProtection,
+  ircServerListEditor.deleteIrcServer);
+console.log('\n * * * ROUTE AUTH DISABLED FOR DEBUGGING * * *\n');
 
 // -------------------------------
 // If unauthorized, redirect to /login for main html file /irc/webclient.html.

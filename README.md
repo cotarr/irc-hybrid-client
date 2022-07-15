@@ -1,3 +1,10 @@
+# = = = = = = Development Branch Notes = = = = = =
+
+Git branch: admin-editor
+
+Work in progress - Branch used to develop browser support to edit the IRC server list.
+
+# = = = = = = = = = = = = = = = = = = = = = = = = =
 # irc-hybrid-client
 
 Single user hybrid IRC client using JavaScript frontend and Node.js/Express backend.

@@ -6,6 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Un-merged 2022-07-14
+
+### Added (WORK IN PROGRESS)
+
+This is a proof of concept edit to create an API for editing of the IRC server list from the web browser.
+
+- Added new nodejs file server/irc/irc-serverlist-editor.js
+  - Added route GET /irc/serverlist to retrieve array of IRC servers
+  - Support query parameters GET/irc/serverlist?index=0&editlock=1 to open edit of specific server
+  - Added route DELETE /etc/serverlist?index=0 to delete an IRC server from the list
+- server/web-server.js - Added routes and authorization for server list edit API
+
 ## [v0.1.44](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.1.44) 2022-07-13
 
 ### Changed
