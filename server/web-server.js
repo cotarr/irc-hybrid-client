@@ -489,6 +489,7 @@ app.get('/irc/serverlist',
   ircServerListEditor.list);
 app.post('/irc/serverlist',
   userAuth.authorizeOrFail, csrfProtection,
+  ircServerListvalidations.create,
   ircServerListEditor.create);
 app.patch('/irc/serverlist',
   userAuth.authorizeOrFail, csrfProtection,
@@ -497,7 +498,7 @@ app.delete('/irc/serverlist',
   userAuth.authorizeOrFail, csrfProtection,
   ircServerListvalidations.destroy,
   ircServerListEditor.destroy);
-// console.log('\n * * * ROUTE AUTH DISABLED FOR DEBUGGING * * *\n');
+console.log('\n * * * ROUTE AUTH DISABLED FOR DEBUGGING * * *\n');
 
 // -------------------------------
 // If unauthorized, redirect to /login for main html file /irc/webclient.html.

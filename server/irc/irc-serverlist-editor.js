@@ -126,6 +126,21 @@
   };
 
   //
+  // Verify editLock is false before modification of records
+  // This is used for creating new records with POST method
+  // Returns Promise resolving to chainObject
+  //
+  const requireNotLock = function (chainObject) {
+    if (editLock) {
+      const err = new Error('Attempt to insert to locked data table');
+      err.status = 409; // Status 409 = Conflict
+      return Promise.reject(err);
+    } else {
+      return Promise.resolve(chainObject);
+    }
+  };
+
+  //
   // Function to check if IRC client is connected to IRC network.
   // Action is denied status 409 if connected to IRC
   // Returns Promoise resolving to chainObject
@@ -193,7 +208,7 @@
         let count = 0;
         chainObject.serverArray = [];
         if (chainObject.serversFile.serverArray.length > 0) {
-          for (let i = 1; i < chainObject.serversFile.serverArray.length; i++) {
+          for (let i = 0; i < chainObject.serversFile.serverArray.length; i++) {
             const tempServer = {};
             tempServer.index = count;
             count += 1;
@@ -231,31 +246,48 @@
     });
   };
 
-  //
-  // Return HTTP response to the following requests
-  //
-  // GET /irc/serverlist                     Array of all configured server
-  // GET /irc/serverlist?index=0             One server at index
-  // GET /irc/serverlist?index=0&lock=1  One server at index, set editLock
-  // This is intended to be the last function in the promise chain.
-  //
-  const returnServerList = function (req, res, next, chainObject) {
-    if (('query' in req) && ('index' in req.query)) {
-      const index = parseInt(req.query.index);
-      if (isNaN(index)) {
-        const err = new Error('Server list index not valid integer');
-        err.status = 400;
-        next(err);
-      } else if ((index < 0) || (index >= chainObject.serverArray.length)) {
-        const err = new Error('Server list array index out of range');
-        err.status = 400;
-        next(err);
-      } else {
-        res.json(chainObject.serverArray[index]);
+  // Accept type string
+  // Remove whitespace
+  // split to array of sub-strings
+  const _stringToArray = function (commaSeparatedString) {
+    if (typeof commaSeparatedString !== 'string') return [];
+    let cleanString = '';
+    const stringLength = commaSeparatedString.length;
+    for (let i = 0; i < stringLength; i++) {
+      if ((commaSeparatedString.charCodeAt(i) !== 32) &&
+        (commaSeparatedString.charCodeAt(i) !== 10) &&
+        (commaSeparatedString.charCodeAt(i) !== 13)) {
+        cleanString += commaSeparatedString.charAt(i);
       }
-    } else {
-      res.json(chainObject.serverArray);
     }
+    return cleanString.split(',');
+  };
+
+  //
+  // Deep copy each IRC server object to a new array
+  // Channel list is deserialized into an Array
+  // newServer is added to the chainObject
+  // Returns Promise resolving to chain Object.
+  //
+  const deserializeElements = function (req, chainObject) {
+    return new Promise(function (resolve, reject) {
+      const tempServer = {};
+      tempServer.name = req.body.name;
+      tempServer.host = req.body.host;
+      tempServer.port = req.body.port;
+      tempServer.tls = req.body.tls;
+      tempServer.verify = req.body.verify;
+      tempServer.password = req.body.password;
+      tempServer.identifyNick = req.body.identifyNick;
+      tempServer.identifyCommand = req.body.identifyCommand;
+      tempServer.nick = req.body.nick;
+      tempServer.user = req.body.user;
+      tempServer.real = req.body.real;
+      tempServer.modes = req.body.modes;
+      tempServer.channelList = _stringToArray(req.body.channelList);
+      chainObject.newServer = tempServer;
+      resolve(chainObject);
+    });
   };
 
   //
@@ -304,12 +336,45 @@
       status: 'success',
       method: req.method
     };
-    console.log(req.query);
     if (('query' in req) && ('index' in req.query)) responseJson.index = parseInt(req.query.index);
-    if (req.method === 'POST') responseJson.index = chainObject.serversFile.serverArray.length;
+    if (req.method === 'POST') responseJson.index = chainObject.serversFile.serverArray.length - 1;
     if (chainObject.resultStatus) responseJson.status = chainObject.resultStatus;
     if (chainObject.resultComment) responseJson.comment = chainObject.resultComment;
     res.json(responseJson);
+  };
+
+  //
+  // Return HTTP response to the following requests
+  //
+  // GET /irc/serverlist                     Array of all configured server
+  // GET /irc/serverlist?index=0             One server at index
+  // GET /irc/serverlist?index=0&lock=1  One server at index, set editLock
+  // This is intended to be the last function in the promise chain.
+  //
+  const returnServerList = function (req, res, next, chainObject) {
+    if (('query' in req) && ('index' in req.query)) {
+      const index = parseInt(req.query.index);
+      if (isNaN(index)) {
+        const err = new Error('Server list index not valid integer');
+        err.status = 400;
+        next(err);
+      } else if ((index < 0) || (index >= chainObject.serverArray.length)) {
+        const err = new Error('Server list array index out of range');
+        err.status = 400;
+        next(err);
+      } else {
+        res.json(chainObject.serverArray[index]);
+      }
+    } else {
+      res.json(chainObject.serverArray);
+    }
+  };
+
+  const appendArrayElement = function (chainObject) {
+    return new Promise(function (resolve, reject) {
+      chainObject.serversFile.serverArray.push(chainObject.newServer);
+      resolve(chainObject);
+    });
   };
 
   //
@@ -347,14 +412,15 @@
   // POST /irc/serverlist route handler
   // --------------------------------------------------
   const createServerlist = function (req, res, next) {
-    res.status(405).send('Method not written yet');
-
-    // const chainObject = {};
-    // requireIrcNotConnected(chainObject)
-    //   .then((chainObject) => requireLock(chainObject))
-    //   .then((chainObject) => readServersFile(chainObject))
-    //   .then((chainObject) => returnStatus(req, res, chainObject))
-    //   .catch((err) => next(err));
+    const chainObject = {};
+    requireIrcNotConnected(chainObject)
+      .then((chainObject) => requireNotLock(chainObject))
+      .then((chainObject) => deserializeElements(req, chainObject))
+      .then((chainObject) => readServersFile(chainObject))
+      .then((chainObject) => appendArrayElement(chainObject))
+      .then((chainObject) => writeServersFile(chainObject))
+      .then((chainObject) => returnStatus(req, res, chainObject))
+      .catch((err) => next(err));
   };
 
   // --------------------------------------------------
