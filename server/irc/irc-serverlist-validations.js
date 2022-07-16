@@ -13,7 +13,7 @@
 
   const list = [
     //
-    // Validate extrneous keys
+    // Validate extraneous keys
     //
     function (req, res, next) {
       checkExtraneousKeys(req, [
@@ -64,7 +64,7 @@
   // ----------------------------
   const create = [
     //
-    // Validate extrneous keys
+    // Validate extraneous keys
     //
     function (req, res, next) {
       checkExtraneousKeys(req, [

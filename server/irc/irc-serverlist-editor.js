@@ -62,9 +62,9 @@
 
   //
   // Parse query params for: GET /irc/serverlist?index=0&lock=1
-  // requies either no query params, or both 'index' and 'lock'
+  // requires either no query params, or both 'index' and 'lock'
   // sets variable editLock
-  // Some input validation is reduncant to express-validator checks.
+  // Some input validation is redundant to express-validator checks.
   // returns Promise resolving to chainObject
   //
   const setReadLock = function (req, chainObject) {
@@ -143,7 +143,7 @@
   //
   // Function to check if IRC client is connected to IRC network.
   // Action is denied status 409 if connected to IRC
-  // Returns Promoise resolving to chainObject
+  // Returns Promise resolving to chainObject
   //
   const requireIrcNotConnected = function (chainObject) {
     return new Promise(function (resolve, reject) {
