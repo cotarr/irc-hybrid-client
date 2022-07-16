@@ -1,0 +1,1791 @@
+{
+	"info": {
+		"name": "irc-hybrid-client server config",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Reset sessions,  cookies, global vars",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// The domain 127.0.0.1 must be whitelisted in postman to avoid error:",
+							"// \"CookieStore: programmatic access to \"localhost\" is denied\"}",
+							"const jar = pm.cookies.jar();",
+							"jar.clear('127.0.0.1', (err) => {",
+							"    if (err) console.log(err);",
+							"});",
+							"",
+							"jar.clear('localhost', (err) => {",
+							"    if (err) console.log(err);",
+							"});",
+							"",
+							"pm.test(\"Unset global variables\", function () {",
+							"    pm.globals.unset('server_nonce');",
+							"    pm.globals.unset('csrf_token');",
+							"    pm.globals.unset('irc_server_index');",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "text/html"
+					}
+				],
+				"url": {
+					"raw": "{{server_URL}}/logout",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"logout"
+					]
+				},
+				"description": "Request /logout route to remove previous session authorization.\nDelete cookies and global variables."
+			},
+			"response": []
+		},
+		{
+			"name": "/login get valid nonce",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"",
+							"pm.test(\"Fail if already logged in\", function () {",
+							"    // If already logged in, then redirect to main page. The nonce can not be tested.     ",
+							"    let statusCode = pm.response.code;",
+							"    if (statusCode === 302) {",
+							"      console.log('You can not get a nonce while logged in, use /logout');",
+							"    }",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"//",
+							"// This assumes that the nonce is in the 23 quote delimitered string fragment.",
+							"//",
+							"pm.test(\"Parse the random nonce from login form\", function () {",
+							"    pm.globals.unset('server_nonce');",
+							"",
+							"    // get response body as string (find the one with the nonce)",
+							"    let arrayOfQuotedStrings = pm.response.text().split('\"')",
+							"    // console.log(arrayOfQuotedStrings)",
+							"    ",
+							"    // Extract n-th the string fragment with nonce from array",
+							"    // Example: /login-authorize?nonce=lWCgTNWj",
+							"    let actionPath = arrayOfQuotedStrings[19];",
+							"    // console.log(actionPath);",
+							"    ",
+							"    // Extract nonce as string.",
+							"    // Example: lWCgTNWj",
+							"    let parsedNonce = actionPath.split('=')[1];",
+							"    // console.log(parsedNonce);",
+							"    if ((parsedNonce) && (parsedNonce.length > 0)) {",
+							"        pm.globals.set('server_nonce', parsedNonce);",
+							"        console.log('/login has set lobal variable server_nonce set to: ' + pm.globals.get('server_nonce'));",
+							"    }",
+							"    ",
+							"    pm.expect(parsedNonce).to.have.lengthOf.above(1);",
+							"});",
+							"",
+							"pm.test(\"Extract CSRF token to global variables\", function () {",
+							"    let body = pm.response.text();",
+							"    let bodyArray = body.split('\\n');",
+							"    let csrfToken = '';",
+							"    for (let i = 0; i < bodyArray.length; i++) {",
+							"        let splitByQuote = bodyArray[i].split('\"');",
+							"        if ((splitByQuote.length === 7) && (splitByQuote[3] === '_csrf')) {",
+							"            csrfToken = splitByQuote[5];",
+							"        }",
+							"    } // next i",
+							"    console.log('/login has set global variable csrf_token to: ', csrfToken);",
+							"    pm.globals.set('csrf_token', csrfToken);",
+							"});",
+							"",
+							"",
+							"pm.test(\"Has header to set cookie\", function () {",
+							"    pm.response.to.have.header(\"Set-Cookie\");",
+							"});",
+							"",
+							"pm.test(\"Has received cookie\", function() {",
+							"    pm.expect(pm.cookies.has('irc-hybrid-client-0')).to.be.true; ",
+							"});",
+							"",
+							"pm.test(\"Response has body\", function () {",
+							"    pm.response.to.have.body();",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "text/html"
+					}
+				],
+				"url": {
+					"raw": "{{server_URL}}/login",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"login"
+					]
+				},
+				"description": "This will request a login form, then extract the login random nonce from the login form, then temporally save the login nonce as a global variable for use in the authorize request"
+			},
+			"response": []
+		},
+		{
+			"name": "/login-authorize (user password)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 302\", function () {",
+							"    pm.response.to.have.status(302);",
+							"});",
+							"",
+							"pm.globals.unset(\"server_nonce\");",
+							"",
+							"pm.test(\"Redirect address is /irc/webclient.html\", function () {",
+							"    let location = pm.response.headers.get('Location');",
+							"    pm.expect(location).to.equal('/irc/webclient.html')",
+							"});",
+							"",
+							"pm.test(\"Has received cookie\", function() {",
+							"    pm.expect(pm.cookies.has('irc-hybrid-client-0')).to.be.true; ",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Accept",
+						"value": "text/html"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "user",
+							"value": "{{server_user1}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{server_password1}}",
+							"type": "text"
+						},
+						{
+							"key": "_csrf",
+							"value": "{{csrf_token}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{server_URL}}/login-authorize?nonce={{server_nonce}}",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"login-authorize"
+					],
+					"query": [
+						{
+							"key": "nonce",
+							"value": "{{server_nonce}}"
+						}
+					]
+				},
+				"description": "This login request with valid random nonce, valid user and valid password is expected to succeed. It will return a redirect to main entry URL."
+			},
+			"response": []
+		},
+		{
+			"name": "/irc/webclient.html get CSRF token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Extract CSRF token to global variables\", function () {",
+							"    let body = pm.response.text();",
+							"    let bodyArray = body.split('\\n');",
+							"    let csrfToken = '';",
+							"    for (let i = 0; i < bodyArray.length; i++) {",
+							"        let splitByQuote = bodyArray[i].split('\"');",
+							"        if ((splitByQuote.length === 5) && (splitByQuote[1] === 'csrf-token')) {",
+							"            csrfToken = splitByQuote[3];",
+							"        }",
+							"    } // next i",
+							"    console.log('/login has set global variable csrf_token to: ', csrfToken);",
+							"    pm.globals.set('csrf_token', csrfToken);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "text/html",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "{{server_URL}}/irc/webclient.html",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"webclient.html"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/irc/getircstate",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "{{server_URL}}/irc/getircstate",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"getircstate"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": "",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/irc/server",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "CSRF-Token",
+						"value": "{{csrf_token}}",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"index\": -1\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server_URL}}/irc/server",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"server"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/irc/serverlist (full list)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/vnd.api+json",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "{{server_URL}}/irc/serverlist",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"serverlist"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/irc/serverlist (clear lock)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/vnd.api+json",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "{{server_URL}}/irc/serverlist?index=0&lock=0",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"serverlist"
+					],
+					"query": [
+						{
+							"key": "index",
+							"value": "0"
+						},
+						{
+							"key": "lock",
+							"value": "0"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/irc/serverlist (set lock)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/vnd.api+json",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "{{server_URL}}/irc/serverlist?index=0&lock=1",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"serverlist"
+					],
+					"query": [
+						{
+							"key": "index",
+							"value": "0"
+						},
+						{
+							"key": "lock",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/irc/serverlist (fail locked)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 409\", function () {",
+							"    pm.response.to.have.status(409);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "CSRF-Token",
+						"value": "{{csrf_token}}",
+						"type": "default"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "default"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 6667,\n    \"tls\": false,\n    \"verify\": false,\n    \"password\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"user\": \"myUser\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server_URL}}/irc/serverlist",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"serverlist"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/irc/serverlist (fail 2nd)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 409\", function () {",
+							"    pm.response.to.have.status(409);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/vnd.api+json",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "{{server_URL}}/irc/serverlist?index=0&lock=1",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"serverlist"
+					],
+					"query": [
+						{
+							"key": "index",
+							"value": "0"
+						},
+						{
+							"key": "lock",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/irc/serverlist (clear lock)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/vnd.api+json",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "{{server_URL}}/irc/serverlist?index=0&lock=0",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"serverlist"
+					],
+					"query": [
+						{
+							"key": "index",
+							"value": "0"
+						},
+						{
+							"key": "lock",
+							"value": "0"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/irc/serverlist (fail unlocked)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 409\", function () {",
+							"    pm.response.to.have.status(409);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "CSRF-Token",
+						"value": "{{csrf_token}}",
+						"type": "default"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "default"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"index\": 0,\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 6667,\n    \"tls\": false,\n    \"verify\": false,\n    \"password\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"user\": \"myUser\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server_URL}}/irc/serverlist?index=0",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"serverlist"
+					],
+					"query": [
+						{
+							"key": "index",
+							"value": "0"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/irc/serverlist (fail unlocked)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 409\", function () {",
+							"    pm.response.to.have.status(409);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "CSRF-Token",
+						"value": "{{csrf_token}}",
+						"type": "default"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "default"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"index\": 0,\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 3000,\n    \"tls\": false,\n    \"verify\": false,\n    \"password\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"user\": \"myUsername\",\n    \"real\": \"Irc Hybrid Client\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server_URL}}/irc/serverlist?index=0",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"serverlist"
+					],
+					"query": [
+						{
+							"key": "index",
+							"value": "0"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/irc/serverlist (success)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Status response\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.eql('success');",
+							"    pm.expect(jsonData.method).to.eql('POST');",
+							"});",
+							"",
+							"pm.test(\"Extract created index to global variables\", function () {",
+							"    let body = pm.response.json();",
+							"    // console.log(body);",
+							"    let index = parseInt(body.index);",
+							"    pm.globals.set('irc_server_index', index);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "CSRF-Token",
+						"value": "{{csrf_token}}",
+						"type": "default"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "default"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 6667,\n    \"tls\": false,\n    \"verify\": false,\n    \"password\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"user\": \"myUser\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server_URL}}/irc/serverlist",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"serverlist"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/irc/serverlist (set edit lock) 1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Verify config values in return JSON\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.name).to.eql('local-server');",
+							"    pm.expect(jsonData.host).to.eql('127.0.0.1');",
+							"    pm.expect(jsonData.port).to.eql(6667);",
+							"    pm.expect(jsonData.tls).to.eql(false);",
+							"    pm.expect(jsonData.verify).to.eql(false);",
+							"    pm.expect(jsonData.password).to.eql('');",
+							"    pm.expect(jsonData.identifyNick).to.eql('');",
+							"    pm.expect(jsonData.nick).to.eql('myNick');",
+							"    pm.expect(jsonData.user).to.eql('myUser');",
+							"    pm.expect(jsonData.real).to.eql('myRealName');",
+							"    pm.expect(jsonData.modes).to.eql('+iw');",
+							"    pm.expect(jsonData.channelList).to.eql('#test, #test2, #test3');",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.test(\"Global variable exists: irc_server_index\", function () {",
+							"    let index = pm.globals.get('irc_server_index');",
+							"    if (typeof index !== 'number') {",
+							"        console.log('Global variable irc_server_index does not exist');",
+							"        throw new Error('Global variable irc_server_index does not exist');",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/vnd.api+json",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "{{server_URL}}/irc/serverlist?index={{irc_server_index}}&lock=1",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"serverlist"
+					],
+					"query": [
+						{
+							"key": "index",
+							"value": "{{irc_server_index}}"
+						},
+						{
+							"key": "lock",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/irc/serverlist (fail lock index)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 409\", function () {",
+							"    pm.response.to.have.status(409);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "CSRF-Token",
+						"value": "{{csrf_token}}",
+						"type": "default"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "default"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"index\": 9999,\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 6667,\n    \"tls\": false,\n    \"verify\": false,\n    \"password\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"user\": \"myUser\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server_URL}}/irc/serverlist?index=9999",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"serverlist"
+					],
+					"query": [
+						{
+							"key": "index",
+							"value": "9999"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/irc/serverlist (set edit lock) 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.test(\"Global variable exists: irc_server_index\", function () {",
+							"    let index = pm.globals.get('irc_server_index');",
+							"    if (typeof index !== 'number') {",
+							"        console.log('Global variable irc_server_index does not exist');",
+							"        throw new Error('Global variable irc_server_index does not exist');",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/vnd.api+json",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "{{server_URL}}/irc/serverlist?index={{irc_server_index}}&lock=1",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"serverlist"
+					],
+					"query": [
+						{
+							"key": "index",
+							"value": "{{irc_server_index}}"
+						},
+						{
+							"key": "lock",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/irc/serverlist (success)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Status response\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.eql('success');",
+							"    pm.expect(jsonData.method).to.eql('PATCH');",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.test(\"Global variable exists: irc_server_index\", function () {",
+							"    let index = pm.globals.get('irc_server_index');",
+							"    if (typeof index !== 'number') {",
+							"        console.log('Global variable irc_server_index does not exist');",
+							"        throw new Error('Global variable irc_server_index does not exist');",
+							"    }",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "CSRF-Token",
+						"value": "{{csrf_token}}",
+						"type": "default"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "default"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"index\": {{irc_server_index}},\n    \"name\": \"local-server2\",\n    \"host\": \"127.0.0.2\",\n    \"port\": 6668,\n    \"tls\": true,\n    \"verify\": true,\n    \"password\": \"test1\",\n    \"identifyNick\": \"test2\",\n    \"identifyCommand\": \"test3\",\n    \"nick\": \"myNick2\",\n    \"user\": \"myUser2\",\n    \"real\": \"myRealName2\",\n    \"modes\": \"+iwww\",\n    \"channelList\": \"#test, #test2, #test3, #test4\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server_URL}}/irc/serverlist?index={{irc_server_index}}",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"serverlist"
+					],
+					"query": [
+						{
+							"key": "index",
+							"value": "{{irc_server_index}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/irc/serverlist (set edit lock) 3",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"",
+							"pm.test(\"Verify config values in return JSON\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.name).to.eql('local-server2');",
+							"    pm.expect(jsonData.host).to.eql('127.0.0.2');",
+							"    pm.expect(jsonData.port).to.eql(6668);",
+							"    pm.expect(jsonData.tls).to.eql(true);",
+							"    pm.expect(jsonData.verify).to.eql(true);",
+							"    pm.expect(jsonData.password).to.eql('test1');",
+							"    pm.expect(jsonData.identifyNick).to.eql('test2');",
+							"    pm.expect(jsonData.identifyCommand).to.eql('test3');",
+							"    pm.expect(jsonData.nick).to.eql('myNick2');",
+							"    pm.expect(jsonData.user).to.eql('myUser2');",
+							"    pm.expect(jsonData.real).to.eql('myRealName2');",
+							"    pm.expect(jsonData.modes).to.eql('+iwww');",
+							"    pm.expect(jsonData.channelList).to.eql('#test, #test2, #test3, #test4');",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.test(\"Global variable exists: irc_server_index\", function () {",
+							"    let index = pm.globals.get('irc_server_index');",
+							"    if (typeof index !== 'number') {",
+							"        console.log('Global variable irc_server_index does not exist');",
+							"        throw new Error('Global variable irc_server_index does not exist');",
+							"    }",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/vnd.api+json",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "{{server_URL}}/irc/serverlist?index={{irc_server_index}}&lock=1",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"serverlist"
+					],
+					"query": [
+						{
+							"key": "index",
+							"value": "{{irc_server_index}}"
+						},
+						{
+							"key": "lock",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/irc/serverlist (fail lock index)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 409\", function () {",
+							"    pm.response.to.have.status(409);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "CSRF-Token",
+						"value": "{{csrf_token}}",
+						"type": "default"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "default"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"index\": 9999,\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 3000,\n    \"tls\": false,\n    \"verify\": false,\n    \"password\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"user\": \"myUsername\",\n    \"real\": \"Irc Hybrid Client\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server_URL}}/irc/serverlist?index=9999",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"serverlist"
+					],
+					"query": [
+						{
+							"key": "index",
+							"value": "9999"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/irc/serverlist (set edit lock) 4",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.test(\"Global variable exists: irc_server_index\", function () {",
+							"    let index = pm.globals.get('irc_server_index');",
+							"    if (typeof index !== 'number') {",
+							"        console.log('Global variable irc_server_index does not exist');",
+							"        throw new Error('Global variable irc_server_index does not exist');",
+							"    }",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/vnd.api+json",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "{{server_URL}}/irc/serverlist?index={{irc_server_index}}&lock=1",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"serverlist"
+					],
+					"query": [
+						{
+							"key": "index",
+							"value": "{{irc_server_index}}"
+						},
+						{
+							"key": "lock",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/irc/serverlist (success)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Status response\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.eql('success');",
+							"    pm.expect(jsonData.method).to.eql('DELETE');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.test(\"Global variable exists: irc_server_index\", function () {",
+							"    let index = pm.globals.get('irc_server_index');",
+							"    if (typeof index !== 'number') {",
+							"        console.log('Global variable irc_server_index does not exist');",
+							"        throw new Error('Global variable irc_server_index does not exist');",
+							"    }",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "CSRF-Token",
+						"value": "{{csrf_token}}",
+						"type": "default"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "default"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"index\": {{irc_server_index}},\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 3000,\n    \"tls\": false,\n    \"verify\": false,\n    \"password\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"user\": \"myUsername\",\n    \"real\": \"Irc Hybrid Client\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server_URL}}/irc/serverlist?index={{irc_server_index}}",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"serverlist"
+					],
+					"query": [
+						{
+							"key": "index",
+							"value": "{{irc_server_index}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/irc/serverlist (fail host syntax)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 422\", function () {",
+							"    pm.response.to.have.status(422);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "CSRF-Token",
+						"value": "{{csrf_token}}",
+						"type": "default"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "default"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"local-server\",\n    \"host\": \"invalid\",\n    \"port\": 6667,\n    \"tls\": false,\n    \"verify\": false,\n    \"password\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"user\": \"myUser\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server_URL}}/irc/serverlist",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"serverlist"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/irc/serverlist (fail port syntax)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 422\", function () {",
+							"    pm.response.to.have.status(422);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "CSRF-Token",
+						"value": "{{csrf_token}}",
+						"type": "default"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "default"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": \"invalid\",\n    \"tls\": false,\n    \"verify\": false,\n    \"password\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"user\": \"myUser\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server_URL}}/irc/serverlist",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"serverlist"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/irc/serverlist (fail missing name)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 422\", function () {",
+							"    pm.response.to.have.status(422);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "CSRF-Token",
+						"value": "{{csrf_token}}",
+						"type": "default"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "default"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 6667,\n    \"tls\": false,\n    \"verify\": false,\n    \"password\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"user\": \"myUser\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server_URL}}/irc/serverlist",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"serverlist"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/irc/serverlist (fail missing nick)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 422\", function () {",
+							"    pm.response.to.have.status(422);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "CSRF-Token",
+						"value": "{{csrf_token}}",
+						"type": "default"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "default"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 6667,\n    \"tls\": false,\n    \"verify\": false,\n    \"password\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"\",\n    \"user\": \"myUser\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server_URL}}/irc/serverlist",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"serverlist"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/irc/serverlist (fail missing user)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 422\", function () {",
+							"    pm.response.to.have.status(422);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "CSRF-Token",
+						"value": "{{csrf_token}}",
+						"type": "default"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "default"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 6667,\n    \"tls\": false,\n    \"verify\": false,\n    \"password\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"user\": \"\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server_URL}}/irc/serverlist",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"serverlist"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
