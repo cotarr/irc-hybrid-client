@@ -493,6 +493,7 @@ app.post('/irc/serverlist',
   ircServerListEditor.create);
 app.patch('/irc/serverlist',
   userAuth.authorizeOrFail, csrfProtection,
+  ircServerListvalidations.update,
   ircServerListEditor.update);
 app.delete('/irc/serverlist',
   userAuth.authorizeOrFail, csrfProtection,

@@ -34,27 +34,44 @@
 
   // const nodeEnv = process.env.NODE_ENV || 'development';
 
+  //
   // editLock must be set to true to accept POST, PATCH or DELETE methods.
+  // lock record index must match
+  //
   let editLock = false;
+  let editLockIndex = -1;
   let editLockTimer = 0;
 
-  const _setEditLock = function (lockValue) {
+  const _setEditLock = function (lockValue, index) {
     if (lockValue) {
       editLock = true;
+      editLockIndex = index;
       editLockTimer = 3600;
     } else {
       editLock = false;
+      editLockIndex = -1;
       editLockTimer = 0;
     }
+  };
+
+  const _checkEditLock = function () {
+    return (editLock);
+  };
+  const _checkEditLockIndex = function (expectedIndex) {
+    return (editLockIndex === expectedIndex);
+  };
+  const _checkNotEditLock = function () {
+    return (!editLock);
   };
 
   //
   // Editlock timer (seconds)
   //
   setInterval(function () {
-    // console.log('editLock ', editLock, ' editLockTimer ', editLockTimer);
+    // console.log('editLock ', editLock, editLockIndex, editLockTimer);
     if (editLockTimer === 1) {
       editLock = false;
+      editLockIndex = -1;
       editLockTimer = 0;
     }
     if (editLockTimer > 0) editLockTimer--;
@@ -71,7 +88,7 @@
     return new Promise(function (resolve, reject) {
       if (('query' in req) && ('index' in req.query) &&
       ('lock' in req.query)) {
-        if (editLock) {
+        if (_checkEditLock()) {
           // Case of editLock === true
           if (parseInt(req.query.lock) === 1) {
             const err = new Error('Lock already set');
@@ -88,7 +105,7 @@
         } else {
           // Case of editLock === false
           if (parseInt(req.query.lock) === 1) {
-            _setEditLock(true);
+            _setEditLock(true, parseInt(req.query.index));
             resolve(chainObject);
           } else if (parseInt(req.query.lock) === 0) {
             resolve(chainObject);
@@ -115,8 +132,7 @@
   // Returns Promise resolving to chainObject
   //
   const requireLock = function (chainObject) {
-    if (editLock) {
-      _setEditLock(false);
+    if (_checkEditLock()) {
       return Promise.resolve(chainObject);
     } else {
       const err = new Error('Attempt to modify unlocked data table');
@@ -131,12 +147,12 @@
   // Returns Promise resolving to chainObject
   //
   const requireNotLock = function (chainObject) {
-    if (editLock) {
+    if (_checkNotEditLock()) {
+      return Promise.resolve(chainObject);
+    } else {
       const err = new Error('Attempt to insert to locked data table');
       err.status = 409; // Status 409 = Conflict
       return Promise.reject(err);
-    } else {
-      return Promise.resolve(chainObject);
     }
   };
 
@@ -301,6 +317,7 @@
   const matchIndex = function (req, chainObject) {
     return new Promise(function (resolve, reject) {
       let errorStr = null;
+      let errorStatus = 400;
       if ((!errorStr) && (!('query' in req))) {
         errorStr = 'required query param: index';
       }
@@ -313,34 +330,24 @@
       if ((!errorStr) && (!('index' in req.body))) {
         errorStr = 'required body param: index';
       }
+      //
+      // Index param value in body must match index URL query param
       if ((!errorStr) && (parseInt(req.query.index) !== parseInt(req.body.index))) {
-        errorStr = 'index mismatch';
+        errorStr = 'Index mismatch (body param, URL query param';
+      }
+      // Index URL query param index must match locked value previously saved
+      if (!(_checkEditLockIndex(parseInt(req.query.index)))) {
+        errorStr = 'Index mismatch (edit lock value)';
+        errorStatus = 409; // conflict
       }
       if (errorStr) {
         const err = new Error(errorStr);
-        err.status = 400;
+        err.status = errorStatus;
         reject(err);
       } else {
         resolve(chainObject);
       }
     });
-  };
-
-  //
-  // This functions returns the HTTP response for methods
-  // that modify a IRC server record (POST, PATCH, DELETE)
-  // This is intended to be the last function in the promise chain.
-  //
-  const returnStatus = function (req, res, chainObject) {
-    const responseJson = {
-      status: 'success',
-      method: req.method
-    };
-    if (('query' in req) && ('index' in req.query)) responseJson.index = parseInt(req.query.index);
-    if (req.method === 'POST') responseJson.index = chainObject.serversFile.serverArray.length - 1;
-    if (chainObject.resultStatus) responseJson.status = chainObject.resultStatus;
-    if (chainObject.resultComment) responseJson.comment = chainObject.resultComment;
-    res.json(responseJson);
   };
 
   //
@@ -370,10 +377,55 @@
     }
   };
 
+  //
+  // This functions returns the HTTP response for methods
+  // that modify a IRC server record (POST, PATCH, DELETE)
+  // This is intended to be the last function in the promise chain.
+  //
+  const returnStatus = function (req, res, chainObject) {
+    _setEditLock(false);
+    const responseJson = {
+      status: 'success',
+      method: req.method
+    };
+    if (('query' in req) && ('index' in req.query)) responseJson.index = parseInt(req.query.index);
+    if (req.method === 'POST') responseJson.index = chainObject.serversFile.serverArray.length - 1;
+    if (chainObject.resultStatus) responseJson.status = chainObject.resultStatus;
+    if (chainObject.resultComment) responseJson.comment = chainObject.resultComment;
+    res.json(responseJson);
+  };
+
+  const handlePromiseErrors = function (next, err) {
+    _setEditLock(false);
+    next(err);
+  };
+
   const appendArrayElement = function (chainObject) {
     return new Promise(function (resolve, reject) {
       chainObject.serversFile.serverArray.push(chainObject.newServer);
       resolve(chainObject);
+    });
+  };
+
+  const replaceArrayElement = function (req, chainObject) {
+    // console.log(JSON.stringify(chainObject, null, 2));
+    return new Promise(function (resolve, reject) {
+      if (('newServer' in chainObject) &&
+        ('serversFile' in chainObject) && ('serverArray' in chainObject.serversFile)) {
+        const index = parseInt(req.query.index);
+        if ((!isNaN(index)) && (index < chainObject.serversFile.serverArray.length)) {
+          chainObject.serversFile.serverArray[index] = chainObject.newServer;
+        } else {
+          const err = new Error('Invalid array index');
+          err.status = 500;
+          reject(err);
+        }
+        resolve(chainObject);
+      } else {
+        const err = new Error('chainObject internal data error');
+        err.status = 500;
+        reject(err);
+      }
     });
   };
 
@@ -427,7 +479,16 @@
   // PATCH /irc/serverlist route handler
   // --------------------------------------------------
   const updateServerlist = function (req, res, next) {
-    res.status(405).send('Method not written yet');
+    const chainObject = {};
+    requireIrcNotConnected(chainObject)
+      .then((chainObject) => requireLock(chainObject))
+      .then((chainObject) => matchIndex(req, chainObject))
+      .then((chainObject) => deserializeElements(req, chainObject))
+      .then((chainObject) => readServersFile(chainObject))
+      .then((chainObject) => replaceArrayElement(req, chainObject))
+      .then((chainObject) => writeServersFile(chainObject))
+      .then((chainObject) => returnStatus(req, res, chainObject))
+      .catch((err) => handlePromiseErrors(next, err));
   };
 
   // --------------------------------------------------
@@ -442,7 +503,7 @@
       .then((chainObject) => deleteArrayElement(req, chainObject))
       .then((chainObject) => writeServersFile(chainObject))
       .then((chainObject) => returnStatus(req, res, chainObject))
-      .catch((err) => next(err));
+      .catch((err) => handlePromiseErrors(next, err));
   };
 
   module.exports = {

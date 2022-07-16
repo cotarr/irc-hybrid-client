@@ -146,11 +146,151 @@
       'tls',
       'verify'])
       .toBoolean(),
+    body([
+      'name',
+      'host',
+      'password',
+      'identifyNick',
+      'identifyCommand',
+      'nick',
+      'user',
+      'real',
+      'modes',
+      'channelList'])
+      // remove starting and ending whitespace
+      .trim(),
     //
     // On error return status 422 Unprocessable Entity
     //
     handleValidationError
   ]; // create
+
+  // ----------------------------
+  // PATCH (update)
+  // ----------------------------
+  const update = [
+    //
+    // Validate extraneous keys
+    //
+    function (req, res, next) {
+      checkExtraneousKeys(req, [
+        'index'
+      ], ['query']);
+      next();
+    },
+    function (req, res, next) {
+      checkExtraneousKeys(req, [
+        'index',
+        'name',
+        'host',
+        'port',
+        'tls',
+        'verify',
+        'password',
+        'identifyNick',
+        'identifyCommand',
+        'nick',
+        'user',
+        'real',
+        'modes',
+        'channelList'
+      ], ['body']);
+      next();
+    },
+    //
+    // Validate forbidden keys
+    //
+
+    //
+    //
+    // Validate required keys
+    //
+    query([
+      'index'], 'Required values')
+      .exists(),
+    body([
+      'index',
+      'name',
+      'host',
+      'port',
+      'tls',
+      'verify',
+      'password',
+      'identifyNick',
+      'identifyCommand',
+      'nick',
+      'user',
+      'real',
+      'modes',
+      'channelList'], 'Required values')
+      .exists(),
+
+    //
+    // validate input
+    //
+    query('index', 'Invalid integer value').optional()
+      .isWhitelisted('0123456789'),
+    query('index', 'Invalid integer value').optional()
+      .isInt(),
+    body('index', 'Invalid integer value').optional()
+      .isWhitelisted('0123456789'),
+    body('index', 'Invalid integer value').optional()
+      .isInt(),
+    oneOf([
+      body('host', 'Invalid server address').isFQDN(),
+      body('host', 'invalid server address').isIP()
+    ]),
+    body('port', 'Invalid socket port number')
+      .isPort(),
+    body(['tls', 'verify'])
+      .isBoolean(),
+    // TODO max length of strings?
+    body([
+      'name',
+      'nick',
+      'user'], 'Require type String and not empty string')
+      .isString()
+      .notEmpty(),
+    body([
+      'password',
+      'identifyNick',
+      'identifyCommand',
+      'real',
+      'modes',
+      'channelList'], 'Require type String')
+      .isString(),
+    //
+    // sanitize input
+    //
+    query(
+      'index')
+      .toInt(),
+    body([
+      'index',
+      'port'])
+      .toInt(),
+    body([
+      'tls',
+      'verify'])
+      .toBoolean(),
+    body([
+      'name',
+      'host',
+      'password',
+      'identifyNick',
+      'identifyCommand',
+      'nick',
+      'user',
+      'real',
+      'modes',
+      'channelList'])
+      // remove starting and ending whitespace
+      .trim(),
+    //
+    // On error return status 422 Unprocessable Entity
+    //
+    handleValidationError
+  ]; // update
 
   // ----------------------------
   // DELETE (destroy) (URL query selectors)
@@ -229,7 +369,7 @@
   module.exports = {
     list: list,
     create: create,
-    // update: update,
+    update: update,
     destroy: destroy
   };
 })();
