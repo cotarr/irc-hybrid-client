@@ -21,7 +21,32 @@
 // SOFTWARE.
 //
 // ---------------------------------------------------------------------------------
-
+//
+// This module is intended to provide an independent web page
+// for the purpose of editing the list of IRC servers.
+//
+// Example IRC server object
+//   - name is used to identify an IRC server definition
+//   - host is FQDN or IPV4 or IPV6 address of type String
+//   - Security: password and identifyCommand are not encrypted
+//   - IRC channels is a comma separated list, optional space characters are ignored.
+//
+// {
+//   "name": "local-server",
+//   "host": "127.0.0.1",
+//   "port": 6667,
+//   "tls": false,
+//   "verify": false,
+//   "password": "",
+//   "identifyNick": "",
+//   "identifyCommand": "",
+//   "nick": "myNick",
+//   "user": "myUser",
+//   "real": "myRealName",
+//   "modes": "+iw",
+//   "channelList": "#test, #test2, #test3"
+// }
+// ----------------------------------------------------
 'use strict';
 
 /**
@@ -50,6 +75,7 @@ const _showError = (errorString) => {
 /**
  * HTTP fetch request to retrieve state of IRC server
  * This is used to check if IRC is connected
+ * @throws {Error} - Network errors throws Error
  * @returns {Promise} Resolved to Object
  */
 const fetchIrcState = () => {
@@ -74,9 +100,10 @@ const fetchIrcState = () => {
 };
 
 /**
- * HTTP fetch request to retrieve full list of servers
+ * HTTP fetch request to retrieve full list of all servers, or one server
  * @param {Number} index - Integer index into IRC server array
- * @param {Number} lock - 0 = request unlock 1 = request lock
+ * @param {Number} lock - 0 = request unlock, 1 = request lock
+ * @throws {Error} - Network errors throws Error
  * @returns {Promise} Resolved to Array of Objects (without index), or one Object (index specified)
  */
 const fetchServerList = (index, lock) => {
@@ -114,8 +141,9 @@ const fetchServerList = (index, lock) => {
 /**
  * HTTP fetch request to service POST, PATCH and DELETE methods
  * @param {Object} body - Object containing IRC server properties
- * @param {String} method - POST, PATCH, or DELETE
- * @param {Numbewr} index - Integer index into IRC server Array, or -1 for new (POST)
+ * @param {String} method - 'POST', 'PATCH', or 'DELETE'
+ * @param {Number} index - Integer index into IRC server Array, or -1 for POST (new server)
+ * @throws {Error} - Network errors throws Error
  * @returns {Promise} resolves to Object containing server response
  */
 const submitServer = (body, method, index) => {
@@ -133,6 +161,7 @@ const submitServer = (body, method, index) => {
     },
     body: JSON.stringify(body)
   };
+  // Returns Promise
   return fetch(fetchURL, fetchOptions)
     .then((response) => {
       if (response.ok) {
@@ -140,7 +169,7 @@ const submitServer = (body, method, index) => {
       } else {
         // console.log(response);
         if (response.status === 409) {
-          const err = new Error('IIRC Connected or Database Locked');
+          const err = new Error('IRC Connected or Database Locked');
           err.status = 409;
           throw err;
         } else if (response.status === 422) {
@@ -153,7 +182,7 @@ const submitServer = (body, method, index) => {
         }
       }
     });
-};
+}; // submitServer()
 
 /**
  * Set form input elements to default values
@@ -196,7 +225,7 @@ const populateIrcServerForm = (data) => {
     document.getElementById('deleteServerButton').removeAttribute('hidden');
     document.getElementById('duplicateServerButton').removeAttribute('hidden');
     document.getElementById('warningVisibilityDiv').setAttribute('hidden', '');
-    document.getElementById('listVisiblityDiv').setAttribute('hidden', '');
+    document.getElementById('listVisibilityDiv').setAttribute('hidden', '');
     document.getElementById('formVisibilityDiv').removeAttribute('hidden');
     document.getElementById('indexInputId').value = data.index.toString();
     document.getElementById('nameInputId').value = data.name;
@@ -217,8 +246,8 @@ const populateIrcServerForm = (data) => {
 };
 
 /**
- * Button Event Handler for dynamically generated buttons in server list table
- * @param {Number} index - Integer index into IRC server Array, or -1 for new (POST) 
+ * Button Event Handler to service dynamically generated buttons in server list table
+ * @param {Number} index - Integer index into IRC server Array
  */
 const openIrcServerEdit = (index) => {
   clearIrcServerForm()
@@ -232,7 +261,7 @@ const openIrcServerEdit = (index) => {
 
 /**
  * Parse form input elements to determine index number
- * @returns (Promise) Resolving to Object
+ * @returns (Promise) Resolving to Object, example: {index: 0, data: {index: 0}}
  */
 const parseIndexValues = () => {
   return Promise.resolve({
@@ -245,6 +274,7 @@ const parseIndexValues = () => {
 
 /**
  * Parse form input elements to determine IRC Server Properties
+ * Example: {index: 0, data: { ... }}
  * @returns (Promise) Resolving to Object, or reject if error
  */
 const parseFormInputValues = () => {
@@ -287,12 +317,12 @@ const parseFormInputValues = () => {
       resolve({ data: data, index: index });
     }
   });
-};
+}; // parseFormInputValues()
 
 /**
- * HTTP fetch request to retrieve full list of servers
+ * Dynamically add rows to HTML table for list of IRC servers
  * @param {Object} data - Array of Objects
- * @returns {Promise} resolved with the Array of Objects
+ * @returns {Promise} resolved to null
  */
 const buildServerListTable = (data) => {
   // console.log(JSON.stringify(data, null, 2));
@@ -356,16 +386,24 @@ const buildServerListTable = (data) => {
         });
       }
     }
+    resolve(null);
   });
-};
+}; // buildServerListTable()
+
+/**
+ * End of promise chain.
+ * Used after saving changes to check for error and close the edit.
+ * @param {data} data - API response, example: {"status":"success","method":"PATCH","index":0}
+ * @returns {Promise} Resolved to null or reject with error
+ */
 
 const checkErrorAndCloseEdit = (data) => {
   return new Promise((resolve, reject) => {
     if (data.status === 'success') {
       document.getElementById('warningVisibilityDiv').setAttribute('hidden', '');
-      document.getElementById('listVisiblityDiv').removeAttribute('hidden');
+      document.getElementById('listVisibilityDiv').removeAttribute('hidden');
       document.getElementById('formVisibilityDiv').setAttribute('hidden', '');
-      resolve();
+      resolve(null);
     } else {
       reject(new Error('PATCH API did not return success status flag'));
     }
@@ -377,7 +415,7 @@ const checkErrorAndCloseEdit = (data) => {
 // -------------------------------------
 
 /**
- * Refresh Button Event Hanler
+ * Refresh Button Event Handler
  */
 document.getElementById('refreshButton').addEventListener('click', () => {
   _clearError();
@@ -394,12 +432,12 @@ document.getElementById('refreshButton').addEventListener('click', () => {
  */
 document.getElementById('duplicateServerButton').addEventListener('click', () => {
   _clearError();
-  // clear edit lock
+  // Fetch with lock=0 to clear edit lock, submission of new record does not require edit lock
   fetchServerList(0, 0)
     .then(() => {
       document.getElementById('indexInputId').value = '-1';
       document.getElementById('nameInputId').value =
-      document.getElementById('nameInputId').value + '-2';
+        document.getElementById('nameInputId').value + '-2';
       document.getElementById('saveNewButton').removeAttribute('hidden');
       document.getElementById('saveModifiedButton').setAttribute('hidden', '');
       document.getElementById('deleteServerButton').setAttribute('hidden', '');
@@ -419,7 +457,7 @@ document.getElementById('createNewButton').addEventListener('click', () => {
   clearIrcServerForm()
     .then(() => {
       document.getElementById('warningVisibilityDiv').setAttribute('hidden', '');
-      document.getElementById('listVisiblityDiv').setAttribute('hidden', '');
+      document.getElementById('listVisibilityDiv').setAttribute('hidden', '');
       document.getElementById('formVisibilityDiv').removeAttribute('hidden');
     })
     .catch((err) => {
@@ -485,7 +523,7 @@ document.getElementById('deleteServerButton').addEventListener('click', () => {
 document.getElementById('cancelEditButton').addEventListener('click', () => {
   _clearError();
   document.getElementById('warningVisibilityDiv').setAttribute('hidden', '');
-  document.getElementById('listVisiblityDiv').removeAttribute('hidden');
+  document.getElementById('listVisibilityDiv').removeAttribute('hidden');
   document.getElementById('formVisibilityDiv').setAttribute('hidden', '');
   // index=0 lock=0
   fetchServerList(0, 0)
@@ -497,7 +535,8 @@ document.getElementById('cancelEditButton').addEventListener('click', () => {
 });
 
 /**
- * Force Unlock Button Event Handler
+ * Force Unlock Button Event Handler,
+ * THis is used when the web page is closed during an edit, leaving database locked.
  */
 document.getElementById('forceUnlockAll').addEventListener('click', () => {
   _clearError();
@@ -509,15 +548,19 @@ document.getElementById('forceUnlockAll').addEventListener('click', () => {
     });
 });
 
+// --------------------------------------------------------------
+// Initialization
 //
 // Do this at page load
-//
+// Verify IRC client is not connected
+// Retrieve list of servers and build IRC server list table
+// --------------------------------------------------------------
 _clearError();
 fetchIrcState()
   .then((data) => {
     if ((data.ircConnected) || (data.ircConnecting)) {
       document.getElementById('warningVisibilityDiv').removeAttribute('hidden');
-      document.getElementById('listVisiblityDiv').setAttribute('hidden', '');
+      document.getElementById('listVisibilityDiv').setAttribute('hidden', '');
       document.getElementById('formVisibilityDiv').setAttribute('hidden', '');
       Promise.resolve({ serverArray: [] });
     } else {

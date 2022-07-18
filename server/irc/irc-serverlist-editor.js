@@ -23,6 +23,30 @@
 //
 //                           Server List Editor API
 //
+// This module is intended to provide an independent API
+// for the purpose of editing the list of IRC servers.
+//
+// Example IRC server object
+//   - name is used to identify an IRC server definition
+//   - host is FQDN or IPV4 or IPV6 address of type String
+//   - Security: password and identifyCommand are not encrypted
+//   - IRC channels is a comma separated list, optional space characters are ignored.
+//
+// {
+//   "name": "local-server",
+//   "host": "127.0.0.1",
+//   "port": 6667,
+//   "tls": false,
+//   "verify": false,
+//   "password": "",
+//   "identifyNick": "",
+//   "identifyCommand": "",
+//   "nick": "myNick",
+//   "user": "myUser",
+//   "real": "myRealName",
+//   "modes": "+iw",
+//   "channelList": "#test, #test2, #test3"
+// }
 // -----------------------------------------------------------------------------
 (function () {
   'use strict';
@@ -38,10 +62,24 @@
   // editLock must be set to true to accept POST, PATCH or DELETE methods.
   // lock record index must match
   //
+  /**
+   * @type {boolean} editlock - Server list database lock flag for edit in progress
+   */
   let editLock = false;
+  /**
+   * @type {number} editlockIndex - Integer value of record being edited
+   */
   let editLockIndex = -1;
+  /**
+   * @type {number} editLockTimer - Internal timer used to expire edit lock if left on
+   */
   let editLockTimer = 0;
 
+  /**
+   * Internal function to manage edit lock variables
+   * @param {Boolean} lockValue - True = locked
+   * @param {*} index - Array index of IRC server entry
+   */
   const _setEditLock = function (lockValue, index) {
     if (lockValue) {
       editLock = true;
@@ -54,18 +92,31 @@
     }
   };
 
+  /**
+   * Check if database is locked for editing
+   * @returns {Boolean} true if database is locked
+   */
   const _checkEditLock = function () {
     return (editLock);
   };
+  /**
+   * Validate match of index between locked database and API request
+   * @param {number} expectedIndex - Integer array index
+   * @returns {boolean} true if index values match, else false
+   */
   const _checkEditLockIndex = function (expectedIndex) {
     return (editLockIndex === expectedIndex);
   };
+  /**
+   * Check if database is NOT locked for editing
+   * @returns {Boolean} true if NOT locked, false if locked
+   */
   const _checkNotEditLock = function () {
     return (!editLock);
   };
 
   //
-  // Editlock timer (seconds)
+  // Edit lock timer (seconds) used to expire database lock if left locked
   //
   setInterval(function () {
     // console.log('editLock ', editLock, editLockIndex, editLockTimer);
@@ -77,14 +128,16 @@
     if (editLockTimer > 0) editLockTimer--;
   }, 1000);
 
-  //
-  // Parse query params for: GET /irc/serverlist?index=0&lock=1
-  // requires either no query params, or both 'index' and 'lock'
-  // sets variable editLock
-  // Some input validation is redundant to express-validator checks.
-  // returns Promise resolving to chainObject
-  //
-  const setReadLock = function (req, chainObject) {
+  /**
+   * Function to flag database as locked for editing, or reject Error if previously locked.
+   * URL query parameters contain index and Lock to indicate index number and lock=1.
+   * If neither index or lock params present in req.query, resolve to chainObject without changes.
+   * Some input validation is redundant to express-validator checks.
+   * @param {Object} req - NodeJs HTTP request object containing URL query params: index, lock
+   * @param {Object} chainObject - Wrapper object used to pass common date through promise chain
+   * @returns {Promise} Resolve to Object (chainObject) or reject error
+   */
+  const setDatabaseLock = function (req, chainObject) {
     return new Promise(function (resolve, reject) {
       if (('query' in req) && ('index' in req.query) &&
       ('lock' in req.query)) {
@@ -121,16 +174,18 @@
         err.status = 400;
         reject(err);
       } else {
+        // Case of neither 'lock' nor 'index' present (full server list requested)
+        // Pass through chainObject without changes
         resolve(chainObject);
       }
     });
-  };
+  }; // setDatabaseLock()
 
-  //
-  // Verify editLock is true before modification of records
-  // If successful remove editLock by set to false
-  // Returns Promise resolving to chainObject
-  //
+  /**
+   * Function to verify database lock is true before modification of records
+   * @param {Object} chainObject - Wrapper object used to pass common date through promise chain
+   * @returns {Promise} Resolve to Object (chainObject) or reject error
+   */
   const requireLock = function (chainObject) {
     if (_checkEditLock()) {
       return Promise.resolve(chainObject);
@@ -141,11 +196,11 @@
     }
   };
 
-  //
-  // Verify editLock is false before modification of records
-  // This is used for creating new records with POST method
-  // Returns Promise resolving to chainObject
-  //
+  /**
+   * Function to verify database lock is false before modification of records
+   * @param {Object} chainObject - Wrapper object used to pass common date through promise chain
+   * @returns {Promise} Resolve to Object (chainObject) or reject error
+   */
   const requireNotLock = function (chainObject) {
     if (_checkNotEditLock()) {
       return Promise.resolve(chainObject);
@@ -156,11 +211,12 @@
     }
   };
 
-  //
-  // Function to check if IRC client is connected to IRC network.
-  // Action is denied status 409 if connected to IRC
-  // Returns Promise resolving to chainObject
-  //
+  /**
+   * Function to check if IRC client is connected to IRC network.
+   * Action is denied status 409 if IRC client is connected to IRC
+   * @param {Object} chainObject - Wrapper object used to pass common date through promise chain
+   * @returns {Promise} Resolve to Object (chainObject) or reject error https status 409
+   */
   const requireIrcNotConnected = function (chainObject) {
     return new Promise(function (resolve, reject) {
       if ((vars.ircState.ircConnected) || (vars.ircState.ircConnecting)) {
@@ -172,11 +228,12 @@
     });
   };
 
-  //
-  // read 'servers.json' file and parse to javascript object
-  // The parsed contents are added to chain object as serversFile property
-  // Returns Promise resolving to chainObject
-  //
+  /**
+   * Read local file 'servers.json' in base project folder.
+   * Parse JSON string into JavaScript object and insert object to chainObject
+   * @param {Object} chainObject - Wrapper object used to pass common date through promise chain
+   * @returns {Promise} Resolve to Object (chainObject) or reject error
+   */
   const readServersFile = function (chainObject) {
     return new Promise(function (resolve, reject) {
       const serverListFilename = path.join(__dirname, '../../servers.json');
@@ -190,11 +247,12 @@
       });
     });
   };
-  //
-  // write 'servers.json' file
-  // File contents are taken from chainObject.serversFile property
-  // Returns Promise resolving to chainObject
-  //
+  /**
+   * Read local file 'servers.json' in base project folder.
+   * Parse JSON string into JavaScript object and insert object to chainObject
+   * @param {Object} chainObject - Wrapper object used to pass common date through promise chain
+   * @returns {Promise} Resolve to Object (chainObject) or reject error
+   */
   const writeServersFile = function (chainObject) {
     return new Promise(function (resolve, reject) {
       const serverListFilename = path.join(__dirname, '../../servers.json');
@@ -211,12 +269,13 @@
     });
   };
 
-  //
-  // Deep copy each IRC server object to a new array
-  // Channel list is serialized into a comma separated list
-  // serverArray is added to the chainObject
-  // Returns Promise resolving to chain Object.
-  //
+  /**
+   * Function to serialize IRC server properties for use in API response.
+   * Strings stored in arrays are converted into comma separated strings
+   * Serialized IRC server object is added to chainObject as chainObject.serverArray
+   * @param {Object} chainObject - Wrapper object used to pass common date through promise chain
+   * @returns {Promise} Resolve to Object (chainObject) or reject error
+   */
   const serializeElements = function (chainObject) {
     return new Promise(function (resolve, reject) {
       if ((chainObject) && ('serversFile' in chainObject) &&
@@ -260,11 +319,13 @@
         reject(error);
       }
     });
-  };
+  }; // serializeElements()
 
-  // Accept type string
-  // Remove whitespace
-  // split to array of sub-strings
+  /**
+   * Internal function to convert comma separated string to arrays
+   * @param {String} commaSeparatedString - comma separated strings
+   * @returns {Array} Array containing strings
+   */
   const _stringToArray = function (commaSeparatedString) {
     if (typeof commaSeparatedString !== 'string') return [];
     let cleanString = '';
@@ -279,12 +340,13 @@
     return cleanString.split(',');
   };
 
-  //
-  // Deep copy each IRC server object to a new array
-  // Channel list is deserialized into an Array
-  // newServer is added to the chainObject
-  // Returns Promise resolving to chain Object.
-  //
+  /**
+   * Function to deserialize IRC server properties from API submission.
+   * Strings stored comma separated lists converted into array of strings
+   * Deserialized IRC server object is added to chainObject as chainObject.newServer
+   * @param {Object} chainObject - Wrapper object used to pass common date through promise chain
+   * @returns {Promise} Resolve to Object (chainObject) or reject error
+   */
   const deserializeElements = function (req, chainObject) {
     return new Promise(function (resolve, reject) {
       const tempServer = {};
@@ -306,14 +368,15 @@
     });
   };
 
-  //
-  // For http methods that modify IRC server definitions
-  // This function will match the query parameter index value
-  // to the index value in the body of the http request.
-  // Check may be redundant to express-validator input validation
-  //
-  // Returns Promise resolving to unmodified chainObject
-  //
+  /**
+   * Function to validate index values match
+   * Case of body.index not match query.index = status 400 error (Bad Request)
+   * Case of query.index not match database lock = status 409 error (Conflict)
+   * Check may be redundant to express-validator input validation
+   * @param {Object} req - NodeJs HTTP request object containing URL query params: index
+   * @param {Object} chainObject - Wrapper object used to pass common date through promise chain
+   * @returns {Promise} Resolve to Object (chainObject) or reject error
+   */
   const matchIndex = function (req, chainObject) {
     return new Promise(function (resolve, reject) {
       let errorStr = null;
@@ -350,14 +413,16 @@
     });
   };
 
-  //
-  // Return HTTP response to the following requests
-  //
-  // GET /irc/serverlist                     Array of all configured server
-  // GET /irc/serverlist?index=0             One server at index
-  // GET /irc/serverlist?index=0&lock=1  One server at index, set editLock
-  // This is intended to be the last function in the promise chain.
-  //
+  /**
+   * Execute HTTP response by returning data from Chain object
+   * Case 1 - Return full list of IRC servers
+   * Case 2 - Return one IRC server specified by index query param
+   * This is intended to be end function in chain of promises
+   * @param {Object} req - NodeJs HTTP request object, req.query.index contains index
+   * @param {Object} res  - NodeJs HTTP response object
+   * @param {Object} next - NodeJs HTTP error object
+   * @param {Object} chainObject - Wrapper object used to pass common date through promise chain
+   */
   const returnServerList = function (req, res, next, chainObject) {
     if (('query' in req) && ('index' in req.query)) {
       const index = parseInt(req.query.index);
@@ -377,11 +442,15 @@
     }
   };
 
-  //
-  // This functions returns the HTTP response for methods
-  // that modify a IRC server record (POST, PATCH, DELETE)
-  // This is intended to be the last function in the promise chain.
-  //
+  /**
+   * Execute HTTP response to API request
+   * Response contains status of data submission for POST, PATCH, DELETE requests
+   * Example response: {status: 'success', method: 'POST', index: 0}
+   * This is intended to be end function in chain of promises
+   * @param {Object} req - NodeJs HTTP request object, req.query.index contain index, or -1
+   * @param {Object} res  - NodeJs HTTP response object
+   * @param {Object} chainObject - Wrapper object used to pass common date through promise chain
+   */
   const returnStatus = function (req, res, chainObject) {
     _setEditLock(false);
     const responseJson = {
@@ -395,11 +464,23 @@
     res.json(responseJson);
   };
 
+  /**
+   * Close edit after error occurs in promise chain
+   * This is intended to be the last function in a promise chain
+   * @param {Object} next - NodeJs error object
+   * @param {Error} err - JS Error, with optional error.status http response code
+   */
   const handlePromiseErrors = function (next, err) {
     _setEditLock(false);
     next(err);
   };
 
+  /**
+   * Function to append a new IRC server to array contain IRC server definitions
+   * Both new IRC server object and IRC server array are present within chainObject
+   * @param {Object} chainObject - Wrapper object used to pass common date through promise chain
+   * @returns {Promise} Resolve to Object (chainObject) or reject error
+   */
   const appendArrayElement = function (chainObject) {
     return new Promise(function (resolve, reject) {
       chainObject.serversFile.serverArray.push(chainObject.newServer);
@@ -407,6 +488,13 @@
     });
   };
 
+  /**
+   * Function to replace existing IRC server in array contain IRC server definitions
+   * Both replacement IRC server object and IRC server array are present within chainObject
+   * @param {Object} req - NodeJs HTTP request object, req.query.index contain index
+   * @param {Object} chainObject - Wrapper object used to pass common date through promise chain
+   * @returns {Promise} Resolve to Object (chainObject) or reject error
+   */
   const replaceArrayElement = function (req, chainObject) {
     // console.log(JSON.stringify(chainObject, null, 2));
     return new Promise(function (resolve, reject) {
@@ -429,10 +517,14 @@
     });
   };
 
-  //
-  // Removes a specified IRC server from serverArray
-  // Returns Promise resolving to chainObject
-  //
+  /**
+   * Function to remove existing IRC server from array contain IRC server definitions
+   * Both replacement IRC server object and IRC server array are present within chainObject
+   * Index number is specified in NodeJS request object as URL query parameter
+   * @param {Object} req - NodeJs HTTP request object, req.query.index contain index
+   * @param {Object} chainObject - Wrapper object used to pass common date through promise chain
+   * @returns {Promise} Resolve to Object (chainObject) or reject error
+   */
   const deleteArrayElement = function (req, chainObject) {
     return new Promise(function (resolve, reject) {
       const index = parseInt(req.query.index);
@@ -447,22 +539,22 @@
     });
   };
 
-  // --------------------------------------------------
-  // GET /irc/serverlist route handler
-  // --------------------------------------------------
+  /**
+   * List - NodeJs Middleware function: GET /irc/serverlist route handler
+   */
   const listServerlist = function (req, res, next) {
     const chainObject = {};
     requireIrcNotConnected(chainObject)
-      .then((chainObject) => setReadLock(req, chainObject))
+      .then((chainObject) => setDatabaseLock(req, chainObject))
       .then((chainObject) => readServersFile(chainObject))
       .then((chainObject) => serializeElements(chainObject))
       .then((chainObject) => returnServerList(req, res, next, chainObject))
       .catch((err) => next(err));
   };
 
-  // --------------------------------------------------
-  // POST /irc/serverlist route handler
-  // --------------------------------------------------
+  /**
+   * Create - NodeJs Middleware function: POST /irc/serverlist route handler
+   */
   const createServerlist = function (req, res, next) {
     const chainObject = {};
     requireIrcNotConnected(chainObject)
@@ -475,9 +567,9 @@
       .catch((err) => next(err));
   };
 
-  // --------------------------------------------------
-  // PATCH /irc/serverlist route handler
-  // --------------------------------------------------
+  /**
+   * Update - NodeJs Middleware function:  PATCH /irc/serverlist?index=0 route handler
+   */
   const updateServerlist = function (req, res, next) {
     const chainObject = {};
     requireIrcNotConnected(chainObject)
@@ -491,9 +583,9 @@
       .catch((err) => handlePromiseErrors(next, err));
   };
 
-  // --------------------------------------------------
-  // DELETE /irc/serverlist route handler
-  // --------------------------------------------------
+  /**
+   * Destroy - NodeJs Middleware function:  DELETE /irc/serverlist?index=0 route handler
+   */
   const destroyServerList = function (req, res, next) {
     const chainObject = {};
     requireIrcNotConnected(chainObject)

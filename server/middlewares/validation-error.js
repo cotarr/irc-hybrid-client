@@ -43,7 +43,7 @@ exports.handleError = function (req, res, next) {
 
 // -----------------------------------------------
 // THIS IS NOT MIDDLEWARE (simple function)
-// check all keys in query object, extraneous keyes are error
+// check all keys in query object, extraneous keys are error
 //
 // Accepts req.query or req.body or req.params as checkObject
 //
