@@ -508,17 +508,34 @@ app.delete('/irc/serverlist',
 // Read contents of main web page for /irc/webclient.html and
 // substitute CSRF token into meta tag for csurf middleware
 // -------------------------------
-let webclientHtml;
-if (nodeEnv === 'production') {
-  webclientHtml = fs.readFileSync('./secure-minify/webclient.html', 'utf8');
-} else {
-  webclientHtml = fs.readFileSync('./secure/webclient.html', 'utf8');
-}
 app.get('/irc/webclient.html',
   userAuth.authorizeOrLogin,
   csrfProtection,
   function (req, res, next) {
-    return res.send(webclientHtml.replace('{{csrfToken}}', req.csrfToken()));
+    let filename = './secure-minify/webclient.html';
+    if (nodeEnv === 'development') filename = './secure/webclient.html';
+    fs.readFile(filename, 'utf8', function (err, data) {
+      if (err) {
+        next(err);
+      } else {
+        res.send(data.replace('{{csrfToken}}', req.csrfToken()));
+      }
+    });
+  }
+);
+app.get('/irc/serverlist.html',
+  userAuth.authorizeOrLogin,
+  csrfProtection,
+  function (req, res, next) {
+    let filename = './secure-minify/serverlist.html';
+    if (nodeEnv === 'development') filename = './secure/serverlist.html';
+    fs.readFile(filename, 'utf8', function (err, data) {
+      if (err) {
+        next(err);
+      } else {
+        res.send(data.replace('{{csrfToken}}', req.csrfToken()));
+      }
+    });
   }
 );
 

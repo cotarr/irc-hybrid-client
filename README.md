@@ -1,8 +1,13 @@
 # = = = = = = Development Branch Notes = = = = = =
 
-Git branch: admin-editor
+Git branch: server-list-editor 2022-07-17
 
 Work in progress - Branch used to develop browser support to edit the IRC server list.
+
+- See CHANGELOG.md
+- Status: API at /irc/serverlist functional for GET, POST, PATCH and DELETE (Debug in progress)
+- Status: Browser page at /irc/serverlist.html (Partial functionality, coding in progress)
+- Do Not Deploy
 
 # = = = = = = = = = = = = = = = = = = = = = = = = =
 # irc-hybrid-client

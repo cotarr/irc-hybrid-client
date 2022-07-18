@@ -6,18 +6,36 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Un-merged 2022-07-14
+## Un-merged 2022-07-17
 
 ### Added (WORK IN PROGRESS)
 
 This is a proof of concept edit to create an API for editing of the IRC server list from the web browser.
 
+Server: 
+
 - Added new nodejs file server/irc/irc-serverlist-editor.js
   - Added route GET /irc/serverlist to retrieve array of IRC servers
-  - Support query parameters GET/irc/serverlist?index=0&editlock=1 to open edit of specific server
-  - Added route DELETE /etc/serverlist?index=0 to delete an IRC server from the list
-- server/web-server.js - Added routes and authorization for server list edit API
+  - Support query parameters GET/irc/serverlist?index=0&lock=1 to open edit of specific server
+  - Added route DELETE /irc/serverlist?index=0 to delete an IRC server from the list
+  - Added route POST /irc/serverlist to create new IRC servers
+  - Added route PATCH /irc/serverlist?index=0 to edit and modify existing server
+- server/web-server.js - Added routes, authorization and CSRF token validation for server list edit API
+- server/web-server.js - Modified code to add CSRF tokens to /irc/webclient.html and /irc/serverlist.html
 
+Browser:
+
+- Added /irc/serverlist.html (IRC server editor interface)
+  - HTML table with list of servers
+  - Form for editing a specific server properties
+- Added /irc/css/serverlist.css (styles)
+- Added /irc/js/serverlist.js (Code to perform API calls and edit server list)
+  - Functions for IRC server list to: edit existing, create new, duplicate, and delete
+
+Minfied code:
+
+- Temporary code used to minify /irc/serverlist.* is not pushed to github.
+- Added /irc/serverlist.html, .js, .css files added to bundler (gulp) with minify disabled for debugging (not pushed github)
 ## [v0.1.44](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.1.44) 2022-07-13
 
 ### Changed

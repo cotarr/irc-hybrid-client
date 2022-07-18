@@ -1,0 +1,87 @@
+html {
+  margin: 0px 0px 0px 0px;
+  padding: 0px 0px 0px 0px;
+}
+body {
+  margin: 0px 0px 0px 0px;
+  padding: 0px 20px 0px 20px;
+  background-color: #e8e8e8;
+}
+
+button {
+  background-color: #f4f4f4;
+  border-top: 1px solid #777777;
+  border-right: 2px solid #444444;
+  border-bottom: 2px solid #444444;
+  border-left: 1px solid #777777;
+  border-radius: 5px;
+  box-shadow: 2px 2px 3px #808080;
+  color: black;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  cursor: pointer;
+}
+button:hover {
+  background-color: #e2e2e2;
+}
+button[disabled] {
+  background-color: #b8b8b8;
+  color: #444444
+}
+
+.error-div {
+  color: white;
+  background-color: red;
+  padding-left: 15px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.error-title {
+  text-align: center;
+  font-size: 120%;
+}
+
+.info-pre-help {
+  font-size: 80%;
+}
+
+.inline-block {
+  display: inline-block;
+}
+
+.button-div {
+  margin-bottom: 5px;
+}
+
+.input-label-right {
+  display: inline-block;
+}
+
+.rm5 {margin-right: 5px;}
+.rm10 {margin-right: 10px;}
+.rm20 {margin-right: 20px;}
+
+table {
+  background-color: white;
+  border-spacing: 0;
+  font-size: 80%;
+}
+tr {
+  background-color: #ffffff;
+}
+td {
+  text-align: center;
+}
+td:first-of-type {
+  text-align: center;
+}
+
+.vh5 {height: 5px;}
+.vh10 {height: 10px;}
+.vh20 {height: 20px;}
+
+.red {
+  color: red;
+}
+
