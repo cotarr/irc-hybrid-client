@@ -119,7 +119,7 @@
   // Edit lock timer (seconds) used to expire database lock if left locked
   //
   setInterval(function () {
-    console.log('editLock ', editLock, editLockIndex, editLockTimer);
+    // console.log('editLock ', editLock, editLockIndex, editLockTimer);
     if (editLockTimer === 1) {
       editLock = false;
       editLockIndex = -1;
@@ -360,7 +360,6 @@
       tempServer.verify = req.body.verify;
       // password is hidden and write only
       // If new values is not provided, use the previous values
-      console.log(JSON.stringify(req.body, null, 2));
       if ('password' in req.body) {
         tempServer.password = req.body.password;
       } else {
