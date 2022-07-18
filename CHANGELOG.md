@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Un-merged 2022-07-17
+## Un-merged 2022-07-18
 
 ### Added (WORK IN PROGRESS)
 
@@ -17,9 +17,10 @@ Server:
 - Added new nodejs file server/irc/irc-serverlist-editor.js
   - Added route GET /irc/serverlist to retrieve array of IRC servers
   - Support query parameters GET/irc/serverlist?index=0&lock=1 to open edit of specific server
-  - Added route DELETE /irc/serverlist?index=0 to delete an IRC server from the list
   - Added route POST /irc/serverlist to create new IRC servers
   - Added route PATCH /irc/serverlist?index=0 to edit and modify existing server
+  - Added route COPY /etc/serverlist?index=0 to copy an existing IRC server to the end of the list
+  - Added route DELETE /irc/serverlist?index=0 to delete an IRC server from the list
 - server/web-server.js - Added routes, authorization and CSRF token validation for server list edit API
 - server/web-server.js - Modified code to add CSRF tokens to /irc/webclient.html and /irc/serverlist.html
 

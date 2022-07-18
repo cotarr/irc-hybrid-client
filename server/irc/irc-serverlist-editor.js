@@ -398,6 +398,30 @@
   };
 
   /**
+   * Function to copy existing IRC server to a new entry at the end of the list.
+   * Index of source server is provided in URL query parameter 'index'
+   * @param {Object} chainObject - Wrapper object used to pass common date through promise chain
+   * @returns {Promise} Resolve to Object (chainObject) or reject error
+   */
+  const copyExistingServer = function (req, chainObject) {
+    return new Promise(function (resolve, reject) {
+      const index = parseInt(req.query.index);
+      const listLength = chainObject.serversFile.serverArray.length;
+      if (index < listLength) {
+        // this is a deep copy
+        chainObject.newServer =
+          JSON.parse(JSON.stringify(chainObject.serversFile.serverArray[index]));
+        chainObject.newServer.name = chainObject.newServer.name + '-2';
+        resolve(chainObject);
+      } else {
+        const err = new Error('Copy index out of range');
+        err.status = 400; // Bad Request
+        reject(err);
+      }
+    });
+  };
+
+  /**
    * Function to validate index values match
    * Case of body.index not match query.index = status 400 error (Bad Request)
    * Case of query.index not match database lock = status 409 error (Conflict)
@@ -488,6 +512,7 @@
     };
     if (('query' in req) && ('index' in req.query)) responseJson.index = parseInt(req.query.index);
     if (req.method === 'POST') responseJson.index = chainObject.serversFile.serverArray.length - 1;
+    if (req.method === 'COPY') responseJson.index = chainObject.serversFile.serverArray.length - 1;
     if (chainObject.resultStatus) responseJson.status = chainObject.resultStatus;
     if (chainObject.resultComment) responseJson.comment = chainObject.resultComment;
     res.json(responseJson);
@@ -613,9 +638,24 @@
   };
 
   /**
+   * Copy - NodeJs Middleware function: COPY /irc/serverlist?index=0 route handler
+   */
+  const copyServerlist = function (req, res, next) {
+    const chainObject = {};
+    requireIrcNotConnected(chainObject)
+      .then((chainObject) => requireNotLock(chainObject))
+      .then((chainObject) => readServersFile(chainObject))
+      .then((chainObject) => copyExistingServer(req, chainObject))
+      .then((chainObject) => appendArrayElement(chainObject))
+      .then((chainObject) => writeServersFile(chainObject))
+      .then((chainObject) => returnStatus(req, res, chainObject))
+      .catch((err) => next(err));
+  };
+
+  /**
    * Destroy - NodeJs Middleware function:  DELETE /irc/serverlist?index=0 route handler
    */
-  const destroyServerList = function (req, res, next) {
+  const destroyServerlist = function (req, res, next) {
     const chainObject = {};
     requireIrcNotConnected(chainObject)
       .then((chainObject) => requireLock(chainObject))
@@ -631,6 +671,7 @@
     list: listServerlist,
     create: createServerlist,
     update: updateServerlist,
-    destroy: destroyServerList
+    copy: copyServerlist,
+    destroy: destroyServerlist
   };
 }());

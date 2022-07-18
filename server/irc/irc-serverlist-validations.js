@@ -338,6 +338,83 @@
   ]; // update
 
   // ----------------------------
+  // Copy (URL query selector)
+  // ----------------------------
+
+  /**
+   * @type {Array} copy - array containing express middleware functions
+   */
+  const copy = [
+    //
+    // Validate extrneous keys
+    //
+    function (req, res, next) {
+      checkExtraneousKeys(req, [
+        'index'
+      ], 'query');
+      next();
+    },
+    function (req, res, next) {
+      checkExtraneousKeys(req, [
+        'index',
+        'name',
+        'host',
+        'port',
+        'tls',
+        'verify',
+        'password',
+        'identifyNick',
+        'identifyCommand',
+        'nick',
+        'user',
+        'real',
+        'modes',
+        'channelList'
+      ], 'body');
+      next();
+    },
+    //
+    // Validate required keys
+    //
+    query('index', 'is required URL query param')
+      .exists(),
+    body('index', 'is required body param')
+      .exists(),
+    //
+    //
+    // Validate forbidden keys
+    //
+
+    //
+    // validate input
+    //
+    query('index', 'Invalid integer value').optional()
+      .isWhitelisted('0123456789'),
+    query('index', 'Invalid integer value').optional()
+      .isInt(),
+    query('index', 'Invalid integer value').optional()
+      .isInt(),
+    query('index').optional()
+      .custom(function (value, { req }) {
+        if (parseInt(req.query.index) !== parseInt(req.body.index)) {
+          throw new Error('Values not match: query index, body index');
+        }
+        return true;
+      }),
+    //
+    // sanitize input
+    //
+    query(['index']).optional()
+      .toInt(),
+    body(['index']).optional()
+      .toInt(),
+    //
+    // On error return status 422 Unprocessable Entity
+    //
+    handleValidationError
+  ]; // copy
+
+  // ----------------------------
   // DELETE (destroy) (URL query selectors)
   // ----------------------------
 
@@ -378,7 +455,7 @@
     //
     query('index', 'is required URL query param')
       .exists(),
-    query('index', 'is required body param')
+    body('index', 'is required body param')
       .exists(),
     //
     //
@@ -392,7 +469,7 @@
       .isWhitelisted('0123456789'),
     query('index', 'Invalid integer value').optional()
       .isInt(),
-    query('index', 'Invalid integer value').optional()
+    body('index', 'Invalid integer value').optional()
       .isInt(),
     query('index').optional()
       .custom(function (value, { req }) {
@@ -418,6 +495,7 @@
     list: list,
     create: create,
     update: update,
+    copy: copy,
     destroy: destroy
   };
 })();

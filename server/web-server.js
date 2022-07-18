@@ -495,6 +495,10 @@ app.patch('/irc/serverlist',
   userAuth.authorizeOrFail, csrfProtection,
   ircServerListvalidations.update,
   ircServerListEditor.update);
+app.copy('/irc/serverlist',
+  userAuth.authorizeOrFail, csrfProtection,
+  ircServerListvalidations.copy,
+  ircServerListEditor.copy);
 app.delete('/irc/serverlist',
   userAuth.authorizeOrFail, csrfProtection,
   ircServerListvalidations.destroy,
