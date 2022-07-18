@@ -346,6 +346,11 @@
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"index 0 check\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.index).to.eql(0);",
 							"});"
 						],
 						"type": "text/javascript"
@@ -363,7 +368,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"index\": -1\n}\n",
+					"raw": "{\n    \"index\": 0\n}\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -479,7 +484,7 @@
 			"response": []
 		},
 		{
-			"name": "/irc/serverlist (set lock)",
+			"name": "/irc/serverlist (set lock #0)",
 			"event": [
 				{
 					"listen": "test",
@@ -773,69 +778,6 @@
 			"response": []
 		},
 		{
-			"name": "/irc/serverlist (fail unlocked)",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 409\", function () {",
-							"    pm.response.to.have.status(409);",
-							"});",
-							""
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "DELETE",
-				"header": [
-					{
-						"key": "CSRF-Token",
-						"value": "{{csrf_token}}",
-						"type": "default"
-					},
-					{
-						"key": "Accept",
-						"value": "application/json",
-						"type": "default"
-					},
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"type": "default"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"index\": 0,\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 3000,\n    \"tls\": false,\n    \"verify\": false,\n    \"password\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"user\": \"myUsername\",\n    \"real\": \"Irc Hybrid Client\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{server_URL}}/irc/serverlist?index=0",
-					"host": [
-						"{{server_URL}}"
-					],
-					"path": [
-						"irc",
-						"serverlist"
-					],
-					"query": [
-						{
-							"key": "index",
-							"value": "0"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "/irc/serverlist (success)",
 			"event": [
 				{
@@ -906,7 +848,7 @@
 			"response": []
 		},
 		{
-			"name": "/irc/serverlist (set edit lock) 1",
+			"name": "/irc/serverlist (set edit lock)",
 			"event": [
 				{
 					"listen": "test",
@@ -984,7 +926,7 @@
 			"response": []
 		},
 		{
-			"name": "/irc/serverlist (fail lock index)",
+			"name": "/irc/serverlist (fail lock value)",
 			"event": [
 				{
 					"listen": "test",
@@ -1030,7 +972,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"index\": 9999,\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 6667,\n    \"tls\": false,\n    \"verify\": false,\n    \"password\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"user\": \"myUser\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
+					"raw": "{\n    \"index\": 9999,\n    \"name\": \"local-serverxxxx\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 6667,\n    \"tls\": false,\n    \"verify\": false,\n    \"password\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"user\": \"myUser\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -1057,14 +999,14 @@
 			"response": []
 		},
 		{
-			"name": "/irc/serverlist (set edit lock) 2",
+			"name": "/irc/serverlist (fail locked)",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
+							"pm.test(\"Status code is 409\", function () {",
+							"    pm.response.to.have.status(409);",
 							"});",
 							""
 						],
@@ -1205,7 +1147,7 @@
 			"response": []
 		},
 		{
-			"name": "/irc/serverlist (set edit lock) 3",
+			"name": "/irc/serverlist (value check & lock)",
 			"event": [
 				{
 					"listen": "test",
@@ -1285,7 +1227,7 @@
 			"response": []
 		},
 		{
-			"name": "/irc/serverlist (fail lock index)",
+			"name": "/irc/serverlist (fail locked)",
 			"event": [
 				{
 					"listen": "test",
@@ -1321,7 +1263,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"index\": 9999,\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 3000,\n    \"tls\": false,\n    \"verify\": false,\n    \"password\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"user\": \"myUsername\",\n    \"real\": \"Irc Hybrid Client\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}",
+					"raw": "{\n    \"index\": \"{{irc_server_index}}\",\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 3000,\n    \"tls\": false,\n    \"verify\": false,\n    \"password\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"user\": \"myUsername\",\n    \"real\": \"Irc Hybrid Client\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -1329,7 +1271,7 @@
 					}
 				},
 				"url": {
-					"raw": "{{server_URL}}/irc/serverlist?index=9999",
+					"raw": "{{server_URL}}/irc/serverlist?index={{irc_server_index}}",
 					"host": [
 						"{{server_URL}}"
 					],
@@ -1340,7 +1282,7 @@
 					"query": [
 						{
 							"key": "index",
-							"value": "9999"
+							"value": "{{irc_server_index}}"
 						}
 					]
 				}
@@ -1348,7 +1290,7 @@
 			"response": []
 		},
 		{
-			"name": "/irc/serverlist (set edit lock) 4",
+			"name": "/irc/serverlist (remove lock)",
 			"event": [
 				{
 					"listen": "test",
@@ -1389,7 +1331,7 @@
 					}
 				],
 				"url": {
-					"raw": "{{server_URL}}/irc/serverlist?index={{irc_server_index}}&lock=1",
+					"raw": "{{server_URL}}/irc/serverlist?index=0&lock=0",
 					"host": [
 						"{{server_URL}}"
 					],
@@ -1400,11 +1342,11 @@
 					"query": [
 						{
 							"key": "index",
-							"value": "{{irc_server_index}}"
+							"value": "0"
 						},
 						{
 							"key": "lock",
-							"value": "1"
+							"value": "0"
 						}
 					]
 				}
@@ -1495,6 +1437,195 @@
 			"response": []
 		},
 		{
+			"name": "/irc/serverlist (lock #0)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.test(\"Global variable exists: irc_server_index\", function () {",
+							"    let index = pm.globals.get('irc_server_index');",
+							"    if (typeof index !== 'number') {",
+							"        console.log('Global variable irc_server_index does not exist');",
+							"        throw new Error('Global variable irc_server_index does not exist');",
+							"    }",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/vnd.api+json",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "{{server_URL}}/irc/serverlist?index=0&lock=1",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"serverlist"
+					],
+					"query": [
+						{
+							"key": "index",
+							"value": "0"
+						},
+						{
+							"key": "lock",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/irc/serverlist (fail locked)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 409\", function () {",
+							"    pm.response.to.have.status(409);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "COPY",
+				"header": [
+					{
+						"key": "CSRF-Token",
+						"value": "{{csrf_token}}",
+						"type": "default"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "default"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"index\": 0\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server_URL}}/irc/serverlist?index=0",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"serverlist"
+					],
+					"query": [
+						{
+							"key": "index",
+							"value": "0"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/irc/serverlist (remove lock)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/vnd.api+json",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "{{server_URL}}/irc/serverlist?index=0&lock=0",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"serverlist"
+					],
+					"query": [
+						{
+							"key": "index",
+							"value": "0"
+						},
+						{
+							"key": "lock",
+							"value": "0"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "/irc/serverlist (copy idx 0)",
 			"event": [
 				{
@@ -1574,71 +1705,7 @@
 			"response": []
 		},
 		{
-			"name": "/irc/serverlist (set edit lock) 5",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});",
-							""
-						],
-						"type": "text/javascript"
-					}
-				},
-				{
-					"listen": "prerequest",
-					"script": {
-						"exec": [
-							"pm.test(\"Global variable exists: irc_server_index\", function () {",
-							"    let index = pm.globals.get('irc_server_index');",
-							"    if (typeof index !== 'number') {",
-							"        console.log('Global variable irc_server_index does not exist');",
-							"        throw new Error('Global variable irc_server_index does not exist');",
-							"    }",
-							"});",
-							""
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Accept",
-						"value": "application/vnd.api+json",
-						"type": "default"
-					}
-				],
-				"url": {
-					"raw": "{{server_URL}}/irc/serverlist?index={{irc_server_index}}&lock=1",
-					"host": [
-						"{{server_URL}}"
-					],
-					"path": [
-						"irc",
-						"serverlist"
-					],
-					"query": [
-						{
-							"key": "index",
-							"value": "{{irc_server_index}}"
-						},
-						{
-							"key": "lock",
-							"value": "1"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "/irc/serverlist (success) Copy",
+			"name": "/irc/serverlist (success)",
 			"event": [
 				{
 					"listen": "test",

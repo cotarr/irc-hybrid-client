@@ -119,7 +119,7 @@
   // Edit lock timer (seconds) used to expire database lock if left locked
   //
   setInterval(function () {
-    // console.log('editLock ', editLock, editLockIndex, editLockTimer);
+    console.log('editLock ', editLock, editLockIndex, editLockTimer);
     if (editLockTimer === 1) {
       editLock = false;
       editLockIndex = -1;
@@ -205,7 +205,7 @@
     if (_checkNotEditLock()) {
       return Promise.resolve(chainObject);
     } else {
-      const err = new Error('Attempt to insert to locked data table');
+      const err = new Error('Attempt to modify locked data table');
       err.status = 409; // Status 409 = Conflict
       return Promise.reject(err);
     }
@@ -525,7 +525,16 @@
    * @param {Error} err - JS Error, with optional error.status http response code
    */
   const handlePromiseErrors = function (next, err) {
-    _setEditLock(false);
+    // Edit lock remain in place for common errors involving submission syntax
+    if (!('status' in err)) {
+      _setEditLock(false);
+    } else {
+      if ((err.status !== 400) &&
+        (err.status !== 409) &&
+        (err.status !== 422)) {
+        _setEditLock(false);
+      }
+    }
     next(err);
   };
 
@@ -658,8 +667,7 @@
   const destroyServerlist = function (req, res, next) {
     const chainObject = {};
     requireIrcNotConnected(chainObject)
-      .then((chainObject) => requireLock(chainObject))
-      .then((chainObject) => matchIndex(req, chainObject))
+      .then((chainObject) => requireNotLock(chainObject))
       .then((chainObject) => readServersFile(chainObject))
       .then((chainObject) => deleteArrayElement(req, chainObject))
       .then((chainObject) => writeServersFile(chainObject))

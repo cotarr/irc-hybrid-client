@@ -141,7 +141,7 @@ const fetchServerList = (index, lock) => {
 /**
  * HTTP fetch request to service POST, PATCH and DELETE methods
  * @param {Object} body - Object containing IRC server properties
- * @param {String} method - 'POST', 'PATCH', or 'DELETE'
+ * @param {String} method - 'POST', 'PATCH', 'COPY' or 'DELETE'
  * @param {Number} index - Integer index into IRC server Array, or -1 for POST (new server)
  * @throws {Error} - Network errors throws Error
  * @returns {Promise} resolves to Object containing server response
@@ -192,8 +192,6 @@ const clearIrcServerForm = () => {
   return new Promise((resolve, reject) => {
     document.getElementById('saveNewButton').removeAttribute('hidden');
     document.getElementById('saveModifiedButton').setAttribute('hidden', '');
-    document.getElementById('deleteServerButton').setAttribute('hidden', '');
-    document.getElementById('duplicateServerButton').setAttribute('hidden', '');
     document.getElementById('indexInputId').value = '-1';
     document.getElementById('nameInputId').value = '';
     document.getElementById('hostInputId').value = '';
@@ -224,8 +222,6 @@ const populateIrcServerForm = (data) => {
     clearIrcServerForm();
     document.getElementById('saveNewButton').setAttribute('hidden', '');
     document.getElementById('saveModifiedButton').removeAttribute('hidden');
-    document.getElementById('deleteServerButton').removeAttribute('hidden');
-    document.getElementById('duplicateServerButton').removeAttribute('hidden');
     document.getElementById('warningVisibilityDiv').setAttribute('hidden', '');
     document.getElementById('listVisibilityDiv').setAttribute('hidden', '');
     document.getElementById('formVisibilityDiv').removeAttribute('hidden');
@@ -254,6 +250,7 @@ const populateIrcServerForm = (data) => {
  * @param {Number} index - Integer index into IRC server Array
  */
 const openIrcServerEdit = (index) => {
+  _clearError();
   clearIrcServerForm()
     .then(() => fetchServerList(index, 1))
     .then((data) => populateIrcServerForm(data))
@@ -264,16 +261,37 @@ const openIrcServerEdit = (index) => {
 };
 
 /**
- * Parse form input elements to determine index number
- * @returns (Promise) Resolving to Object, example: {index: 0, data: {index: 0}}
+ * Button Event Handler to service dynamically generated buttons in server list table
+ * @param {Number} index - Integer index into IRC server Array
  */
-const parseIndexValues = () => {
-  return Promise.resolve({
-    index: parseInt(document.getElementById('indexInputId').value),
-    data: {
-      index: parseInt(document.getElementById('indexInputId').value)
-    }
-  });
+const copyIrcServerToNew = (index) => {
+  _clearError();
+  submitServer({ index: index }, 'COPY', index)
+    .then((data) => checkErrorAndCloseEdit(data))
+    // Reload a fresh server list
+    .then(() => fetchServerList(-1, -1))
+    .then((data) => buildServerListTable(data))
+    .catch((err) => {
+      _showError(err.toString() || err);
+      console.log(err);
+    });
+};
+
+/**
+ * Button Event Handler to service dynamically generated buttons in server list table
+ * @param {Number} index - Integer index into IRC server Array
+ */
+const deleteIrcServer = (index) => {
+  _clearError();
+  submitServer({ index: index }, 'DELETE', index)
+    .then((data) => checkErrorAndCloseEdit(data))
+    // Reload a fresh server list
+    .then(() => fetchServerList(-1, -1))
+    .then((data) => buildServerListTable(data))
+    .catch((err) => {
+      _showError(err.toString() || err);
+      console.log(err);
+    });
 };
 
 /**
@@ -349,8 +367,10 @@ const buildServerListTable = (data) => {
       'Host',
       'Port',
       'Nick',
-      // Empty for button
-      ''
+      // Empty for buttons
+      '', // Edit
+      '', // Duplicate
+      '' // Delete
     ];
 
     const titleRowEl = document.createElement('tr');
@@ -371,26 +391,42 @@ const buildServerListTable = (data) => {
         const td04El = document.createElement('td');
         const td05El = document.createElement('td');
         const td06El = document.createElement('td');
+        const td07El = document.createElement('td');
+        const td08El = document.createElement('td');
         const editButtonEl = document.createElement('button');
-        editButtonEl.textContent = 'Open';
+        const copyButtonEl = document.createElement('button');
+        const deleteButtonEl = document.createElement('button');
+        editButtonEl.textContent = 'Edit';
+        copyButtonEl.textContent = 'Copy';
+        deleteButtonEl.textContent = 'Delete';
         td01El.textContent = i.toString();
         td02El.textContent = data[i].name;
         td03El.textContent = data[i].host;
         td04El.textContent = data[i].port;
         td05El.textContent = data[i].nick;
         td06El.appendChild(editButtonEl);
+        td07El.appendChild(copyButtonEl);
+        td08El.appendChild(deleteButtonEl);
         rowEl.appendChild(td01El);
         rowEl.appendChild(td02El);
         rowEl.appendChild(td03El);
         rowEl.appendChild(td04El);
         rowEl.appendChild(td05El);
         rowEl.appendChild(td06El);
+        rowEl.appendChild(td07El);
+        rowEl.appendChild(td08El);
         tableNode.appendChild(rowEl);
         //
         // Add event listeners
         //
         editButtonEl.addEventListener('click', () => {
           openIrcServerEdit(parseInt(rowEl.getAttribute('index')));
+        });
+        copyButtonEl.addEventListener('click', () => {
+          copyIrcServerToNew(parseInt(rowEl.getAttribute('index')));
+        });
+        deleteButtonEl.addEventListener('click', () => {
+          deleteIrcServer(parseInt(rowEl.getAttribute('index')));
         });
       }
     }
@@ -452,33 +488,14 @@ document.getElementById('refreshButton').addEventListener('click', () => {
 });
 
 /**
- * Duplicate Button Event Handler
- */
-document.getElementById('duplicateServerButton').addEventListener('click', () => {
-  _clearError();
-  // Fetch with lock=0 to clear edit lock, submission of new record does not require edit lock
-  fetchServerList(0, 0)
-    .then(() => {
-      document.getElementById('indexInputId').value = '-1';
-      document.getElementById('nameInputId').value =
-        document.getElementById('nameInputId').value + '-2';
-      document.getElementById('saveNewButton').removeAttribute('hidden');
-      document.getElementById('saveModifiedButton').setAttribute('hidden', '');
-      document.getElementById('deleteServerButton').setAttribute('hidden', '');
-      document.getElementById('duplicateServerButton').setAttribute('hidden', '');
-    })
-    .catch((err) => {
-      _showError(err.toString() || err);
-      console.log(err);
-    });
-});
-
-/**
  * Create New Button Event Handler
  */
 document.getElementById('createNewButton').addEventListener('click', () => {
   _clearError();
-  clearIrcServerForm()
+  // First lock, error if already locked, if not error reverse with unlock
+  fetchServerList(0, 1)
+    .then(() => fetchServerList(0, 0))
+    .then(() => clearIrcServerForm())
     .then(() => {
       document.getElementById('warningVisibilityDiv').setAttribute('hidden', '');
       document.getElementById('listVisibilityDiv').setAttribute('hidden', '');
@@ -514,23 +531,6 @@ document.getElementById('saveModifiedButton').addEventListener('click', () => {
   _clearError();
   parseFormInputValues()
     .then((data) => submitServer(data.data, 'PATCH', data.index))
-    .then((data) => checkErrorAndCloseEdit(data))
-    // Reload a fresh server list
-    .then(() => fetchServerList(-1, -1))
-    .then((data) => buildServerListTable(data))
-    .catch((err) => {
-      _showError(err.toString() || err);
-      console.log(err);
-    });
-});
-
-/**
- * Delete Button Event Handler
- */
-document.getElementById('deleteServerButton').addEventListener('click', () => {
-  _clearError();
-  parseIndexValues()
-    .then((data) => submitServer(data.data, 'DELETE', data.index))
     .then((data) => checkErrorAndCloseEdit(data))
     // Reload a fresh server list
     .then(() => fetchServerList(-1, -1))
