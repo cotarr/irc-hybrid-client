@@ -200,9 +200,11 @@ const clearIrcServerForm = () => {
     document.getElementById('portInputId').value = 6667;
     document.getElementById('tlsInputId').value = 'false';
     document.getElementById('verifyInputId').value = 'false';
-    document.getElementById('passwordInputId').value = '';
+    document.getElementById('passwordInputId').setAttribute('disabled', '');
+    document.getElementById('passwordInputId').value = '(Hidden)';
     document.getElementById('identifyNickInputId').value = '';
-    document.getElementById('identifyCommandInputId').value = '';
+    document.getElementById('identifyCommandInputId').setAttribute('disabled', '');
+    document.getElementById('identifyCommandInputId').value = '(Hidden)';
     document.getElementById('nickInputId').value = '';
     document.getElementById('userInputId').value = '';
     document.getElementById('realInputId').value = '';
@@ -233,9 +235,11 @@ const populateIrcServerForm = (data) => {
     document.getElementById('portInputId').value = parseInt(data.port);
     document.getElementById('tlsInputId').value = data.tls.toString();
     document.getElementById('verifyInputId').value = data.verify.toString();
-    document.getElementById('passwordInputId').value = data.password;
+    document.getElementById('passwordInputId').setAttribute('disabled', '');
+    document.getElementById('passwordInputId').value = '(hidden)';
     document.getElementById('identifyNickInputId').value = data.identifyNick;
-    document.getElementById('identifyCommandInputId').value = data.identifyCommand;
+    document.getElementById('identifyCommandInputId').setAttribute('disabled', '');
+    document.getElementById('identifyCommandInputId').value = ('hidden');
     document.getElementById('nickInputId').value = data.nick;
     document.getElementById('userInputId').value = data.user;
     document.getElementById('realInputId').value = data.real;
@@ -302,9 +306,13 @@ const parseFormInputValues = () => {
       data.verify = null;
       errorStr = 'Invalid verify';
     }
-    data.password = document.getElementById('passwordInputId').value;
+    if (!(document.getElementById('passwordInputId').hasAttribute('disabled'))) {
+      data.password = document.getElementById('passwordInputId').value;
+    }
     data.identifyNick = document.getElementById('identifyNickInputId').value;
-    data.identifyCommand = document.getElementById('identifyCommandInputId').value;
+    if (!(document.getElementById('identifyCommandInputId').hasAttribute('disabled'))) {
+      data.identifyCommand = document.getElementById('identifyCommandInputId').value;
+    }
     data.nick = document.getElementById('nickInputId').value;
     data.user = document.getElementById('userInputId').value;
     data.real = document.getElementById('realInputId').value;
@@ -413,6 +421,22 @@ const checkErrorAndCloseEdit = (data) => {
 // -------------------------------------
 //        Button Event Handlers
 // -------------------------------------
+
+/**
+ * Replace IRC server password Button Event Handler
+ */
+document.getElementById('replacePasswordButton').addEventListener('click', () => {
+  document.getElementById('passwordInputId').removeAttribute('disabled');
+  document.getElementById('passwordInputId').value = '';
+});
+
+/**
+ * Replace Nickserv Command Button Event Handler
+ */
+document.getElementById('replaceIdentifyCommandButton').addEventListener('click', () => {
+  document.getElementById('identifyCommandInputId').removeAttribute('disabled');
+  document.getElementById('identifyCommandInputId').value = '';
+});
 
 /**
  * Refresh Button Event Handler

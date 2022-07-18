@@ -134,9 +134,7 @@
       'port',
       'tls',
       'verify',
-      'password',
       'identifyNick',
-      'identifyCommand',
       'nick',
       'user',
       'real',
@@ -164,8 +162,10 @@
       .notEmpty(),
     body([
       'password',
+      'identifyCommand'], 'Require type String').optional()
+      .isString(),
+    body([
       'identifyNick',
-      'identifyCommand',
       'real',
       'modes',
       'channelList'], 'Require type String')
@@ -182,15 +182,19 @@
     body([
       'name',
       'host',
-      'password',
       'identifyNick',
-      'identifyCommand',
       'nick',
       'user',
       'real',
       'modes',
       'channelList'])
       // remove starting and ending whitespace
+      .trim(),
+    body([
+      'password',
+      'identifyCommand'])
+      // remove starting and ending whitespace
+      .optional()
       .trim(),
     //
     // On error return status 422 Unprocessable Entity
@@ -252,9 +256,7 @@
       'port',
       'tls',
       'verify',
-      'password',
       'identifyNick',
-      'identifyCommand',
       'nick',
       'user',
       'real',
@@ -290,8 +292,10 @@
       .notEmpty(),
     body([
       'password',
+      'identifyCommand'], 'Require type String').optional()
+      .isString(),
+    body([
       'identifyNick',
-      'identifyCommand',
       'real',
       'modes',
       'channelList'], 'Require type String')
@@ -313,15 +317,19 @@
     body([
       'name',
       'host',
-      'password',
       'identifyNick',
-      'identifyCommand',
       'nick',
       'user',
       'real',
       'modes',
       'channelList'])
       // remove starting and ending whitespace
+      .trim(),
+    body([
+      'password',
+      'identifyCommand'])
+      // remove starting and ending whitespace
+      .optional()
       .trim(),
     //
     // On error return status 422 Unprocessable Entity

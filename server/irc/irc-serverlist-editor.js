@@ -292,9 +292,11 @@
             tempServer.port = chainObject.serversFile.serverArray[i].port;
             tempServer.tls = chainObject.serversFile.serverArray[i].tls;
             tempServer.verify = chainObject.serversFile.serverArray[i].verify;
-            tempServer.password = chainObject.serversFile.serverArray[i].password;
+            // Security: Password is not sent
+            // tempServer.password = chainObject.serversFile.serverArray[i].password;
             tempServer.identifyNick = chainObject.serversFile.serverArray[i].identifyNick;
-            tempServer.identifyCommand = chainObject.serversFile.serverArray[i].identifyCommand;
+            // Security: Nickserv identify password  not sent
+            // tempServer.identifyCommand = chainObject.serversFile.serverArray[i].identifyCommand;
             tempServer.nick = chainObject.serversFile.serverArray[i].nick;
             tempServer.user = chainObject.serversFile.serverArray[i].user;
             tempServer.real = chainObject.serversFile.serverArray[i].real;
@@ -349,19 +351,46 @@
    */
   const deserializeElements = function (req, chainObject) {
     return new Promise(function (resolve, reject) {
+      const index = parseInt(req.query.index);
       const tempServer = {};
       tempServer.name = req.body.name;
       tempServer.host = req.body.host;
       tempServer.port = req.body.port;
       tempServer.tls = req.body.tls;
       tempServer.verify = req.body.verify;
-      tempServer.password = req.body.password;
+      // password is hidden and write only
+      // If new values is not provided, use the previous values
+      console.log(JSON.stringify(req.body, null, 2));
+      if ('password' in req.body) {
+        tempServer.password = req.body.password;
+      } else {
+        if ((!('index' in req.query)) || (req.query.index === -1)) {
+          // case of new IRC server
+          tempServer.password = '';
+        } else {
+          // case of existing IRC server, use existing value
+          tempServer.password = chainObject.serversFile.serverArray[index].password;
+        }
+      }
       tempServer.identifyNick = req.body.identifyNick;
-      tempServer.identifyCommand = req.body.identifyCommand;
+      // identifyCommand is hidden and write only
+      // If new values is not provided, use the previous values
+      if ('identifyCommand' in req.body) {
+        tempServer.identifyCommand = req.body.identifyCommand;
+      } else {
+        if ((!('index' in req.query)) || (req.query.index === -1)) {
+          // case of new IRC server
+          tempServer.identifyCommand = '';
+        } else {
+          // case of existing IRC server, use existing value
+          tempServer.identifyCommand = chainObject.serversFile.serverArray[index].identifyCommand;
+        }
+      }
       tempServer.nick = req.body.nick;
       tempServer.user = req.body.user;
       tempServer.real = req.body.real;
       tempServer.modes = req.body.modes;
+      // Convert comma separated strings to array of strings
       tempServer.channelList = _stringToArray(req.body.channelList);
       chainObject.newServer = tempServer;
       resolve(chainObject);
@@ -559,8 +588,8 @@
     const chainObject = {};
     requireIrcNotConnected(chainObject)
       .then((chainObject) => requireNotLock(chainObject))
-      .then((chainObject) => deserializeElements(req, chainObject))
       .then((chainObject) => readServersFile(chainObject))
+      .then((chainObject) => deserializeElements(req, chainObject))
       .then((chainObject) => appendArrayElement(chainObject))
       .then((chainObject) => writeServersFile(chainObject))
       .then((chainObject) => returnStatus(req, res, chainObject))
@@ -575,8 +604,8 @@
     requireIrcNotConnected(chainObject)
       .then((chainObject) => requireLock(chainObject))
       .then((chainObject) => matchIndex(req, chainObject))
-      .then((chainObject) => deserializeElements(req, chainObject))
       .then((chainObject) => readServersFile(chainObject))
+      .then((chainObject) => deserializeElements(req, chainObject))
       .then((chainObject) => replaceArrayElement(req, chainObject))
       .then((chainObject) => writeServersFile(chainObject))
       .then((chainObject) => returnStatus(req, res, chainObject))
