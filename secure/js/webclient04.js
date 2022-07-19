@@ -23,6 +23,57 @@
 // webclient04.js - IRC Connect/Disconnect API requests
 // ---------------------------------------------
 'use strict';
+
+// ------------------------
+// Prev Server Button
+// ------------------------
+document.getElementById('cyclePrevServerButton').addEventListener('click', function () {
+  // Are we connected to web server?
+  if (ircState.ircConnected) {
+    showError('Can not change servers while connected');
+    return;
+  }
+
+  // The value of index is set to -2 to cycle through all
+  // servers one at a time. For the future, an index can
+  // be specified for a specific server
+  //
+  const fetchURL = webServerUrl + '/irc/server';
+  const fetchOptions = {
+    method: 'POST',
+    headers: {
+      'CSRF-Token': csrfToken,
+      'Content-type': 'application/json',
+      Accept: 'application/json'
+    },
+    body: JSON.stringify({ index: -2 })
+  };
+
+  fetch(fetchURL, fetchOptions)
+    .then((response) => {
+      // console.log(response.status);
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error('Fetch status ' + response.status + ' ' + response.statusText);
+      }
+    })
+    .then((responseJson) => {
+      // console.log(JSON.stringify(responseJson, null, 2));
+      if (responseJson.error) {
+        showError(responseJson.message);
+      } else {
+        // this will cause nickname, username and realname to update
+        // in the login form upon receiving the next getUpdateState() response
+        webState.lastIrcServerIndex = -2;
+      }
+    })
+    .catch((error) => {
+      console.log(error);
+      showError(error.toString());
+    });
+}); // cyclePrevServerButton()
+
 // ------------------------
 // Next Server Button
 // ------------------------

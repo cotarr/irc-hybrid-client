@@ -173,12 +173,17 @@ a raw command to the IRC server directly.
           <div class="vh10"></div>
           <div id="hideLoginSection">
             <div class="vh10"></div>
-            <div>
+            <!-- <div>
               To modify, edit file: &quotservers.json&quot
-            </div>
+            </div> -->
             <div class="button-div">
+              <input type="text" id="ircServerIndexInputId" size="2" value="" disabled>
               <input type="text" id="ircServerNameInputId" size="10" value="" disabled>
-              <button id="cycleNextServerButton">Next Server</button>
+              <button id="cyclePrevServerButton">Prev</button>
+              <button id="cycleNextServerButton">Next</button>
+              <a href="/irc/serverlist.html">
+                <button id="editServerListButton">Edit</button>
+              </a>
             </div>
             <div class="button-div">
               <input type="checkbox" id="ircServerTlsEnable" disabled>

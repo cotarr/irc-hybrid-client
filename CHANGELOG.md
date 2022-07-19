@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Un-merged 2022-07-18
+## Un-merged 2022-07-19
 
 ### Added (WORK IN PROGRESS)
 
@@ -14,7 +14,7 @@ This is a proof of concept edit to create an API for editing of the IRC server l
 
 Server: 
 
-- Added new nodejs file server/irc/irc-serverlist-editor.js
+- Added new nodejs file: server/irc/irc-serverlist-editor.js
   - Added route GET /irc/serverlist to retrieve array of IRC servers
   - Support query parameters GET/irc/serverlist?index=0&lock=1 to open edit of specific server
   - Added route POST /irc/serverlist to create new IRC servers
@@ -22,7 +22,9 @@ Server:
   - Added route COPY /etc/serverlist?index=0 to copy an existing IRC server to the end of the list
   - Added route DELETE /irc/serverlist?index=0 to delete an IRC server from the list
 - server/web-server.js - Added routes, authorization and CSRF token validation for server list edit API
-- server/web-server.js - Modified code to add CSRF tokens to /irc/webclient.html and /irc/serverlist.html
+- server/web-server.js - Modified code for CSRF tokens /irc/webclient.html and /irc/serverlist.html
+- server/irc-client.js - Added global event for IRC client to reload server list after edit.
+- server/irc-client.js - Route /irc/server body param {index: -2} = previous, -1 = next (rotate servers)
 
 Browser:
 
@@ -31,12 +33,19 @@ Browser:
   - Form for editing a specific server properties
 - Added /irc/css/serverlist.css (styles)
 - Added /irc/js/serverlist.js (Code to perform API calls and edit server list)
-  - Functions for IRC server list to: edit existing, create new, duplicate, and delete
+  - Functions for IRC server list editing: GET, POST, PATCH, COPY, DELETE
+- webclient.html - Added 'Prev' button to select both next and previous server from IRC server list
+- webclient04.js - Added button handler for 'Prev' button
+- webclient.js - Various disabled attributes to new 'Prev' button
+- webclient.html - Added 'Edit' button as link `<a href='/irc/serverlist.html'>`
+- webclient.js - Various disabled attributes to new 'Edit' button
+- webclient.html - Added read only input element for server index number.
+- webclient04.js - On state change update value of new index input element
 
 Minfied code:
 
 - Temporary code used to minify /irc/serverlist.* is not pushed to github.
-- Added /irc/serverlist.html, .js, .css files added to bundler (gulp) with minify disabled for debugging (not pushed github)
+- Added /irc/serverlist.html, .js, .css files added to bundler (gulp) with minify disabled for debugging (Gulpfile.js not pushed github)
 ## [v0.1.44](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.1.44) 2022-07-13
 
 ### Changed

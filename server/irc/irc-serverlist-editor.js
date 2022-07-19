@@ -263,6 +263,10 @@
           if (err) {
             reject(err);
           } else {
+            // Tell the IRC client to reload the server list
+            if ('externalEvent' in global) {
+              global.externalEvent.emit('serverListChanged');
+            }
             resolve(chainObject);
           }
         });

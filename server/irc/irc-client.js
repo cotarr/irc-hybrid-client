@@ -34,6 +34,9 @@
   const fs = require('fs');
   const isValidUTF8 = require('utf-8-validate');
   const socks5 = require('socks5-client');
+  const events = require('events');
+  // For use by server list editor
+  global.externalEvent = new events.EventEmitter();
 
   // log module loaded first to create /logs folder if needed.
   const ircLog = require('./irc-client-log');
@@ -46,20 +49,26 @@
 
   const nodeEnv = process.env.NODE_ENV || 'development';
 
-  const servers = JSON.parse(fs.readFileSync('./servers.json', 'utf8'));
-  if ((!('configVersion' in servers)) || (servers.configVersion !== 1)) {
-    console.error('Error, servers.js wrong configVersion');
-    process.exit(1);
-  }
-  if ((!('serverArray' in servers)) || (servers.serverArray.length < 1)) {
-    console.error('Error, no server configuration in servers.json');
-    process.exit(1);
-  }
-  // TLS Verify property added 2021-07-17, message to update config file.
-  if (!('verify' in servers.serverArray[0])) {
-    console.error('File: servers.json: missing boolean "verify" property for TLS hostname check.');
-    process.exit(1);
-  }
+  let servers = null;
+  const loadServerList = function () {
+    servers = JSON.parse(fs.readFileSync('./servers.json', 'utf8'));
+    if ((!('configVersion' in servers)) || (servers.configVersion !== 1)) {
+      console.error('Error, servers.js wrong configVersion');
+      process.exit(1);
+    }
+    if ((!('serverArray' in servers)) || (servers.serverArray.length < 1)) {
+      console.error('Error, no server configuration in servers.json');
+      process.exit(1);
+    }
+    // TLS Verify property added 2021-07-17, message to update config file.
+    if (!('verify' in servers.serverArray[0])) {
+      console.error('File: servers.json: missing boolean "verify" property for TLS host check.');
+      process.exit(1);
+    }
+  }; // loadServerList()
+
+  // Do on program load
+  loadServerList();
 
   // ----------------------------------------------------
   //
@@ -1129,7 +1138,7 @@
     }
     // input range validaton
     const inputIndex = req.body.index;
-    if ((inputIndex < -1) || (inputIndex >= servers.serverArray.length)) {
+    if ((inputIndex < -2) || (inputIndex >= servers.serverArray.length)) {
       return res.json({
         error: true,
         message: 'Requested server index number out of range.'
@@ -1145,6 +1154,12 @@
       vars.ircState.ircServerIndex++;
       if (vars.ircState.ircServerIndex >= servers.serverArray.length) {
         vars.ircState.ircServerIndex = 0;
+      }
+    // if index ===-2, then cycle through servers, else use index value
+    } else if (inputIndex === -2) {
+      vars.ircState.ircServerIndex--;
+      if (vars.ircState.ircServerIndex < 0) {
+        vars.ircState.ircServerIndex = servers.serverArray.length - 1;
       }
     } else {
       vars.ircState.ircServerIndex = inputIndex;
@@ -1176,6 +1191,38 @@
       name: vars.ircState.ircServerName
     });
   }; // serverHandler()
+
+  //
+  // Global event handler for changes to IRC server list file servers.json
+  // External IRC server list editor send event after saving the file.
+  //
+  global.externalEvent.on('serverListChanged', function () {
+    console.log('Debug: server list reloaded from file');
+    loadServerList();
+
+    //
+    // Update IRC parameters
+    //
+    vars.ircState.ircServerIndex = 0;
+
+    vars.ircState.ircServerName = servers.serverArray[0].name;
+    vars.ircState.ircServerHost = servers.serverArray[0].host;
+    vars.ircState.ircServerPort = servers.serverArray[0].port;
+    vars.ircState.ircTLSEnabled = servers.serverArray[0].tls;
+    vars.ircState.ircTLSVerify = servers.serverArray[0].verify;
+    vars.ircServerPassword = servers.serverArray[0].password;
+    vars.nsIdentifyNick = servers.serverArray[0].identifyNick;
+    vars.nsIdentifyCommand = servers.serverArray[0].identifyCommand;
+    vars.ircState.channelList = servers.serverArray[0].channelList;
+
+    vars.ircState.nickName = servers.serverArray[0].nick;
+    vars.ircState.userName = servers.serverArray[0].user;
+    vars.ircState.realName = servers.serverArray[0].real;
+    vars.ircState.userMode = servers.serverArray[0].modes;
+    vars.ircState.userHost = '';
+
+    tellBrowserToRequestState();
+  });
 
   // -----------------------------------------------------
   // API connect request handler (Called by browser)
