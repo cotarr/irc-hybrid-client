@@ -271,7 +271,7 @@ const openIrcServerEdit = (index) => {
  */
 const copyIrcServerToNew = (index) => {
   _clearError();
-  submitServer({ index: index }, 'COPY', index)
+  submitServer({ index: index, action: 'duplicate' }, 'COPY', index)
     .then((data) => checkErrorAndCloseEdit(data))
     // Reload a fresh server list
     .then(() => fetchServerList(-1, -1))
@@ -290,6 +290,24 @@ const deleteIrcServer = (index) => {
   _clearError();
   submitServer({ index: index }, 'DELETE', index)
     .then((data) => checkErrorAndCloseEdit(data))
+    // Reload a fresh server list
+    .then(() => fetchServerList(-1, -1))
+    .then((data) => buildServerListTable(data))
+    .catch((err) => {
+      _showError(err.toString() || err);
+      console.log(err);
+    });
+};
+
+/**
+ * Button Event Handler to service dynamically generated buttons in server list table
+ * @param {Number} index - Integer index into IRC server Array
+ */
+const moveUpInList = (index) => {
+  _clearError();
+  submitServer({ index: index, action: 'move-up' }, 'COPY', index)
+    .then((data) => checkErrorAndCloseEdit(data))
+
     // Reload a fresh server list
     .then(() => fetchServerList(-1, -1))
     .then((data) => buildServerListTable(data))
@@ -375,7 +393,8 @@ const buildServerListTable = (data) => {
       // Empty for buttons
       '', // Edit
       '', // Duplicate
-      '' // Delete
+      '', // Delete
+      '' // Move Up
     ];
 
     const titleRowEl = document.createElement('tr');
@@ -398,12 +417,15 @@ const buildServerListTable = (data) => {
         const td06El = document.createElement('td');
         const td07El = document.createElement('td');
         const td08El = document.createElement('td');
+        const td09El = document.createElement('td');
         const editButtonEl = document.createElement('button');
         const copyButtonEl = document.createElement('button');
         const deleteButtonEl = document.createElement('button');
+        const moveUpButtonEl = document.createElement('button');
         editButtonEl.textContent = 'Edit';
         copyButtonEl.textContent = 'Copy';
         deleteButtonEl.textContent = 'Delete';
+        moveUpButtonEl.textContent = 'move-up';
         td01El.textContent = i.toString();
         td02El.textContent = data[i].name;
         td03El.textContent = data[i].host;
@@ -412,6 +434,8 @@ const buildServerListTable = (data) => {
         td06El.appendChild(editButtonEl);
         td07El.appendChild(copyButtonEl);
         td08El.appendChild(deleteButtonEl);
+        // skip first row
+        if (i > 0) td09El.appendChild(moveUpButtonEl);
         rowEl.appendChild(td01El);
         rowEl.appendChild(td02El);
         rowEl.appendChild(td03El);
@@ -420,6 +444,7 @@ const buildServerListTable = (data) => {
         rowEl.appendChild(td06El);
         rowEl.appendChild(td07El);
         rowEl.appendChild(td08El);
+        rowEl.appendChild(td09El);
         tableNode.appendChild(rowEl);
         //
         // Add event listeners
@@ -433,6 +458,11 @@ const buildServerListTable = (data) => {
         deleteButtonEl.addEventListener('click', () => {
           deleteIrcServer(parseInt(rowEl.getAttribute('index')));
         });
+        if (i > 0) {
+          moveUpButtonEl.addEventListener('click', () => {
+            moveUpInList(parseInt(rowEl.getAttribute('index')));
+          });
+        }
       }
     }
     resolve(null);

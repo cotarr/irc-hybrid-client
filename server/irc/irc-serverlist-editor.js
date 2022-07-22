@@ -554,6 +554,39 @@
   };
 
   /**
+   * Function to re-order server list. The record at the
+   * specified index is moved up by one position in the list
+   * @param {Object} req - NodeJs HTTP request object, req.query.index contain index
+   * @param {Object} chainObject - Wrapper object used to pass common date through promise chain
+   * @returns {Promise} Resolve to Object (chainObject) or reject error
+   */
+  const reorderArray = function (req, chainObject) {
+    return new Promise(function (resolve, reject) {
+      // chainObject.serversFile.serverArray.push(chainObject.newServer);
+      const index = parseInt(req.query.index);
+      const listLength = chainObject.serversFile.serverArray.length;
+      if ((!isNaN(index)) && (index < listLength)) {
+        console.log('index', index, ' length ', listLength);
+        if (index === 0) {
+          // first record can not move up, no changed needed
+          resolve(chainObject);
+        } else {
+          // Exchange 2 records
+          const temp = chainObject.serversFile.serverArray[index];
+          chainObject.serversFile.serverArray[index] =
+            chainObject.serversFile.serverArray[index - 1];
+          chainObject.serversFile.serverArray[index - 1] = temp;
+          resolve(chainObject);
+        }
+      } else {
+        const err = new Error('Invalid array index');
+        err.status = 500;
+        reject(err);
+      }
+    });
+  };
+
+  /**
    * Function to replace existing IRC server in array contain IRC server definitions
    * Both replacement IRC server object and IRC server array are present within chainObject
    * @param {Object} req - NodeJs HTTP request object, req.query.index contain index
@@ -652,15 +685,32 @@
    * Copy - NodeJs Middleware function: COPY /irc/serverlist?index=0 route handler
    */
   const copyServerlist = function (req, res, next) {
-    const chainObject = {};
-    requireIrcNotConnected(chainObject)
-      .then((chainObject) => requireNotLock(chainObject))
-      .then((chainObject) => readServersFile(chainObject))
-      .then((chainObject) => copyExistingServer(req, chainObject))
-      .then((chainObject) => appendArrayElement(chainObject))
-      .then((chainObject) => writeServersFile(chainObject))
-      .then((chainObject) => returnStatus(req, res, chainObject))
-      .catch((err) => next(err));
+    if (('action' in req.body) && (req.body.action === 'duplicate')) {
+      // Case 1: copy specified record to the end of the list as a duplicate
+      const chainObject = {};
+      requireIrcNotConnected(chainObject)
+        .then((chainObject) => requireNotLock(chainObject))
+        .then((chainObject) => readServersFile(chainObject))
+        .then((chainObject) => copyExistingServer(req, chainObject))
+        .then((chainObject) => appendArrayElement(chainObject))
+        .then((chainObject) => writeServersFile(chainObject))
+        .then((chainObject) => returnStatus(req, res, chainObject))
+        .catch((err) => next(err));
+    } else if (('action' in req.body) && (req.body.action === 'move-up')) {
+      // Case 2: reorder the list moving record at index up 1 position
+      const chainObject = {};
+      requireIrcNotConnected(chainObject)
+        .then((chainObject) => requireNotLock(chainObject))
+        .then((chainObject) => readServersFile(chainObject))
+        .then((chainObject) => reorderArray(req, chainObject))
+        .then((chainObject) => writeServersFile(chainObject))
+        .then((chainObject) => returnStatus(req, res, chainObject))
+        .catch((err) => next(err));
+    } else {
+      const err = new Error('Invalid action property');
+      err.status = 400;
+      next(err);
+    }
   };
 
   /**

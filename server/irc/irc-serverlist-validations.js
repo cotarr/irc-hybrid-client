@@ -357,6 +357,7 @@
     function (req, res, next) {
       checkExtraneousKeys(req, [
         'index',
+        'action',
         'name',
         'host',
         'port',
@@ -378,7 +379,9 @@
     //
     query('index', 'is required URL query param')
       .exists(),
-    body('index', 'is required body param')
+    body([
+      'index',
+      'action'], 'is required body param')
       .exists(),
     //
     //
@@ -401,6 +404,10 @@
         }
         return true;
       }),
+    oneOf([
+      body('action', 'Unrecognized action value').equals('duplicate'),
+      body('action', 'Unrecognized action value').equals('move-up')
+    ]),
     //
     // sanitize input
     //
@@ -408,6 +415,9 @@
       .toInt(),
     body(['index']).optional()
       .toInt(),
+    body('action')
+      // remove starting and ending whitespace
+      .trim(),
     //
     // On error return status 422 Unprocessable Entity
     //
