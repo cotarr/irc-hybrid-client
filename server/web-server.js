@@ -483,27 +483,42 @@ app.post('/irc/erase', userAuth.authorizeOrFail, csrfProtection, ircClient.erase
 app.get('/irc/test1', userAuth.authorizeOrFail, ircClient.test1Handler);
 app.get('/irc/test2', userAuth.authorizeOrFail, ircClient.test2Handler);
 
-app.get('/irc/serverlist',
-  userAuth.authorizeOrFail,
-  ircServerListvalidations.list,
-  ircServerListEditor.list);
-app.post('/irc/serverlist',
-  userAuth.authorizeOrFail, csrfProtection,
-  ircServerListvalidations.create,
-  ircServerListEditor.create);
-app.patch('/irc/serverlist',
-  userAuth.authorizeOrFail, csrfProtection,
-  ircServerListvalidations.update,
-  ircServerListEditor.update);
-app.copy('/irc/serverlist',
-  userAuth.authorizeOrFail, csrfProtection,
-  ircServerListvalidations.copy,
-  ircServerListEditor.copy);
-app.delete('/irc/serverlist',
-  userAuth.authorizeOrFail, csrfProtection,
-  ircServerListvalidations.destroy,
-  ircServerListEditor.destroy);
-// console.log('\n * * * ROUTE AUTH DISABLED FOR DEBUGGING * * *\n');
+//
+// API for Server List Editor
+//
+if (credentials.disableServerListEditor) {
+  app.get('/irc/serverlist', userAuth.authorizeOrFail,
+    (req, res) => res.status(405).json({ Error: 'Server List Editor Disabled' }));
+  app.post('/irc/serverlist', userAuth.authorizeOrFail,
+    (req, res) => res.status(405).json({ Error: 'Server List Editor Disabled' }));
+  app.patch('/irc/serverlist', userAuth.authorizeOrFail,
+    (req, res) => res.status(405).json({ Error: 'Server List Editor Disabled' }));
+  app.copy('/irc/serverlist', userAuth.authorizeOrFail,
+    (req, res) => res.status(405).json({ Error: 'Server List Editor Disabled' }));
+  app.delete('/irc/serverlist', userAuth.authorizeOrFail,
+    (req, res) => res.status(405).json({ Error: 'Server List Editor Disabled' }));
+} else {
+  app.get('/irc/serverlist',
+    userAuth.authorizeOrFail,
+    ircServerListvalidations.list,
+    ircServerListEditor.list);
+  app.post('/irc/serverlist',
+    userAuth.authorizeOrFail, csrfProtection,
+    ircServerListvalidations.create,
+    ircServerListEditor.create);
+  app.patch('/irc/serverlist',
+    userAuth.authorizeOrFail, csrfProtection,
+    ircServerListvalidations.update,
+    ircServerListEditor.update);
+  app.copy('/irc/serverlist',
+    userAuth.authorizeOrFail, csrfProtection,
+    ircServerListvalidations.copy,
+    ircServerListEditor.copy);
+  app.delete('/irc/serverlist',
+    userAuth.authorizeOrFail, csrfProtection,
+    ircServerListvalidations.destroy,
+    ircServerListEditor.destroy);
+}
 
 // -------------------------------
 // If unauthorized, redirect to /login for main html file /irc/webclient.html.

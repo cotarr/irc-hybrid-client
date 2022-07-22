@@ -179,6 +179,11 @@
   };
   vars.ircState.websocketCount = 0;
 
+  // Used to disable or hide buttons in IRC client page
+  if (credentials.disableServerListEditor) {
+    vars.ircState.disableServerListEditor = true;
+  }
+
   ircLog.setRawMessageLogEnabled(servers.rawMessageLog);
 
   console.log('Starting web server: ' + vars.ircState.progName +
@@ -1197,7 +1202,6 @@
   // External IRC server list editor send event after saving the file.
   //
   global.externalEvent.on('serverListChanged', function () {
-    console.log('Debug: server list reloaded from file');
     loadServerList();
 
     //

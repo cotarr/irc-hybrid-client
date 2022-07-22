@@ -157,7 +157,8 @@
     body([
       'name',
       'nick',
-      'user'], 'Require type String and not empty string')
+      'user',
+      'real'], 'Require type String and not empty string')
       .isString()
       .notEmpty(),
     body([
@@ -166,7 +167,6 @@
       .isString(),
     body([
       'identifyNick',
-      'real',
       'modes',
       'channelList'], 'Require type String')
       .isString(),
@@ -287,7 +287,8 @@
     body([
       'name',
       'nick',
-      'user'], 'Require type String and not empty string')
+      'user',
+      'real'], 'Require type String and not empty string')
       .isString()
       .notEmpty(),
     body([
@@ -296,7 +297,6 @@
       .isString(),
     body([
       'identifyNick',
-      'real',
       'modes',
       'channelList'], 'Require type String')
       .isString(),

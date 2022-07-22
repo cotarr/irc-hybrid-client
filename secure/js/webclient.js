@@ -587,7 +587,11 @@ function updateDivVisibility () {
       if (document.getElementById('waitConnectIconId').hasAttribute('hidden')) {
         document.getElementById('cyclePrevServerButton').removeAttribute('disabled');
         document.getElementById('cycleNextServerButton').removeAttribute('disabled');
-        document.getElementById('editServerListButton').removeAttribute('disabled');
+        if (ircState.disableServerListEditor) {
+          document.getElementById('editServerListButton').setAttribute('disabled', '');
+        } else {
+          document.getElementById('editServerListButton').removeAttribute('disabled');
+        }
         document.getElementById('nickNameInputId').removeAttribute('disabled');
         // document.getElementById('userNameInputId').removeAttribute('disabled');
         document.getElementById('realNameInputId').removeAttribute('disabled');

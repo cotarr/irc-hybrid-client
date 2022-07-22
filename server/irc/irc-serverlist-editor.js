@@ -256,9 +256,8 @@
   const writeServersFile = function (chainObject) {
     return new Promise(function (resolve, reject) {
       const serverListFilename = path.join(__dirname, '../../servers.json');
-      fs.writeFile(serverListFilename,
-        JSON.stringify(chainObject.serversFile, null, 2),
-        { encoding: 'utf8' },
+      const data = JSON.stringify(chainObject.serversFile, null, 2) + '\n';
+      fs.writeFile(serverListFilename, data, { encoding: 'utf8' },
         function (err, jsonData) {
           if (err) {
             reject(err);

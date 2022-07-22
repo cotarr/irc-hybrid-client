@@ -130,6 +130,10 @@ const fetchServerList = (index, lock) => {
           const err = new Error('IRC Connected or Database Locked');
           err.status = 409;
           throw err;
+        } else if (response.status === 405) {
+          const err = new Error('Server List Editor Disabled');
+          err.status = 405;
+          throw err;
         } else {
           throw new Error('Fetch status ' + response.status + ' ' +
             response.statusText + ' ' + fetchURL);
@@ -222,6 +226,7 @@ const populateIrcServerForm = (data) => {
     clearIrcServerForm();
     document.getElementById('saveNewButton').setAttribute('hidden', '');
     document.getElementById('saveModifiedButton').removeAttribute('hidden');
+    document.getElementById('serverListDisabledDiv').setAttribute('hidden', '');
     document.getElementById('warningVisibilityDiv').setAttribute('hidden', '');
     document.getElementById('listVisibilityDiv').setAttribute('hidden', '');
     document.getElementById('formVisibilityDiv').removeAttribute('hidden');
@@ -235,7 +240,7 @@ const populateIrcServerForm = (data) => {
     document.getElementById('passwordInputId').value = '(hidden)';
     document.getElementById('identifyNickInputId').value = data.identifyNick;
     document.getElementById('identifyCommandInputId').setAttribute('disabled', '');
-    document.getElementById('identifyCommandInputId').value = ('hidden');
+    document.getElementById('identifyCommandInputId').value = ('(hidden)');
     document.getElementById('nickInputId').value = data.nick;
     document.getElementById('userInputId').value = data.user;
     document.getElementById('realInputId').value = data.real;
@@ -363,7 +368,7 @@ const buildServerListTable = (data) => {
 
     const columnTitles = [
       'Index',
-      'Name',
+      'Label',
       'Host',
       'Port',
       'Nick',
@@ -444,6 +449,7 @@ const buildServerListTable = (data) => {
 const checkErrorAndCloseEdit = (data) => {
   return new Promise((resolve, reject) => {
     if (data.status === 'success') {
+      document.getElementById('serverListDisabledDiv').setAttribute('hidden', '');
       document.getElementById('warningVisibilityDiv').setAttribute('hidden', '');
       document.getElementById('listVisibilityDiv').removeAttribute('hidden');
       document.getElementById('formVisibilityDiv').setAttribute('hidden', '');
@@ -497,6 +503,7 @@ document.getElementById('createNewButton').addEventListener('click', () => {
     .then(() => fetchServerList(0, 0))
     .then(() => clearIrcServerForm())
     .then(() => {
+      document.getElementById('serverListDisabledDiv').setAttribute('hidden', '');
       document.getElementById('warningVisibilityDiv').setAttribute('hidden', '');
       document.getElementById('listVisibilityDiv').setAttribute('hidden', '');
       document.getElementById('formVisibilityDiv').removeAttribute('hidden');
@@ -546,6 +553,7 @@ document.getElementById('saveModifiedButton').addEventListener('click', () => {
  */
 document.getElementById('cancelEditButton').addEventListener('click', () => {
   _clearError();
+  document.getElementById('serverListDisabledDiv').setAttribute('hidden', '');
   document.getElementById('warningVisibilityDiv').setAttribute('hidden', '');
   document.getElementById('listVisibilityDiv').removeAttribute('hidden');
   document.getElementById('formVisibilityDiv').setAttribute('hidden', '');
@@ -583,6 +591,7 @@ _clearError();
 fetchIrcState()
   .then((data) => {
     if ((data.ircConnected) || (data.ircConnecting)) {
+      document.getElementById('serverListDisabledDiv').setAttribute('hidden', '');
       document.getElementById('warningVisibilityDiv').removeAttribute('hidden');
       document.getElementById('listVisibilityDiv').setAttribute('hidden', '');
       document.getElementById('formVisibilityDiv').setAttribute('hidden', '');
@@ -593,6 +602,13 @@ fetchIrcState()
   })
   .then((data) => buildServerListTable(data))
   .catch((err) => {
-    _showError(err.toString() || err);
-    console.log(err);
+    if ((err.status) && (err.status === 405)) {
+      document.getElementById('serverListDisabledDiv').removeAttribute('hidden');
+      document.getElementById('warningVisibilityDiv').setAttribute('hidden', '');
+      document.getElementById('listVisibilityDiv').setAttribute('hidden', '');
+      document.getElementById('formVisibilityDiv').setAttribute('hidden', '');
+    } else {
+      _showError(err.toString() || err);
+      console.log(err);
+    }
   });

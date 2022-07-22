@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Un-merged 2022-07-19
+## Un-merged 2022-07-22
 
 ### Added (WORK IN PROGRESS)
 
@@ -25,6 +25,7 @@ Server:
 - server/web-server.js - Modified code for CSRF tokens /irc/webclient.html and /irc/serverlist.html
 - server/irc-client.js - Added global event for IRC client to reload server list after edit.
 - server/irc-client.js - Route /irc/server body param {index: -2} = previous, -1 = next (rotate servers)
+- credentials.json - Add property `disableServerListEditor`.
 
 Browser:
 
