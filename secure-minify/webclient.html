@@ -48,20 +48,23 @@ a raw command to the IRC server directly.
 You are receiving this message because your nickname is still present on IRC, or the status of your IRC connection is unknown. Your nickname may remain present on IRC. Web page login is independant of IRC login.
 </div></div><div id="webDisconnectedHiddenDiv1" hidden><div class="aa-section-div color-connect"><div class="head-flex"><div class="head-left"><button id="hideLoginSectionButton">-</button> <span>
 IRC Controls</span></div><div class="head-right"><button id="webLogoutButton">Web logout</button></div></div><div class="vh10"></div><div class="button-div"><span class="user-span" id="headerServer">
-server</span> <span class="user-span" id="headerUser"></span></div><div class="vh10"></div><div id="hideLoginSection"><div class="vh10"></div><div class="button-div"><input type="text" 
-id="ircServerIndexInputId" size="2" value="" disabled="disabled"> <input type="text" id="ircServerNameInputId" size="10" value="" disabled="disabled"> <button id="cyclePrevServerButton">Prev</button> 
-<button id="cycleNextServerButton">Next</button> <a href="/irc/serverlist.html"><button id="editServerListButton">Edit</button></a></div><div class="button-div"><input type="checkbox" 
-id="ircServerTlsEnable" disabled="disabled"> <span>TLS</span> <input type="checkbox" id="ircServerTlsVerify" disabled="disabled"> <span>Verify Hostname</span></div><div class="button-div"><input 
-type="text" id="ircServerAddrInputId" size="26" value="" disabled="disabled"> <span>:</span> <input type="text" id="ircServerPortInputId" size="4" value="" disabled="disabled"></div><div class="vh10">
-</div><div class="button-div"><input type="text" id="nickNameInputId" value=""><div class="input-label-right">Nickname</div></div><div class="button-div"><input type="text" id="userNameInputId" 
-value="" disabled="disabled"><div class="input-label-right">Username</div></div><div class="button-div"><input type="text" id="realNameInputId" value=""><div class="input-label-right">Real Name</div>
-</div><div class="button-div"><input type="text" id="userModeInputId" size="6" value=""><div class="input-label-right">Initial User Mode</div></div><div class="button-div"><input type="text" 
-id="userAwayMessageId" size="20" value="AFK"> <button id="setAwayButton">Away</button> <button id="setBackButton">Back</button></div><div id="socks5HidableDiv"><div class="button-div"><input 
-type="checkbox" id="socks5EnabledCheckbox" disabled="disabled"> <span>Connect using socks5 proxy</span></div><div class="button-div"><input type="text" id="socks5AddrInputId" size="26" value="" 
-disabled="disabled"> <span>:</span> <input type="text" id="socks5PortInputId" size="4" value="" disabled="disabled"></div></div><div class="vh10"></div><div class="button-div"><button 
-id="connectButton">Connect IRC</button> <button id="quitButton">Disconnect IRC</button></div></div></div></div><div><div class="aa-section-div color-raw" id="rawSectionDiv"><div class="head-flex"><div
- class="head-left"><button class="notice-button" id="rawHiddenElementsButton">-</button> <span>Server</span></div><div class="head-center"></div><div class="head-right"><div id="rawHeadRightButtons">
-<button id="rawTallerButton">Taller</button> <button id="rawNormalButton">Normal</button> <button id="rawClearButton">Clear</button></div></div></div><div id="rawHiddenElements"><div><textarea 
+server</span> <span class="user-span" id="headerUser"></span></div><div class="vh10"></div><div id="hideLoginSection"><div class="empty-server-list-div" id="emptyServerListDiv" hidden><h2>
+Empty Server List</h2><p>
+The list of IRC servers is empty. Please add at least one IRC server definition by selecting the &quot;Edit IRC Server List&quot; button, then selecting the button &quot;Create New IRC Server&quot;
+</p><a href="/irc/serverlist.html"><button>Edit IRC Server List</button></a></div><div class="vh10"></div><div class="button-div"><input type="text" id="ircServerIndexInputId" size="2" value="" 
+disabled="disabled"> <input type="text" id="ircServerNameInputId" size="10" value="" disabled="disabled"> <button id="cyclePrevServerButton">Prev</button> <button id="cycleNextServerButton">Next
+</button> <a href="/irc/serverlist.html"><button id="editServerListButton">Edit</button></a></div><div class="button-div"><input type="checkbox" id="ircServerTlsEnable" disabled="disabled"> <span>TLS
+</span> <input type="checkbox" id="ircServerTlsVerify" disabled="disabled"> <span>Verify Hostname</span></div><div class="button-div"><input type="text" id="ircServerAddrInputId" size="26" value="" 
+disabled="disabled"> <span>:</span> <input type="text" id="ircServerPortInputId" size="4" value="" disabled="disabled"></div><div class="vh10"></div><div class="button-div"><input type="text" 
+id="nickNameInputId" value=""><div class="input-label-right">Nickname</div></div><div class="button-div"><input type="text" id="userNameInputId" value="" disabled="disabled"><div 
+class="input-label-right">Username</div></div><div class="button-div"><input type="text" id="realNameInputId" value=""><div class="input-label-right">Real Name</div></div><div class="button-div">
+<input type="text" id="userModeInputId" size="6" value=""><div class="input-label-right">Initial User Mode</div></div><div class="button-div"><input type="text" id="userAwayMessageId" size="20" 
+value="AFK"> <button id="setAwayButton">Away</button> <button id="setBackButton">Back</button></div><div id="socks5HidableDiv"><div class="button-div"><input type="checkbox" 
+id="socks5EnabledCheckbox" disabled="disabled"> <span>Connect using socks5 proxy</span></div><div class="button-div"><input type="text" id="socks5AddrInputId" size="26" value="" disabled="disabled"> 
+<span>:</span> <input type="text" id="socks5PortInputId" size="4" value="" disabled="disabled"></div></div><div class="vh10"></div><div class="button-div"><button id="connectButton">Connect IRC
+</button> <button id="quitButton">Disconnect IRC</button></div></div></div></div><div><div class="aa-section-div color-raw" id="rawSectionDiv"><div class="head-flex"><div class="head-left"><button 
+class="notice-button" id="rawHiddenElementsButton">-</button> <span>Server</span></div><div class="head-center"></div><div class="head-right"><div id="rawHeadRightButtons"><button 
+id="rawTallerButton">Taller</button> <button id="rawNormalButton">Normal</button> <button id="rawClearButton">Clear</button></div></div></div><div id="rawHiddenElements"><div><textarea 
 id="rawMessageDisplay" cols="120" rows="10" spellcheck="false" readonly="readonly"></textarea></div><div id="hideRawButtons"><div class="button-div"><textarea class="va-middle" spellcheck="false" 
 id="rawMessageInputId" cols="83" rows="1"></textarea> <button class="va-middle" id="sendRawMessageButton">Send</button></div><div class="button-div"><button id="loadFromCacheButton">Refresh</button> 
 <button id="eraseCacheButton">Erase Cache</button> <button id="showDebugButton">More...</button></div><div id="hiddenDebugDiv" hidden><div class="button-div"><input class="raw-cb-cb" type="checkbox" 

@@ -271,6 +271,13 @@ button[disabled] {
   background-color: yellow;
   padding: 10px;
 }
+.empty-server-list-div {
+  border: 1px solid black;
+  border-radius: 6px;
+  background-color: yellow;
+  padding: 10px;
+  margin-right: 10px;
+}
 
 .message-icon {
   border: 1px solid black;

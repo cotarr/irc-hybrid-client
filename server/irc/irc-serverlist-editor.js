@@ -485,6 +485,11 @@
         const err = new Error('Server list index not valid integer');
         err.status = 400;
         next(err);
+      } else if ((index === 0) && (chainObject.serverArray.length === 0)) {
+        // This is to address edge case of empty server list.
+        // A valid lock + unlock request is needed to create a new record in
+        // an empty server list.
+        res.json({});
       } else if ((index < 0) || (index >= chainObject.serverArray.length)) {
         const err = new Error('Server list array index out of range');
         err.status = 400;

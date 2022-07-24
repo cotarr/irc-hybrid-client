@@ -58,6 +58,7 @@ const _clearError = () => {
   while (errorDivEl.firstChild) {
     errorDivEl.removeChild(errorDivEl.firstChild);
   }
+  document.getElementById('showRefreshButtonDiv').setAttribute('hidden', '');
 };
 
 /**
@@ -70,6 +71,7 @@ const _showError = (errorString) => {
   const errorMessageEl = document.createElement('div');
   errorMessageEl.textContent = errorString || 'Error: unknown error (4712)';
   errorDivEl.appendChild(errorMessageEl);
+  document.getElementById('showRefreshButtonDiv').removeAttribute('hidden');
 };
 
 /**
@@ -516,19 +518,6 @@ document.getElementById('replacePasswordButton').addEventListener('click', () =>
 document.getElementById('replaceIdentifyCommandButton').addEventListener('click', () => {
   document.getElementById('identifyCommandInputId').removeAttribute('disabled');
   document.getElementById('identifyCommandInputId').value = '';
-});
-
-/**
- * Refresh Button Event Handler
- */
-document.getElementById('refreshButton').addEventListener('click', () => {
-  _clearError();
-  fetchServerList(-1, -1)
-    .then((data) => buildServerListTable(data))
-    .catch((err) => {
-      _showError(err.toString() || err);
-      console.log(err);
-    });
 });
 
 /**

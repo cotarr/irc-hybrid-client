@@ -24,24 +24,31 @@ Server:
 - server/web-server.js - Added routes, authorization and CSRF token validation for server list edit API
 - server/web-server.js - Modified code for CSRF tokens /irc/webclient.html and /irc/serverlist.html
 - server/irc-client.js - Added global event for IRC client to reload server list after edit.
+- server/irc-client.js - On loading servers.json file, remove error for empty server list.
+- server/irc-client.js - On loading servers.json file, default values are null for empty server list.
+- server/irc-client.js - ircState.ircServerIndex uses value -1 to indicate empty server list
 - server/irc-client.js - Route /irc/server body param {index: -2} = previous, -1 = next (rotate servers)
 - credentials.json - Add property `disableServerListEditor`.
 
 Browser:
 
-- Added /irc/serverlist.html (IRC server editor interface)
+- Added new file /irc/serverlist.html (IRC server editor interface)
   - HTML table with list of servers
   - Form for editing a specific server properties
-- Added /irc/css/serverlist.css (styles)
-- Added /irc/js/serverlist.js (Code to perform API calls and edit server list)
+- Added new file /irc/css/serverlist.css (styles)
+- Added new file /irc/js/serverlist.js (Code to perform API calls and edit server list)
   - Functions for IRC server list editing: GET, POST, PATCH, COPY, DELETE
-- webclient.html - Added 'Prev' button to select both next and previous server from IRC server list
-- webclient04.js - Added button handler for 'Prev' button
-- webclient.js - Various disabled attributes to new 'Prev' button
-- webclient.html - Added 'Edit' button as link `<a href='/irc/serverlist.html'>`
-- webclient.js - Various disabled attributes to new 'Edit' button
-- webclient.html - Added read only input element for server index number.
-- webclient04.js - On state change update value of new index input element
+- secure/webclient.html - Added 'Prev' button to select both next and previous server from IRC server list
+- secure/webclient.html - Added 'Edit' button as link `<a href='/irc/serverlist.html'>`
+- secure/webclient.html - Added read only input element for server index number.
+- secure/webclient.html - Added hidden div for message to indicate empty IRC server list
+- secure/css/styles.css - Add new styles for empty server list message
+- secure/js/webclient.js - Various disabled attributes to new 'Prev' button
+- secure/js/webclient.js - Various disabled attributes to new 'Edit' button
+- secure/js/webclient.js - Added code to show/hide empty server list error message div
+- secure/js/webclient04.js - On state change update value of new index input element
+- secure/js/webclient04.js - Added button handler for 'Prev' button
+- secure/js/webclient04.js - Added Connect Button Error when ircServerIndex = -1 on empty serverlist
 
 Minfied code:
 

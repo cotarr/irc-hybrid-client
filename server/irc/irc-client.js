@@ -56,15 +56,6 @@
       console.error('Error, servers.js wrong configVersion');
       process.exit(1);
     }
-    if ((!('serverArray' in servers)) || (servers.serverArray.length < 1)) {
-      console.error('Error, no server configuration in servers.json');
-      process.exit(1);
-    }
-    // TLS Verify property added 2021-07-17, message to update config file.
-    if (!('verify' in servers.serverArray[0])) {
-      console.error('File: servers.json: missing boolean "verify" property for TLS host check.');
-      process.exit(1);
-    }
   }; // loadServerList()
 
   // Do on program load
@@ -85,27 +76,48 @@
   vars.ircState.ircAutoReconnect = servers.ircAutoReconnect;
   vars.ircState.lastPing = '0.000';
 
-  vars.ircState.ircServerName = servers.serverArray[0].name;
-  vars.ircState.ircServerHost = servers.serverArray[0].host;
-  vars.ircState.ircServerPort = servers.serverArray[0].port;
-  vars.ircState.ircTLSEnabled = servers.serverArray[0].tls;
-  vars.ircState.ircTLSVerify = servers.serverArray[0].verify;
-  vars.ircServerPassword = servers.serverArray[0].password;
-  vars.nsIdentifyNick = servers.serverArray[0].identifyNick;
-  vars.nsIdentifyCommand = servers.serverArray[0].identifyCommand;
-  // index into servers.json file
-  vars.ircState.ircServerIndex = 0;
-  vars.ircState.ircServerPrefix = '';
   // pass on IRC socket TLS info
   vars.ircState.ircSockInfo = {};
-  // List of favorite channels
-  vars.ircState.channelList = servers.serverArray[0].channelList;
 
-  vars.ircState.nickName = servers.serverArray[0].nick;
-  vars.ircState.userName = servers.serverArray[0].user;
-  vars.ircState.realName = servers.serverArray[0].real;
-  vars.ircState.userMode = servers.serverArray[0].modes;
-  vars.ircState.userHost = '';
+  vars.ircState.ircServerName = null;
+  vars.ircState.ircServerHost = null;
+  vars.ircState.ircServerPort = null;
+  vars.ircState.ircTLSEnabled = null;
+  vars.ircState.ircTLSVerify = null;
+  vars.ircServerPassword = null;
+  vars.nsIdentifyNick = null;
+  vars.nsIdentifyCommand = null;
+  vars.ircState.nickName = null;
+  vars.ircState.userName = null;
+  vars.ircState.realName = null;
+  vars.ircState.userMode = null;
+  // List of favorite channels
+  vars.ircState.channelList = [];
+  // index into servers.json file
+  vars.ircState.ircServerIndex = -1;
+  vars.ircState.ircServerPrefix = '';
+
+  if (servers.serverArray.length > 0) {
+    vars.ircState.ircServerName = servers.serverArray[0].name;
+    vars.ircState.ircServerHost = servers.serverArray[0].host;
+    vars.ircState.ircServerPort = servers.serverArray[0].port;
+    vars.ircState.ircTLSEnabled = servers.serverArray[0].tls;
+    vars.ircState.ircTLSVerify = servers.serverArray[0].verify;
+    vars.ircServerPassword = servers.serverArray[0].password;
+    vars.nsIdentifyNick = servers.serverArray[0].identifyNick;
+    vars.nsIdentifyCommand = servers.serverArray[0].identifyCommand;
+    vars.ircState.nickName = servers.serverArray[0].nick;
+    vars.ircState.userName = servers.serverArray[0].user;
+    vars.ircState.realName = servers.serverArray[0].real;
+    vars.ircState.userMode = servers.serverArray[0].modes;
+    // List of favorite channels
+    vars.ircState.channelList = servers.serverArray[0].channelList;
+    vars.ircState.userHost = '';
+
+    // index into servers.json file
+    vars.ircState.ircServerIndex = 0;
+    vars.ircState.ircServerPrefix = '';
+  }
 
   if ('ctcpTimeLocale' in servers) {
     vars.ctcpTimeLocale = servers.ctcpTimeLocale;
@@ -1122,6 +1134,13 @@
         message: 'Can not change servers while connected or connecting'
       });
     }
+    // Check for empty server list
+    if (vars.ircState.ircServerIndex === -1) {
+      return res.json({
+        error: true,
+        message: 'Empty Server List'
+      });
+    }
     // Check for presence of extraneous keys
     const validKeys = ['index'];
     Object.keys(req.body).forEach(function (key) {
@@ -1207,23 +1226,44 @@
     //
     // Update IRC parameters
     //
-    vars.ircState.ircServerIndex = 0;
-
-    vars.ircState.ircServerName = servers.serverArray[0].name;
-    vars.ircState.ircServerHost = servers.serverArray[0].host;
-    vars.ircState.ircServerPort = servers.serverArray[0].port;
-    vars.ircState.ircTLSEnabled = servers.serverArray[0].tls;
-    vars.ircState.ircTLSVerify = servers.serverArray[0].verify;
-    vars.ircServerPassword = servers.serverArray[0].password;
-    vars.nsIdentifyNick = servers.serverArray[0].identifyNick;
-    vars.nsIdentifyCommand = servers.serverArray[0].identifyCommand;
-    vars.ircState.channelList = servers.serverArray[0].channelList;
-
-    vars.ircState.nickName = servers.serverArray[0].nick;
-    vars.ircState.userName = servers.serverArray[0].user;
-    vars.ircState.realName = servers.serverArray[0].real;
-    vars.ircState.userMode = servers.serverArray[0].modes;
+    // Case of empty server list
+    vars.ircState.ircServerName = null;
+    vars.ircState.ircServerHost = null;
+    vars.ircState.ircServerPort = null;
+    vars.ircState.ircTLSEnabled = null;
+    vars.ircState.ircTLSVerify = null;
+    vars.ircServerPassword = null;
+    vars.nsIdentifyNick = null;
+    vars.nsIdentifyCommand = null;
+    vars.ircState.nickName = null;
+    vars.ircState.userName = null;
+    vars.ircState.realName = null;
+    vars.ircState.userMode = null;
+    vars.ircState.channelList = [];
     vars.ircState.userHost = '';
+    vars.ircState.ircServerIndex = -1;
+    vars.ircState.ircServerPrefix = '';
+
+    // Default to server at index 0
+    if (servers.serverArray.length > 0) {
+      vars.ircState.ircServerName = servers.serverArray[0].name;
+      vars.ircState.ircServerHost = servers.serverArray[0].host;
+      vars.ircState.ircServerPort = servers.serverArray[0].port;
+      vars.ircState.ircTLSEnabled = servers.serverArray[0].tls;
+      vars.ircState.ircTLSVerify = servers.serverArray[0].verify;
+      vars.ircServerPassword = servers.serverArray[0].password;
+      vars.nsIdentifyNick = servers.serverArray[0].identifyNick;
+      vars.nsIdentifyCommand = servers.serverArray[0].identifyCommand;
+      vars.ircState.nickName = servers.serverArray[0].nick;
+      vars.ircState.userName = servers.serverArray[0].user;
+      vars.ircState.realName = servers.serverArray[0].real;
+      vars.ircState.userMode = servers.serverArray[0].modes;
+      vars.ircState.channelList = servers.serverArray[0].channelList;
+      vars.ircState.userHost = '';
+
+      vars.ircState.ircServerIndex = 0;
+      vars.ircState.ircServerPrefix = '';
+    }
 
     tellBrowserToRequestState();
   });

@@ -136,6 +136,11 @@ function connectButtonHandler () {
     return;
   }
 
+  if (ircState.ircServerIndex === -1) {
+    showError('Empty Server List');
+    return;
+  }
+
   if (document.getElementById('nickNameInputId').value.length < 1) {
     showError('Invalid nick name.');
     return;

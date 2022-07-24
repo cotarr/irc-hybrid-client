@@ -959,6 +959,12 @@ function getIrcState (callback) {
         webState.ircConnecting = false;
       }
       if (!ircState.ircConnected) {
+        // If no server list, show message and link button to add new servers
+        if (ircState.ircServerIndex === -1) {
+          document.getElementById('emptyServerListDiv').removeAttribute('hidden');
+        } else {
+          document.getElementById('emptyServerListDiv').setAttribute('hidden', '');
+        }
         // Since disconnected from IRC remove all channel plugin div
         setVariablesShowingIRCDisconnected();
 

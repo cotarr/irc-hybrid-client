@@ -177,6 +177,7 @@ document.getElementById('socks5HidableDiv').removeAttribute('hidden');document.g
 document.getElementById('headerServer').textContent=ircState.ircServerName;document.getElementById('headerUser').textContent=' ('+ircState.nickName+')'
 ;document.getElementById('nickNameInputId').value=ircState.nickName;document.getElementById('userNameInputId').value=ircState.userName
 ;document.getElementById('realNameInputId').value=ircState.realName;document.getElementById('userModeInputId').value=ircState.userMode;webState.ircConnecting=false}if(!ircState.ircConnected){
+if(ircState.ircServerIndex===-1){document.getElementById('emptyServerListDiv').removeAttribute('hidden')}else{document.getElementById('emptyServerListDiv').setAttribute('hidden','')}
 setVariablesShowingIRCDisconnected();document.title='irc-hybrid-client'}if(lastConnectErrorCount!==ircState.count.ircConnectError){lastConnectErrorCount=ircState.count.ircConnectError
 ;if(ircState.count.ircConnectError>0){if(webState.count.webStateCalls>1){showError('An IRC Server connection error occurred')}}webState.ircConnecting=false}
 document.dispatchEvent(new CustomEvent('irc-state-changed',{bubbles:true,detail:{}}));updateDivVisibility();if(!document.getElementById('variablesDivId').hasAttribute('hidden')){
@@ -331,8 +332,8 @@ if(responseJson.error){showError(responseJson.message)}else{webState.lastIrcServ
 const fetchURL=webServerUrl+'/irc/server';const fetchOptions={method:'POST',headers:{'CSRF-Token':csrfToken,'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify({index:-1})
 };fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()}else{throw new Error('Fetch status '+response.status+' '+response.statusText)}}).then(responseJson=>{
 if(responseJson.error){showError(responseJson.message)}else{webState.lastIrcServerIndex=-1}}).catch(error=>{console.log(error);showError(error.toString())})});function connectButtonHandler(){
-if(!checkConnect(1))return;if(ircState.ircConnected||ircState.ircConnecting||webState.ircConnecting){showError('Error: Already connected to IRC server');return}
-if(document.getElementById('nickNameInputId').value.length<1){showError('Invalid nick name.');return}webState.ircConnecting=true;const connectObject={}
+if(!checkConnect(1))return;if(ircState.ircConnected||ircState.ircConnecting||webState.ircConnecting){showError('Error: Already connected to IRC server');return}if(ircState.ircServerIndex===-1){
+showError('Empty Server List');return}if(document.getElementById('nickNameInputId').value.length<1){showError('Invalid nick name.');return}webState.ircConnecting=true;const connectObject={}
 ;connectObject.nickName=document.getElementById('nickNameInputId').value;connectObject.realName=document.getElementById('realNameInputId').value
 ;connectObject.userMode=document.getElementById('userModeInputId').value;const fetchURL=webServerUrl+'/irc/connect';const fetchOptions={method:'POST',headers:{'CSRF-Token':csrfToken,
 'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify(connectObject)};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok){return response.json()}else{
