@@ -200,8 +200,8 @@ const clearIrcServerForm = () => {
     document.getElementById('nameInputId').value = '';
     document.getElementById('hostInputId').value = '';
     document.getElementById('portInputId').value = 6667;
-    document.getElementById('tlsInputId').value = 'false';
-    document.getElementById('verifyInputId').value = 'false';
+    document.getElementById('tlsCheckboxId').checked = false;
+    document.getElementById('verifyCheckboxId').checked = false;
     document.getElementById('passwordInputId').setAttribute('disabled', '');
     document.getElementById('passwordInputId').value = '(Hidden)';
     document.getElementById('identifyNickInputId').value = '';
@@ -234,8 +234,16 @@ const populateIrcServerForm = (data) => {
     document.getElementById('nameInputId').value = data.name;
     document.getElementById('hostInputId').value = data.host;
     document.getElementById('portInputId').value = parseInt(data.port);
-    document.getElementById('tlsInputId').value = data.tls.toString();
-    document.getElementById('verifyInputId').value = data.verify.toString();
+    if (data.tls) {
+      document.getElementById('tlsCheckboxId').checked = true;
+    } else {
+      document.getElementById('tlsCheckboxId').checked = false;
+    }
+    if (data.verify) {
+      document.getElementById('verifyCheckboxId').checked = true;
+    } else {
+      document.getElementById('verifyCheckboxId').checked = false;
+    }
     document.getElementById('passwordInputId').setAttribute('disabled', '');
     document.getElementById('passwordInputId').value = '(hidden)';
     document.getElementById('identifyNickInputId').value = data.identifyNick;
@@ -324,28 +332,21 @@ const moveUpInList = (index) => {
  */
 const parseFormInputValues = () => {
   return new Promise((resolve, reject) => {
-    let errorStr = null;
     const index = parseInt(document.getElementById('indexInputId').value);
     const data = {};
     if (index !== -1) data.index = parseInt(document.getElementById('indexInputId').value);
     data.name = document.getElementById('nameInputId').value;
     data.host = document.getElementById('hostInputId').value;
     data.port = parseInt(document.getElementById('portInputId').value);
-    if (document.getElementById('tlsInputId').value.toLowerCase() === 'false') {
-      data.tls = false;
-    } else if ((document.getElementById('tlsInputId').value.toLowerCase() === 'true')) {
+    if (document.getElementById('tlsCheckboxId').checked) {
       data.tls = true;
     } else {
-      data.tls = null;
-      errorStr = 'Invalid tls';
+      data.tls = false;
     }
-    if (document.getElementById('verifyInputId').value.toLowerCase() === 'false') {
-      data.verify = false;
-    } else if ((document.getElementById('verifyInputId').value.toLowerCase() === 'true')) {
+    if (document.getElementById('verifyCheckboxId').checked) {
       data.verify = true;
     } else {
-      data.verify = null;
-      errorStr = 'Invalid verify';
+      data.verify = false;
     }
     if (!(document.getElementById('passwordInputId').hasAttribute('disabled'))) {
       data.password = document.getElementById('passwordInputId').value;
@@ -360,6 +361,13 @@ const parseFormInputValues = () => {
     data.modes = document.getElementById('modesInputId').value;
     data.channelList = document.getElementById('channelListInputId').value;
 
+    let errorStr = null;
+    if (data.name === '') errorStr = 'Label is required input.';
+    if (data.host === '') errorStr = 'Host/IP is required input.';
+    if (isNaN(data.port)) errorStr = 'Invalid port number';
+    if (data.nick === '') errorStr = 'Nickname is required input.';
+    if (data.user === '') errorStr = 'Unix ident user is required input.';
+    if (data.real === '') errorStr = 'Real Name is required input.';
     if (errorStr) {
       reject(new Error(errorStr));
     } else {

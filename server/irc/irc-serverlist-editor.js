@@ -566,7 +566,6 @@
       const index = parseInt(req.query.index);
       const listLength = chainObject.serversFile.serverArray.length;
       if ((!isNaN(index)) && (index < listLength)) {
-        console.log('index', index, ' length ', listLength);
         if (index === 0) {
           // first record can not move up, no changed needed
           resolve(chainObject);
