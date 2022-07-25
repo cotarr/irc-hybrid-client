@@ -579,7 +579,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 6667,\n    \"tls\": false,\n    \"verify\": false,\n    \"password\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"user\": \"myUser\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
+					"raw": "{\n    \"disabled\": false,\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 6667,\n    \"tls\": false,\n    \"verify\": false,\n    \"proxy\": false,\n    \"password\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"user\": \"myUser\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -751,7 +751,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"index\": 0,\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 6667,\n    \"tls\": false,\n    \"verify\": false,\n    \"password\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"user\": \"myUser\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
+					"raw": "{\n    \"index\": 0,\n    \"disabled\": false,\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 6667,\n    \"tls\": false,\n    \"verify\": false,\n    \"proxy\": false,\n    \"password\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"user\": \"myUser\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -827,7 +827,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 6667,\n    \"tls\": false,\n    \"verify\": false,\n    \"password\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"user\": \"myUser\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
+					"raw": "{\n    \"disabled\": false,\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 6667,\n    \"tls\": false,\n    \"verify\": false,\n    \"proxy\": false,\n    \"password\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"user\": \"myUser\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -972,7 +972,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"index\": 9999,\n    \"name\": \"local-serverxxxx\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 6667,\n    \"tls\": false,\n    \"verify\": false,\n    \"password\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"user\": \"myUser\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
+					"raw": "{\n    \"index\": 9999,\n    \"disabled\": false, \n    \"name\": \"local-serverxxxx\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 6667,\n    \"tls\": false,\n    \"verify\": false,\n    \"proxy\": false,\n    \"password\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"user\": \"myUser\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -1120,7 +1120,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"index\": {{irc_server_index}},\n    \"name\": \"local-server2\",\n    \"host\": \"127.0.0.2\",\n    \"port\": 6668,\n    \"tls\": true,\n    \"verify\": true,\n    \"password\": \"test1\",\n    \"identifyNick\": \"test2\",\n    \"identifyCommand\": \"test3\",\n    \"nick\": \"myNick2\",\n    \"user\": \"myUser2\",\n    \"real\": \"myRealName2\",\n    \"modes\": \"+iwww\",\n    \"channelList\": \"#test, #test2, #test3, #test4\"\n}\n",
+					"raw": "{\n    \"index\": {{irc_server_index}},\n    \"disabled\": false,\n    \"name\": \"local-server2\",\n    \"host\": \"127.0.0.2\",\n    \"port\": 6668,\n    \"tls\": true,\n    \"verify\": true,\n    \"proxy\": false,\n    \"password\": \"test1\",\n    \"identifyNick\": \"test2\",\n    \"identifyCommand\": \"test3\",\n    \"nick\": \"myNick2\",\n    \"user\": \"myUser2\",\n    \"real\": \"myRealName2\",\n    \"modes\": \"+iwww\",\n    \"channelList\": \"#test, #test2, #test3, #test4\"\n}\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -1263,7 +1263,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"index\": \"{{irc_server_index}}\",\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 3000,\n    \"tls\": false,\n    \"verify\": false,\n    \"password\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"user\": \"myUsername\",\n    \"real\": \"Irc Hybrid Client\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}",
+					"raw": "{\n    \"disabled\": false,\n    \"index\": \"{{irc_server_index}}\",\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 3000,\n    \"tls\": false,\n    \"verify\": false,\n    \"proxy\": false,\n    \"password\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"user\": \"myUsername\",\n    \"real\": \"Irc Hybrid Client\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -1410,7 +1410,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"index\": {{irc_server_index}},\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 3000,\n    \"tls\": false,\n    \"verify\": false,\n    \"password\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"user\": \"myUsername\",\n    \"real\": \"Irc Hybrid Client\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}",
+					"raw": "{\n    \"index\": {{irc_server_index}},\n    \"disabled\": false,\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 3000,\n    \"tls\": false,\n    \"verify\": false,\n    \"proxy\": false,\n    \"password\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"user\": \"myUsername\",\n    \"real\": \"Irc Hybrid Client\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -1761,7 +1761,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"index\": {{irc_server_index}},\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 3000,\n    \"tls\": false,\n    \"verify\": false,\n    \"password\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"user\": \"myUsername\",\n    \"real\": \"Irc Hybrid Client\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}",
+					"raw": "{\n    \"index\": {{irc_server_index}},\n    \"disabled\": false,\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 3000,\n    \"tls\": false,\n    \"verify\": false,\n    \"proxy\": false,\n    \"password\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"user\": \"myUsername\",\n    \"real\": \"Irc Hybrid Client\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -1825,7 +1825,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"name\": \"local-server\",\n    \"host\": \"invalid\",\n    \"port\": 6667,\n    \"tls\": false,\n    \"verify\": false,\n    \"password\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"user\": \"myUser\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
+					"raw": "{\n    \"disabled\": false,\n    \"name\": \"local-server\",\n    \"host\": \"invalid\",\n    \"port\": 6667,\n    \"tls\": false,\n    \"verify\": false,\n    \"proxy\": false,\n    \"password\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"user\": \"myUser\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -1883,7 +1883,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": \"invalid\",\n    \"tls\": false,\n    \"verify\": false,\n    \"password\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"user\": \"myUser\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
+					"raw": "{\n    \"disabled\": false,\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": \"invalid\",\n    \"tls\": false,\n    \"verify\": false,\n    \"proxy\": false,\n    \"password\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"user\": \"myUser\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -1941,7 +1941,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"name\": \"\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 6667,\n    \"tls\": false,\n    \"verify\": false,\n    \"password\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"user\": \"myUser\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
+					"raw": "{\n    \"disabled\": false,\n    \"name\": \"\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 6667,\n    \"tls\": false,\n    \"verify\": false,\n    \"proxy\": false,\n    \"password\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"user\": \"myUser\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -1999,7 +1999,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 6667,\n    \"tls\": false,\n    \"verify\": false,\n    \"password\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"\",\n    \"user\": \"myUser\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
+					"raw": "{\n    \"disabled\": false,\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 6667,\n    \"tls\": false,\n    \"verify\": false,\n    \"proxy\": false,\n    \"password\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"\",\n    \"user\": \"myUser\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -2057,7 +2057,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 6667,\n    \"tls\": false,\n    \"verify\": false,\n    \"password\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"user\": \"\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
+					"raw": "{\n    \"disabled\": false,\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 6667,\n    \"tls\": false,\n    \"verify\": false,\n    \"proxy\": false,\n    \"password\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"user\": \"\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
 					"options": {
 						"raw": {
 							"language": "json"
