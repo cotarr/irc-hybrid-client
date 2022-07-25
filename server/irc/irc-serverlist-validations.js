@@ -102,6 +102,7 @@
     function (req, res, next) {
       checkExtraneousKeys(req, [
         'index',
+        'disabled',
         'name',
         'host',
         'port',
@@ -130,6 +131,7 @@
     // Validate required keys
     //
     body([
+      'disabled',
       'name',
       'host',
       'port',
@@ -153,7 +155,9 @@
     ]),
     body('port', 'Invalid socket port number')
       .isPort(),
-    body(['tls',
+    body([
+      'disabled',
+      'tls',
       'verify',
       'proxy'])
       .isBoolean(),
@@ -180,6 +184,7 @@
     body(['port'])
       .toInt(),
     body([
+      'disabled',
       'tls',
       'verify',
       'proxy'])
@@ -227,6 +232,7 @@
     function (req, res, next) {
       checkExtraneousKeys(req, [
         'index',
+        'disabled',
         'name',
         'host',
         'port',
@@ -257,6 +263,7 @@
       .exists(),
     body([
       'index',
+      'disabled',
       'name',
       'host',
       'port',
@@ -288,7 +295,9 @@
     ]),
     body('port', 'Invalid socket port number')
       .isPort(),
-    body(['tls',
+    body([
+      'disabled',
+      'tls',
       'verify',
       'proxy'])
       .isBoolean(),
@@ -320,6 +329,7 @@
       'port'])
       .toInt(),
     body([
+      'disabled',
       'tls',
       'verify',
       'proxy'])
@@ -367,6 +377,7 @@
     function (req, res, next) {
       checkExtraneousKeys(req, [
         'index',
+        'disabled',
         'action',
         'name',
         'host',
@@ -455,6 +466,7 @@
     function (req, res, next) {
       checkExtraneousKeys(req, [
         'index',
+        'disabled',
         'name',
         'host',
         'port',

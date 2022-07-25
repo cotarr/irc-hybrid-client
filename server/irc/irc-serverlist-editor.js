@@ -291,6 +291,7 @@
             const tempServer = {};
             tempServer.index = count;
             count += 1;
+            tempServer.disabled = chainObject.serversFile.serverArray[i].disabled;
             tempServer.name = chainObject.serversFile.serverArray[i].name;
             tempServer.host = chainObject.serversFile.serverArray[i].host;
             tempServer.port = chainObject.serversFile.serverArray[i].port;
@@ -358,6 +359,7 @@
     return new Promise(function (resolve, reject) {
       const index = parseInt(req.query.index);
       const tempServer = {};
+      tempServer.disabled = req.body.disabled;
       tempServer.name = req.body.name;
       tempServer.host = req.body.host;
       tempServer.port = req.body.port;

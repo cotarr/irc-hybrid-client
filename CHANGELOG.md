@@ -6,16 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Un-merged 2022-07-24
+## Un-merged 2022-07-25 (Work in progress)
 
-### Added (WORK IN PROGRESS)
 
-This is a proof of concept edit to create an API for editing of the IRC server list from the web browser.
+This is a major upgrade. An independent web page was added to view and edit the list of IRC servers.
+An API was added to service the web page for adding, modifying, copying, and deleting IRC servers.
+IRC server definitions can be disabled individually. Socks5 proxy can be enabled for specific IRC server definitions.
 
-Configuration:
-
-- credentials.json - New boolean property `disableServerListEditor` to disable the /irc/serverlist API routes
-- servers.json - New boolean property `proxy` added to IRC server object.
+### Added
 
 Server: 
 
@@ -26,6 +24,29 @@ Server:
   - Added route PATCH /irc/serverlist?index=0 to edit and modify existing server
   - Added route COPY /etc/serverlist?index=0 to copy an existing IRC server to the end of the list
   - Added route DELETE /irc/serverlist?index=0 to delete an IRC server from the list
+- Added new nodejs file: server/irc/irc-serverlist-validations.js
+  - Input validation for GET, POST, PATCH, COPY, and DELETE methods on /irc/serverlist API
+
+Browser:
+
+- Added new file /irc/serverlist.html (IRC server editor interface)
+  - HTML table with list of servers
+  - Form for editing a specific server properties
+  - Support for new IRC server properties `deleted` and `proxy`
+- Added new file /irc/css/serverlist.css (styles)
+- Added new file /irc/js/serverlist.js (Code to perform API calls and edit server list)
+  - Functions for IRC server list editing: GET, POST, PATCH, COPY, DELETE
+
+### Changed
+
+Configuration:
+
+- credentials.json - New boolean property `disableServerListEditor` to disable the /irc/serverlist API routes
+- servers.json - New boolean property `proxy` added to IRC server object.
+- servers.json - New boolean property `disabled` added to IRC server object.
+
+Server:
+
 - server/web-server.js - Added routes, authorization and CSRF token validation for /irc/serverlist  API
 - server/web-server.js - Modified code for CSRF tokens /irc/webclient.html and /irc/serverlist.html
 - server/irc-client.js - Added global event for IRC client to reload server list after edit.
@@ -36,16 +57,12 @@ Server:
 - server/irc-client.js - Individual irc server definition - new boolean property `proxy` to use socks5 if enabled globally
 - server/irc-client.js - New ircState boolean property `ircProxy` selected IRC server uses socks5 proxy if enabled globally.
 - server/irc-client.js - Network socket to IRC server uses socks5 proxy only if both global and selected IRC server enables socks5.
+- server/irc-client.js - Individual irc server definition - new boolean property `disabled` added to hide an entry.
+- server/irc-client.js - Code to select initial server, next server modified to skip disabled servers.
 - credentials.json - Add property `disableServerListEditor`.
 
 Browser:
 
-- Added new file /irc/serverlist.html (IRC server editor interface)
-  - HTML table with list of servers
-  - Form for editing a specific server properties
-- Added new file /irc/css/serverlist.css (styles)
-- Added new file /irc/js/serverlist.js (Code to perform API calls and edit server list)
-  - Functions for IRC server list editing: GET, POST, PATCH, COPY, DELETE
 - secure/webclient.html - Added 'Prev' button to select both next and previous server from IRC server list
 - secure/webclient.html - Added 'Edit' button as link `<a href='/irc/serverlist.html'>`
 - secure/webclient.html - Added read only input element for server index number.
@@ -59,10 +76,12 @@ Browser:
 - secure/js/webclient04.js - Added button handler for 'Prev' button
 - secure/js/webclient04.js - Added Connect Button Error when ircServerIndex = -1 on empty serverlist
 
-Minfied code:
+Minified code:
 
-- Temporary code used to minify /irc/serverlist.* is not pushed to github.
-- Added /irc/serverlist.html, .js, .css files added to bundler (gulp) with minify disabled for debugging (Gulpfile.js not pushed github)
+- Temporary code used to bundle and minify the project is not pushed to github.
+- Added /irc/serverlist.html, .js, .css files added to bundler (gulp). Gulpfile.js not pushed github.
+- Bundled version of in-progress edit is included, but it is not minified to assist debugging.
+
 ## [v0.1.44](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.1.44) 2022-07-13
 
 ### Changed

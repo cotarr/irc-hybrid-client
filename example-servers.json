@@ -5,6 +5,7 @@
   "rawMessageLog": false,
   "serverArray": [
     {
+      "disabled": false,
       "name": "DALnet",
       "host": "lion.dal.net",
       "port": 6697,

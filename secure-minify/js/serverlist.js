@@ -199,6 +199,7 @@ const clearIrcServerForm = () => {
     document.getElementById('saveNewButton').removeAttribute('hidden');
     document.getElementById('saveModifiedButton').setAttribute('hidden', '');
     document.getElementById('indexInputId').value = '-1';
+    document.getElementById('disabledCheckboxId').checked = false;
     document.getElementById('nameInputId').value = '';
     document.getElementById('hostInputId').value = '';
     document.getElementById('portInputId').value = 6697;
@@ -234,6 +235,11 @@ const populateIrcServerForm = (data) => {
     document.getElementById('listVisibilityDiv').setAttribute('hidden', '');
     document.getElementById('formVisibilityDiv').removeAttribute('hidden');
     document.getElementById('indexInputId').value = data.index.toString();
+    if (data.disabled) {
+      document.getElementById('disabledCheckboxId').checked = true;
+    } else {
+      document.getElementById('disabledCheckboxId').checked = false;
+    }
     document.getElementById('nameInputId').value = data.name;
     document.getElementById('hostInputId').value = data.host;
     document.getElementById('portInputId').value = parseInt(data.port);
@@ -343,6 +349,11 @@ const parseFormInputValues = () => {
     const index = parseInt(document.getElementById('indexInputId').value);
     const data = {};
     if (index !== -1) data.index = parseInt(document.getElementById('indexInputId').value);
+    if (document.getElementById('disabledCheckboxId').checked) {
+      data.disabled = true;
+    } else {
+      data.disabled = false;
+    }
     data.name = document.getElementById('nameInputId').value;
     data.host = document.getElementById('hostInputId').value;
     data.port = parseInt(document.getElementById('portInputId').value);
@@ -407,6 +418,7 @@ const buildServerListTable = (data) => {
 
     const columnTitles = [
       'Index',
+      'Disabled',
       'Label',
       'Host',
       'Port',
@@ -439,6 +451,10 @@ const buildServerListTable = (data) => {
         const td07El = document.createElement('td');
         const td08El = document.createElement('td');
         const td09El = document.createElement('td');
+        const td10El = document.createElement('td');
+        const disabledCheckboxEl = document.createElement('input');
+        disabledCheckboxEl.setAttribute('type', 'checkbox');
+        disabledCheckboxEl.setAttribute('disabled', '');
         const editButtonEl = document.createElement('button');
         const copyButtonEl = document.createElement('button');
         const deleteButtonEl = document.createElement('button');
@@ -448,15 +464,17 @@ const buildServerListTable = (data) => {
         deleteButtonEl.textContent = 'Delete';
         moveUpButtonEl.textContent = 'move-up';
         td01El.textContent = i.toString();
-        td02El.textContent = data[i].name;
-        td03El.textContent = data[i].host;
-        td04El.textContent = data[i].port;
-        td05El.textContent = data[i].nick;
-        td06El.appendChild(editButtonEl);
-        td07El.appendChild(copyButtonEl);
-        td08El.appendChild(deleteButtonEl);
+        disabledCheckboxEl.checked = data[i].disabled;
+        td02El.appendChild(disabledCheckboxEl);
+        td03El.textContent = data[i].name;
+        td04El.textContent = data[i].host;
+        td05El.textContent = data[i].port;
+        td06El.textContent = data[i].nick;
+        td07El.appendChild(editButtonEl);
+        td08El.appendChild(copyButtonEl);
+        td09El.appendChild(deleteButtonEl);
         // skip first row
-        if (i > 0) td09El.appendChild(moveUpButtonEl);
+        if (i > 0) td10El.appendChild(moveUpButtonEl);
         rowEl.appendChild(td01El);
         rowEl.appendChild(td02El);
         rowEl.appendChild(td03El);
@@ -466,6 +484,7 @@ const buildServerListTable = (data) => {
         rowEl.appendChild(td07El);
         rowEl.appendChild(td08El);
         rowEl.appendChild(td09El);
+        rowEl.appendChild(td10El);
         tableNode.appendChild(rowEl);
         //
         // Add event listeners

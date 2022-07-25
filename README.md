@@ -1,6 +1,6 @@
 # = = = = = = Development Branch Notes = = = = = =
 
-Git branch: server-list-editor 2022-07-24
+Git branch: server-list-editor 2022-07-25
 
 Work in progress - Branch used to develop browser support to edit the IRC server list.
 

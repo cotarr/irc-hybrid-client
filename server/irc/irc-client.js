@@ -61,6 +61,30 @@
   // Do on program load
   loadServerList();
 
+  const _countEnabledServers = function () {
+    let count = 0;
+    if (servers.serverArray.length > 0) {
+      for (let i = 0; i < servers.serverArray.length; i++) {
+        if (!servers.serverArray[i].disabled) count++;
+      }
+    }
+    return count;
+  };
+  //
+  // Returns index of first enabled IRC server, or -1 if none
+  const _findFirstEnabledServer = function () {
+    let first = -1;
+    if (servers.serverArray.length > 0) {
+      for (let i = 0; i < servers.serverArray.length; i++) {
+        if (!servers.serverArray[i].disabled) {
+          first = i;
+          break;
+        }
+      }
+    }
+    return first;
+  };
+
   // ----------------------------------------------------
   //
   //     Setup IRC Client variables and configuration
@@ -98,26 +122,26 @@
   vars.ircState.ircServerIndex = -1;
   vars.ircState.ircServerPrefix = '';
 
-  if (servers.serverArray.length > 0) {
-    vars.ircState.ircServerName = servers.serverArray[0].name;
-    vars.ircState.ircServerHost = servers.serverArray[0].host;
-    vars.ircState.ircServerPort = servers.serverArray[0].port;
-    vars.ircState.ircTLSEnabled = servers.serverArray[0].tls;
-    vars.ircState.ircTLSVerify = servers.serverArray[0].verify;
-    vars.ircState.ircProxy = servers.serverArray[0].proxy;
-    vars.ircServerPassword = servers.serverArray[0].password;
-    vars.nsIdentifyNick = servers.serverArray[0].identifyNick;
-    vars.nsIdentifyCommand = servers.serverArray[0].identifyCommand;
-    vars.ircState.nickName = servers.serverArray[0].nick;
-    vars.ircState.userName = servers.serverArray[0].user;
-    vars.ircState.realName = servers.serverArray[0].real;
-    vars.ircState.userMode = servers.serverArray[0].modes;
+  const loadingServerIndex = _findFirstEnabledServer();
+  if (loadingServerIndex >= 0) {
+    vars.ircState.ircServerIndex = loadingServerIndex;
+    vars.ircState.ircServerName = servers.serverArray[loadingServerIndex].name;
+    vars.ircState.ircServerHost = servers.serverArray[loadingServerIndex].host;
+    vars.ircState.ircServerPort = servers.serverArray[loadingServerIndex].port;
+    vars.ircState.ircTLSEnabled = servers.serverArray[loadingServerIndex].tls;
+    vars.ircState.ircTLSVerify = servers.serverArray[loadingServerIndex].verify;
+    vars.ircState.ircProxy = servers.serverArray[loadingServerIndex].proxy;
+    vars.ircServerPassword = servers.serverArray[loadingServerIndex].password;
+    vars.nsIdentifyNick = servers.serverArray[loadingServerIndex].identifyNick;
+    vars.nsIdentifyCommand = servers.serverArray[loadingServerIndex].identifyCommand;
+    vars.ircState.nickName = servers.serverArray[loadingServerIndex].nick;
+    vars.ircState.userName = servers.serverArray[loadingServerIndex].user;
+    vars.ircState.realName = servers.serverArray[loadingServerIndex].real;
+    vars.ircState.userMode = servers.serverArray[loadingServerIndex].modes;
     // List of favorite channels
-    vars.ircState.channelList = servers.serverArray[0].channelList;
-    vars.ircState.userHost = '';
+    vars.ircState.channelList = servers.serverArray[loadingServerIndex].channelList;
 
-    // index into servers.json file
-    vars.ircState.ircServerIndex = 0;
+    vars.ircState.userHost = '';
     vars.ircState.ircServerPrefix = '';
   }
 
@@ -1123,6 +1147,8 @@
   //
   // Input: Index of server starting from 0
   //        Set to -1 for next in sequence (cycle)
+  //        SEt to -2 for previous in sequence (cycle)
+  //        Servers with server.disabled = true are skipped.
   //
   //  req.body{
   //    "index": -1
@@ -1171,25 +1197,60 @@
         message: 'Requested server index number out of range.'
       });
     }
-
+    if (_countEnabledServers() === 0) {
+      return res.json({
+        error: true,
+        message: 'No enabled servers found'
+      });
+    }
+    // Check if number is disabled
+    if ((inputIndex >= 0) && (servers.serverArray[inputIndex].disabled)) {
+      return res.json({
+        error: true,
+        message: 'Requested server is disabled'
+      });
+    }
     // clear these to reinitialize restart logic
     vars.ircState.count.ircConnect = 0;
     vars.ircState.count.ircConnectError = 0;
 
     // if index === -1, then cycle through servers, else use index value
     if (inputIndex === -1) {
-      vars.ircState.ircServerIndex++;
-      if (vars.ircState.ircServerIndex >= servers.serverArray.length) {
-        vars.ircState.ircServerIndex = 0;
+      if (_countEnabledServers() === 1) {
+        vars.ircState.ircServerIndex = _findFirstEnabledServer();
+      } else {
+        // Count is not 0 and not 1 so must be 2 or greater, ok to cycle
+        for (let i = 0; i < servers.serverArray.length; i++) {
+          vars.ircState.ircServerIndex++;
+          if (vars.ircState.ircServerIndex >= servers.serverArray.length) {
+            vars.ircState.ircServerIndex = 0;
+          }
+          if (!servers.serverArray[vars.ircState.ircServerIndex].disabled) break;
+        }
       }
     // if index ===-2, then cycle through servers, else use index value
     } else if (inputIndex === -2) {
-      vars.ircState.ircServerIndex--;
-      if (vars.ircState.ircServerIndex < 0) {
-        vars.ircState.ircServerIndex = servers.serverArray.length - 1;
+      if (_countEnabledServers() === 1) {
+        vars.ircState.ircServerIndex = _findFirstEnabledServer();
+      } else {
+        // Count is not 0 and not 1 so must be 2 or greater, ok to cycle
+        for (let i = 0; i < servers.serverArray.length; i++) {
+          vars.ircState.ircServerIndex--;
+          if (vars.ircState.ircServerIndex < 0) {
+            vars.ircState.ircServerIndex = servers.serverArray.length - 1;
+          }
+          if (!servers.serverArray[vars.ircState.ircServerIndex].disabled) break;
+        }
       }
     } else {
-      vars.ircState.ircServerIndex = inputIndex;
+      if (!servers.serverArray[inputIndex].disabled) {
+        vars.ircState.ircServerIndex = inputIndex;
+      } else {
+        return res.json({
+          error: true,
+          message: 'Requested server is disabled'
+        });
+      }
     }
     //
     // Update IRC parameters
@@ -1249,25 +1310,25 @@
     vars.ircState.ircServerIndex = -1;
     vars.ircState.ircServerPrefix = '';
 
-    // Default to server at index 0
-    if (servers.serverArray.length > 0) {
-      vars.ircState.ircServerName = servers.serverArray[0].name;
-      vars.ircState.ircServerHost = servers.serverArray[0].host;
-      vars.ircState.ircServerPort = servers.serverArray[0].port;
-      vars.ircState.ircTLSEnabled = servers.serverArray[0].tls;
-      vars.ircState.ircTLSVerify = servers.serverArray[0].verify;
-      vars.ircState.ircProxy = servers.serverArray[0].proxy;
-      vars.ircServerPassword = servers.serverArray[0].password;
-      vars.nsIdentifyNick = servers.serverArray[0].identifyNick;
-      vars.nsIdentifyCommand = servers.serverArray[0].identifyCommand;
-      vars.ircState.nickName = servers.serverArray[0].nick;
-      vars.ircState.userName = servers.serverArray[0].user;
-      vars.ircState.realName = servers.serverArray[0].real;
-      vars.ircState.userMode = servers.serverArray[0].modes;
-      vars.ircState.channelList = servers.serverArray[0].channelList;
-      vars.ircState.userHost = '';
+    const reloadServerIndex = _findFirstEnabledServer();
+    if (reloadServerIndex >= 0) {
+      vars.ircState.ircServerIndex = reloadServerIndex;
+      vars.ircState.ircServerName = servers.serverArray[reloadServerIndex].name;
+      vars.ircState.ircServerHost = servers.serverArray[reloadServerIndex].host;
+      vars.ircState.ircServerPort = servers.serverArray[reloadServerIndex].port;
+      vars.ircState.ircTLSEnabled = servers.serverArray[reloadServerIndex].tls;
+      vars.ircState.ircTLSVerify = servers.serverArray[reloadServerIndex].verify;
+      vars.ircState.ircProxy = servers.serverArray[reloadServerIndex].proxy;
+      vars.ircServerPassword = servers.serverArray[reloadServerIndex].password;
+      vars.nsIdentifyNick = servers.serverArray[reloadServerIndex].identifyNick;
+      vars.nsIdentifyCommand = servers.serverArray[reloadServerIndex].identifyCommand;
+      vars.ircState.nickName = servers.serverArray[reloadServerIndex].nick;
+      vars.ircState.userName = servers.serverArray[reloadServerIndex].user;
+      vars.ircState.realName = servers.serverArray[reloadServerIndex].real;
+      vars.ircState.userMode = servers.serverArray[reloadServerIndex].modes;
+      vars.ircState.channelList = servers.serverArray[reloadServerIndex].channelList;
 
-      vars.ircState.ircServerIndex = 0;
+      vars.ircState.userHost = '';
       vars.ircState.ircServerPrefix = '';
     }
 
