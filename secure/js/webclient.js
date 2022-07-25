@@ -902,7 +902,8 @@ function getIrcState (callback) {
         } else {
           document.getElementById('ircServerTlsVerify').removeAttribute('checked');
         }
-        if (ircState.enableSocks5Proxy) {
+        // If socks5 proxy enabled globally and enabled for selected server
+        if (ircState.enableSocks5Proxy && ircState.ircProxy) {
           document.getElementById('socks5HidableDiv').removeAttribute('hidden');
           document.getElementById('socks5EnabledCheckbox').setAttribute('disabled', '');
           document.getElementById('socks5EnabledCheckbox').setAttribute('checked', '');
@@ -937,7 +938,8 @@ function getIrcState (callback) {
         } else {
           document.getElementById('ircServerTlsVerify').removeAttribute('checked');
         }
-        if (ircState.enableSocks5Proxy) {
+        // If socks5 proxy enabled globally and enabled for selected server
+        if (ircState.enableSocks5Proxy && ircState.ircProxy) {
           document.getElementById('socks5HidableDiv').removeAttribute('hidden');
           document.getElementById('socks5EnabledCheckbox').setAttribute('disabled', '');
           document.getElementById('socks5EnabledCheckbox').setAttribute('checked', '');

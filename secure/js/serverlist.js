@@ -201,9 +201,10 @@ const clearIrcServerForm = () => {
     document.getElementById('indexInputId').value = '-1';
     document.getElementById('nameInputId').value = '';
     document.getElementById('hostInputId').value = '';
-    document.getElementById('portInputId').value = 6667;
-    document.getElementById('tlsCheckboxId').checked = false;
-    document.getElementById('verifyCheckboxId').checked = false;
+    document.getElementById('portInputId').value = 6697;
+    document.getElementById('tlsCheckboxId').checked = true;
+    document.getElementById('verifyCheckboxId').checked = true;
+    document.getElementById('proxyCheckboxId').checked = true;
     document.getElementById('passwordInputId').setAttribute('disabled', '');
     document.getElementById('passwordInputId').value = '(Hidden)';
     document.getElementById('identifyNickInputId').value = '';
@@ -245,6 +246,11 @@ const populateIrcServerForm = (data) => {
       document.getElementById('verifyCheckboxId').checked = true;
     } else {
       document.getElementById('verifyCheckboxId').checked = false;
+    }
+    if (data.proxy) {
+      document.getElementById('proxyCheckboxId').checked = true;
+    } else {
+      document.getElementById('proxyCheckboxId').checked = false;
     }
     document.getElementById('passwordInputId').setAttribute('disabled', '');
     document.getElementById('passwordInputId').value = '(hidden)';
@@ -349,6 +355,11 @@ const parseFormInputValues = () => {
       data.verify = true;
     } else {
       data.verify = false;
+    }
+    if (document.getElementById('proxyCheckboxId').checked) {
+      data.proxy = true;
+    } else {
+      data.proxy = false;
     }
     if (!(document.getElementById('passwordInputId').hasAttribute('disabled'))) {
       data.password = document.getElementById('passwordInputId').value;
@@ -617,6 +628,7 @@ document.getElementById('forceUnlockAll').addEventListener('click', () => {
 _clearError();
 fetchIrcState()
   .then((data) => {
+    console.log(JSON.stringify(data, null, 2));
     if ((data.ircConnected) || (data.ircConnecting)) {
       document.getElementById('serverListDisabledDiv').setAttribute('hidden', '');
       document.getElementById('warningVisibilityDiv').removeAttribute('hidden');
@@ -624,6 +636,14 @@ fetchIrcState()
       document.getElementById('formVisibilityDiv').setAttribute('hidden', '');
       Promise.resolve({ serverArray: [] });
     } else {
+      if (data.enableSocks5Proxy) {
+        document.getElementById('ircProxyDiv').textContent =
+          'Socks5 Proxy: Enabled Globally\nSocks5 Proxy: ' +
+          data.socks5Host + ':' + data.socks5Port;
+      } else {
+        document.getElementById('ircProxyDiv').textContent = 'Socks5 Proxy: Disabled Globally';
+      }
+      // return promise
       return fetchServerList(-1, -1);
     }
   })

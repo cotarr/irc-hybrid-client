@@ -12,6 +12,11 @@ and this project adheres to
 
 This is a proof of concept edit to create an API for editing of the IRC server list from the web browser.
 
+Configuration:
+
+- credentials.json - New boolean property `disableServerListEditor` to disable the /irc/serverlist API routes
+- servers.json - New boolean property `proxy` added to IRC server object.
+
 Server: 
 
 - Added new nodejs file: server/irc/irc-serverlist-editor.js
@@ -21,13 +26,16 @@ Server:
   - Added route PATCH /irc/serverlist?index=0 to edit and modify existing server
   - Added route COPY /etc/serverlist?index=0 to copy an existing IRC server to the end of the list
   - Added route DELETE /irc/serverlist?index=0 to delete an IRC server from the list
-- server/web-server.js - Added routes, authorization and CSRF token validation for server list edit API
+- server/web-server.js - Added routes, authorization and CSRF token validation for /irc/serverlist  API
 - server/web-server.js - Modified code for CSRF tokens /irc/webclient.html and /irc/serverlist.html
 - server/irc-client.js - Added global event for IRC client to reload server list after edit.
 - server/irc-client.js - On loading servers.json file, remove error for empty server list.
 - server/irc-client.js - On loading servers.json file, default values are null for empty server list.
 - server/irc-client.js - ircState.ircServerIndex uses value -1 to indicate empty server list
 - server/irc-client.js - Route /irc/server body param {index: -2} = previous, -1 = next (rotate servers)
+- server/irc-client.js - Individual irc server definition - new boolean property `proxy` to use socks5 if enabled globally
+- server/irc-client.js - New ircState boolean property `ircProxy` selected IRC server uses socks5 proxy if enabled globally.
+- server/irc-client.js - Network socket to IRC server uses socks5 proxy only if both global and selected IRC server enables socks5.
 - credentials.json - Add property `disableServerListEditor`.
 
 Browser:
@@ -46,6 +54,7 @@ Browser:
 - secure/js/webclient.js - Various disabled attributes to new 'Prev' button
 - secure/js/webclient.js - Various disabled attributes to new 'Edit' button
 - secure/js/webclient.js - Added code to show/hide empty server list error message div
+- secure/js/webclient.js - Socks5 proxy info is hidden unless both global and selected IRC server enables socks5.
 - secure/js/webclient04.js - On state change update value of new index input element
 - secure/js/webclient04.js - Added button handler for 'Prev' button
 - secure/js/webclient04.js - Added Connect Button Error when ircServerIndex = -1 on empty serverlist

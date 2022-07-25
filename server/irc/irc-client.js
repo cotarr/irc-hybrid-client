@@ -84,6 +84,7 @@
   vars.ircState.ircServerPort = null;
   vars.ircState.ircTLSEnabled = null;
   vars.ircState.ircTLSVerify = null;
+  vars.ircState.ircProxy = null;
   vars.ircServerPassword = null;
   vars.nsIdentifyNick = null;
   vars.nsIdentifyCommand = null;
@@ -103,6 +104,7 @@
     vars.ircState.ircServerPort = servers.serverArray[0].port;
     vars.ircState.ircTLSEnabled = servers.serverArray[0].tls;
     vars.ircState.ircTLSVerify = servers.serverArray[0].verify;
+    vars.ircState.ircProxy = servers.serverArray[0].proxy;
     vars.ircServerPassword = servers.serverArray[0].password;
     vars.nsIdentifyNick = servers.serverArray[0].identifyNick;
     vars.nsIdentifyCommand = servers.serverArray[0].identifyCommand;
@@ -601,6 +603,8 @@
       });
     } // createIrcSocketEventListeners()
 
+    // Proxy enabled both global and for specific selected IRC server.
+    const ircProxyInUse = vars.ircState.enableSocks5Proxy && vars.ircState.ircProxy;
     // ----------------------------------
     //       Create New IRC Socket
     // Once created, call previous function
@@ -609,8 +613,7 @@
     //
     // There are 4 different cases
     // ----------------------------------
-
-    if ((!vars.ircState.ircTLSEnabled) && (!vars.ircState.enableSocks5Proxy)) {
+    if ((!vars.ircState.ircTLSEnabled) && (!ircProxyInUse)) {
       // --------------------------------------------------------------------------
       // Case 1 of 4 - TCP connection to IRC server with NodeJs module
       //               "net" using method net.connect()
@@ -621,7 +624,7 @@
       };
       ircSocket = net.connect(options);
       _createIrcSocketEventListeners(ircSocket);
-    } else if ((vars.ircState.ircTLSEnabled) && (!vars.ircState.enableSocks5Proxy)) {
+    } else if ((vars.ircState.ircTLSEnabled) && (!ircProxyInUse)) {
       // --------------------------------------------------------------------------
       // Case 2 of 4 - TLS encrypted connection to IRC server with NodeJs
       //               "tls" module calling tls.connect()
@@ -636,7 +639,7 @@
       }
       ircSocket = tls.connect(options);
       _createIrcSocketEventListeners(ircSocket);
-    } else if ((!vars.ircState.ircTLSEnabled) && (vars.ircState.enableSocks5Proxy)) {
+    } else if ((!vars.ircState.ircTLSEnabled) && (ircProxyInUse)) {
       // --------------------------------------------------------------------------
       // Case 3 of 4 - TCP connection to socks5 proxy using npm module
       //               "socks5-client" calling method socks5.createConnection()
@@ -659,7 +662,7 @@
       }
       ircSocket = socks5.createConnection(options);
       _createIrcSocketEventListeners(ircSocket);
-    } else if ((vars.ircState.ircTLSEnabled) && (vars.ircState.enableSocks5Proxy)) {
+    } else if ((vars.ircState.ircTLSEnabled) && (ircProxyInUse)) {
       // --------------------------------------------------------------------------
       // Case 4 of 4 - TCP connection to socks5 proxy using npm module
       //               "socks5-client" calling method socks5.createConnection()
@@ -1196,6 +1199,7 @@
     vars.ircState.ircServerPort = servers.serverArray[vars.ircState.ircServerIndex].port;
     vars.ircState.ircTLSEnabled = servers.serverArray[vars.ircState.ircServerIndex].tls;
     vars.ircState.ircTLSVerify = servers.serverArray[vars.ircState.ircServerIndex].verify;
+    vars.ircState.ircProxy = servers.serverArray[vars.ircState.ircServerIndex].proxy;
     vars.ircServerPassword = servers.serverArray[vars.ircState.ircServerIndex].password;
     vars.nsIdentifyNick = servers.serverArray[vars.ircState.ircServerIndex].identifyNick;
     vars.nsIdentifyCommand = servers.serverArray[vars.ircState.ircServerIndex].identifyCommand;
@@ -1232,6 +1236,7 @@
     vars.ircState.ircServerPort = null;
     vars.ircState.ircTLSEnabled = null;
     vars.ircState.ircTLSVerify = null;
+    vars.ircState.ircProxy = null;
     vars.ircServerPassword = null;
     vars.nsIdentifyNick = null;
     vars.nsIdentifyCommand = null;
@@ -1251,6 +1256,7 @@
       vars.ircState.ircServerPort = servers.serverArray[0].port;
       vars.ircState.ircTLSEnabled = servers.serverArray[0].tls;
       vars.ircState.ircTLSVerify = servers.serverArray[0].verify;
+      vars.ircState.ircProxy = servers.serverArray[0].proxy;
       vars.ircServerPassword = servers.serverArray[0].password;
       vars.nsIdentifyNick = servers.serverArray[0].identifyNick;
       vars.nsIdentifyCommand = servers.serverArray[0].identifyCommand;

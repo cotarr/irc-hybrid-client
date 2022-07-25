@@ -38,6 +38,7 @@
 //   "port": 6667,
 //   "tls": false,
 //   "verify": false,
+//   "proxy": true,
 //   "password": "",
 //   "identifyNick": "",
 //   "identifyCommand": "",
@@ -295,6 +296,7 @@
             tempServer.port = chainObject.serversFile.serverArray[i].port;
             tempServer.tls = chainObject.serversFile.serverArray[i].tls;
             tempServer.verify = chainObject.serversFile.serverArray[i].verify;
+            tempServer.proxy = chainObject.serversFile.serverArray[i].proxy;
             // Security: Password is not sent
             // tempServer.password = chainObject.serversFile.serverArray[i].password;
             tempServer.identifyNick = chainObject.serversFile.serverArray[i].identifyNick;
@@ -361,6 +363,7 @@
       tempServer.port = req.body.port;
       tempServer.tls = req.body.tls;
       tempServer.verify = req.body.verify;
+      tempServer.proxy = req.body.proxy;
       // password is hidden and write only
       // If new values is not provided, use the previous values
       if ('password' in req.body) {

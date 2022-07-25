@@ -159,8 +159,8 @@ Accept:'application/json'}};fetch(fetchURL,fetchOptions).then(response=>{if(resp
 ;document.getElementById('ircServerIndexInputId').value=ircState.ircServerIndex;document.getElementById('ircServerNameInputId').value=ircState.ircServerName
 ;document.getElementById('ircServerAddrInputId').value=ircState.ircServerHost;document.getElementById('ircServerPortInputId').value=ircState.ircServerPort;if(ircState.ircTLSEnabled){
 document.getElementById('ircServerTlsEnable').setAttribute('checked','')}else{document.getElementById('ircServerTlsEnable').removeAttribute('checked')}if(ircState.ircTLSVerify){
-document.getElementById('ircServerTlsVerify').setAttribute('checked','')}else{document.getElementById('ircServerTlsVerify').removeAttribute('checked')}if(ircState.enableSocks5Proxy){
-document.getElementById('socks5HidableDiv').removeAttribute('hidden');document.getElementById('socks5EnabledCheckbox').setAttribute('disabled','')
+document.getElementById('ircServerTlsVerify').setAttribute('checked','')}else{document.getElementById('ircServerTlsVerify').removeAttribute('checked')}
+if(ircState.enableSocks5Proxy&&ircState.ircProxy){document.getElementById('socks5HidableDiv').removeAttribute('hidden');document.getElementById('socks5EnabledCheckbox').setAttribute('disabled','')
 ;document.getElementById('socks5EnabledCheckbox').setAttribute('checked','');document.getElementById('socks5AddrInputId').value=ircState.socks5Host
 ;document.getElementById('socks5PortInputId').value=ircState.socks5Port}else{document.getElementById('socks5HidableDiv').setAttribute('hidden','')
 ;document.getElementById('socks5EnabledCheckbox').removeAttribute('checked');document.getElementById('socks5AddrInputId').value='';document.getElementById('socks5PortInputId').value=''}
@@ -169,8 +169,8 @@ document.getElementById('nickNameInputId').value=ircState.nickName;document.getE
 ;document.getElementById('ircServerIndexInputId').value=ircState.ircServerIndex;document.getElementById('ircServerNameInputId').value=ircState.ircServerName
 ;document.getElementById('ircServerAddrInputId').value=ircState.ircServerHost;document.getElementById('ircServerPortInputId').value=ircState.ircServerPort;if(ircState.ircTLSEnabled){
 document.getElementById('ircServerTlsEnable').setAttribute('checked','')}else{document.getElementById('ircServerTlsEnable').removeAttribute('checked')}if(ircState.ircTLSVerify){
-document.getElementById('ircServerTlsVerify').setAttribute('checked','')}else{document.getElementById('ircServerTlsVerify').removeAttribute('checked')}if(ircState.enableSocks5Proxy){
-document.getElementById('socks5HidableDiv').removeAttribute('hidden');document.getElementById('socks5EnabledCheckbox').setAttribute('disabled','')
+document.getElementById('ircServerTlsVerify').setAttribute('checked','')}else{document.getElementById('ircServerTlsVerify').removeAttribute('checked')}
+if(ircState.enableSocks5Proxy&&ircState.ircProxy){document.getElementById('socks5HidableDiv').removeAttribute('hidden');document.getElementById('socks5EnabledCheckbox').setAttribute('disabled','')
 ;document.getElementById('socks5EnabledCheckbox').setAttribute('checked','');document.getElementById('socks5AddrInputId').value=ircState.socks5Host
 ;document.getElementById('socks5PortInputId').value=ircState.socks5Port}else{document.getElementById('socks5HidableDiv').setAttribute('hidden','')
 ;document.getElementById('socks5EnabledCheckbox').removeAttribute('checked');document.getElementById('socks5AddrInputId').value='';document.getElementById('socks5PortInputId').value=''}

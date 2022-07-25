@@ -10,6 +10,7 @@
       "port": 6697,
       "tls": true,
       "verify": true,
+      "proxy": true,
       "password": "",
       "identifyNick": "",
       "identifyCommand": "",

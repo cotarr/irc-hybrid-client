@@ -107,6 +107,7 @@
         'port',
         'tls',
         'verify',
+        'proxy',
         'password',
         'identifyNick',
         'identifyCommand',
@@ -134,6 +135,7 @@
       'port',
       'tls',
       'verify',
+      'proxy',
       'identifyNick',
       'nick',
       'user',
@@ -151,7 +153,9 @@
     ]),
     body('port', 'Invalid socket port number')
       .isPort(),
-    body(['tls', 'verify'])
+    body(['tls',
+      'verify',
+      'proxy'])
       .isBoolean(),
     // TODO max length of strings?
     body([
@@ -177,7 +181,8 @@
       .toInt(),
     body([
       'tls',
-      'verify'])
+      'verify',
+      'proxy'])
       .toBoolean(),
     body([
       'name',
@@ -227,6 +232,7 @@
         'port',
         'tls',
         'verify',
+        'proxy',
         'password',
         'identifyNick',
         'identifyCommand',
@@ -256,6 +262,7 @@
       'port',
       'tls',
       'verify',
+      'proxy',
       'identifyNick',
       'nick',
       'user',
@@ -281,7 +288,9 @@
     ]),
     body('port', 'Invalid socket port number')
       .isPort(),
-    body(['tls', 'verify'])
+    body(['tls',
+      'verify',
+      'proxy'])
       .isBoolean(),
     // TODO max length of strings?
     body([
@@ -312,7 +321,8 @@
       .toInt(),
     body([
       'tls',
-      'verify'])
+      'verify',
+      'proxy'])
       .toBoolean(),
     body([
       'name',
@@ -363,6 +373,7 @@
         'port',
         'tls',
         'verify',
+        'proxy',
         'password',
         'identifyNick',
         'identifyCommand',
@@ -449,6 +460,7 @@
         'port',
         'tls',
         'verify',
+        'proxy',
         'password',
         'identifyNick',
         'identifyCommand',
