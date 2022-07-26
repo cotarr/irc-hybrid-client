@@ -109,6 +109,7 @@
         'tls',
         'verify',
         'proxy',
+        'reconnect',
         'password',
         'identifyNick',
         'identifyCommand',
@@ -138,6 +139,7 @@
       'tls',
       'verify',
       'proxy',
+      'reconnect',
       'identifyNick',
       'nick',
       'user',
@@ -159,7 +161,8 @@
       'disabled',
       'tls',
       'verify',
-      'proxy'])
+      'proxy',
+      'reconnect'])
       .isBoolean(),
     // TODO max length of strings?
     body([
@@ -187,7 +190,8 @@
       'disabled',
       'tls',
       'verify',
-      'proxy'])
+      'proxy',
+      'reconnect'])
       .toBoolean(),
     body([
       'name',
@@ -239,6 +243,7 @@
         'tls',
         'verify',
         'proxy',
+        'reconnect',
         'password',
         'identifyNick',
         'identifyCommand',
@@ -270,6 +275,7 @@
       'tls',
       'verify',
       'proxy',
+      'reconnect',
       'identifyNick',
       'nick',
       'user',
@@ -299,7 +305,8 @@
       'disabled',
       'tls',
       'verify',
-      'proxy'])
+      'proxy',
+      'reconnect'])
       .isBoolean(),
     // TODO max length of strings?
     body([
@@ -332,7 +339,8 @@
       'disabled',
       'tls',
       'verify',
-      'proxy'])
+      'proxy',
+      'reconnect'])
       .toBoolean(),
     body([
       'name',
@@ -385,6 +393,7 @@
         'tls',
         'verify',
         'proxy',
+        'reconnect',
         'password',
         'identifyNick',
         'identifyCommand',
@@ -473,6 +482,7 @@
         'tls',
         'verify',
         'proxy',
+        'reconnect',
         'password',
         'identifyNick',
         'identifyCommand',

@@ -97,7 +97,9 @@
   vars.ircState.ircRegistered = false;
   vars.ircState.ircIsAway = false;
 
-  vars.ircState.ircAutoReconnect = servers.ircAutoReconnect;
+  // Note: ircAutoReconnect moved from global setting to server setting
+  // vars.ircState.ircAutoReconnect = servers.ircAutoReconnect;
+
   vars.ircState.lastPing = '0.000';
 
   // pass on IRC socket TLS info
@@ -109,6 +111,7 @@
   vars.ircState.ircTLSEnabled = null;
   vars.ircState.ircTLSVerify = null;
   vars.ircState.ircProxy = null;
+  vars.ircState.ircAutoReconnect = null;
   vars.ircServerPassword = null;
   vars.nsIdentifyNick = null;
   vars.nsIdentifyCommand = null;
@@ -131,6 +134,7 @@
     vars.ircState.ircTLSEnabled = servers.serverArray[loadingServerIndex].tls;
     vars.ircState.ircTLSVerify = servers.serverArray[loadingServerIndex].verify;
     vars.ircState.ircProxy = servers.serverArray[loadingServerIndex].proxy;
+    vars.ircState.ircAutoReconnect = servers.serverArray[loadingServerIndex].reconnect;
     vars.ircServerPassword = servers.serverArray[loadingServerIndex].password;
     vars.nsIdentifyNick = servers.serverArray[loadingServerIndex].identifyNick;
     vars.nsIdentifyCommand = servers.serverArray[loadingServerIndex].identifyCommand;
@@ -1261,6 +1265,7 @@
     vars.ircState.ircTLSEnabled = servers.serverArray[vars.ircState.ircServerIndex].tls;
     vars.ircState.ircTLSVerify = servers.serverArray[vars.ircState.ircServerIndex].verify;
     vars.ircState.ircProxy = servers.serverArray[vars.ircState.ircServerIndex].proxy;
+    vars.ircState.ircAutoReconnect = servers.serverArray[vars.ircState.ircServerIndex].reconnect;
     vars.ircServerPassword = servers.serverArray[vars.ircState.ircServerIndex].password;
     vars.nsIdentifyNick = servers.serverArray[vars.ircState.ircServerIndex].identifyNick;
     vars.nsIdentifyCommand = servers.serverArray[vars.ircState.ircServerIndex].identifyCommand;
@@ -1298,6 +1303,7 @@
     vars.ircState.ircTLSEnabled = null;
     vars.ircState.ircTLSVerify = null;
     vars.ircState.ircProxy = null;
+    vars.ircState.ircAutoReconnect = null;
     vars.ircServerPassword = null;
     vars.nsIdentifyNick = null;
     vars.nsIdentifyCommand = null;
@@ -1319,6 +1325,7 @@
       vars.ircState.ircTLSEnabled = servers.serverArray[reloadServerIndex].tls;
       vars.ircState.ircTLSVerify = servers.serverArray[reloadServerIndex].verify;
       vars.ircState.ircProxy = servers.serverArray[reloadServerIndex].proxy;
+      vars.ircState.ircAutoReconnect = servers.serverArray[reloadServerIndex].reconnect;
       vars.ircServerPassword = servers.serverArray[reloadServerIndex].password;
       vars.nsIdentifyNick = servers.serverArray[reloadServerIndex].identifyNick;
       vars.nsIdentifyCommand = servers.serverArray[reloadServerIndex].identifyCommand;

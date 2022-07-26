@@ -44,6 +44,7 @@ Configuration:
 - credentials.json - New boolean property `disableServerListEditor` to disable the /irc/serverlist API routes
 - servers.json - New boolean property `proxy` added to IRC server object.
 - servers.json - New boolean property `disabled` added to IRC server object.
+- servers.json - Eliminated global property `ircAutoReconnect`, replace with server property `reconnect`
 
 Server:
 
@@ -59,6 +60,7 @@ Server:
 - server/irc-client.js - Network socket to IRC server uses socks5 proxy only if both global and selected IRC server enables socks5.
 - server/irc-client.js - Individual irc server definition - new boolean property `disabled` added to hide an entry.
 - server/irc-client.js - Code to select initial server, next server modified to skip disabled servers.
+- server/irc-client.js - Individual IRC server definition - new boolean property `reconnect` replace global `ircAutoReconnect` setting.
 - credentials.json - Add property `disableServerListEditor`.
 
 Browser:
