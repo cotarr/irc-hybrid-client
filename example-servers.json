@@ -1,7 +1,6 @@
 {
   "configVersion": 1,
   "ctcpTimeLocale": ["en-US", "UTC"],
-  "rawMessageLog": false,
   "serverArray": [
     {
       "disabled": false,
@@ -12,6 +11,7 @@
       "verify": true,
       "proxy": true,
       "reconnect": false,
+      "logging": false,
       "password": "",
       "identifyNick": "",
       "identifyCommand": "",

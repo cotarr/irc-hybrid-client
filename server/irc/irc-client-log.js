@@ -122,10 +122,14 @@
       rawMessageLogEnabled = flag;
     }
   };
+  const getRawMessageLogEnabled = function () {
+    return rawMessageLogEnabled;
+  };
   module.exports = {
     writeAccessLog: writeAccessLog,
     writeIrcLog: writeIrcLog,
     setRawMessageLogEnabled: setRawMessageLogEnabled,
+    getRawMessageLogEnabled: getRawMessageLogEnabled,
     accessLogFilename: accessLogFilename,
     ircLogFilename: ircLogFilename
   };

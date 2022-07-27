@@ -40,6 +40,7 @@
 //   "verify": false,
 //   "proxy": true,
 //   "reconnect": false,
+//   "logging": false,
 //   "password": "",
 //   "identifyNick": "",
 //   "identifyCommand": "",
@@ -300,6 +301,7 @@
             tempServer.verify = chainObject.serversFile.serverArray[i].verify;
             tempServer.proxy = chainObject.serversFile.serverArray[i].proxy;
             tempServer.reconnect = chainObject.serversFile.serverArray[i].reconnect;
+            tempServer.logging = chainObject.serversFile.serverArray[i].logging;
             // Security: Password is not sent
             // tempServer.password = chainObject.serversFile.serverArray[i].password;
             tempServer.identifyNick = chainObject.serversFile.serverArray[i].identifyNick;
@@ -369,6 +371,7 @@
       tempServer.verify = req.body.verify;
       tempServer.proxy = req.body.proxy;
       tempServer.reconnect = req.body.reconnect;
+      tempServer.logging = req.body.logging;
       // password is hidden and write only
       // If new values is not provided, use the previous values
       if ('password' in req.body) {

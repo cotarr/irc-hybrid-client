@@ -13,6 +13,9 @@ This is a major upgrade. An independent web page was added to view and edit the 
 An API was added to service the web page for adding, modifying, copying, and deleting IRC servers.
 IRC server definitions can be disabled individually. Socks5 proxy can be enabled for specific IRC server definitions.
 
+The format `servers.json` file has changed. Global properties 'ircAutoReconnect' and 'rawMessageLog' have been 
+replaced with properties 'reconnect' and 'logging' in individual server definitions.
+
 ### Added
 
 Server: 
@@ -45,6 +48,7 @@ Configuration:
 - servers.json - New boolean property `proxy` added to IRC server object.
 - servers.json - New boolean property `disabled` added to IRC server object.
 - servers.json - Eliminated global property `ircAutoReconnect`, replace with server property `reconnect`
+- servers.json - Eliminated global property `rawMessageLog`, replace with server property `logging`
 
 Server:
 
@@ -61,7 +65,8 @@ Server:
 - server/irc-client.js - Individual irc server definition - new boolean property `disabled` added to hide an entry.
 - server/irc-client.js - Code to select initial server, next server modified to skip disabled servers.
 - server/irc-client.js - Individual IRC server definition - new boolean property `reconnect` replace global `ircAutoReconnect` setting.
-- credentials.json - Add property `disableServerListEditor`.
+- server/irc-client.js - Individual IRC server definition - new boolean property `logging` replace global `ircRawMessage` setting.
+- server/irc-client-log.js - Added new function getRawMessageLogEnabled()
 
 Browser:
 

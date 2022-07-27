@@ -135,6 +135,7 @@
     vars.ircState.ircTLSVerify = servers.serverArray[loadingServerIndex].verify;
     vars.ircState.ircProxy = servers.serverArray[loadingServerIndex].proxy;
     vars.ircState.ircAutoReconnect = servers.serverArray[loadingServerIndex].reconnect;
+    ircLog.setRawMessageLogEnabled(servers.serverArray[loadingServerIndex].logging);
     vars.ircServerPassword = servers.serverArray[loadingServerIndex].password;
     vars.nsIdentifyNick = servers.serverArray[loadingServerIndex].identifyNick;
     vars.nsIdentifyCommand = servers.serverArray[loadingServerIndex].identifyCommand;
@@ -226,7 +227,7 @@
     vars.ircState.disableServerListEditor = true;
   }
 
-  ircLog.setRawMessageLogEnabled(servers.rawMessageLog);
+  // ircLog.setRawMessageLogEnabled(servers.rawMessageLog);
 
   console.log('Starting web server: ' + vars.ircState.progName +
     ' version-' + vars.ircState.progVersion);
@@ -234,13 +235,14 @@
 
   // report log file status
   if (nodeEnv === 'production') {
-    if (servers.rawMessageLog) {
-      ircLog.writeIrcLog('-----------------------------------------');
-      ircLog.writeIrcLog('Starting ' + vars.ircState.progName + ' ' + vars.ircState.progVersion);
-      console.log('IRC raw message log enabled: ' + ircLog.ircLogFilename);
-      console.log('Caution: IRC raw message log not pruned for size, monitor your file size.');
+    ircLog.writeIrcLog('-----------------------------------------');
+    ircLog.writeIrcLog('Starting ' + vars.ircState.progName + ' ' + vars.ircState.progVersion);
+    console.log('IRC raw message log filename: ' + ircLog.ircLogFilename);
+    console.log('Caution: IRC raw message log not pruned for size, monitor your file size.');
+    if (ircLog.getRawMessageLogEnabled()) {
+      console.log('IRC raw message log enabled.');
     } else {
-      console.log('IRC raw message log disabled.');
+      console.log('IRC raw message log disabled');
     }
   } else {
     console.log('IRC raw message log enabled: (console)');
@@ -1266,6 +1268,7 @@
     vars.ircState.ircTLSVerify = servers.serverArray[vars.ircState.ircServerIndex].verify;
     vars.ircState.ircProxy = servers.serverArray[vars.ircState.ircServerIndex].proxy;
     vars.ircState.ircAutoReconnect = servers.serverArray[vars.ircState.ircServerIndex].reconnect;
+    ircLog.setRawMessageLogEnabled(servers.serverArray[vars.ircState.ircServerIndex].logging);
     vars.ircServerPassword = servers.serverArray[vars.ircState.ircServerIndex].password;
     vars.nsIdentifyNick = servers.serverArray[vars.ircState.ircServerIndex].identifyNick;
     vars.nsIdentifyCommand = servers.serverArray[vars.ircState.ircServerIndex].identifyCommand;
@@ -1326,6 +1329,7 @@
       vars.ircState.ircTLSVerify = servers.serverArray[reloadServerIndex].verify;
       vars.ircState.ircProxy = servers.serverArray[reloadServerIndex].proxy;
       vars.ircState.ircAutoReconnect = servers.serverArray[reloadServerIndex].reconnect;
+      ircLog.setRawMessageLogEnabled(servers.serverArray[reloadServerIndex].logging);
       vars.ircServerPassword = servers.serverArray[reloadServerIndex].password;
       vars.nsIdentifyNick = servers.serverArray[reloadServerIndex].identifyNick;
       vars.nsIdentifyCommand = servers.serverArray[reloadServerIndex].identifyCommand;

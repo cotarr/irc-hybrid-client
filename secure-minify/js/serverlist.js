@@ -207,6 +207,7 @@ const clearIrcServerForm = () => {
     document.getElementById('verifyCheckboxId').checked = true;
     document.getElementById('proxyCheckboxId').checked = true;
     document.getElementById('autoReconnectCheckboxId').checked = false;
+    document.getElementById('loggingCheckboxId').checked = false;
     document.getElementById('passwordInputId').setAttribute('disabled', '');
     document.getElementById('passwordInputId').value = '(Hidden)';
     document.getElementById('identifyNickInputId').value = '';
@@ -263,6 +264,11 @@ const populateIrcServerForm = (data) => {
       document.getElementById('autoReconnectCheckboxId').checked = true;
     } else {
       document.getElementById('autoReconnectCheckboxId').checked = false;
+    }
+    if (data.logging) {
+      document.getElementById('loggingCheckboxId').checked = true;
+    } else {
+      document.getElementById('loggingCheckboxId').checked = false;
     }
     document.getElementById('passwordInputId').setAttribute('disabled', '');
     document.getElementById('passwordInputId').value = '(hidden)';
@@ -382,6 +388,11 @@ const parseFormInputValues = () => {
       data.reconnect = true;
     } else {
       data.reconnect = false;
+    }
+    if (document.getElementById('loggingCheckboxId').checked) {
+      data.logging = true;
+    } else {
+      data.logging = false;
     }
     if (!(document.getElementById('passwordInputId').hasAttribute('disabled'))) {
       data.password = document.getElementById('passwordInputId').value;
