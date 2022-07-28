@@ -53,9 +53,19 @@
   let servers = null;
   const loadServerList = function () {
     servers = JSON.parse(fs.readFileSync('./servers.json', 'utf8'));
-    if ((!('configVersion' in servers)) || (servers.configVersion !== 1)) {
-      console.error('Error, servers.js wrong configVersion');
-      process.exit(1);
+    if ((!('configVersion' in servers)) || (servers.configVersion !== 2)) {
+      if (servers.configVersion === 1) {
+        console.log('\nObsolete configuration format in: servers.json');
+        console.log(' - See: example-servers.json');
+        console.log(' - Edit: servers.json requires version 2 flag: "configVersion": 2,');
+        console.log(' - Removed (Ignored): Legacy properties ircAutoReconnect and rawMessageLog.');
+        console.log(' - Added: Individual servers properties: disabled, proxy, reconnect, logging');
+        console.log(' - Recommend open/save each IRC server definition using IRC server editor.\n');
+        process.exit(1);
+      } else {
+        console.error('Error, servers.json wrong configVersion');
+        process.exit(1);
+      }
     }
   }; // loadServerList()
 

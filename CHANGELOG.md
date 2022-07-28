@@ -41,6 +41,7 @@ Browser:
 Configuration:
 
 - credentials.json - New boolean property `disableServerListEditor` to disable the /irc/serverlist API routes
+- servers.json - Bump servers.json file format to: `"configVersion": 2`
 - servers.json - Eliminated global property `ircAutoReconnect`
 - servers.json - Eliminated global property `rawMessageLog`
 - servers.json - New boolean property `disabled` to disable/hide a server entry from the IRC client [next] and [prev] buttons
@@ -66,6 +67,7 @@ Server:
 - server/irc-client.js - Code to select initial server, next server modified to skip disabled servers.
 - server/irc-client.js - Individual IRC server definition - new boolean property `reconnect` replace global `ircAutoReconnect` setting.
 - server/irc-client.js - Individual IRC server definition - new boolean property `logging` replace global `ircRawMessage` setting.
+- server/irc-client.js - Require servers.json version 2, else exit with upgrade instructions.
 - server/irc-client-log.js - Added new function getRawMessageLogEnabled()
 
 Browser:
