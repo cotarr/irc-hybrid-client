@@ -48,6 +48,7 @@
   const vars = require('./irc-client-vars');
 
   const nodeEnv = process.env.NODE_ENV || 'development';
+  const nodeDebugLog = process.env.NODE_DEBUG_LOG || 0;
 
   let servers = null;
   const loadServerList = function () {
@@ -234,7 +235,9 @@
   console.log('Point web browser to <your-http-domain-name> + "/irc/webclient.html"');
 
   // report log file status
-  if (nodeEnv === 'production') {
+  if ((nodeEnv === 'development') || (nodeDebugLog)) {
+    console.log('IRC raw message log enabled: (console)');
+  } else {
     ircLog.writeIrcLog('-----------------------------------------');
     ircLog.writeIrcLog('Starting ' + vars.ircState.progName + ' ' + vars.ircState.progVersion);
     console.log('IRC raw message log filename: ' + ircLog.ircLogFilename);
@@ -244,8 +247,6 @@
     } else {
       console.log('IRC raw message log disabled');
     }
-  } else {
-    console.log('IRC raw message log enabled: (console)');
   }
 
   const tellBrowserToRequestState = function () {

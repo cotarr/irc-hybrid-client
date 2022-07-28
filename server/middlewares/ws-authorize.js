@@ -64,6 +64,7 @@
   // console.log('cookieSecret ' + cookieSecret);
 
   const nodeEnv = process.env.NODE_ENV || 'development';
+  const nodeDebugLog = process.env.NODE_DEBUG_LOG || 0;
 
   // Also set cookieName in web-server.js
   let cookieName = 'irc-hybrid-client';
@@ -94,7 +95,9 @@
     //
     // Append string to file
     //
-    if (nodeEnv === 'production') {
+    if ((nodeEnv === 'development') || (nodeDebugLog)) {
+      console.log(logEntry);
+    } else {
       fs.writeFile(
         authLogFilename,
         logEntry + '\n',
@@ -110,8 +113,6 @@
           }
         }
       );
-    } else {
-      console.log(logEntry);
     }
   };
 

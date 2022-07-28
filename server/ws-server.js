@@ -33,6 +33,9 @@ const isValidUTF8 = require('utf-8-validate');
 const authorizeWebSocket = require('./middlewares/ws-authorize').authorizeWebSocket;
 const customLog = require('./middlewares/ws-authorize').customLog;
 
+const nodeEnv = process.env.NODE_ENV || 'development';
+const nodeDebugLog = process.env.NODE_DEBUG_LOG || 0;
+
 // ----------------------------------------
 // Set up a headless websocket server
 // ----------------------------------------
@@ -41,7 +44,7 @@ const wsServer = new ws.Server({ noServer: true });
 // -------------------------------------------------
 // Message handler (browser --> web server)
 //
-// In this sapplication, the websocket use is limited
+// In this application, the websocket use is limited
 // to messages from web server to browser. The return
 // direction is not used at this time.
 // This listener will catch return messages, but
@@ -121,7 +124,9 @@ const wsOnUpgrade = function (request, socket, head) {
   }
   if (upgradePath === '/irc/ws') {
     if (authorizeWebSocket(request)) {
-      customLog(request, 'websocket-connection');
+      if ((nodeEnv === 'development') || (nodeDebugLog)) {
+        customLog(request, 'websocket-connection');
+      }
       wsServer.handleUpgrade(request, socket, head, function (socket) {
         wsServer.emit('connection', socket, request);
       });

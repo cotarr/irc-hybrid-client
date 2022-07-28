@@ -93,6 +93,7 @@ const sessionExpireAfterMs = 1000 * sessionExpireAfterSec;
 // console.log('sessionExpireAfterMs ' + sessionExpireAfterMs);
 
 const nodeEnv = process.env.NODE_ENV || 'development';
+const nodeDebugLog = process.env.NODE_DEBUG_LOG || 0;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -120,7 +121,7 @@ if (nodeEnv === 'production') {
 // HTTP access log
 //
 const accessLogFilename = path.join(__dirname, '../logs/access.log');
-if (nodeEnv === 'development') {
+if ((nodeEnv === 'development') || (nodeDebugLog)) {
   console.log('Access log: (console)');
   app.use(logger(':date[iso] :remote-addr :status :method :http-version :req[host]:url', {
   }));

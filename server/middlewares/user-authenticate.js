@@ -47,6 +47,7 @@
   const logoutHtmlBottom = fs.readFileSync('./server/fragments/logout-bottom.html', 'utf8');
 
   const nodeEnv = process.env.NODE_ENV || 'development';
+  const nodeDebugLog = process.env.NODE_DEBUG_LOG || 0;
 
   //
   // Load credentials, user database from file, check users exist
@@ -75,7 +76,9 @@
     //
     // Append string to file
     //
-    if (nodeEnv === 'production') {
+    if ((nodeEnv === 'development') || (nodeDebugLog)) {
+      console.log(logEntry);
+    } else {
       fs.writeFile(
         authLogFilename,
         logEntry + '\n',
@@ -91,16 +94,14 @@
           }
         }
       );
-    } else {
-      console.log(logEntry);
     }
   };
 
   // print at server start
-  if (nodeEnv === 'production') {
-    console.log('Auth users: ' + userArray.length + ' Auth log: ' + authLogFilename);
-  } else {
+  if ((nodeEnv === 'development') || (nodeDebugLog)) {
     console.log('Auth users: ' + userArray.length + ' Auth log: (console)');
+  } else {
+    console.log('Auth users: ' + userArray.length + ' Auth log: ' + authLogFilename);
   }
 
   //

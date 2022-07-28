@@ -68,6 +68,7 @@
   const logoutHtmlBottom = fs.readFileSync('./server/fragments/logout-bottom.html', 'utf8');
 
   const nodeEnv = process.env.NODE_ENV || 'development';
+  const nodeDebugLog = process.env.NODE_DEBUG_LOG || 0;
 
   //
   // Custom log file (Option: setup to fail2ban to block IP addresses)
@@ -88,7 +89,9 @@
     //
     // Append string to file
     //
-    if (nodeEnv === 'production') {
+    if ((nodeEnv === 'development') || (nodeDebugLog)) {
+      console.log(logEntry);
+    } else {
       fs.writeFile(
         authLogFilename,
         logEntry + '\n',
@@ -104,16 +107,14 @@
           }
         }
       );
-    } else {
-      console.log(logEntry);
     }
   };
 
   // print at server start
-  if (nodeEnv === 'production') {
-    console.log('User Login: (remote) Auth log: ' + authLogFilename);
-  } else {
+  if ((nodeEnv === 'development') || (nodeDebugLog)) {
     console.log('User Login: (remote) Auth log: (console)');
+  } else {
+    console.log('User Login: (remote) Auth log: ' + authLogFilename);
   }
 
   //

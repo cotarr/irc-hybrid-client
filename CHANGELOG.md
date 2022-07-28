@@ -6,23 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Un-merged 2022-07-25 (Work in progress)
+## Un-merged 2022-07-28 (Work in progress)
 
 
 This is a major upgrade. An independent web page was added to view and edit the list of IRC servers.
 An API was added to service the web page for adding, modifying, copying, and deleting IRC servers.
-IRC server definitions can be disabled individually. Socks5 proxy can be enabled for specific IRC server definitions.
-
-The format `servers.json` file has changed. Global properties 'ircAutoReconnect' and 'rawMessageLog' have been 
-replaced with properties 'reconnect' and 'logging' in individual server definitions.
+IRC server definitions include new settings for `disabled`, `proxy`, `reconnect`, and `logging`.
 
 ### Added
 
 Server: 
 
 - Added new nodejs file: server/irc/irc-serverlist-editor.js
-  - Added route GET /irc/serverlist to retrieve array of IRC servers
-  - Support query parameters GET/irc/serverlist?index=0&lock=1 to open edit of specific server
+  - Added route GET/irc/serverlist?index=0&lock=1 to retrieve array of IRC servers
   - Added route POST /irc/serverlist to create new IRC servers
   - Added route PATCH /irc/serverlist?index=0 to edit and modify existing server
   - Added route COPY /etc/serverlist?index=0 to copy an existing IRC server to the end of the list
@@ -35,7 +31,7 @@ Browser:
 - Added new file /irc/serverlist.html (IRC server editor interface)
   - HTML table with list of servers
   - Form for editing a specific server properties
-  - Support for new IRC server properties `deleted` and `proxy`
+  - Support for new IRC server properties `disabled`, `proxy`, `reconnect`, and `logging`.
 - Added new file /irc/css/serverlist.css (styles)
 - Added new file /irc/js/serverlist.js (Code to perform API calls and edit server list)
   - Functions for IRC server list editing: GET, POST, PATCH, COPY, DELETE
@@ -45,15 +41,19 @@ Browser:
 Configuration:
 
 - credentials.json - New boolean property `disableServerListEditor` to disable the /irc/serverlist API routes
-- servers.json - New boolean property `proxy` added to IRC server object.
-- servers.json - New boolean property `disabled` added to IRC server object.
-- servers.json - Eliminated global property `ircAutoReconnect`, replace with server property `reconnect`
-- servers.json - Eliminated global property `rawMessageLog`, replace with server property `logging`
+- servers.json - Eliminated global property `ircAutoReconnect`
+- servers.json - Eliminated global property `rawMessageLog`
+- servers.json - New boolean property `disabled` to disable/hide a server entry from the IRC client [next] and [prev] buttons
+- servers.json - New boolean property `proxy` for a server to enable Socks5 Proxy if available (previously a global setting)
+- servers.json - New boolean property `reconnect` for a server to enable automatic reconnection (previously a global setting)
+- servers.json - New boolean property `logging` for a server to enable write of raw IRC messages to log file (previously a global setting)
 
 Server:
 
-- server/web-server.js - Added routes, authorization and CSRF token validation for /irc/serverlist  API
+- server/web-server.js - Environment variable NODE_DEBUG_LOG=1 will force all log output to console during NODE_ENV=production.
+- server/web-server.js - Added routes, authorization and CSRF token validation for /irc/serverlist API
 - server/web-server.js - Modified code for CSRF tokens /irc/webclient.html and /irc/serverlist.html
+- server/web-server.js - Web connections no longer logged in 'production' node environment
 - server/irc-client.js - Added global event for IRC client to reload server list after edit.
 - server/irc-client.js - On loading servers.json file, remove error for empty server list.
 - server/irc-client.js - On loading servers.json file, default values are null for empty server list.

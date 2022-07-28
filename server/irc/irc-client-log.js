@@ -49,6 +49,7 @@
   const ircLogFilename = path.join(__dirname, '../../logs/irc.log');
 
   const nodeEnv = process.env.NODE_ENV || 'development';
+  const nodeDebugLog = process.env.NODE_DEBUG_LOG || 0;
 
   const writeAccessLog = function (logString) {
     //
@@ -60,7 +61,9 @@
     //
     // Append string to file
     //
-    if (nodeEnv === 'production') {
+    if ((nodeEnv === 'development') || (nodeDebugLog)) {
+      console.log(logEntry);
+    } else {
       fs.writeFile(
         accessLogFilename,
         logEntry + '\n',
@@ -76,8 +79,6 @@
           }
         }
       );
-    } else {
-      console.log(logEntry);
     }
   };
 
@@ -94,7 +95,9 @@
     //
     // Append string to file
     //
-    if (nodeEnv === 'production') {
+    if ((nodeEnv === 'development') || (nodeDebugLog)) {
+      console.log(logEntry);
+    } else {
       if (rawMessageLogEnabled) {
         fs.writeFile(
           ircLogFilename,
@@ -112,8 +115,6 @@
           }
         );
       };
-    } else {
-      console.log(logEntry);
     }
   };
 
