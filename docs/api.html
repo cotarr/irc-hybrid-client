@@ -130,17 +130,72 @@
           A more detail description of web socket usage is included near the bottom of this page.
         </p>
 
+        <h1>API Authorization</h1>
+
+        <h3>Cookies</h3>
+
+        <p>
+          HTTP requests to the web server API require a session cookie with a valid digital signature.
+          API requests made to any protected API without a valid cookie will return
+          status 403 Forbidden.
+        </p><p>
+          The user should have previously obtained a cookie by loading the page at 
+          &quot;/irc/webclient.html&quot;.
+          The web server will check for a valid cookie.
+          In the case of a missing, invalid or expired cookie, the users web
+          browser is redirected from /irc/webclient.html to the proper form for entry of username and password. 
+          After successful password entry, the browser is redirected back to /irc/webclient.html with
+          a new valid cookie.
+        </p>
+
+        <h3>CSRF Tokens</h3>
+        <p>
+          Cross site request forgery is a security concern where html &lt;form&gt; elements
+          are used to submit data using the form's submit button with method POST.
+          A malicious page would attempt to trick a user to clicking an embedded form causing
+          data to be submitted to a different web site where the user previously obtained a valid cookie. 
+          A CSRF token is a random nonce that is embedded into the HTML of a web page. 
+          It changes each time the page is reloaded to a new random value.
+        </p>
+        <p>
+          The hrc-hybrid-client web server requires CSRF tokens for HTTP methods 
+          that change state, such as the POST methods.
+          The CSRF token is obtained by using JavaScript to parse the token data from the HTML code
+          in /irc/webclient.html as shown in this example.
+        </p>
+<div class="pre-div"><pre>
+  &lt;head&gt;
+    &lt;meta name="csrf-token" content="ob1P2QF3-bBXabc8At9xxiJyC2I44sAbjgsA"&gt;
+  &lt;/head&gt;
+</pre></div>
+
+        <p>
+          When performing a HTTP request using the POST method, the CSRF token 
+          can be added to the request headers as follows:
+        </p>
+<div class="pre-div"><pre>
+  &quot;accept&quot;: &quot;application/json&quot;,
+  &quot;csrf-token&quot;: &quot;ob1P2QF3-bBXabc8At9xxiJyC2I44sAbjgsA&quot;,
+  &quot;content-type&quot;: &quot;application/json&quot;,
+</pre></div>
+        
+        <p>Requests with missing or invalid CSRF tokens will return 403 Forbidden &quot;invalid csrf token&quot;</p> 
+
         <h1>IRC Client API Routes</h1>
 
         <h3>POST /irc/server</h3>
 
         <p>
           The backend NodeJs web server maintains a list of available IRC servers.
-          This list is loaded from a configuration file and is not editable from the browser.
+          This list is loaded from a configuration file &quot;servers.json&quot;.
           Calls to /irc/server shall include an &quot;index&quot; property of type integer
           that is used to select a specific server.
-          A value of -1 is used to rotate to the next server in the configuration.
         </p>
+        <ul>
+          <li>A value of 0 or greater is used to specify the index of an IRC server in the list.</li>
+          <li>A value of -1 is used to rotate to the next server in the configuration.</li>
+          <li>A value of -2 is used to rotate to the previous server in the configuration.</li>
+        </ul>
 
         <p>
           When the web server configuration changes to index a different IRC server,
@@ -160,15 +215,17 @@
 <p>Success Response:</p>
 <div class="pre-div"><pre>
 {
-    "error": false
+  "error": false,
+  "index": 2,
+  "name": "DALnet"
 }
 </pre></div>
 
 <p>Error Response:</p>
 <div class="pre-div"><pre>
 {
-    "error": true,
-    "message": "Can not change servers while connected or connecting"
+  "error": true,
+  "message": "Requested server index number out of range."
 }
 </pre></div>
 
@@ -336,25 +393,26 @@ UPDATE
     "ircConnected": true,
     "ircRegistered": true,
     "ircIsAway": false,
-    "ircAutoReconnect": true,
     "lastPing": "0.022",
-    "ircServerName": "freenode",
-    "ircServerHost": "chat.freenode.net",
-    "ircServerPort": 7000,
-    "ircTLSEnabled": true,
-    "ircTLSVerify": true,
-    "ircServerIndex": 3,
-    "ircServerPrefix": "tildes.freenode.net",
     "ircSockInfo": {
       "encrypted": true,
       "verified": true,
       "protocol": "TLSv1.3"
     }
-    "channelList": [],
+    "ircServerName": "freenode",
+    "ircServerHost": "chat.freenode.net",
+    "ircServerPort": 7000,
+    "ircTLSEnabled": true,
+    "ircTLSVerify": true,
+    "ircProxy": false,
+    "ircAutoReconnect": true,
     "nickName": "myNickName",
     "userName": "myNickName",
     "realName": "myNickName",
     "userMode": "+i",
+    "channelList": [],
+    "ircServerIndex": 3,
+    "ircServerPrefix": "tildes.freenode.net",
     "userHost": "~someuser@somehose.example.net",
     "channels": [
       ""#mychannel"
@@ -483,6 +541,414 @@ UPDATE
 }
 </pre></div>
 
+        <div class="desc-title">
+          Server List Editor API
+        </div>
+
+        <p>
+          The server list editor web page located at &quot;/irc/serverlist.html&quot;
+          is used to view the list of available IRC server definitions.
+          Individual IRC servers can be modified using a simple HTML form editor.
+          The purpose of the API located at &quot;/irc/serverlist&quot; is to service the 
+          associated HTML page.
+        </p><p>
+          Modification of the list of IRC servers operates independently of the 
+          IRC web client. The IRC client must be disconnected from all IRC servers
+          in order to use these API calls to modify the list of IRC servers. 
+        </p><p>
+          The list of IRC servers is stored in the base folder of the IRC web 
+          server in the file &quot;servers.json&quot;
+          The file may be edited manually instead of using this interface.
+        </p><p>
+          The IRC server list editor can be disabled by setting &quot;disableServerListEditor: true&quot;
+          in the credentials.json file. When disabled, all attempts to access the 
+          /irc/serverlist API will return Status 405 Method not allowed 
+          &quot;Server List Editor Disabled&quot;
+        </p><p>
+          The API supports several methods, such as GET, POST, PATCH, COPY, and DELETE
+          which are used to perform various tasks.
+        </p>
+        <p>
+          The fields used for IRC server password and user's NickServ command
+          are write only fields. New values may be submitted, but existing values
+          are not returned by the API. However, these values are stored
+          un-encrypted in plain text in the servers.json file, and may be viewed there.
+        </p>
+
+        <h3>GET /irc/serverlist (without params)</h3>
+
+        <p>
+          Submitting a GET request without any URL query parameters will return 
+          the complete list of IRC server definitions from the servers.json file.
+          The response is a JSON encoded array of javascript objects.
+          The list of IRC channels is a comma separated list.
+        </p>
+
+<p>API response to GET /irc/serverlist</p>
+<div class="pre-div"><pre>
+[
+    {
+      "index": 0,
+      "disabled": false,
+      "name": "DALnet-1",
+      "host": "lion.dal.net",
+      "port": 6697,
+      "tls": true,
+      "verify": true,
+      "proxy": false,
+      "reconnect": false,
+      "logging": true,
+      "identifyNick": "",
+      "nick": "MyNickName",
+      "user": "user",
+      "real": "John Doe",
+      "modes": "+i",
+      "channelList": "#myChannel, #otherChannel"
+  },
+  {
+    "index": 1,
+    "disabled": false,
+    "name": "DALnet-2",
+    "host": "irc.dal.net",
+    "port": 6667,
+    "tls": false,
+    "verify": false,
+    "proxy": false,
+    "reconnect": false,
+    "logging": true,
+    "identifyNick": "",
+    "nick": "MyNickName",
+    "user": "user",
+    "real": "John Doe",
+    "modes": "+i",
+    "channelList": "#myChannel, #otherChannel"
+  }
+]
+</pre></div>
+
+        <h3>GET /irc/serverlist?index=0&lock=1</h3>
+
+        <p>
+          Submitting a GET request with a query parameter &quot;index&quot;
+          will return the individual server definition with the specified index number.
+          Specification of the query parameter &quot;lock=1&quot; will attempt to 
+          check out the record for editing by placing a lock flag on the database.
+          Repeating the same request with &quot;lock=0&quot; will clear the lock flag .
+        </p>
+        <p>
+          The purpose of this request is to checkout and open an existing 
+          IRC server definition for editing. When editing complete,
+          the modified data would be returned using the PATCH method shown further below.
+        </p>
+
+<p>API response to GET /irc/getircstate?index=0&lock=1</p>
+<div class="pre-div"><pre>
+{
+  "index": 0,
+  "disabled": false,
+  "name": "DALnet",
+  "host": "lion.dal.net",
+  "port": 6697,
+  "tls": true,
+  "verify": true,
+  "proxy": false,
+  "reconnect": false,
+  "logging": true,
+  "identifyNick": "",
+  "nick": "MyNickName",
+  "user": "user",
+  "real": "John Doe",
+  "modes": "+i",
+  "channelList": "#myChannel, #otherChannel"
+}
+</pre></div>
+
+        <p>
+          Error responses: 
+        </p>
+        <ul>
+          <li>Status 400 Bad Request &quot;Server list array index out of range&quot;</li>
+          <li>Status 409 Conflict &quot;Lock already set&quot;</li>
+        </ul>
+
+        <h3>POST /irc/serverlist</h3>
+
+        <p>
+          The POST method is used to create a new IRC server definition.
+          The database should be unlocked for this request.
+          A valid CSRF token is required in the request headers as described above.
+        </p>
+        <p>
+          The request must not include an &quot;index&quot; property because a 
+          new index will be automatically generated when the record is created.
+        </p>
+        <p>
+          The properties &quot;password&quot; and &quot;identifyCommand&quot;
+          are optional. If the POST request includes these properties, they will be part
+          of the server definition. An empty string may be submitted, such as: password:&quot;&quot; 
+        </p>
+
+<p>POST Request Body:</p>
+<div class="pre-div"><pre>
+{
+  "disabled": false,
+  "name": "DALnet",
+  "host": "lion.dal.net",
+  "port": 6697,
+  "tls": true,
+  "verify": true,
+  "proxy": false,
+  "reconnect": false,
+  "logging": true,
+  "password": "",
+  "identifyNick": "",
+  "identifyCommand": "",
+  "nick": "MyNickName",
+  "user": "user",
+  "real": "John Doe",
+  "modes": "+i",
+  "channelList": "#myChannel, #otherChannel"
+}  
+</pre></div>
+
+        <p>
+          The response body will include the index number of the new record.
+        </p>
+
+<p>Success Response:</p>
+<div class="pre-div"><pre>
+{
+  "status": "success",
+  "method": "POST",
+  "index": 4
+}
+</pre></div>
+
+<p>Error Response:</p>
+<ul>
+  <li>Status 409 Conflict &quot;Attempt to modify locked data table&quot;</li>
+</ul>
+
+<p>Input Validation Error Response: (Missing port number)</p>
+<div class="pre-div"><pre>
+{
+  "status": 422,
+  "message": "Unprocessable Entity",
+  "errors": [
+      {
+          "msg": "Required values",
+          "param": "port",
+          "location": "body"
+      },
+      {
+          "msg": "Invalid socket port number",
+          "param": "port",
+          "location": "body"
+      }
+  ]
+}
+</pre></div>
+
+<h3>PATCH /irc/serverlist?index=xxx</h3>
+
+<p>
+  The PATCH method is used to modify an existing IRC server definition.
+  Prior to calling the PATCH method, a current copy of the data
+  should be retrieved using GET /irc/serverlist?index=xxx?lock=1.
+  The GET request query parameter &quot;lock=1&quot; will set a lock flag
+  with the index value for this record.
+  A valid CSRF token is required in the request headers as described above.
+</p>
+<p>
+  The index parameter is required as a URL query parameter. 
+  The index value specified in the body of the request must match the index
+  value in the URL query parameters.
+</p>
+<p>
+  The properties &quot;password&quot; and &quot;identifyCommand&quot;
+  are optional. If the PATCH request includes these properties, 
+  any existing value will be replaced. If the properties are 
+  omitted from the object, no changes will be made to hose properties 
+  in the original record.
+  The GET request will not include these existing values for security concerns.
+  An empty string can be sent to remove a previous value (i.e. no server password).
+  In the example below, they are omitted, retaining existing values.
+</p>
+<p>
+  It is also possible to edit the existing servers manually in the 
+  servers.json file using a text editor.
+</p>
+
+<p>PATCH Request Body:</p>
+<div class="pre-div"><pre>
+{
+  "index": 0,
+  "disabled": false,
+  "name": "DALnet",
+  "host": "lion.dal.net",
+  "port": 6697,
+  "tls": true,
+  "verify": true,
+  "proxy": false,
+  "reconnect": false,
+  "logging": true,
+  "identifyNick": "",
+  "nick": "MyNickName",
+  "user": "user",
+  "real": "John Doe",
+  "modes": "+i",
+  "channelList": "#myChannel, #otherChannel"
+}  
+</pre></div>
+
+<p>Success Response:</p>
+<div class="pre-div"><pre>
+{
+"status": "success",
+"method": "PATCH",
+"index": 0
+}
+</pre></div>
+
+<p>Error Response:</p>
+<ul>
+<li>Status 409 Conflict &quot;Attempt to modify unlocked data table&quot;</li>
+</ul>
+
+<p>Input Validation Error Response: (Missing port number)</p>
+<div class="pre-div"><pre>
+{
+  "status": 422,
+  "message": "Unprocessable Entity",
+  "errors": [
+    {
+      "msg": "Required values",
+      "param": "port",
+      "location": "body"
+    },
+    {
+      "msg": "Invalid socket port number",
+      "param": "port",
+      "location": "body"
+    }
+  ]
+}
+</pre></div>
+
+        <h3>COPY /irc/serverlist?index=xxx (Duplicate)</h3>
+
+        <p>
+          The COPY method services two actions: duplicate records, or reorder records. 
+          The selection is based on the &quot;action&quot; property in the 
+          body of the request. When action is set to &quot;duplicate&quot;
+          the record at the specified index is duplicated.
+          The duplicated record an added to the end of the list as the last record.
+          The index number of the new record is returned in the body of the response.
+        </p>
+        <p>
+          The index parameter is required as a URL query parameter. 
+          The index value specified in the body of the request must match the index
+          value in the URL query parameters.
+        </p>
+
+<p>COPY Request Body:</p>
+<div class="pre-div"><pre>
+{
+  "index": 0,
+  "action": "duplicate"
+} 
+</pre></div>
+
+<p>Success Response:</p>
+<div class="pre-div"><pre>
+{
+  "status": "success",
+  "method": "COPY",
+  "index": 3
+}
+</pre></div>
+
+        <p>Error Response:</p>
+        <ul>
+        <li>Status 409 Conflict &quot;Attempt to modify locked data table&quot;</li>
+        </ul>
+
+        <h3>COPY /irc/serverlist?index=xxx (reorder)</h3>
+
+        <p>
+          The COPY method services two actions: duplicate records, or reorder records. 
+          The selection is based on the &quot;action&quot; property in the 
+          body of the request. When action is set to &quot;move-up&quot;
+          the record at the specified index is moved up to the next lowest index number.
+        </p>
+        <p>
+          The index parameter is required as a URL query parameter. 
+          The index value specified in the body of the request must match the index
+          value in the URL query parameters.
+        </p>
+
+<p>COPY Request Body:</p>
+<div class="pre-div"><pre>
+ {
+  "index": 2,
+  "action": "move-up"
+}
+</pre></div>
+
+<p>Success Response:</p>
+<div class="pre-div"><pre>
+{
+  "status": "success",
+  "method": "COPY",
+  "index": 3
+}
+</pre></div>
+
+        <p>Error Response:</p>
+        <ul>
+        <li>Status 409 Conflict &quot;Attempt to modify locked data table&quot;</li>
+        </ul>
+
+        <h3>DELETE /irc/serverlist?index=xxx</h3>
+
+        <p>
+          The DELETE method will remove and delete the record at the specified index.
+          The remaining records will be renumbered.
+          The response body will include the index number of the deleted record.
+          The database must be unlocked to the DELETE method.
+        </p>
+        <p>
+          The index parameter is required as a URL query parameter. 
+          The index value specified in the body of the request must match the index
+          value in the URL query parameters.
+        </p>
+        <p>
+          The body of the request may include other valid properties. Only the 
+          &quot;index&quot; property is used by the DELETE method.
+          Other valid properties are ignored. Extraneous unrecognized properties will 
+          generate an error.
+        </p>
+
+<p>DELETE Request Body:</p>
+<div class="pre-div"><pre>
+ {
+  "index": 2,
+}
+</pre></div>
+
+<p>Success Response:</p>
+<div class="pre-div"><pre>
+{
+  "status": "success",
+  "method": "DELETE",
+  "index": 3
+}
+</pre></div>
+
+        <p>Error Response:</p>
+        <ul>
+        <li>Status 409 Conflict &quot;Attempt to modify locked data table&quot;</li>
+        </ul>
 
         <div class="desc-title">
           Websocket Interface
