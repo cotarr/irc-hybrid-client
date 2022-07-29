@@ -5,7 +5,7 @@ html {
 body {
   margin: 0px 0px 0px 0px;
   padding: 0px 20px 0px 20px;
-  background-color: #e8e8e8;
+  background-color: #9cf7d4;
 }
 
 button {
@@ -27,6 +27,15 @@ button:hover {
 button[disabled] {
   background-color: #b8b8b8;
   color: #444444
+}
+
+.input-group {
+  background-color: #d7fcee;
+  border: 1px solid black;
+  border-radius: 7px;
+  padding-top: 0px;
+  padding-left: 10px;
+  padding-bottom: 10px;
 }
 
 .error-div {
