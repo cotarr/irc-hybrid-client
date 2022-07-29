@@ -386,7 +386,12 @@ cd ..
           The irc-hybrid-client supports TLS between IRC client and IRC server inside of socks5.
         </p>
         <p>
-          To enable use of a remote socks5 proxy server without authentication,
+          Each individual IRC server definition that uses the proxy must have a &quot;proxy:true&quot;
+          set in the IRC server definition. When the socks5 proxy is disabled globally,
+          the server's proxy property is ignored. 
+        </p>
+        <p>
+          To globally enable use of a remote socks5 proxy server without authentication,
           update the credentials.json file as in the following example, changing address and port.
         </p>
 
@@ -399,7 +404,7 @@ cd ..
 </pre></div>
 
         <p>
-          To enable use of a remote socks5 proxy server with password authentication,
+          To globally enable use of a remote socks5 proxy server with password authentication,
           update the credentials.json file as in the following example.
           Note:  This can expose socks5 authentication passwords in plain text.
           This issue can be addressed by passing the socks5 connection through a TLS
