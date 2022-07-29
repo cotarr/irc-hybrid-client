@@ -34,7 +34,7 @@
           Installation
         </div>
         <p>
-          If you are familiar with the process of cloning a Node.js/Exress
+          If you are familiar with the process of cloning a Node.js/Express
           git repository, you can use abbreviated instructions in the README.md
           file in the github repository.
         </p>
@@ -42,7 +42,8 @@
 
         <div class="install-section-title">Project Status (Work in Progress)</div>
         <p>
-          This project is still under development and changes frequently.
+          This project is still under development and 
+          new features may be added in the future .
           At this time, no formal release has been issued.
         </p>
 
@@ -83,8 +84,8 @@
           behind a NAT router.
         </p>
         <p>
-          The program has run without errors under Node.js versions 12 and 14
-          and npm version 7.
+          The program has run without errors under Node.js versions 12, 14, and 16
+          and npm versions 7 and 8.
           Other versions of Node.js have not been tried.
         </p>
         <div class="install-section-title">System Requirements (Browser)</div>
@@ -92,9 +93,10 @@
           This HTML, CSS and browser JavaScript was written and debugged
           using the Chrome web browser running under Linux, and using
           the mobile Chrome browser on an Apple iPhone 8 Plus.
-          No other browsers besides Chrome have been tested.
+          Therefore, Chrome is the recommended browser and 
+          other browsers may exhibit minor font and page layout issues.
         </p>
-        <div class="install-section-title">Other Requriements (IRC network)</div>
+        <div class="install-section-title">Other Requirements (IRC network)</div>
         <p>
           The IRC interface was primarily developed and tested using the DALnet
           IRC network. Local testing was performed using ngirc-25 from the
@@ -109,11 +111,11 @@
           from a Linux terminal.
           It is similar to using python, and it includes a package manager, npm,
           similar to using pip in python.
-          Some web developers prefer node, becasue their JavaScript programming
+          Some web developers prefer node, because their JavaScript programming
           knowledge can be used for coding both browser and backend web server
           using the JavaScript language.
           You can check if nodejs is installed by typing
-          &quotnode -v&quot
+          &quot;node -v&quot;
           in your terminal. If installed, the version will be displayed.
           If node is not installed, there are several options:
         </p>
@@ -121,11 +123,11 @@
           To install Node.js, one option is to visit the Node.js website at
           <a href="https://nodejs.org/en/">https://nodejs.org/en/</a>
           where you can download a tar file and compile node from source.
-          The second alternatvie is to use pre-compiled binaries
+          The second alternative is to use pre-compiled binaries
           for Linux that are available from
           <a href="https://github.com/nodesource/distributions">https://github.com/nodesource/distributions</a>.
           Both of these include installation instructions.
-          Depending on your version of Linux, &quotnodejs&quot and &quotnpm&quot may be available
+          Depending on your version of Linux, &quot;nodejs&quot; and &quot;npm&quot; may be available
           as system packages in your Linux distribution, but these may be older versions.
         </p>
         <div class="install-section-title">2 - Clone github repository</div>
@@ -149,8 +151,8 @@ cd irc-hybrid-client
           will be installed using the npm package manager.
         </p>
         <p>
-          The npm package manager library dependencies are specified in the file &quotpackage.json&quot.
-          The dependencies will managed by npm and placed in a folder named &quotnode_modules&quot.
+          The npm package manager library dependencies are specified in the file &quot;package.json&quot;.
+          The dependencies will managed by npm and placed in a folder named &quot;node_modules&quot;.
           Prior to installing dependencies, the environment variable &quotNODE_ENV&QUOT
           should be set to select which dependencies should be included and how
           program output should be logged.
@@ -192,7 +194,7 @@ npm ci
           For the browser to connect, as with any webserver,
           use of TLS requires a registered domain name
           and server TLS certificates that have been signed by a
-          recognized certificate authority. I use the LetsEncrypt certbot.
+          recognized certificate authority. LetsEncrypt certbot is a simple solution.
           Debian includes certbot as an apt package. Assuming you have a domain
           name, the following command would generate a set of certificates
           good for 90 days. Be sure to switch example.com with your domain name.
@@ -203,8 +205,8 @@ npm ci
 sudo certbot certonly --standalone -d abcd.example.com
 </pre></div>
         <p>
-          Since it is recommended to run this program in a non-privledged
-          account using non-privledged ports, it may be necessary to make
+          Since it is recommended to run this program in a non-privileged
+          account using non-privileged ports, it may be necessary to make
           a copy of privkey.pem and fullchain.pem to a local folder
           where the web server will have read access. It is NOT recommended
           to run the IRC client as root, simply for certificate access.
@@ -223,7 +225,8 @@ sudo certbot certonly --standalone -d abcd.example.com
           There are two example configuration files that need to be
           copied to new filenames. They require editing before use.
           The web server reads configuration from these files when the server starts.
-          A utililty program is included to assign the web page login password.
+          A utility program is included to assign the web page login password.
+          There is also a simple web based IRC server list editor.
           Two other sections of this web page contain detail instructions describing
           how to edit the configuration, so it will not be repeated here.
         </p>
@@ -277,7 +280,7 @@ sudo certbot certonly --standalone -d abcd.example.com
           If you prefer to use restricted port 443 for your webserver, it would be recommended
           to place the IRC client on an alternate non-privileged port, then use
           iptables rules to exchange port numbers to 443 as packets cross the firewall.
-          This will improve security by keeping the IRC client in a non-privledged account.
+          This will improve security by keeping the IRC client in a non-privileged account.
           It would be necessary to temporarily remove these iptables rules to
           use certbot to renew the TLS certificates.
         </p>
@@ -292,8 +295,8 @@ sudo certbot certonly --standalone -d abcd.example.com
           When running on a multi-user system, review directory or file permissions
           to properly protect configuration passwords and log files.
           When the program first starts, if not existing, it will create a
-          &quotlogs&quot folder with 0o700 (drwx------) permissions.
-          The &quotcredentials.json&quot and &quotservers.json&quot files
+          &quot;logs&quot; folder with 0o700 (drwx------) permissions.
+          The &quot;credentials.json&quot; and &quot;servers.json&quot; files
           are recommended to be 0o600 (drw-------).
         </p>
 
@@ -304,7 +307,7 @@ sudo certbot certonly --standalone -d abcd.example.com
         </p>
         <p>
           When the program first starts, if not existing, it will create a
-          &quotlogs&quot folder. If you have enabled logging,
+          &quot;logs&quot; folder. If you have enabled logging,
           the log files will be written to this folder in the current working directory.
           Configuration of a custom directory location is not supported in this version.
         </p>
@@ -317,8 +320,15 @@ sudo certbot certonly --standalone -d abcd.example.com
 
           <li>irc.log - This is a log of all IRC server messages in raw format.
           This can become quite large.
-          It is primarily indended for debugging, and should probably be left disabled.</li>
+          It is primarily intended for debugging, and should probably be left disabled.</li>
         </ul>
+        </p>
+        <p>
+          If the program is started with environment variable NODE_ENV=development, 
+          all logging will be redirected to the console. In a production situation 
+          where NODE_ENV=production, log data is written to files in the log folder.
+          For debugging, it is possible to force logging to the console in production 
+          by defining NODE_DEBUG_LOG=1 when starting in the production environment.
         </p>
 
         <div class="install-section-title">10 - Starting the server</div>
@@ -328,11 +338,6 @@ sudo certbot certonly --standalone -d abcd.example.com
         <p>
           The web server will be started from the command line.
           It will remain in the foreground.
-          If NODE_ENV is set to &quotdevelopment&quot, all of the
-          log file output will be sent to the console terminal.
-          If NODE_ENV is set to production, log file output will be
-          sent to files located in the logs folder.
-          Any javascript console.log output that will still go to the console terminal.
         </p>
         <p>
           While running in the foreground, the server can be stopped by
@@ -354,7 +359,7 @@ node bin/www
           There are several ways to
           run the server unattended in the background. One way is to
           append an &quot&amp&quot symbol to the end of the command line.
-          An alternative method is to load the &quotscreen&quot
+          An alternative method is to load the &quot;screen&quot;
           program which allows Linux to run a detached command shell
           that can be reattached at a later time as a console terminal.
         </p>
@@ -364,7 +369,7 @@ node bin/www
           launch to the program into the background by appending an &quot&amp&quot.
           Attempting this from a script or from cron may require full file pathnames.
           Systems may vary, but it would look something like this:
-          &quotnode bin/www &amp>> logs/node.log &&quot
+          &quot;node bin/www &amp>> logs/node.log &&quot;
         </p>
 
         <div class="install-section-title">11 - Minify and bundle (Optional)</div>
@@ -383,7 +388,7 @@ node bin/www
         </p>
         <p>
           In the case where the web page files have been edited, you may want
-          to regenrate a new folder containing replacement minified files for the web page.
+          to regenerate a new folder containing replacement minified files for the web page.
           The there is a separate repository for this called
           <a href="https://github.com/cotarr/irc-hybrid-client-dev-tools">irc-hybrid-client-dev-tools</a>.
           There are complete instructions for use of this utility in the
@@ -393,8 +398,8 @@ node bin/www
 
         <div class="install-section-title">12 - Upgrade Procedure</div>
         <p>
-          This upgrade procedure is for the case where the web server consistes of a
-          cloned git repositiory, copied and edited configuration files, and
+          This upgrade procedure is for the case where the web server consists of a
+          cloned git repository, copied and edited configuration files, and
           packages installed with npm ci, then the web server can be upgraded by
           stopping the server, changing to the repository folder and typing the following:
         </p>
