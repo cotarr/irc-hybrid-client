@@ -1,16 +1,3 @@
-# = = = = = = Development Branch Notes = = = = = =
-
-Git branch: server-list-editor 2022-07-30
-
-Work in progress - Git branch to add web page for edit list of IRC server definitions
-
-- See CHANGELOG.md
-- Status: API at /irc/serverlist - Done
-- Status: Browser editor web page at /irc/serverlist.html - Done
-- Status: Configuration file servers.json property changes - Done.
-- Remaining: Documentation updates.
-
-# = = = = = = = = = = = = = = = = = = = = = = = = =
 # irc-hybrid-client
 
 Single user hybrid IRC client using JavaScript frontend and Node.js/Express backend.
