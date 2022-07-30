@@ -45,7 +45,7 @@ const app = express();
 
 // Irc Client Module
 const ircClient = require('./irc/irc-client');
-const ircServerListvalidations = require('./irc/irc-serverlist-validations');
+const ircServerListValidations = require('./irc/irc-serverlist-validations');
 const ircServerListEditor = require('./irc/irc-serverlist-editor');
 
 // TLS certificate filenames
@@ -501,23 +501,23 @@ if (credentials.disableServerListEditor) {
 } else {
   app.get('/irc/serverlist',
     userAuth.authorizeOrFail,
-    ircServerListvalidations.list,
+    ircServerListValidations.list,
     ircServerListEditor.list);
   app.post('/irc/serverlist',
     userAuth.authorizeOrFail, csrfProtection,
-    ircServerListvalidations.create,
+    ircServerListValidations.create,
     ircServerListEditor.create);
   app.patch('/irc/serverlist',
     userAuth.authorizeOrFail, csrfProtection,
-    ircServerListvalidations.update,
+    ircServerListValidations.update,
     ircServerListEditor.update);
   app.copy('/irc/serverlist',
     userAuth.authorizeOrFail, csrfProtection,
-    ircServerListvalidations.copy,
+    ircServerListValidations.copy,
     ircServerListEditor.copy);
   app.delete('/irc/serverlist',
     userAuth.authorizeOrFail, csrfProtection,
-    ircServerListvalidations.destroy,
+    ircServerListValidations.destroy,
     ircServerListEditor.destroy);
 }
 

@@ -569,6 +569,10 @@ UPDATE
           which are used to perform various tasks.
         </p>
         <p>
+          Error that occur during input validation checking will return 
+          Status 422 Unprocessable entity.
+        </p>
+        <p>
           The fields used for IRC server password and user's NickServ command
           are write only fields. New values may be submitted, but existing values
           are not returned by the API. However, these values are stored
@@ -757,6 +761,7 @@ UPDATE
   should be retrieved using GET /irc/serverlist?index=xxx?lock=1.
   The GET request query parameter &quot;lock=1&quot; will set a lock flag
   with the index value for this record.
+  Successful completion of this request will remove the lock flag automatically.
   A valid CSRF token is required in the request headers as described above.
 </p>
 <p>
