@@ -1,14 +1,14 @@
 # = = = = = = Development Branch Notes = = = = = =
 
-Git branch: server-list-editor 2022-07-28
+Git branch: server-list-editor 2022-07-30
 
-Work in progress - Branch used to develop browser support to edit the IRC server list.
+Work in progress - Git branch to add web page for edit list of IRC server definitions
 
 - See CHANGELOG.md
-- Status: API at /irc/serverlist functional for GET, POST, PATCH, COPY and DELETE (Debug in progress)
-- Status: Browser page at /irc/serverlist.html (Partial functionality, coding in progress)
-- Refactoring of the servers.json configuration file is in progress.
-- Do Not Deploy
+- Status: API at /irc/serverlist - Done
+- Status: Browser editor web page at /irc/serverlist.html - Done
+- Status: Configuration file servers.json property changes - Done.
+- Remaining: Documentation updates.
 
 # = = = = = = = = = = = = = = = = = = = = = = = = =
 # irc-hybrid-client
@@ -23,7 +23,7 @@ Screen capture images are available in the [documentation](https://cotarr.github
 
 ### Project Status (Work in Progress)
 
-This project is still under development and changes frequently.
+This project is still under development and new features may be added in the future.
 At this time, no formal release has been issued.
 
 ### Repository Contents
@@ -89,11 +89,13 @@ cp -v example-servers.json servers.json
 # If multi user system optionally change permissions
 chmod 600 servers.json
 
-# 1) Edit a short name for the server
-# 2) host/port and TLS true/false
+# The following steps are the minimal setup of one IRC server definition.
+# IRC server definitions can also be edited from the web interface.
+# 1) Edit a short name for the server definition
+# 2) IRC server host, port and TLS flags
 # 3) IRC server password (if needed)
-# 4) Initial nick name, user, real name and initial user modes.
-# 5) Preferred list of channels for this server.
+# 4) IRC nick name, user, real name.
+# 5) Optional: Preferred list of channels for this server.
 
 # Configure firewall ports as required.
 
@@ -109,8 +111,9 @@ The program configuration is contained in the JSON file `credentials.json`
 located in the base repository folder. The list of IRC servers and 
 related connection information is stored in the JSON file `servers.json`.
 Changes to program configuration or changes to the IRC server list 
-are performed by manually editing these 2 JSON files in a linux terminal,
-then restarting the server. 
+can be performed by manually editing these 2 JSON files in a linux terminal,
+then restarting the server.
+The list of server definitions can also be edited from the web page.
 Detailed configuration instructions are provided in the 
 [documentation](https://cotarr.github.io/irc-hybrid-client).
 

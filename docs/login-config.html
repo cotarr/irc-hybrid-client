@@ -254,6 +254,41 @@
   "pidFilename": "/home/user1/tmp/ircHybridClient.PID",
 </pre></div>
 
+        <div class="install-section-title">Disable Server List Editor Web Page</div>
+        <p>
+          The boolean property &quot;disableServerListEditor&quot;
+          can be set to true to disable the web server API routes that are 
+          capable to write changes to the servers.json file.
+          When disabled, API calls to /irc/serverlist with methods GET, 
+          POST, PATCH, COPY, and DELETE will return status 405 Method not allowed.
+          This will disable the web page that is used to modify the 
+          list of available IRC server definitions.
+        </p>
+        <p>
+          The capability to disable the interface can be useful to restrict 
+          access of the IRC client to one specific IRC network, or to 
+          control the list of available IRC channel preset buttons.
+          When disabled, a user of the IRC client is still able to specify
+          a unique nickname and real name prior to connect, but the 
+          values would not persist after the web server is restarted.
+        </p>
+        <p>
+          In terms of security risk, when set to true to disable the interface, 
+          all configuration changes would require SSH shell access.
+          No remote configuration changes would be possible from the web page.
+        </p>
+        <p>
+          When set to false the API routes will be active. HTTP requests 
+          will be capable to write changes to the servers.json file,
+          but only within the restrictions of the input validation checks.
+          Authorization to use the API requires user login and a valid 
+          session cookie.
+        </p>
+
+<div class="pre-div"><pre>
+  "disableServerListEditor": false,
+</pre></div>
+
         <div class="install-section-title">Assign Login Password</div>
         <p>
           In the current version of the program, the username and password
@@ -336,6 +371,7 @@ Enter new password:<blue-example>zuwa79xoJxLJ</blue-example>
   "securityContact": "mailto:security@example.com",
   "securityExpires": "Fri, 1 Apr 2022 08:00:00 -0600",
   "pidFilename": "/home/user1/tmp/ircHybridClient.PID",
+  "disableServerListEditor": false,
   "loginUsers": [<yellow-example>
     {
       "userid": 1,

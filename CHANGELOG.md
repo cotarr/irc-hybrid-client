@@ -6,12 +6,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Un-merged 2022-07-28 (Work in progress)
+## Un-merged 2022-07-30 (Work in progress)
 
-
-This is a major upgrade. An independent web page was added to view and edit the list of IRC servers.
+This is a feature upgrade. An independent web page was added to view and edit the list of IRC server definitions.
 An API was added to service the web page for adding, modifying, copying, and deleting IRC servers.
-IRC server definitions include new settings for `disabled`, `proxy`, `reconnect`, and `logging`.
+
+### Upgrade Notes
+
+Upgrade from version 0.1.44 to 0.2.x requires changes to existing configuration 
+files `credentials.json` and `servers.json`.
+The template files example-credentials.json, example-servers.json have been updated.
+
+- credentials.json - New boolean property `disableServerListEditor` to disable the /irc/serverlist API routes
+- servers.json - Bumped servers.json file format to: `"configVersion": 2`
+- servers.json - Eliminated global property `ircAutoReconnect`
+- servers.json - Eliminated global property `rawMessageLog`
+- servers.json - New boolean property `disabled` to disable/hide a server entry from the IRC client [next] and [prev] buttons
+- servers.json - New boolean property `proxy` for a server to enable Socks5 Proxy if available (previously a global setting)
+- servers.json - New boolean property `reconnect` for a server to enable automatic reconnection (previously a global setting)
+- servers.json - New boolean property `logging` for a server to enable write of raw IRC messages to log file (previously a global setting)
 
 ### Added
 
@@ -37,17 +50,6 @@ Browser:
   - Functions for IRC server list editing: GET, POST, PATCH, COPY, DELETE
 
 ### Changed
-
-Configuration:
-
-- credentials.json - New boolean property `disableServerListEditor` to disable the /irc/serverlist API routes
-- servers.json - Bump servers.json file format to: `"configVersion": 2`
-- servers.json - Eliminated global property `ircAutoReconnect`
-- servers.json - Eliminated global property `rawMessageLog`
-- servers.json - New boolean property `disabled` to disable/hide a server entry from the IRC client [next] and [prev] buttons
-- servers.json - New boolean property `proxy` for a server to enable Socks5 Proxy if available (previously a global setting)
-- servers.json - New boolean property `reconnect` for a server to enable automatic reconnection (previously a global setting)
-- servers.json - New boolean property `logging` for a server to enable write of raw IRC messages to log file (previously a global setting)
 
 Server:
 
@@ -84,12 +86,6 @@ Browser:
 - secure/js/webclient04.js - On state change update value of new index input element
 - secure/js/webclient04.js - Added button handler for 'Prev' button
 - secure/js/webclient04.js - Added Connect Button Error when ircServerIndex = -1 on empty serverlist
-
-Minified code:
-
-- Temporary code used to bundle and minify the project is not pushed to github.
-- Added /irc/serverlist.html, .js, .css files added to bundler (gulp). Gulpfile.js not pushed github.
-- Bundled version of in-progress edit is included, but it is not minified to assist debugging.
 
 ## [v0.1.44](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.1.44) 2022-07-13
 
