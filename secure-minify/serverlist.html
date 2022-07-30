@@ -1,175 +1,25 @@
-<!DOCTYPE html>
-<html lang="en" dir="ltr">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1.0">
-    <meta name="csrf-token" content="{{csrfToken}}">
-    <link rel="stylesheet" href="css/serverlist.css">
-    <script src="./js/serverlist.js" defer></script>
-    <title>IRC Server List</title>
-  </head>
-  <body>
-    <noscript>
-      <br>
-      <h1>JavaScript is required to load this page.</h1>
-    </noscript>
-
-    <h1>IRC Server List Editor</h1>
-    
-    <div id="serverListDisabledDiv" hidden>
-      <p>
-        The Server List Editor has been disabled in the 
-        web server configuration file.
-      </p>
-      <a href="/irc/webclient.html">
-        <button>Return to IRC Client...</button>
-      </a>
-    </div>
-
-    <div id="warningVisibilityDiv" hidden>
-      <h2>IRC server connected.</h2>
-      <p>
-        Please disconnect from IRC before loading the IRC Server List Editor.
-      </p>
-      <a href="/irc/webclient.html">
-        <button>Return to IRC Client...</button>
-      </a>
-    </div>
-
-    <div id="listVisibilityDiv">
-      <div class="list-style-div">
-        <div>
-          <a href="/irc/webclient.html">
-            <button>Return to IRC Client...</button>
-          </a>
-          <button id="createNewButton">Create New IRC Server...</button>
-        </div>
-        <div class="vh10"></div>
-        <table border="1" cellpadding="3px">
-          <tbody id="tbodyId">
-          </tbody>
-        </table>
-        <div>
-          <pre id="ircProxyDiv"></pre>
-        </div>
-        <div class="vh20"></div>
-        <div id="showRefreshButtonDiv" hidden>
-          <button id="forceUnlockAll">Force Unlock</button>
-        </div>
-      </div>
-    </div>
-
-    <div id="formVisibilityDiv" hidden>
-      <div class="form-style-div>">
-        <div>
-          <button id="saveNewButton">Save</button>
-          <button id="saveModifiedButton">Save</button>
-          <button id="cancelEditButton">Cancel</button>
-        </div>
-        <div class="vh20"></div>
-        <div class="button-div" hidden>
-          <input type="number" id="indexInputId" value="" readonly>
-          <div class="input-label-right">index</div>
-        </div>
-        <div class="button-div">
-          <input type="checkbox" id="disabledCheckboxId">
-          <div class="input-label-right">Disable/Hide IRC server definition</div>
-        </div>
-        <div class="button-div">
-          <input type="text" id="nameInputId" value="">
-          <div class="input-label-right">Label</div>
-        </div>
- 
-        <div class="vh10"></div>
-
-        <div class="input-group">
-          <h3>IRC Server Connection</h3>
-          <div class="button-div">
-            <input type="text" id="hostInputId" value="">
-            <div class="input-label-right">IRC Server: Host or IP</div>
-          </div>
-          <div class="button-div">
-            <input type="number" id="portInputId" value="">
-            <div class="input-label-right">IRC Server: Port</div>
-          </div>
-          <div class="button-div">
-            <input type="checkbox" id="tlsCheckboxId">
-            <div class="input-label-right">Use TLS</div>
-            <input type="checkbox" id="verifyCheckboxId">
-            <div class="input-label-right">TLS certificate verify</div>
-          </div>
-          <div class="button-div">
-            <input type="checkbox" id="proxyCheckboxId">
-            <div class="input-label-right">Use Socks5 Proxy if available.</div>
-          </div>
-          <div class="button-div">
-            <input type="text" id="passwordInputId" value="">
-            <div class="input-label-right">IRC server password (Optional) </div>
-            <button id="replacePasswordButton">Replace</button>
-          </div>
-        </div>
-
-        <div class="vh20"></div>
-
-        <div class="input-group">
-          <h3>User Settings</h3>
-          <div class="button-div">
-            <input type="text" id="nickInputId" value="">
-            <div class="input-label-right">User IRC nickname</div>
-          </div>
-          <div class="button-div">
-            <input type="text" id="realInputId" value="">
-            <div class="input-label-right">User real name</div>
-          </div>
-          <div class="button-div">
-            <input type="text" id="userInputId" value="">
-            <div class="input-label-right">Unix ident user (for address mask)</div>
-          </div>
-          <div class="button-div">
-            <input type="text" id="modesInputId" value="">
-            <div class="input-label-right">Initial user modes Example: &quot;+i&quot; (Optional)</div>
-          </div>
-        </div>
-
-        <div class="vh20"></div>
-
-        <div class="input-group">
-          <h3>Channel Preset Buttons</h3>
-          <div class="button-div">
-            <input type="text" id="channelListInputId" value="">
-            <div class="input-label-right">IRC Channels, Comma separated list (Optional)</div>
-          </div>
-        </div>
-
-        <div class="vh20"></div>
-
-        <div class="input-group">
-          <h3>IRC Services</h3>
-          <div class="button-div">
-            <input type="text" id="identifyNickInputId" value="">
-            <div class="input-label-right">Nickserv identify nick (Optional) </div>
-          </div>
-          <div class="button-div">
-            <input type="text" id="identifyCommandInputId" value="">
-            <div class="input-label-right">Nickserv identify command (Optional) </div>
-            <button id="replaceIdentifyCommandButton">Replace</button>
-          </div>
-        </div>
-
-        <div class="vh10"></div>
-
-        <div class="button-div">
-          <input type="checkbox" id="autoReconnectCheckboxId">
-          <div class="input-label-right">Automatic Reconnect</div>
-        </div>
-        <div class="button-div">
-          <input type="checkbox" id="loggingCheckboxId">
-          <div class="input-label-right">Log IRC raw server messages</div>
-        </div>
-      </div>
-    </div>
-    <div class="vh20"></div>
-
-    <div class="error-div" id='errorDiv' hidden> </div>
-  </body>
-</html>
+<!DOCTYPE html><html lang="en" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"><meta name="csrf-token" content="{{csrfToken}}">
+<link rel="stylesheet" href="css/serverlist.css"><script src="./js/serverlist.js" defer="defer"></script><title>IRC Server List</title></head><body><noscript><br><h1>
+JavaScript is required to load this page.</h1></noscript><h1>IRC Server List Editor</h1><div id="serverListDisabledDiv" hidden><p>
+The Server List Editor has been disabled in the web server configuration file.</p><a href="/irc/webclient.html"><button>Return to IRC Client...</button></a></div><div id="warningVisibilityDiv" hidden>
+<h2>IRC server connected.</h2><p>Please disconnect from IRC before loading the IRC Server List Editor.</p><a href="/irc/webclient.html"><button>Return to IRC Client...</button></a></div><div 
+id="listVisibilityDiv"><div class="list-style-div"><div><a href="/irc/webclient.html"><button>Return to IRC Client...</button> </a><button id="createNewButton">Create New IRC Server...</button></div>
+<div class="vh10"></div><table border="1" cellpadding="3px"><tbody id="tbodyId"></tbody></table><div><pre id="ircProxyDiv"></pre></div><div class="vh20"></div><div id="showRefreshButtonDiv" hidden>
+<button id="forceUnlockAll">Force Unlock</button></div></div></div><div id="formVisibilityDiv" hidden><div class="form-style-div>"><div><button id="saveNewButton">Save</button> <button 
+id="saveModifiedButton">Save</button> <button id="cancelEditButton">Cancel</button></div><div class="vh20"></div><div class="button-div" hidden><input type="number" id="indexInputId" value="" 
+readonly="readonly"><div class="input-label-right">index</div></div><div class="button-div"><input type="checkbox" id="disabledCheckboxId"><div class="input-label-right">
+Disable/Hide IRC server definition</div></div><div class="button-div"><input type="text" id="nameInputId" value=""><div class="input-label-right">Label</div></div><div class="vh10"></div><div 
+class="input-group"><h3>IRC Server Connection</h3><div class="button-div"><input type="text" id="hostInputId" value=""><div class="input-label-right">IRC Server: Host or IP</div></div><div 
+class="button-div"><input type="number" id="portInputId" value=""><div class="input-label-right">IRC Server: Port</div></div><div class="button-div"><input type="checkbox" id="tlsCheckboxId"><div 
+class="input-label-right">Use TLS</div><input type="checkbox" id="verifyCheckboxId"><div class="input-label-right">TLS certificate verify</div></div><div class="button-div"><input type="checkbox" 
+id="proxyCheckboxId"><div class="input-label-right">Use Socks5 Proxy if available.</div></div><div class="button-div"><input type="text" id="passwordInputId" value=""><div class="input-label-right">
+IRC server password (Optional)</div><button id="replacePasswordButton">Replace</button></div></div><div class="vh20"></div><div class="input-group"><h3>User Settings</h3><div class="button-div"><input
+ type="text" id="nickInputId" value=""><div class="input-label-right">User IRC nickname</div></div><div class="button-div"><input type="text" id="realInputId" value=""><div class="input-label-right">
+User real name</div></div><div class="button-div"><input type="text" id="userInputId" value=""><div class="input-label-right">Unix ident user (for address mask)</div></div><div class="button-div">
+<input type="text" id="modesInputId" value=""><div class="input-label-right">Initial user modes Example: &quot;+i&quot; (Optional)</div></div></div><div class="vh20"></div><div class="input-group">
+<h3>Channel Preset Buttons</h3><div class="button-div"><input type="text" id="channelListInputId" value=""><div class="input-label-right">IRC Channels, Comma separated list (Optional)</div></div>
+</div><div class="vh20"></div><div class="input-group"><h3>IRC Services</h3><div class="button-div"><input type="text" id="identifyNickInputId" value=""><div class="input-label-right">
+Nickserv identify nick (Optional)</div></div><div class="button-div"><input type="text" id="identifyCommandInputId" value=""><div class="input-label-right">Nickserv identify command (Optional)</div>
+<button id="replaceIdentifyCommandButton">Replace</button></div></div><div class="vh10"></div><div class="button-div"><input type="checkbox" id="autoReconnectCheckboxId"><div 
+class="input-label-right">Automatic Reconnect</div></div><div class="button-div"><input type="checkbox" id="loggingCheckboxId"><div class="input-label-right">Log IRC raw server messages</div></div>
+</div></div><div class="vh20"></div><div class="error-div" id="errorDiv" hidden></div></body></html>
