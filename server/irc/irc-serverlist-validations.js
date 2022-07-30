@@ -174,16 +174,19 @@
       'user',
       'real'], 'Require type String and not empty string')
       .isString()
+      .isLength({ min: 0, max: 255 })
       .notEmpty(),
     body([
       'password',
       'identifyCommand'], 'Require type String').optional()
-      .isString(),
+      .isString()
+      .isLength({ min: 0, max: 255 }),
     body([
       'identifyNick',
       'modes',
       'channelList'], 'Require type String')
-      .isString(),
+      .isString()
+      .isLength({ min: 0, max: 255 }),
     //
     // sanitize input
     //
@@ -320,18 +323,21 @@
       'name',
       'nick',
       'user',
-      'real'], 'Require type String and not empty string')
+      'real'], 'Require type String, not empty string')
       .isString()
+      .isLength({ min: 0, max: 255 })
       .notEmpty(),
     body([
       'password',
       'identifyCommand'], 'Require type String').optional()
-      .isString(),
+      .isString()
+      .isLength({ min: 0, max: 255 }),
     body([
       'identifyNick',
       'modes',
       'channelList'], 'Require type String')
-      .isString(),
+      .isString()
+      .isLength({ min: 0, max: 255 }),
     //
     // sanitize input
     //
@@ -444,6 +450,9 @@
         }
         return true;
       }),
+    body(['action'], 'Require type String')
+      .isString()
+      .isLength({ min: 0, max: 255 }),
     oneOf([
       body('action', 'Unrecognized action value').equals('duplicate'),
       body('action', 'Unrecognized action value').equals('move-up')
