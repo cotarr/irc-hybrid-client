@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Un-merged 2022-07-30 (Work in progress)
+## [v0.2.0](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.0) 2022-07-30
 
 This is a feature upgrade. An independent web page was added to view and edit the list of IRC server definitions.
 An API was added to service the web page for adding, modifying, copying, and deleting IRC servers.
