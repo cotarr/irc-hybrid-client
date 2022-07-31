@@ -18,8 +18,8 @@ At this time, no formal release has been issued.
 HTML content is available in both the minified-bundled version and
 the commented development files. HTML content is located in folders `secure-minify/` and `secure/`.
 Selection is determined by the NODE_ENV environment variable.
-The browser download is about 31 kB for minify-bundled version
-with server compression, compared to about 240 kB serving
+The browser download is about 37 kB for minify-bundled version
+with server compression, compared to about 338 kB serving
 from development folders without compression.
 
 The server files are located in the `server/` folder. The server is launched

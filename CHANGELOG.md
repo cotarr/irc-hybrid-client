@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.2.1](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.1) 2022-07-31
+
+- webclient.js, serverlist.js - Minor changes in minified code due to changes in bundler repository irc-hybrid-client-dev-tools.
+- There are no changes to the base code in the un-minified files in the is commit.
+
+Github dependabot identified some dependency security issues in gulp-minify in the alternate tools repository. 
+This required bumping terser from version 3.7.6 to 4.8.1 (See changelog for irc-hybrid-client-dev-tools)
+This has produced some minor differences in the minified code in webclient.js and serverlist.js in irc-hybrid-client.
+This commit is to update the minified code from this change in the other repository.
+
 ## [v0.2.0](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.0) 2022-07-30
 
 This is a feature upgrade. An independent web page was added to view and edit the list of IRC server definitions.
