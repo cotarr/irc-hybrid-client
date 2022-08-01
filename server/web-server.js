@@ -34,6 +34,7 @@ const fs = require('fs');
 
 // express packages
 const express = require('express');
+const rateLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const logger = require('morgan');
@@ -321,6 +322,25 @@ if (credentials.sessionEnableRedis) {
 // -----------------------------------------------------------------
 app.use('/', session(sessionOptions));
 
+// --------------------------------------------
+// Rate limit http requests
+// 100 http request per 10 seconds per IP address
+//
+// This was added to quiet github CodeQL
+// security warning for missing rate-limiter
+// ---------------------------------------------
+const rateLimiter = rateLimit({
+  windowMs: 10000,
+  max: 100,
+  statusCode: 429,
+  message: 'Too many requests',
+  standardHeaders: false,
+  legacyHeaders: false
+});
+if (nodeEnv === 'production') {
+  app.use(rateLimiter);
+}
+
 // ------------------
 // User Login Routes
 // ------------------
@@ -490,13 +510,13 @@ app.get('/irc/test2', userAuth.authorizeOrFail, ircClient.test2Handler);
 if (credentials.disableServerListEditor) {
   app.get('/irc/serverlist', userAuth.authorizeOrFail,
     (req, res) => res.status(405).json({ Error: 'Server List Editor Disabled' }));
-  app.post('/irc/serverlist', userAuth.authorizeOrFail,
+  app.post('/irc/serverlist', userAuth.authorizeOrFail, csrfProtection,
     (req, res) => res.status(405).json({ Error: 'Server List Editor Disabled' }));
-  app.patch('/irc/serverlist', userAuth.authorizeOrFail,
+  app.patch('/irc/serverlist', userAuth.authorizeOrFail, csrfProtection,
     (req, res) => res.status(405).json({ Error: 'Server List Editor Disabled' }));
-  app.copy('/irc/serverlist', userAuth.authorizeOrFail,
+  app.copy('/irc/serverlist', userAuth.authorizeOrFail, csrfProtection,
     (req, res) => res.status(405).json({ Error: 'Server List Editor Disabled' }));
-  app.delete('/irc/serverlist', userAuth.authorizeOrFail,
+  app.delete('/irc/serverlist', userAuth.authorizeOrFail, csrfProtection,
     (req, res) => res.status(405).json({ Error: 'Server List Editor Disabled' }));
 } else {
   app.get('/irc/serverlist',
