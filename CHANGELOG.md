@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Next 2022-08-02
+
+This is a feature upgrade. Optional functionality has been added to automatically 
+save and restore the IRC message cache across web server restarts.
+
+### Added
+
+- server/irc/irc-client-cache.js - Added function triggered by SIGINT and SIGTERM that asynchronously writes the cache file, then process.exit(0). The JSON encoded cache includes timestamp, cache pointer, and message data converted to an array of type utf-8 String to file `logs/savedMessageCache.json`. 
+- server/irc/irc-client-cache.js - Added javascript to run on web server restart to asynchronously read the cache file. If the timestamp age is
+300 seconds or less, the cache pointer and cache data is restored as Array of type Buffer. Cache data is then removed from the file.
+- example-credentials.json - Added new property `enableTerminateSignals: false` used to enable auto-save and restore of message cache across web server restarts. In the case of verson upgrade, if the new property is missing from the configuration, the auto-save will not be enabled, but no errors are thrown for missing property.
+- package.json, .eslintrc.js - Upgrade eslint to Version 8 due to deprecated dependencies in older version of eslint.
+
 ## [v0.2.2](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.2) 2022-08-01
 
 - server/web-server.js - Add express-rate-limit set initially to 100 request per 10 seconds per IP address. This was added to address a GitHub CodeQL security issue.
