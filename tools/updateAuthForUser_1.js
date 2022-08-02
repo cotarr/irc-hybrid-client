@@ -57,7 +57,7 @@ const _sanatizeString = function (inString) {
     'abcdefghijklmnoqprstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   if ((typeof inString === 'string') && (inString.length > 0)) {
     for (let i = 0; i < inString.length; i++) {
-      let allowedCharIndex = allowedChars.indexOf(inString[i]);
+      const allowedCharIndex = allowedChars.indexOf(inString[i]);
       if (allowedCharIndex > -1) {
         sanitizedString += allowedChars[allowedCharIndex];
       }
@@ -91,17 +91,17 @@ getPass.question('Enter new user:', function (user) {
     }
     getPass.question('\nEnter new password:', function (password) {
       // Unicode characters can be up to 4 bytes, bcrypt has maximum input 72 characters.
-      let uint8PasswordArray = new TextEncoder('utf8').encode(password);
+      const uint8PasswordArray = new TextEncoder('utf8').encode(password);
       if (uint8PasswordArray.length > 72) {
         console.log('Error: Exceeded maximum password length 72 bytes');
         process.exit(1);
       }
       password = _removeCRLF(password);
-      let hash = bcrypt.hashSync(password, 10);
+      const hash = bcrypt.hashSync(password, 10);
       credentials.loginUsers[0].user = user;
       credentials.loginUsers[0].name = name;
       credentials.loginUsers[0].hash = hash;
-      let filename = '../credentials.json';
+      const filename = '../credentials.json';
       fs.writeFileSync(filename, JSON.stringify(credentials, null, 2) + '\n', {
         encoding: 'utf8',
         mode: 0o600,
