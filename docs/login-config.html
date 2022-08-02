@@ -292,6 +292,83 @@
   "disableServerListEditor": false,
 </pre></div>
 
+
+        <div class="install-section-title">Restore Message Cache After Web Server Restart</div>
+        <p>
+          The web server includes optional code that can be used to save and reload
+          a copy of the IRC message cache across web server restarts.
+        </p>
+        <p>
+          When enabled in the credentials.json file, Unix signals SIGINT and SIGTERM 
+          will cause the web server to asynchronously write the cache file, then exit with status 0.
+          The JSON encoded cache includes timestamp, cache pointer, and message 
+          data converted to an array of type utf-8 String to file `logs/savedMessageCache.json`. 
+        </p>
+        <p>
+          As the web server is restarted, it will to asynchronously read the cache file. 
+          If the timestamp age is 300 seconds or less (5 minutes),
+          the cache pointer and cache data is restored as Array of type Buffer. 
+          Cache data is then removed from the file.
+        </p>
+        <p>
+          Issues: In the case where an IRC channel window is opened after the IRC cache is 
+          restored, it may be necessary use the [Refresh] button. The IRC message cache 
+          contains raw IRC server messages, and refreshing will re-parse the message cache 
+          and extract messages for the intended IRC channel window.
+        </p>
+        <p>
+          Example of File Format:
+        </p>
+<div class="pre-div"><pre>
+{
+  "timestamp":1659402194,
+  "hasBeenUsed": false,
+  "cacheInPointer": 44,
+  "cacheArray": [
+    "UTF-8 String",
+    "UTF-8 String",
+        ...
+    "UTF-8 String",
+    null,
+    null,
+        ...
+    null
+  ]
+}
+</pre></div>
+
+        <p>
+          This feature may be used to write bash scripts
+          to restart the web server. It is up to the user
+          to write his own script, and this is only an 
+          example to get you started.
+          Assuming the &quot;pidFilename&quot; was configured
+          in the credentials.json file, the web server Unix process PID
+          number will be saved in that file when the web server starts.
+          A bash script can read the PID number from the file
+          and send the kill signal to the web server's process.
+        </p>
+<div class="pre-div"><pre>
+IRC_HYBRID_CLIENT_PATH=$HOME/tmp/irc-hybrid-client.PID
+PID_NUMBER=$(cat $IRC_HYBRID_CLIENT_PATH)
+if [ -n "$PID_NUMBER" ] ; then
+  echo "Sending SIGTERM to $PID_NUMBER irc-hybrid-client"
+  kill -SIGTERM $PID_NUMBER
+fi
+</pre></div>
+
+        <p>
+          In the file example-credentials.json, a new boolean
+          property `enableTerminateSignals` will enable auto-save
+          and restore of message cache across web server restarts.
+          In the case where the property is missing from the configuration, 
+          the auto-save will not be enabled, but no errors are thrown for missing property.         
+        </p>
+<div class="pre-div"><pre>
+  "enableTerminateSignals": true,
+</pre></div>
+
+
         <div class="install-section-title">Assign Login Password</div>
         <p>
           In the current version of the program, the username and password
