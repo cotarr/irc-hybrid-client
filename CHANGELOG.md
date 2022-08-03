@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Next 2022-08-03
+## [v0.2.3](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.3) 2022-08-03
 
 This is a feature upgrade. Optional functionality has been added to automatically 
 save and restore the IRC message cache across web server restarts.
