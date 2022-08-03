@@ -6,10 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Next 2022-08-02
+## Next 2022-08-03
 
 This is a feature upgrade. Optional functionality has been added to automatically 
 save and restore the IRC message cache across web server restarts.
+Independently includes minor code debug and security improvements as listed below.
 
 ### Added
 
@@ -23,10 +24,13 @@ Server:
 
 Browser:
 
-- secure/js/webclient06.js - During creation of new IRC channel element, added delay timer to request entire message cache be re-sent and parsed for IC messages associated with the selected IRC channel, then add matching messages to the channel textarea element.
+- secure/js/webclient06.js - During creation of new IRC channel element, added delay timer to request entire message cache be re-sent and parsed for IRC messages associated with the selected IRC channel, then add matching messages to the channel textarea element.
 
 ### Changed
 - server/irc/irc-client-log.js (+others), all log files change permission from 644 to 600 when creating new log files.
+- secure/serverlist.html - Add text warning notice that passwords will stored in clear text to IRC server list editing form.
+- secure/js/serverlist.js - Set visibility of div elements to show password warning.
+- secure/js/serverlist.js - For data validation errors on IRC server list editor page, page automatically scrolls to bottom to see the error message.
 - package.json, .eslintrc.js - Upgrade eslint to Version 8 due to deprecated dependencies in older version of eslint.
 - package.json - add `tools/*.js` to .eslintrc.js (was omitted by mistake)
 - tools/updateAuthForUser_1.js - Syntax linting, no code changes.

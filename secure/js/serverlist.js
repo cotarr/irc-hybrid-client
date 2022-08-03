@@ -72,6 +72,8 @@ const _showError = (errorString) => {
   errorMessageEl.textContent = errorString || 'Error: unknown error (4712)';
   errorDivEl.appendChild(errorMessageEl);
   document.getElementById('showRefreshButtonDiv').removeAttribute('hidden');
+  // scroll to bottom of page to show error
+  window.scrollTo(0, document.querySelector('body').scrollHeight);
 };
 
 /**
@@ -236,6 +238,8 @@ const populateIrcServerForm = (data) => {
     document.getElementById('warningVisibilityDiv').setAttribute('hidden', '');
     document.getElementById('listVisibilityDiv').setAttribute('hidden', '');
     document.getElementById('formVisibilityDiv').removeAttribute('hidden');
+    document.getElementById('serverPasswordWarningDiv').setAttribute('hidden', '');
+    document.getElementById('nickservCommandWarningDiv').setAttribute('hidden', '');
     document.getElementById('indexInputId').value = data.index.toString();
     if (data.disabled) {
       document.getElementById('disabledCheckboxId').checked = true;
@@ -275,6 +279,8 @@ const populateIrcServerForm = (data) => {
     document.getElementById('identifyNickInputId').value = data.identifyNick;
     document.getElementById('identifyCommandInputId').setAttribute('disabled', '');
     document.getElementById('identifyCommandInputId').value = ('(hidden)');
+    document.getElementById('serverPasswordWarningDiv').setAttribute('hidden', '');
+    document.getElementById('nickservCommandWarningDiv').setAttribute('hidden', '');
     document.getElementById('nickInputId').value = data.nick;
     document.getElementById('userInputId').value = data.user;
     document.getElementById('realInputId').value = data.real;
@@ -562,6 +568,7 @@ const checkErrorAndCloseEdit = (data) => {
 document.getElementById('replacePasswordButton').addEventListener('click', () => {
   document.getElementById('passwordInputId').removeAttribute('disabled');
   document.getElementById('passwordInputId').value = '';
+  document.getElementById('serverPasswordWarningDiv').removeAttribute('hidden');
 });
 
 /**
@@ -570,6 +577,7 @@ document.getElementById('replacePasswordButton').addEventListener('click', () =>
 document.getElementById('replaceIdentifyCommandButton').addEventListener('click', () => {
   document.getElementById('identifyCommandInputId').removeAttribute('disabled');
   document.getElementById('identifyCommandInputId').value = '';
+  document.getElementById('nickservCommandWarningDiv').removeAttribute('hidden');
 });
 
 /**
@@ -586,6 +594,8 @@ document.getElementById('createNewButton').addEventListener('click', () => {
       document.getElementById('warningVisibilityDiv').setAttribute('hidden', '');
       document.getElementById('listVisibilityDiv').setAttribute('hidden', '');
       document.getElementById('formVisibilityDiv').removeAttribute('hidden');
+      document.getElementById('serverPasswordWarningDiv').setAttribute('hidden', '');
+      document.getElementById('nickservCommandWarningDiv').setAttribute('hidden', '');
     })
     .catch((err) => {
       _showError(err.toString() || err);
@@ -669,12 +679,14 @@ document.getElementById('forceUnlockAll').addEventListener('click', () => {
 _clearError();
 fetchIrcState()
   .then((data) => {
-    console.log(JSON.stringify(data, null, 2));
+    // console.log(JSON.stringify(data, null, 2));
     if ((data.ircConnected) || (data.ircConnecting)) {
       document.getElementById('serverListDisabledDiv').setAttribute('hidden', '');
       document.getElementById('warningVisibilityDiv').removeAttribute('hidden');
       document.getElementById('listVisibilityDiv').setAttribute('hidden', '');
       document.getElementById('formVisibilityDiv').setAttribute('hidden', '');
+      document.getElementById('serverPasswordWarningDiv').setAttribute('hidden', '');
+      document.getElementById('nickservCommandWarningDiv').setAttribute('hidden', '');
       Promise.resolve({ serverArray: [] });
     } else {
       if (data.enableSocks5Proxy) {
@@ -695,6 +707,8 @@ fetchIrcState()
       document.getElementById('warningVisibilityDiv').setAttribute('hidden', '');
       document.getElementById('listVisibilityDiv').setAttribute('hidden', '');
       document.getElementById('formVisibilityDiv').setAttribute('hidden', '');
+      document.getElementById('serverPasswordWarningDiv').setAttribute('hidden', '');
+      document.getElementById('nickservCommandWarningDiv').setAttribute('hidden', '');
     } else {
       _showError(err.toString() || err);
       console.log(err);

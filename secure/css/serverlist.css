@@ -38,6 +38,14 @@ button[disabled] {
   padding-bottom: 10px;
 }
 
+.yellow-warning-div {
+  background-color: yellow;
+  border: 1px solid black;
+  border-radius: 7px;
+  margin-top: 10px;
+  padding: 10px;
+}
+
 .error-div {
   color: white;
   background-color: red;

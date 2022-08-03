@@ -103,9 +103,15 @@
             <div class="input-label-right">Use Socks5 Proxy if available.</div>
           </div>
           <div class="button-div">
-            <input type="text" id="passwordInputId" value="">
-            <div class="input-label-right">IRC server password (Optional) </div>
-            <button id="replacePasswordButton">Replace</button>
+            <div>
+              <input type="text" id="passwordInputId" value="">
+              <div class="input-label-right">IRC server password (Optional) </div>
+              <button id="replacePasswordButton">Replace</button>
+            </div>
+            <div class="yellow-warning-div" id="serverPasswordWarningDiv">
+              Note: IRC server passwords will be stored unencrypted in clear text
+              in &quot;servers.json&quot; located in the base folder of the web server.
+            </div>
           </div>
         </div>
 
@@ -149,11 +155,17 @@
             <input type="text" id="identifyNickInputId" value="">
             <div class="input-label-right">Nickserv identify nick (Optional) </div>
           </div>
-          <div class="button-div">
-            <input type="text" id="identifyCommandInputId" value="">
-            <div class="input-label-right">Nickserv identify command (Optional) </div>
-            <button id="replaceIdentifyCommandButton">Replace</button>
-          </div>
+            <div class="button-div">
+              <div>
+                <input type="text" id="identifyCommandInputId" value="">
+                <div class="input-label-right">Nickserv identify command (Optional) </div>
+                <button id="replaceIdentifyCommandButton">Replace</button>
+              </div>
+              <div class="yellow-warning-div" id="nickservCommandWarningDiv">
+                Note: NickServ command including any passwords will be stored unencrypted in clear text
+                in &quot;servers.json&quot; located in the base folder of the web server.
+              </div>
+            </div>
         </div>
 
         <div class="vh10"></div>
@@ -171,5 +183,6 @@
     <div class="vh20"></div>
 
     <div class="error-div" id='errorDiv' hidden> </div>
+    <div class="vh20"></div>
   </body>
 </html>
