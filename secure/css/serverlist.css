@@ -45,6 +45,14 @@ button[disabled] {
   margin-top: 10px;
   padding: 10px;
 }
+.white-example-div {
+  background-color: white;
+  border: 1px solid black;
+  display: inline-block;
+  margin-top: 3px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
 
 .error-div {
   color: white;

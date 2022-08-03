@@ -28,9 +28,11 @@ Browser:
 
 ### Changed
 - server/irc/irc-client-log.js (+others), all log files change permission from 644 to 600 when creating new log files.
+- secure/serverlist.html - Add in-form instructions for use of form.
 - secure/serverlist.html - Add text warning notice that passwords will stored in clear text to IRC server list editing form.
 - secure/js/serverlist.js - Set visibility of div elements to show password warning.
 - secure/js/serverlist.js - For data validation errors on IRC server list editor page, page automatically scrolls to bottom to see the error message.
+- secure/css/serverlist.css - Misc style classes
 - package.json, .eslintrc.js - Upgrade eslint to Version 8 due to deprecated dependencies in older version of eslint.
 - package.json - add `tools/*.js` to .eslintrc.js (was omitted by mistake)
 - tools/updateAuthForUser_1.js - Syntax linting, no code changes.

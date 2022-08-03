@@ -108,9 +108,16 @@
               <div class="input-label-right">IRC server password (Optional) </div>
               <button id="replacePasswordButton">Replace</button>
             </div>
-            <div class="yellow-warning-div" id="serverPasswordWarningDiv">
-              Note: IRC server passwords will be stored unencrypted in clear text
-              in &quot;servers.json&quot; located in the base folder of the web server.
+            <div id="serverPasswordWarningDiv">
+              <ul>
+                <li>Enter new IRC server password, then press [Save] button</li>
+                <li>To clear previous entry, leave blank and press [Save] button</li>
+                <li>To abort changing this value, press [Cancel] button above</li>
+              </ul>
+              <div class="yellow-warning-div">
+                Note: IRC server passwords will be stored unencrypted in clear text
+                in &quot;servers.json&quot; located in the base folder of the web server.
+              </div>
             </div>
           </div>
         </div>
@@ -145,6 +152,9 @@
             <input type="text" id="channelListInputId" value="">
             <div class="input-label-right">IRC Channels, Comma separated list (Optional)</div>
           </div>
+          <ul>
+            <li>Example: <div class="white-example-div">#coolchannel, #lamechannel, #helpchannel</div></li>
+          </ul>
         </div>
 
         <div class="vh20"></div>
@@ -161,9 +171,19 @@
                 <div class="input-label-right">Nickserv identify command (Optional) </div>
                 <button id="replaceIdentifyCommandButton">Replace</button>
               </div>
-              <div class="yellow-warning-div" id="nickservCommandWarningDiv">
-                Note: NickServ command including any passwords will be stored unencrypted in clear text
-                in &quot;servers.json&quot; located in the base folder of the web server.
+              <div id="nickservCommandWarningDiv">
+                <ul>
+                  <li>Enter new value, then press [Save] button</li>
+                  <li>To clear previous entry, leave blank and press [Save] button</li>
+                  <li>To abort changing this value, press [Cancel] button above</li>
+                  <li>Example command: <div class="white-example-div">PRIVMSG NickServ :IDENTIFY xxxxxxxx</div></li>
+                  <li>Example command: <div class="white-example-div">PRIVMSG NickServ@services.dal.net :IDENTIFY xxxxxxxx</div></li>
+                  <li>Example command: <div class="white-example-div">NICKSERV IDENTIFY xxxxxxxx</div></li>
+                </ul>
+                <div class="yellow-warning-div">
+                  Note: NickServ command including any passwords will be stored unencrypted in clear text
+                  in &quot;servers.json&quot; located in the base folder of the web server.
+                </div>
               </div>
             </div>
         </div>
