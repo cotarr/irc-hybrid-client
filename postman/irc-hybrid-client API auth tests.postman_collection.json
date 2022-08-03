@@ -1303,6 +1303,20 @@
 							"",
 							"pm.test(\"Response has body\", function () {",
 							"    pm.response.to.have.body();",
+							"});",
+							"",
+							"pm.test(\"Extract CSRF token to global variables\", function () {",
+							"    let body = pm.response.text();",
+							"    let bodyArray = body.split('\\n');",
+							"    let csrfToken = '';",
+							"    for (let i = 0; i < bodyArray.length; i++) {",
+							"        let splitByQuote = bodyArray[i].split('\"');",
+							"        if ((splitByQuote.length === 5) && (splitByQuote[1] === 'csrf-token')) {",
+							"            csrfToken = splitByQuote[3];",
+							"        }",
+							"    } // next i",
+							"    console.log('/login has set global variable csrf_token to: ', csrfToken);",
+							"    pm.globals.set('csrf_token', csrfToken);",
 							"});"
 						],
 						"type": "text/javascript"
@@ -1332,7 +1346,7 @@
 			"response": []
 		},
 		{
-			"name": "3.4 /irc/getircstate verify access",
+			"name": "3.4 /irc/getircstate verify access get CSRF token",
 			"event": [
 				{
 					"listen": "test",
