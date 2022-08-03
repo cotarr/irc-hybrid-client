@@ -13,16 +13,17 @@ save and restore the IRC message cache across web server restarts.
 
 ### Added
 
+Server:
+
 - server/irc/irc-client-cache.js - Added function triggered by SIGINT and SIGTERM that asynchronously writes the cache file, then process.exit(0). The JSON encoded cache includes timestamp, cache pointer, and message data converted to an array of type utf-8 String to file `logs/savedMessageCache.json`. 
 - server/irc/irc-client-cache.js - Added javascript to run on web server restart to asynchronously read the cache file. If the timestamp age is
 300 seconds or less, the cache pointer and cache data is restored as Array of type Buffer. Cache data is then removed from the file.
 - example-credentials.json - Added new property `enableTerminateSignals: false` used to enable auto-save and restore of message cache across web server restarts. In the case of version upgrade, if the new property is missing from the configuration, the auto-save will not be enabled, but no errors are thrown for missing property.
 - docs/login-config.html updated help files.
 
-Possible Issue: In the case where an IRC channel window is opened after the IRC cache is 
-restored, it may be necessary use the [Refresh] button. The IRC message cache 
-contains raw IRC server messages, and refreshing will re-parse the message cache 
-and extract messages for the intended IRC channel window.
+Browser:
+
+- secure/js/webclient06.js - During creation of new IRC channel element, added delay timer to request entire message cache be re-sent and parsed for IC messages associated with the selected IRC channel, then add matching messages to the channel textarea element.
 
 ### Changed
 - package.json, .eslintrc.js - Upgrade eslint to Version 8 due to deprecated dependencies in older version of eslint.

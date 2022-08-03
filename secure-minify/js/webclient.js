@@ -488,6 +488,7 @@ console.log('createChannelEl: channel already exist');return}const defaultHeight
 ;channelMainSectionEl.appendChild(channelTopSpacerDivEl);channelMainSectionEl.appendChild(channelBottomDivEl)
 ;if(channelContainerDivEl.firstChild)channelContainerDivEl.insertBefore(channelMainSectionEl,channelContainerDivEl.firstChild);else channelContainerDivEl.appendChild(channelMainSectionEl)
 ;if(ircState.channelStates[initIrcStateIndex].joined)hideRawMessageWindow();let activityIconInhibitTimer=0;setInterval((function(){if(activityIconInhibitTimer>0)activityIconInhibitTimer--}),1e3)
+;setTimeout((function(){if(0===channelTextAreaEl.value.length)if(!webState.cacheReloadInProgress)document.dispatchEvent(new CustomEvent('update-from-cache',{bubbles:true}))}),750)
 ;channelHideButtonEl.addEventListener('click',(function(){if(channelMainSectionEl.hasAttribute('opened')){channelMainSectionEl.removeAttribute('opened');channelMainSectionEl.removeAttribute('zoom')
 }else{channelMainSectionEl.setAttribute('opened','');channelMainSectionEl.removeAttribute('zoom');clearLastZoom()}updateVisibility()}));channelTallerButtonEl.addEventListener('click',(function(){
 const newRows=parseInt(channelTextAreaEl.getAttribute('rows'))+10;channelTextAreaEl.setAttribute('rows',newRows.toString());channelNamesDisplayEl.setAttribute('rows',newRows.toString())
