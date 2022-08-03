@@ -26,6 +26,7 @@ Browser:
 - secure/js/webclient06.js - During creation of new IRC channel element, added delay timer to request entire message cache be re-sent and parsed for IC messages associated with the selected IRC channel, then add matching messages to the channel textarea element.
 
 ### Changed
+- server/irc/irc-client-log.js (+others), all log files change permission from 644 to 600 when creating new log files.
 - package.json, .eslintrc.js - Upgrade eslint to Version 8 due to deprecated dependencies in older version of eslint.
 - package.json - add `tools/*.js` to .eslintrc.js (was omitted by mistake)
 - tools/updateAuthForUser_1.js - Syntax linting, no code changes.

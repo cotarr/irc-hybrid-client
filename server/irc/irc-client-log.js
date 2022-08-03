@@ -69,7 +69,7 @@
         logEntry + '\n',
         {
           encoding: 'utf8',
-          mode: 0o644,
+          mode: 0o600,
           flag: 'a'
         },
         function (err) {
@@ -104,7 +104,7 @@
           logEntry + '\n',
           {
             encoding: 'utf8',
-            mode: 0o644,
+            mode: 0o600,
             flag: 'a'
           },
           function (err) {

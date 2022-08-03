@@ -131,7 +131,7 @@ if ((nodeEnv === 'development') || (nodeDebugLog)) {
   app.use(logger(':date[iso] :remote-addr :status :method :http-version :req[host]:url', {
     stream: fs.createWriteStream(accessLogFilename, {
       encoding: 'utf8',
-      mode: 0o644,
+      mode: 0o600,
       flags: 'a'
     }),
     // Log only errors, comment out this next part to see all traffic
