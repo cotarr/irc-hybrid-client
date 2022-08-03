@@ -106,7 +106,7 @@
   // ---------------------------------------------------------
   // Optional Code Section
   //
-  // Enabled by credentials.enableTerminateSignals === true
+  // Enabled by credentials.persistIrcMessageCache === true
   //
   // In this section of the code, functionality has been added
   // to automatically save and restore the IRC message cache
@@ -199,7 +199,7 @@
   // The program will exit with status 0 if the file is successfully saved.
   //
   let acceptSignalsFlag = true;
-  if (credentials.enableTerminateSignals) {
+  if (credentials.persistIrcMessageCache) {
     process.on('SIGINT', function (signal) {
       if (acceptSignalsFlag) {
         acceptSignalsFlag = false;
@@ -302,7 +302,7 @@
         }
       );
     })();
-  } // if (credentials.enableTerminateSignals)
+  } // if (credentials.persistIrcMessageCache)
 
   module.exports = {
     eraseCache: eraseCache,
