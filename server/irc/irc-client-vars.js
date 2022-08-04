@@ -83,7 +83,7 @@
 
   // Time in seconds
   const ircSocketConnectingTimeout = 10;
-  const ircRegistrationTimeout = 30;
+  const ircRegistrationTimeout = 50;
 
   // Time in seconds
   let activityWatchdogTimerSeconds = 0;
