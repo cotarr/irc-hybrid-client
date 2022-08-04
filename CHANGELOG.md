@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Nexxt 2022-08-04
+
+### Changed
+- server/irc/irc-client.js - Added existing `servers` object to global vars object to allow global access to the server list. Instances of servers.xxxxx are now vars.servers.xxxxx. Before this change, scope of servers object was local to irc-client.js.
+
 ## [v0.2.4](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.4) 2022-08-04
 
 ### Changed
