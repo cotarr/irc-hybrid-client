@@ -46,6 +46,8 @@
     global.sendToBrowser('UPDATE\r\n');
   };
 
+  let nickservIdentifyActiveFlag = false;
+
   // ----------------------------------------------------------------
   // Internal function to parse one line of message from IRC server
   //
@@ -535,6 +537,8 @@
                 if ((vars.ircState.ircConnected) &&
                   (vars.ircState.nickName === configNick) &&
                   (vars.ircState.nickName === vars.nsIdentifyNick)) {
+                  // This is a raw server message
+                  // Example: "PRIVMSG NickServ :IDENTIFY xxxxxxxx"
                   ircWrite.writeSocket(socket, vars.nsIdentifyCommand);
                 }
               }, 1500);
@@ -673,6 +677,10 @@
             (vars.ircState.nickName === alternateNick)) {
             //
             // Recover configuration nickname
+            nickservIdentifyActiveFlag = true;
+            setTimeout(function () {
+              nickservIdentifyActiveFlag = false;
+            }, 10000);
             setTimeout(function () {
               _cancelNickRecovery();
               ircWrite.writeSocket(socket, 'NICK ' + configNick);
@@ -869,7 +877,9 @@
         }
         // To initiate NickServ registration after /NICK xxxxx command
         // in the case where new nickname equals the default configured nickname for server
-        if ((vars.nsIdentifyNick.length > 0) && (vars.nsIdentifyCommand.length > 0)) {
+        if ((vars.nsIdentifyNick.length > 0) &&
+          (vars.nsIdentifyCommand.length > 0) &&
+          (nickservIdentifyActiveFlag)) {
           setTimeout(function () {
             const configNick = vars.servers.serverArray[vars.ircState.ircServerIndex].nick;
             const alternateNick = vars.servers.serverArray[vars.ircState.ircServerIndex].altNick;
@@ -881,6 +891,10 @@
               (nextNick === configNick) &&
               (vars.ircState.nickName === configNick) &&
               (vars.ircState.nickName === vars.nsIdentifyNick)) {
+              // prevent multiple IDENTIFY actions
+              nickservIdentifyActiveFlag = false;
+              // This is a raw server message
+              // Example: "PRIVMSG NickServ :IDENTIFY xxxxxxxx"
               ircWrite.writeSocket(socket, vars.nsIdentifyCommand);
             }
           }, 500);
@@ -944,6 +958,10 @@
             (alternateNick.length > 0) &&
             (parsedMessage.nick === configNick) &&
             (vars.ircState.nickName === alternateNick)) {
+            nickservIdentifyActiveFlag = true;
+            setTimeout(function () {
+              nickservIdentifyActiveFlag = false;
+            }, 10000);
             setTimeout(function () {
               _cancelNickRecovery();
               ircWrite.writeSocket(socket, 'NICK ' + configNick);
