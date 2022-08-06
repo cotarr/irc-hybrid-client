@@ -940,11 +940,9 @@
           const configNick = vars.servers.serverArray[vars.ircState.ircServerIndex].nick;
           const alternateNick = vars.servers.serverArray[vars.ircState.ircServerIndex].altNick;
           if (
+            // Empty string is disabled
             (alternateNick.length > 0) &&
-            (parsedMessage.params) &&
-            // nick of QUIT message
-            (parsedMessage.params[0]) &&
-            (parsedMessage.params[0] === configNick) &&
+            (parsedMessage.nick === configNick) &&
             (vars.ircState.nickName === alternateNick)) {
             setTimeout(function () {
               _cancelNickRecovery();
@@ -979,8 +977,9 @@
 
   let nickRecoveryWhoisTimer = 0;
   let nickRecoveryWhoisCounter = 0;
-  const nickRecoveryWhoisDuration = 30;
-  const nickRecoveryWhoisCountLimit = 5;
+  // Set every 2 minutes for 2 hours
+  const nickRecoveryWhoisDuration = 120;
+  const nickRecoveryWhoisCountLimit = 60;
 
   function _activateNickRecovery () {
     nickRecoveryWhoisTimer = nickRecoveryWhoisDuration;
