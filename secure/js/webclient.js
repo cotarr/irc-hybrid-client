@@ -961,6 +961,8 @@ function getIrcState (callback) {
         webState.ircConnecting = false;
       }
       if (!ircState.ircConnected) {
+        // Also needed disconnected to handle alternate nickname and recovery
+        document.getElementById('nickNameInputId').value = ircState.nickName;
         // If no server list, show message and link button to add new servers
         if (ircState.ircServerIndex === -1) {
           document.getElementById('emptyServerListDiv').removeAttribute('hidden');

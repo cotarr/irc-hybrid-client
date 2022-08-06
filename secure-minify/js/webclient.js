@@ -177,7 +177,8 @@ document.getElementById('nickNameInputId').value=ircState.nickName;document.getE
 document.getElementById('headerServer').textContent=ircState.ircServerName;document.getElementById('headerUser').textContent=' ('+ircState.nickName+')'
 ;document.getElementById('nickNameInputId').value=ircState.nickName;document.getElementById('userNameInputId').value=ircState.userName
 ;document.getElementById('realNameInputId').value=ircState.realName;document.getElementById('userModeInputId').value=ircState.userMode;webState.ircConnecting=false}if(!ircState.ircConnected){
-if(-1===ircState.ircServerIndex)document.getElementById('emptyServerListDiv').removeAttribute('hidden');else document.getElementById('emptyServerListDiv').setAttribute('hidden','')
+document.getElementById('nickNameInputId').value=ircState.nickName
+;if(-1===ircState.ircServerIndex)document.getElementById('emptyServerListDiv').removeAttribute('hidden');else document.getElementById('emptyServerListDiv').setAttribute('hidden','')
 ;setVariablesShowingIRCDisconnected();document.title='irc-hybrid-client'}if(lastConnectErrorCount!==ircState.count.ircConnectError){lastConnectErrorCount=ircState.count.ircConnectError
 ;if(ircState.count.ircConnectError>0)if(webState.count.webStateCalls>1)showError('An IRC Server connection error occurred');webState.ircConnecting=false}
 document.dispatchEvent(new CustomEvent('irc-state-changed',{bubbles:true,detail:{}}));updateDivVisibility()

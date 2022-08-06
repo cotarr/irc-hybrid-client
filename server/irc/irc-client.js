@@ -287,6 +287,16 @@
     vars.ircServerReconnectAwayString = '';
   }; // onDisconnectGrabState()
 
+  // If IRC becomes disconnected while using configured
+  // alternate nickname, reset to primary nickname on disconnect.
+  const onDisconnectResetPrimaryNick = function () {
+    const configNick = vars.servers.serverArray[vars.ircState.ircServerIndex].nick;
+    const alternateNick = vars.servers.serverArray[vars.ircState.ircServerIndex].altNick;
+    if ((alternateNick.length > 0) && (vars.ircState.nickName === alternateNick)) {
+      vars.ircState.nickName = configNick;
+    }
+  };
+
   // -------------------------------------------
   //  On Ready Event Handler (Internal function)
   //
@@ -566,6 +576,7 @@
             onDisconnectGrabState();
           }
         }
+        onDisconnectResetPrimaryNick();
         vars.ircState.ircServerPrefix = '';
         vars.ircState.ircConnecting = false;
         vars.ircState.ircConnected = false;
@@ -606,6 +617,7 @@
             onDisconnectGrabState();
           }
         }
+        onDisconnectResetPrimaryNick();
         vars.ircState.ircServerPrefix = '';
         vars.ircState.ircConnecting = false;
         vars.ircState.ircConnected = false;
@@ -783,6 +795,7 @@
             onDisconnectGrabState();
           }
         }
+        onDisconnectResetPrimaryNick();
         vars.ircState.ircServerPrefix = '';
         vars.ircState.ircConnecting = false;
         vars.ircState.ircConnected = false;
