@@ -531,7 +531,9 @@
             //
             if ((vars.nsIdentifyNick.length > 0) && (vars.nsIdentifyCommand.length > 0)) {
               setTimeout(function () {
+                const configNick = vars.servers.serverArray[vars.ircState.ircServerIndex].nick;
                 if ((vars.ircState.ircConnected) &&
+                  (vars.ircState.nickName === configNick) &&
                   (vars.ircState.nickName === vars.nsIdentifyNick)) {
                   ircWrite.writeSocket(socket, vars.nsIdentifyCommand);
                 }
@@ -637,7 +639,7 @@
               }
             }
           } else {
-            console.log('Error message 353 for non-existant channel');
+            console.log('Error message 353 for non-existent channel');
           }
         } else {
           console.log('Error message 353 missing params');
@@ -650,26 +652,84 @@
         tellBrowserToRequestState();
         break;
       //
+      // 401 ERR_NOSUCHNICK
+      //
+      case '401':
+        // Case of periodic WHOIS used to recover nickname, 401 --> nickname available
+        if ((vars.servers.serverArray[vars.ircState.ircServerIndex].recoverNick) &&
+          (_isNickRecoverActive()) &&
+          (vars.ircState.ircRegistered)) {
+          const configNick = vars.servers.serverArray[vars.ircState.ircServerIndex].nick;
+          const alternateNick = vars.servers.serverArray[vars.ircState.ircServerIndex].altNick;
+          if (
+            (alternateNick.length > 0) &&
+            (parsedMessage.params) &&
+            // previous nick
+            (parsedMessage.params[0]) &&
+            // next nick
+            (parsedMessage.params[1]) &&
+            (parsedMessage.params[0] === alternateNick) &&
+            (parsedMessage.params[1] === configNick) &&
+            (vars.ircState.nickName === alternateNick)) {
+            //
+            // Recover configuration nickname
+            setTimeout(function () {
+              _cancelNickRecovery();
+              ircWrite.writeSocket(socket, 'NICK ' + configNick);
+            }, 100);
+          }
+        }
+        break;
+      //
       // 433 ERR_NICKNAMEINUSE
       //
       case '433':
-        // Connect to IRC has failed, nickname already in use, disconnect to try again
+        // Connect to IRC has failed, nickname already in use
+        //
+        // ircRegistered is used to skip user's /NICK commands after login
         if (!vars.ircState.ircRegistered) {
-          if (socket) {
-            socket.destroy();
-          }
-          // signal browser to show an error
-          vars.ircState.count.ircConnectError++;
+          // Case of alternate nickname is enabled
+          const configNick = vars.servers.serverArray[vars.ircState.ircServerIndex].nick;
+          const alternateNick = vars.servers.serverArray[vars.ircState.ircServerIndex].altNick;
+          if ((!_isNickRecoverActive()) &&
+            (alternateNick.length > 0) &&
+            // The in-use nick is parsedMessage.params[1]
+            (parsedMessage.params) &&
+            (parsedMessage.params[1]) &&
+            (parsedMessage.params[1] === configNick) &&
+            (vars.ircState.nickName === configNick) &&
+            (configNick !== alternateNick)) {
+            // continue parser, move this to async
+            setTimeout(function () {
+              // Special case:
+              // vars.ircState.nickName is normally set in
+              // response to a NAME server message.
+              // In this case, the nickname has not been registered yet.
+              // The connect will proceed to message 001 RPL_WELCOME
+              // and the server will not send a NICK message response to
+              // this NICK message.
+              vars.ircState.nickName = alternateNick;
+              ircWrite.writeSocket(socket, 'NICK ' + alternateNick);
+              _activateNickRecovery();
+            }, 500);
+          } else {
+            // Else alternate nickname not enabled, disconnect and wait for user input
+            if (socket) {
+              socket.destroy();
+            }
+            // signal browser to show an error
+            vars.ircState.count.ircConnectError++;
 
-          vars.ircState.ircServerPrefix = '';
-          // Do not reconnect
-          vars.ircState.ircConnectOn = false;
-          vars.ircState.ircConnecting = false;
-          vars.ircState.ircConnected = false;
-          vars.ircState.ircRegistered = false;
-          vars.ircState.ircIsAway = false;
-          vars.ircServerReconnectChannelString = '';
-          tellBrowserToRequestState();
+            vars.ircState.ircServerPrefix = '';
+            // Do not reconnect
+            vars.ircState.ircConnectOn = false;
+            vars.ircState.ircConnecting = false;
+            vars.ircState.ircConnected = false;
+            vars.ircState.ircRegistered = false;
+            vars.ircState.ircIsAway = false;
+            vars.ircServerReconnectChannelString = '';
+            tellBrowserToRequestState();
+          }
         }
         break;
       //
@@ -796,14 +856,34 @@
         break;
 
       case 'NICK':
+        // Update global state variable with new nickname
         if ((parsedMessage.nick === vars.ircState.nickName) &&
           (parsedMessage.host === vars.ircState.userHost)) {
           vars.ircState.nickName = parsedMessage.params[0];
         }
+        // Change nickname in each channel in attendance
         if (vars.ircState.channels.length > 0) {
           const previousNick = parsedMessage.nick;
           const nextNick = parsedMessage.params[0];
           _exchangeNames(previousNick, nextNick);
+        }
+        // To initiate NickServ registration after /NICK xxxxx command
+        // in the case where new nickname equals the default configured nickname for server
+        if ((vars.nsIdentifyNick.length > 0) && (vars.nsIdentifyCommand.length > 0)) {
+          setTimeout(function () {
+            const configNick = vars.servers.serverArray[vars.ircState.ircServerIndex].nick;
+            const alternateNick = vars.servers.serverArray[vars.ircState.ircServerIndex].altNick;
+            const previousNick = parsedMessage.nick;
+            const nextNick = parsedMessage.params[0];
+            if ((vars.ircState.ircConnected) &&
+              (vars.servers.serverArray[vars.ircState.ircServerIndex].recoverNick) &&
+              (previousNick === alternateNick) &&
+              (nextNick === configNick) &&
+              (vars.ircState.nickName === configNick) &&
+              (vars.ircState.nickName === vars.nsIdentifyNick)) {
+              ircWrite.writeSocket(socket, vars.nsIdentifyCommand);
+            }
+          }, 500);
         }
         tellBrowserToRequestState();
         break;
@@ -841,8 +921,9 @@
         }
         break;
       case 'QUIT':
+        //
+        // case of QUIT message for other members of an IRC channel
         if (parsedMessage.nick !== vars.ircState.nickname) {
-          // case of it is not me who QUIT
           if (vars.ircState.channels.length > 0) {
             for (let i = 0; i < vars.ircState.channels.length; i++) {
               if (vars.ircState.channelStates[i].joined) {
@@ -850,6 +931,25 @@
                 tellBrowserToRequestState();
               }
             }
+          }
+        }
+        //
+        // Case of nickname auto-recovery of own nickname
+        if ((vars.servers.serverArray[vars.ircState.ircServerIndex].recoverNick) &&
+          (_isNickRecoverActive())) {
+          const configNick = vars.servers.serverArray[vars.ircState.ircServerIndex].nick;
+          const alternateNick = vars.servers.serverArray[vars.ircState.ircServerIndex].altNick;
+          if (
+            (alternateNick.length > 0) &&
+            (parsedMessage.params) &&
+            // nick of QUIT message
+            (parsedMessage.params[0]) &&
+            (parsedMessage.params[0] === configNick) &&
+            (vars.ircState.nickName === alternateNick)) {
+            setTimeout(function () {
+              _cancelNickRecovery();
+              ircWrite.writeSocket(socket, 'NICK ' + configNick);
+            }, 500);
           }
         }
         break;
@@ -873,7 +973,60 @@
     }
   }; // _processIrcMessage
 
+  // --------------------------------------------------
+  // Alternate Nickname and Nickname Auto-recovery
+  // --------------------------------------------------
+
+  let nickRecoveryWhoisTimer = 0;
+  let nickRecoveryWhoisCounter = 0;
+  const nickRecoveryWhoisDuration = 30;
+  const nickRecoveryWhoisCountLimit = 5;
+
+  function _activateNickRecovery () {
+    nickRecoveryWhoisTimer = nickRecoveryWhoisDuration;
+    nickRecoveryWhoisCounter = 0;
+  }
+  function _cancelNickRecovery () {
+    nickRecoveryWhoisTimer = 0;
+    nickRecoveryWhoisCounter = 0;
+  }
+  function _isNickRecoverActive () {
+    if (nickRecoveryWhoisTimer > 0) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  // this is called from main module irc-client.js to insert TCP socket object
+  function recoverNickTimerTick (socket) {
+    if (nickRecoveryWhoisTimer > 0) {
+      const configNick = vars.servers.serverArray[vars.ircState.ircServerIndex].nick;
+      const alternateNick = vars.servers.serverArray[vars.ircState.ircServerIndex].altNick;
+      if (!vars.ircState.ircConnected) _cancelNickRecovery();
+      if (vars.ircState.nickName === configNick) _cancelNickRecovery();
+      if (nickRecoveryWhoisTimer > 0) {
+        nickRecoveryWhoisTimer--;
+        if (nickRecoveryWhoisTimer === 0) {
+          nickRecoveryWhoisCounter++;
+          if (nickRecoveryWhoisCounter < nickRecoveryWhoisCountLimit) {
+            if ((alternateNick.length > 0) &&
+              (vars.ircState.nickName === alternateNick) &&
+              (vars.servers.serverArray[vars.ircState.ircServerIndex].recoverNick)) {
+              nickRecoveryWhoisTimer = nickRecoveryWhoisDuration;
+              ircWrite.writeSocket(socket, 'WHOIS ' + configNick);
+            }
+          } else {
+            _cancelNickRecovery();
+          }
+        }
+      }
+    }
+    return null;
+  };
+
   module.exports = {
-    _processIrcMessage: _processIrcMessage
+    _processIrcMessage: _processIrcMessage,
+    recoverNickTimerTick: recoverNickTimerTick
   };
 })();

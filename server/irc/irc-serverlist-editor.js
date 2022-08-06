@@ -45,6 +45,8 @@
 //   "identifyNick": "",
 //   "identifyCommand": "",
 //   "nick": "myNick",
+//   "altNick": "myNick2",
+//   "recoverNick": false,
 //   "user": "myUser",
 //   "real": "myRealName",
 //   "modes": "+iw",
@@ -308,6 +310,9 @@
             // Security: Nickserv identify password  not sent
             // tempServer.identifyCommand = chainObject.serversFile.serverArray[i].identifyCommand;
             tempServer.nick = chainObject.serversFile.serverArray[i].nick;
+            tempServer.altNick = chainObject.serversFile.serverArray[i].altNick || '';
+            tempServer.recoverNick = chainObject.serversFile.serverArray[i].recoverNick || false;
+            if (tempServer.altNick.length === 0) tempServer.recoverNick = false;
             tempServer.user = chainObject.serversFile.serverArray[i].user;
             tempServer.real = chainObject.serversFile.serverArray[i].real;
             tempServer.modes = chainObject.serversFile.serverArray[i].modes;
@@ -400,6 +405,9 @@
         }
       }
       tempServer.nick = req.body.nick;
+      tempServer.altNick = req.body.altNick;
+      tempServer.recoverNick = req.body.recoverNick;
+      if (tempServer.altNick.length === 0) tempServer.recoverNick = false;
       tempServer.user = req.body.user;
       tempServer.real = req.body.real;
       tempServer.modes = req.body.modes;

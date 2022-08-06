@@ -1900,6 +1900,7 @@
     registrationWatchdogTimerTick();
     activityWatchdogTimerTick();
     clientToServerPingTimerTick();
+    ircParse.recoverNickTimerTick(ircSocket);
   }, 1000);
 
   // Program run timestamp

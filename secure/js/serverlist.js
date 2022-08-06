@@ -37,10 +37,14 @@
 //   "port": 6667,
 //   "tls": false,
 //   "verify": false,
+//   "reconnect": false,
+//   "logging": logging,
 //   "password": "",
 //   "identifyNick": "",
 //   "identifyCommand": "",
 //   "nick": "myNick",
+//   "altNick": "myNick2",
+//   "recoverNick", false,
 //   "user": "myUser",
 //   "real": "myRealName",
 //   "modes": "+iw",
@@ -216,6 +220,8 @@ const clearIrcServerForm = () => {
     document.getElementById('identifyCommandInputId').setAttribute('disabled', '');
     document.getElementById('identifyCommandInputId').value = '(Hidden)';
     document.getElementById('nickInputId').value = '';
+    document.getElementById('altNickInputId').value = '';
+    document.getElementById('recoverNickCheckboxId').checked = false;
     document.getElementById('userInputId').value = '';
     document.getElementById('realInputId').value = '';
     document.getElementById('modesInputId').value = '';
@@ -282,6 +288,16 @@ const populateIrcServerForm = (data) => {
     document.getElementById('serverPasswordWarningDiv').setAttribute('hidden', '');
     document.getElementById('nickservCommandWarningDiv').setAttribute('hidden', '');
     document.getElementById('nickInputId').value = data.nick;
+    document.getElementById('altNickInputId').value = data.altNick;
+    if (data.altNick.length === 0) {
+      document.getElementById('recoverNickCheckboxId').checked = false;
+    } else {
+      if (data.recoverNick) {
+        document.getElementById('recoverNickCheckboxId').checked = true;
+      } else {
+        document.getElementById('recoverNickCheckboxId').checked = false;
+      }
+    }
     document.getElementById('userInputId').value = data.user;
     document.getElementById('realInputId').value = data.real;
     document.getElementById('modesInputId').value = data.modes;
@@ -408,6 +424,16 @@ const parseFormInputValues = () => {
       data.identifyCommand = document.getElementById('identifyCommandInputId').value;
     }
     data.nick = document.getElementById('nickInputId').value;
+    data.altNick = document.getElementById('altNickInputId').value;
+    if (data.altNick.length === 0) {
+      data.recoverNick = false;
+    } else {
+      if (document.getElementById('recoverNickCheckboxId').checked) {
+        data.recoverNick = true;
+      } else {
+        data.recoverNick = false;
+      }
+    }
     data.user = document.getElementById('userInputId').value;
     data.real = document.getElementById('realInputId').value;
     data.modes = document.getElementById('modesInputId').value;

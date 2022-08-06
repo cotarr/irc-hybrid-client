@@ -16,6 +16,8 @@
       "identifyNick": "",
       "identifyCommand": "",
       "nick": "MyNickname",
+      "altNick": "",
+      "recoverNick": false,
       "user": "user",
       "real": "John Doe",
       "modes": "+i",

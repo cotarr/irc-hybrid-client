@@ -6,10 +6,36 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Nexxt 2022-08-04
+## Next 2022-08-04
+
+This is a feature update. New functionality has been added to use an alternate nickname when the primary nickname is in use.
+Later, when the desired nickname becomes available, the nickname can be auto-recovered to it's primary value. Nickserv IDENTIFY commands 
+are issued during nickname recovery if configured in the server setup.
 
 ### Changed
+
+Configuration:
+
+- example-servers.json - Added new server properties "altNick" and "recoverNick". For older version of credentials.json files, these will be updated automatically without error to values with new features disabled.
+
+Server:
+
 - server/irc/irc-client.js - Added existing `servers` object to global vars object to allow global access to the server list. Instances of servers.xxxxx are now vars.servers.xxxxx. Before this change, scope of servers object was local to irc-client.js.
+- server/irc/irc-client.js - Added recoverNickTimerTick(ircSocket) to the global multi-task timer event.
+- server/irc/irc-serverlist-editor.js - Added new server properties "altNick" and "recoverNick" to server list editing API.
+- server/irc/irc-serverlist-validations.js - Add input validation for new properties "altNick" and "recoverNick"
+- server/irc/irc-parse.js - Multiple changes as follows
+  - Message 001 RPL_WELCOME - Update conditions for nickserv IDENTIFY functions
+  - Message 401 ERR_NOSUCHNICK - New IRC server message handler added to catch periodic WHOIS responses used to detect availability of primary nickname and issue /NICK xxxx command to IRC server.
+  - Message 433 ERR_NICKNAMEINUSE - During initial IRC connect, before nickname registration, add functionality to send alternate nickname to IRC sever using /NICK command. Sets variables used to enable auto-recovery of primary nickname.
+  - Message NICK - Add functionality to automatically send the nickerv IDENTIFY command if nickname auto-recovery is enabled and the user is currently using the configured alternate nickname.
+  - Message QUIT - Added functionality to detect a match between the QUIT nickname and the user's primary nickname. If match then automatically recover the primary nickname by sending a /NICK command to the server.
+  - Added timer tick handler to manage auto-recovery of nickname by incrementing timers, monitoring current nickname to detect primary nickname, and periodically issuing /WHOIS commands for the primary nickname to detect availability. This is called globally from timer loop in irc-client.js to include scope of IRC TCP socket object.
+
+Browser:
+
+- secure/serverlist.html - Added input element and checkbox element for new properties "altNick" and "recoverNick"
+- secure/js/serverlist.js - Added value parsing for new server properties "altNick" and "recoverNick"
 
 ## [v0.2.4](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.4) 2022-08-04
 

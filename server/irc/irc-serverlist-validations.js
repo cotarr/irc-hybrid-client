@@ -115,6 +115,8 @@
         'identifyNick',
         'identifyCommand',
         'nick',
+        'altNick',
+        'recoverNick',
         'user',
         'real',
         'modes',
@@ -144,6 +146,8 @@
       'logging',
       'identifyNick',
       'nick',
+      'altNick',
+      'recoverNick',
       'user',
       'real',
       'modes',
@@ -165,7 +169,8 @@
       'verify',
       'proxy',
       'reconnect',
-      'logging'])
+      'logging',
+      'recoverNick'])
       .isBoolean(),
     // TODO max length of strings?
     body([
@@ -183,6 +188,7 @@
       .isLength({ min: 0, max: 255 }),
     body([
       'identifyNick',
+      'altNick',
       'modes',
       'channelList'], 'Require type String')
       .isString()
@@ -198,13 +204,15 @@
       'verify',
       'proxy',
       'reconnect',
-      'logging'])
+      'logging',
+      'recoverNick'])
       .toBoolean(),
     body([
       'name',
       'host',
       'identifyNick',
       'nick',
+      'altNick',
       'user',
       'real',
       'modes',
@@ -256,6 +264,8 @@
         'identifyNick',
         'identifyCommand',
         'nick',
+        'altNick',
+        'recoverNick',
         'user',
         'real',
         'modes',
@@ -287,6 +297,8 @@
       'logging',
       'identifyNick',
       'nick',
+      'altNick',
+      'recoverNick',
       'user',
       'real',
       'modes',
@@ -316,7 +328,8 @@
       'verify',
       'proxy',
       'reconnect',
-      'logging'])
+      'logging',
+      'recoverNick'])
       .isBoolean(),
     // TODO max length of strings?
     body([
@@ -334,6 +347,7 @@
       .isLength({ min: 0, max: 255 }),
     body([
       'identifyNick',
+      'altNick',
       'modes',
       'channelList'], 'Require type String')
       .isString()
@@ -354,13 +368,15 @@
       'verify',
       'proxy',
       'reconnect',
-      'logging'])
+      'logging',
+      'recoverNick'])
       .toBoolean(),
     body([
       'name',
       'host',
       'identifyNick',
       'nick',
+      'altNick',
       'user',
       'real',
       'modes',
@@ -413,6 +429,8 @@
         'identifyNick',
         'identifyCommand',
         'nick',
+        'altNick',
+        'recoverNick',
         'user',
         'real',
         'modes',
@@ -506,6 +524,8 @@
         'identifyNick',
         'identifyCommand',
         'nick',
+        'altNick',
+        'recoverNick',
         'user',
         'real',
         'modes',
