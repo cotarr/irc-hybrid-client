@@ -107,6 +107,7 @@
   vars.ircState.ircConnected = false;
   vars.ircState.ircRegistered = false;
   vars.ircState.ircIsAway = false;
+  vars.ircState.nickRecoveryActive = false;
 
   // Note: ircAutoReconnect moved from global setting to server setting
   // vars.ircState.ircAutoReconnect = vars.servers.ircAutoReconnect;
@@ -326,6 +327,7 @@
         vars.ircState.ircConnected = false;
         vars.ircState.ircRegistered = false;
         vars.ircState.ircIsAway = false;
+        vars.ircState.nickRecoveryActive = false;
         tellBrowserToRequestState();
       }
       // reset the state variables
@@ -509,6 +511,7 @@
           vars.ircState.ircConnected = false;
           vars.ircState.ircRegistered = false;
           vars.ircState.ircIsAway = false;
+          vars.ircState.nickRecoveryActive = false;
           global.sendToBrowser('UPDATE\nwebError: IRC server timeout while connecting\n');
           ircLog.writeIrcLog('IRC server timeout while connecting');
         }
@@ -582,6 +585,7 @@
         vars.ircState.ircConnected = false;
         vars.ircState.ircRegistered = false;
         vars.ircState.ircIsAway = false;
+        vars.ircState.nickRecoveryActive = false;
         // clear watchdog timer
         if (watchdogTimer) clearTimeout(watchdogTimer);
         if (hadError) {
@@ -623,6 +627,7 @@
         vars.ircState.ircConnected = false;
         vars.ircState.ircRegistered = false;
         vars.ircState.ircIsAway = false;
+        vars.ircState.nickRecoveryActive = false;
         if ((vars.ircState.ircConnectOn) && (vars.ircState.count.ircConnect === 0)) {
           // Case of socket error when not previously connected, cancel auto-connect
           vars.ircState.ircConnectOn = false;
@@ -801,6 +806,7 @@
         vars.ircState.ircConnected = false;
         vars.ircState.ircRegistered = false;
         vars.ircState.ircIsAway = false;
+        vars.ircState.nickRecoveryActive = false;
         if ((vars.ircState.ircConnectOn) && (vars.ircState.count.ircConnect === 0)) {
           // Case of socket error when not previously connected, cancel auto-connect
           vars.ircState.ircConnectOn = false;
@@ -858,6 +864,7 @@
       vars.ircState.ircConnected = false;
       vars.ircState.ircRegistered = false;
       vars.ircState.ircIsAway = false;
+      vars.ircState.nickRecoveryActive = false;
 
       if ((vars.ircState.ircConnectOn) && (vars.ircState.count.ircConnect === 0)) {
         // Case of socket error when not previously connected, cancel auto-connect
@@ -1034,6 +1041,7 @@
       vars.ircState.ircConnected = false;
       vars.ircState.ircRegistered = false;
       vars.ircState.ircIsAway = false;
+      vars.ircState.nickRecoveryActive = false;
       tellBrowserToRequestState();
       return;
     }
@@ -1054,6 +1062,7 @@
       vars.ircState.ircConnected = false;
       vars.ircState.ircRegistered = false;
       vars.ircState.ircIsAway = false;
+      vars.ircState.nickRecoveryActive = false;
 
       //
       // This will create the socket and connect it.
@@ -1090,6 +1099,7 @@
       vars.ircState.ircConnected = false;
       vars.ircState.ircRegistered = false;
       vars.ircState.ircIsAway = false;
+      vars.ircState.nickRecoveryActive = false;
       global.sendToBrowser('UPDATE\nwebError: IRC server activity watchdog expired\n');
       ircLog.writeIrcLog('IRC server activity watchdog expired');
     }
@@ -1121,6 +1131,7 @@
           vars.ircState.ircConnected = false;
           vars.ircState.ircRegistered = false;
           vars.ircState.ircIsAway = false;
+          vars.ircState.nickRecoveryActive = false;
           global.sendToBrowser('UPDATE\nwebError: IRC server not responding to client PING\n');
           ircLog.writeIrcLog('IRC server not responding to client PING');
         }
@@ -1507,6 +1518,7 @@
     vars.ircState.ircConnected = false;
     vars.ircState.ircRegistered = false;
     vars.ircState.ircIsAway = false;
+    vars.ircState.nickRecoveryActive = false;
 
     // Set flag, used in automatic restart
     vars.ircState.ircConnectOn = true;
@@ -1567,6 +1579,7 @@
     vars.ircState.ircConnected = false;
     vars.ircState.ircRegistered = false;
     vars.ircState.ircIsAway = false;
+    vars.ircState.nickRecoveryActive = false;
     tellBrowserToRequestState();
     res.json({ error: false });
   }; // disconnectHandler()

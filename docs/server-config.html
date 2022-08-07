@@ -158,6 +158,8 @@
               nickname is not available. If the nickname recovery checkbox is checked, should the 
               primary nickname become available while the user is logged in to IRC with the alternate 
               nickname, automatic recovery of the primary nickname will be attempted.
+              The manual configuration section shown below provides a detailed 
+              explanation of nickname recovery.
             </p>
             <p>
               The IRC channel list is a comma separated list of channel names. 
@@ -335,7 +337,7 @@
 
         <div class="install-section-title">4 - IRC User Information</div>
         <p>
-          This section should be obvious to anyone using IRC.
+          This section with nickname and real name should be obvious to anyone using IRC.
         </p>
         <p>
           In the case where an IRC server returns a 433 ERR_NICKNAMEINUSE
@@ -351,7 +353,8 @@
           If a ghost user with primary nickname is present in an IRC channel
           with the active alternate nickname, a QUIT message will trigger immediate
           nickname recovery. Otherwise, a cycle timer will periodically 
-          attempt to select the primary nickname until a time limit is reached.
+          attempt to send NICK commands with the primary nickname 
+          until a time limit is reached.
         </p>
         <p>
           Please note that different type of IRC servers have different
