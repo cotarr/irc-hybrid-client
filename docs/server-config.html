@@ -152,8 +152,12 @@
             </p>
             <p>
               The IRC nickname, real name, used ID and initial modes are similar to other IRC clients.
-              The program only supports one nickname entry per IRC server definition. 
-              Automatic rotation to backup nicknames is not currently available (perhaps in the future).
+            </p>
+            <p>
+              If an optional alternate nickname is specified, it will be tried when the primary 
+              nickname is not available. If the nickname recovery checkbox is checked, should the 
+              primary nickname become available while the user is logged in to IRC with the alternate 
+              nickname, automatic recovery of the primary nickname will be attempted.
             </p>
             <p>
               The IRC channel list is a comma separated list of channel names. 
@@ -172,7 +176,7 @@
             </p>
           </div>
           <div class="image-photo">
-            <img src=images/server-form.png width="567" height="930"alt="Server definition form">
+            <img src=images/server-form.png width="572" height="1014"alt="Server definition form">
           </div>
         </div>  
         <p>
@@ -286,6 +290,11 @@
   "password": "",
 </pre></div>
 
+        <p>
+          Security note: The optional IRC server password will be stored unencrypted 
+          in clear text in the servers.json file.
+          It is recommended to check for proper file permissions.
+        </p>
 
         <div class="install-section-title">3 - Server Options</div>
        
@@ -329,6 +338,22 @@
           This section should be obvious to anyone using IRC.
         </p>
         <p>
+          In the case where an IRC server returns a 433 ERR_NICKNAMEINUSE
+          prior to nickname registration, the altNick value will be 
+          submitted as an alternate nickname. Upon IRC disconnect, 
+          if the alternate nickname is in use, the requested nickname will revert back
+          to the  primary nickname value.
+        </p>
+        <p>
+          If recoverNick is set to the true, the client will automatically 
+          attempt to recover the primary nickname by sending a NICK command
+          with the primary nickname. This is triggered in 2 ways.
+          If a ghost user with primary nickname is present in an IRC channel
+          with the active alternate nickname, a QUIT message will trigger immediate
+          nickname recovery. Otherwise, a cycle timer will periodically 
+          attempt to select the primary nickname until a time limit is reached.
+        </p>
+        <p>
           Please note that different type of IRC servers have different
           requirements for the number of characters allowed in a Nickname,
           user or real name. These are often displayed in a server message
@@ -338,6 +363,8 @@
         </p>
 <div class="pre-div"><pre>
   "nick": "MyNickname",
+  "altNick": "",
+  "recoverNick", false,
   "user": "user",
   "real": "John Doe",
   "modes": "+i",
@@ -370,9 +397,21 @@
 
         <div class="install-section-title">6 - NickServ IDENTIFY</div>
         <p>
-          There is a provision to automatically dispatch a NickServ
-          IDENTIFY message when the IRC server connection is made and
-          when the current IRC nickname matches the property &quotidentifyNick&quot.
+          There is a provision to automatically dispatch a NickServ IDENTIFY message.
+          This enabled when the IRC configured primary nickname matches the property &quotidentifyNick&quot.
+        </p>
+        <ul>
+          <li>
+            Prior to nickname registration, triggered upon server &quot;433&quot; message ERR_NICKNAMEINUSE.
+          </li>
+          <li>
+            During nickname recovery, triggered upon server &quot;NICK&quot; message.
+          </li>
+        </ul>
+        <p>
+          Security Note: the optional identify command may contain passwords.
+          This configuration is stored unencrypted in clear text in the servers.json file.
+          It is recommended to check for proper file permissions.
         </p>
         <p>
           To disable this feature, set the following properties
@@ -492,6 +531,8 @@
       "identifyNick": "MyNickname",
       "identifyCommand": "PRIVMSG NickServ@services.dal.net :IDENTIFY xxxxxxxx",
       "nick": "MyNickname",
+      "altNick": "",
+      "recoverNick", false,
       "user": "user",
       "real": "John Doe",
       "modes": "+i",
