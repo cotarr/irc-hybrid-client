@@ -173,6 +173,10 @@ button[disabled] {
   background-color: #fada9d;
 }
 
+.color-recovery {
+  background-color: #f2f1e1;
+}
+
 .color-pm {
   background-color: #a8cbe3;
 }

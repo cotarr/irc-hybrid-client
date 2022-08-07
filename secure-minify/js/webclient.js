@@ -85,6 +85,7 @@ document.getElementById('webDisconnectedVisibleDiv').setAttribute('hidden','');d
 document.getElementById('ircConnectIconId').removeAttribute('connecting');document.getElementById('ircConnectIconId').setAttribute('connected','')}else{
 document.getElementById('ircConnectIconId').setAttribute('connecting','');document.getElementById('ircConnectIconId').removeAttribute('connected')}
 if(ircState.ircIsAway)document.getElementById('ircIsAwayIconId').removeAttribute('hidden');else document.getElementById('ircIsAwayIconId').setAttribute('hidden','')
+;if(ircState.nickRecoveryActive)document.getElementById('nickRecovIconId').removeAttribute('hidden','');else document.getElementById('nickRecovIconId').setAttribute('hidden','')
 ;document.getElementById('hideLoginSection').setAttribute('hidden','');document.getElementById('hideLoginSectionButton').textContent='+'
 ;document.getElementById('nickNameInputId').setAttribute('disabled','');document.getElementById('realNameInputId').setAttribute('disabled','')
 ;document.getElementById('userModeInputId').setAttribute('disabled','');document.getElementById('connectButton').setAttribute('disabled','')
@@ -98,9 +99,9 @@ if(webState.ircConnecting||ircState.ircConnecting){document.getElementById('ircC
 ;document.getElementById('ircConnectIconId').removeAttribute('connecting');document.getElementById('ircConnectIconId').removeAttribute('connected')}
 if(ircState.ircAutoReconnect&&ircState.ircConnectOn&&!ircState.ircConnected&&!ircState.ircConnecting)document.getElementById('waitConnectIconId').removeAttribute('hidden');else document.getElementById('waitConnectIconId').setAttribute('hidden','')
 ;resetNotActivityIcon();resetPmActivityIcon(-1);resetChanActivityIcon(-1);document.getElementById('ircIsAwayIconId').setAttribute('hidden','')
-;document.getElementById('hideLoginSection').removeAttribute('hidden');document.getElementById('hideLoginSectionButton').textContent='-'
-;if(document.getElementById('waitConnectIconId').hasAttribute('hidden')){document.getElementById('cyclePrevServerButton').removeAttribute('disabled')
-;document.getElementById('cycleNextServerButton').removeAttribute('disabled')
+;document.getElementById('nickRecovIconId').setAttribute('hidden','');document.getElementById('hideLoginSection').removeAttribute('hidden')
+;document.getElementById('hideLoginSectionButton').textContent='-';if(document.getElementById('waitConnectIconId').hasAttribute('hidden')){
+document.getElementById('cyclePrevServerButton').removeAttribute('disabled');document.getElementById('cycleNextServerButton').removeAttribute('disabled')
 ;if(ircState.disableServerListEditor)document.getElementById('editServerListButton').setAttribute('disabled','');else document.getElementById('editServerListButton').removeAttribute('disabled')
 ;document.getElementById('nickNameInputId').removeAttribute('disabled');document.getElementById('realNameInputId').removeAttribute('disabled')
 ;document.getElementById('userModeInputId').removeAttribute('disabled')}else{document.getElementById('cyclePrevServerButton').setAttribute('disabled','')
@@ -122,15 +123,15 @@ document.getElementById('webConnectIconId').removeAttribute('connected');documen
 document.getElementById('webConnectIconId').removeAttribute('connected');document.getElementById('webConnectIconId').removeAttribute('connecting')}resetNotActivityIcon();resetPmActivityIcon(-1)
 ;resetChanActivityIcon(-1);document.getElementById('ircConnectIconId').setAttribute('unavailable','');document.getElementById('ircConnectIconId').removeAttribute('connected')
 ;document.getElementById('ircConnectIconId').removeAttribute('connecting');document.getElementById('ircIsAwayIconId').setAttribute('hidden','')
-;document.getElementById('hideLoginSection').setAttribute('hidden','');document.getElementById('nickNameInputId').setAttribute('disabled','')
-;document.getElementById('realNameInputId').setAttribute('disabled','');document.getElementById('userModeInputId').setAttribute('disabled','')
-;document.getElementById('connectButton').setAttribute('disabled','');document.getElementById('quitButton').setAttribute('disabled','')
-;document.getElementById('userAwayMessageId').setAttribute('disabled','');document.getElementById('setAwayButton').setAttribute('disabled','')
-;document.getElementById('setBackButton').setAttribute('disabled','')}}document.addEventListener('show-all-divs',(function(event){document.getElementById('hideLoginSection').removeAttribute('hidden')
-;document.getElementById('hideLoginSectionButton').textContent='-';document.getElementById('privMsgMainHiddenDiv').removeAttribute('hidden')
-;document.getElementById('privMsgMainHiddenButton').textContent='-';document.getElementById('ircChannelsMainHiddenDiv').removeAttribute('hidden')
-;document.getElementById('ircChannelsMainHiddenButton').textContent='-';showRawMessageWindow();webState.noticeOpen=true;webState.wallopsOpen=true
-;document.getElementById('noticeSectionDiv').removeAttribute('hidden');document.getElementById('wallopsSectionDiv').removeAttribute('hidden')}))
+;document.getElementById('nickRecovIconId').setAttribute('hidden','');document.getElementById('hideLoginSection').setAttribute('hidden','')
+;document.getElementById('nickNameInputId').setAttribute('disabled','');document.getElementById('realNameInputId').setAttribute('disabled','')
+;document.getElementById('userModeInputId').setAttribute('disabled','');document.getElementById('connectButton').setAttribute('disabled','')
+;document.getElementById('quitButton').setAttribute('disabled','');document.getElementById('userAwayMessageId').setAttribute('disabled','')
+;document.getElementById('setAwayButton').setAttribute('disabled','');document.getElementById('setBackButton').setAttribute('disabled','')}}document.addEventListener('show-all-divs',(function(event){
+document.getElementById('hideLoginSection').removeAttribute('hidden');document.getElementById('hideLoginSectionButton').textContent='-'
+;document.getElementById('privMsgMainHiddenDiv').removeAttribute('hidden');document.getElementById('privMsgMainHiddenButton').textContent='-'
+;document.getElementById('ircChannelsMainHiddenDiv').removeAttribute('hidden');document.getElementById('ircChannelsMainHiddenButton').textContent='-';showRawMessageWindow();webState.noticeOpen=true
+;webState.wallopsOpen=true;document.getElementById('noticeSectionDiv').removeAttribute('hidden');document.getElementById('wallopsSectionDiv').removeAttribute('hidden')}))
 ;document.addEventListener('hide-or-zoom',(function(event){document.getElementById('hideLoginSection').setAttribute('hidden','');document.getElementById('hideLoginSectionButton').textContent='+'
 ;document.getElementById('privMsgMainHiddenDiv').setAttribute('hidden','');document.getElementById('privMsgMainHiddenButton').textContent='+'
 ;document.getElementById('ircChannelsMainHiddenDiv').setAttribute('hidden','');document.getElementById('ircChannelsMainHiddenButton').textContent='+';hideRawMessageWindow();webState.noticeOpen=false

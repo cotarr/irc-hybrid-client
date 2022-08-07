@@ -36,8 +36,11 @@ Server:
 Browser:
 
 - secure/serverlist.html - Added input element and checkbox element for new properties "altNick" and "recoverNick"
+- secure/serverlist.html - Added (R) icon to show auto-Recovery of nickname is active.
 - secure/js/serverlist.js - Added value parsing for new server properties "altNick" and "recoverNick"
-- secure/js/webclient.js - On change in ircState object, nickname input element updates from state object even if not connected to IRC. This is necessary for alternate nickname rotation and nickname recovery. However, a change in state could possibly revert the nickname input element to current value on the web server. 
+- secure/js/webclient.js - On change in ircState object, nickname input element updates from state object even if not connected to IRC. This is 
+necessary for alternate nickname rotation and nickname recovery. However, a change in state could possibly revert the nickname input element to current value on the web server. 
+- secure/js/webclient.js - Added code to control visibility of (R) icon for nickname recovery.
 
 ## [v0.2.4](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.4) 2022-08-04
 

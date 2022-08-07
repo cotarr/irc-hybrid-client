@@ -536,6 +536,11 @@ function updateDivVisibility () {
       } else {
         document.getElementById('ircIsAwayIconId').setAttribute('hidden', '');
       }
+      if (ircState.nickRecoveryActive) {
+        document.getElementById('nickRecovIconId').removeAttribute('hidden', '');
+      } else {
+        document.getElementById('nickRecovIconId').setAttribute('hidden', '');
+      }
       document.getElementById('hideLoginSection').setAttribute('hidden', '');
       document.getElementById('hideLoginSectionButton').textContent = '+';
       document.getElementById('nickNameInputId').setAttribute('disabled', '');
@@ -582,6 +587,7 @@ function updateDivVisibility () {
       resetPmActivityIcon(-1);
       resetChanActivityIcon(-1);
       document.getElementById('ircIsAwayIconId').setAttribute('hidden', '');
+      document.getElementById('nickRecovIconId').setAttribute('hidden', '');
       document.getElementById('hideLoginSection').removeAttribute('hidden');
       document.getElementById('hideLoginSectionButton').textContent = '-';
       if (document.getElementById('waitConnectIconId').hasAttribute('hidden')) {
@@ -656,6 +662,7 @@ function updateDivVisibility () {
     document.getElementById('ircConnectIconId').removeAttribute('connected');
     document.getElementById('ircConnectIconId').removeAttribute('connecting');
     document.getElementById('ircIsAwayIconId').setAttribute('hidden', '');
+    document.getElementById('nickRecovIconId').setAttribute('hidden', '');
     document.getElementById('hideLoginSection').setAttribute('hidden', '');
     document.getElementById('nickNameInputId').setAttribute('disabled', '');
     // document.getElementById('userNameInputId').setAttribute('disabled', '');
