@@ -27,6 +27,7 @@ Server:
 - server/irc/irc-parse.js - Multiple changes as follows
   - Message 001 RPL_WELCOME - Update conditions for nickserv IDENTIFY functions
   - Message 401 ERR_NOSUCHNICK - New IRC server message handler added to catch periodic WHOIS responses used to detect availability of primary nickname and issue /NICK xxxx command to IRC server.
+  - Message 432 ERR_ERONEUSNICKNAME - Abort alternate nickname and auto-recover.
   - Message 433 ERR_NICKNAMEINUSE - During initial IRC connect, before nickname registration, add functionality to send alternate nickname to IRC sever using /NICK command. Sets variables used to enable auto-recovery of primary nickname.
   - Message NICK - Add functionality to automatically send the nickerv IDENTIFY command if nickname auto-recovery is enabled and the user is currently using the configured alternate nickname.
   - Message QUIT - Added functionality to detect a match between the QUIT nickname and the user's primary nickname. If match then automatically recover the primary nickname by sending a /NICK command to the server.

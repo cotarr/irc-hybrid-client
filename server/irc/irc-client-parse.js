@@ -682,10 +682,44 @@
               nickservIdentifyActiveFlag = false;
             }, 10000);
             setTimeout(function () {
-              _cancelNickRecovery();
+              // _cancelNickRecovery();
               ircWrite.writeSocket(socket, 'NICK ' + configNick);
             }, 100);
           }
+        }
+        break;
+      //
+      // 432 ERR_ERRONEUSNICKNAME
+      //
+      case '432':
+        //
+        // This is seen on DALnet when a desired nickname
+        // is locked and requires a release command sent to nickserv
+        //
+        // Action: disconnect from IRC
+        //
+        if (!vars.ircState.ircRegistered) {
+          if (socket) {
+            socket.destroy();
+          }
+          // signal browser to show an error
+          vars.ircState.count.ircConnectError++;
+
+          vars.ircState.ircServerPrefix = '';
+          // Do not reconnect
+          vars.ircState.ircConnectOn = false;
+          vars.ircState.ircConnecting = false;
+          vars.ircState.ircConnected = false;
+          vars.ircState.ircRegistered = false;
+          vars.ircState.ircIsAway = false;
+          vars.ircServerReconnectChannelString = '';
+          tellBrowserToRequestState();
+        }
+        // An error has occurred trying to change nickname while connected.
+        // This is most likely a serverices lock on the nickname
+        // Action: abort auto-reconnect
+        if (vars.ircState.ircConnected) {
+          _cancelNickRecovery();
         }
         break;
       //
@@ -891,6 +925,7 @@
               (nextNick === configNick) &&
               (vars.ircState.nickName === configNick) &&
               (vars.ircState.nickName === vars.nsIdentifyNick)) {
+              _cancelNickRecovery();
               // prevent multiple IDENTIFY actions
               nickservIdentifyActiveFlag = false;
               // This is a raw server message
@@ -963,7 +998,7 @@
               nickservIdentifyActiveFlag = false;
             }, 10000);
             setTimeout(function () {
-              _cancelNickRecovery();
+              // _cancelNickRecovery();
               ircWrite.writeSocket(socket, 'NICK ' + configNick);
             }, 500);
           }
@@ -995,13 +1030,15 @@
 
   let nickRecoveryWhoisTimer = 0;
   let nickRecoveryWhoisCounter = 0;
-  // Set every 2 minutes for 2 hours
-  const nickRecoveryWhoisDuration = 120;
-  const nickRecoveryWhoisCountLimit = 60;
+  // Set every 5 minutes for 1 hours
+  const nickRecoveryWhoisDuration = 300;
+  const nickRecoveryWhoisCountLimit = 12;
 
   function _activateNickRecovery () {
-    nickRecoveryWhoisTimer = nickRecoveryWhoisDuration;
-    nickRecoveryWhoisCounter = 0;
+    if (vars.servers.serverArray[vars.ircState.ircServerIndex].recoverNick) {
+      nickRecoveryWhoisTimer = nickRecoveryWhoisDuration;
+      nickRecoveryWhoisCounter = 0;
+    }
   }
   function _cancelNickRecovery () {
     nickRecoveryWhoisTimer = 0;
