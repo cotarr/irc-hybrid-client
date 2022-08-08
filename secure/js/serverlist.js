@@ -425,14 +425,10 @@ const parseFormInputValues = () => {
     }
     data.nick = document.getElementById('nickInputId').value;
     data.altNick = document.getElementById('altNickInputId').value;
-    if (data.altNick.length === 0) {
-      data.recoverNick = false;
+    if (document.getElementById('recoverNickCheckboxId').checked) {
+      data.recoverNick = true;
     } else {
-      if (document.getElementById('recoverNickCheckboxId').checked) {
-        data.recoverNick = true;
-      } else {
-        data.recoverNick = false;
-      }
+      data.recoverNick = false;
     }
     data.user = document.getElementById('userInputId').value;
     data.real = document.getElementById('realInputId').value;
@@ -443,6 +439,10 @@ const parseFormInputValues = () => {
     if (data.name === '') errorStr = 'Label is required input.';
     if (data.host === '') errorStr = 'Host/IP is required input.';
     if (isNaN(data.port)) errorStr = 'Invalid port number';
+    if (data.nick === data.altNick) errorStr = 'Nickname and alternate nickname must be different.';
+    if ((data.recoverNick) && (data.altNick.length === 0)) {
+      errorStr = 'Nickname recovery checkbox set without valid alternate nickname';
+    }
     if (data.nick === '') errorStr = 'Nickname is required input.';
     if (data.user === '') errorStr = 'Unix ident user is required input.';
     if (data.real === '') errorStr = 'Real Name is required input.';

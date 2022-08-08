@@ -82,12 +82,13 @@ _showError(err.toString()||err);console.log(err)})};const deleteIrcServer=index=
 ;data.identifyNick=document.getElementById('identifyNickInputId').value
 ;if(!document.getElementById('identifyCommandInputId').hasAttribute('disabled'))data.identifyCommand=document.getElementById('identifyCommandInputId').value
 ;data.nick=document.getElementById('nickInputId').value;data.altNick=document.getElementById('altNickInputId').value
-;if(0===data.altNick.length)data.recoverNick=false;else if(document.getElementById('recoverNickCheckboxId').checked)data.recoverNick=true;else data.recoverNick=false
-;data.user=document.getElementById('userInputId').value;data.real=document.getElementById('realInputId').value;data.modes=document.getElementById('modesInputId').value
-;data.channelList=document.getElementById('channelListInputId').value;let errorStr=null;if(''===data.name)errorStr='Label is required input.';if(''===data.host)errorStr='Host/IP is required input.'
-;if(isNaN(data.port))errorStr='Invalid port number';if(''===data.nick)errorStr='Nickname is required input.';if(''===data.user)errorStr='Unix ident user is required input.'
-;if(''===data.real)errorStr='Real Name is required input.';if(errorStr)reject(new Error(errorStr));else resolve({data:data,index:index})})
-;const buildServerListTable=data=>new Promise((resolve,reject)=>{const tableNode=document.getElementById('tbodyId');while(tableNode.firstChild)tableNode.removeChild(tableNode.firstChild)
+;if(document.getElementById('recoverNickCheckboxId').checked)data.recoverNick=true;else data.recoverNick=false;data.user=document.getElementById('userInputId').value
+;data.real=document.getElementById('realInputId').value;data.modes=document.getElementById('modesInputId').value;data.channelList=document.getElementById('channelListInputId').value;let errorStr=null
+;if(''===data.name)errorStr='Label is required input.';if(''===data.host)errorStr='Host/IP is required input.';if(isNaN(data.port))errorStr='Invalid port number'
+;if(data.nick===data.altNick)errorStr='Nickname and alternate nickname must be different.'
+;if(data.recoverNick&&0===data.altNick.length)errorStr='Nickname recovery checkbox set without valid alternate nickname';if(''===data.nick)errorStr='Nickname is required input.'
+;if(''===data.user)errorStr='Unix ident user is required input.';if(''===data.real)errorStr='Real Name is required input.';if(errorStr)reject(new Error(errorStr));else resolve({data:data,index:index})
+});const buildServerListTable=data=>new Promise((resolve,reject)=>{const tableNode=document.getElementById('tbodyId');while(tableNode.firstChild)tableNode.removeChild(tableNode.firstChild)
 ;const columnTitles=['Index','Disabled','Label','Host','Port','Nick','','','',''];const titleRowEl=document.createElement('tr');columnTitles.forEach(titleName=>{const tdEl=document.createElement('td')
 ;tdEl.textContent=titleName;titleRowEl.appendChild(tdEl)});tableNode.appendChild(titleRowEl);if(Array.isArray(data)&&data.length>0)for(let i=0;i<data.length;i++){
 const rowEl=document.createElement('tr');rowEl.setAttribute('index',i.toString());const td01El=document.createElement('td');const td02El=document.createElement('td')

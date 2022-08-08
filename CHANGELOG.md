@@ -16,18 +16,20 @@ are issued during nickname recovery if configured in the server setup.
 
 Configuration:
 
-- example-servers.json - Added new server properties "altNick" and "recoverNick". For older version of credentials.json files, these will be updated automatically without error to values with new features disabled.
+- example-servers.json - Added new server properties "altNick" and "recoverNick". For older version of servers.json files, these will be updated automatically without error to values with new features disabled.
 
 Server:
 
-- server/irc/irc-client.js - Added existing `servers` object to global vars object to allow global access to the server list. Instances of servers.xxxxx are now vars.servers.xxxxx. Before this change, scope of servers object was local to irc-client.js.
+- server/irc/irc-client.js - Added existing `servers` object to global `vars` object to allow global access to the server list. Instances of servers.xxxxx are now `vars.servers.xxxxx`. Before this change, scope of servers object was local to irc-client.js.
 - server/irc/irc-client.js - Add new boolean property `nickRecoveryActive` to ircState object;
-- server/irc/irc-client.js - Added recoverNickTimerTick(ircSocket) to the global multi-task timer event.
+- server/irc/irc-client.js - Added recoverNickTimerTick(ircSocket) to the global multi-task timer event, passing in the current TCP socket object.
+- server/irc/irc-client.js - On disconnect alternate nickname reset to primary nickname, other values not changed.
+- server/irc/irc-client.js - On disconnect DALnet services forced rename Guest12345 (Guest*) reset to primary nickname, unless set as primary.
 - server/irc/irc-serverlist-editor.js - Added new server properties "altNick" and "recoverNick" to server list editing API.
 - server/irc/irc-serverlist-validations.js - Add input validation for new properties "altNick" and "recoverNick"
 - server/irc/irc-parse.js - Multiple changes as follows
-  - Message 001 RPL_WELCOME - Update conditions for nickserv IDENTIFY functions
-  - Message 432 ERR_ERONEUSNICKNAME - Abort alternate nickname and auto-recover.
+  - Message 001 RPL_WELCOME - Update conditions for automatically sending nickserv IDENTIFY command on initial connect to IRC.
+  - Message 432 ERR_ERONEUSNICKNAME - (432 add new handler) - During initial IRC connect, before nickname registration, add functionality to send alternate nickname to IRC sever using /NICK command. Nickname auto-recovery is not enabled, because user's command for nickserv RELEASE password is required manually before attempting to user primary nickname.
   - Message 433 ERR_NICKNAMEINUSE - During initial IRC connect, before nickname registration, add functionality to send alternate nickname to IRC sever using /NICK command. Sets variables used to enable auto-recovery of primary nickname.
   - Message NICK - Add functionality to automatically send the nickserv IDENTIFY command if nickname auto-recovery is enabled and the user is currently using the configured alternate nickname.
   - Message QUIT - Added functionality to detect a match between the QUIT nickname and the user's primary nickname. If match then automatically recover the primary nickname by sending a /NICK command to the server.
@@ -36,10 +38,10 @@ Server:
 Browser:
 
 - secure/serverlist.html - Added input element and checkbox element for new properties "altNick" and "recoverNick"
-- secure/serverlist.html - Added (R) icon to show auto-Recovery of nickname is active.
 - secure/js/serverlist.js - Added value parsing for new server properties "altNick" and "recoverNick"
 - secure/js/webclient.js - On change in ircState object, nickname input element updates from state object even if not connected to IRC. This is 
 necessary for alternate nickname rotation and nickname recovery. However, a change in state could possibly revert the nickname input element to current value on the web server. 
+- secure/js/webclient.html - Added (R) icon to show auto-Recovery of nickname is active.
 - secure/js/webclient.js - Added code to control visibility of (R) icon for nickname recovery.
 
 ## [v0.2.4](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.4) 2022-08-04

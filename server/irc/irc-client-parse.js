@@ -658,37 +658,71 @@
         break;
       //
       // 432 ERR_ERRONEUSNICKNAME
-      //
       case '432':
         //
         // This is seen on DALnet when a desired nickname
-        // is locked and requires a release command sent to nickserv
+        // is locked by nickserv services and requires a
+        // release command sent to nickserv.
         //
-        // Action: disconnect from IRC
+        // Action: If primary nickname match, try alternate nick
+        //         else, disconnect.
         //
+        // ircRegistered is used to skip user's /NICK commands after login
         if (!vars.ircState.ircRegistered) {
-          if (socket) {
-            socket.destroy();
-          }
-          // signal browser to show an error
-          vars.ircState.count.ircConnectError++;
+          const configNick = vars.servers.serverArray[vars.ircState.ircServerIndex].nick;
+          const alternateNick = vars.servers.serverArray[vars.ircState.ircServerIndex].altNick;
+          if ((!vars.ircState.nickRecoveryActive) &&
+            // if enabled...
+            (alternateNick.length > 0) &&
+            // The in-use nick is parsedMessage.params[1]
+            (parsedMessage.params) &&
+            (parsedMessage.params[1]) &&
+            // nickname requested params[1] is primary nickname
+            (parsedMessage.params[1] === configNick) &&
+            // and current nickname equals primary nickname
+            (vars.ircState.nickName === configNick) &&
+            (configNick !== alternateNick)) {
+            // continue parser, move this to async
+            setTimeout(function () {
+              // Special case:
+              // vars.ircState.nickName is normally set in
+              // response to a NAME server message.
+              // In this case, the nickname has not been registered yet.
+              // The connect will proceed to message 001 RPL_WELCOME
+              // and the server will not send a NICK message response to
+              // this NICK message.
+              vars.ircState.nickName = alternateNick;
+              ircWrite.writeSocket(socket, 'NICK ' + alternateNick);
+              // Only change nickname,
+              // Do not request auto recovery after 422
+              // because it would require user password manually
+            }, 500);
+          } else {
+            // Else disconnect from IRC
+            if (socket) {
+              socket.destroy();
+            }
+            // signal browser to show an error
+            vars.ircState.count.ircConnectError++;
 
-          vars.ircState.ircServerPrefix = '';
-          // Do not reconnect
-          vars.ircState.ircConnectOn = false;
-          vars.ircState.ircConnecting = false;
-          vars.ircState.ircConnected = false;
-          vars.ircState.ircRegistered = false;
-          vars.ircState.ircIsAway = false;
-          vars.ircState.nickRecoveryActive = false;
-          vars.ircServerReconnectChannelString = '';
-          tellBrowserToRequestState();
-        }
+            vars.ircState.ircServerPrefix = '';
+            // Do not reconnect
+            vars.ircState.ircConnectOn = false;
+            vars.ircState.ircConnecting = false;
+            vars.ircState.ircConnected = false;
+            vars.ircState.ircRegistered = false;
+            vars.ircState.ircIsAway = false;
+            vars.ircState.nickRecoveryActive = false;
+            vars.ircServerReconnectChannelString = '';
+            tellBrowserToRequestState();
+          }
+        } // ! ircRegistered
         // An error has occurred trying to change nickname while connected.
-        // This is most likely a serverices lock on the nickname
-        // Action: abort auto-reconnect
+        // This is most likely a services lock on the nickname
+        // Action: abort auto-reconnect, requires user password manually
         if (vars.ircState.ircConnected) {
           _cancelNickRecovery();
+          tellBrowserToRequestState();
         }
         break;
       //
@@ -703,11 +737,14 @@
           const configNick = vars.servers.serverArray[vars.ircState.ircServerIndex].nick;
           const alternateNick = vars.servers.serverArray[vars.ircState.ircServerIndex].altNick;
           if ((!vars.ircState.nickRecoveryActive) &&
+            // if enabled...
             (alternateNick.length > 0) &&
             // The in-use nick is parsedMessage.params[1]
             (parsedMessage.params) &&
             (parsedMessage.params[1]) &&
+            // nickname requested params[1] is primary nickname
             (parsedMessage.params[1] === configNick) &&
+            // and current nickname equals primary nickname
             (vars.ircState.nickName === configNick) &&
             (configNick !== alternateNick)) {
             // continue parser, move this to async
@@ -722,6 +759,7 @@
               vars.ircState.nickName = alternateNick;
               ircWrite.writeSocket(socket, 'NICK ' + alternateNick);
               _activateNickRecovery();
+              tellBrowserToRequestState();
             }, 500);
           } else {
             // Else alternate nickname not enabled, disconnect and wait for user input
@@ -752,6 +790,7 @@
             console.log('433 ', nickRecoveryWhoisCounter, nickRecoveryWhoisResponses);
             if (nickRecoveryWhoisCounter !== nickRecoveryWhoisResponses) {
               _cancelNickRecovery();
+              tellBrowserToRequestState();
             }
           }
         }
@@ -990,7 +1029,8 @@
             // Empty string is disabled
             (alternateNick.length > 0) &&
             (parsedMessage.nick === configNick) &&
-            (vars.ircState.nickName === alternateNick)) {
+            (vars.ircState.nickName === alternateNick) &&
+            (configNick !== alternateNick)) {
             nickservIdentifyActiveFlag = true;
             setTimeout(function () {
               nickservIdentifyActiveFlag = false;
@@ -1052,9 +1092,18 @@
     if (nickRecoveryWhoisTimer > 0) {
       const configNick = vars.servers.serverArray[vars.ircState.ircServerIndex].nick;
       const alternateNick = vars.servers.serverArray[vars.ircState.ircServerIndex].altNick;
-      if (!vars.ircState.ircConnected) _cancelNickRecovery();
-      if (vars.ircState.nickName === configNick) _cancelNickRecovery();
-      if (vars.ircState.nickName !== alternateNick) _cancelNickRecovery();
+      if (!vars.ircState.ircConnected) {
+        _cancelNickRecovery();
+        tellBrowserToRequestState();
+      }
+      if (vars.ircState.nickName === configNick) {
+        _cancelNickRecovery();
+        tellBrowserToRequestState();
+      }
+      if (vars.ircState.nickName !== alternateNick) {
+        _cancelNickRecovery();
+        tellBrowserToRequestState();
+      }
       if (nickRecoveryWhoisTimer > 0) {
         nickRecoveryWhoisTimer--;
         if (nickRecoveryWhoisTimer === 0) {
@@ -1062,7 +1111,8 @@
           if (nickRecoveryWhoisCounter < 76) {
             if ((alternateNick.length > 0) &&
               (vars.ircState.nickName === alternateNick) &&
-              (vars.servers.serverArray[vars.ircState.ircServerIndex].recoverNick)) {
+              (vars.servers.serverArray[vars.ircState.ircServerIndex].recoverNick) &&
+              (configNick !== alternateNick)) {
               nickRecoveryWhoisTimer = 60;
               // each 1 minute until 20 minutes
               if (nickRecoveryWhoisCounter > 20) nickRecoveryWhoisTimer = 300;
@@ -1077,6 +1127,7 @@
             }
           } else {
             _cancelNickRecovery();
+            tellBrowserToRequestState();
           }
         }
       }

@@ -288,13 +288,30 @@
     vars.ircServerReconnectAwayString = '';
   }; // onDisconnectGrabState()
 
-  // If IRC becomes disconnected while using configured
-  // alternate nickname, reset to primary nickname on disconnect.
+  // Primary nickname reset function
+  //
+  // 1) Alternate nickname reset to primary nickname
+  // 2) Services Guest12345 (Guest*) reset to primary nickname.
+  //
   const onDisconnectResetPrimaryNick = function () {
     const configNick = vars.servers.serverArray[vars.ircState.ircServerIndex].nick;
     const alternateNick = vars.servers.serverArray[vars.ircState.ircServerIndex].altNick;
-    if ((alternateNick.length > 0) && (vars.ircState.nickName === alternateNick)) {
+    if ((alternateNick.length > 0) &&
+      (vars.ircState.nickName === alternateNick) &&
+      (configNick !== alternateNick)) {
       vars.ircState.nickName = configNick;
+    } else if ((vars.ircState.nickName !== configNick) &&
+      (vars.ircState.nickName !== alternateNick)) {
+      if ((vars.ircState.nickName.indexOf('Guest') === 0) &&
+        (vars.ircState.nickName.length === 10)) {
+        let numberSubStr = '';
+        for (let i = 5; i < 10; i++) {
+          numberSubStr += vars.ircState.nickName.charAt(i);
+        }
+        if (!isNaN(numberSubStr)) {
+          vars.ircState.nickName = configNick;
+        }
+      }
     }
   };
 
