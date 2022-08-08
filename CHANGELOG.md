@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Next 2022-08-08
+## [v0.2.5](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.5) 2022-08-08
 
 This is a feature update. New functionality has been added to use an alternate nickname when the primary nickname is in use.
 Later, when the desired nickname becomes available, the nickname can be auto-recovered to it's primary value. Nickserv IDENTIFY commands 
