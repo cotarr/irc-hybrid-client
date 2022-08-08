@@ -312,7 +312,8 @@
           When the &quot;reconnect&quot; property is set to true, the backend web server will
           attempt to reconnect to the IRC server after it has been disconnected.
           It will attempt to re-join up to 5 channels at the time of disconnection.
-          This feature does not support channel passwords.
+          This feature does not support channel passwords. There is no provision to 
+          rotate multiple IRC server addresses, and the original server address will be used.
         </p>
         <p>
           When the &quot;logging&quot; property is set to true, IRC messages 
@@ -337,14 +338,45 @@
 
         <div class="install-section-title">4 - IRC User Information</div>
         <p>
-          This section with nickname and real name should be obvious to anyone using IRC.
+          This input values in this section with nickname, user name, and real name 
+          should be obvious to anyone familiar with using IRC.
+        </p>
+        <p>
+          The &quot;altNick&quot; field is used when the primary nickname is unavailable.
+          When &quot;recoverNick&quot; is set to true, automatic recovery of 
+          the primary nickname will be attempted when the primary nickname becomes available.
         </p>
         <p>
           In the case where an IRC server returns a 433 ERR_NICKNAMEINUSE
           prior to nickname registration, the altNick value will be 
-          submitted as an alternate nickname. Upon IRC disconnect, 
-          if the alternate nickname is in use, the requested nickname will revert back
-          to the  primary nickname value.
+          submitted as an alternate nickname. If recoverNick is set to true, 
+          the automatic nickname recovery process will be activated by the 433 message.
+          The &quot;nickRecoveryActive&quot; property in the irc state object will be set
+          to true so the web browser can update status icons accordingly.
+        </p>
+        <p>
+          In the case where an IRC server returns a 432 ERR_ERRONEUSNICKNAME
+          prior to nickname registration, the altNick value will be 
+          submitted as an alternate nickname. However, auto-recovery of the 
+          primary nickname is not enabled.  This is because 432 is probably caused by
+          a services/nickserv nickname lock, and manual user intervention 
+          will most likely be needed to clear the 432 IRC server message.
+        </p>
+        <p>
+          Upon IRC disconnect, if the alternate nickname is in use at the time
+          of disconnect, the requested nickname will revert back to the 
+          primary nickname value. Next next connection event will therefore 
+          use the primary nickname. If the use has entered an ad-hoc nickname value different
+          from both the primary and alternate nicknames, the ad-hoc nickname 
+          will persist after disconnect.
+        </p>
+        <p>
+          As a special case for DALnet where the user's nickname may be forced
+          to a value of &quot;Guest12345&quot; by services/nickserv.
+          The numeric part shown here as 12345 is uniquely created and may be a different number.
+          Unless the user's primary nickname has been set to Guest12345 in the 
+          configuration, the Guest* nickname will revert to the primary nickname 
+          after IRC server disconnect.
         </p>
         <p>
           If recoverNick is set to the true, the client will automatically 
@@ -354,10 +386,11 @@
           with the active alternate nickname, a QUIT message will trigger immediate
           nickname recovery. Otherwise, a cycle timer will periodically 
           attempt to send NICK commands with the primary nickname 
-          until a time limit is reached.
+          until a time limit is reached. The duration between attempts 
+          increases over time.
         </p>
         <p>
-          Please note that different type of IRC servers have different
+          Please note that different types of IRC servers have different
           requirements for the number of characters allowed in a Nickname,
           user or real name. These are often displayed in a server message
           when you first connect to IRC. At the present time, the maximum
@@ -381,7 +414,7 @@
           This may be added in the future.
         </p>
         <p>
-          The &quotchannelList&quot property is used to designate a javascript array
+          The &quot;channelList&quot; property is used to designate a javascript array
           of string entries, where each array value is the name of an IRC channel.
           After connection to an IRC server, the favorite channels are
           displayed as buttons to allow easy /JOIN capability when using a
@@ -401,14 +434,22 @@
         <div class="install-section-title">6 - NickServ IDENTIFY</div>
         <p>
           There is a provision to automatically dispatch a NickServ IDENTIFY message.
-          This enabled when the IRC configured primary nickname matches the property &quotidentifyNick&quot.
+          This enabled when the IRC configured primary nickname matches the 
+          property &quot;identifyNick&quot; and both identifyNick and identifyCommand 
+          properties are strings of length greater than zero. This feature is disabled by clearing either 
+          or both of the properties.
+        </p>
+        <p>
+          Triggers:
         </p>
         <ul>
           <li>
-            Prior to nickname registration, triggered upon server &quot;433&quot; message ERR_NICKNAMEINUSE.
+            Prior to nickname registration, the nickserv IDENTIFY command is
+            triggered upon receiving an IRC server &quot;001&quot; RPL_WELCOME message.
           </li>
           <li>
-            During nickname recovery, triggered upon server &quot;NICK&quot; message.
+            During nickname recovery, the nickserv IDENTIFY command is 
+            triggered upon server &quot;NICK&quot; message with proper nickname values.
           </li>
         </ul>
         <p>
@@ -428,7 +469,7 @@
         Please read this section carefully. This &quotidentifyCommand&quot property
         represents a <yellow-example>raw IRC command, not a private message</yellow-example>.
         This allows identification with IRC servers where
-        &quotNICKSERV&quot and &quotNS&quot are valid IRC server commands and
+        &quot;NICKSERV&quot; and &quot;NS&quot; are valid IRC server commands and
         understood by NickServ network services.
         In cases where the identification must be sent by private message (/msg), then
         the proper private message raw command must be constructed with valid syntax.
@@ -436,7 +477,7 @@
       <p>
         If NickServ services requires a simple private message then the PRIVMSG
         raw server command would be used. The format of the entire message starts
-        with the command &quotPRIVMSG&quot, followed by a space, followed by
+        with the command &quot;PRIVMSG&quot;, followed by a space, followed by
         the IRC nickname of the recipient, followed by a space. The the
         message delimiter is a colon character &quot:&quot which is then followed
         with the private message contents. To identify in this manner using
@@ -459,10 +500,10 @@
   "identifyCommand": "PRIVMSG NickServ@services.dal.net :IDENTIFY xxxxxxxx",
 </pre></div>
       <p>
-        In the case where an IRC network has reserved &quotNICKSERV&quot as
+        In the case where an IRC network has reserved &quot;NICKSERV&quot; as
         a custom IRC command you can use the next method. It reduces the
         risk of sending your IDENTIFY password to another user pretending
-        to be Nickserv. In this case, IDENTIFY and the password are sent as
+        to be nickserv. In this case, IDENTIFY and the password are sent as
         command parameters, so the colon is not required.
       </p>
 <div class="pre-div"><pre>
@@ -475,9 +516,9 @@
 
         <div class="install-section-title">configVersion (Global)</div>
         <p>
-          The property &quotconfigVersion&quot is intended to throw a JavaScript 
+          The property &quot;configVersion&quot; is intended to throw a JavaScript 
           error on the NodeJs web server when the format version does not match the expected value.
-          The expected value is curently 2.
+          The expected value is currently 2.
         </p>
         <p>
           Upgrade Notes: For upgrade from 0.1.44 to 0.2.x perform the following changes:
@@ -496,7 +537,7 @@
         
         <div class="install-section-title">CTCP Time Locale (global)</div>
         <p>
-          The &quotctcpTimeLocale&quot property is optional. It may be used
+          The &quot;ctcpTimeLocale&quot; property is optional. It may be used
           to specify a CTCP TIME reply format.
           It may be used in the case where a client time zone when different
           from the server.
@@ -504,9 +545,9 @@
           Caution, the toLocaleString() is implementation dependant, and
           this was written using Debian 10.
           The value is an array. The first element is the toLocaleString() locales string.
-          The default locales string is &quoten.US&quot. The second element
+          The default locales string is &quot;en.US&quot;. The second element
           is used by the timeZone property of toLocaleString options parameter. The
-          default value is &quotUTC&QUOT. It may be set to a different
+          default value is &quot;UTC&quot;. It may be set to a different
           locale value such as "America/Chicago".
         </p>
         
