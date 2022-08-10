@@ -73,9 +73,9 @@
         <p>
           The server list editor is external to the IRC web client web page. 
           The editor operates fully independent from chatting with the IRC client.
-          In order to use the web page editor remotely to modify the database, 
-          it is necessary to disconnect from the IRC network while making changes 
-          to the list of IRC server definitions.
+          The web page editor may be used to view IRC server definitions as read-only
+          while connected to the IRC network. However, it is necessary to disconnect 
+          from the IRC network while making changes.
         </p>
 
         <div class="home-detail">
@@ -89,9 +89,12 @@
               into the browser address bar. The editor and web client may be open concurrently, 
               but the client must be disconnected from the IRC network to edit the list.
             </p>
+            <p>
+              Both the IRC client and the server list may be open concurrently.
+            </p>
           </div>
           <div class="image-photo">
-            <img src=images/server-list-button.png width="512" height="313"alt="Server List Edit Button">
+            <img src=images/server-list-button.png width="525" height="313"alt="Server List Edit Button">
           </div>
         </div>
 
@@ -103,9 +106,16 @@
           The server definition at index number 0 is the default definition 
           that will be selected when the application is started.
           In the far right column, [move-up] buttons may be used to re-order the list.
-        </p><p>
+        </p>
+        <p>
           The [Return to IRC Client] button is a hyper-link back to the IRC client URL at /irc/webclient.html.
-        </p><p>
+        </p>
+        <p>
+          The [Show all columns] button will expand the table to that all IRC server properties are displayed 
+          with IRC server definitions in a single table.
+          Clicking the button a second time will collapse the table to it's original small size.
+        </p>
+        <p>
           The [Copy] button will duplicate the selected IRC server definition and add the 
           copy to the bottom of the list.
         </p><p>
@@ -115,7 +125,7 @@
           The [Create New IRC Server] button will open the same form populated with some default values.
         </p>
         <div>
-          <img src=images/server-list.png width="636" height="333"alt="Server Listing Table">
+          <img src=images/server-list.png width="633" height="272"alt="Server Listing Table">
         </div>
 
         <div class="install-section-title">Data Entry</div>
