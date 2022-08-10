@@ -67,6 +67,17 @@
         process.exit(1);
       }
     }
+    // Upgrade from servers.json version 1 to 2, missing properties set to default
+    if ((vars.servers.configVersion === 2) && (vars.servers.serverArray.length > 0)) {
+      for (let i = 0; i < vars.servers.serverArray.length; i++) {
+        if (!('altNick' in vars.servers.serverArray[i])) {
+          vars.servers.serverArray[i].altNick = '';
+        }
+        if (!('recoverNick' in vars.servers.serverArray[i])) {
+          vars.servers.serverArray[i].recoverNick = false;
+        }
+      }
+    }
   }; // loadServerList()
 
   // Do on program load
