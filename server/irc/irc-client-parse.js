@@ -787,7 +787,6 @@
           // If out of sync, abort
           if (vars.ircState.nickRecoveryActive) {
             nickRecoveryWhoisResponses++;
-            console.log('433 ', nickRecoveryWhoisCounter, nickRecoveryWhoisResponses);
             if (nickRecoveryWhoisCounter !== nickRecoveryWhoisResponses) {
               _cancelNickRecovery();
               tellBrowserToRequestState();

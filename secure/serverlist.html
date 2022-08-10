@@ -16,7 +16,7 @@
 
     <h1>IRC Server List Editor</h1>
     
-    <div id="serverListDisabledDiv" hidden>
+    <div class="yellow-warning-div" id="serverListDisabledDiv" hidden>
       <p>
         The Server List Editor has been disabled in the 
         web server configuration file.
@@ -26,14 +26,10 @@
       </a>
     </div>
 
-    <div id="warningVisibilityDiv" hidden>
-      <h2>IRC server connected.</h2>
+    <div class="connected-warning-div" id="warningVisibilityDiv" hiddenXXX>
       <p>
-        Please disconnect from IRC before loading the IRC Server List Editor.
+        READ ONLY - Disconnect from IRC network to enable editing.
       </p>
-      <a href="/irc/webclient.html">
-        <button>Return to IRC Client...</button>
-      </a>
     </div>
 
     <div id="listVisibilityDiv">
@@ -42,7 +38,10 @@
           <a href="/irc/webclient.html">
             <button>Return to IRC Client...</button>
           </a>
+          
           <button id="createNewButton">Create New IRC Server...</button>
+          <button id="fullButton">Show all columns</button>
+          <button id="refreshButton">Refresh...</button>
         </div>
         <div class="vh10"></div>
         <table border="1" cellpadding="3px">

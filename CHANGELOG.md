@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Next 2022-08-09
+
+### Changed
+
+- Added button to the IRC server list to expand the table to show all server definition properties for all defined IRC servers in one large table.
+- The list of IRC servers may now be opened when connected to the IRC network. The list may be viewed as read-only, but the client must disconnect from IRC to edit the IRC server definitions.
+- Changed to the API to allow GET request /irc/serverlist while connected to the IRC network provided the database "lock" parameter is not included as a URL query parameter.
+
 ## [v0.2.5](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.5) 2022-08-08
 
 This is a feature update. New functionality has been added to use an alternate nickname when the primary nickname is in use.

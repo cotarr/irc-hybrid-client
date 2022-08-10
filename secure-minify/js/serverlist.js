@@ -24,11 +24,12 @@ SOFTWARE.
 
 'use strict';
 
-const _clearError=()=>{const errorDivEl=document.getElementById('errorDiv');errorDivEl.setAttribute('hidden','');while(errorDivEl.firstChild)errorDivEl.removeChild(errorDivEl.firstChild)
-;document.getElementById('showRefreshButtonDiv').setAttribute('hidden','')};const _showError=errorString=>{const errorDivEl=document.getElementById('errorDiv');errorDivEl.removeAttribute('hidden')
-;const errorMessageEl=document.createElement('div');errorMessageEl.textContent=errorString||'Error: unknown error (4712)';errorDivEl.appendChild(errorMessageEl)
-;document.getElementById('showRefreshButtonDiv').removeAttribute('hidden');window.scrollTo(0,document.querySelector('body').scrollHeight)};const fetchIrcState=()=>{
-const fetchURL=encodeURI('/irc/getircstate');const fetchOptions={method:'GET',credentials:'include',headers:{Accept:'application/json'}};return fetch(fetchURL,fetchOptions).then(response=>{
+let full=false;let editable=false;const _clearError=()=>{const errorDivEl=document.getElementById('errorDiv');errorDivEl.setAttribute('hidden','')
+;while(errorDivEl.firstChild)errorDivEl.removeChild(errorDivEl.firstChild);document.getElementById('showRefreshButtonDiv').setAttribute('hidden','')};const _showError=errorString=>{
+const errorDivEl=document.getElementById('errorDiv');errorDivEl.removeAttribute('hidden');const errorMessageEl=document.createElement('div')
+;errorMessageEl.textContent=errorString||'Error: unknown error (4712)';errorDivEl.appendChild(errorMessageEl);document.getElementById('showRefreshButtonDiv').removeAttribute('hidden')
+;window.scrollTo(0,document.querySelector('body').scrollHeight)};const fetchIrcState=()=>{const fetchURL=encodeURI('/irc/getircstate');const fetchOptions={method:'GET',credentials:'include',headers:{
+Accept:'application/json'}};return fetch(fetchURL,fetchOptions).then(response=>{
 if(response.ok)return response.json();else throw new Error('Fetch status '+response.status+' '+response.statusText+' '+fetchURL)})};const fetchServerList=(index,lock)=>{let urlStr='/irc/serverlist'
 ;if(index>=0){urlStr+='?index='+index.toString();if(lock>=0)urlStr+='&lock='+lock.toString()}const fetchURL=encodeURI(urlStr);const fetchOptions={method:'GET',credentials:'include',headers:{
 Accept:'application/json'}};return fetch(fetchURL,fetchOptions).then(response=>{if(response.ok)return response.json();else if(409===response.status){
@@ -42,14 +43,13 @@ const err=new Error('IRC Connected or Database Locked');err.status=409;throw err
 document.getElementById('saveNewButton').removeAttribute('hidden');document.getElementById('saveModifiedButton').setAttribute('hidden','');document.getElementById('indexInputId').value='-1'
 ;document.getElementById('disabledCheckboxId').checked=false;document.getElementById('nameInputId').value='';document.getElementById('hostInputId').value=''
 ;document.getElementById('portInputId').value=6697;document.getElementById('tlsCheckboxId').checked=true;document.getElementById('verifyCheckboxId').checked=true
-;document.getElementById('proxyCheckboxId').checked=true;document.getElementById('autoReconnectCheckboxId').checked=false;document.getElementById('loggingCheckboxId').checked=false
+;document.getElementById('proxyCheckboxId').checked=false;document.getElementById('autoReconnectCheckboxId').checked=false;document.getElementById('loggingCheckboxId').checked=false
 ;document.getElementById('passwordInputId').setAttribute('disabled','');document.getElementById('passwordInputId').value='(Hidden)';document.getElementById('identifyNickInputId').value=''
 ;document.getElementById('identifyCommandInputId').setAttribute('disabled','');document.getElementById('identifyCommandInputId').value='(Hidden)';document.getElementById('nickInputId').value=''
 ;document.getElementById('altNickInputId').value='';document.getElementById('recoverNickCheckboxId').checked=false;document.getElementById('userInputId').value=''
 ;document.getElementById('realInputId').value='';document.getElementById('modesInputId').value='';document.getElementById('channelListInputId').value='';resolve(null)})
 ;const populateIrcServerForm=data=>new Promise((resolve,reject)=>{clearIrcServerForm();document.getElementById('saveNewButton').setAttribute('hidden','')
-;document.getElementById('saveModifiedButton').removeAttribute('hidden');document.getElementById('serverListDisabledDiv').setAttribute('hidden','')
-;document.getElementById('warningVisibilityDiv').setAttribute('hidden','');document.getElementById('listVisibilityDiv').setAttribute('hidden','')
+;document.getElementById('saveModifiedButton').removeAttribute('hidden');document.getElementById('listVisibilityDiv').setAttribute('hidden','')
 ;document.getElementById('formVisibilityDiv').removeAttribute('hidden');document.getElementById('serverPasswordWarningDiv').setAttribute('hidden','')
 ;document.getElementById('nickservCommandWarningDiv').setAttribute('hidden','');document.getElementById('indexInputId').value=data.index.toString()
 ;if(data.disabled)document.getElementById('disabledCheckboxId').checked=true;else document.getElementById('disabledCheckboxId').checked=false;document.getElementById('nameInputId').value=data.name
@@ -67,12 +67,13 @@ document.getElementById('saveNewButton').removeAttribute('hidden');document.getE
 ;document.getElementById('userInputId').value=data.user;document.getElementById('realInputId').value=data.real;document.getElementById('modesInputId').value=data.modes
 ;document.getElementById('channelListInputId').value=data.channelList;resolve(null)});const openIrcServerEdit=index=>{_clearError()
 ;clearIrcServerForm().then(()=>fetchServerList(index,1)).then(data=>populateIrcServerForm(data)).catch(err=>{_showError(err.toString()||err);console.log(err)})};const copyIrcServerToNew=index=>{
-_clearError();submitServer({index:index,action:'duplicate'},'COPY',index).then(data=>checkErrorAndCloseEdit(data)).then(()=>fetchServerList(-1,-1)).then(data=>buildServerListTable(data)).catch(err=>{
+_clearError();submitServer({index:index,action:'duplicate'
+},'COPY',index).then(data=>checkForApiError(data)).then(()=>fetchIrcState()).then(data=>setDivVisibility(data)).then(()=>fetchServerList(-1,-1)).then(data=>buildServerListTable(data)).catch(err=>{
 _showError(err.toString()||err);console.log(err)})};const deleteIrcServer=index=>{_clearError();submitServer({index:index
-},'DELETE',index).then(data=>checkErrorAndCloseEdit(data)).then(()=>fetchServerList(-1,-1)).then(data=>buildServerListTable(data)).catch(err=>{_showError(err.toString()||err);console.log(err)})}
-;const moveUpInList=index=>{_clearError();submitServer({index:index,action:'move-up'
-},'COPY',index).then(data=>checkErrorAndCloseEdit(data)).then(()=>fetchServerList(-1,-1)).then(data=>buildServerListTable(data)).catch(err=>{_showError(err.toString()||err);console.log(err)})}
-;const parseFormInputValues=()=>new Promise((resolve,reject)=>{const index=parseInt(document.getElementById('indexInputId').value);const data={}
+},'DELETE',index).then(data=>checkForApiError(data)).then(()=>fetchIrcState()).then(data=>setDivVisibility(data)).then(()=>fetchServerList(-1,-1)).then(data=>buildServerListTable(data)).catch(err=>{
+_showError(err.toString()||err);console.log(err)})};const moveUpInList=index=>{_clearError();submitServer({index:index,action:'move-up'
+},'COPY',index).then(data=>checkForApiError(data)).then(()=>fetchIrcState()).then(data=>setDivVisibility(data)).then(()=>fetchServerList(-1,-1)).then(data=>buildServerListTable(data)).catch(err=>{
+_showError(err.toString()||err);console.log(err)})};const parseFormInputValues=()=>new Promise((resolve,reject)=>{const index=parseInt(document.getElementById('indexInputId').value);const data={}
 ;if(-1!==index)data.index=parseInt(document.getElementById('indexInputId').value);if(document.getElementById('disabledCheckboxId').checked)data.disabled=true;else data.disabled=false
 ;data.name=document.getElementById('nameInputId').value;data.host=document.getElementById('hostInputId').value;data.port=parseInt(document.getElementById('portInputId').value)
 ;if(document.getElementById('tlsCheckboxId').checked)data.tls=true;else data.tls=false;if(document.getElementById('verifyCheckboxId').checked)data.verify=true;else data.verify=false
@@ -89,45 +90,66 @@ _showError(err.toString()||err);console.log(err)})};const deleteIrcServer=index=
 ;if(data.recoverNick&&0===data.altNick.length)errorStr='Nickname recovery checkbox set without valid alternate nickname';if(''===data.nick)errorStr='Nickname is required input.'
 ;if(''===data.user)errorStr='Unix ident user is required input.';if(''===data.real)errorStr='Real Name is required input.';if(errorStr)reject(new Error(errorStr));else resolve({data:data,index:index})
 });const buildServerListTable=data=>new Promise((resolve,reject)=>{const tableNode=document.getElementById('tbodyId');while(tableNode.firstChild)tableNode.removeChild(tableNode.firstChild)
-;const columnTitles=['Index','Disabled','Label','Host','Port','Nick','','','',''];const titleRowEl=document.createElement('tr');columnTitles.forEach(titleName=>{const tdEl=document.createElement('td')
-;tdEl.textContent=titleName;titleRowEl.appendChild(tdEl)});tableNode.appendChild(titleRowEl);if(Array.isArray(data)&&data.length>0)for(let i=0;i<data.length;i++){
-const rowEl=document.createElement('tr');rowEl.setAttribute('index',i.toString());const td01El=document.createElement('td');const td02El=document.createElement('td')
-;const td03El=document.createElement('td');const td04El=document.createElement('td');const td05El=document.createElement('td');const td06El=document.createElement('td')
-;const td07El=document.createElement('td');const td08El=document.createElement('td');const td09El=document.createElement('td');const td10El=document.createElement('td')
-;const disabledCheckboxEl=document.createElement('input');disabledCheckboxEl.setAttribute('type','checkbox');disabledCheckboxEl.setAttribute('disabled','')
-;const editButtonEl=document.createElement('button');const copyButtonEl=document.createElement('button');const deleteButtonEl=document.createElement('button')
-;const moveUpButtonEl=document.createElement('button');editButtonEl.textContent='Edit';copyButtonEl.textContent='Copy';deleteButtonEl.textContent='Delete';moveUpButtonEl.textContent='move-up'
-;td01El.textContent=i.toString();disabledCheckboxEl.checked=data[i].disabled;td02El.appendChild(disabledCheckboxEl);td03El.textContent=data[i].name;td04El.textContent=data[i].host
-;td05El.textContent=data[i].port;td06El.textContent=data[i].nick;td07El.appendChild(editButtonEl);td08El.appendChild(copyButtonEl);td09El.appendChild(deleteButtonEl)
-;if(i>0)td10El.appendChild(moveUpButtonEl);rowEl.appendChild(td01El);rowEl.appendChild(td02El);rowEl.appendChild(td03El);rowEl.appendChild(td04El);rowEl.appendChild(td05El);rowEl.appendChild(td06El)
-;rowEl.appendChild(td07El);rowEl.appendChild(td08El);rowEl.appendChild(td09El);rowEl.appendChild(td10El);tableNode.appendChild(rowEl);editButtonEl.addEventListener('click',()=>{
-openIrcServerEdit(parseInt(rowEl.getAttribute('index')))});copyButtonEl.addEventListener('click',()=>{copyIrcServerToNew(parseInt(rowEl.getAttribute('index')))})
-;deleteButtonEl.addEventListener('click',()=>{deleteIrcServer(parseInt(rowEl.getAttribute('index')))});if(i>0)moveUpButtonEl.addEventListener('click',()=>{
-moveUpInList(parseInt(rowEl.getAttribute('index')))})}resolve(null)});const checkErrorAndCloseEdit=data=>new Promise((resolve,reject)=>{if('success'===data.status){
-document.getElementById('serverListDisabledDiv').setAttribute('hidden','');document.getElementById('warningVisibilityDiv').setAttribute('hidden','')
-;document.getElementById('listVisibilityDiv').removeAttribute('hidden');document.getElementById('formVisibilityDiv').setAttribute('hidden','');resolve(null)
-}else reject(new Error('PATCH API did not return success status flag'))});document.getElementById('replacePasswordButton').addEventListener('click',()=>{
-document.getElementById('passwordInputId').removeAttribute('disabled');document.getElementById('passwordInputId').value='';document.getElementById('serverPasswordWarningDiv').removeAttribute('hidden')
-});document.getElementById('replaceIdentifyCommandButton').addEventListener('click',()=>{document.getElementById('identifyCommandInputId').removeAttribute('disabled')
+;const columnTitles=[];columnTitles.push('Index');columnTitles.push('Disabled');columnTitles.push('Label');columnTitles.push('Host');columnTitles.push('Port');if(full)columnTitles.push('TLS')
+;if(full)columnTitles.push('verify');if(full)columnTitles.push('proxy');if(full)columnTitles.push('password');columnTitles.push('Nick');if(full)columnTitles.push('Alternate')
+;if(full)columnTitles.push('Recover');if(full)columnTitles.push('user');if(full)columnTitles.push('Real Name');if(full)columnTitles.push('Modes');if(full)columnTitles.push('Channels')
+;if(full)columnTitles.push('identifyNick');if(full)columnTitles.push('command');if(full)columnTitles.push('reconnect');if(full)columnTitles.push('logging');if(editable)columnTitles.push('')
+;if(editable)columnTitles.push('');if(editable)columnTitles.push('');if(editable)columnTitles.push('');const titleRowEl=document.createElement('tr');columnTitles.forEach(titleName=>{
+const tdEl=document.createElement('td');tdEl.textContent=titleName;titleRowEl.appendChild(tdEl)});tableNode.appendChild(titleRowEl)
+;if(Array.isArray(data)&&data.length>0)for(let i=0;i<data.length;i++){const rowEl=document.createElement('tr');rowEl.setAttribute('index',i.toString());const td01El=document.createElement('td')
+;td01El.textContent=i.toString();rowEl.appendChild(td01El);const td10El=document.createElement('td');const disabledCheckboxEl=document.createElement('input')
+;disabledCheckboxEl.setAttribute('type','checkbox');disabledCheckboxEl.setAttribute('disabled','');disabledCheckboxEl.checked=data[i].disabled;td10El.appendChild(disabledCheckboxEl)
+;rowEl.appendChild(td10El);const td12El=document.createElement('td');td12El.textContent=data[i].name;rowEl.appendChild(td12El);const td20El=document.createElement('td');td20El.textContent=data[i].host
+;rowEl.appendChild(td20El);const td21El=document.createElement('td');td21El.textContent=data[i].port;rowEl.appendChild(td21El);if(full){const td22El=document.createElement('td')
+;const tlsCheckboxEl=document.createElement('input');tlsCheckboxEl.setAttribute('type','checkbox');tlsCheckboxEl.setAttribute('disabled','');tlsCheckboxEl.checked=data[i].tls
+;td22El.appendChild(tlsCheckboxEl);rowEl.appendChild(td22El);const td23El=document.createElement('td');const verifyCheckboxEl=document.createElement('input')
+;verifyCheckboxEl.setAttribute('type','checkbox');verifyCheckboxEl.setAttribute('disabled','');verifyCheckboxEl.checked=data[i].verify;td23El.appendChild(verifyCheckboxEl);rowEl.appendChild(td23El)
+;const td24El=document.createElement('td');const proxyCheckboxEl=document.createElement('input');proxyCheckboxEl.setAttribute('type','checkbox');proxyCheckboxEl.setAttribute('disabled','')
+;proxyCheckboxEl.checked=data[i].proxy;td24El.appendChild(proxyCheckboxEl);rowEl.appendChild(td24El);const td25El=document.createElement('td');td25El.textContent='(hidden)';rowEl.appendChild(td25El)}
+const td30El=document.createElement('td');td30El.textContent=data[i].nick;rowEl.appendChild(td30El);if(full){const td31El=document.createElement('td');td31El.textContent=data[i].altNick
+;rowEl.appendChild(td31El);const td32El=document.createElement('td');const recoverCheckboxEl=document.createElement('input');recoverCheckboxEl.setAttribute('type','checkbox')
+;recoverCheckboxEl.setAttribute('disabled','');recoverCheckboxEl.checked=data[i].recoverNick;td32El.appendChild(recoverCheckboxEl);rowEl.appendChild(td32El);const td33El=document.createElement('td')
+;td33El.textContent=data[i].user;rowEl.appendChild(td33El);const td34El=document.createElement('td');td34El.textContent=data[i].real;rowEl.appendChild(td34El);const td35El=document.createElement('td')
+;td35El.textContent=data[i].modes;rowEl.appendChild(td35El);const td40El=document.createElement('td');data[i].channelList.split(',').forEach(channel=>{const chanDiv=document.createElement('div')
+;chanDiv.textContent=channel;td40El.appendChild(chanDiv)});rowEl.appendChild(td40El);const td50El=document.createElement('td');td50El.textContent=data[i].identifyNick;rowEl.appendChild(td50El)
+;const td51El=document.createElement('td');td51El.textContent='(hidden)';rowEl.appendChild(td51El);const td60El=document.createElement('td');const reconnectCheckboxEl=document.createElement('input')
+;reconnectCheckboxEl.setAttribute('type','checkbox');reconnectCheckboxEl.setAttribute('disabled','');reconnectCheckboxEl.checked=data[i].reconnect;td60El.appendChild(reconnectCheckboxEl)
+;rowEl.appendChild(td60El);const td61El=document.createElement('td');const loggingCheckboxEl=document.createElement('input');loggingCheckboxEl.setAttribute('type','checkbox')
+;loggingCheckboxEl.setAttribute('disabled','');loggingCheckboxEl.checked=data[i].logging;td61El.appendChild(loggingCheckboxEl);rowEl.appendChild(td61El)}if(editable){
+const td70El=document.createElement('td');const editButtonEl=document.createElement('button');editButtonEl.textContent='Edit';td70El.appendChild(editButtonEl);rowEl.appendChild(td70El)
+;const td71El=document.createElement('td');const copyButtonEl=document.createElement('button');copyButtonEl.textContent='Copy';td71El.appendChild(copyButtonEl);rowEl.appendChild(td71El)
+;const td72El=document.createElement('td');const deleteButtonEl=document.createElement('button');deleteButtonEl.textContent='Delete';td72El.appendChild(deleteButtonEl);rowEl.appendChild(td72El)
+;const td73El=document.createElement('td');const moveUpButtonEl=document.createElement('button');moveUpButtonEl.textContent='move-up';if(i>0)td73El.appendChild(moveUpButtonEl)
+;rowEl.appendChild(td73El);editButtonEl.addEventListener('click',()=>{openIrcServerEdit(parseInt(rowEl.getAttribute('index')))});copyButtonEl.addEventListener('click',()=>{
+copyIrcServerToNew(parseInt(rowEl.getAttribute('index')))});deleteButtonEl.addEventListener('click',()=>{deleteIrcServer(parseInt(rowEl.getAttribute('index')))})
+;if(i>0)moveUpButtonEl.addEventListener('click',()=>{moveUpInList(parseInt(rowEl.getAttribute('index')))})}tableNode.appendChild(rowEl)}resolve(null)})
+;const checkForApiError=data=>new Promise((resolve,reject)=>{if('success'===data.status)resolve(null);else reject(new Error('PATCH API did not return success status flag'))})
+;const setDivVisibility=data=>{document.getElementById('listVisibilityDiv').removeAttribute('hidden','');document.getElementById('formVisibilityDiv').setAttribute('hidden','')
+;document.getElementById('serverPasswordWarningDiv').setAttribute('hidden','');document.getElementById('nickservCommandWarningDiv').setAttribute('hidden','');if(data.ircConnected||data.ircConnecting){
+document.getElementById('createNewButton').setAttribute('hidden','');document.getElementById('warningVisibilityDiv').removeAttribute('hidden');editable=false}else{
+document.getElementById('createNewButton').removeAttribute('hidden');document.getElementById('warningVisibilityDiv').setAttribute('hidden','');editable=true}
+if(data.enableSocks5Proxy)document.getElementById('ircProxyDiv').textContent='Socks5 Proxy: Enabled Globally\nSocks5 Proxy: '+data.socks5Host+':'+data.socks5Port;else document.getElementById('ircProxyDiv').textContent='Socks5 Proxy: Disabled Globally'
+;return Promise.resolve(null)};document.getElementById('replacePasswordButton').addEventListener('click',()=>{document.getElementById('passwordInputId').removeAttribute('disabled')
+;document.getElementById('passwordInputId').value='';document.getElementById('serverPasswordWarningDiv').removeAttribute('hidden')})
+;document.getElementById('replaceIdentifyCommandButton').addEventListener('click',()=>{document.getElementById('identifyCommandInputId').removeAttribute('disabled')
 ;document.getElementById('identifyCommandInputId').value='';document.getElementById('nickservCommandWarningDiv').removeAttribute('hidden')})
 ;document.getElementById('createNewButton').addEventListener('click',()=>{_clearError();fetchServerList(0,1).then(()=>fetchServerList(0,0)).then(()=>clearIrcServerForm()).then(()=>{
-document.getElementById('serverListDisabledDiv').setAttribute('hidden','');document.getElementById('warningVisibilityDiv').setAttribute('hidden','')
-;document.getElementById('listVisibilityDiv').setAttribute('hidden','');document.getElementById('formVisibilityDiv').removeAttribute('hidden')
+document.getElementById('listVisibilityDiv').setAttribute('hidden','');document.getElementById('formVisibilityDiv').removeAttribute('hidden')
 ;document.getElementById('serverPasswordWarningDiv').setAttribute('hidden','');document.getElementById('nickservCommandWarningDiv').setAttribute('hidden','')}).catch(err=>{
 _showError(err.toString()||err);console.log(err)})});document.getElementById('saveNewButton').addEventListener('click',()=>{_clearError()
-;parseFormInputValues().then(data=>submitServer(data.data,'POST',-1)).then(data=>checkErrorAndCloseEdit(data)).then(()=>fetchServerList(-1,-1)).then(data=>buildServerListTable(data)).catch(err=>{
+;parseFormInputValues().then(data=>submitServer(data.data,'POST',-1)).then(data=>checkForApiError(data)).then(()=>fetchIrcState()).then(data=>setDivVisibility(data)).then(()=>fetchServerList(-1,-1)).then(data=>buildServerListTable(data)).catch(err=>{
 _showError(err.toString()||err);console.log(err)})});document.getElementById('saveModifiedButton').addEventListener('click',()=>{_clearError()
-;parseFormInputValues().then(data=>submitServer(data.data,'PATCH',data.index)).then(data=>checkErrorAndCloseEdit(data)).then(()=>fetchServerList(-1,-1)).then(data=>buildServerListTable(data)).catch(err=>{
+;parseFormInputValues().then(data=>submitServer(data.data,'PATCH',data.index)).then(data=>checkForApiError(data)).then(()=>fetchIrcState()).then(data=>setDivVisibility(data)).then(()=>fetchServerList(-1,-1)).then(data=>buildServerListTable(data)).catch(err=>{
 _showError(err.toString()||err);console.log(err)})});document.getElementById('cancelEditButton').addEventListener('click',()=>{_clearError()
-;document.getElementById('serverListDisabledDiv').setAttribute('hidden','');document.getElementById('warningVisibilityDiv').setAttribute('hidden','')
-;document.getElementById('listVisibilityDiv').removeAttribute('hidden');document.getElementById('formVisibilityDiv').setAttribute('hidden','')
-;fetchServerList(0,0).then(()=>fetchServerList(0,0)).catch(err=>{_showError(err.toString()||err);console.log(err)})});document.getElementById('forceUnlockAll').addEventListener('click',()=>{
-_clearError();clearIrcServerForm().then(()=>fetchServerList(0,0)).catch(err=>{_showError(err.toString()||err);console.log(err)})});_clearError();fetchIrcState().then(data=>{
-if(data.ircConnected||data.ircConnecting){document.getElementById('serverListDisabledDiv').setAttribute('hidden','');document.getElementById('warningVisibilityDiv').removeAttribute('hidden')
+;fetchIrcState().then(data=>setDivVisibility(data)).then(()=>fetchServerList(-1,-1)).then(data=>buildServerListTable(data)).then(()=>fetchServerList(0,0)).catch(err=>{_showError(err.toString()||err)
+;console.log(err)})});document.getElementById('forceUnlockAll').addEventListener('click',()=>{_clearError();clearIrcServerForm().then(()=>fetchServerList(0,0)).catch(err=>{
+_showError(err.toString()||err);console.log(err)})});document.getElementById('refreshButton').addEventListener('click',()=>{_clearError()
+;fetchIrcState().then(data=>setDivVisibility(data)).then(()=>fetchServerList(-1,-1)).then(data=>buildServerListTable(data)).catch(err=>{_showError(err.toString()||err);console.log(err)})})
+;document.getElementById('fullButton').addEventListener('click',()=>{_clearError();if(full){full=false;document.getElementById('fullButton').textContent='Show All Columns'}else{full=true
+;document.getElementById('fullButton').textContent='Hide Columns'}
+fetchIrcState().then(data=>setDivVisibility(data)).then(()=>fetchServerList(-1,-1)).then(data=>buildServerListTable(data)).catch(err=>{_showError(err.toString()||err);console.log(err)})})
+;_clearError();fetchIrcState().then(data=>setDivVisibility(data)).then(()=>fetchServerList(-1,-1)).then(data=>buildServerListTable(data)).catch(err=>{if(err.status&&405===err.status){
+document.getElementById('serverListDisabledDiv').removeAttribute('hidden');document.getElementById('warningVisibilityDiv').setAttribute('hidden','')
 ;document.getElementById('listVisibilityDiv').setAttribute('hidden','');document.getElementById('formVisibilityDiv').setAttribute('hidden','')
-;document.getElementById('serverPasswordWarningDiv').setAttribute('hidden','');document.getElementById('nickservCommandWarningDiv').setAttribute('hidden','');Promise.resolve({serverArray:[]})}else{
-if(data.enableSocks5Proxy)document.getElementById('ircProxyDiv').textContent='Socks5 Proxy: Enabled Globally\nSocks5 Proxy: '+data.socks5Host+':'+data.socks5Port;else document.getElementById('ircProxyDiv').textContent='Socks5 Proxy: Disabled Globally'
-;return fetchServerList(-1,-1)}}).then(data=>buildServerListTable(data)).catch(err=>{if(err.status&&405===err.status){document.getElementById('serverListDisabledDiv').removeAttribute('hidden')
-;document.getElementById('warningVisibilityDiv').setAttribute('hidden','');document.getElementById('listVisibilityDiv').setAttribute('hidden','')
-;document.getElementById('formVisibilityDiv').setAttribute('hidden','');document.getElementById('serverPasswordWarningDiv').setAttribute('hidden','')
-;document.getElementById('nickservCommandWarningDiv').setAttribute('hidden','')}else{_showError(err.toString()||err);console.log(err)}});
+;document.getElementById('serverPasswordWarningDiv').setAttribute('hidden','');document.getElementById('nickservCommandWarningDiv').setAttribute('hidden','')}else{_showError(err.toString()||err)
+;console.log(err)}});

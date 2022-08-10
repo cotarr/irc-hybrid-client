@@ -53,6 +53,11 @@
 // ----------------------------------------------------
 'use strict';
 
+// Flag to show all columns in server list table
+let full = false;
+// In server list table hide editor buttons in read only
+let editable = false;
+
 /**
   * Removes current error messages from error display element
   */
@@ -211,7 +216,7 @@ const clearIrcServerForm = () => {
     document.getElementById('portInputId').value = 6697;
     document.getElementById('tlsCheckboxId').checked = true;
     document.getElementById('verifyCheckboxId').checked = true;
-    document.getElementById('proxyCheckboxId').checked = true;
+    document.getElementById('proxyCheckboxId').checked = false;
     document.getElementById('autoReconnectCheckboxId').checked = false;
     document.getElementById('loggingCheckboxId').checked = false;
     document.getElementById('passwordInputId').setAttribute('disabled', '');
@@ -240,8 +245,6 @@ const populateIrcServerForm = (data) => {
     clearIrcServerForm();
     document.getElementById('saveNewButton').setAttribute('hidden', '');
     document.getElementById('saveModifiedButton').removeAttribute('hidden');
-    document.getElementById('serverListDisabledDiv').setAttribute('hidden', '');
-    document.getElementById('warningVisibilityDiv').setAttribute('hidden', '');
     document.getElementById('listVisibilityDiv').setAttribute('hidden', '');
     document.getElementById('formVisibilityDiv').removeAttribute('hidden');
     document.getElementById('serverPasswordWarningDiv').setAttribute('hidden', '');
@@ -328,8 +331,9 @@ const openIrcServerEdit = (index) => {
 const copyIrcServerToNew = (index) => {
   _clearError();
   submitServer({ index: index, action: 'duplicate' }, 'COPY', index)
-    .then((data) => checkErrorAndCloseEdit(data))
-    // Reload a fresh server list
+    .then((data) => checkForApiError(data))
+    .then(() => fetchIrcState())
+    .then((data) => setDivVisibility(data))
     .then(() => fetchServerList(-1, -1))
     .then((data) => buildServerListTable(data))
     .catch((err) => {
@@ -345,8 +349,9 @@ const copyIrcServerToNew = (index) => {
 const deleteIrcServer = (index) => {
   _clearError();
   submitServer({ index: index }, 'DELETE', index)
-    .then((data) => checkErrorAndCloseEdit(data))
-    // Reload a fresh server list
+    .then((data) => checkForApiError(data))
+    .then(() => fetchIrcState())
+    .then((data) => setDivVisibility(data))
     .then(() => fetchServerList(-1, -1))
     .then((data) => buildServerListTable(data))
     .catch((err) => {
@@ -362,9 +367,9 @@ const deleteIrcServer = (index) => {
 const moveUpInList = (index) => {
   _clearError();
   submitServer({ index: index, action: 'move-up' }, 'COPY', index)
-    .then((data) => checkErrorAndCloseEdit(data))
-
-    // Reload a fresh server list
+    .then((data) => checkForApiError(data))
+    .then(() => fetchIrcState())
+    .then((data) => setDivVisibility(data))
     .then(() => fetchServerList(-1, -1))
     .then((data) => buildServerListTable(data))
     .catch((err) => {
@@ -470,19 +475,42 @@ const buildServerListTable = (data) => {
       tableNode.removeChild(tableNode.firstChild);
     }
 
-    const columnTitles = [
-      'Index',
-      'Disabled',
-      'Label',
-      'Host',
-      'Port',
-      'Nick',
-      // Empty for buttons
-      '', // Edit
-      '', // Duplicate
-      '', // Delete
-      '' // Move Up
-    ];
+    //
+    // dynamically build array of column headings for the server list
+    //
+    const columnTitles = [];
+
+    columnTitles.push('Index');// td01 Not a server property, array index number
+    columnTitles.push('Disabled');// td10 .disabled
+    // 'Group' ,    td11 .group (Reserved)
+    columnTitles.push('Label');//     td12 .name
+
+    columnTitles.push('Host');// td20 .host
+    columnTitles.push('Port');// td21 .port
+    if (full) columnTitles.push('TLS'); // td22 .tls
+    if (full) columnTitles.push('verify'); // td23 .verify
+    if (full) columnTitles.push('proxy'); // td24 .proxy
+    if (full) columnTitles.push('password'); //  td25 .password
+
+    columnTitles.push('Nick'); // td30 .nick
+    if (full) columnTitles.push('Alternate'); // td32 .altNick
+    if (full) columnTitles.push('Recover'); // td32 .recoverNick
+    if (full) columnTitles.push('user'); // td33 .user
+    if (full) columnTitles.push('Real Name'); // td34 .real
+    if (full) columnTitles.push('Modes'); // td35 .modes
+
+    if (full) columnTitles.push('Channels'); // td40 .channelList
+
+    if (full) columnTitles.push('identifyNick'); // td50 .identifyNick
+    if (full) columnTitles.push('command'); // td51 .identifyCommand
+
+    if (full) columnTitles.push('reconnect'); // td60 .reconnect
+    if (full) columnTitles.push('logging'); // td61 .logging
+
+    if (editable) columnTitles.push(''); // td70 .logging
+    if (editable) columnTitles.push(''); // td71 .logging
+    if (editable) columnTitles.push(''); // td72 .logging
+    if (editable) columnTitles.push(''); // td73 .logging
 
     const titleRowEl = document.createElement('tr');
     columnTitles.forEach((titleName) => {
@@ -492,96 +520,225 @@ const buildServerListTable = (data) => {
     });
     tableNode.appendChild(titleRowEl);
 
+    //
+    // Dynamically create table elements and add to table
+    //
     if ((Array.isArray(data)) && (data.length > 0)) {
       for (let i = 0; i < data.length; i++) {
         const rowEl = document.createElement('tr');
+
         rowEl.setAttribute('index', i.toString());
+
         const td01El = document.createElement('td');
-        const td02El = document.createElement('td');
-        const td03El = document.createElement('td');
-        const td04El = document.createElement('td');
-        const td05El = document.createElement('td');
-        const td06El = document.createElement('td');
-        const td07El = document.createElement('td');
-        const td08El = document.createElement('td');
-        const td09El = document.createElement('td');
+        td01El.textContent = i.toString();
+        rowEl.appendChild(td01El);
+
         const td10El = document.createElement('td');
         const disabledCheckboxEl = document.createElement('input');
         disabledCheckboxEl.setAttribute('type', 'checkbox');
         disabledCheckboxEl.setAttribute('disabled', '');
-        const editButtonEl = document.createElement('button');
-        const copyButtonEl = document.createElement('button');
-        const deleteButtonEl = document.createElement('button');
-        const moveUpButtonEl = document.createElement('button');
-        editButtonEl.textContent = 'Edit';
-        copyButtonEl.textContent = 'Copy';
-        deleteButtonEl.textContent = 'Delete';
-        moveUpButtonEl.textContent = 'move-up';
-        td01El.textContent = i.toString();
         disabledCheckboxEl.checked = data[i].disabled;
-        td02El.appendChild(disabledCheckboxEl);
-        td03El.textContent = data[i].name;
-        td04El.textContent = data[i].host;
-        td05El.textContent = data[i].port;
-        td06El.textContent = data[i].nick;
-        td07El.appendChild(editButtonEl);
-        td08El.appendChild(copyButtonEl);
-        td09El.appendChild(deleteButtonEl);
-        // skip first row
-        if (i > 0) td10El.appendChild(moveUpButtonEl);
-        rowEl.appendChild(td01El);
-        rowEl.appendChild(td02El);
-        rowEl.appendChild(td03El);
-        rowEl.appendChild(td04El);
-        rowEl.appendChild(td05El);
-        rowEl.appendChild(td06El);
-        rowEl.appendChild(td07El);
-        rowEl.appendChild(td08El);
-        rowEl.appendChild(td09El);
+        td10El.appendChild(disabledCheckboxEl);
         rowEl.appendChild(td10El);
-        tableNode.appendChild(rowEl);
-        //
-        // Add event listeners
-        //
-        editButtonEl.addEventListener('click', () => {
-          openIrcServerEdit(parseInt(rowEl.getAttribute('index')));
-        });
-        copyButtonEl.addEventListener('click', () => {
-          copyIrcServerToNew(parseInt(rowEl.getAttribute('index')));
-        });
-        deleteButtonEl.addEventListener('click', () => {
-          deleteIrcServer(parseInt(rowEl.getAttribute('index')));
-        });
-        if (i > 0) {
-          moveUpButtonEl.addEventListener('click', () => {
-            moveUpInList(parseInt(rowEl.getAttribute('index')));
+
+        // td11El Reserved from sever group
+
+        const td12El = document.createElement('td');
+        td12El.textContent = data[i].name;
+        rowEl.appendChild(td12El);
+
+        const td20El = document.createElement('td');
+        td20El.textContent = data[i].host;
+        rowEl.appendChild(td20El);
+
+        const td21El = document.createElement('td');
+        td21El.textContent = data[i].port;
+        rowEl.appendChild(td21El);
+
+        if (full) {
+          const td22El = document.createElement('td');
+          const tlsCheckboxEl = document.createElement('input');
+          tlsCheckboxEl.setAttribute('type', 'checkbox');
+          tlsCheckboxEl.setAttribute('disabled', '');
+          tlsCheckboxEl.checked = data[i].tls;
+          td22El.appendChild(tlsCheckboxEl);
+          rowEl.appendChild(td22El);
+
+          const td23El = document.createElement('td');
+          const verifyCheckboxEl = document.createElement('input');
+          verifyCheckboxEl.setAttribute('type', 'checkbox');
+          verifyCheckboxEl.setAttribute('disabled', '');
+          verifyCheckboxEl.checked = data[i].verify;
+          td23El.appendChild(verifyCheckboxEl);
+          rowEl.appendChild(td23El);
+
+          const td24El = document.createElement('td');
+          const proxyCheckboxEl = document.createElement('input');
+          proxyCheckboxEl.setAttribute('type', 'checkbox');
+          proxyCheckboxEl.setAttribute('disabled', '');
+          proxyCheckboxEl.checked = data[i].proxy;
+          td24El.appendChild(proxyCheckboxEl);
+          rowEl.appendChild(td24El);
+
+          const td25El = document.createElement('td');
+          td25El.textContent = '(hidden)';
+          rowEl.appendChild(td25El);
+        } // if (full)
+
+        const td30El = document.createElement('td');
+        td30El.textContent = data[i].nick;
+        rowEl.appendChild(td30El);
+
+        if (full) {
+          const td31El = document.createElement('td');
+          td31El.textContent = data[i].altNick;
+          rowEl.appendChild(td31El);
+
+          const td32El = document.createElement('td');
+          const recoverCheckboxEl = document.createElement('input');
+          recoverCheckboxEl.setAttribute('type', 'checkbox');
+          recoverCheckboxEl.setAttribute('disabled', '');
+          recoverCheckboxEl.checked = data[i].recoverNick;
+          td32El.appendChild(recoverCheckboxEl);
+          rowEl.appendChild(td32El);
+
+          const td33El = document.createElement('td');
+          td33El.textContent = data[i].user;
+          rowEl.appendChild(td33El);
+
+          const td34El = document.createElement('td');
+          td34El.textContent = data[i].real;
+          rowEl.appendChild(td34El);
+
+          const td35El = document.createElement('td');
+          td35El.textContent = data[i].modes;
+          rowEl.appendChild(td35El);
+
+          const td40El = document.createElement('td');
+          data[i].channelList.split(',').forEach((channel) => {
+            const chanDiv = document.createElement('div');
+            chanDiv.textContent = channel;
+            td40El.appendChild(chanDiv);
           });
-        }
-      }
+          rowEl.appendChild(td40El);
+
+          const td50El = document.createElement('td');
+          td50El.textContent = data[i].identifyNick;
+          rowEl.appendChild(td50El);
+
+          const td51El = document.createElement('td');
+          td51El.textContent = '(hidden)';
+          rowEl.appendChild(td51El);
+
+          const td60El = document.createElement('td');
+          const reconnectCheckboxEl = document.createElement('input');
+          reconnectCheckboxEl.setAttribute('type', 'checkbox');
+          reconnectCheckboxEl.setAttribute('disabled', '');
+          reconnectCheckboxEl.checked = data[i].reconnect;
+          td60El.appendChild(reconnectCheckboxEl);
+          rowEl.appendChild(td60El);
+
+          const td61El = document.createElement('td');
+          const loggingCheckboxEl = document.createElement('input');
+          loggingCheckboxEl.setAttribute('type', 'checkbox');
+          loggingCheckboxEl.setAttribute('disabled', '');
+          loggingCheckboxEl.checked = data[i].logging;
+          td61El.appendChild(loggingCheckboxEl);
+          rowEl.appendChild(td61El);
+        } // if (full)
+
+        if (editable) {
+          const td70El = document.createElement('td');
+          const editButtonEl = document.createElement('button');
+          editButtonEl.textContent = 'Edit';
+          td70El.appendChild(editButtonEl);
+          rowEl.appendChild(td70El);
+
+          const td71El = document.createElement('td');
+          const copyButtonEl = document.createElement('button');
+          copyButtonEl.textContent = 'Copy';
+          td71El.appendChild(copyButtonEl);
+          rowEl.appendChild(td71El);
+
+          const td72El = document.createElement('td');
+          const deleteButtonEl = document.createElement('button');
+          deleteButtonEl.textContent = 'Delete';
+          td72El.appendChild(deleteButtonEl);
+          rowEl.appendChild(td72El);
+
+          const td73El = document.createElement('td');
+          const moveUpButtonEl = document.createElement('button');
+          moveUpButtonEl.textContent = 'move-up';
+          if (i > 0) td73El.appendChild(moveUpButtonEl);
+          rowEl.appendChild(td73El);
+
+          editButtonEl.addEventListener('click', () => {
+            openIrcServerEdit(parseInt(rowEl.getAttribute('index')));
+          });
+          copyButtonEl.addEventListener('click', () => {
+            copyIrcServerToNew(parseInt(rowEl.getAttribute('index')));
+          });
+          deleteButtonEl.addEventListener('click', () => {
+            deleteIrcServer(parseInt(rowEl.getAttribute('index')));
+          });
+          if (i > 0) {
+            moveUpButtonEl.addEventListener('click', () => {
+              moveUpInList(parseInt(rowEl.getAttribute('index')));
+            });
+          }
+        } // if editable
+        tableNode.appendChild(rowEl);
+      } // next i
     }
     resolve(null);
   });
 }; // buildServerListTable()
 
 /**
- * End of promise chain.
- * Used after saving changes to check for error and close the edit.
+ * Used after saving changes to check for error.
  * @param {data} data - API response, example: {"status":"success","method":"PATCH","index":0}
  * @returns {Promise} Resolved to null or reject with error
  */
 
-const checkErrorAndCloseEdit = (data) => {
+const checkForApiError = (data) => {
   return new Promise((resolve, reject) => {
     if (data.status === 'success') {
-      document.getElementById('serverListDisabledDiv').setAttribute('hidden', '');
-      document.getElementById('warningVisibilityDiv').setAttribute('hidden', '');
-      document.getElementById('listVisibilityDiv').removeAttribute('hidden');
-      document.getElementById('formVisibilityDiv').setAttribute('hidden', '');
       resolve(null);
     } else {
       reject(new Error('PATCH API did not return success status flag'));
     }
   });
+};
+
+/**
+ * Accept ircState object, determine if IRC network connected, and set visibility of div elements
+ * @param {data} data - API response, example: {"ircConnected": false, ... }
+ * @returns {Promise} Resolved to null
+ */
+const setDivVisibility = (data) => {
+  document.getElementById('listVisibilityDiv').removeAttribute('hidden', '');
+  document.getElementById('formVisibilityDiv').setAttribute('hidden', '');
+  document.getElementById('serverPasswordWarningDiv').setAttribute('hidden', '');
+  document.getElementById('nickservCommandWarningDiv').setAttribute('hidden', '');
+  // show/hide buttons in server list table
+  if ((data.ircConnected) || (data.ircConnecting)) {
+    document.getElementById('createNewButton').setAttribute('hidden', '');
+    document.getElementById('warningVisibilityDiv').removeAttribute('hidden');
+    editable = false;
+  } else {
+    document.getElementById('createNewButton').removeAttribute('hidden');
+    document.getElementById('warningVisibilityDiv').setAttribute('hidden', '');
+    editable = true;
+  }
+  // show/hide proxy setting info at bottom
+  if (data.enableSocks5Proxy) {
+    document.getElementById('ircProxyDiv').textContent =
+      'Socks5 Proxy: Enabled Globally\nSocks5 Proxy: ' +
+      data.socks5Host + ':' + data.socks5Port;
+  } else {
+    document.getElementById('ircProxyDiv').textContent = 'Socks5 Proxy: Disabled Globally';
+  }
+  return Promise.resolve(null);
 };
 
 // -------------------------------------
@@ -616,8 +773,6 @@ document.getElementById('createNewButton').addEventListener('click', () => {
     .then(() => fetchServerList(0, 0))
     .then(() => clearIrcServerForm())
     .then(() => {
-      document.getElementById('serverListDisabledDiv').setAttribute('hidden', '');
-      document.getElementById('warningVisibilityDiv').setAttribute('hidden', '');
       document.getElementById('listVisibilityDiv').setAttribute('hidden', '');
       document.getElementById('formVisibilityDiv').removeAttribute('hidden');
       document.getElementById('serverPasswordWarningDiv').setAttribute('hidden', '');
@@ -636,8 +791,9 @@ document.getElementById('saveNewButton').addEventListener('click', () => {
   _clearError();
   parseFormInputValues()
     .then((data) => submitServer(data.data, 'POST', -1))
-    .then((data) => checkErrorAndCloseEdit(data))
-    // Reload a fresh server list
+    .then((data) => checkForApiError(data))
+    .then(() => fetchIrcState())
+    .then((data) => setDivVisibility(data))
     .then(() => fetchServerList(-1, -1))
     .then((data) => buildServerListTable(data))
     .catch((err) => {
@@ -653,8 +809,9 @@ document.getElementById('saveModifiedButton').addEventListener('click', () => {
   _clearError();
   parseFormInputValues()
     .then((data) => submitServer(data.data, 'PATCH', data.index))
-    .then((data) => checkErrorAndCloseEdit(data))
-    // Reload a fresh server list
+    .then((data) => checkForApiError(data))
+    .then(() => fetchIrcState())
+    .then((data) => setDivVisibility(data))
     .then(() => fetchServerList(-1, -1))
     .then((data) => buildServerListTable(data))
     .catch((err) => {
@@ -668,12 +825,11 @@ document.getElementById('saveModifiedButton').addEventListener('click', () => {
  */
 document.getElementById('cancelEditButton').addEventListener('click', () => {
   _clearError();
-  document.getElementById('serverListDisabledDiv').setAttribute('hidden', '');
-  document.getElementById('warningVisibilityDiv').setAttribute('hidden', '');
-  document.getElementById('listVisibilityDiv').removeAttribute('hidden');
-  document.getElementById('formVisibilityDiv').setAttribute('hidden', '');
-  // index=0 lock=0
-  fetchServerList(0, 0)
+  fetchIrcState()
+    .then((data) => setDivVisibility(data))
+    .then(() => fetchServerList(-1, -1))
+    .then((data) => buildServerListTable(data))
+    // Unlock database index=0 lock=0
     .then(() => fetchServerList(0, 0))
     .catch((err) => {
       _showError(err.toString() || err);
@@ -695,41 +851,60 @@ document.getElementById('forceUnlockAll').addEventListener('click', () => {
     });
 });
 
+/**
+ * Button handler to pull fresh data from API and regenerate page content
+ */
+document.getElementById('refreshButton').addEventListener('click', () => {
+  _clearError();
+  fetchIrcState()
+    .then((data) => setDivVisibility(data))
+    .then(() => fetchServerList(-1, -1))
+    .then((data) => buildServerListTable(data))
+    .catch((err) => {
+      _showError(err.toString() || err);
+      console.log(err);
+    });
+});
+
+/**
+ * Button handler to toggle between full table (all columns) and small table.
+ */
+document.getElementById('fullButton').addEventListener('click', () => {
+  _clearError();
+  if (full) {
+    full = false;
+    document.getElementById('fullButton').textContent = 'Show All Columns';
+  } else {
+    full = true;
+    document.getElementById('fullButton').textContent = 'Hide Columns';
+  }
+  fetchIrcState()
+    .then((data) => setDivVisibility(data))
+    .then(() => fetchServerList(-1, -1))
+    .then((data) => buildServerListTable(data))
+    .catch((err) => {
+      _showError(err.toString() || err);
+      console.log(err);
+    });
+});
+
 // --------------------------------------------------------------
 // Initialization
 //
 // Do this at page load
-// Verify IRC client is not connected
+// Determine if editor disabled and show message, else,
 // Retrieve list of servers and build IRC server list table
 // --------------------------------------------------------------
 _clearError();
 fetchIrcState()
-  .then((data) => {
-    // console.log(JSON.stringify(data, null, 2));
-    if ((data.ircConnected) || (data.ircConnecting)) {
-      document.getElementById('serverListDisabledDiv').setAttribute('hidden', '');
-      document.getElementById('warningVisibilityDiv').removeAttribute('hidden');
-      document.getElementById('listVisibilityDiv').setAttribute('hidden', '');
-      document.getElementById('formVisibilityDiv').setAttribute('hidden', '');
-      document.getElementById('serverPasswordWarningDiv').setAttribute('hidden', '');
-      document.getElementById('nickservCommandWarningDiv').setAttribute('hidden', '');
-      Promise.resolve({ serverArray: [] });
-    } else {
-      if (data.enableSocks5Proxy) {
-        document.getElementById('ircProxyDiv').textContent =
-          'Socks5 Proxy: Enabled Globally\nSocks5 Proxy: ' +
-          data.socks5Host + ':' + data.socks5Port;
-      } else {
-        document.getElementById('ircProxyDiv').textContent = 'Socks5 Proxy: Disabled Globally';
-      }
-      // return promise
-      return fetchServerList(-1, -1);
-    }
-  })
+  .then((data) => setDivVisibility(data))
+  .then(() => fetchServerList(-1, -1))
   .then((data) => buildServerListTable(data))
   .catch((err) => {
     if ((err.status) && (err.status === 405)) {
+      // Show disabled message
       document.getElementById('serverListDisabledDiv').removeAttribute('hidden');
+      // And ... hide everything else
       document.getElementById('warningVisibilityDiv').setAttribute('hidden', '');
       document.getElementById('listVisibilityDiv').setAttribute('hidden', '');
       document.getElementById('formVisibilityDiv').setAttribute('hidden', '');

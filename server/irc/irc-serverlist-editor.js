@@ -228,8 +228,31 @@
         const err = new Error('Editing server list requires IRC client to disconnect from IRC');
         err.status = 409; // Status 409 = Conflict
         reject(err);
+      } else {
+        resolve(chainObject);
       }
-      resolve(chainObject);
+    });
+  };
+
+  /**
+   * Function to prevent using list controller to lock or unlock the database when
+   * the IRC client is connected to the IRC network.
+   * @param {Object} chainObject - Wrapper object used to pass common date through promise chain
+   * @returns {Promise} Resolve to Object (chainObject) or reject error https status 409
+   */
+  const requireListWithoutLock = function (req, chainObject) {
+    return new Promise(function (resolve, reject) {
+      if ((vars.ircState.ircConnected) || (vars.ircState.ircConnecting)) {
+        if (('query' in req) && ('lock' in req.query)) {
+          const err = new Error('Editing server list requires IRC client to disconnect from IRC');
+          err.status = 409; // Status 409 = Conflict
+          reject(err);
+        } else {
+          resolve(chainObject);
+        }
+      } else {
+        resolve(chainObject);
+      }
     });
   };
 
@@ -665,7 +688,7 @@
    */
   const listServerlist = function (req, res, next) {
     const chainObject = {};
-    requireIrcNotConnected(chainObject)
+    requireListWithoutLock(req, chainObject)
       .then((chainObject) => setDatabaseLock(req, chainObject))
       .then((chainObject) => readServersFile(chainObject))
       .then((chainObject) => serializeElements(chainObject))
