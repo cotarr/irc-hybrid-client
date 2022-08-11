@@ -192,11 +192,11 @@ var wsocket = null;
 //
 // new Audio returns a Promise
 //
-// 1300 Hz 0.75 Amplitude 0.250 sec
+// 1300 Hz 0.20 Amplitude 0.250 sec
 const beep1 = new Audio('sounds/short-beep1.mp3');
-// 850 Hz 0.75 Amplitude 0.400 Sec
+// 850 Hz 0.20 Amplitude 0.400 Sec
 const beep2 = new Audio('sounds/short-beep2.mp3');
-// 1175 Hz 0.75 Amplitude 0.250 Sec
+// 1175 Hz 0.20 Amplitude 0.250 Sec
 const beep3 = new Audio('sounds/short-beep3.mp3');
 
 let beep1InhibitTimer = 0;
