@@ -41,18 +41,20 @@ body:JSON.stringify(body)};return fetch(fetchURL,fetchOptions).then(response=>{i
 const err=new Error('IRC Connected or Database Locked');err.status=409;throw err}else if(422===response.status){const err=new Error('Unprocessable Entity');err.status=422;throw err
 }else throw new Error('Fetch status '+response.status+' '+response.statusText+' '+fetchURL)})};const clearIrcServerForm=()=>new Promise((resolve,reject)=>{
 document.getElementById('saveNewButton').removeAttribute('hidden');document.getElementById('saveModifiedButton').setAttribute('hidden','');document.getElementById('indexInputId').value='-1'
-;document.getElementById('disabledCheckboxId').checked=false;document.getElementById('nameInputId').value='';document.getElementById('hostInputId').value=''
-;document.getElementById('portInputId').value=6697;document.getElementById('tlsCheckboxId').checked=true;document.getElementById('verifyCheckboxId').checked=true
-;document.getElementById('proxyCheckboxId').checked=false;document.getElementById('autoReconnectCheckboxId').checked=false;document.getElementById('loggingCheckboxId').checked=false
-;document.getElementById('passwordInputId').setAttribute('disabled','');document.getElementById('passwordInputId').value='(Hidden)';document.getElementById('identifyNickInputId').value=''
-;document.getElementById('identifyCommandInputId').setAttribute('disabled','');document.getElementById('identifyCommandInputId').value='(Hidden)';document.getElementById('nickInputId').value=''
-;document.getElementById('altNickInputId').value='';document.getElementById('recoverNickCheckboxId').checked=false;document.getElementById('userInputId').value=''
-;document.getElementById('realInputId').value='';document.getElementById('modesInputId').value='';document.getElementById('channelListInputId').value='';resolve(null)})
-;const populateIrcServerForm=data=>new Promise((resolve,reject)=>{clearIrcServerForm();document.getElementById('saveNewButton').setAttribute('hidden','')
-;document.getElementById('saveModifiedButton').removeAttribute('hidden');document.getElementById('listVisibilityDiv').setAttribute('hidden','')
-;document.getElementById('formVisibilityDiv').removeAttribute('hidden');document.getElementById('serverPasswordWarningDiv').setAttribute('hidden','')
-;document.getElementById('nickservCommandWarningDiv').setAttribute('hidden','');document.getElementById('indexInputId').value=data.index.toString()
-;if(data.disabled)document.getElementById('disabledCheckboxId').checked=true;else document.getElementById('disabledCheckboxId').checked=false;document.getElementById('nameInputId').value=data.name
+;document.getElementById('disabledCheckboxId').checked=false;document.getElementById('groupInputId').value=0;document.getElementById('nameInputId').value=''
+;document.getElementById('hostInputId').value='';document.getElementById('portInputId').value=6697;document.getElementById('tlsCheckboxId').checked=true
+;document.getElementById('verifyCheckboxId').checked=true;document.getElementById('proxyCheckboxId').checked=false;document.getElementById('autoReconnectCheckboxId').checked=false
+;document.getElementById('loggingCheckboxId').checked=false;document.getElementById('passwordInputId').setAttribute('disabled','');document.getElementById('passwordInputId').value='(Hidden)'
+;document.getElementById('identifyNickInputId').value='';document.getElementById('identifyCommandInputId').setAttribute('disabled','')
+;document.getElementById('identifyCommandInputId').value='(Hidden)';document.getElementById('nickInputId').value='';document.getElementById('altNickInputId').value=''
+;document.getElementById('recoverNickCheckboxId').checked=false;document.getElementById('userInputId').value='';document.getElementById('realInputId').value=''
+;document.getElementById('modesInputId').value='';document.getElementById('channelListInputId').value='';resolve(null)});const populateIrcServerForm=data=>new Promise((resolve,reject)=>{
+clearIrcServerForm();document.getElementById('saveNewButton').setAttribute('hidden','');document.getElementById('saveModifiedButton').removeAttribute('hidden')
+;document.getElementById('listVisibilityDiv').setAttribute('hidden','');document.getElementById('formVisibilityDiv').removeAttribute('hidden')
+;document.getElementById('serverPasswordWarningDiv').setAttribute('hidden','');document.getElementById('nickservCommandWarningDiv').setAttribute('hidden','')
+;document.getElementById('indexInputId').value=data.index.toString()
+;if(data.disabled)document.getElementById('disabledCheckboxId').checked=true;else document.getElementById('disabledCheckboxId').checked=false
+;if('group'in data)document.getElementById('groupInputId').value=parseInt(data.group);else document.getElementById('groupInputId').value=0;document.getElementById('nameInputId').value=data.name
 ;document.getElementById('hostInputId').value=data.host;document.getElementById('portInputId').value=parseInt(data.port)
 ;if(data.tls)document.getElementById('tlsCheckboxId').checked=true;else document.getElementById('tlsCheckboxId').checked=false
 ;if(data.verify)document.getElementById('verifyCheckboxId').checked=true;else document.getElementById('verifyCheckboxId').checked=false
@@ -75,9 +77,10 @@ _showError(err.toString()||err);console.log(err)})};const moveUpInList=index=>{_
 },'COPY',index).then(data=>checkForApiError(data)).then(()=>fetchIrcState()).then(data=>setDivVisibility(data)).then(()=>fetchServerList(-1,-1)).then(data=>buildServerListTable(data)).catch(err=>{
 _showError(err.toString()||err);console.log(err)})};const parseFormInputValues=()=>new Promise((resolve,reject)=>{const index=parseInt(document.getElementById('indexInputId').value);const data={}
 ;if(-1!==index)data.index=parseInt(document.getElementById('indexInputId').value);if(document.getElementById('disabledCheckboxId').checked)data.disabled=true;else data.disabled=false
-;data.name=document.getElementById('nameInputId').value;data.host=document.getElementById('hostInputId').value;data.port=parseInt(document.getElementById('portInputId').value)
-;if(document.getElementById('tlsCheckboxId').checked)data.tls=true;else data.tls=false;if(document.getElementById('verifyCheckboxId').checked)data.verify=true;else data.verify=false
-;if(document.getElementById('proxyCheckboxId').checked)data.proxy=true;else data.proxy=false;if(document.getElementById('autoReconnectCheckboxId').checked)data.reconnect=true;else data.reconnect=false
+;data.group=parseInt(document.getElementById('groupInputId').value);data.name=document.getElementById('nameInputId').value;data.host=document.getElementById('hostInputId').value
+;data.port=parseInt(document.getElementById('portInputId').value);if(document.getElementById('tlsCheckboxId').checked)data.tls=true;else data.tls=false
+;if(document.getElementById('verifyCheckboxId').checked)data.verify=true;else data.verify=false;if(document.getElementById('proxyCheckboxId').checked)data.proxy=true;else data.proxy=false
+;if(document.getElementById('autoReconnectCheckboxId').checked)data.reconnect=true;else data.reconnect=false
 ;if(document.getElementById('loggingCheckboxId').checked)data.logging=true;else data.logging=false
 ;if(!document.getElementById('passwordInputId').hasAttribute('disabled'))data.password=document.getElementById('passwordInputId').value
 ;data.identifyNick=document.getElementById('identifyNickInputId').value
@@ -85,22 +88,23 @@ _showError(err.toString()||err);console.log(err)})};const parseFormInputValues=(
 ;data.nick=document.getElementById('nickInputId').value;data.altNick=document.getElementById('altNickInputId').value
 ;if(document.getElementById('recoverNickCheckboxId').checked)data.recoverNick=true;else data.recoverNick=false;data.user=document.getElementById('userInputId').value
 ;data.real=document.getElementById('realInputId').value;data.modes=document.getElementById('modesInputId').value;data.channelList=document.getElementById('channelListInputId').value;let errorStr=null
-;if(''===data.name)errorStr='Label is required input.';if(''===data.host)errorStr='Host/IP is required input.';if(isNaN(data.port))errorStr='Invalid port number'
-;if(data.nick===data.altNick)errorStr='Nickname and alternate nickname must be different.'
+;if(isNaN(data.group))errorStr='Invalid group number';if(parseInt(data.group)<0)errorStr='Invalid group number';if(''===data.name)errorStr='Label is required input.'
+;if(''===data.host)errorStr='Host/IP is required input.';if(isNaN(data.port))errorStr='Invalid port number';if(data.nick===data.altNick)errorStr='Nickname and alternate nickname must be different.'
 ;if(data.recoverNick&&0===data.altNick.length)errorStr='Nickname recovery checkbox set without valid alternate nickname';if(''===data.nick)errorStr='Nickname is required input.'
 ;if(''===data.user)errorStr='Unix ident user is required input.';if(''===data.real)errorStr='Real Name is required input.';if(errorStr)reject(new Error(errorStr));else resolve({data:data,index:index})
 });const buildServerListTable=data=>new Promise((resolve,reject)=>{const tableNode=document.getElementById('tbodyId');while(tableNode.firstChild)tableNode.removeChild(tableNode.firstChild)
-;const columnTitles=[];columnTitles.push('Index');columnTitles.push('Disabled');columnTitles.push('Label');columnTitles.push('Host');columnTitles.push('Port');if(full)columnTitles.push('TLS')
-;if(full)columnTitles.push('verify');if(full)columnTitles.push('proxy');if(full)columnTitles.push('password');columnTitles.push('Nick');if(full)columnTitles.push('Alternate')
-;if(full)columnTitles.push('Recover');if(full)columnTitles.push('user');if(full)columnTitles.push('Real Name');if(full)columnTitles.push('Modes');if(full)columnTitles.push('Channels')
-;if(full)columnTitles.push('identifyNick');if(full)columnTitles.push('command');if(full)columnTitles.push('reconnect');if(full)columnTitles.push('logging');if(editable)columnTitles.push('')
-;if(editable)columnTitles.push('');if(editable)columnTitles.push('');if(editable)columnTitles.push('');const titleRowEl=document.createElement('tr');columnTitles.forEach(titleName=>{
-const tdEl=document.createElement('td');tdEl.textContent=titleName;titleRowEl.appendChild(tdEl)});tableNode.appendChild(titleRowEl)
+;const columnTitles=[];columnTitles.push('Index');columnTitles.push('Disabled');columnTitles.push('Group');columnTitles.push('Label');columnTitles.push('Host');columnTitles.push('Port')
+;if(full)columnTitles.push('TLS');if(full)columnTitles.push('verify');if(full)columnTitles.push('proxy');if(full)columnTitles.push('password');columnTitles.push('Nick')
+;if(full)columnTitles.push('Alternate');if(full)columnTitles.push('Recover');if(full)columnTitles.push('user');if(full)columnTitles.push('Real Name');if(full)columnTitles.push('Modes')
+;if(full)columnTitles.push('Channels');if(full)columnTitles.push('identifyNick');if(full)columnTitles.push('command');if(full)columnTitles.push('reconnect');if(full)columnTitles.push('logging')
+;if(editable)columnTitles.push('');if(editable)columnTitles.push('');if(editable)columnTitles.push('');if(editable)columnTitles.push('');const titleRowEl=document.createElement('tr')
+;columnTitles.forEach(titleName=>{const tdEl=document.createElement('td');tdEl.textContent=titleName;titleRowEl.appendChild(tdEl)});tableNode.appendChild(titleRowEl)
 ;if(Array.isArray(data)&&data.length>0)for(let i=0;i<data.length;i++){const rowEl=document.createElement('tr');rowEl.setAttribute('index',i.toString());const td01El=document.createElement('td')
 ;td01El.textContent=i.toString();rowEl.appendChild(td01El);const td10El=document.createElement('td');const disabledCheckboxEl=document.createElement('input')
 ;disabledCheckboxEl.setAttribute('type','checkbox');disabledCheckboxEl.setAttribute('disabled','');disabledCheckboxEl.checked=data[i].disabled;td10El.appendChild(disabledCheckboxEl)
-;rowEl.appendChild(td10El);const td12El=document.createElement('td');td12El.textContent=data[i].name;rowEl.appendChild(td12El);const td20El=document.createElement('td');td20El.textContent=data[i].host
-;rowEl.appendChild(td20El);const td21El=document.createElement('td');td21El.textContent=data[i].port;rowEl.appendChild(td21El);if(full){const td22El=document.createElement('td')
+;rowEl.appendChild(td10El);const td11El=document.createElement('td');if('group'in data[i])td11El.textContent=data[i].group;else td11El.textContent=0;rowEl.appendChild(td11El)
+;const td12El=document.createElement('td');td12El.textContent=data[i].name;rowEl.appendChild(td12El);const td20El=document.createElement('td');td20El.textContent=data[i].host;rowEl.appendChild(td20El)
+;const td21El=document.createElement('td');td21El.textContent=data[i].port;rowEl.appendChild(td21El);if(full){const td22El=document.createElement('td')
 ;const tlsCheckboxEl=document.createElement('input');tlsCheckboxEl.setAttribute('type','checkbox');tlsCheckboxEl.setAttribute('disabled','');tlsCheckboxEl.checked=data[i].tls
 ;td22El.appendChild(tlsCheckboxEl);rowEl.appendChild(td22El);const td23El=document.createElement('td');const verifyCheckboxEl=document.createElement('input')
 ;verifyCheckboxEl.setAttribute('type','checkbox');verifyCheckboxEl.setAttribute('disabled','');verifyCheckboxEl.checked=data[i].verify;td23El.appendChild(verifyCheckboxEl);rowEl.appendChild(td23El)
@@ -129,7 +133,8 @@ copyIrcServerToNew(parseInt(rowEl.getAttribute('index')))});deleteButtonEl.addEv
 document.getElementById('createNewButton').setAttribute('hidden','');document.getElementById('warningVisibilityDiv').removeAttribute('hidden');editable=false}else{
 document.getElementById('createNewButton').removeAttribute('hidden');document.getElementById('warningVisibilityDiv').setAttribute('hidden','');editable=true}
 if(data.enableSocks5Proxy)document.getElementById('ircProxyDiv').textContent='Socks5 Proxy: Enabled Globally\nSocks5 Proxy: '+data.socks5Host+':'+data.socks5Port;else document.getElementById('ircProxyDiv').textContent='Socks5 Proxy: Disabled Globally'
-;return Promise.resolve(null)};document.getElementById('replacePasswordButton').addEventListener('click',()=>{document.getElementById('passwordInputId').removeAttribute('disabled')
+;return Promise.resolve(null)};document.getElementById('groupInfoButton').addEventListener('click',()=>{document.getElementById('groupInfoHiddenDiv').removeAttribute('hidden')})
+;document.getElementById('replacePasswordButton').addEventListener('click',()=>{document.getElementById('passwordInputId').removeAttribute('disabled')
 ;document.getElementById('passwordInputId').value='';document.getElementById('serverPasswordWarningDiv').removeAttribute('hidden')})
 ;document.getElementById('replaceIdentifyCommandButton').addEventListener('click',()=>{document.getElementById('identifyCommandInputId').removeAttribute('disabled')
 ;document.getElementById('identifyCommandInputId').value='';document.getElementById('nickservCommandWarningDiv').removeAttribute('hidden')})

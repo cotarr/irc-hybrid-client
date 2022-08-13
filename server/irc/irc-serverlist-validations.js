@@ -103,6 +103,7 @@
       checkExtraneousKeys(req, [
         'index',
         'disabled',
+        'group',
         'name',
         'host',
         'port',
@@ -136,6 +137,7 @@
     //
     body([
       'disabled',
+      'group',
       'name',
       'host',
       'port',
@@ -161,6 +163,8 @@
       body('host', 'Invalid server address').isFQDN(),
       body('host', 'invalid server address').isIP()
     ]),
+    body('group', 'Server group requires type positive integer')
+      .isInt({ min: 0, max: 9999 }),
     body('port', 'Invalid socket port number')
       .isPort(),
     body([
@@ -196,7 +200,9 @@
     //
     // sanitize input
     //
-    body(['port'])
+    body([
+      'group',
+      'port'])
       .toInt(),
     body([
       'disabled',
@@ -252,6 +258,7 @@
       checkExtraneousKeys(req, [
         'index',
         'disabled',
+        'group',
         'name',
         'host',
         'port',
@@ -287,6 +294,7 @@
     body([
       'index',
       'disabled',
+      'group',
       'name',
       'host',
       'port',
@@ -320,6 +328,8 @@
       body('host', 'Invalid server address').isFQDN(),
       body('host', 'invalid server address').isIP()
     ]),
+    body('group', 'Server group requires type positive integer')
+      .isInt({ min: 0, max: 9999 }),
     body('port', 'Invalid socket port number')
       .isPort(),
     body([
@@ -360,6 +370,7 @@
       .toInt(),
     body([
       'index',
+      'group',
       'port'])
       .toInt(),
     body([
@@ -417,6 +428,7 @@
         'index',
         'disabled',
         'action',
+        'group',
         'name',
         'host',
         'port',
@@ -512,7 +524,7 @@
       checkExtraneousKeys(req, [
         'index',
         'disabled',
-        'name',
+        'group',
         'host',
         'port',
         'tls',

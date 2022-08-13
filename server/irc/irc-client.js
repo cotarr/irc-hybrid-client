@@ -70,6 +70,9 @@
     // Upgrade from servers.json version 1 to 2, missing properties set to default
     if ((vars.servers.configVersion === 2) && (vars.servers.serverArray.length > 0)) {
       for (let i = 0; i < vars.servers.serverArray.length; i++) {
+        if (!('group' in vars.servers.serverArray[i])) {
+          vars.servers.serverArray[i].group = 0;
+        }
         if (!('altNick' in vars.servers.serverArray[i])) {
           vars.servers.serverArray[i].altNick = '';
         }

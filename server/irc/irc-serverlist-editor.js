@@ -35,6 +35,7 @@
 // {
 //   "name": "local-server",
 //   "host": "127.0.0.1",
+//   "group": 0,
 //   "port": 6667,
 //   "tls": false,
 //   "verify": false,
@@ -319,6 +320,7 @@
             tempServer.index = count;
             count += 1;
             tempServer.disabled = chainObject.serversFile.serverArray[i].disabled;
+            tempServer.group = chainObject.serversFile.serverArray[i].group;
             tempServer.name = chainObject.serversFile.serverArray[i].name;
             tempServer.host = chainObject.serversFile.serverArray[i].host;
             tempServer.port = chainObject.serversFile.serverArray[i].port;
@@ -392,6 +394,7 @@
       const index = parseInt(req.query.index);
       const tempServer = {};
       tempServer.disabled = req.body.disabled;
+      tempServer.group = req.body.group;
       tempServer.name = req.body.name;
       tempServer.host = req.body.host;
       tempServer.port = req.body.port;

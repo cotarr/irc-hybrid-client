@@ -211,6 +211,7 @@ const clearIrcServerForm = () => {
     document.getElementById('saveModifiedButton').setAttribute('hidden', '');
     document.getElementById('indexInputId').value = '-1';
     document.getElementById('disabledCheckboxId').checked = false;
+    document.getElementById('groupInputId').value = 0;
     document.getElementById('nameInputId').value = '';
     document.getElementById('hostInputId').value = '';
     document.getElementById('portInputId').value = 6697;
@@ -254,6 +255,12 @@ const populateIrcServerForm = (data) => {
       document.getElementById('disabledCheckboxId').checked = true;
     } else {
       document.getElementById('disabledCheckboxId').checked = false;
+    }
+    if ('group' in data) {
+      document.getElementById('groupInputId').value = parseInt(data.group);
+    } else {
+      // Case of loading servers.json from earlier version
+      document.getElementById('groupInputId').value = 0;
     }
     document.getElementById('nameInputId').value = data.name;
     document.getElementById('hostInputId').value = data.host;
@@ -393,6 +400,7 @@ const parseFormInputValues = () => {
     } else {
       data.disabled = false;
     }
+    data.group = parseInt(document.getElementById('groupInputId').value);
     data.name = document.getElementById('nameInputId').value;
     data.host = document.getElementById('hostInputId').value;
     data.port = parseInt(document.getElementById('portInputId').value);
@@ -441,6 +449,8 @@ const parseFormInputValues = () => {
     data.channelList = document.getElementById('channelListInputId').value;
 
     let errorStr = null;
+    if (isNaN(data.group)) errorStr = 'Invalid group number';
+    if (parseInt(data.group) < 0) errorStr = 'Invalid group number';
     if (data.name === '') errorStr = 'Label is required input.';
     if (data.host === '') errorStr = 'Host/IP is required input.';
     if (isNaN(data.port)) errorStr = 'Invalid port number';
@@ -480,10 +490,10 @@ const buildServerListTable = (data) => {
     //
     const columnTitles = [];
 
-    columnTitles.push('Index');// td01 Not a server property, array index number
-    columnTitles.push('Disabled');// td10 .disabled
-    // 'Group' ,    td11 .group (Reserved)
-    columnTitles.push('Label');//     td12 .name
+    columnTitles.push('Index'); // td01 Not a server property, array index number
+    columnTitles.push('Disabled'); // td10 .disabled
+    columnTitles.push('Group'); // td11 .group
+    columnTitles.push('Label'); // td12 .name
 
     columnTitles.push('Host');// td20 .host
     columnTitles.push('Port');// td21 .port
@@ -541,7 +551,13 @@ const buildServerListTable = (data) => {
         td10El.appendChild(disabledCheckboxEl);
         rowEl.appendChild(td10El);
 
-        // td11El Reserved from sever group
+        const td11El = document.createElement('td');
+        if ('group' in data[i]) {
+          td11El.textContent = data[i].group;
+        } else {
+          td11El.textContent = 0;
+        }
+        rowEl.appendChild(td11El);
 
         const td12El = document.createElement('td');
         td12El.textContent = data[i].name;
@@ -744,6 +760,13 @@ const setDivVisibility = (data) => {
 // -------------------------------------
 //        Button Event Handlers
 // -------------------------------------
+
+/**
+ * Show help for server groups
+ */
+document.getElementById('groupInfoButton').addEventListener('click', () => {
+  document.getElementById('groupInfoHiddenDiv').removeAttribute('hidden');
+});
 
 /**
  * Replace IRC server password Button Event Handler

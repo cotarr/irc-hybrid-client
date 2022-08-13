@@ -75,10 +75,33 @@
           <div class="input-label-right">Disable/Hide IRC server definition</div>
         </div>
         <div class="button-div">
+          <input type="number" id="groupInputId" class="group-input" value="">
+          <div class="input-label-right">Group</div>
+          <button id="groupInfoButton">?</button>
+        </div>
+        <div class="button-div">
           <input type="text" id="nameInputId" value="">
           <div class="input-label-right">Label</div>
         </div>
- 
+        <div class="white-info-div" id="groupInfoHiddenDiv" hidden>
+          <p>
+            A server group defines a set of IRC server definitions where different 
+            IRC servers can be rotated in sequence after disconnect from IRC.
+          </p>
+          <ul>
+            <li>The Group input field accepts integer values 0 to 9999</li>
+            <li>Group 0 is used to define individual IRC server addresses that do not rotate.</li>
+            <li>
+              Group 1 or greater defines a set of server where servers of the same group number 
+              will automatically rotate different server addresses after disconnect.
+            </li>
+            <li>
+              In typical use, a server group would allow different IRC networks 
+              such as DALnet or Undernet to have different group numbers.
+            </li>
+          </ul>
+        </div>
+
         <div class="vh10"></div>
 
         <div class="input-group">
@@ -88,7 +111,7 @@
             <div class="input-label-right">IRC Server: Host or IP</div>
           </div>
           <div class="button-div">
-            <input type="number" id="portInputId" value="">
+            <input type="number" id="portInputId" class="port-input" value="">
             <div class="input-label-right">IRC Server: Port</div>
           </div>
           <div class="button-div">

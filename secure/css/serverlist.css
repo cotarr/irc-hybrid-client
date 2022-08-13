@@ -65,6 +65,15 @@ button[disabled] {
   border: 1px solid black;
   display: inline-block;
   margin-top: 3px;
+  padding-top: 0px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.white-info-div {
+  background-color: white;
+  border: 1px solid black;
+  margin-top: 3px;
   padding-left: 5px;
   padding-right: 5px;
 }
@@ -96,6 +105,14 @@ button[disabled] {
 
 .input-label-right {
   display: inline-block;
+}
+
+input[type='number'].group-input {
+  width: 50px;
+}
+
+input[type='number'].port-input {
+  width: 75px;
 }
 
 .rm5 {margin-right: 5px;}

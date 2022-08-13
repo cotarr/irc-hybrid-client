@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Next 2022-08-13
+
+### Added
+
+( Configuration only, no active functionality yet )
+
+- Added new integer property `group` to IRC the server definition object, including server list editor form, server list API and API data validation.
+- To handle upgrade from version v0.2.8 and before, the group property will default to 0 is not present in the config file. The value 0 defines individual servers that do not rotate addresses.
+
 ## [v0.2.8](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.8) 2022-08-11
 
 ### Changed
