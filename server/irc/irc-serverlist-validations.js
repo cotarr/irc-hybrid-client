@@ -525,6 +525,7 @@
         'index',
         'disabled',
         'group',
+        'name',
         'host',
         'port',
         'tls',
