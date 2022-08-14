@@ -595,6 +595,7 @@ UPDATE
     {
       "index": 0,
       "disabled": false,
+      "group": 0,
       "name": "DALnet-1",
       "host": "lion.dal.net",
       "port": 6697,
@@ -615,6 +616,7 @@ UPDATE
   {
     "index": 1,
     "disabled": false,
+    "group": 0,
     "name": "DALnet-2",
     "host": "irc.dal.net",
     "port": 6667,
@@ -655,6 +657,7 @@ UPDATE
 {
   "index": 0,
   "disabled": false,
+  "group": 0,
   "name": "DALnet",
   "host": "lion.dal.net",
   "port": 6697,
@@ -703,6 +706,7 @@ UPDATE
 <div class="pre-div"><pre>
 {
   "disabled": false,
+  "group": 0,
   "name": "DALnet",
   "host": "lion.dal.net",
   "port": 6697,
@@ -798,6 +802,7 @@ UPDATE
 {
   "index": 0,
   "disabled": false,
+  "group": 0,
   "name": "DALnet",
   "host": "lion.dal.net",
   "port": 6697,
@@ -963,6 +968,36 @@ UPDATE
   "index": 1
 }
 </pre></div>
+
+<h3>POST /irc/serverlist/tools?index=xxx with action: 'toggle-disabled'</h3>
+
+<p>
+  When action is set to &quot;toggle-disabled&quot;
+  the record at the specified index will toggle the &quot;disabled&quot; property
+  between true and false.
+  The index property in the response body will point to the index of
+  the modified record. The new value of the disabled property will
+  be returned in the body of the response as a boolean &quot;value&quot; property.
+</p>
+
+<p>POST Request Body:</p>
+<div class="pre-div"><pre>
+{
+"index": 2,
+"action": "toggle-disabled"
+}
+</pre></div>
+
+<p>Success Response:</p>
+<div class="pre-div"><pre>
+{
+"status": "success",
+"method": "POST",
+"index": 2,
+"value": false
+}
+</pre></div>
+
 
         <p>Error Response:</p>
         <ul>
