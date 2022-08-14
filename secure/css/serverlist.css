@@ -84,6 +84,9 @@ button[disabled] {
   padding-left: 5px;
   padding-right: 5px;
 }
+.disabled-tr {
+  background-color: #e0e0e0;
+}
 
 .error-div {
   color: white;

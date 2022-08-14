@@ -101,24 +101,24 @@ _showError(err.toString()||err);console.log(err)})};const parseFormInputValues=(
 ;if(full)columnTitles.push('Channels');if(full)columnTitles.push('identifyNick');if(full)columnTitles.push('command');if(full)columnTitles.push('reconnect');if(full)columnTitles.push('logging')
 ;if(editable)columnTitles.push('');if(editable)columnTitles.push('');if(editable)columnTitles.push('');if(editable)columnTitles.push('');const titleRowEl=document.createElement('tr')
 ;columnTitles.forEach(titleName=>{const tdEl=document.createElement('td');tdEl.textContent=titleName;titleRowEl.appendChild(tdEl)});tableNode.appendChild(titleRowEl)
-;if(Array.isArray(data)&&data.length>0)for(let i=0;i<data.length;i++){const rowEl=document.createElement('tr');rowEl.setAttribute('index',i.toString());const td01El=document.createElement('td')
-;td01El.textContent=i.toString();rowEl.appendChild(td01El);const td10El=document.createElement('td');const disabledCheckboxEl=document.createElement('input')
-;disabledCheckboxEl.setAttribute('type','checkbox');if(editable)disabledCheckboxEl.removeAttribute('disabled');else disabledCheckboxEl.setAttribute('disabled','')
-;disabledCheckboxEl.checked=data[i].disabled;td10El.appendChild(disabledCheckboxEl);rowEl.appendChild(td10El);const td11El=document.createElement('td')
-;if('group'in data[i])td11El.textContent=data[i].group;else td11El.textContent=0;rowEl.appendChild(td11El);const td12El=document.createElement('td');td12El.textContent=data[i].name
-;rowEl.appendChild(td12El);const td20El=document.createElement('td');td20El.textContent=data[i].host;rowEl.appendChild(td20El);const td21El=document.createElement('td');td21El.textContent=data[i].port
-;rowEl.appendChild(td21El);if(full){const td22El=document.createElement('td');const tlsCheckboxEl=document.createElement('input');tlsCheckboxEl.setAttribute('type','checkbox')
-;tlsCheckboxEl.setAttribute('disabled','');tlsCheckboxEl.checked=data[i].tls;td22El.appendChild(tlsCheckboxEl);rowEl.appendChild(td22El);const td23El=document.createElement('td')
-;const verifyCheckboxEl=document.createElement('input');verifyCheckboxEl.setAttribute('type','checkbox');verifyCheckboxEl.setAttribute('disabled','');verifyCheckboxEl.checked=data[i].verify
-;td23El.appendChild(verifyCheckboxEl);rowEl.appendChild(td23El);const td24El=document.createElement('td');const proxyCheckboxEl=document.createElement('input')
-;proxyCheckboxEl.setAttribute('type','checkbox');proxyCheckboxEl.setAttribute('disabled','');proxyCheckboxEl.checked=data[i].proxy;td24El.appendChild(proxyCheckboxEl);rowEl.appendChild(td24El)
-;const td25El=document.createElement('td');td25El.textContent='(hidden)';rowEl.appendChild(td25El)}const td30El=document.createElement('td');td30El.textContent=data[i].nick;rowEl.appendChild(td30El)
-;if(full){const td31El=document.createElement('td');td31El.textContent=data[i].altNick;rowEl.appendChild(td31El);const td32El=document.createElement('td')
-;const recoverCheckboxEl=document.createElement('input');recoverCheckboxEl.setAttribute('type','checkbox');recoverCheckboxEl.setAttribute('disabled','');recoverCheckboxEl.checked=data[i].recoverNick
-;td32El.appendChild(recoverCheckboxEl);rowEl.appendChild(td32El);const td33El=document.createElement('td');td33El.textContent=data[i].user;rowEl.appendChild(td33El)
-;const td34El=document.createElement('td');td34El.textContent=data[i].real;rowEl.appendChild(td34El);const td35El=document.createElement('td');td35El.textContent=data[i].modes
-;rowEl.appendChild(td35El);const td40El=document.createElement('td');data[i].channelList.split(',').forEach(channel=>{const chanDiv=document.createElement('div');chanDiv.textContent=channel
-;td40El.appendChild(chanDiv)});rowEl.appendChild(td40El);const td50El=document.createElement('td');td50El.textContent=data[i].identifyNick;rowEl.appendChild(td50El)
+;if(Array.isArray(data)&&data.length>0)for(let i=0;i<data.length;i++){const rowEl=document.createElement('tr');rowEl.setAttribute('index',i.toString())
+;if(data[i].disabled)rowEl.classList.add('disabled-tr');const td01El=document.createElement('td');td01El.textContent=i.toString();rowEl.appendChild(td01El);const td10El=document.createElement('td')
+;const disabledCheckboxEl=document.createElement('input');disabledCheckboxEl.setAttribute('type','checkbox')
+;if(editable)disabledCheckboxEl.removeAttribute('disabled');else disabledCheckboxEl.setAttribute('disabled','');disabledCheckboxEl.checked=data[i].disabled;td10El.appendChild(disabledCheckboxEl)
+;rowEl.appendChild(td10El);const td11El=document.createElement('td');if('group'in data[i])td11El.textContent=data[i].group;else td11El.textContent=0;rowEl.appendChild(td11El)
+;const td12El=document.createElement('td');td12El.textContent=data[i].name;rowEl.appendChild(td12El);const td20El=document.createElement('td');td20El.textContent=data[i].host;rowEl.appendChild(td20El)
+;const td21El=document.createElement('td');td21El.textContent=data[i].port;rowEl.appendChild(td21El);if(full){const td22El=document.createElement('td')
+;const tlsCheckboxEl=document.createElement('input');tlsCheckboxEl.setAttribute('type','checkbox');tlsCheckboxEl.setAttribute('disabled','');tlsCheckboxEl.checked=data[i].tls
+;td22El.appendChild(tlsCheckboxEl);rowEl.appendChild(td22El);const td23El=document.createElement('td');const verifyCheckboxEl=document.createElement('input')
+;verifyCheckboxEl.setAttribute('type','checkbox');verifyCheckboxEl.setAttribute('disabled','');verifyCheckboxEl.checked=data[i].verify;td23El.appendChild(verifyCheckboxEl);rowEl.appendChild(td23El)
+;const td24El=document.createElement('td');const proxyCheckboxEl=document.createElement('input');proxyCheckboxEl.setAttribute('type','checkbox');proxyCheckboxEl.setAttribute('disabled','')
+;proxyCheckboxEl.checked=data[i].proxy;td24El.appendChild(proxyCheckboxEl);rowEl.appendChild(td24El);const td25El=document.createElement('td');td25El.textContent='(hidden)';rowEl.appendChild(td25El)}
+const td30El=document.createElement('td');td30El.textContent=data[i].nick;rowEl.appendChild(td30El);if(full){const td31El=document.createElement('td');td31El.textContent=data[i].altNick
+;rowEl.appendChild(td31El);const td32El=document.createElement('td');const recoverCheckboxEl=document.createElement('input');recoverCheckboxEl.setAttribute('type','checkbox')
+;recoverCheckboxEl.setAttribute('disabled','');recoverCheckboxEl.checked=data[i].recoverNick;td32El.appendChild(recoverCheckboxEl);rowEl.appendChild(td32El);const td33El=document.createElement('td')
+;td33El.textContent=data[i].user;rowEl.appendChild(td33El);const td34El=document.createElement('td');td34El.textContent=data[i].real;rowEl.appendChild(td34El);const td35El=document.createElement('td')
+;td35El.textContent=data[i].modes;rowEl.appendChild(td35El);const td40El=document.createElement('td');data[i].channelList.split(',').forEach(channel=>{const chanDiv=document.createElement('div')
+;chanDiv.textContent=channel;td40El.appendChild(chanDiv)});rowEl.appendChild(td40El);const td50El=document.createElement('td');td50El.textContent=data[i].identifyNick;rowEl.appendChild(td50El)
 ;const td51El=document.createElement('td');td51El.textContent='(hidden)';rowEl.appendChild(td51El);const td60El=document.createElement('td');const reconnectCheckboxEl=document.createElement('input')
 ;reconnectCheckboxEl.setAttribute('type','checkbox');reconnectCheckboxEl.setAttribute('disabled','');reconnectCheckboxEl.checked=data[i].reconnect;td60El.appendChild(reconnectCheckboxEl)
 ;rowEl.appendChild(td60El);const td61El=document.createElement('td');const loggingCheckboxEl=document.createElement('input');loggingCheckboxEl.setAttribute('type','checkbox')

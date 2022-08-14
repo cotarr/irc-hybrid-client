@@ -555,8 +555,10 @@ const buildServerListTable = (data) => {
     if ((Array.isArray(data)) && (data.length > 0)) {
       for (let i = 0; i < data.length; i++) {
         const rowEl = document.createElement('tr');
-
         rowEl.setAttribute('index', i.toString());
+        if (data[i].disabled) {
+          rowEl.classList.add('disabled-tr');
+        }
 
         const td01El = document.createElement('td');
         td01El.textContent = i.toString();
