@@ -415,7 +415,7 @@
    */
   const copy = [
     //
-    // Validate extrneous keys
+    // Validate extraneous keys
     //
     function (req, res, next) {
       checkExtraneousKeys(req, [
@@ -427,7 +427,6 @@
       checkExtraneousKeys(req, [
         'index',
         'disabled',
-        'action',
         'group',
         'name',
         'host',
@@ -456,8 +455,7 @@
     query('index', 'is required URL query param')
       .exists(),
     body([
-      'index',
-      'action'], 'is required body param')
+      'index'], 'is required body param')
       .exists(),
     //
     //
@@ -480,13 +478,6 @@
         }
         return true;
       }),
-    body(['action'], 'Require type String')
-      .isString()
-      .isLength({ min: 0, max: 255 }),
-    oneOf([
-      body('action', 'Unrecognized action value').equals('duplicate'),
-      body('action', 'Unrecognized action value').equals('move-up')
-    ]),
     //
     // sanitize input
     //
@@ -494,9 +485,6 @@
       .toInt(),
     body(['index']).optional()
       .toInt(),
-    body('action')
-      // remove starting and ending whitespace
-      .trim(),
     //
     // On error return status 422 Unprocessable Entity
     //
@@ -512,7 +500,7 @@
    */
   const destroy = [
     //
-    // Validate extrneous keys
+    // Validate extraneous keys
     //
     function (req, res, next) {
       checkExtraneousKeys(req, [
@@ -587,11 +575,108 @@
     handleValidationError
   ]; // destroy
 
+  // ----------------------------
+  // tools
+  // ----------------------------
+
+  /**
+   * @type {Array} tools - array containing express middleware functions
+   */
+  const tools = [
+    //
+    // Validate extraneous keys
+    //
+    function (req, res, next) {
+      checkExtraneousKeys(req, [
+        'index'
+      ], 'query');
+      next();
+    },
+    function (req, res, next) {
+      checkExtraneousKeys(req, [
+        'index',
+        'disabled',
+        'action',
+        'group',
+        'name',
+        'host',
+        'port',
+        'tls',
+        'verify',
+        'proxy',
+        'reconnect',
+        'logging',
+        'password',
+        'identifyNick',
+        'identifyCommand',
+        'nick',
+        'altNick',
+        'recoverNick',
+        'user',
+        'real',
+        'modes',
+        'channelList'
+      ], 'body');
+      next();
+    },
+    //
+    // Validate required keys
+    //
+    query('index', 'is required URL query param')
+      .exists(),
+    body([
+      'index',
+      'action'], 'is required body param')
+      .exists(),
+    //
+    //
+    // Validate forbidden keys
+    //
+
+    //
+    // validate input
+    //
+    query('index', 'Invalid integer value').optional()
+      .isWhitelisted('0123456789'),
+    query('index', 'Invalid integer value').optional()
+      .isInt(),
+    query('index', 'Invalid integer value').optional()
+      .isInt(),
+    query('index').optional()
+      .custom(function (value, { req }) {
+        if (parseInt(req.query.index) !== parseInt(req.body.index)) {
+          throw new Error('Values not match: query index, body index');
+        }
+        return true;
+      }),
+    body(['action'], 'Require type String')
+      .isString()
+      .isLength({ min: 0, max: 255 }),
+    oneOf([
+      body('action', 'Unrecognized action value').equals('move-up')
+    ]),
+    //
+    // sanitize input
+    //
+    query(['index']).optional()
+      .toInt(),
+    body(['index']).optional()
+      .toInt(),
+    body('action')
+      // remove starting and ending whitespace
+      .trim(),
+    //
+    // On error return status 422 Unprocessable Entity
+    //
+    handleValidationError
+  ]; // tools
+
   module.exports = {
     list: list,
     create: create,
     update: update,
     copy: copy,
-    destroy: destroy
+    destroy: destroy,
+    tools: tools
   };
 })();

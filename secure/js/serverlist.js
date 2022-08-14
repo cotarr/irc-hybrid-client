@@ -166,6 +166,7 @@ const fetchServerList = (index, lock) => {
 const submitServer = (body, method, index) => {
   const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
   let baseUrl = '/irc/serverlist';
+  if ('action' in body) baseUrl = '/irc/serverlist/tools';
   if (index !== -1) baseUrl += '?index=' + index.toString();
   const fetchURL = encodeURI(baseUrl);
   const fetchOptions = {
@@ -337,7 +338,7 @@ const openIrcServerEdit = (index) => {
  */
 const copyIrcServerToNew = (index) => {
   _clearError();
-  submitServer({ index: index, action: 'duplicate' }, 'COPY', index)
+  submitServer({ index: index }, 'COPY', index)
     .then((data) => checkForApiError(data))
     .then(() => fetchIrcState())
     .then((data) => setDivVisibility(data))
@@ -373,7 +374,7 @@ const deleteIrcServer = (index) => {
  */
 const moveUpInList = (index) => {
   _clearError();
-  submitServer({ index: index, action: 'move-up' }, 'COPY', index)
+  submitServer({ index: index, action: 'move-up' }, 'POST', index)
     .then((data) => checkForApiError(data))
     .then(() => fetchIrcState())
     .then((data) => setDivVisibility(data))

@@ -518,6 +518,8 @@ if (credentials.disableServerListEditor) {
     (req, res) => res.status(405).json({ Error: 'Server List Editor Disabled' }));
   app.delete('/irc/serverlist', userAuth.authorizeOrFail, csrfProtection,
     (req, res) => res.status(405).json({ Error: 'Server List Editor Disabled' }));
+  app.post('/irc/serverlist/tools', userAuth.authorizeOrFail, csrfProtection,
+    (req, res) => res.status(405).json({ Error: 'Server List Editor Disabled' }));
 } else {
   app.get('/irc/serverlist',
     userAuth.authorizeOrFail,
@@ -539,6 +541,10 @@ if (credentials.disableServerListEditor) {
     userAuth.authorizeOrFail, csrfProtection,
     ircServerListValidations.destroy,
     ircServerListEditor.destroy);
+  app.post('/irc/serverlist/tools',
+    userAuth.authorizeOrFail, csrfProtection,
+    ircServerListValidations.tools,
+    ircServerListEditor.tools);
 }
 
 // -------------------------------

@@ -560,11 +560,9 @@
     _setEditLock(false);
     const responseJson = {
       status: 'success',
-      method: req.method
+      method: req.method,
+      index: chainObject.returnIndex
     };
-    if (('query' in req) && ('index' in req.query)) responseJson.index = parseInt(req.query.index);
-    if (req.method === 'POST') responseJson.index = chainObject.serversFile.serverArray.length - 1;
-    if (req.method === 'COPY') responseJson.index = chainObject.serversFile.serverArray.length - 1;
     if (chainObject.resultStatus) responseJson.status = chainObject.resultStatus;
     if (chainObject.resultComment) responseJson.comment = chainObject.resultComment;
     res.json(responseJson);
@@ -599,6 +597,7 @@
   const appendArrayElement = function (chainObject) {
     return new Promise(function (resolve, reject) {
       chainObject.serversFile.serverArray.push(chainObject.newServer);
+      chainObject.returnIndex = chainObject.serversFile.serverArray.length - 1;
       resolve(chainObject);
     });
   };
@@ -618,6 +617,7 @@
       if ((!isNaN(index)) && (index < listLength)) {
         if (index === 0) {
           // first record can not move up, no changed needed
+          chainObject.returnIndex = 0;
           resolve(chainObject);
         } else {
           // Exchange 2 records
@@ -625,6 +625,7 @@
           chainObject.serversFile.serverArray[index] =
             chainObject.serversFile.serverArray[index - 1];
           chainObject.serversFile.serverArray[index - 1] = temp;
+          chainObject.returnIndex = index - 1;
           resolve(chainObject);
         }
       } else {
@@ -650,12 +651,13 @@
         const index = parseInt(req.query.index);
         if ((!isNaN(index)) && (index < chainObject.serversFile.serverArray.length)) {
           chainObject.serversFile.serverArray[index] = chainObject.newServer;
+          chainObject.returnIndex = index;
+          resolve(chainObject);
         } else {
           const err = new Error('Invalid array index');
           err.status = 500;
           reject(err);
         }
-        resolve(chainObject);
       } else {
         const err = new Error('chainObject internal data error');
         err.status = 500;
@@ -677,6 +679,7 @@
       const index = parseInt(req.query.index);
       if (index < chainObject.serversFile.serverArray.length) {
         chainObject.serversFile.serverArray.splice(index, 1);
+        chainObject.returnIndex = chainObject.serversFile.serverArray.length - 1;
         resolve(chainObject);
       } else {
         const err = new Error('Array index out of range');
@@ -734,32 +737,16 @@
    * Copy - NodeJs Middleware function: COPY /irc/serverlist?index=0 route handler
    */
   const copyServerlist = function (req, res, next) {
-    if (('action' in req.body) && (req.body.action === 'duplicate')) {
-      // Case 1: copy specified record to the end of the list as a duplicate
-      const chainObject = {};
-      requireIrcNotConnected(chainObject)
-        .then((chainObject) => requireNotLock(chainObject))
-        .then((chainObject) => readServersFile(chainObject))
-        .then((chainObject) => copyExistingServer(req, chainObject))
-        .then((chainObject) => appendArrayElement(chainObject))
-        .then((chainObject) => writeServersFile(chainObject))
-        .then((chainObject) => returnStatus(req, res, chainObject))
-        .catch((err) => next(err));
-    } else if (('action' in req.body) && (req.body.action === 'move-up')) {
-      // Case 2: reorder the list moving record at index up 1 position
-      const chainObject = {};
-      requireIrcNotConnected(chainObject)
-        .then((chainObject) => requireNotLock(chainObject))
-        .then((chainObject) => readServersFile(chainObject))
-        .then((chainObject) => reorderArray(req, chainObject))
-        .then((chainObject) => writeServersFile(chainObject))
-        .then((chainObject) => returnStatus(req, res, chainObject))
-        .catch((err) => next(err));
-    } else {
-      const err = new Error('Invalid action property');
-      err.status = 400;
-      next(err);
-    }
+    // Copy specified record to the end of the list as a duplicate
+    const chainObject = {};
+    requireIrcNotConnected(chainObject)
+      .then((chainObject) => requireNotLock(chainObject))
+      .then((chainObject) => readServersFile(chainObject))
+      .then((chainObject) => copyExistingServer(req, chainObject))
+      .then((chainObject) => appendArrayElement(chainObject))
+      .then((chainObject) => writeServersFile(chainObject))
+      .then((chainObject) => returnStatus(req, res, chainObject))
+      .catch((err) => next(err));
   };
 
   /**
@@ -776,11 +763,37 @@
       .catch((err) => handlePromiseErrors(next, err));
   };
 
+  /**
+   * Tools - NodeJs Middleware function: POST /irc/serverlist/tools?index=0 route handler
+  */
+  const serverlistTools = function (req, res, next) {
+    if (('action' in req.body) && (req.body.action === 'move-up')) {
+      // Case 1: reorder the list moving record at index up 1 position
+      // body {
+      //   "index": 0,
+      //   "action": "move-up"
+      // }
+      const chainObject = {};
+      requireIrcNotConnected(chainObject)
+        .then((chainObject) => requireNotLock(chainObject))
+        .then((chainObject) => readServersFile(chainObject))
+        .then((chainObject) => reorderArray(req, chainObject))
+        .then((chainObject) => writeServersFile(chainObject))
+        .then((chainObject) => returnStatus(req, res, chainObject))
+        .catch((err) => next(err));
+    } else {
+      const err = new Error('Invalid action property');
+      err.status = 400;
+      next(err);
+    }
+  };
+
   module.exports = {
     list: listServerlist,
     create: createServerlist,
     update: updateServerlist,
     copy: copyServerlist,
-    destroy: destroyServerlist
+    destroy: destroyServerlist,
+    tools: serverlistTools
   };
 }());

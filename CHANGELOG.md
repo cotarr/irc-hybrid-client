@@ -15,6 +15,21 @@ and this project adheres to
 - Added new integer property `group` to IRC the server definition object, including server list editor form, server list API and API data validation.
 - To handle upgrade from version v0.2.8 and before, the group property will default to 0 is not present in the config file. The value 0 defines individual servers that do not rotate addresses.
 
+### Changed
+
+- API change: to move records up one position uses different method/route
+  - Old: COPY method /irc/serverlist with body {action: 'move-up'}
+  - New: POST method /irc/serverlist/tools with body {action: 'move-up'}
+- server/web-server.js - Added route POST /irc/serverlist/tools
+- server/irc/irc-serverlist-validations.js - update validations for COPY /irc/serverlist and POST /irc/serverlist/tools.
+- server/irc/irc-serverlist-editor.js Changes:
+  - Removed `action` property from body in COPY method. Records can be duplicated by COPY method using only `index` property.
+  - Added generic tools route, selector is `action` property.
+  - Added action `move-up` to tools route to move record up by 1 at specified index.
+  - Moving record up now returns index number of new position in database.
+  - Deleting record up now returns index number last record in database.
+- secure/js/serverlist.js - Minor update to method and url to support above changes
+
 ## [v0.2.8](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.8) 2022-08-11
 
 ### Changed

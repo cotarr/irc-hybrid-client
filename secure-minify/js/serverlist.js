@@ -35,9 +35,9 @@ if(response.ok)return response.json();else throw new Error('Fetch status '+respo
 Accept:'application/json'}};return fetch(fetchURL,fetchOptions).then(response=>{if(response.ok)return response.json();else if(409===response.status){
 const err=new Error('IRC Connected or Database Locked');err.status=409;throw err}else if(405===response.status){const err=new Error('Server List Editor Disabled');err.status=405;throw err
 }else throw new Error('Fetch status '+response.status+' '+response.statusText+' '+fetchURL)})};const submitServer=(body,method,index)=>{
-const csrfToken=document.querySelector('meta[name="csrf-token"]').getAttribute('content');let baseUrl='/irc/serverlist';if(-1!==index)baseUrl+='?index='+index.toString()
-;const fetchURL=encodeURI(baseUrl);const fetchOptions={method:method,credentials:'include',headers:{'CSRF-Token':csrfToken,Accept:'application/json','Content-Type':'application/json'},
-body:JSON.stringify(body)};return fetch(fetchURL,fetchOptions).then(response=>{if(response.ok)return response.json();else if(409===response.status){
+const csrfToken=document.querySelector('meta[name="csrf-token"]').getAttribute('content');let baseUrl='/irc/serverlist';if('action'in body)baseUrl='/irc/serverlist/tools'
+;if(-1!==index)baseUrl+='?index='+index.toString();const fetchURL=encodeURI(baseUrl);const fetchOptions={method:method,credentials:'include',headers:{'CSRF-Token':csrfToken,Accept:'application/json',
+'Content-Type':'application/json'},body:JSON.stringify(body)};return fetch(fetchURL,fetchOptions).then(response=>{if(response.ok)return response.json();else if(409===response.status){
 const err=new Error('IRC Connected or Database Locked');err.status=409;throw err}else if(422===response.status){const err=new Error('Unprocessable Entity');err.status=422;throw err
 }else throw new Error('Fetch status '+response.status+' '+response.statusText+' '+fetchURL)})};const clearIrcServerForm=()=>new Promise((resolve,reject)=>{
 document.getElementById('saveNewButton').removeAttribute('hidden');document.getElementById('saveModifiedButton').setAttribute('hidden','');document.getElementById('indexInputId').value='-1'
@@ -69,12 +69,12 @@ clearIrcServerForm();document.getElementById('saveNewButton').setAttribute('hidd
 ;document.getElementById('userInputId').value=data.user;document.getElementById('realInputId').value=data.real;document.getElementById('modesInputId').value=data.modes
 ;document.getElementById('channelListInputId').value=data.channelList;resolve(null)});const openIrcServerEdit=index=>{_clearError()
 ;clearIrcServerForm().then(()=>fetchServerList(index,1)).then(data=>populateIrcServerForm(data)).catch(err=>{_showError(err.toString()||err);console.log(err)})};const copyIrcServerToNew=index=>{
-_clearError();submitServer({index:index,action:'duplicate'
+_clearError();submitServer({index:index
 },'COPY',index).then(data=>checkForApiError(data)).then(()=>fetchIrcState()).then(data=>setDivVisibility(data)).then(()=>fetchServerList(-1,-1)).then(data=>buildServerListTable(data)).catch(err=>{
 _showError(err.toString()||err);console.log(err)})};const deleteIrcServer=index=>{_clearError();submitServer({index:index
 },'DELETE',index).then(data=>checkForApiError(data)).then(()=>fetchIrcState()).then(data=>setDivVisibility(data)).then(()=>fetchServerList(-1,-1)).then(data=>buildServerListTable(data)).catch(err=>{
 _showError(err.toString()||err);console.log(err)})};const moveUpInList=index=>{_clearError();submitServer({index:index,action:'move-up'
-},'COPY',index).then(data=>checkForApiError(data)).then(()=>fetchIrcState()).then(data=>setDivVisibility(data)).then(()=>fetchServerList(-1,-1)).then(data=>buildServerListTable(data)).catch(err=>{
+},'POST',index).then(data=>checkForApiError(data)).then(()=>fetchIrcState()).then(data=>setDivVisibility(data)).then(()=>fetchServerList(-1,-1)).then(data=>buildServerListTable(data)).catch(err=>{
 _showError(err.toString()||err);console.log(err)})};const parseFormInputValues=()=>new Promise((resolve,reject)=>{const index=parseInt(document.getElementById('indexInputId').value);const data={}
 ;if(-1!==index)data.index=parseInt(document.getElementById('indexInputId').value);if(document.getElementById('disabledCheckboxId').checked)data.disabled=true;else data.disabled=false
 ;data.group=parseInt(document.getElementById('groupInputId').value);data.name=document.getElementById('nameInputId').value;data.host=document.getElementById('hostInputId').value
