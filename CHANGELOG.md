@@ -29,6 +29,7 @@ and this project adheres to
   - Moving record up now returns index number of new position in database.
   - Deleting record up now returns index number last record in database.
 - secure/js/serverlist.js - Minor update to method and url to support above changes
+- docs/api.html - updated for API changes
 
 ## [v0.2.8](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.8) 2022-08-11
 

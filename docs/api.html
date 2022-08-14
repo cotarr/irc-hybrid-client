@@ -605,6 +605,8 @@ UPDATE
       "logging": true,
       "identifyNick": "",
       "nick": "MyNickName",
+      "altNick": "",
+      "recoverNick": false,
       "user": "user",
       "real": "John Doe",
       "modes": "+i",
@@ -623,6 +625,8 @@ UPDATE
     "logging": true,
     "identifyNick": "",
     "nick": "MyNickName",
+    "altNick": "",
+    "recoverNick": false,
     "user": "user",
     "real": "John Doe",
     "modes": "+i",
@@ -661,6 +665,8 @@ UPDATE
   "logging": true,
   "identifyNick": "",
   "nick": "MyNickName",
+  "altNick": "",
+  "recoverNick": false,
   "user": "user",
   "real": "John Doe",
   "modes": "+i",
@@ -709,6 +715,8 @@ UPDATE
   "identifyNick": "",
   "identifyCommand": "",
   "nick": "MyNickName",
+  "altNick": "",
+  "recoverNick": false,
   "user": "user",
   "real": "John Doe",
   "modes": "+i",
@@ -800,6 +808,8 @@ UPDATE
   "logging": true,
   "identifyNick": "",
   "nick": "MyNickName",
+  "altNick": "",
+  "recoverNick": false,
   "user": "user",
   "real": "John Doe",
   "modes": "+i",
@@ -841,64 +851,25 @@ UPDATE
 }
 </pre></div>
 
-        <h3>COPY /irc/serverlist?index=xxx (Duplicate)</h3>
+        <h3>COPY /irc/serverlist?index=xxx</h3>
 
         <p>
-          The COPY method services two actions: duplicate records, or reorder records. 
-          The selection is based on the &quot;action&quot; property in the 
-          body of the request. When action is set to &quot;duplicate&quot;
-          the record at the specified index is duplicated.
-          The duplicated record an added to the end of the list as the last record.
-          The index number of the new record is returned in the body of the response.
+          The COPY method is used to duplicate one of the existing records
+          and append the duplicated copy to the end of the server list arrray.
         </p>
         <p>
           The index parameter is required as a URL query parameter. 
           The index value specified in the body of the request must match the index
           value in the URL query parameters.
+          The index property in the response body will point to the index of
+          the new record created by the request.
         </p>
 
 <p>COPY Request Body:</p>
 <div class="pre-div"><pre>
 {
-  "index": 0,
-  "action": "duplicate"
+  "index": 0
 } 
-</pre></div>
-
-<p>Success Response:</p>
-<div class="pre-div"><pre>
-{
-  "status": "success",
-  "method": "COPY",
-  "index": 3
-}
-</pre></div>
-
-        <p>Error Response:</p>
-        <ul>
-        <li>Status 409 Conflict &quot;Attempt to modify locked data table&quot;</li>
-        </ul>
-
-        <h3>COPY /irc/serverlist?index=xxx (reorder)</h3>
-
-        <p>
-          The COPY method services two actions: duplicate records, or reorder records. 
-          The selection is based on the &quot;action&quot; property in the 
-          body of the request. When action is set to &quot;move-up&quot;
-          the record at the specified index is moved up to the next lowest index number.
-        </p>
-        <p>
-          The index parameter is required as a URL query parameter. 
-          The index value specified in the body of the request must match the index
-          value in the URL query parameters.
-        </p>
-
-<p>COPY Request Body:</p>
-<div class="pre-div"><pre>
- {
-  "index": 2,
-  "action": "move-up"
-}
 </pre></div>
 
 <p>Success Response:</p>
@@ -948,6 +919,48 @@ UPDATE
   "status": "success",
   "method": "DELETE",
   "index": 3
+}
+</pre></div>
+
+        <p>Error Response:</p>
+        <ul>
+        <li>Status 409 Conflict &quot;Attempt to modify locked data table&quot;</li>
+        </ul>
+
+        <h3>POST /irc/serverlist/tools?index=0</h3>
+
+        <p>
+          A &quot;tools&quot; API can be used to perform various toolbox functions
+          to the server list.
+          The selection is based on the &quot;action&quot; property in the 
+          body of the request.  The following actions are available.
+        </p>
+
+        <h3>POST /irc/serverlist/tools?index=xxx with action: 'move-up'</h3>
+
+        <p>
+          When action is set to &quot;move-up&quot;
+          the record at the specified index is moved up to the next decremented index number.
+          The up direction will lower the index number by 1 moving records towards index 0.
+          The record at index 0 can not be moved, and the request will be ignored without error.
+          The index property in the response body will point to the index of
+          the relocated record.
+        </p>
+
+<p>POST Request Body:</p>
+<div class="pre-div"><pre>
+ {
+  "index": 2,
+  "action": "move-up"
+}
+</pre></div>
+
+<p>Success Response:</p>
+<div class="pre-div"><pre>
+{
+  "status": "success",
+  "method": "POST",
+  "index": 1
 }
 </pre></div>
 
