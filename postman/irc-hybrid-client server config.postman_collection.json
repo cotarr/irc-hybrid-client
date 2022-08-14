@@ -1551,7 +1551,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"index\": 0,\n    \"action\": \"duplicate\"\n}\n",
+					"raw": "{\n    \"index\": 0\n}\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -1688,7 +1688,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"index\": 0,\n    \"action\": \"duplicate\"\n}\n",
+					"raw": "{\n    \"index\": 0\n}\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -1708,6 +1708,83 @@
 						{
 							"key": "index",
 							"value": "0"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/irc/serverlist/tools move-up",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Status response\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.eql('success');",
+							"    pm.expect(jsonData.method).to.eql('POST');",
+							"});",
+							"",
+							"pm.test(\"Extract created index to global variables\", function () {",
+							"    let body = pm.response.json();",
+							"    // console.log(body);",
+							"    let index = parseInt(body.index);",
+							"    pm.globals.set('irc_server_index', index);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "CSRF-Token",
+						"value": "{{csrf_token}}",
+						"type": "default"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "default"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"index\": {{irc_server_index}},\n    \"action\": \"move-up\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server_URL}}/irc/serverlist/tools?index={{irc_server_index}}",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"serverlist",
+						"tools"
+					],
+					"query": [
+						{
+							"key": "index",
+							"value": "{{irc_server_index}}"
 						}
 					]
 				}
