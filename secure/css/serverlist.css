@@ -37,7 +37,14 @@ button[disabled] {
   padding-left: 10px;
   padding-bottom: 10px;
 }
-
+.input-group2 {
+  background-color: #c4deff;
+  border: 1px solid black;
+  border-radius: 7px;
+  padding-top: 0px;
+  padding-left: 10px;
+  padding-bottom: 10px;
+}
 .yellow-warning-div {
   background-color: yellow;
   border: 1px solid black;

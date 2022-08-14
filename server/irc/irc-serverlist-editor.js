@@ -563,6 +563,7 @@
       method: req.method,
       index: chainObject.returnIndex
     };
+    if (chainObject.returnValue) responseJson.value = chainObject.returnValue;
     if (chainObject.resultStatus) responseJson.status = chainObject.resultStatus;
     if (chainObject.resultComment) responseJson.comment = chainObject.resultComment;
     res.json(responseJson);
@@ -690,6 +691,38 @@
   };
 
   /**
+   * Function to toggle disabled property of a server object
+   * The IRC server array is assumed to be present within chainObject
+   * @param {Object} req - NodeJs HTTP request object, req.query.index contain index
+   * @param {Object} chainObject - Wrapper object used to pass common date through promise chain
+   * @returns {Promise} Resolve to Object (chainObject) or reject error
+   */
+  const toggleServerDisabled = function (req, chainObject) {
+    // console.log(JSON.stringify(chainObject, null, 2));
+    return new Promise(function (resolve, reject) {
+      if (('serversFile' in chainObject) && ('serverArray' in chainObject.serversFile)) {
+        const index = parseInt(req.query.index);
+        if ((!isNaN(index)) && (index < chainObject.serversFile.serverArray.length)) {
+          let toggledLock = true;
+          if (chainObject.serversFile.serverArray[index].disabled) toggledLock = false;
+          chainObject.serversFile.serverArray[index].disabled = toggledLock;
+          chainObject.returnIndex = index;
+          chainObject.returnValue = toggledLock;
+          resolve(chainObject);
+        } else {
+          const err = new Error('Invalid array index');
+          err.status = 500;
+          reject(err);
+        }
+      } else {
+        const err = new Error('chainObject internal data error');
+        err.status = 500;
+        reject(err);
+      }
+    });
+  };
+
+  /**
    * List - NodeJs Middleware function: GET /irc/serverlist route handler
    */
   const listServerlist = function (req, res, next) {
@@ -781,6 +814,20 @@
         .then((chainObject) => writeServersFile(chainObject))
         .then((chainObject) => returnStatus(req, res, chainObject))
         .catch((err) => next(err));
+    } else if (('action' in req.body) && (req.body.action === 'toggle-disabled')) {
+      // Case 2: toggle disabled setting
+      // body {
+      //   "index": 0,
+      //   "action": "toggle-disabled"
+      // }
+      const chainObject = {};
+      requireIrcNotConnected(chainObject)
+        .then((chainObject) => requireNotLock(chainObject))
+        .then((chainObject) => readServersFile(chainObject))
+        .then((chainObject) => toggleServerDisabled(req, chainObject))
+        .then((chainObject) => writeServersFile(chainObject))
+        .then((chainObject) => returnStatus(req, res, chainObject))
+        .catch((err) => handlePromiseErrors(next, err));
     } else {
       const err = new Error('Invalid action property');
       err.status = 400;

@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Next 2022-08-13
+## Next 2022-08-14
 
 ### Added
 
@@ -17,18 +17,25 @@ and this project adheres to
 
 ### Changed
 
-- API change: to move records up one position uses different method/route
+- Server list table the [ ] disabled checkboxs are now clickable within the main table.
+- API change: to move records up one position uses different method/route (needed for new features in future)
   - Old: COPY method /irc/serverlist with body {action: 'move-up'}
   - New: POST method /irc/serverlist/tools with body {action: 'move-up'}
+
+
 - server/web-server.js - Added route POST /irc/serverlist/tools
-- server/irc/irc-serverlist-validations.js - update validations for COPY /irc/serverlist and POST /irc/serverlist/tools.
+- server/irc/irc-serverlist-validations.js
+  - update validations for COPY /irc/serverlist and POST /irc/serverlist/tools.
 - server/irc/irc-serverlist-editor.js Changes:
+  - Added generic tools route at /irc/serverlist/tools, selector is `action` property.
   - Removed `action` property from body in COPY method. Records can be duplicated by COPY method using only `index` property.
-  - Added generic tools route, selector is `action` property.
   - Added action `move-up` to tools route to move record up by 1 at specified index.
   - Moving record up now returns index number of new position in database.
   - Deleting record up now returns index number last record in database.
-- secure/js/serverlist.js - Minor update to method and url to support above changes
+  - Added action `toggle-disabled` to tools API /irc/serverlist/tools
+- secure/js/serverlist.js
+  - Minor update to method and url of move-up to use tools API
+  - Event handlers for checkbox in main serverlist using tools API.
 - docs/api.html - updated for API changes
 
 ## [v0.2.8](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.8) 2022-08-11

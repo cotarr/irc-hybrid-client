@@ -321,6 +321,24 @@ const populateIrcServerForm = (data) => {
  * Button Event Handler to service dynamically generated buttons in server list table
  * @param {Number} index - Integer index into IRC server Array
  */
+const toggleDisabled = (index) => {
+  _clearError();
+  submitServer({ index: index, action: 'toggle-disabled' }, 'POST', index)
+    .then((data) => checkForApiError(data))
+    .then(() => fetchIrcState())
+    .then((data) => setDivVisibility(data))
+    .then(() => fetchServerList(-1, -1))
+    .then((data) => buildServerListTable(data))
+    .catch((err) => {
+      _showError(err.toString() || err);
+      console.log(err);
+    });
+};
+
+/**
+ * Button Event Handler to service dynamically generated buttons in server list table
+ * @param {Number} index - Integer index into IRC server Array
+ */
 const openIrcServerEdit = (index) => {
   _clearError();
   clearIrcServerForm()
@@ -547,7 +565,11 @@ const buildServerListTable = (data) => {
         const td10El = document.createElement('td');
         const disabledCheckboxEl = document.createElement('input');
         disabledCheckboxEl.setAttribute('type', 'checkbox');
-        disabledCheckboxEl.setAttribute('disabled', '');
+        if (editable) {
+          disabledCheckboxEl.removeAttribute('disabled');
+        } else {
+          disabledCheckboxEl.setAttribute('disabled', '');
+        }
         disabledCheckboxEl.checked = data[i].disabled;
         td10El.appendChild(disabledCheckboxEl);
         rowEl.appendChild(td10El);
@@ -689,6 +711,9 @@ const buildServerListTable = (data) => {
           if (i > 0) td73El.appendChild(moveUpButtonEl);
           rowEl.appendChild(td73El);
 
+          disabledCheckboxEl.addEventListener('click', () => {
+            toggleDisabled(parseInt(rowEl.getAttribute('index')));
+          });
           editButtonEl.addEventListener('click', () => {
             openIrcServerEdit(parseInt(rowEl.getAttribute('index')));
           });

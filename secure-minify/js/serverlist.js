@@ -67,7 +67,9 @@ clearIrcServerForm();document.getElementById('saveNewButton').setAttribute('hidd
 ;document.getElementById('nickservCommandWarningDiv').setAttribute('hidden','');document.getElementById('nickInputId').value=data.nick;document.getElementById('altNickInputId').value=data.altNick
 ;if(0===data.altNick.length)document.getElementById('recoverNickCheckboxId').checked=false;else if(data.recoverNick)document.getElementById('recoverNickCheckboxId').checked=true;else document.getElementById('recoverNickCheckboxId').checked=false
 ;document.getElementById('userInputId').value=data.user;document.getElementById('realInputId').value=data.real;document.getElementById('modesInputId').value=data.modes
-;document.getElementById('channelListInputId').value=data.channelList;resolve(null)});const openIrcServerEdit=index=>{_clearError()
+;document.getElementById('channelListInputId').value=data.channelList;resolve(null)});const toggleDisabled=index=>{_clearError();submitServer({index:index,action:'toggle-disabled'
+},'POST',index).then(data=>checkForApiError(data)).then(()=>fetchIrcState()).then(data=>setDivVisibility(data)).then(()=>fetchServerList(-1,-1)).then(data=>buildServerListTable(data)).catch(err=>{
+_showError(err.toString()||err);console.log(err)})};const openIrcServerEdit=index=>{_clearError()
 ;clearIrcServerForm().then(()=>fetchServerList(index,1)).then(data=>populateIrcServerForm(data)).catch(err=>{_showError(err.toString()||err);console.log(err)})};const copyIrcServerToNew=index=>{
 _clearError();submitServer({index:index
 },'COPY',index).then(data=>checkForApiError(data)).then(()=>fetchIrcState()).then(data=>setDivVisibility(data)).then(()=>fetchServerList(-1,-1)).then(data=>buildServerListTable(data)).catch(err=>{
@@ -101,21 +103,22 @@ _showError(err.toString()||err);console.log(err)})};const parseFormInputValues=(
 ;columnTitles.forEach(titleName=>{const tdEl=document.createElement('td');tdEl.textContent=titleName;titleRowEl.appendChild(tdEl)});tableNode.appendChild(titleRowEl)
 ;if(Array.isArray(data)&&data.length>0)for(let i=0;i<data.length;i++){const rowEl=document.createElement('tr');rowEl.setAttribute('index',i.toString());const td01El=document.createElement('td')
 ;td01El.textContent=i.toString();rowEl.appendChild(td01El);const td10El=document.createElement('td');const disabledCheckboxEl=document.createElement('input')
-;disabledCheckboxEl.setAttribute('type','checkbox');disabledCheckboxEl.setAttribute('disabled','');disabledCheckboxEl.checked=data[i].disabled;td10El.appendChild(disabledCheckboxEl)
-;rowEl.appendChild(td10El);const td11El=document.createElement('td');if('group'in data[i])td11El.textContent=data[i].group;else td11El.textContent=0;rowEl.appendChild(td11El)
-;const td12El=document.createElement('td');td12El.textContent=data[i].name;rowEl.appendChild(td12El);const td20El=document.createElement('td');td20El.textContent=data[i].host;rowEl.appendChild(td20El)
-;const td21El=document.createElement('td');td21El.textContent=data[i].port;rowEl.appendChild(td21El);if(full){const td22El=document.createElement('td')
-;const tlsCheckboxEl=document.createElement('input');tlsCheckboxEl.setAttribute('type','checkbox');tlsCheckboxEl.setAttribute('disabled','');tlsCheckboxEl.checked=data[i].tls
-;td22El.appendChild(tlsCheckboxEl);rowEl.appendChild(td22El);const td23El=document.createElement('td');const verifyCheckboxEl=document.createElement('input')
-;verifyCheckboxEl.setAttribute('type','checkbox');verifyCheckboxEl.setAttribute('disabled','');verifyCheckboxEl.checked=data[i].verify;td23El.appendChild(verifyCheckboxEl);rowEl.appendChild(td23El)
-;const td24El=document.createElement('td');const proxyCheckboxEl=document.createElement('input');proxyCheckboxEl.setAttribute('type','checkbox');proxyCheckboxEl.setAttribute('disabled','')
-;proxyCheckboxEl.checked=data[i].proxy;td24El.appendChild(proxyCheckboxEl);rowEl.appendChild(td24El);const td25El=document.createElement('td');td25El.textContent='(hidden)';rowEl.appendChild(td25El)}
-const td30El=document.createElement('td');td30El.textContent=data[i].nick;rowEl.appendChild(td30El);if(full){const td31El=document.createElement('td');td31El.textContent=data[i].altNick
-;rowEl.appendChild(td31El);const td32El=document.createElement('td');const recoverCheckboxEl=document.createElement('input');recoverCheckboxEl.setAttribute('type','checkbox')
-;recoverCheckboxEl.setAttribute('disabled','');recoverCheckboxEl.checked=data[i].recoverNick;td32El.appendChild(recoverCheckboxEl);rowEl.appendChild(td32El);const td33El=document.createElement('td')
-;td33El.textContent=data[i].user;rowEl.appendChild(td33El);const td34El=document.createElement('td');td34El.textContent=data[i].real;rowEl.appendChild(td34El);const td35El=document.createElement('td')
-;td35El.textContent=data[i].modes;rowEl.appendChild(td35El);const td40El=document.createElement('td');data[i].channelList.split(',').forEach(channel=>{const chanDiv=document.createElement('div')
-;chanDiv.textContent=channel;td40El.appendChild(chanDiv)});rowEl.appendChild(td40El);const td50El=document.createElement('td');td50El.textContent=data[i].identifyNick;rowEl.appendChild(td50El)
+;disabledCheckboxEl.setAttribute('type','checkbox');if(editable)disabledCheckboxEl.removeAttribute('disabled');else disabledCheckboxEl.setAttribute('disabled','')
+;disabledCheckboxEl.checked=data[i].disabled;td10El.appendChild(disabledCheckboxEl);rowEl.appendChild(td10El);const td11El=document.createElement('td')
+;if('group'in data[i])td11El.textContent=data[i].group;else td11El.textContent=0;rowEl.appendChild(td11El);const td12El=document.createElement('td');td12El.textContent=data[i].name
+;rowEl.appendChild(td12El);const td20El=document.createElement('td');td20El.textContent=data[i].host;rowEl.appendChild(td20El);const td21El=document.createElement('td');td21El.textContent=data[i].port
+;rowEl.appendChild(td21El);if(full){const td22El=document.createElement('td');const tlsCheckboxEl=document.createElement('input');tlsCheckboxEl.setAttribute('type','checkbox')
+;tlsCheckboxEl.setAttribute('disabled','');tlsCheckboxEl.checked=data[i].tls;td22El.appendChild(tlsCheckboxEl);rowEl.appendChild(td22El);const td23El=document.createElement('td')
+;const verifyCheckboxEl=document.createElement('input');verifyCheckboxEl.setAttribute('type','checkbox');verifyCheckboxEl.setAttribute('disabled','');verifyCheckboxEl.checked=data[i].verify
+;td23El.appendChild(verifyCheckboxEl);rowEl.appendChild(td23El);const td24El=document.createElement('td');const proxyCheckboxEl=document.createElement('input')
+;proxyCheckboxEl.setAttribute('type','checkbox');proxyCheckboxEl.setAttribute('disabled','');proxyCheckboxEl.checked=data[i].proxy;td24El.appendChild(proxyCheckboxEl);rowEl.appendChild(td24El)
+;const td25El=document.createElement('td');td25El.textContent='(hidden)';rowEl.appendChild(td25El)}const td30El=document.createElement('td');td30El.textContent=data[i].nick;rowEl.appendChild(td30El)
+;if(full){const td31El=document.createElement('td');td31El.textContent=data[i].altNick;rowEl.appendChild(td31El);const td32El=document.createElement('td')
+;const recoverCheckboxEl=document.createElement('input');recoverCheckboxEl.setAttribute('type','checkbox');recoverCheckboxEl.setAttribute('disabled','');recoverCheckboxEl.checked=data[i].recoverNick
+;td32El.appendChild(recoverCheckboxEl);rowEl.appendChild(td32El);const td33El=document.createElement('td');td33El.textContent=data[i].user;rowEl.appendChild(td33El)
+;const td34El=document.createElement('td');td34El.textContent=data[i].real;rowEl.appendChild(td34El);const td35El=document.createElement('td');td35El.textContent=data[i].modes
+;rowEl.appendChild(td35El);const td40El=document.createElement('td');data[i].channelList.split(',').forEach(channel=>{const chanDiv=document.createElement('div');chanDiv.textContent=channel
+;td40El.appendChild(chanDiv)});rowEl.appendChild(td40El);const td50El=document.createElement('td');td50El.textContent=data[i].identifyNick;rowEl.appendChild(td50El)
 ;const td51El=document.createElement('td');td51El.textContent='(hidden)';rowEl.appendChild(td51El);const td60El=document.createElement('td');const reconnectCheckboxEl=document.createElement('input')
 ;reconnectCheckboxEl.setAttribute('type','checkbox');reconnectCheckboxEl.setAttribute('disabled','');reconnectCheckboxEl.checked=data[i].reconnect;td60El.appendChild(reconnectCheckboxEl)
 ;rowEl.appendChild(td60El);const td61El=document.createElement('td');const loggingCheckboxEl=document.createElement('input');loggingCheckboxEl.setAttribute('type','checkbox')
@@ -124,11 +127,12 @@ const td70El=document.createElement('td');const editButtonEl=document.createElem
 ;const td71El=document.createElement('td');const copyButtonEl=document.createElement('button');copyButtonEl.textContent='Copy';td71El.appendChild(copyButtonEl);rowEl.appendChild(td71El)
 ;const td72El=document.createElement('td');const deleteButtonEl=document.createElement('button');deleteButtonEl.textContent='Delete';td72El.appendChild(deleteButtonEl);rowEl.appendChild(td72El)
 ;const td73El=document.createElement('td');const moveUpButtonEl=document.createElement('button');moveUpButtonEl.textContent='move-up';if(i>0)td73El.appendChild(moveUpButtonEl)
-;rowEl.appendChild(td73El);editButtonEl.addEventListener('click',()=>{openIrcServerEdit(parseInt(rowEl.getAttribute('index')))});copyButtonEl.addEventListener('click',()=>{
-copyIrcServerToNew(parseInt(rowEl.getAttribute('index')))});deleteButtonEl.addEventListener('click',()=>{deleteIrcServer(parseInt(rowEl.getAttribute('index')))})
-;if(i>0)moveUpButtonEl.addEventListener('click',()=>{moveUpInList(parseInt(rowEl.getAttribute('index')))})}tableNode.appendChild(rowEl)}resolve(null)})
-;const checkForApiError=data=>new Promise((resolve,reject)=>{if('success'===data.status)resolve(null);else reject(new Error('PATCH API did not return success status flag'))})
-;const setDivVisibility=data=>{document.getElementById('listVisibilityDiv').removeAttribute('hidden','');document.getElementById('formVisibilityDiv').setAttribute('hidden','')
+;rowEl.appendChild(td73El);disabledCheckboxEl.addEventListener('click',()=>{toggleDisabled(parseInt(rowEl.getAttribute('index')))});editButtonEl.addEventListener('click',()=>{
+openIrcServerEdit(parseInt(rowEl.getAttribute('index')))});copyButtonEl.addEventListener('click',()=>{copyIrcServerToNew(parseInt(rowEl.getAttribute('index')))})
+;deleteButtonEl.addEventListener('click',()=>{deleteIrcServer(parseInt(rowEl.getAttribute('index')))});if(i>0)moveUpButtonEl.addEventListener('click',()=>{
+moveUpInList(parseInt(rowEl.getAttribute('index')))})}tableNode.appendChild(rowEl)}resolve(null)});const checkForApiError=data=>new Promise((resolve,reject)=>{
+if('success'===data.status)resolve(null);else reject(new Error('PATCH API did not return success status flag'))});const setDivVisibility=data=>{
+document.getElementById('listVisibilityDiv').removeAttribute('hidden','');document.getElementById('formVisibilityDiv').setAttribute('hidden','')
 ;document.getElementById('serverPasswordWarningDiv').setAttribute('hidden','');document.getElementById('nickservCommandWarningDiv').setAttribute('hidden','');if(data.ircConnected||data.ircConnecting){
 document.getElementById('createNewButton').setAttribute('hidden','');document.getElementById('warningVisibilityDiv').removeAttribute('hidden');editable=false}else{
 document.getElementById('createNewButton').removeAttribute('hidden');document.getElementById('warningVisibilityDiv').setAttribute('hidden','');editable=true}

@@ -653,7 +653,8 @@
       .isString()
       .isLength({ min: 0, max: 255 }),
     oneOf([
-      body('action', 'Unrecognized action value').equals('move-up')
+      body('action', 'Unrecognized action value').equals('move-up'),
+      body('action', 'Unrecognized action value').equals('toggle-disabled')
     ]),
     //
     // sanitize input
