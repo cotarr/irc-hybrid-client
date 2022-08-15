@@ -261,6 +261,7 @@ button[disabled] {
   border-radius: 8px;
   color: #000000;
   display: inline-block;
+  margin-right: 3px;
   width: 16px;
   height: 16px;
 }
@@ -270,6 +271,7 @@ button[disabled] {
   border-radius: 8px;
   color: #e00000;
   display: inline-block;
+  margin-right: 3px;
   width: 16px;
   height: 16px;
 }
