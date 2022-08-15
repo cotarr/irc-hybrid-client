@@ -6,22 +6,32 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Next 2022-08-14
+## Next 2022-08-15
+
+This is a feature upgrade. Previously, each different server definition was a stand alone configuration containing only a single IRC server address. This upgrade brings a group number property the server definition. Group 0 is reserved for stand alone servers.
+In the case where group is 1 or greater, the group property defines a group of servers. If more than 2 server in a group are 
+not disabled and have reconnect enabled, then up on disconnect the client will automatically rotate IRC server definitions within a server group.
 
 ### Added
 
-( Configuration only, no active functionality yet )
+- servers.json configuration changes:
+  - Added new integer property `group` to IRC the server definition object, including server list editor form, server list API and API data validation. To handle upgrade from version v0.2.8 and before, the group property will default to 0 is not present in the config file. The value 0 defines individual servers that do not rotate addresses.
+- Additions to ircState object:
+  - Added integer property `ircServerGroup` to show current server group number.
+  - Added boolean property `ircServerRotation` to tell browser if automatic rotation of server definitions is enabled in the configuration
+- server/irc/irc-client.js includes multiple changes
+  - New function onDisconnectRotateNextServer() to manage substitution of alternate server definitions
+  - Population of server properties into ircState object recoded into common function.
+  - Minor logic changes for reset of primary nickname on disconnect
 
-- Added new integer property `group` to IRC the server definition object, including server list editor form, server list API and API data validation.
-- To handle upgrade from version v0.2.8 and before, the group property will default to 0 is not present in the config file. The value 0 defines individual servers that do not rotate addresses.
+- server/irc/irc-client-vars - Modified array containing list of reconnect time intervals.
 
 ### Changed
 
-- Server list table the [ ] disabled checkboxs are now clickable within the main table.
+- Server list table the [ ] disabled checkboxes are now clickable within the main table.
 - API change: to move records up one position uses different method/route (needed for new features in future)
   - Old: COPY method /irc/serverlist with body {action: 'move-up'}
   - New: POST method /irc/serverlist/tools with body {action: 'move-up'}
-
 
 - server/web-server.js - Added route POST /irc/serverlist/tools
 - server/irc/irc-serverlist-validations.js

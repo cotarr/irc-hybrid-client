@@ -131,49 +131,102 @@
   // pass on IRC socket TLS info
   vars.ircState.ircSockInfo = {};
 
-  vars.ircState.ircServerName = null;
-  vars.ircState.ircServerHost = null;
-  vars.ircState.ircServerPort = null;
-  vars.ircState.ircTLSEnabled = null;
-  vars.ircState.ircTLSVerify = null;
-  vars.ircState.ircProxy = null;
-  vars.ircState.ircAutoReconnect = null;
-  vars.ircServerPassword = null;
-  vars.nsIdentifyNick = null;
-  vars.nsIdentifyCommand = null;
-  vars.ircState.nickName = null;
-  vars.ircState.userName = null;
-  vars.ircState.realName = null;
-  vars.ircState.userMode = null;
-  // List of favorite channels
-  vars.ircState.channelList = [];
-  // index into vars.servers.json file
-  vars.ircState.ircServerIndex = -1;
-  vars.ircState.ircServerPrefix = '';
+  // function to remove a server definition from ircState object
+  const eraseServerDefinition = function () {
+    if (!('ircServerIndex' in vars.ircState)) {
+      vars.ircState.ircServerIndex = -1;
+    }
+    vars.ircState.ircServerGroup = 0;
+    vars.ircState.ircServerName = null;
+    vars.ircState.ircServerHost = null;
+    vars.ircState.ircServerPort = null;
+    vars.ircState.ircTLSEnabled = null;
+    vars.ircState.ircTLSVerify = null;
+    vars.ircState.ircProxy = null;
+    vars.ircState.ircAutoReconnect = false;
+    vars.ircState.ircServerRotation = false;
+    ircLog.setRawMessageLogEnabled(false);
+    vars.ircServerPassword = null;
+    vars.nsIdentifyNick = null;
+    vars.nsIdentifyCommand = null;
+    vars.ircState.nickName = null;
+    vars.ircState.userName = null;
+    vars.ircState.realName = null;
+    vars.ircState.userMode = null;
+    // List of favorite channels
+    vars.ircState.channelList = [];
+    // some dynamic vars
+    vars.ircState.userHost = '';
+    vars.ircState.ircServerPrefix = '';
+  };
 
+  // Function to set current IRC server information into IRC state object
+  // These values will be available in the web browser
+  //
+  // The value of vars.ircState.ircServerIndex must be set before calling this function.
+  //
+  const loadServerDefinition = function () {
+    // index range check
+    if ((vars.ircState.ircServerIndex >= 0) &&
+      (vars.ircState.ircServerIndex < vars.servers.serverArray.length)) {
+      // copy definition
+      vars.ircState.ircServerGroup = vars.servers.serverArray[vars.ircState.ircServerIndex].group;
+      vars.ircState.ircServerName = vars.servers.serverArray[vars.ircState.ircServerIndex].name;
+      vars.ircState.ircServerHost = vars.servers.serverArray[vars.ircState.ircServerIndex].host;
+      vars.ircState.ircServerPort = vars.servers.serverArray[vars.ircState.ircServerIndex].port;
+      vars.ircState.ircTLSEnabled = vars.servers.serverArray[vars.ircState.ircServerIndex].tls;
+      vars.ircState.ircTLSVerify = vars.servers.serverArray[vars.ircState.ircServerIndex].verify;
+      vars.ircState.ircProxy = vars.servers.serverArray[vars.ircState.ircServerIndex].proxy;
+      vars.ircState.ircAutoReconnect =
+        vars.servers.serverArray[vars.ircState.ircServerIndex].reconnect;
+
+      // Capability to perform server rotation is determined by configuration as follows:
+      vars.ircState.ircServerRotation = false;
+      // group 0 is reserved for stand alone server definitions.
+      if (vars.ircState.ircServerGroup > 0) {
+        let rotationCount = 0;
+        if (vars.servers.serverArray.length > 0) {
+          for (let i = 0; i < vars.servers.serverArray.length; i++) {
+            if (
+              (!vars.servers.serverArray[i].disabled) &&
+              (vars.servers.serverArray[i].reconnect) &&
+              (vars.servers.serverArray[i].group === vars.ircState.ircServerGroup)) {
+              rotationCount++;
+            }
+          }
+          // must have greater than 2 server to perform rotation.
+          if (rotationCount > 1) vars.ircState.ircServerRotation = true;
+        }
+      }
+      // Note, not an ircState property, but included here due to common configuration
+      ircLog.setRawMessageLogEnabled(
+        vars.servers.serverArray[vars.ircState.ircServerIndex].logging);
+
+      vars.ircServerPassword = vars.servers.serverArray[vars.ircState.ircServerIndex].password;
+      vars.nsIdentifyNick = vars.servers.serverArray[vars.ircState.ircServerIndex].identifyNick;
+      vars.nsIdentifyCommand =
+        vars.servers.serverArray[vars.ircState.ircServerIndex].identifyCommand;
+      vars.ircState.nickName = vars.servers.serverArray[vars.ircState.ircServerIndex].nick;
+      vars.ircState.userName = vars.servers.serverArray[vars.ircState.ircServerIndex].user;
+      vars.ircState.realName = vars.servers.serverArray[vars.ircState.ircServerIndex].real;
+      vars.ircState.userMode = vars.servers.serverArray[vars.ircState.ircServerIndex].modes;
+      // List of favorite channels
+      vars.ircState.channelList =
+        vars.servers.serverArray[vars.ircState.ircServerIndex].channelList;
+    } else {
+      throw new Error('Index out of range copying server definition');
+    }
+  };
+
+  //
+  // On program load, initialize the ircState object with default server
+  //
+  eraseServerDefinition();
+  vars.ircState.ircServerIndex = -1;
   const loadingServerIndex = _findFirstEnabledServer();
   if (loadingServerIndex >= 0) {
     vars.ircState.ircServerIndex = loadingServerIndex;
-    vars.ircState.ircServerName = vars.servers.serverArray[loadingServerIndex].name;
-    vars.ircState.ircServerHost = vars.servers.serverArray[loadingServerIndex].host;
-    vars.ircState.ircServerPort = vars.servers.serverArray[loadingServerIndex].port;
-    vars.ircState.ircTLSEnabled = vars.servers.serverArray[loadingServerIndex].tls;
-    vars.ircState.ircTLSVerify = vars.servers.serverArray[loadingServerIndex].verify;
-    vars.ircState.ircProxy = vars.servers.serverArray[loadingServerIndex].proxy;
-    vars.ircState.ircAutoReconnect = vars.servers.serverArray[loadingServerIndex].reconnect;
-    ircLog.setRawMessageLogEnabled(vars.servers.serverArray[loadingServerIndex].logging);
-    vars.ircServerPassword = vars.servers.serverArray[loadingServerIndex].password;
-    vars.nsIdentifyNick = vars.servers.serverArray[loadingServerIndex].identifyNick;
-    vars.nsIdentifyCommand = vars.servers.serverArray[loadingServerIndex].identifyCommand;
-    vars.ircState.nickName = vars.servers.serverArray[loadingServerIndex].nick;
-    vars.ircState.userName = vars.servers.serverArray[loadingServerIndex].user;
-    vars.ircState.realName = vars.servers.serverArray[loadingServerIndex].real;
-    vars.ircState.userMode = vars.servers.serverArray[loadingServerIndex].modes;
-    // List of favorite channels
-    vars.ircState.channelList = vars.servers.serverArray[loadingServerIndex].channelList;
-
-    vars.ircState.userHost = '';
-    vars.ircState.ircServerPrefix = '';
+    loadServerDefinition();
   }
 
   if ('ctcpTimeLocale' in vars.servers) {
@@ -328,6 +381,111 @@
       }
     }
   };
+
+  // De-bounce, see below
+  let disconnectRotateInhibitFlag = false;
+
+  // Rotate server definition after disconnect
+  //
+  // Connected server must have reconnect === true
+  // Connected server must have group number > 0
+  // At least one other server in the same group must
+  // exist, not disabled, with reconnect === true
+  //
+  // Time intervals and inhibit interval are set in server/irc/irc-client-vars.js
+  // to prioritize the existing server on the first reconnect(s)
+  // before automatically rotating server on future disconnects.
+  //
+  const onDisconnectRotateNextServer = function () {
+    // Internal function to generate list of available servers
+    // Accepts group number
+    // Returns array of available index numbers
+    function _getGroupIndexList (group) {
+      const groupIndexList = [];
+      if (vars.servers.serverArray.length > 0) {
+        for (let i = 0; i < vars.servers.serverArray.length; i++) {
+          if (
+            (!vars.servers.serverArray[i].disabled) &&
+            (vars.servers.serverArray[i].reconnect) &&
+            (vars.servers.serverArray[i].group === group)) {
+            groupIndexList.push(i);
+          }
+        }
+      }
+      return groupIndexList;
+    }
+    // Internal function to generate next available server index number
+    // accepts array of available index numbers and current index number
+    // returns integer index number of next available server
+    function _nextIndexInGroup (groupList, index) {
+      let nextIndex = index;
+      if (vars.servers.serverArray.length > 0) {
+        for (let i = 0; i < vars.servers.serverArray.length; i++) {
+          nextIndex++;
+          if (nextIndex >= vars.servers.serverArray.length) nextIndex = 0;
+          if (groupList.indexOf(nextIndex) >= 0) break;
+        }
+      }
+      console.log('Rotate servers ', index, groupList, nextIndex);
+      return nextIndex;
+    }
+    const currentIndex = vars.ircState.ircServerIndex;
+    const currentServerObj = vars.servers.serverArray[currentIndex];
+    const currentGroupNumber = currentServerObj.group;
+    const groupIndexList = _getGroupIndexList(currentGroupNumber);
+
+    // De-bounce, see below
+    if (disconnectRotateInhibitFlag) return;
+
+    // The first reconnect(s) before this limit should use the current server without rotation.
+    if (vars.ircServerReconnectTimerSeconds < vars.serverRotateInhibitTimeout) return;
+
+    // Group #0 is reserved for standalone servers that do not rotate
+    if (currentGroupNumber === 0) return;
+
+    // This server is not set to reconnect
+    if (!currentServerObj.reconnect) return;
+
+    // There are no other available servers in the list for rotation
+    if (groupIndexList.length < 2) return;
+
+    const nextIndex = _nextIndexInGroup(groupIndexList, currentIndex);
+    //
+    // loading a new server definition will include the default nickname.
+    // When reconnecting from existing connection,
+    // preserve current nickname to use in place of server definition nickname.
+    // Note, if current nickname is alternate nickname or Guest12345
+    // it may have been reverted back to the primary configuration nickname
+    // by function onDisconnectResetPrimaryNick()
+    //
+    const lastNick = vars.ircState.nickName;
+
+    //
+    // Update IRC parameters
+    //
+    vars.ircState.ircServerIndex = -1;
+    eraseServerDefinition();
+    vars.ircState.ircServerIndex = nextIndex;
+    // load definition from index var.ircState.ircServerIndex
+    loadServerDefinition();
+
+    // Nickname special case, keep save across server rotation
+    vars.ircState.nickName = lastNick;
+
+    tellBrowserToRequestState();
+
+    //
+    // De-bounce disconnect for 5 seconds
+    // There can be several sockets: Proxy socket, TLS socket and TCP socket.
+    // Sometimes multiple socket error events can fire for a single disconnect.
+    // This 5 second inhibit timer prevents stepping over possible IRC servers
+    // in the list for chained errors
+    //
+    disconnectRotateInhibitFlag = true;
+    setTimeout(function () {
+      disconnectRotateInhibitFlag = false;
+    }, 5000);
+  }; // onDisconnectRotateNextServer()
 
   // -------------------------------------------
   //  On Ready Event Handler (Internal function)
@@ -608,9 +766,14 @@
               vars.ircServerReconnectTimerSeconds = 1;
             }
             onDisconnectGrabState();
+            onDisconnectResetPrimaryNick();
+            onDisconnectRotateNextServer();
+          } else {
+            onDisconnectResetPrimaryNick();
           }
+        } else {
+          onDisconnectResetPrimaryNick();
         }
-        onDisconnectResetPrimaryNick();
         vars.ircState.ircServerPrefix = '';
         vars.ircState.ircConnecting = false;
         vars.ircState.ircConnected = false;
@@ -650,9 +813,14 @@
               vars.ircServerReconnectTimerSeconds = 1;
             }
             onDisconnectGrabState();
+            onDisconnectResetPrimaryNick();
+            onDisconnectRotateNextServer();
+          } else {
+            onDisconnectResetPrimaryNick();
           }
+        } else {
+          onDisconnectResetPrimaryNick();
         }
-        onDisconnectResetPrimaryNick();
         vars.ircState.ircServerPrefix = '';
         vars.ircState.ircConnecting = false;
         vars.ircState.ircConnected = false;
@@ -829,9 +997,14 @@
               vars.ircServerReconnectTimerSeconds = 1;
             }
             onDisconnectGrabState();
+            onDisconnectRotateNextServer();
+            onDisconnectResetPrimaryNick();
+          } else {
+            onDisconnectResetPrimaryNick();
           }
+        } else {
+          onDisconnectResetPrimaryNick();
         }
-        onDisconnectResetPrimaryNick();
         vars.ircState.ircServerPrefix = '';
         vars.ircState.ircConnecting = false;
         vars.ircState.ircConnected = false;
@@ -938,10 +1111,10 @@
   //   T  T  F  F  10 - Function: connectIRC()
   //   T  F  F  F  10 - Event: on error
   //   T  F  F  F  10 - Event: on close
-  //   T  T  F  F  60 - Function: connectIRC()
-  //   T  T  F  F  60 - Event: on connect
-  //   T  F  T  F  60 - Function: _connectEventHandler
-  //   T  F  T  T  60 - Event: IRC message 001 from IRC server
+  //   T  T  F  F  76 - Function: connectIRC()
+  //   T  T  F  F  76 - Event: on connect
+  //   T  F  T  F  76 - Function: _connectEventHandler
+  //   T  F  T  T  76 - Event: IRC message 001 from IRC server
   //   T  F  T  T  0  - Function: ircServerReconnectTimerTick()
 
   //   A  B  C  D  E  Case socks5 proxy to port 6667 (no TLS) and stop IRC server, then restart
@@ -955,10 +1128,10 @@
   //   T  F  F  F  1  - Event: on close
   //   T  T  F  F  10 - Function: connectIRC()
   //   T  F  F  F  10 - Event: on error
-  //   T  T  F  F  60 - Function: connectIRC()
-  //   T  T  F  F  60 - Event: on connect
-  //   T  F  T  F  60 - Function: _connectEventHandler
-  //   T  F  T  T  60 - Event: IRC message 001 from IRC server
+  //   T  T  F  F  76 - Function: connectIRC()
+  //   T  T  F  F  76 - Event: on connect
+  //   T  F  T  F  76 - Function: _connectEventHandler
+  //   T  F  T  T  76 - Event: IRC message 001 from IRC server
   //   T  F  T  T  0  - Function: ircServerReconnectTimerTick()
 
   //   A  B  C  D  E  Case of TLS connect using socks5 proxy, then stop IRC server, then restart
@@ -972,11 +1145,11 @@
   //   T  F  F  F  1  - Event: on close
   //   T  T  F  F  10 - Function: connectIRC()
   //   T  F  F  F  10 - Event: socks5 on error
-  //   T  T  F  F  60 - Function: connectIRC()
-  //   T  T  F  F  60 - Event: socks5 on connect
-  //   T  T  F  F  60 - Event: on secureConnect
-  //   T  F  T  F  60 - Function: _connectEventHandler
-  //   T  F  T  T  60 - Event: IRC message 001 from IRC server
+  //   T  T  F  F  76 - Function: connectIRC()
+  //   T  T  F  F  76 - Event: socks5 on connect
+  //   T  T  F  F  76 - Event: on secureConnect
+  //   T  F  T  F  76 - Function: _connectEventHandler
+  //   T  F  T  T  76 - Event: IRC message 001 from IRC server
   //   T  F  T  T  0  - Function: ircServerReconnectTimerTick()
 
   //   A  B  C  D  E  Case of TLS connect using socks5 proxy, then stop socks5 proxy, then restart
@@ -992,11 +1165,11 @@
   //   T  F  F  F  1  - Event: on close
   //   T  T  F  F  10 - Function: connectIRC()
   //   T  F  F  F  10 - Event: socks5 on error
-  //   T  T  F  F  60 - Function: connectIRC()
-  //   T  T  F  F  60 - Event: socks5 on connect
-  //   T  T  F  F  60 - Event: on secureConnect
-  //   T  F  T  F  60 - Function: _connectEventHandler
-  //   T  F  T  T  60 - Event: IRC message 001 from IRC server
+  //   T  T  F  F  76 - Function: connectIRC()
+  //   T  T  F  F  76 - Event: socks5 on connect
+  //   T  T  F  F  76 - Event: on secureConnect
+  //   T  F  T  F  76 - Function: _connectEventHandler
+  //   T  F  T  T  76 - Event: IRC message 001 from IRC server
   //   T  F  T  T  0  - Function: ircServerReconnectTimerTick()
 
   //
@@ -1012,11 +1185,11 @@
   //   T  T  F  F  10 - Function: connectIRC()
   //   T  F  F  F  10 - Event: on error
   //   T  F  F  F  10 - Event: on close
-  //   T  T  F  F  60 - Function: connectIRC()
-  //   T  T  F  F  60 - Event: on connect
-  //   T  T  F  F  60 - Event: on secureConnect
-  //   T  F  T  F  60 - Function: _connectEventHandler
-  //   T  F  T  T  60 - Event: IRC message 001 from IRC server
+  //   T  T  F  F  76 - Function: connectIRC()
+  //   T  T  F  F  76 - Event: on connect
+  //   T  T  F  F  76 - Event: on secureConnect
+  //   T  F  T  F  76 - Function: _connectEventHandler
+  //   T  F  T  T  76 - Event: IRC message 001 from IRC server
   //   T  F  T  T  0  - Function: ircServerReconnectTimerTick()
   //
   // ------------------------------------------------------
@@ -1327,25 +1500,16 @@
     //
     // Update IRC parameters
     //
-    vars.ircState.ircServerName = vars.servers.serverArray[vars.ircState.ircServerIndex].name;
-    vars.ircState.ircServerHost = vars.servers.serverArray[vars.ircState.ircServerIndex].host;
-    vars.ircState.ircServerPort = vars.servers.serverArray[vars.ircState.ircServerIndex].port;
-    vars.ircState.ircTLSEnabled = vars.servers.serverArray[vars.ircState.ircServerIndex].tls;
-    vars.ircState.ircTLSVerify = vars.servers.serverArray[vars.ircState.ircServerIndex].verify;
-    vars.ircState.ircProxy = vars.servers.serverArray[vars.ircState.ircServerIndex].proxy;
-    vars.ircState.ircAutoReconnect =
-      vars.servers.serverArray[vars.ircState.ircServerIndex].reconnect;
-    ircLog.setRawMessageLogEnabled(vars.servers.serverArray[vars.ircState.ircServerIndex].logging);
-    vars.ircServerPassword = vars.servers.serverArray[vars.ircState.ircServerIndex].password;
-    vars.nsIdentifyNick = vars.servers.serverArray[vars.ircState.ircServerIndex].identifyNick;
-    vars.nsIdentifyCommand = vars.servers.serverArray[vars.ircState.ircServerIndex].identifyCommand;
-    vars.ircState.channelList = vars.servers.serverArray[vars.ircState.ircServerIndex].channelList;
-
-    vars.ircState.nickName = vars.servers.serverArray[vars.ircState.ircServerIndex].nick;
-    vars.ircState.userName = vars.servers.serverArray[vars.ircState.ircServerIndex].user;
-    vars.ircState.realName = vars.servers.serverArray[vars.ircState.ircServerIndex].real;
-    vars.ircState.userMode = vars.servers.serverArray[vars.ircState.ircServerIndex].modes;
-    vars.ircState.userHost = '';
+    // load definition from index var.ircState.ircServerIndex
+    eraseServerDefinition();
+    if ((vars.ircState.ircServerIndex >= 0) &&
+      (vars.ircState.ircServerIndex < vars.servers.serverArray.length)) {
+      loadServerDefinition();
+    } else {
+      // This is a fatal error
+      const err = new Error('Server index out of range loading server definition');
+      return next(err);
+    }
 
     tellBrowserToRequestState();
 
@@ -1367,47 +1531,14 @@
     // Update IRC parameters
     //
     // Case of empty server list
-    vars.ircState.ircServerName = null;
-    vars.ircState.ircServerHost = null;
-    vars.ircState.ircServerPort = null;
-    vars.ircState.ircTLSEnabled = null;
-    vars.ircState.ircTLSVerify = null;
-    vars.ircState.ircProxy = null;
-    vars.ircState.ircAutoReconnect = null;
-    vars.ircServerPassword = null;
-    vars.nsIdentifyNick = null;
-    vars.nsIdentifyCommand = null;
-    vars.ircState.nickName = null;
-    vars.ircState.userName = null;
-    vars.ircState.realName = null;
-    vars.ircState.userMode = null;
-    vars.ircState.channelList = [];
-    vars.ircState.userHost = '';
     vars.ircState.ircServerIndex = -1;
-    vars.ircState.ircServerPrefix = '';
+    eraseServerDefinition();
 
     const reloadServerIndex = _findFirstEnabledServer();
     if (reloadServerIndex >= 0) {
       vars.ircState.ircServerIndex = reloadServerIndex;
-      vars.ircState.ircServerName = vars.servers.serverArray[reloadServerIndex].name;
-      vars.ircState.ircServerHost = vars.servers.serverArray[reloadServerIndex].host;
-      vars.ircState.ircServerPort = vars.servers.serverArray[reloadServerIndex].port;
-      vars.ircState.ircTLSEnabled = vars.servers.serverArray[reloadServerIndex].tls;
-      vars.ircState.ircTLSVerify = vars.servers.serverArray[reloadServerIndex].verify;
-      vars.ircState.ircProxy = vars.servers.serverArray[reloadServerIndex].proxy;
-      vars.ircState.ircAutoReconnect = vars.servers.serverArray[reloadServerIndex].reconnect;
-      ircLog.setRawMessageLogEnabled(vars.servers.serverArray[reloadServerIndex].logging);
-      vars.ircServerPassword = vars.servers.serverArray[reloadServerIndex].password;
-      vars.nsIdentifyNick = vars.servers.serverArray[reloadServerIndex].identifyNick;
-      vars.nsIdentifyCommand = vars.servers.serverArray[reloadServerIndex].identifyCommand;
-      vars.ircState.nickName = vars.servers.serverArray[reloadServerIndex].nick;
-      vars.ircState.userName = vars.servers.serverArray[reloadServerIndex].user;
-      vars.ircState.realName = vars.servers.serverArray[reloadServerIndex].real;
-      vars.ircState.userMode = vars.servers.serverArray[reloadServerIndex].modes;
-      vars.ircState.channelList = vars.servers.serverArray[reloadServerIndex].channelList;
-
-      vars.ircState.userHost = '';
-      vars.ircState.ircServerPrefix = '';
+      // load definition from index var.ircState.ircServerIndex
+      loadServerDefinition();
     }
 
     tellBrowserToRequestState();

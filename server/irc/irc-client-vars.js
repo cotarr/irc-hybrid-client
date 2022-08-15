@@ -38,6 +38,13 @@
     'PONG'
   ];
 
+  // Replaced when loaded from file
+  const servers = {
+    configVersion: -1,
+    ctcpTimeLocale: ['en-US', 'UTC'],
+    serverArray: []
+  };
+
   // ircState hold main IRC state variables visible to browser and backend
   const ircState = {};
   let ircServerPassword = null;
@@ -60,23 +67,67 @@
   const commandMsgPrefix = '--> ';
 
   // IRC server reconnect when timer matches (time in seconds)
-  // Schedule times are up to 4 hours
-  const ircServerReconnectIntervals = [
-    10,
-    60,
-    120,
-    180,
-    300,
-    600,
-    900,
-    1800,
-    2700,
-    3600,
-    5400,
-    7200,
-    10080,
-    14400
-  ];
+  //
+  // Comments:
+  // This program can experience occasional disconnects,
+  // sometimes due to TLS or Socks5 sockets being re-opened.
+  // that seem to be general network issues.
+  // In this case, the IRC client can typically reconnect
+  // successfully to the same IRC server without issue.
+  // For tis reason, a const serverRotateInhibitTimeout
+  // is used to inhibit IRC server rotation.
+  //
+  // In the default values, the first 3 attempts are at 10, 76, 142 seconds
+  // With an inhibit value of 90 seconds, the first two reconnects at
+  // 10 and 76 seconds will try the existing IRC server, then future
+  // attempts will rotate address at time intervals given by the array.
+  //
+  // It is also noted that some ident lookups on port 113 can take up to
+  // 45 seconds to exceed network time limits, so the
+  // socket connect timeout is set to 10 seconds, followed by
+  // nickname registration at 50 seconds limit.
+  // Therefore, interval spacing of reconnects should be greater than 60 seconds.
+  //
+  //
+  // Example: ircServerReconnectIntervals  [
+  //   10,76,142,208,274,340,666,992,1318,1644,1970,2296,2622,2948,3274,3600
+  //   4500,5400,6300,7200,9000,10800,12600,14400,18000,21600,25200,28800]
+  //
+  const ircServerReconnectIntervals = [];
+  // End after 10 seconds
+  let tempValue = 10;
+  ircServerReconnectIntervals.push(tempValue);
+  // End after 10 + (5*66) = 340 seconds
+  for (let i = 0; i < 5; i++) {
+    tempValue += 66;
+    ircServerReconnectIntervals.push(tempValue);
+  }
+  // End after 340 + (10*326) = 3600 seconds or 1 hour
+  for (let i = 0; i < 10; i++) {
+    tempValue += 326;
+    ircServerReconnectIntervals.push(tempValue);
+  }
+  // End after 3600 + (4*900) = 7200 seconds or 2 hour
+  for (let i = 0; i < 4; i++) {
+    tempValue += 900;
+    ircServerReconnectIntervals.push(tempValue);
+  }
+  // End after 7200 + (4*1800) = 14400 seconds or 4 hour
+  for (let i = 0; i < 4; i++) {
+    tempValue += 1800;
+    ircServerReconnectIntervals.push(tempValue);
+  }
+  // End after 14400 + (4*3600) = 28800 seconds or 8 hour
+  for (let i = 0; i < 4; i++) {
+    tempValue += 3600;
+    ircServerReconnectIntervals.push(tempValue);
+  }
+  // console.log('ircServerReconnectIntervals ', JSON.stringify(ircServerReconnectIntervals));
+
+  // Time in seconds
+  // This is to keep same server for initial reconnect
+  const serverRotateInhibitTimeout = 90;
+
   let ircServerReconnectTimerSeconds = 0;
   let ircServerReconnectChannelString = '';
   let ircServerReconnectAwayString = '';
@@ -115,6 +166,7 @@
 
   module.exports = {
     excludedCommands: excludedCommands,
+    servers: servers,
     ircState: ircState,
     ircServerPassword: ircServerPassword,
     socks5Username: socks5Username,
@@ -134,6 +186,7 @@
     ircServerReconnectAwayString: ircServerReconnectAwayString,
     ircSocketConnectingTimeout: ircSocketConnectingTimeout,
     ircRegistrationTimeout: ircRegistrationTimeout,
+    serverRotateInhibitTimeout: serverRotateInhibitTimeout,
     activityWatchdogTimerSeconds: activityWatchdogTimerSeconds,
     activityWatchdogTimerLimit: activityWatchdogTimerLimit,
     clientToServerPingSendTimer: clientToServerPingSendTimer,
