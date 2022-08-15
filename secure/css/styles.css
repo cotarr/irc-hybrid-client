@@ -234,6 +234,46 @@ button[disabled] {
   padding-right: 10px;
 }
 
+.icon-inner-true {
+  background-color: #000000;
+  border: 1px solid black;
+  border-radius: 3px;
+  color: #000000;
+  display: inline-block;
+  margin: 4px;
+  width: 6px;
+  height: 6px;
+}
+
+.icon-inner-false {
+  background-color: #e00000;
+  border: 1px solid #e00000;
+  border-radius: 3px;
+  color: #e00000;
+  display: inline-block;
+  margin: 4px;
+  width: 6px;
+  height: 6px;
+}
+.icon-true {
+  background-color: #00b800;
+  border: 1px solid black;
+  border-radius: 8px;
+  color: #000000;
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+}
+.icon-false {
+  background-color: #e00000;
+  border: 1px solid black;
+  border-radius: 8px;
+  color: #e00000;
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+}
+
 .info-license-div {
   background-color: white;
   border: 1px solid black;

@@ -153,34 +153,30 @@ const timePreEl=document.getElementById('elapsedTimeDiv');const now=unixTimestam
 ;if(ircState.ircConnected)timeStr+='IRC Connected: '+toTimeString(now-ircState.times.ircConnect)+' ('+ircState.count.ircConnect.toString()+')\n';else timeStr+='IRC Connected: N/A\n'
 ;if(webState.webConnected)timeStr+='Backend Start: '+toTimeString(now-ircState.times.programRun)+'\n';else timeStr+='Backend Start: N/A\n'
 ;if(ircState.ircConnected&&webState.lag.min<9998)timeStr+='IRC Lag: '+webState.lag.last.toFixed(3)+' Min: '+webState.lag.min.toFixed(3)+' Max: '+webState.lag.max.toFixed(3);else timeStr+='IRC Lag: (Waiting next ping)'
-;timePreEl.textContent=timeStr}let lastConnectErrorCount=0;function getIrcState(callback){webState.count.webStateCalls++;const fetchURL=webServerUrl+'/irc/getircstate';const fetchOptions={
-method:'GET',headers:{Accept:'application/json'}};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok)return response.json();else{if(403===response.status)window.location.href='/login'
-;throw new Error('Fetch status '+response.status+' '+response.statusText)}}).then(responseJson=>{ircState=responseJson
-;if(!ircState.ircConnected&&webState.lastIrcServerIndex!==ircState.ircServerIndex){webState.lastIrcServerIndex=ircState.ircServerIndex
+;timePreEl.textContent=timeStr}function updateTrueFalseIcons(id,value){if(value){document.getElementById(id).classList.remove('icon-false')
+;document.getElementById(id+'Dot').classList.remove('icon-inner-false');document.getElementById(id).classList.add('icon-true');document.getElementById(id+'Dot').classList.add('icon-inner-true')}else{
+document.getElementById(id).classList.remove('icon-true');document.getElementById(id+'Dot').classList.remove('icon-inner-true');document.getElementById(id).classList.add('icon-false')
+;document.getElementById(id+'Dot').classList.add('icon-inner-false')}}let lastConnectErrorCount=0;function getIrcState(callback){webState.count.webStateCalls++
+;const fetchURL=webServerUrl+'/irc/getircstate';const fetchOptions={method:'GET',headers:{Accept:'application/json'}};fetch(fetchURL,fetchOptions).then(response=>{
+if(response.ok)return response.json();else{if(403===response.status)window.location.href='/login';throw new Error('Fetch status '+response.status+' '+response.statusText)}}).then(responseJson=>{
+ircState=responseJson;if(!ircState.ircConnected&&webState.lastIrcServerIndex!==ircState.ircServerIndex){webState.lastIrcServerIndex=ircState.ircServerIndex
 ;document.getElementById('ircServerIndexInputId').value=ircState.ircServerIndex;document.getElementById('ircServerGroupInputId').value=ircState.ircServerGroup
 ;document.getElementById('ircServerNameInputId').value=ircState.ircServerName;document.getElementById('ircServerAddrInputId').value=ircState.ircServerHost
-;document.getElementById('ircServerPortInputId').value=ircState.ircServerPort
-;if(ircState.ircAutoReconnect)document.getElementById('ircServerReconnectEnable').setAttribute('checked','');else document.getElementById('ircServerReconnectEnable').removeAttribute('checked')
-;if(ircState.ircServerRotation)document.getElementById('ircServerRotateEnable').setAttribute('checked','');else document.getElementById('ircServerRotateEnable').removeAttribute('checked')
-;if(ircState.ircTLSEnabled)document.getElementById('ircServerTlsEnable').setAttribute('checked','');else document.getElementById('ircServerTlsEnable').removeAttribute('checked')
-;if(ircState.ircTLSVerify)document.getElementById('ircServerTlsVerify').setAttribute('checked','');else document.getElementById('ircServerTlsVerify').removeAttribute('checked')
-;if(ircState.enableSocks5Proxy&&ircState.ircProxy){document.getElementById('socks5HidableDiv').removeAttribute('hidden');document.getElementById('socks5EnabledCheckbox').setAttribute('disabled','')
-;document.getElementById('socks5EnabledCheckbox').setAttribute('checked','');document.getElementById('socks5AddrInputId').value=ircState.socks5Host
-;document.getElementById('socks5PortInputId').value=ircState.socks5Port}else{document.getElementById('socks5EnabledCheckbox').removeAttribute('checked')
-;document.getElementById('socks5AddrInputId').value='';document.getElementById('socks5PortInputId').value=''}document.getElementById('nickNameInputId').value=ircState.nickName
-;document.getElementById('userNameInputId').textContent='"'+ircState.userName+'"';document.getElementById('realNameInputId').textContent='"'+ircState.realName+'"'
-;document.getElementById('userModeInputId').textContent='"'+ircState.userMode+'"'}if(ircState.ircConnected){document.title='IRC-'+ircState.ircServerName
-;document.getElementById('ircServerIndexInputId').value=ircState.ircServerIndex;document.getElementById('ircServerGroupInputId').value=ircState.ircServerGroup
-;document.getElementById('ircServerNameInputId').value=ircState.ircServerName;document.getElementById('ircServerAddrInputId').value=ircState.ircServerHost
-;document.getElementById('ircServerPortInputId').value=ircState.ircServerPort
-;if(ircState.ircAutoReconnect)document.getElementById('ircServerReconnectEnable').setAttribute('checked','');else document.getElementById('ircServerReconnectEnable').removeAttribute('checked')
-;if(ircState.ircServerRotation)document.getElementById('ircServerRotateEnable').setAttribute('checked','');else document.getElementById('ircServerRotateEnable').removeAttribute('checked')
-;if(ircState.ircTLSEnabled)document.getElementById('ircServerTlsEnable').setAttribute('checked','');else document.getElementById('ircServerTlsEnable').removeAttribute('checked')
-;if(ircState.ircTLSVerify)document.getElementById('ircServerTlsVerify').setAttribute('checked','');else document.getElementById('ircServerTlsVerify').removeAttribute('checked')
-;if(ircState.enableSocks5Proxy&&ircState.ircProxy){document.getElementById('socks5HidableDiv').removeAttribute('hidden');document.getElementById('socks5EnabledCheckbox').setAttribute('disabled','')
-;document.getElementById('socks5EnabledCheckbox').setAttribute('checked','');document.getElementById('socks5AddrInputId').value=ircState.socks5Host
-;document.getElementById('socks5PortInputId').value=ircState.socks5Port}else{document.getElementById('socks5EnabledCheckbox').removeAttribute('checked')
-;document.getElementById('socks5AddrInputId').value='';document.getElementById('socks5PortInputId').value=''}document.getElementById('headerServer').textContent=ircState.ircServerName
+;document.getElementById('ircServerPortInputId').value=ircState.ircServerPort;updateTrueFalseIcons('ircServerTlsEnable',ircState.ircTLSEnabled)
+;updateTrueFalseIcons('ircServerTlsVerify',ircState.ircTLSVerify);updateTrueFalseIcons('ircServerReconnectEnable',ircState.ircAutoReconnect)
+;updateTrueFalseIcons('ircServerRotateEnable',ircState.ircServerRotation);if(ircState.enableSocks5Proxy&&ircState.ircProxy){document.getElementById('socks5HidableDiv').removeAttribute('hidden')
+;updateTrueFalseIcons('socks5EnabledCheckbox',true);document.getElementById('socks5AddrInputId').value=ircState.socks5Host;document.getElementById('socks5PortInputId').value=ircState.socks5Port}else{
+updateTrueFalseIcons('socks5EnabledCheckbox',false);document.getElementById('socks5AddrInputId').value='';document.getElementById('socks5PortInputId').value=''}
+document.getElementById('nickNameInputId').value=ircState.nickName;document.getElementById('userNameInputId').textContent='"'+ircState.userName+'"'
+;document.getElementById('realNameInputId').textContent='"'+ircState.realName+'"';document.getElementById('userModeInputId').textContent='"'+ircState.userMode+'"'}if(ircState.ircConnected){
+document.title='IRC-'+ircState.ircServerName;document.getElementById('ircServerIndexInputId').value=ircState.ircServerIndex
+;document.getElementById('ircServerGroupInputId').value=ircState.ircServerGroup;document.getElementById('ircServerNameInputId').value=ircState.ircServerName
+;document.getElementById('ircServerAddrInputId').value=ircState.ircServerHost;document.getElementById('ircServerPortInputId').value=ircState.ircServerPort
+;updateTrueFalseIcons('ircServerTlsEnable',ircState.ircTLSEnabled);updateTrueFalseIcons('ircServerTlsVerify',ircState.ircTLSVerify)
+;updateTrueFalseIcons('ircServerReconnectEnable',ircState.ircAutoReconnect);updateTrueFalseIcons('ircServerRotateEnable',ircState.ircServerRotation);if(ircState.enableSocks5Proxy&&ircState.ircProxy){
+document.getElementById('socks5HidableDiv').removeAttribute('hidden');updateTrueFalseIcons('socks5EnabledCheckbox',true);document.getElementById('socks5AddrInputId').value=ircState.socks5Host
+;document.getElementById('socks5PortInputId').value=ircState.socks5Port}else{updateTrueFalseIcons('socks5EnabledCheckbox',false);document.getElementById('socks5AddrInputId').value=''
+;document.getElementById('socks5PortInputId').value=''}document.getElementById('headerServer').textContent=ircState.ircServerName
 ;document.getElementById('headerUser').textContent=' ('+ircState.nickName+')';document.getElementById('nickNameInputId').value=ircState.nickName
 ;document.getElementById('userNameInputId').textContent='"'+ircState.userName+'"';document.getElementById('realNameInputId').textContent='"'+ircState.realName+'"'
 ;document.getElementById('userModeInputId').textContent='"'+ircState.userMode+'"';webState.ircConnecting=false}if(!ircState.ircConnected){

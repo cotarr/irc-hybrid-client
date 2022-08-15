@@ -48,6 +48,11 @@ not disabled and have reconnect enabled, then up on disconnect the client will a
   - Event handlers for checkbox in main serverlist using tools API.
 - docs/api.html - updated for API changes
 
+- User interface changes
+  - IRC controls tab, eliminate real name input box
+  - New form layout for server rotation status display
+  - Replace readonly checkboxes with true/false color icons using CSS
+
 ## [v0.2.8](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.8) 2022-08-11
 
 ### Changed

@@ -61,10 +61,10 @@ The Group input field accepts integer values 0 to 9999</li><li>Group 0 is used t
 Group 1 or greater defines a set of server where servers of the same group number will automatically rotate different server addresses after disconnect.</li><li>
 In typical use, a server group would allow different IRC networks such as DALnet or Undernet to have different group numbers.</li></ul></div><div class="vh10"></div><div class="button-div"><input 
 type="text" id="ircServerAddrInputId" size="26" value="" disabled="disabled"> <span>:</span> <input type="text" id="ircServerPortInputId" size="4" value="" disabled="disabled"></div><div 
-class="button-div"><input type="checkbox" id="ircServerTlsEnable" disabled="disabled"> <span>TLS</span> <input type="checkbox" id="ircServerTlsVerify" disabled="disabled"> <span>Verify Hostname</span>
-</div><div class="button-div"><input type="checkbox" id="ircServerReconnectEnable" disabled="disabled"> <span>Auto Reconnect</span> <input type="checkbox" id="ircServerRotateEnable" 
-disabled="disabled"> <span>Server Rotation</span></div><div id="socks5HidableDiv"><div class="button-div"><input type="checkbox" id="socks5EnabledCheckbox" disabled="disabled"> <span>
-Connect using socks5 proxy</span></div><div class="button-div"><input type="text" id="socks5AddrInputId" size="26" value="" disabled="disabled"> <span>:</span> <input type="text" 
+class="button-div"><div id="ircServerTlsEnable"><div id="ircServerTlsEnableDot"></div></div><span>TLS</span><div id="ircServerTlsVerify"><div id="ircServerTlsVerifyDot"></div></div><span>
+Verify Hostname</span></div><div class="button-div"><div id="ircServerReconnectEnable"><div id="ircServerReconnectEnableDot"></div></div><span>Auto Reconnect</span><div id="ircServerRotateEnable"><div
+ id="ircServerRotateEnableDot"></div></div><span>Server Rotation</span></div><div id="socks5HidableDiv"><div class="button-div"><div id="socks5EnabledCheckbox"><div id="socks5EnabledCheckboxDot">
+</div></div><span>Connect using socks5 proxy</span></div><div class="button-div"><input type="text" id="socks5AddrInputId" size="26" value="" disabled="disabled"> <span>:</span> <input type="text" 
 id="socks5PortInputId" size="4" value="" disabled="disabled"></div></div><div class="vh10"></div><div class="nickname-input-div"><div class="button-div"><input type="text" id="nickNameInputId" 
 value=""><div class="input-label-right">Nickname</div></div><div class="button-div"><span>User: </span><span id="userNameInputId"></span> <span>Real:</span> <span id="realNameInputId"></span> <span>
 Mode:</span> <span id="userModeInputId"></span></div></div><div class="vh10"></div><div class="button-div"><input type="text" id="userAwayMessageId" size="20" value="AFK"> <button id="setAwayButton">
