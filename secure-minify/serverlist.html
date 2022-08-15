@@ -8,10 +8,12 @@ id="warningVisibilityDiv" hiddenxxx><p>READ ONLY - Disconnect from IRC network t
 id="showRefreshButtonDiv" hidden><button id="forceUnlockAll">Force Unlock</button></div></div></div><div id="formVisibilityDiv" hidden><div class="form-style-div>"><div><button id="saveNewButton">Save
 </button> <button id="saveModifiedButton">Save</button> <button id="cancelEditButton">Cancel</button></div><div class="vh20"></div><div class="input-group2"><div class="vh10"></div><div 
 class="button-div" hidden><input type="number" id="indexInputId" value="" readonly="readonly"><div class="input-label-right">index</div></div><div class="button-div"><input type="checkbox" 
-id="disabledCheckboxId"><div class="input-label-right">Disable/Hide IRC server definition</div></div><div class="button-div"><input type="number" id="groupInputId" class="group-input" value=""><div 
-class="input-label-right">Group</div><button id="groupInfoButton">?</button></div><div class="button-div"><input type="text" id="nameInputId" value=""><div class="input-label-right">Label</div></div>
-<div class="white-info-div" id="groupInfoHiddenDiv" hidden><p>A server group defines a set of IRC server definitions where different IRC servers can be rotated in sequence after disconnect from IRC.
-</p><ul><li>The Group input field accepts integer values 0 to 9999</li><li>Group 0 is used to define individual IRC server addresses that do not rotate.</li><li>
+id="disabledCheckboxId"><div class="input-label-right">Disable/Hide this IRC server definition</div></div><div class="button-div"><input type="number" id="groupInputId" class="group-input" value="">
+<div class="input-label-right">Group</div><button id="groupInfoButton">?</button></div><div class="button-div"><input type="text" id="nameInputId" value=""><div class="input-label-right">Label</div>
+</div><div class="button-div"><input type="checkbox" id="autoReconnectCheckboxId"><div class="input-label-right">Automatic Reconnect</div></div><div class="button-div"><input type="checkbox" 
+id="loggingCheckboxId"><div class="input-label-right">Log IRC raw server messages</div></div><div class="white-info-div" id="groupInfoHiddenDiv" hidden><p>
+A server group defines a set of IRC server definitions where different IRC servers can be rotated in sequence after disconnect from IRC.</p><ul><li>
+The Group input field accepts integer values 0 to 9999</li><li>Group 0 is used to define individual IRC server addresses that do not rotate.</li><li>
 Group 1 or greater defines a set of server where servers of the same group number will automatically rotate different server addresses after disconnect.</li><li>
 In typical use, a server group would allow different IRC networks such as DALnet or Undernet to have different group numbers.</li></ul></div></div><div class="vh10"></div><div class="input-group"><h3>
 IRC Server Connection</h3><div class="button-div"><input type="text" id="hostInputId" value=""><div class="input-label-right">IRC Server: Host or IP</div></div><div class="button-div"><input 
@@ -34,6 +36,4 @@ Replace</button></div><div id="nickservCommandWarningDiv"><ul><li>Enter new valu
 To abort changing this value, press [Cancel] button above</li><li>Example command:<div class="white-example-div">PRIVMSG NickServ :IDENTIFY xxxxxxxx</div></li><li>Example command:<div 
 class="white-example-div">PRIVMSG NickServ@services.dal.net :IDENTIFY xxxxxxxx</div></li><li>Example command:<div class="white-example-div">NICKSERV IDENTIFY xxxxxxxx</div></li></ul><div 
 class="yellow-warning-div">Note: NickServ command including any passwords will be stored unencrypted in clear text in &quot;servers.json&quot; located in the base folder of the web server.</div></div>
-</div></div><div class="vh20"></div><div class="input-group"><div class="vh10"></div><div class="button-div"><input type="checkbox" id="autoReconnectCheckboxId"><div class="input-label-right">
-Automatic Reconnect</div></div><div class="button-div"><input type="checkbox" id="loggingCheckboxId"><div class="input-label-right">Log IRC raw server messages</div></div></div></div></div><div 
-class="vh20"></div><div class="error-div" id="errorDiv" hidden></div><div class="vh20"></div></body></html>
+</div></div></div></div><div class="vh20"></div><div class="error-div" id="errorDiv" hidden></div><div class="vh20"></div></body></html>
