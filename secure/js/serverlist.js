@@ -793,7 +793,11 @@ const setDivVisibility = (data) => {
  * Show help for server groups
  */
 document.getElementById('groupInfoButton').addEventListener('click', () => {
-  document.getElementById('groupInfoHiddenDiv').removeAttribute('hidden');
+  if (document.getElementById('groupInfoHiddenDiv').hasAttribute('hidden')) {
+    document.getElementById('groupInfoHiddenDiv').removeAttribute('hidden');
+  } else {
+    document.getElementById('groupInfoHiddenDiv').setAttribute('hidden', '');
+  }
 });
 
 /**

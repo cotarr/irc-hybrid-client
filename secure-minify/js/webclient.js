@@ -73,7 +73,9 @@ document.getElementById('notMsgIconId').setAttribute('hidden','')}function reset
 function resetChanActivityIcon(index){if(-1===index){lastChanActivityIconIndex=-1;document.getElementById('chanMsgIconId').setAttribute('hidden','')}else if(index===lastChanActivityIconIndex){
 lastChanActivityIconIndex=-1;document.getElementById('chanMsgIconId').setAttribute('hidden','')}}document.getElementById('notMsgIconId').addEventListener('click',(function(){resetNotActivityIcon()}))
 ;document.getElementById('pmMsgIconId').addEventListener('click',(function(){resetPmActivityIcon(-1)}));document.getElementById('chanMsgIconId').addEventListener('click',(function(){
-resetChanActivityIcon(-1)}));document.getElementById('annunciatorBackgroundDivId').removeAttribute('hidden');document.getElementById('annunciatiorDivId').removeAttribute('hidden')
+resetChanActivityIcon(-1)}));document.getElementById('groupInfoButton').addEventListener('click',(function(){
+if(document.getElementById('groupInfoHiddenDiv').hasAttribute('hidden'))document.getElementById('groupInfoHiddenDiv').removeAttribute('hidden');else document.getElementById('groupInfoHiddenDiv').setAttribute('hidden','')
+}));document.getElementById('annunciatorBackgroundDivId').removeAttribute('hidden');document.getElementById('annunciatiorDivId').removeAttribute('hidden')
 ;document.getElementById('scrollableDivId').removeAttribute('hidden');hideRawMessageWindow();function updateDivVisibility(){if(webState.webConnected){
 document.getElementById('webDisconnectedVisibleDiv').setAttribute('hidden','');document.getElementById('webDisconnectedHiddenDiv1').removeAttribute('hidden')
 ;document.getElementById('webDisconnectedHiddenDiv2').removeAttribute('hidden');document.getElementById('reconnectStatusDiv').textContent=''
@@ -87,8 +89,7 @@ document.getElementById('webDisconnectedVisibleDiv').setAttribute('hidden','');d
 if(ircState.ircIsAway)document.getElementById('ircIsAwayIconId').removeAttribute('hidden');else document.getElementById('ircIsAwayIconId').setAttribute('hidden','')
 ;if(ircState.nickRecoveryActive)document.getElementById('nickRecovIconId').removeAttribute('hidden','');else document.getElementById('nickRecovIconId').setAttribute('hidden','')
 ;document.getElementById('hideLoginSection').setAttribute('hidden','');document.getElementById('hideLoginSectionButton').textContent='+'
-;document.getElementById('nickNameInputId').setAttribute('disabled','');document.getElementById('realNameInputId').setAttribute('disabled','')
-;document.getElementById('userModeInputId').setAttribute('disabled','');document.getElementById('connectButton').setAttribute('disabled','')
+;document.getElementById('nickNameInputId').setAttribute('disabled','');document.getElementById('connectButton').setAttribute('disabled','')
 ;document.getElementById('quitButton').removeAttribute('disabled');document.getElementById('userAwayMessageId').removeAttribute('disabled')
 ;document.getElementById('setAwayButton').removeAttribute('disabled');document.getElementById('setBackButton').removeAttribute('disabled')
 ;document.getElementById('eraseCacheButton').setAttribute('disabled','');document.getElementById('ircDisconnectedHiddenDiv').removeAttribute('hidden')
@@ -102,10 +103,8 @@ if(ircState.ircAutoReconnect&&ircState.ircConnectOn&&!ircState.ircConnected&&!ir
 ;document.getElementById('nickRecovIconId').setAttribute('hidden','');document.getElementById('hideLoginSection').removeAttribute('hidden')
 ;document.getElementById('hideLoginSectionButton').textContent='-';if(document.getElementById('waitConnectIconId').hasAttribute('hidden')){
 document.getElementById('cyclePrevServerButton').removeAttribute('disabled');document.getElementById('cycleNextServerButton').removeAttribute('disabled')
-;document.getElementById('nickNameInputId').removeAttribute('disabled');document.getElementById('realNameInputId').removeAttribute('disabled')
-;document.getElementById('userModeInputId').removeAttribute('disabled')}else{document.getElementById('cyclePrevServerButton').setAttribute('disabled','')
-;document.getElementById('cycleNextServerButton').setAttribute('disabled','');document.getElementById('nickNameInputId').setAttribute('disabled','')
-;document.getElementById('realNameInputId').setAttribute('disabled','');document.getElementById('userModeInputId').setAttribute('disabled','')}if(ircState.ircConnecting){
+;document.getElementById('nickNameInputId').removeAttribute('disabled')}else{document.getElementById('cyclePrevServerButton').setAttribute('disabled','')
+;document.getElementById('cycleNextServerButton').setAttribute('disabled','');document.getElementById('nickNameInputId').setAttribute('disabled','')}if(ircState.ircConnecting){
 document.getElementById('connectButton').setAttribute('disabled','');document.getElementById('quitButton').removeAttribute('disabled')}else{
 document.getElementById('connectButton').removeAttribute('disabled')
 ;if(document.getElementById('waitConnectIconId').hasAttribute('hidden'))document.getElementById('quitButton').setAttribute('disabled','');else document.getElementById('quitButton').removeAttribute('disabled')
@@ -114,20 +113,21 @@ document.getElementById('connectButton').removeAttribute('disabled')
 ;document.getElementById('ircDisconnectedHiddenDiv').setAttribute('hidden','');webState.noticeOpen=false;document.getElementById('noticeSectionDiv').setAttribute('hidden','')
 ;webState.wallopsOpen=false;document.getElementById('wallopsSectionDiv').setAttribute('hidden','');document.getElementById('ircChannelsMainHiddenDiv').removeAttribute('hidden')
 ;document.getElementById('ircChannelsMainHiddenButton').textContent='-'}
-if(ircState.disableServerListEditor)document.getElementById('editServerListButton').setAttribute('disabled','');else document.getElementById('editServerListButton').removeAttribute('disabled')}else{
-document.getElementById('hiddenInfoDiv').setAttribute('hidden','');document.getElementById('infoOpenCloseButton').textContent='+';hideRawMessageWindow()
-;document.getElementById('webDisconnectedVisibleDiv').removeAttribute('hidden');document.getElementById('webDisconnectedHiddenDiv1').setAttribute('hidden','')
-;document.getElementById('webDisconnectedHiddenDiv2').setAttribute('hidden','');document.getElementById('waitConnectIconId').setAttribute('hidden','')
-;document.getElementById('cyclePrevServerButton').setAttribute('disabled','');document.getElementById('cycleNextServerButton').setAttribute('disabled','');if(webState.webConnecting){
-document.getElementById('webConnectIconId').removeAttribute('connected');document.getElementById('webConnectIconId').setAttribute('connecting','')}else{
-document.getElementById('webConnectIconId').removeAttribute('connected');document.getElementById('webConnectIconId').removeAttribute('connecting')}resetNotActivityIcon();resetPmActivityIcon(-1)
-;resetChanActivityIcon(-1);document.getElementById('ircConnectIconId').setAttribute('unavailable','');document.getElementById('ircConnectIconId').removeAttribute('connected')
+if(ircState.disableServerListEditor)document.getElementById('editServerListButton').setAttribute('disabled','');else document.getElementById('editServerListButton').removeAttribute('disabled')
+;document.getElementById('groupInfoHiddenDiv').setAttribute('hidden','')}else{document.getElementById('hiddenInfoDiv').setAttribute('hidden','')
+;document.getElementById('infoOpenCloseButton').textContent='+';hideRawMessageWindow();document.getElementById('webDisconnectedVisibleDiv').removeAttribute('hidden')
+;document.getElementById('webDisconnectedHiddenDiv1').setAttribute('hidden','');document.getElementById('webDisconnectedHiddenDiv2').setAttribute('hidden','')
+;document.getElementById('waitConnectIconId').setAttribute('hidden','');document.getElementById('cyclePrevServerButton').setAttribute('disabled','')
+;document.getElementById('cycleNextServerButton').setAttribute('disabled','');if(webState.webConnecting){document.getElementById('webConnectIconId').removeAttribute('connected')
+;document.getElementById('webConnectIconId').setAttribute('connecting','')}else{document.getElementById('webConnectIconId').removeAttribute('connected')
+;document.getElementById('webConnectIconId').removeAttribute('connecting')}resetNotActivityIcon();resetPmActivityIcon(-1);resetChanActivityIcon(-1)
+;document.getElementById('ircConnectIconId').setAttribute('unavailable','');document.getElementById('ircConnectIconId').removeAttribute('connected')
 ;document.getElementById('ircConnectIconId').removeAttribute('connecting');document.getElementById('ircIsAwayIconId').setAttribute('hidden','')
 ;document.getElementById('nickRecovIconId').setAttribute('hidden','');document.getElementById('hideLoginSection').setAttribute('hidden','')
-;document.getElementById('nickNameInputId').setAttribute('disabled','');document.getElementById('realNameInputId').setAttribute('disabled','')
-;document.getElementById('userModeInputId').setAttribute('disabled','');document.getElementById('connectButton').setAttribute('disabled','')
+;document.getElementById('nickNameInputId').setAttribute('disabled','');document.getElementById('connectButton').setAttribute('disabled','')
 ;document.getElementById('quitButton').setAttribute('disabled','');document.getElementById('userAwayMessageId').setAttribute('disabled','')
-;document.getElementById('setAwayButton').setAttribute('disabled','');document.getElementById('setBackButton').setAttribute('disabled','')}}document.addEventListener('show-all-divs',(function(event){
+;document.getElementById('setAwayButton').setAttribute('disabled','');document.getElementById('setBackButton').setAttribute('disabled','')
+;document.getElementById('groupInfoHiddenDiv').setAttribute('hidden','')}}document.addEventListener('show-all-divs',(function(event){
 document.getElementById('hideLoginSection').removeAttribute('hidden');document.getElementById('hideLoginSectionButton').textContent='-'
 ;document.getElementById('privMsgMainHiddenDiv').removeAttribute('hidden');document.getElementById('privMsgMainHiddenButton').textContent='-'
 ;document.getElementById('ircChannelsMainHiddenDiv').removeAttribute('hidden');document.getElementById('ircChannelsMainHiddenButton').textContent='-';showRawMessageWindow();webState.noticeOpen=true
@@ -157,27 +157,33 @@ const timePreEl=document.getElementById('elapsedTimeDiv');const now=unixTimestam
 method:'GET',headers:{Accept:'application/json'}};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok)return response.json();else{if(403===response.status)window.location.href='/login'
 ;throw new Error('Fetch status '+response.status+' '+response.statusText)}}).then(responseJson=>{ircState=responseJson
 ;if(!ircState.ircConnected&&webState.lastIrcServerIndex!==ircState.ircServerIndex){webState.lastIrcServerIndex=ircState.ircServerIndex
-;document.getElementById('ircServerIndexInputId').value=ircState.ircServerIndex;document.getElementById('ircServerNameInputId').value=ircState.ircServerName
-;document.getElementById('ircServerAddrInputId').value=ircState.ircServerHost;document.getElementById('ircServerPortInputId').value=ircState.ircServerPort
+;document.getElementById('ircServerIndexInputId').value=ircState.ircServerIndex;document.getElementById('ircServerGroupInputId').value=ircState.ircServerGroup
+;document.getElementById('ircServerNameInputId').value=ircState.ircServerName;document.getElementById('ircServerAddrInputId').value=ircState.ircServerHost
+;document.getElementById('ircServerPortInputId').value=ircState.ircServerPort
+;if(ircState.ircAutoReconnect)document.getElementById('ircServerReconnectEnable').setAttribute('checked','');else document.getElementById('ircServerReconnectEnable').removeAttribute('checked')
+;if(ircState.ircServerRotation)document.getElementById('ircServerRotateEnable').setAttribute('checked','');else document.getElementById('ircServerRotateEnable').removeAttribute('checked')
 ;if(ircState.ircTLSEnabled)document.getElementById('ircServerTlsEnable').setAttribute('checked','');else document.getElementById('ircServerTlsEnable').removeAttribute('checked')
 ;if(ircState.ircTLSVerify)document.getElementById('ircServerTlsVerify').setAttribute('checked','');else document.getElementById('ircServerTlsVerify').removeAttribute('checked')
 ;if(ircState.enableSocks5Proxy&&ircState.ircProxy){document.getElementById('socks5HidableDiv').removeAttribute('hidden');document.getElementById('socks5EnabledCheckbox').setAttribute('disabled','')
 ;document.getElementById('socks5EnabledCheckbox').setAttribute('checked','');document.getElementById('socks5AddrInputId').value=ircState.socks5Host
-;document.getElementById('socks5PortInputId').value=ircState.socks5Port}else{document.getElementById('socks5HidableDiv').setAttribute('hidden','')
-;document.getElementById('socks5EnabledCheckbox').removeAttribute('checked');document.getElementById('socks5AddrInputId').value='';document.getElementById('socks5PortInputId').value=''}
-document.getElementById('nickNameInputId').value=ircState.nickName;document.getElementById('userNameInputId').value=ircState.userName;document.getElementById('realNameInputId').value=ircState.realName
-;document.getElementById('userModeInputId').value=ircState.userMode}if(ircState.ircConnected){document.title='IRC-'+ircState.ircServerName
-;document.getElementById('ircServerIndexInputId').value=ircState.ircServerIndex;document.getElementById('ircServerNameInputId').value=ircState.ircServerName
-;document.getElementById('ircServerAddrInputId').value=ircState.ircServerHost;document.getElementById('ircServerPortInputId').value=ircState.ircServerPort
+;document.getElementById('socks5PortInputId').value=ircState.socks5Port}else{document.getElementById('socks5EnabledCheckbox').removeAttribute('checked')
+;document.getElementById('socks5AddrInputId').value='';document.getElementById('socks5PortInputId').value=''}document.getElementById('nickNameInputId').value=ircState.nickName
+;document.getElementById('userNameInputId').textContent='"'+ircState.userName+'"';document.getElementById('realNameInputId').textContent='"'+ircState.realName+'"'
+;document.getElementById('userModeInputId').textContent='"'+ircState.userMode+'"'}if(ircState.ircConnected){document.title='IRC-'+ircState.ircServerName
+;document.getElementById('ircServerIndexInputId').value=ircState.ircServerIndex;document.getElementById('ircServerGroupInputId').value=ircState.ircServerGroup
+;document.getElementById('ircServerNameInputId').value=ircState.ircServerName;document.getElementById('ircServerAddrInputId').value=ircState.ircServerHost
+;document.getElementById('ircServerPortInputId').value=ircState.ircServerPort
+;if(ircState.ircAutoReconnect)document.getElementById('ircServerReconnectEnable').setAttribute('checked','');else document.getElementById('ircServerReconnectEnable').removeAttribute('checked')
+;if(ircState.ircServerRotation)document.getElementById('ircServerRotateEnable').setAttribute('checked','');else document.getElementById('ircServerRotateEnable').removeAttribute('checked')
 ;if(ircState.ircTLSEnabled)document.getElementById('ircServerTlsEnable').setAttribute('checked','');else document.getElementById('ircServerTlsEnable').removeAttribute('checked')
 ;if(ircState.ircTLSVerify)document.getElementById('ircServerTlsVerify').setAttribute('checked','');else document.getElementById('ircServerTlsVerify').removeAttribute('checked')
 ;if(ircState.enableSocks5Proxy&&ircState.ircProxy){document.getElementById('socks5HidableDiv').removeAttribute('hidden');document.getElementById('socks5EnabledCheckbox').setAttribute('disabled','')
 ;document.getElementById('socks5EnabledCheckbox').setAttribute('checked','');document.getElementById('socks5AddrInputId').value=ircState.socks5Host
-;document.getElementById('socks5PortInputId').value=ircState.socks5Port}else{document.getElementById('socks5HidableDiv').setAttribute('hidden','')
-;document.getElementById('socks5EnabledCheckbox').removeAttribute('checked');document.getElementById('socks5AddrInputId').value='';document.getElementById('socks5PortInputId').value=''}
-document.getElementById('headerServer').textContent=ircState.ircServerName;document.getElementById('headerUser').textContent=' ('+ircState.nickName+')'
-;document.getElementById('nickNameInputId').value=ircState.nickName;document.getElementById('userNameInputId').value=ircState.userName
-;document.getElementById('realNameInputId').value=ircState.realName;document.getElementById('userModeInputId').value=ircState.userMode;webState.ircConnecting=false}if(!ircState.ircConnected){
+;document.getElementById('socks5PortInputId').value=ircState.socks5Port}else{document.getElementById('socks5EnabledCheckbox').removeAttribute('checked')
+;document.getElementById('socks5AddrInputId').value='';document.getElementById('socks5PortInputId').value=''}document.getElementById('headerServer').textContent=ircState.ircServerName
+;document.getElementById('headerUser').textContent=' ('+ircState.nickName+')';document.getElementById('nickNameInputId').value=ircState.nickName
+;document.getElementById('userNameInputId').textContent='"'+ircState.userName+'"';document.getElementById('realNameInputId').textContent='"'+ircState.realName+'"'
+;document.getElementById('userModeInputId').textContent='"'+ircState.userMode+'"';webState.ircConnecting=false}if(!ircState.ircConnected){
 document.getElementById('nickNameInputId').value=ircState.nickName
 ;if(-1===ircState.ircServerIndex)document.getElementById('emptyServerListDiv').removeAttribute('hidden');else document.getElementById('emptyServerListDiv').setAttribute('hidden','')
 ;setVariablesShowingIRCDisconnected();document.title='irc-hybrid-client'}if(lastConnectErrorCount!==ircState.count.ircConnectError){lastConnectErrorCount=ircState.count.ircConnectError
@@ -340,12 +346,12 @@ const fetchURL=webServerUrl+'/irc/server';const fetchOptions={method:'POST',head
 if(responseJson.error)showError(responseJson.message);else webState.lastIrcServerIndex=-1}).catch(error=>{console.log(error);showError(error.toString())})}));function connectButtonHandler(){
 if(!checkConnect(1))return;if(ircState.ircConnected||ircState.ircConnecting||webState.ircConnecting){showError('Error: Already connected to IRC server');return}if(-1===ircState.ircServerIndex){
 showError('Empty Server List');return}if(document.getElementById('nickNameInputId').value.length<1){showError('Invalid nick name.');return}webState.ircConnecting=true;const connectObject={}
-;connectObject.nickName=document.getElementById('nickNameInputId').value;connectObject.realName=document.getElementById('realNameInputId').value
-;connectObject.userMode=document.getElementById('userModeInputId').value;const fetchURL=webServerUrl+'/irc/connect';const fetchOptions={method:'POST',headers:{'CSRF-Token':csrfToken,
-'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify(connectObject)};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok)return response.json();else{
-if(403===response.status)window.location.href='/login';throw new Error('Fetch status '+response.status+' '+response.statusText)}}).then(responseJson=>{
-if(responseJson.error)showError(responseJson.message)}).catch(error=>{console.log(error)})}function forceDisconnectHandler(){const fetchURL=webServerUrl+'/irc/disconnect';const fetchOptions={
-method:'POST',headers:{'CSRF-Token':csrfToken,'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify({})};fetch(fetchURL,fetchOptions).then(response=>{
+;connectObject.nickName=document.getElementById('nickNameInputId').value;connectObject.realName=ircState.realName;connectObject.userMode=ircState.userMode;const fetchURL=webServerUrl+'/irc/connect'
+;const fetchOptions={method:'POST',headers:{'CSRF-Token':csrfToken,'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify(connectObject)}
+;fetch(fetchURL,fetchOptions).then(response=>{if(response.ok)return response.json();else{if(403===response.status)window.location.href='/login'
+;throw new Error('Fetch status '+response.status+' '+response.statusText)}}).then(responseJson=>{if(responseJson.error)showError(responseJson.message)}).catch(error=>{console.log(error)})}
+function forceDisconnectHandler(){const fetchURL=webServerUrl+'/irc/disconnect';const fetchOptions={method:'POST',headers:{'CSRF-Token':csrfToken,'Content-type':'application/json',
+Accept:'application/json'},body:JSON.stringify({})};fetch(fetchURL,fetchOptions).then(response=>{
 if(response.ok)return response.json();else throw new Error('Fetch status '+response.status+' '+response.statusText)}).then(responseJson=>{if(responseJson.error)showError(responseJson.message)
 }).catch(error=>{console.log(error)})}document.getElementById('connectButton').addEventListener('click',(function(){connectButtonHandler()}))
 ;document.getElementById('disconnectButton').addEventListener('click',(function(){forceDisconnectHandler()}));let ircStatusIconTouchDebounce=false

@@ -496,6 +496,17 @@ document.getElementById('chanMsgIconId').addEventListener('click', function () {
   resetChanActivityIcon(-1);
 });
 
+// -----------------------------
+// Show help for server groups
+// -----------------------------
+document.getElementById('groupInfoButton').addEventListener('click', function () {
+  if (document.getElementById('groupInfoHiddenDiv').hasAttribute('hidden')) {
+    document.getElementById('groupInfoHiddenDiv').removeAttribute('hidden');
+  } else {
+    document.getElementById('groupInfoHiddenDiv').setAttribute('hidden', '');
+  }
+});
+
 // Some initialization of div visibility at laod time
 // Hidden divs to allow <noscrpit> when not javascript
 // In case of javascript, show them
@@ -543,9 +554,6 @@ function updateDivVisibility () {
       document.getElementById('hideLoginSection').setAttribute('hidden', '');
       document.getElementById('hideLoginSectionButton').textContent = '+';
       document.getElementById('nickNameInputId').setAttribute('disabled', '');
-      // document.getElementById('userNameInputId').setAttribute('disabled', '');
-      document.getElementById('realNameInputId').setAttribute('disabled', '');
-      document.getElementById('userModeInputId').setAttribute('disabled', '');
       document.getElementById('connectButton').setAttribute('disabled', '');
       document.getElementById('quitButton').removeAttribute('disabled');
       document.getElementById('userAwayMessageId').removeAttribute('disabled');
@@ -593,16 +601,10 @@ function updateDivVisibility () {
         document.getElementById('cyclePrevServerButton').removeAttribute('disabled');
         document.getElementById('cycleNextServerButton').removeAttribute('disabled');
         document.getElementById('nickNameInputId').removeAttribute('disabled');
-        // document.getElementById('userNameInputId').removeAttribute('disabled');
-        document.getElementById('realNameInputId').removeAttribute('disabled');
-        document.getElementById('userModeInputId').removeAttribute('disabled');
       } else {
         document.getElementById('cyclePrevServerButton').setAttribute('disabled', '');
         document.getElementById('cycleNextServerButton').setAttribute('disabled', '');
         document.getElementById('nickNameInputId').setAttribute('disabled', '');
-        // document.getElementById('userNameInputId').setAttribute('disabled', '');
-        document.getElementById('realNameInputId').setAttribute('disabled', '');
-        document.getElementById('userModeInputId').setAttribute('disabled', '');
       }
       if (ircState.ircConnecting) {
         document.getElementById('connectButton').setAttribute('disabled', '');
@@ -634,6 +636,7 @@ function updateDivVisibility () {
     } else {
       document.getElementById('editServerListButton').removeAttribute('disabled');
     }
+    document.getElementById('groupInfoHiddenDiv').setAttribute('hidden', '');
   } else {
     // Else, Web server disconnected
     document.getElementById('hiddenInfoDiv').setAttribute('hidden', '');
@@ -662,14 +665,12 @@ function updateDivVisibility () {
     document.getElementById('nickRecovIconId').setAttribute('hidden', '');
     document.getElementById('hideLoginSection').setAttribute('hidden', '');
     document.getElementById('nickNameInputId').setAttribute('disabled', '');
-    // document.getElementById('userNameInputId').setAttribute('disabled', '');
-    document.getElementById('realNameInputId').setAttribute('disabled', '');
-    document.getElementById('userModeInputId').setAttribute('disabled', '');
     document.getElementById('connectButton').setAttribute('disabled', '');
     document.getElementById('quitButton').setAttribute('disabled', '');
     document.getElementById('userAwayMessageId').setAttribute('disabled', '');
     document.getElementById('setAwayButton').setAttribute('disabled', '');
     document.getElementById('setBackButton').setAttribute('disabled', '');
+    document.getElementById('groupInfoHiddenDiv').setAttribute('hidden', '');
   }
 }
 
@@ -893,9 +894,20 @@ function getIrcState (callback) {
       if ((!ircState.ircConnected) && (webState.lastIrcServerIndex !== ircState.ircServerIndex)) {
         webState.lastIrcServerIndex = ircState.ircServerIndex;
         document.getElementById('ircServerIndexInputId').value = ircState.ircServerIndex;
+        document.getElementById('ircServerGroupInputId').value = ircState.ircServerGroup;
         document.getElementById('ircServerNameInputId').value = ircState.ircServerName;
         document.getElementById('ircServerAddrInputId').value = ircState.ircServerHost;
         document.getElementById('ircServerPortInputId').value = ircState.ircServerPort;
+        if (ircState.ircAutoReconnect) {
+          document.getElementById('ircServerReconnectEnable').setAttribute('checked', '');
+        } else {
+          document.getElementById('ircServerReconnectEnable').removeAttribute('checked');
+        }
+        if (ircState.ircServerRotation) {
+          document.getElementById('ircServerRotateEnable').setAttribute('checked', '');
+        } else {
+          document.getElementById('ircServerRotateEnable').removeAttribute('checked');
+        }
         if (ircState.ircTLSEnabled) {
           document.getElementById('ircServerTlsEnable').setAttribute('checked', '');
         } else {
@@ -914,24 +926,35 @@ function getIrcState (callback) {
           document.getElementById('socks5AddrInputId').value = ircState.socks5Host;
           document.getElementById('socks5PortInputId').value = ircState.socks5Port;
         } else {
-          document.getElementById('socks5HidableDiv').setAttribute('hidden', '');
+          // document.getElementById('socks5HidableDiv').setAttribute('hidden', '');
           document.getElementById('socks5EnabledCheckbox').removeAttribute('checked');
           document.getElementById('socks5AddrInputId').value = '';
           document.getElementById('socks5PortInputId').value = '';
         }
         document.getElementById('nickNameInputId').value = ircState.nickName;
-        document.getElementById('userNameInputId').value = ircState.userName;
-        document.getElementById('realNameInputId').value = ircState.realName;
-        document.getElementById('userModeInputId').value = ircState.userMode;
+        document.getElementById('userNameInputId').textContent = '"' + ircState.userName + '"';
+        document.getElementById('realNameInputId').textContent = '"' + ircState.realName + '"';
+        document.getElementById('userModeInputId').textContent = '"' + ircState.userMode + '"';
       }
       if (ircState.ircConnected) {
         // For display in browser tab
         document.title = 'IRC-' + ircState.ircServerName;
 
         document.getElementById('ircServerIndexInputId').value = ircState.ircServerIndex;
+        document.getElementById('ircServerGroupInputId').value = ircState.ircServerGroup;
         document.getElementById('ircServerNameInputId').value = ircState.ircServerName;
         document.getElementById('ircServerAddrInputId').value = ircState.ircServerHost;
         document.getElementById('ircServerPortInputId').value = ircState.ircServerPort;
+        if (ircState.ircAutoReconnect) {
+          document.getElementById('ircServerReconnectEnable').setAttribute('checked', '');
+        } else {
+          document.getElementById('ircServerReconnectEnable').removeAttribute('checked');
+        }
+        if (ircState.ircServerRotation) {
+          document.getElementById('ircServerRotateEnable').setAttribute('checked', '');
+        } else {
+          document.getElementById('ircServerRotateEnable').removeAttribute('checked');
+        }
         if (ircState.ircTLSEnabled) {
           document.getElementById('ircServerTlsEnable').setAttribute('checked', '');
         } else {
@@ -950,7 +973,7 @@ function getIrcState (callback) {
           document.getElementById('socks5AddrInputId').value = ircState.socks5Host;
           document.getElementById('socks5PortInputId').value = ircState.socks5Port;
         } else {
-          document.getElementById('socks5HidableDiv').setAttribute('hidden', '');
+          // document.getElementById('socks5HidableDiv').setAttribute('hidden', '');
           document.getElementById('socks5EnabledCheckbox').removeAttribute('checked');
           document.getElementById('socks5AddrInputId').value = '';
           document.getElementById('socks5PortInputId').value = '';
@@ -958,12 +981,12 @@ function getIrcState (callback) {
         document.getElementById('headerServer').textContent = ircState.ircServerName;
         document.getElementById('headerUser').textContent = ' (' + ircState.nickName + ')';
         document.getElementById('nickNameInputId').value = ircState.nickName;
-        document.getElementById('userNameInputId').value = ircState.userName;
-        document.getElementById('realNameInputId').value = ircState.realName;
-        document.getElementById('userModeInputId').value = ircState.userMode;
+        document.getElementById('userNameInputId').textContent = '"' + ircState.userName + '"';
+        document.getElementById('realNameInputId').textContent = '"' + ircState.realName + '"';
+        document.getElementById('userModeInputId').textContent = '"' + ircState.userMode + '"';
         // for color icon
         webState.ircConnecting = false;
-      }
+      } // if (ircState.ircConnected) {
       if (!ircState.ircConnected) {
         // Also needed disconnected to handle alternate nickname and recovery
         document.getElementById('nickNameInputId').value = ircState.nickName;
@@ -978,7 +1001,7 @@ function getIrcState (callback) {
 
         // For display in browser tab
         document.title = 'irc-hybrid-client';
-      }
+      } // if (!ircState.ircConnected) {
       if (lastConnectErrorCount !== ircState.count.ircConnectError) {
         lastConnectErrorCount = ircState.count.ircConnectError;
         if (ircState.count.ircConnectError > 0) {

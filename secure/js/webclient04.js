@@ -153,8 +153,10 @@ function connectButtonHandler () {
   connectObject.nickName = document.getElementById('nickNameInputId').value;
   // The username is set only in the config file
   // connectObject.userName = document.getElementById('userNameInputId').value;
-  connectObject.realName = document.getElementById('realNameInputId').value;
-  connectObject.userMode = document.getElementById('userModeInputId').value;
+
+  // Although API allows edit, to simplify, these are part of configuration
+  connectObject.realName = ircState.realName;
+  connectObject.userMode = ircState.userMode;
 
   const fetchURL = webServerUrl + '/irc/connect';
   const fetchOptions = {

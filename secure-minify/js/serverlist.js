@@ -137,8 +137,9 @@ document.getElementById('listVisibilityDiv').removeAttribute('hidden','');docume
 document.getElementById('createNewButton').setAttribute('hidden','');document.getElementById('warningVisibilityDiv').removeAttribute('hidden');editable=false}else{
 document.getElementById('createNewButton').removeAttribute('hidden');document.getElementById('warningVisibilityDiv').setAttribute('hidden','');editable=true}
 if(data.enableSocks5Proxy)document.getElementById('ircProxyDiv').textContent='Socks5 Proxy: Enabled Globally\nSocks5 Proxy: '+data.socks5Host+':'+data.socks5Port;else document.getElementById('ircProxyDiv').textContent='Socks5 Proxy: Disabled Globally'
-;return Promise.resolve(null)};document.getElementById('groupInfoButton').addEventListener('click',()=>{document.getElementById('groupInfoHiddenDiv').removeAttribute('hidden')})
-;document.getElementById('replacePasswordButton').addEventListener('click',()=>{document.getElementById('passwordInputId').removeAttribute('disabled')
+;return Promise.resolve(null)};document.getElementById('groupInfoButton').addEventListener('click',()=>{
+if(document.getElementById('groupInfoHiddenDiv').hasAttribute('hidden'))document.getElementById('groupInfoHiddenDiv').removeAttribute('hidden');else document.getElementById('groupInfoHiddenDiv').setAttribute('hidden','')
+});document.getElementById('replacePasswordButton').addEventListener('click',()=>{document.getElementById('passwordInputId').removeAttribute('disabled')
 ;document.getElementById('passwordInputId').value='';document.getElementById('serverPasswordWarningDiv').removeAttribute('hidden')})
 ;document.getElementById('replaceIdentifyCommandButton').addEventListener('click',()=>{document.getElementById('identifyCommandInputId').removeAttribute('disabled')
 ;document.getElementById('identifyCommandInputId').value='';document.getElementById('nickservCommandWarningDiv').removeAttribute('hidden')})
