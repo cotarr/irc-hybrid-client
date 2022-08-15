@@ -598,27 +598,45 @@ const buildServerListTable = (data) => {
 
         if (full) {
           const td22El = document.createElement('td');
-          const tlsCheckboxEl = document.createElement('input');
-          tlsCheckboxEl.setAttribute('type', 'checkbox');
-          tlsCheckboxEl.setAttribute('disabled', '');
-          tlsCheckboxEl.checked = data[i].tls;
-          td22El.appendChild(tlsCheckboxEl);
+          const tlsIconEl = document.createElement('div');
+          const tlsIconInnerEl = document.createElement('div');
+          tlsIconEl.appendChild(tlsIconInnerEl);
+          if (data[i].tls) {
+            tlsIconEl.classList.add('icon-true');
+            tlsIconInnerEl.classList.add('icon-inner-true');
+          } else {
+            tlsIconEl.classList.add('icon-false');
+            tlsIconInnerEl.classList.add('icon-inner-false');
+          }
+          td22El.appendChild(tlsIconEl);
           rowEl.appendChild(td22El);
 
           const td23El = document.createElement('td');
-          const verifyCheckboxEl = document.createElement('input');
-          verifyCheckboxEl.setAttribute('type', 'checkbox');
-          verifyCheckboxEl.setAttribute('disabled', '');
-          verifyCheckboxEl.checked = data[i].verify;
-          td23El.appendChild(verifyCheckboxEl);
+          const verifyIconEl = document.createElement('div');
+          const verifyIconInnerEl = document.createElement('div');
+          verifyIconEl.appendChild(verifyIconInnerEl);
+          if (data[i].verify) {
+            verifyIconEl.classList.add('icon-true');
+            verifyIconInnerEl.classList.add('icon-inner-true');
+          } else {
+            verifyIconEl.classList.add('icon-false');
+            verifyIconInnerEl.classList.add('icon-inner-false');
+          }
+          td23El.appendChild(verifyIconEl);
           rowEl.appendChild(td23El);
 
           const td24El = document.createElement('td');
-          const proxyCheckboxEl = document.createElement('input');
-          proxyCheckboxEl.setAttribute('type', 'checkbox');
-          proxyCheckboxEl.setAttribute('disabled', '');
-          proxyCheckboxEl.checked = data[i].proxy;
-          td24El.appendChild(proxyCheckboxEl);
+          const proxyIconEl = document.createElement('div');
+          const proxyIconInnerEl = document.createElement('div');
+          proxyIconEl.appendChild(proxyIconInnerEl);
+          if (data[i].proxy) {
+            proxyIconEl.classList.add('icon-true');
+            proxyIconInnerEl.classList.add('icon-inner-true');
+          } else {
+            proxyIconEl.classList.add('icon-false');
+            proxyIconInnerEl.classList.add('icon-inner-false');
+          }
+          td24El.appendChild(proxyIconEl);
           rowEl.appendChild(td24El);
 
           const td25El = document.createElement('td');
@@ -636,11 +654,17 @@ const buildServerListTable = (data) => {
           rowEl.appendChild(td31El);
 
           const td32El = document.createElement('td');
-          const recoverCheckboxEl = document.createElement('input');
-          recoverCheckboxEl.setAttribute('type', 'checkbox');
-          recoverCheckboxEl.setAttribute('disabled', '');
-          recoverCheckboxEl.checked = data[i].recoverNick;
-          td32El.appendChild(recoverCheckboxEl);
+          const recoverNickIconEl = document.createElement('div');
+          const recoverNickIconInnerEl = document.createElement('div');
+          recoverNickIconEl.appendChild(recoverNickIconInnerEl);
+          if (data[i].recoverNick) {
+            recoverNickIconEl.classList.add('icon-true');
+            recoverNickIconInnerEl.classList.add('icon-inner-true');
+          } else {
+            recoverNickIconEl.classList.add('icon-false');
+            recoverNickIconInnerEl.classList.add('icon-inner-false');
+          }
+          td32El.appendChild(recoverNickIconEl);
           rowEl.appendChild(td32El);
 
           const td33El = document.createElement('td');
@@ -672,19 +696,31 @@ const buildServerListTable = (data) => {
           rowEl.appendChild(td51El);
 
           const td60El = document.createElement('td');
-          const reconnectCheckboxEl = document.createElement('input');
-          reconnectCheckboxEl.setAttribute('type', 'checkbox');
-          reconnectCheckboxEl.setAttribute('disabled', '');
-          reconnectCheckboxEl.checked = data[i].reconnect;
-          td60El.appendChild(reconnectCheckboxEl);
+          const reconnectIconEl = document.createElement('div');
+          const reconnectIconInnerEl = document.createElement('div');
+          reconnectIconEl.appendChild(reconnectIconInnerEl);
+          if (data[i].reconnect) {
+            reconnectIconEl.classList.add('icon-true');
+            reconnectIconInnerEl.classList.add('icon-inner-true');
+          } else {
+            reconnectIconEl.classList.add('icon-false');
+            reconnectIconInnerEl.classList.add('icon-inner-false');
+          }
+          td60El.appendChild(reconnectIconEl);
           rowEl.appendChild(td60El);
 
           const td61El = document.createElement('td');
-          const loggingCheckboxEl = document.createElement('input');
-          loggingCheckboxEl.setAttribute('type', 'checkbox');
-          loggingCheckboxEl.setAttribute('disabled', '');
-          loggingCheckboxEl.checked = data[i].logging;
-          td61El.appendChild(loggingCheckboxEl);
+          const loggingIconEl = document.createElement('div');
+          const loggingIconInnerEl = document.createElement('div');
+          loggingIconEl.appendChild(loggingIconInnerEl);
+          if (data[i].logging) {
+            loggingIconEl.classList.add('icon-true');
+            loggingIconInnerEl.classList.add('icon-inner-true');
+          } else {
+            loggingIconEl.classList.add('icon-false');
+            loggingIconInnerEl.classList.add('icon-inner-false');
+          }
+          td61El.appendChild(loggingIconEl);
           rowEl.appendChild(td61El);
         } // if (full)
 
