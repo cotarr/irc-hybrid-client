@@ -15,7 +15,7 @@ not disabled and have reconnect enabled, then upon disconnect the client will au
 ### Added
 
 - servers.json configuration changes:
-  - Added new integer property `group` to IRC the server definition object, including server list editor form, server list API and API data validation. To handle upgrade from version v0.2.8 and before, the group property will default to 0 when the new property is not present in the config file. The value 0 defines individual servers that do not rotate addresses.
+  - Added new integer property `group` to IRC the server definition object, including server list editor form, server list API and API data validation. To handle upgrade from version v0.2.8 and before, the group property will default to 0 when the new property is not present in the config file. The value 0 defines individual servers that do not rotate addresses. There should be no issue using the old config.
 - Additions to ircState object:
   - Added integer property `ircServerGroup` to show current server group number.
   - Added boolean property `ircServerRotation` to tell browser if automatic rotation of server definitions is enabled in the configuration
@@ -50,7 +50,7 @@ not disabled and have reconnect enabled, then upon disconnect the client will au
 - docs/api.html - updated for API changes
 
 - User interface changes
-  - IRC controls tab, eliminate real name input box
+  - IRC controls tab, user name, real name, mode are now printed in text as readonly information.
   - New form layout for server rotation status display (new screen capture in /docs)
   - Replace readonly checkboxes with true/false color icons using CSS
 

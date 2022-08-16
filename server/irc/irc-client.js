@@ -426,7 +426,7 @@
           if (groupList.indexOf(nextIndex) >= 0) break;
         }
       }
-      console.log('Rotate servers ', index, groupList, nextIndex);
+      // console.log('Rotate servers ', index, groupList, nextIndex);
       return nextIndex;
     }
     const currentIndex = vars.ircState.ircServerIndex;
