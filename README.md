@@ -1,15 +1,3 @@
-# ========== TEMPORARY BRANCH NOTES =============
-
-Branch: server-groups, see CHANGELOG.md
-
-This branch is intended to develop code that 
-allows IRC server definitions to include a 
-`group` property. Servers definitions
-with the same group number would automatically
-rotate IRC server addresses after disconnect.
-Group 0 defines individual servers that do not rotate.
-
-# ================================================
 # irc-hybrid-client
 
 Single user hybrid IRC client using JavaScript frontend and Node.js/Express backend.
