@@ -8,14 +8,14 @@ and this project adheres to
 
 ## Next 2022-08-15
 
-This is a feature upgrade. Previously, each different server definition was a stand alone configuration containing only a single IRC server address. This upgrade brings a group number property the server definition. Group 0 is reserved for stand alone servers.
-In the case where group is 1 or greater, the group property defines a group of servers. If more than 2 server in a group are 
-not disabled and have reconnect enabled, then up on disconnect the client will automatically rotate IRC server definitions within a server group.
+This is a feature upgrade to add automatic IRC server rotation. Previously, each different server definition was a stand alone configuration containing only one single IRC server address. This upgrade introduces a new integer group number property to the server definition. Group 0 is reserved for stand alone servers.
+In the case where the group is 1 or greater, the group property defines a group of servers. If more than 2 server in a group are 
+not disabled and have reconnect enabled, then upon disconnect the client will automatically rotate different IRC server definitions within a server group.
 
 ### Added
 
 - servers.json configuration changes:
-  - Added new integer property `group` to IRC the server definition object, including server list editor form, server list API and API data validation. To handle upgrade from version v0.2.8 and before, the group property will default to 0 is not present in the config file. The value 0 defines individual servers that do not rotate addresses.
+  - Added new integer property `group` to IRC the server definition object, including server list editor form, server list API and API data validation. To handle upgrade from version v0.2.8 and before, the group property will default to 0 when the new property is not present in the config file. The value 0 defines individual servers that do not rotate addresses.
 - Additions to ircState object:
   - Added integer property `ircServerGroup` to show current server group number.
   - Added boolean property `ircServerRotation` to tell browser if automatic rotation of server definitions is enabled in the configuration
@@ -23,12 +23,12 @@ not disabled and have reconnect enabled, then up on disconnect the client will a
   - New function onDisconnectRotateNextServer() to manage substitution of alternate server definitions
   - Population of server properties into ircState object recoded into common function.
   - Minor logic changes for reset of primary nickname on disconnect
-
 - server/irc/irc-client-vars - Modified array containing list of reconnect time intervals.
+- docs/ - Update instructions for server list rotation and added new screen capture images.
 
 ### Changed
 
-- Server list table the [ ] disabled checkboxes are now clickable within the main table.
+- Server list table the [ ] disabled checkboxes are now clickable within the main table. Disabled rows show gray background color.
 - API change: to move records up one position uses different method/route (needed for new features in future)
   - Old: COPY method /irc/serverlist with body {action: 'move-up'}
   - New: POST method /irc/serverlist/tools with body {action: 'move-up'}
@@ -50,7 +50,7 @@ not disabled and have reconnect enabled, then up on disconnect the client will a
 
 - User interface changes
   - IRC controls tab, eliminate real name input box
-  - New form layout for server rotation status display
+  - New form layout for server rotation status display (new screen capture in /docs)
   - Replace readonly checkboxes with true/false color icons using CSS
 
 ## [v0.2.8](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.8) 2022-08-11
