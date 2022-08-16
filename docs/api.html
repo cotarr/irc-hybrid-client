@@ -400,6 +400,8 @@ UPDATE
       "verified": true,
       "protocol": "TLSv1.3"
     }
+    "ircServerIndex": 0,
+    "ircServerGroup": 0,
     "ircServerName": "freenode",
     "ircServerHost": "chat.freenode.net",
     "ircServerPort": 7000,
@@ -407,14 +409,16 @@ UPDATE
     "ircTLSVerify": true,
     "ircProxy": false,
     "ircAutoReconnect": true,
+    "ircServerRotation": true,
     "nickName": "myNickName",
     "userName": "myNickName",
     "realName": "myNickName",
     "userMode": "+i",
     "channelList": [],
     "ircServerIndex": 3,
-    "ircServerPrefix": "tildes.freenode.net",
     "userHost": "~someuser@somehose.example.net",
+
+    "ircServerPrefix": "tildes.freenode.net",
     "channels": [
       ""#mychannel"
     ],
@@ -431,7 +435,10 @@ UPDATE
         "kicked": false
       }
     ],
-    "progVersion": "0.1.7",
+    "enableSocks5Proxy": true,
+    "socks5Host": "socks5.example.com",
+    "socks5Port": 10080,
+    "progVersion": "0.2.8",
     "progName": "irc-hybrid-client",
     "times": {
         "programRun": "1624047717",
@@ -439,7 +446,8 @@ UPDATE
     },
     "count": {
         "ircConnect": 1,
-        "ircConnectError": 0
+        "ircConnectError": 0,
+        "ircStateCalls": 20
     },
     "websocketCount": 1
 }

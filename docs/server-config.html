@@ -81,7 +81,7 @@
         <div class="home-detail">
           <div class="image-text">
             <p>
-              The server list editor web page can be invoked by clicking the [Edit]
+              The server list editor web page can be invoked by clicking the [Edit Server List]
               button located on the &quot;IRC Controls&quot; panel of the IRC web client.
             </p>
             <p>
@@ -94,7 +94,7 @@
             </p>
           </div>
           <div class="image-photo">
-            <img src=images/server-list-button.png width="525" height="313"alt="Server List Edit Button">
+            <img src=images/server-list-button.png width="436" height="302"alt="Server List Edit Button">
           </div>
         </div>
 
@@ -108,12 +108,22 @@
           In the far right column, [move-up] buttons may be used to re-order the list.
         </p>
         <p>
-          The [Return to IRC Client] button is a hyper-link back to the IRC client URL at /irc/webclient.html.
+          The disable checkbox is used to prevent an individual server from 
+          being selected using the [Next], [Prev] buttons in the web client.
+          This checkbox may be activated here in the table.
         </p>
         <p>
-          The [Show all columns] button will expand the table to that all IRC server properties are displayed 
-          with IRC server definitions in a single table.
-          Clicking the button a second time will collapse the table to it's original small size.
+          The &quot;group&quot; column shows an integer group number. 
+          Groups are used to configure and define a common group of IRC server definitions.
+          Different IRC servers can be rotated after disconnect from the IRC network.
+          Group 0 is reserved for stand alone servers.
+          In the case where the group number is 1 or greater a rotation group is defined. 
+          If more than 2 server in a group are not disabled and have reconnect enabled, 
+          then up on disconnect the client will automatically rotate IRC server 
+          definitions within a server group.
+        </p>
+        <p>
+          The [Return to IRC Client] button is a hyper-link back to the IRC client URL at /irc/webclient.html.
         </p>
         <p>
           The [Copy] button will duplicate the selected IRC server definition and add the 
@@ -125,7 +135,15 @@
           The [Create New IRC Server] button will open the same form populated with some default values.
         </p>
         <div>
-          <img src=images/server-list.png width="633" height="272"alt="Server Listing Table">
+          <img src=images/server-list.png width="677" height="277"alt="Server Listing Table">
+        </div>
+        <p>
+          The [Show all columns] button will expand the table to that all IRC server properties are displayed 
+          with IRC server definitions in a single table.
+          Clicking the button a second time will collapse the table to it's original small size.
+        </p>
+        <div>
+          <img src=images/server-list-full.png width="1189" height="165"alt="Server Listing Table">
         </div>
 
         <div class="install-section-title">Data Entry</div>
@@ -134,15 +152,47 @@
           After editing is complete, the [Save] button will write the changes to the database file 
           on the web server. The [Cancel] button will leave the data unchanged.
         </p>
+        <p>
+          The disable/hide checkbox is used to prevent an individual server from 
+          being selected using the [Next], [Prev] buttons in the web client.
+        </p>
+        <p>
+          The &quot;group&quot; field shows an integer group number. 
+          Groups are used to configure and define a common group of IRC server definitions.
+          Different IRC servers can be rotated after disconnect from the IRC network.
+          Group 0 is reserved for stand alone servers.
+          In the case where the group number is 1 or greater a rotation group is defined. 
+          If more than 2 server in a group are not disabled and have reconnect enabled, 
+          then up on disconnect the client will automatically rotate IRC server 
+          definitions within a server group.
+        </p>        
         <div class="home-detail">
           <div class="image-text">
+
             <p>
-              The disable/hide checkbox is used to prevent an individual server from 
-              being selected using the [Next], [Prev] buttons in the web client.
-            </p><p>
               The Label is used to provide a descriptive name for an IRC server definition.
               The Label is not otherwise used, and it may contain any arbitrary string values.
               If you are using a small screen smartphone, it is best to keep the Label short.
+            </p>
+            <p>
+              When the reconnect checkbox is checked, after disconnect, the IRC
+              client will attempt to reconnect to IRC. It will use the existing server
+              definition and existing nickname. Server rotation and nickname rotation 
+              are not currently available. It will attempt to re-join up to 5 channels 
+              at the time of disconnection. 
+              This feature does not support channel passwords.
+            </p>
+            <p>
+              At this time there are no provisions to configure a server to 
+              auto-connect to IRC on startup. There is no provision 
+              to auto-join channels on startup
+            </p><p>
+              When the log checkbox is checked, the raw IRC messages from the IRC server
+              are written the file &quot;irc.log&quot; located in the logs folder.
+              Caution should be used as logging of passwords or other bot credentials
+              may occur.
+              This is really intended for debugging. It is recommended to leave
+              this set to false.
             </p>
             <p>
               The IRC server address, port, and TLS settings are similar to other IRC clients.
@@ -176,41 +226,22 @@
               In the client interface, a button will be created for each channel to /JOIN the channel 
               when pressed.
             </p>
-            <p>
-              The IRC services section is optional. 
-              Leave these field empty to disable this feature.
-              The purpose is to send a user IDENTIFY message to a NickServ service. 
-              The command may contain passwords so it is a write-only value and the command
-              may not be viewed from the web page. The command is stored in the 
-              servers.json files on the web server in plain text format.
-              The manual configuration section shown below provides a detailed 
-              explanation and example for services configuration.
-            </p>
           </div>
           <div class="image-photo">
-            <img src=images/server-form.png width="572" height="1014"alt="Server definition form">
+            <img src=images/server-form.png width="566" height="1064"alt="Server definition form">
           </div>
         </div>  
         <p>
-          When the reconnect checkbox is checked, after disconnect, the IRC
-          client will attempt to reconnect to IRC. It will use the existing server
-          definition and existing nickname. Server rotation and nickname rotation 
-          are not currently available. It will attempt to re-join up to 5 channels 
-          at the time of disconnection. 
-          This feature does not support channel passwords.
+          The IRC services section is optional. 
+          Leave these field empty to disable this feature.
+          The purpose is to send a user IDENTIFY message to a NickServ service. 
+          The command may contain passwords so it is a write-only value and the command
+          may not be viewed from the web page. The command is stored in the 
+          servers.json files on the web server in plain text format.
+          The manual configuration section shown below provides a detailed 
+          explanation and example for services configuration.
         </p>
-        <p>
-          At this time there are no provisions to configure a server to 
-          auto-connect to IRC on startup. There is no provision 
-          to auto-join channels on startup
-        </p><p>
-          When the log checkbox is checked, the raw IRC messages from the IRC server
-          are written the file &quot;irc.log&quot; located in the logs folder.
-          Caution should be used as logging of passwords or other bot credentials
-          may occur.
-          This is really intended for debugging. It is recommended to leave
-          this set to false.
-        </p>
+ 
         <p>
           After edit is complete, use the [Save] button, then return to the IRC client and 
           attempt to reconnect using the new IRC server definitions.
@@ -251,12 +282,23 @@
 
         <h2>Server Configuration (each IRC server)</h2>
 
-        <div class="install-section-title">1 - Record name and status</div>
+        <div class="install-section-title">1 - Record Status, Group and Name</div>
 
         <p>
           The &quot;disabled&quot; property is used to prevent an individual server from 
           being selected using the [Next], [Prev] buttons in the web client.
-        </p><p>
+        </p>
+        <p>
+          The &quot;group&quot; column shows an integer group number. 
+          Groups are used to configure and define a common group of IRC server definitions.
+          Different IRC servers can be rotated after disconnect from the IRC network.
+          Group 0 is reserved for stand alone servers.
+          In the case where the group number is 1 or greater a rotation group is defined. 
+          If more than 2 server in a group are not disabled and have reconnect enabled, 
+          then up on disconnect the client will automatically rotate IRC server 
+          definitions within a server group.
+        </p>
+        <p>
           The &quot;name&quot; property is used to provide a descriptive name for an IRC server definition.
           The value is not otherwise used, and it may contain any arbitrary string values.
           If you are using a smartphone, it is best to keep the name short.
@@ -264,6 +306,7 @@
 
 <div class="pre-div"><pre>
   "disabled": false,
+  "group": 0,
   "name": "DALnet",
 </pre></div>
 
@@ -577,6 +620,7 @@
   "serverArray": [
     {
       "disabled": false,
+      "group": 0,
       "name": "DALnet",
       "host": "lion.dal.net",
       "port": 6697,
