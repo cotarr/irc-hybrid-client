@@ -582,6 +582,10 @@ const buildServerListTable = (data) => {
         } else {
           td11El.textContent = 0;
         }
+        if (('group' in data[i]) &&
+          (data[i].group > 0) && (data[i].group < 6)) {
+          td11El.classList.add('group-color-' + data[i].group.toString());
+        }
         rowEl.appendChild(td11El);
 
         const td12El = document.createElement('td');

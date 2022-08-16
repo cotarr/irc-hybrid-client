@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Next 2022-08-15
+## Next 2022-08-16
 
 This is a feature upgrade to add automatic IRC server rotation. Previously, each different server definition was a stand alone configuration containing only one single IRC server address. This upgrade introduces a new integer group number property to the server definition. Group 0 is reserved for stand alone servers.
 In the case where the group is 1 or greater, the group property defines a group of servers. If more than 2 server in a group are 
@@ -43,9 +43,10 @@ not disabled and have reconnect enabled, then upon disconnect the client will au
   - Moving record up now returns index number of new position in database.
   - Deleting record up now returns index number last record in database.
   - Added action `toggle-disabled` to tools API /irc/serverlist/tools
-- secure/js/serverlist.js
+  secure/js/serverlist.js
   - Minor update to method and url of move-up to use tools API
   - Event handlers for checkbox in main serverlist using tools API.
+  - Custom background color for server group 1 to 5 in group column TD element.
 - docs/api.html - updated for API changes
 
 - User interface changes

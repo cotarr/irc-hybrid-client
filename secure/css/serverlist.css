@@ -29,6 +29,12 @@ button[disabled] {
   color: #444444
 }
 
+.group-color-1 { background-color: rgb(168, 233, 255); }
+.group-color-2 { background-color: rgb(255, 187, 187); }
+.group-color-3 { background-color: rgb(222, 216, 135); }
+.group-color-4 { background-color: rgb(149, 200, 168); }
+.group-color-5 { background-color: rgb(212, 142, 218); }
+
 .input-group {
   background-color: #d7fcee;
   border: 1px solid black;

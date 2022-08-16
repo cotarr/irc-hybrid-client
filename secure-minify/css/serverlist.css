@@ -1,7 +1,8 @@
 html{margin:0;padding:0}body{margin:0;padding:0 20px 0 20px;background-color:#9cf7d4}button{background-color:#f4f4f4;border-top:1px solid #777;border-right:2px solid #444;border-bottom:2px solid #444;
 border-left:1px solid #777;border-radius:5px;box-shadow:2px 2px 3px grey;color:#000;padding-top:3px;padding-bottom:3px;cursor:pointer}button:hover{background-color:#e2e2e2}button[disabled]{
-background-color:#b8b8b8;color:#444}.input-group{background-color:#d7fcee;border:1px solid #000;border-radius:7px;padding-top:0;padding-left:10px;padding-bottom:10px}.input-group2{background-color:
-#c4deff;border:1px solid #000;border-radius:7px;padding-top:0;padding-left:10px;padding-bottom:10px}.yellow-warning-div{background-color:#ff0;border:1px solid #000;border-radius:7px;margin-top:10px;
+background-color:#b8b8b8;color:#444}.group-color-1{background-color:#a8e9ff}.group-color-2{background-color:#fbb}.group-color-3{background-color:#ded887}.group-color-4{background-color:#95c8a8}
+.group-color-5{background-color:#d48eda}.input-group{background-color:#d7fcee;border:1px solid #000;border-radius:7px;padding-top:0;padding-left:10px;padding-bottom:10px}.input-group2{background-color
+:#c4deff;border:1px solid #000;border-radius:7px;padding-top:0;padding-left:10px;padding-bottom:10px}.yellow-warning-div{background-color:#ff0;border:1px solid #000;border-radius:7px;margin-top:10px;
 margin-right:10px;padding:10px}.connected-warning-div{background-color:#faeea2;border:1px solid #000;border-radius:7px;margin-top:10px;margin-right:10px;margin-bottom:20px;padding-top:0;padding-bottom
 :0;padding-left:10px;padding-right:10px}.icon-inner-true{background-color:#000;border:1px solid #000;border-radius:3px;color:#000;display:inline-block;margin:4px;width:6px;height:6px}.icon-inner-false
 {background-color:#e00000;border:1px solid #e00000;border-radius:3px;color:#e00000;display:inline-block;margin:4px;width:6px;height:6px}.icon-true{background-color:#00b800;border:1px solid #000;

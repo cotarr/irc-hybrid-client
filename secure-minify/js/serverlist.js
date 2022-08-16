@@ -105,9 +105,10 @@ _showError(err.toString()||err);console.log(err)})};const parseFormInputValues=(
 ;if(data[i].disabled)rowEl.classList.add('disabled-tr');const td01El=document.createElement('td');td01El.textContent=i.toString();rowEl.appendChild(td01El);const td10El=document.createElement('td')
 ;const disabledCheckboxEl=document.createElement('input');disabledCheckboxEl.setAttribute('type','checkbox')
 ;if(editable)disabledCheckboxEl.removeAttribute('disabled');else disabledCheckboxEl.setAttribute('disabled','');disabledCheckboxEl.checked=data[i].disabled;td10El.appendChild(disabledCheckboxEl)
-;rowEl.appendChild(td10El);const td11El=document.createElement('td');if('group'in data[i])td11El.textContent=data[i].group;else td11El.textContent=0;rowEl.appendChild(td11El)
-;const td12El=document.createElement('td');td12El.textContent=data[i].name;rowEl.appendChild(td12El);const td20El=document.createElement('td');td20El.textContent=data[i].host;rowEl.appendChild(td20El)
-;const td21El=document.createElement('td');td21El.textContent=data[i].port;rowEl.appendChild(td21El);if(full){const td22El=document.createElement('td');const tlsIconEl=document.createElement('div')
+;rowEl.appendChild(td10El);const td11El=document.createElement('td');if('group'in data[i])td11El.textContent=data[i].group;else td11El.textContent=0
+;if('group'in data[i]&&data[i].group>0&&data[i].group<6)td11El.classList.add('group-color-'+data[i].group.toString());rowEl.appendChild(td11El);const td12El=document.createElement('td')
+;td12El.textContent=data[i].name;rowEl.appendChild(td12El);const td20El=document.createElement('td');td20El.textContent=data[i].host;rowEl.appendChild(td20El);const td21El=document.createElement('td')
+;td21El.textContent=data[i].port;rowEl.appendChild(td21El);if(full){const td22El=document.createElement('td');const tlsIconEl=document.createElement('div')
 ;const tlsIconInnerEl=document.createElement('div');tlsIconEl.appendChild(tlsIconInnerEl);if(data[i].tls){tlsIconEl.classList.add('icon-true');tlsIconInnerEl.classList.add('icon-inner-true')}else{
 tlsIconEl.classList.add('icon-false');tlsIconInnerEl.classList.add('icon-inner-false')}td22El.appendChild(tlsIconEl);rowEl.appendChild(td22El);const td23El=document.createElement('td')
 ;const verifyIconEl=document.createElement('div');const verifyIconInnerEl=document.createElement('div');verifyIconEl.appendChild(verifyIconInnerEl);if(data[i].verify){
