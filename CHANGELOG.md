@@ -6,6 +6,36 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Next 2022-08-20
+
+This is a feature upgrade. Counter icons have been added to the top 
+of several windows to show a count of unread messages in the window.
+
+### Added
+
+- Private message launch window (parent window)
+  - Added count icon showing the number of private message windows that exist
+  - Added count icon showing the total sum of unread private messages in all windows
+- Individual private message window
+  - Added count icon showing the number of unread messages in the private message window.
+- IRC channel launch window (menu window)
+  - Added count icon showing the the number of channel windows that exist
+  - Added count icon showing the total number of unread messages in all channel windows
+- Individual IRC channel window
+  - Added count icon showing number of nicknames present in the IRC channel
+  - Added count icon showing number of unread IRC messages in the IRC channel window
+- Main page title bar
+  - The icon for unread private messages (P) updated to show icon if private message count is > 0
+  - The icon for unread channel messages (C) updated to show icon if private message count is >0
+
+### Fixed
+
+- Fixed - Use of [Prune] button to remove channel not mirrored to concurrent browser connections.
+- Fixed - After selecting the [erase cache] button, private message windows could not be opened.
+- Fixed - Found several global event listeners that were being duplicated when refreshing the message cache. The was observed to cause multiple count increments when new messages were received and counted for the new count icons added with this upgrade.
+- General code cleanup  of browser code in webclient06.js (IRC Channel) and webclient07.js (Private messages)
+- Fixed - Several setInterval timers were being duplicated when reloading cache.
+
 ## [v0.2.9](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.9) 2022-08-16
 
 This is a feature upgrade to add automatic IRC server rotation. Previously, each different server definition was a stand alone configuration containing only one single IRC server address. This upgrade introduces a new integer group number property to the server definition. Group 0 is reserved for stand alone servers.

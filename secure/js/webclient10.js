@@ -43,8 +43,6 @@ function updateFromCache () {
 
   // Clear activity icons
   resetNotActivityIcon();
-  resetPmActivityIcon(-1);
-  resetChanActivityIcon(-1);
 
   // Fire event to clear previous contents
   // TODO this is async, could clear after fetch

@@ -339,6 +339,75 @@ button[disabled] {
   display: none;
 }
 
+.pm-window-count {
+  background-color: #c5d5e0;
+  border: 1px solid black;
+  border-radius: 12px;
+  color: #000000;
+  display: inline-block;
+  margin-left: 2px;
+  margin-right: 0px;
+  min-height: 20px;
+  min-width: 20px;
+  padding: 2px 3px 1px 3px;
+  text-align: center;
+}
+.pm-window-count[hidden] {
+  display: none;
+}
+
+.channel-window-count {
+  background-color: #90fc92;
+  border: 1px solid black;
+  border-radius: 12px;
+  color: #000000;
+  display: inline-block;
+  margin-left: 2px;
+  margin-right: 0px;
+  min-height: 20px;
+  min-width: 20px;
+  padding: 2px 3px 1px 3px;
+  text-align: center;
+}
+.channel-window-count[hidden] {
+  display: none;
+}
+
+.nick-count {
+  background-color: #e3fce4;
+  border: 1px solid black;
+  border-radius: 12px;
+  color: #000000;
+  display: inline-block;
+  margin-left: 2px;
+  margin-right: 0px;
+  min-height: 20px;
+  min-width: 20px;
+  padding: 2px 3px 1px 3px;
+  text-align: center;
+}
+.nick-count[hidden] {
+  display: none;
+}
+
+.message-count {
+  background-color: #ffffff;
+  border: 1px solid #000000;
+  border-radius: 12px;
+  color: #000000;
+  display: inline-block;
+  margin-left: 2px;
+  margin-right: 2px;
+  min-height: 20px;
+  min-width: 20px;
+  padding: 2px 3px 1px 3px;
+  text-align: center;
+  cursor: pointer;    
+}
+.message-count[hidden] {
+  display: none;
+}
+
 .nickname-input-div {
   background-color: #95eefc;
   border: 1px solid black;

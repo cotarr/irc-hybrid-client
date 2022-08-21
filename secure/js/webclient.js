@@ -436,64 +436,26 @@ function hideRawMessageWindow () {
 // Functions to handle activity indicator icons
 // ----------------------------------------------
 function setNotActivityIcon (index) {
-  document.getElementById('notMsgIconId').removeAttribute('hidden');
-}
-// -1 indicates icon is available to be shown
-let lastPmActivityIconIndex = -1;
-function setPmActivityIcon (index) {
-  if (lastPmActivityIconIndex === -1) {
-    lastPmActivityIconIndex = index;
-    document.getElementById('pmMsgIconId').removeAttribute('hidden');
-  }
-  // else ignore request
-}
-// -1 indicates icon is available to be shown
-let lastChanActivityIconIndex = -1;
-function setChanActivityIcon (index) {
-  if (lastChanActivityIconIndex === -1) {
-    lastChanActivityIconIndex = index;
-    document.getElementById('chanMsgIconId').removeAttribute('hidden');
-  }
-  // else ignore request
+  document.getElementById('noticeUnreadExistIcon').removeAttribute('hidden');
 }
 function resetNotActivityIcon (index) {
-  document.getElementById('notMsgIconId').setAttribute('hidden', '');
+  document.getElementById('noticeUnreadExistIcon').setAttribute('hidden', '');
 }
-function resetPmActivityIcon (index) {
-  if (index === -1) {
-    // code -1 match any channel
-    lastPmActivityIconIndex = -1;
-    document.getElementById('pmMsgIconId').setAttribute('hidden', '');
-  } else if (index === lastPmActivityIconIndex) {
-    // Channel can only clear own icon
-    lastPmActivityIconIndex = -1;
-    document.getElementById('pmMsgIconId').setAttribute('hidden', '');
+
+// -1 indicates icon is available to be shown
+let lastChanActivityIconList = [];
+function setChanActivityIcon (index) {
+  if (lastChanActivityIconList.indexOf(index) < 0) {
+    lastChanActivityIconList.push(index);
   }
-  // else ignore request
+  document.getElementById('channelUnreadExistIcon').removeAttribute('hidden');
 }
-function resetChanActivityIcon (index) {
-  if (index === -1) {
-    // code -1 match any channel
-    lastChanActivityIconIndex = -1;
-    document.getElementById('chanMsgIconId').setAttribute('hidden', '');
-  } else if (index === lastChanActivityIconIndex) {
-    // Channel can only clear own icon
-    lastChanActivityIconIndex = -1;
-    document.getElementById('chanMsgIconId').setAttribute('hidden', '');
-  }
-  // else ignore request
-}
+
 // --------------------------
 // Clear message activity ICONs by tapping icon
 // --------------------------
-document.getElementById('notMsgIconId').addEventListener('click', function () {
+document.getElementById('noticeUnreadExistIcon').addEventListener('click', function () {
   resetNotActivityIcon();
-});
-document.getElementById('pmMsgIconId').addEventListener('click', function () {
-  resetPmActivityIcon(-1);
-});
-document.getElementById('chanMsgIconId').addEventListener('click', function () {
-  resetChanActivityIcon(-1);
 });
 
 // -----------------------------
@@ -591,8 +553,6 @@ function updateDivVisibility () {
         document.getElementById('waitConnectIconId').setAttribute('hidden', '');
       }
       resetNotActivityIcon();
-      resetPmActivityIcon(-1);
-      resetChanActivityIcon(-1);
       document.getElementById('ircIsAwayIconId').setAttribute('hidden', '');
       document.getElementById('nickRecovIconId').setAttribute('hidden', '');
       document.getElementById('hideLoginSection').removeAttribute('hidden');
@@ -656,8 +616,6 @@ function updateDivVisibility () {
       document.getElementById('webConnectIconId').removeAttribute('connecting');
     }
     resetNotActivityIcon();
-    resetPmActivityIcon(-1);
-    resetChanActivityIcon(-1);
     document.getElementById('ircConnectIconId').setAttribute('unavailable', '');
     document.getElementById('ircConnectIconId').removeAttribute('connected');
     document.getElementById('ircConnectIconId').removeAttribute('connecting');

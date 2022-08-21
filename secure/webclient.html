@@ -47,9 +47,9 @@
       <div class="annunciator-connect-icon" id="ircConnectIconId">IRC</div>
       <div class="annunciator-wait-icon" id="waitConnectIconId" hidden>Wait...</div>
       <div class="annunciator-away-icon" id="ircIsAwayIconId" hidden>Away</div>
-      <div class="message-icon color-channel" id="chanMsgIconId" hidden>C</div>
-      <div class="message-icon color-pm" id="pmMsgIconId" hidden>P</div>
-      <div class="message-icon color-notice" id="notMsgIconId" hidden>N</div>
+      <div class="message-icon color-channel" id="channelUnreadExistIcon" hidden>C</div>
+      <div class="message-icon color-pm" id="privMsgUnreadExistIcon" hidden>P</div>
+      <div class="message-icon color-notice" id="noticeUnreadExistIcon" hidden>N</div>
       <div class="message-icon color-recovery" id="nickRecovIconId" hidden>R</div>
     </div>
 
@@ -414,6 +414,8 @@ a raw command to the IRC server directly.
             <div>
               <button id="privMsgMainHiddenButton">+</button>
               <span>Private Messages</span>
+              <div class="pm-window-count" id="privMsgWindowCountDiv" hidden>0</div>
+              <div class="message-count" id="privMsgCountDiv" hidden>0</div>
             </div>
             <div id="privMsgMainHiddenDiv" hidden>
               <div class="vh10"></div>
@@ -438,6 +440,8 @@ a raw command to the IRC server directly.
             <div>
               <button id="ircChannelsMainHiddenButton">+</button>
               <span>IRC Channels</span>
+              <div class="channel-window-count" id="activeChannelCount" hidden>0</div>
+              <div class="message-count" id="channelUnreadCountDiv" hidden>0</div>
             </div>
             <div id="ircChannelsMainHiddenDiv">
               <div class="vh10"></div>

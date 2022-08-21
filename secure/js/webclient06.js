@@ -90,6 +90,92 @@ function _sendTextToChannel (channelIndex, textAreaEl) {
   textAreaEl.value = '';
 }; // _sendTextToChannel
 
+// -----------------------------------------------------------------
+// This shows the page layout hierarchy for private message sections
+// -----------------------------------------------------------------
+//
+// html
+// - head
+// - body
+// -- div (errorDiv)
+// -- div (annunciatorDivId)
+// -- div (scrollableDivId)
+// --- div (infoSectionDiv)
+// --- div (logoutConfirmDiv)
+// --- div (webDisconnectedHiddenDiv1)
+// --- div ( ) No id, used both webDisconnected and web connected
+// --- div (webDisconnectedHiddenDiv2)
+// ---- div (ircDisconnectedHiddenDiv)
+// ----- div (wallopsSectionDiv)
+// ----- div (noticeSectionDiv)
+// ----- div (privMsgSectionDiv)
+// ----- div (privateMessageContainerDiv)  <--- static container in html
+
+// ----- div (channelMenuDiv)
+// ------ div ( ) No id
+// ------- button (ircChannelsMainHiddenButton)
+// ------- span ()
+// ------ div (ircChannelsMainHiddenDiv)
+// ------- div ( ) button div
+// -------- textarea (newChannelNameInputId)
+// -------- button (newChannelButton)
+// ------- div (channelJoinButtonContainer) <-- dynamically filled
+
+// ----- div (channelContainerDiv) <-- Dynamically filled with following items:
+// ------ div (channelMainSectionEl)
+// ------- div (channelTopDivEl)
+// -------- div (channelTopLeftDivEl)
+// --------- button (channelHideButtonEl)
+// --------- div (channelNameDivEl)
+// --------- div (channelNickCounterEl)
+// --------- div (channelMessageCounterEl)
+// -------- div (channelTopRightDivEl)
+// --------- div (channelTopRightHidableDivEl)
+// ---------- button (channelJoinButtonEl)
+// ---------- button (channelPruneButtonEl)
+// ---------- button (channelPartButtonEl)
+// ---------- button (channelZoomButtonEl)
+// ------- div (channelBottomDivEl)           <-- hidable
+// -------- div (channelTopicDivEl)
+// -------- textarea (channelNamesDisplayEl)
+// -------- textarea (channelTextAreaEl)
+// -------- div (channelBottomDiv1El)
+// --------- textarea (channelInputAreaEl)
+// --------- button (channelSendButtonEl)
+// -------- div (channelBottomDiv2El)
+// --------- button (channelRefreshButtonEl)
+// --------- button (channelClearButtonEl)
+// --------- button (channelTallerButtonEl)
+// --------- button (channelNormalButtonEl)
+// -------- div (channelBottomDiv3El)
+// --------- input/checkbox (channelFormatCBInputEl)
+// --------- span
+// --------- input/checkbox (channelAutoCompCBInputEl)
+// --------- span
+// -------- div (channelBottomDiv4El)
+// --------- input/checkbox (channelBeep1CBInputEl)
+// --------- span
+// --------- input/checkbox (channelBeep3CBInputEl)
+// --------- span
+// --------- input/checkbox (channelBeep3CBInputEl)
+// --------- span
+
+// -- div (webDisconnectedVisibleDiv)
+//
+// -------------------
+// Global Event Listeners
+// -------------------
+// show-all-divs
+// hide-or-zoom
+// cancel-beep-sounds
+// irc-state-changed
+// channel-message
+// erase-before-reload
+// cache-reload-done
+// cache-reload-error
+// update-channel-count
+//
+
 const mobileBreakpointPx = 600;
 
 // --------------------------------------------------------
@@ -141,7 +227,9 @@ function createChannelEl (name) {
   const channelTopSpacerDivEl = document.createElement('div');
   channelTopSpacerDivEl.classList.add('vh5');
 
-  // center if needed here
+  // center flexbox div
+  // const channelTopCenterDivEl = document.createElement('div');
+  // channelTopCenterDivEl.classList.add('head-center');
 
   // right flexbox div
   const channelTopRightDivEl = document.createElement('div');
@@ -160,6 +248,19 @@ function createChannelEl (name) {
   const channelNameDivEl = document.createElement('div');
   channelNameDivEl.textContent = ircState.channelStates[channelIndex].name;
   channelNameDivEl.classList.add('chan-name-div');
+
+  // Channel message activity counter
+  const channelNickCounterEl = document.createElement('div');
+  channelNickCounterEl.textContent = '0';
+  channelNickCounterEl.classList.add('nick-count');
+
+  // Channel message activity counter
+  const channelMessageCounterEl = document.createElement('div');
+  channelMessageCounterEl.textContent = '0';
+  channelMessageCounterEl.classList.add('message-count');
+  // channel-count-class used by querySelectorAll loop summation (below)
+  channelMessageCounterEl.classList.add('channel-count-class');
+  channelMessageCounterEl.setAttribute('hidden', '');
 
   // Taller button
   const channelTallerButtonEl = document.createElement('button');
@@ -307,6 +408,8 @@ function createChannelEl (name) {
 
   channelTopLeftDivEl.appendChild(channelHideButtonEl);
   channelTopLeftDivEl.appendChild(channelNameDivEl);
+  channelTopLeftDivEl.appendChild(channelNickCounterEl);
+  channelTopLeftDivEl.appendChild(channelMessageCounterEl);
 
   channelTopRightHidableDivEl.appendChild(channelJoinButtonEl);
   channelTopRightHidableDivEl.appendChild(channelPruneButtonEl);
@@ -316,6 +419,7 @@ function createChannelEl (name) {
   channelTopRightDivEl.appendChild(channelTopRightHidableDivEl);
 
   channelTopDivEl.appendChild(channelTopLeftDivEl);
+  // channelTopDivEl.appendChild(channelTopCenterDivEl);
   channelTopDivEl.appendChild(channelTopRightDivEl);
 
   channelBottomDiv1El.appendChild(channelInputAreaEl);
@@ -369,7 +473,8 @@ function createChannelEl (name) {
 
   // inhibit timer to prevent display of activity icon
   let activityIconInhibitTimer = 0;
-  setInterval(function () {
+  // this timer is removed before pruning a channel
+  const channelIntervalTimer = setInterval(function () {
     if (activityIconInhibitTimer > 0) activityIconInhibitTimer--;
   }, 1000);
 
@@ -406,6 +511,30 @@ function createChannelEl (name) {
       }
     }
   }, 750);
+
+  // -----------------------------------------------------
+  // Increment channel message counter and make visible
+  // -----------------------------------------------------
+  function updateChannelCount () {
+    // This is handled at globally in this source file
+    // so that all IRC channels can be summed
+    document.dispatchEvent(new CustomEvent('update-channel-count', { bubbles: true }));
+  };
+  // Incrfement counter, and show count icon if needed
+  function incrementMessageCount () {
+    let count = parseInt(channelMessageCounterEl.textContent);
+    count++;
+    channelMessageCounterEl.textContent = count.toString();
+    channelMessageCounterEl.removeAttribute('hidden');
+    updateChannelCount();
+  }
+  // Clear and hide count icon
+  function resetMessageCount () {
+    const count = 0;
+    channelMessageCounterEl.textContent = count.toString();
+    channelMessageCounterEl.setAttribute('hidden', '');
+    updateChannelCount();
+  }
 
   // --------------------------
   // Channel Event listeners
@@ -475,21 +604,6 @@ function createChannelEl (name) {
   // Prune button handler
   // -------------------------
   channelPruneButtonEl.addEventListener('click', function () {
-    // Internal function to remove channel window from DOM
-    // Some variabes are within variable namespace of parent function.
-    function _removeChannelFromDom () {
-      // remove frontend browser state info for this channel
-      const webStateChannelsIndex = webState.channels.indexOf(name.toLowerCase());
-      if (webStateChannelsIndex >= 0) {
-        webState.channels.splice(webStateChannelsIndex, 1);
-        webState.channelStates.splice(webStateChannelsIndex, 1);
-      }
-
-      // This removes self (own element)
-      // remove the channel element from DOM
-      channelContainerDivEl.removeChild(channelMainSectionEl);
-    }
-
     // Fetch API to remove channel from backend server
     const index = ircState.channels.indexOf(name.toLowerCase());
     if (index >= 0) {
@@ -519,8 +633,11 @@ function createChannelEl (name) {
             if (responseJson.error) {
               showError(responseJson.message);
             } else {
-              // channel successfully removed from server, remove it from client also
-              _removeChannelFromDom();
+              // channel successfully removed from server
+              // The server will response with a state change
+              // The irc-state-change event handler
+              // will detect the channel has been removed
+              // It will remove it's window from the DOM
             }
           })
           .catch((error) => {
@@ -556,7 +673,7 @@ function createChannelEl (name) {
   channelSendButtonEl.addEventListener('click', function () {
     _sendTextToChannel(channelIndex, channelInputAreaEl);
     channelInputAreaEl.focus();
-    resetChanActivityIcon(channelIndex);
+    resetMessageCount();
     activityIconInhibitTimer = activityIconInhibitTimerValue;
   });
 
@@ -569,19 +686,43 @@ function createChannelEl (name) {
       // Remove EOL characters at cursor loction
       stripOneCrLfFromElement(channelInputAreaEl);
       _sendTextToChannel(channelIndex, channelInputAreaEl);
-      resetChanActivityIcon(channelIndex);
+      resetMessageCount();
       activityIconInhibitTimer = activityIconInhibitTimerValue;
     }
   });
 
   // ------------------------------------------------
-  // Clear message activity ICON by click anywhere on the
-  // dynamically created channel message window
+  // Clear unread message activity ICON by click
+  // anywhere below the top bar (below the [+] button)
+  // of the dynamically created channel message window
+  // This is to preserve activity icon when
+  // clicking the [+] to expand the section
   // -------------------------------------------------
-  channelMainSectionEl.addEventListener('click', function () {
-    resetChanActivityIcon(channelIndex);
+  channelBottomDivEl.addEventListener('click', function () {
+    resetMessageCount();
     activityIconInhibitTimer = activityIconInhibitTimerValue;
   });
+
+  // Clear unread message activity ICON by clicking this channel activity icon
+  channelMessageCounterEl.addEventListener('click', function () {
+    resetMessageCount();
+    activityIconInhibitTimer = activityIconInhibitTimerValue;
+  });
+  // Clear unread message activity counters when activity
+  // counter in the channel menu window is clicked
+  function handleChannelCountDivClick () {
+    resetMessageCount();
+  };
+  document.getElementById('channelUnreadCountDiv')
+    .addEventListener('click', handleChannelCountDivClick);
+
+  // Clear unread message activity counters when activity
+  // counter at top of Main page is clicked
+  function handleChannelUnreadExist () {
+    resetMessageCount();
+  };
+  document.getElementById('channelUnreadExistIcon')
+    .addEventListener('click', handleChannelUnreadExist);
 
   function updateVisibility () {
     const index = ircState.channels.indexOf(name.toLowerCase());
@@ -718,17 +859,18 @@ function createChannelEl (name) {
   // ----------------
   // show all event
   // ----------------
-  document.addEventListener('show-all-divs', function (event) {
+  function handleShowAllDivs (event) {
     channelMainSectionEl.removeAttribute('zoom');
     channelMainSectionEl.setAttribute('opened', '');
     updateVisibility();
-  });
+  };
+  document.addEventListener('show-all-divs', handleShowAllDivs);
   // -----------------------------------------------------------
   // hide all event, except skipped zoom div
   //
   // If event.detail.zoomValue === channel name string
   // -----------------------------------------------------------
-  document.addEventListener('hide-or-zoom', function (event) {
+  function handleHideOrZoom (event) {
     // console.log('hide-or-zoom ' + JSON.stringify(event.detail, null, 2));
     if ((event.detail) &&
       (event.detail.zoomType) &&
@@ -752,7 +894,8 @@ function createChannelEl (name) {
     channelMainSectionEl.removeAttribute('zoom');
     channelMainSectionEl.removeAttribute('opened');
     updateVisibility();
-  });
+  };
+  document.addEventListener('hide-or-zoom', handleHideOrZoom);
 
   // --------------------------------------------------
   // Function to update window.localStorage with IRC
@@ -875,11 +1018,12 @@ function createChannelEl (name) {
   // -----------------------
   // Cancel all beep sounds
   // -----------------------
-  document.addEventListener('cancel-beep-sounds', function (event) {
+  function handleCancelBeepSounds (event) {
     channelMainSectionEl.removeAttribute('beep1-enabled');
     channelMainSectionEl.removeAttribute('beep2-enabled');
     channelMainSectionEl.removeAttribute('beep3-enabled');
-  });
+  };
+  document.addEventListener('cancel-beep-sounds', handleCancelBeepSounds);
 
   // -------------------------
   // Text Format checkbox handler
@@ -1117,7 +1261,6 @@ function createChannelEl (name) {
       }
     } // case of tab key
   };
-  // channelInputAreaEl.addEventListener('beforeinput', channelAutoComplete);
   channelInputAreaEl.addEventListener('keydown', channelAutoComplete, false);
 
   // ----------------
@@ -1166,20 +1309,18 @@ function createChannelEl (name) {
   // Append user count to the end of the channel name string in title area
   //
   function _updateChannelTitle () {
-    let titleStr = name + ' (';
+    let titleStr = name;
+    let nickCount = 0;
     const index = ircState.channels.indexOf(name.toLowerCase());
     if (index >= 0) {
-      if (ircState.channelStates[index].joined) {
-        titleStr += parseInt(ircState.channelStates[index].names.length).toString();
+      if (ircState.channelStates[index].kicked) {
+        titleStr += ' (Kicked)';
       } else {
-        if (ircState.channelStates[index].kicked) {
-          titleStr += 'Kicked';
-        } else {
-          titleStr += '0';
-        }
+        nickCount = ircState.channelStates[index].names.length;
       }
     }
-    channelNameDivEl.textContent = titleStr + ')';
+    channelNameDivEl.textContent = titleStr;
+    channelNickCounterEl.textContent = nickCount.toString();
   }
   // do one upon channel creation
   _updateChannelTitle();
@@ -1210,37 +1351,69 @@ function createChannelEl (name) {
     return present;
   } // _nickInChannel()
 
-  document.addEventListener('irc-state-changed', function (event) {
+  function handleIrcStateChanged (event) {
     // console.log('Event: irc-state-changed (createChannelEl)');
-
-    //
-    // If channel was previously joined, then parted, then re-joined
-    // Check for joined change to true and show channel if hidden
-    //
     const ircStateIndex = ircState.channels.indexOf(name.toLowerCase());
-    const webStateIndex = webState.channels.indexOf(name.toLowerCase());
-    if ((ircStateIndex >= 0) && (webStateIndex >= 0)) {
-      if (ircState.channelStates[ircStateIndex].joined !==
-        webState.channelStates[webStateIndex].lastJoined) {
-        if ((ircState.channelStates[ircStateIndex].joined) &&
-          (!webState.channelStates[webStateIndex].lastJoined)) {
-          channelBottomDivEl.removeAttribute('hidden');
-          channelHideButtonEl.textContent = '-';
-          // channelTopRightHidableDivEl.removeAttribute('hidden');
-        }
-        webState.channelStates[webStateIndex].lastJoined =
-          ircState.channelStates[ircStateIndex].joined;
+    if (ircStateIndex < 0) {
+      //
+      // Case of channel has been pruned from the IRC client
+      //
+      // remove frontend browser state info for this channel
+      const webStateChannelsIndex = webState.channels.indexOf(name.toLowerCase());
+      if (webStateChannelsIndex >= 0) {
+        webState.channels.splice(webStateChannelsIndex, 1);
+        webState.channelStates.splice(webStateChannelsIndex, 1);
       }
-    }
-    // state object includes up to date list of nicks in a channel
-    _updateNickList();
-    // Update title string to include some data
-    _updateChannelTitle();
-    // show/hide disable or enable channel elements depend on state
-    updateVisibility();
-  });
+      // remove interval cycle timers
+      clearInterval(channelIntervalTimer);
+      // Remove global event listeners
+      document.removeEventListener('show-all-divs', handleShowAllDivs);
+      document.removeEventListener('hide-or-zoom', handleHideOrZoom);
+      document.removeEventListener('cancel-beep-sounds', handleCancelBeepSounds);
+      document.removeEventListener('irc-state-changed', handleIrcStateChanged);
+      document.removeEventListener('channel-message', handleChannelMessage);
+      document.removeEventListener('erase-before-reload', handleEraseBeforeReload);
+      document.removeEventListener('cache-reload-done', handleCacheReloadDone);
+      document.removeEventListener('cache-reload-error', handleCacheReloadError);
+      window.removeEventListener('resize-custom-elements', handleResizeCustomElements);
+      document.getElementById('channelUnreadExistIcon')
+        .removeEventListener('click', handleChannelUnreadExist);
+      document.getElementById('channelUnreadCountDiv')
+        .removeEventListener('click', handleChannelCountDivClick);
 
-  document.addEventListener('channel-message', function (event) {
+      // This removes self (own element)
+      // remove the channel element from DOM
+      channelContainerDivEl.removeChild(channelMainSectionEl);
+    } else {
+      //
+      // If channel was previously joined, then parted, then re-joined
+      // Check for joined change to true and show channel if hidden
+      //
+      const webStateIndex = webState.channels.indexOf(name.toLowerCase());
+      if ((ircStateIndex >= 0) && (webStateIndex >= 0)) {
+        if (ircState.channelStates[ircStateIndex].joined !==
+          webState.channelStates[webStateIndex].lastJoined) {
+          if ((ircState.channelStates[ircStateIndex].joined) &&
+            (!webState.channelStates[webStateIndex].lastJoined)) {
+            channelBottomDivEl.removeAttribute('hidden');
+            channelHideButtonEl.textContent = '-';
+            // channelTopRightHidableDivEl.removeAttribute('hidden');
+          }
+          webState.channelStates[webStateIndex].lastJoined =
+            ircState.channelStates[ircStateIndex].joined;
+        }
+      }
+      // state object includes up to date list of nicks in a channel
+      _updateNickList();
+      // Update title string to include some data
+      _updateChannelTitle();
+      // show/hide disable or enable channel elements depend on state
+      updateVisibility();
+    }
+  };
+  document.addEventListener('irc-state-changed', handleIrcStateChanged);
+
+  function handleChannelMessage (event) {
     function _addText (timestamp, nick, text) {
       //
       let out = '';
@@ -1362,7 +1535,7 @@ function createChannelEl (name) {
           (document.activeElement !== channelSendButtonEl) &&
           (!webState.cacheReloadInProgress) &&
           (activityIconInhibitTimer === 0)) {
-            setChanActivityIcon(channelIndex);
+            incrementMessageCount();
           }
         }
         break;
@@ -1399,7 +1572,7 @@ function createChannelEl (name) {
               setTimeout(playBeep2Sound, 250);
             }
           }
-          // Upon channel message, make sectino visible.
+          // Upon channel message, make section visible.
           let lastZoomObj = null;
           lastZoomObj = JSON.parse(window.localStorage.getItem('lastZoom'));
           if ((lastZoomObj) &&
@@ -1421,7 +1594,7 @@ function createChannelEl (name) {
           updateVisibility();
 
           // Message activity Icon
-          // If focus not <textarea> elment,
+          // If focus not <textarea> element,
           // and focus not message send button
           // and NOT reload from cache in progress (timer not zero)
           // then display incoming message activity icon
@@ -1429,7 +1602,7 @@ function createChannelEl (name) {
           (document.activeElement !== channelSendButtonEl) &&
           (!webState.cacheReloadInProgress) &&
           (activityIconInhibitTimer === 0)) {
-            setChanActivityIcon(channelIndex);
+            incrementMessageCount();
           }
         }
         break;
@@ -1474,12 +1647,22 @@ function createChannelEl (name) {
         break;
       default:
     }
-  });
+  };
+  document.addEventListener('channel-message', handleChannelMessage);
 
-  document.addEventListener('erase-before-reload', function (event) {
+  function handleEraseBeforeReload (event) {
     // console.log('Event erase-before-reload');
     channelTextAreaEl.value = '';
     channelInputAreaEl.value = '';
+    // Local count in channel window (to match global activity icon visibility)
+    resetMessageCount();
+  };
+  document.addEventListener('erase-before-reload', handleEraseBeforeReload);
+
+  // This is the global activity icon in the bar at the top of the page.
+  document.getElementById('channelUnreadExistIcon').addEventListener('click', function () {
+    // Local count in channel window (to match global activity icon visibility)
+    resetMessageCount();
   });
 
   //
@@ -1487,7 +1670,7 @@ function createChannelEl (name) {
   //
   // Example:  14:33:02 -----Cache Reload-----
   //
-  document.addEventListener('cache-reload-done', function (event) {
+  function handleCacheReloadDone (event) {
     let markerString = '';
     let timestampString = '';
     if (('detail' in event) && ('timestamp' in event.detail)) {
@@ -1533,9 +1716,10 @@ function createChannelEl (name) {
       // move scroll bar so text is scrolled all the way up
       channelTextAreaEl.scrollTop = channelTextAreaEl.scrollHeight;
     }
-  });
+  };
+  document.addEventListener('cache-reload-done', handleCacheReloadDone);
 
-  document.addEventListener('cache-reload-error', function (event) {
+  function handleCacheReloadError (event) {
     let errorString = '\n';
     let timestampString = '';
     if (('detail' in event) && ('timestamp' in event.detail)) {
@@ -1546,7 +1730,8 @@ function createChannelEl (name) {
     }
     errorString += ' ' + cacheErrorString + '\n\n';
     channelTextAreaEl.value = errorString;
-  });
+  };
+  document.addEventListener('cache-reload-error', handleCacheReloadError);
 
   // -----------------------------------------------------------
   // Setup textarea elements as dynamically resizable
@@ -1590,11 +1775,12 @@ function createChannelEl (name) {
   //
   // Event listener for resize window (fired as global event)
   //
-  window.addEventListener('resize-custom-elements', function (event) {
+  function handleResizeCustomElements (event) {
     if (webState.dynamic.inputAreaCharWidthPx) {
       adjustChannelInputToWidowWidth();
     }
-  });
+  };
+  window.addEventListener('resize-custom-elements', handleResizeCustomElements);
 
   // Upon creating new channel window, open it unzoomed
   channelMainSectionEl.setAttribute('opened', '');
@@ -1634,6 +1820,15 @@ document.addEventListener('irc-state-changed', function (event) {
         createChannelEl(name);
       }
     };
+  }
+
+  // Update count of channels in channel menu window
+  document.getElementById('activeChannelCount').textContent =
+    ircState.channels.length.toString();
+  if (ircState.channels.length > 0) {
+    document.getElementById('activeChannelCount').removeAttribute('hidden');
+  } else {
+    document.getElementById('activeChannelCount').setAttribute('hidden', '');
   }
 
   // Check if a new channel was added, or old one /PARTed
@@ -1717,4 +1912,30 @@ document.getElementById('newChannelNameInputId').addEventListener('input', funct
 });
 document.getElementById('newChannelButton').addEventListener('click', function () {
   _newChannel();
+});
+
+// ---------------------------------------------------------
+// Update unread message count in channel menu window
+//
+// This function will loop through all channel window elements
+// For each element, build a sum of total un-read messages
+// Then update the count displayed in the channel menu widow
+// ---------------------------------------------------------
+document.addEventListener('update-channel-count', function (event) {
+  let totalCount = 0;
+  document.querySelectorAll('.channel-count-class').forEach(function (el) {
+    totalCount += parseInt(el.textContent);
+  });
+  document.getElementById('channelUnreadCountDiv').textContent = totalCount.toString();
+  if (totalCount > 0) {
+    // This is local icon at parent window to PM section
+    document.getElementById('channelUnreadCountDiv').removeAttribute('hidden');
+    // This is global icon at top of main page
+    document.getElementById('channelUnreadExistIcon').removeAttribute('hidden');
+  } else {
+    // This is local icon at parent window to PM section
+    document.getElementById('channelUnreadCountDiv').setAttribute('hidden', '');
+    // This is global icon at top of main page
+    document.getElementById('channelUnreadExistIcon').setAttribute('hidden', '');
+  }
 });
