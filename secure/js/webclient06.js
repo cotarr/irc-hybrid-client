@@ -1395,7 +1395,6 @@ function createChannelEl (name) {
       // This removes self (own element)
       // remove the channel element from DOM
       if (channelContainerDivEl.hasChildNodes()) {
-        console.log('removing node');
         channelContainerDivEl.removeChild(channelMainSectionEl);
       }
     } else {

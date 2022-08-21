@@ -24,6 +24,7 @@ of several windows to show a count of unread messages in the window.
 - Individual IRC channel window
   - Added count icon showing number of nicknames present in the IRC channel
   - Added count icon showing number of unread IRC messages in the IRC channel window
+  - Added red kicked icon in place of string appended to channel name.
 - Main page title bar
   - The icon for unread private messages (P) updated to show icon if private message count is > 0
   - The icon for unread channel messages (C) updated to show icon if private message count is >0
