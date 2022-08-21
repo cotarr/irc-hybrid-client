@@ -66,9 +66,7 @@ document.getElementById('rawHiddenElements').setAttribute('hidden','');document.
 ;document.getElementById('rawHeadRightButtons').setAttribute('hidden','');document.getElementById('hiddenDebugDiv').setAttribute('hidden','')
 ;document.getElementById('variablesDivId').setAttribute('hidden','');document.getElementById('showDebugButton').textContent='More...'}function setNotActivityIcon(index){
 document.getElementById('noticeUnreadExistIcon').removeAttribute('hidden')}function resetNotActivityIcon(index){document.getElementById('noticeUnreadExistIcon').setAttribute('hidden','')}
-let lastChanActivityIconList=[];function setChanActivityIcon(index){if(lastChanActivityIconList.indexOf(index)<0)lastChanActivityIconList.push(index)
-;document.getElementById('channelUnreadExistIcon').removeAttribute('hidden')}document.getElementById('noticeUnreadExistIcon').addEventListener('click',(function(){resetNotActivityIcon()}))
-;document.getElementById('groupInfoButton').addEventListener('click',(function(){
+document.getElementById('noticeUnreadExistIcon').addEventListener('click',(function(){resetNotActivityIcon()}));document.getElementById('groupInfoButton').addEventListener('click',(function(){
 if(document.getElementById('groupInfoHiddenDiv').hasAttribute('hidden'))document.getElementById('groupInfoHiddenDiv').removeAttribute('hidden');else document.getElementById('groupInfoHiddenDiv').setAttribute('hidden','')
 }));document.getElementById('annunciatorBackgroundDivId').removeAttribute('hidden');document.getElementById('annunciatiorDivId').removeAttribute('hidden')
 ;document.getElementById('scrollableDivId').removeAttribute('hidden');hideRawMessageWindow();function updateDivVisibility(){if(webState.webConnected){
@@ -441,18 +439,19 @@ console.log('createChannelEl: channel already exist');return}const defaultHeight
 ;const channelTopSpacerDivEl=document.createElement('div');channelTopSpacerDivEl.classList.add('vh5');const channelTopRightDivEl=document.createElement('div')
 ;channelTopRightDivEl.classList.add('head-right');const channelTopRightHidableDivEl=document.createElement('div');channelTopRightHidableDivEl.classList.add('head-right-hidable-div')
 ;const channelHideButtonEl=document.createElement('button');channelHideButtonEl.textContent='-';channelHideButtonEl.classList.add('channel-button');const channelNameDivEl=document.createElement('div')
-;channelNameDivEl.textContent=ircState.channelStates[channelIndex].name;channelNameDivEl.classList.add('chan-name-div');const channelNickCounterEl=document.createElement('div')
-;channelNickCounterEl.textContent='0';channelNickCounterEl.classList.add('nick-count');const channelMessageCounterEl=document.createElement('div');channelMessageCounterEl.textContent='0'
-;channelMessageCounterEl.classList.add('message-count');channelMessageCounterEl.classList.add('channel-count-class');channelMessageCounterEl.setAttribute('hidden','')
-;const channelTallerButtonEl=document.createElement('button');channelTallerButtonEl.textContent='Taller';channelTallerButtonEl.classList.add('channel-button')
-;const channelNormalButtonEl=document.createElement('button');channelNormalButtonEl.textContent='Normal';channelNormalButtonEl.classList.add('channel-button')
-;const channelClearButtonEl=document.createElement('button');channelClearButtonEl.textContent='Clear';channelClearButtonEl.classList.add('channel-button')
-;const channelBottomDivEl=document.createElement('div');channelBottomDivEl.classList.add('channel-bottom-div');const channelTopicDivEl=document.createElement('div')
-;channelTopicDivEl.textContent=cleanFormatting(ircState.channelStates[channelIndex].topic);channelTopicDivEl.classList.add('chan-topic-div');const channelNamesCharWidth=20
-;const channelNamesDisplayEl=document.createElement('textarea');channelNamesDisplayEl.classList.add('channel-names-display');channelNamesDisplayEl.setAttribute('cols',channelNamesCharWidth.toString())
-;channelNamesDisplayEl.setAttribute('rows',defaultHeightInRows);channelNamesDisplayEl.setAttribute('spellCheck','false');channelNamesDisplayEl.setAttribute('readonly','')
-;const channelTextAreaEl=document.createElement('textarea');const channelTextAreaId='chan'+channelIndex.toString()+'TextAreaId';channelTextAreaEl.id=channelTextAreaId
-;channelTextAreaEl.setAttribute('cols','30');channelTextAreaEl.setAttribute('rows',defaultHeightInRows);channelTextAreaEl.setAttribute('spellCheck','false')
+;channelNameDivEl.textContent=ircState.channelStates[channelIndex].name;channelNameDivEl.classList.add('chan-name-div');const channelBeenKickedIconEl=document.createElement('div')
+;channelBeenKickedIconEl.textContent='Kicked';channelBeenKickedIconEl.classList.add('been-kicked-icon');channelBeenKickedIconEl.setAttribute('hidden','')
+;const channelNickCounterEl=document.createElement('div');channelNickCounterEl.textContent='0';channelNickCounterEl.classList.add('nick-count')
+;const channelMessageCounterEl=document.createElement('div');channelMessageCounterEl.textContent='0';channelMessageCounterEl.classList.add('message-count')
+;channelMessageCounterEl.classList.add('channel-count-class');channelMessageCounterEl.setAttribute('hidden','');const channelTallerButtonEl=document.createElement('button')
+;channelTallerButtonEl.textContent='Taller';channelTallerButtonEl.classList.add('channel-button');const channelNormalButtonEl=document.createElement('button')
+;channelNormalButtonEl.textContent='Normal';channelNormalButtonEl.classList.add('channel-button');const channelClearButtonEl=document.createElement('button');channelClearButtonEl.textContent='Clear'
+;channelClearButtonEl.classList.add('channel-button');const channelBottomDivEl=document.createElement('div');channelBottomDivEl.classList.add('channel-bottom-div')
+;const channelTopicDivEl=document.createElement('div');channelTopicDivEl.textContent=cleanFormatting(ircState.channelStates[channelIndex].topic);channelTopicDivEl.classList.add('chan-topic-div')
+;const channelNamesCharWidth=20;const channelNamesDisplayEl=document.createElement('textarea');channelNamesDisplayEl.classList.add('channel-names-display')
+;channelNamesDisplayEl.setAttribute('cols',channelNamesCharWidth.toString());channelNamesDisplayEl.setAttribute('rows',defaultHeightInRows);channelNamesDisplayEl.setAttribute('spellCheck','false')
+;channelNamesDisplayEl.setAttribute('readonly','');const channelTextAreaEl=document.createElement('textarea');const channelTextAreaId='chan'+channelIndex.toString()+'TextAreaId'
+;channelTextAreaEl.id=channelTextAreaId;channelTextAreaEl.setAttribute('cols','30');channelTextAreaEl.setAttribute('rows',defaultHeightInRows);channelTextAreaEl.setAttribute('spellCheck','false')
 ;channelTextAreaEl.setAttribute('readonly','');const channelBottomDiv1El=document.createElement('div');channelBottomDiv1El.classList.add('button-div')
 ;const channelInputAreaEl=document.createElement('textarea');const channelInputAreaId='chan'+channelIndex.toString()+'InputInputId';channelInputAreaEl.id=channelInputAreaId
 ;channelInputAreaEl.setAttribute('cols','120');channelInputAreaEl.setAttribute('rows','1');channelInputAreaEl.classList.add('va-middle');channelInputAreaEl.classList.add('rm5')
@@ -474,19 +473,19 @@ console.log('createChannelEl: channel already exist');return}const defaultHeight
 ;const channelBeep2CBTitleEl=document.createElement('span');channelBeep2CBTitleEl.classList.add('channel-cb-span');channelBeep2CBTitleEl.textContent='Join-beep'
 ;const channelBeep3CBInputEl=document.createElement('input');channelBeep3CBInputEl.classList.add('channel-cb-cb');channelBeep3CBInputEl.setAttribute('type','checkbox')
 ;const channelBeep3CBTitleEl=document.createElement('span');channelBeep3CBTitleEl.classList.add('channel-cb-span');channelBeep3CBTitleEl.textContent='Name-beep'
-;channelTopLeftDivEl.appendChild(channelHideButtonEl);channelTopLeftDivEl.appendChild(channelNameDivEl);channelTopLeftDivEl.appendChild(channelNickCounterEl)
-;channelTopLeftDivEl.appendChild(channelMessageCounterEl);channelTopRightHidableDivEl.appendChild(channelJoinButtonEl);channelTopRightHidableDivEl.appendChild(channelPruneButtonEl)
-;channelTopRightHidableDivEl.appendChild(channelPartButtonEl);channelTopRightHidableDivEl.appendChild(channelZoomButtonEl);channelTopRightDivEl.appendChild(channelTopRightHidableDivEl)
-;channelTopDivEl.appendChild(channelTopLeftDivEl);channelTopDivEl.appendChild(channelTopRightDivEl);channelBottomDiv1El.appendChild(channelInputAreaEl)
-;channelBottomDiv1El.appendChild(channelSendButtonEl);channelBottomDiv2El.appendChild(channelRefreshButtonEl);channelBottomDiv2El.appendChild(channelClearButtonEl)
-;channelBottomDiv2El.appendChild(channelTallerButtonEl);channelBottomDiv2El.appendChild(channelNormalButtonEl);channelBottomDiv3El.appendChild(channelFormatCBInputEl)
-;channelBottomDiv3El.appendChild(channelFormatCBTitleEl);channelBottomDiv3El.appendChild(channelAutoCompCBInputEl);channelBottomDiv3El.appendChild(channelAutoCompCBTitleEl)
-;channelBottomDiv4El.appendChild(channelBeep1CBInputEl);channelBottomDiv4El.appendChild(channelBeep1CBTitleEl);channelBottomDiv4El.appendChild(channelBeep2CBInputEl)
-;channelBottomDiv4El.appendChild(channelBeep2CBTitleEl);channelBottomDiv4El.appendChild(channelBeep3CBInputEl);channelBottomDiv4El.appendChild(channelBeep3CBTitleEl)
-;channelBottomDivEl.appendChild(channelTopicDivEl);channelBottomDivEl.appendChild(channelNamesDisplayEl);channelBottomDivEl.appendChild(channelTextAreaEl)
-;channelBottomDivEl.appendChild(channelBottomDiv1El);channelBottomDivEl.appendChild(channelBottomDiv2El);channelBottomDivEl.appendChild(channelBottomDiv3El)
-;channelBottomDivEl.appendChild(channelBottomDiv4El);channelMainSectionEl.appendChild(channelTopDivEl);channelMainSectionEl.appendChild(channelTopSpacerDivEl)
-;channelMainSectionEl.appendChild(channelBottomDivEl)
+;channelTopLeftDivEl.appendChild(channelHideButtonEl);channelTopLeftDivEl.appendChild(channelNameDivEl);channelTopLeftDivEl.appendChild(channelBeenKickedIconEl)
+;channelTopLeftDivEl.appendChild(channelNickCounterEl);channelTopLeftDivEl.appendChild(channelMessageCounterEl);channelTopRightHidableDivEl.appendChild(channelJoinButtonEl)
+;channelTopRightHidableDivEl.appendChild(channelPruneButtonEl);channelTopRightHidableDivEl.appendChild(channelPartButtonEl);channelTopRightHidableDivEl.appendChild(channelZoomButtonEl)
+;channelTopRightDivEl.appendChild(channelTopRightHidableDivEl);channelTopDivEl.appendChild(channelTopLeftDivEl);channelTopDivEl.appendChild(channelTopRightDivEl)
+;channelBottomDiv1El.appendChild(channelInputAreaEl);channelBottomDiv1El.appendChild(channelSendButtonEl);channelBottomDiv2El.appendChild(channelRefreshButtonEl)
+;channelBottomDiv2El.appendChild(channelClearButtonEl);channelBottomDiv2El.appendChild(channelTallerButtonEl);channelBottomDiv2El.appendChild(channelNormalButtonEl)
+;channelBottomDiv3El.appendChild(channelFormatCBInputEl);channelBottomDiv3El.appendChild(channelFormatCBTitleEl);channelBottomDiv3El.appendChild(channelAutoCompCBInputEl)
+;channelBottomDiv3El.appendChild(channelAutoCompCBTitleEl);channelBottomDiv4El.appendChild(channelBeep1CBInputEl);channelBottomDiv4El.appendChild(channelBeep1CBTitleEl)
+;channelBottomDiv4El.appendChild(channelBeep2CBInputEl);channelBottomDiv4El.appendChild(channelBeep2CBTitleEl);channelBottomDiv4El.appendChild(channelBeep3CBInputEl)
+;channelBottomDiv4El.appendChild(channelBeep3CBTitleEl);channelBottomDivEl.appendChild(channelTopicDivEl);channelBottomDivEl.appendChild(channelNamesDisplayEl)
+;channelBottomDivEl.appendChild(channelTextAreaEl);channelBottomDivEl.appendChild(channelBottomDiv1El);channelBottomDivEl.appendChild(channelBottomDiv2El)
+;channelBottomDivEl.appendChild(channelBottomDiv3El);channelBottomDivEl.appendChild(channelBottomDiv4El);channelMainSectionEl.appendChild(channelTopDivEl)
+;channelMainSectionEl.appendChild(channelTopSpacerDivEl);channelMainSectionEl.appendChild(channelBottomDivEl)
 ;if(channelContainerDivEl.firstChild)channelContainerDivEl.insertBefore(channelMainSectionEl,channelContainerDivEl.firstChild);else channelContainerDivEl.appendChild(channelMainSectionEl)
 ;if(ircState.channelStates[initIrcStateIndex].joined)hideRawMessageWindow();let activityIconInhibitTimer=0;const channelIntervalTimer=setInterval((function(){
 if(activityIconInhibitTimer>0)activityIconInhibitTimer--}),1e3);setTimeout((function(){
@@ -598,15 +597,15 @@ channelInputAreaEl.value=channelInputAreaEl.value.slice(0,channelInputAreaEl.val
 ;for(let i=0;i<ircState.channelStates[index].names.length;i++)if('@'===ircState.channelStates[index].names[i].charAt(0))opList.push(ircState.channelStates[index].names[i]);else otherList.push(ircState.channelStates[index].names[i])
 ;const sortedOpList=opList.sort();const sortedOtherList=otherList.sort();if(sortedOpList.length>0)for(let i=0;i<sortedOpList.length;i++){channelNamesDisplayEl.value+=sortedOpList[i]+'\n'
 ;if(maxNickLength<sortedOpList[i].length)maxNickLength=sortedOpList[i].length}if(sortedOtherList.length>0)for(let i=0;i<sortedOtherList.length;i++){channelNamesDisplayEl.value+=sortedOtherList[i]+'\n'
-;if(maxNickLength<sortedOtherList[i].length)maxNickLength=sortedOtherList[i].length}}}}_updateNickList();function _updateChannelTitle(){let titleStr=name;let nickCount=0
-;const index=ircState.channels.indexOf(name.toLowerCase());if(index>=0)if(ircState.channelStates[index].kicked)titleStr+=' (Kicked)';else nickCount=ircState.channelStates[index].names.length
-;channelNameDivEl.textContent=titleStr;channelNickCounterEl.textContent=nickCount.toString()}_updateChannelTitle();function _isNickInChannel(nickString,channelString){
-if(!nickString||0===nickString.length)return false;if(0===ircState.channels.length)return false;let channelIndex=-1
+;if(maxNickLength<sortedOtherList[i].length)maxNickLength=sortedOtherList[i].length}}}}_updateNickList();function _updateChannelTitle(){const titleStr=name;let nickCount=0
+;const index=ircState.channels.indexOf(name.toLowerCase());if(index>=0)if(ircState.channelStates[index].kicked)channelBeenKickedIconEl.removeAttribute('hidden');else{
+channelBeenKickedIconEl.setAttribute('hidden','');nickCount=ircState.channelStates[index].names.length}channelNameDivEl.textContent=titleStr;channelNickCounterEl.textContent=nickCount.toString()}
+_updateChannelTitle();function _isNickInChannel(nickString,channelString){if(!nickString||0===nickString.length)return false;if(0===ircState.channels.length)return false;let channelIndex=-1
 ;for(let i=0;i<ircState.channels.length;i++)if(channelString.toLowerCase()===ircState.channels[i].toLowerCase())channelIndex=i;if(channelIndex<0)return false
 ;if(0===ircState.channelStates[channelIndex].names.length)return false;let pureNick=nickString.toLowerCase()
 ;if(nicknamePrefixChars.indexOf(pureNick.charAt(0))>=0)pureNick=pureNick.slice(1,pureNick.length);let present=false;for(let i=0;i<ircState.channelStates[channelIndex].names.length;i++){
 let checkNick=ircState.channelStates[channelIndex].names[i].toLowerCase();if(nicknamePrefixChars.indexOf(checkNick.charAt(0))>=0)checkNick=checkNick.slice(1,checkNick.length)
-;if(checkNick===pureNick)present=true}return present}function handleIrcStateChanged(event){const ircStateIndex=ircState.channels.indexOf(name.toLowerCase());if(ircStateIndex<0){
+;if(checkNick===pureNick)present=true}return present}function handleIrcStateChanged(event){const ircStateIndex=ircState.channels.indexOf(name.toLowerCase());if(ircStateIndex<0&&ircState.ircConnected){
 const webStateChannelsIndex=webState.channels.indexOf(name.toLowerCase());if(webStateChannelsIndex>=0){webState.channels.splice(webStateChannelsIndex,1)
 ;webState.channelStates.splice(webStateChannelsIndex,1)}clearInterval(channelIntervalTimer);document.removeEventListener('show-all-divs',handleShowAllDivs)
 ;document.removeEventListener('hide-or-zoom',handleHideOrZoom);document.removeEventListener('cancel-beep-sounds',handleCancelBeepSounds)
@@ -614,8 +613,8 @@ const webStateChannelsIndex=webState.channels.indexOf(name.toLowerCase());if(web
 ;document.removeEventListener('erase-before-reload',handleEraseBeforeReload);document.removeEventListener('cache-reload-done',handleCacheReloadDone)
 ;document.removeEventListener('cache-reload-error',handleCacheReloadError);window.removeEventListener('resize-custom-elements',handleResizeCustomElements)
 ;document.getElementById('channelUnreadExistIcon').removeEventListener('click',handleChannelUnreadExist)
-;document.getElementById('channelUnreadCountDiv').removeEventListener('click',handleChannelCountDivClick);channelContainerDivEl.removeChild(channelMainSectionEl)}else{
-const webStateIndex=webState.channels.indexOf(name.toLowerCase())
+;document.getElementById('channelUnreadCountDiv').removeEventListener('click',handleChannelCountDivClick);if(channelContainerDivEl.hasChildNodes()){console.log('removing node')
+;channelContainerDivEl.removeChild(channelMainSectionEl)}}else{const webStateIndex=webState.channels.indexOf(name.toLowerCase())
 ;if(ircStateIndex>=0&&webStateIndex>=0)if(ircState.channelStates[ircStateIndex].joined!==webState.channelStates[webStateIndex].lastJoined){
 if(ircState.channelStates[ircStateIndex].joined&&!webState.channelStates[webStateIndex].lastJoined){channelBottomDivEl.removeAttribute('hidden');channelHideButtonEl.textContent='-'}
 webState.channelStates[webStateIndex].lastJoined=ircState.channelStates[ircStateIndex].joined}_updateNickList();_updateChannelTitle();updateVisibility()}}

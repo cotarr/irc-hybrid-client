@@ -249,6 +249,12 @@ function createChannelEl (name) {
   channelNameDivEl.textContent = ircState.channelStates[channelIndex].name;
   channelNameDivEl.classList.add('chan-name-div');
 
+  // CHannel has been kicked icon
+  const channelBeenKickedIconEl = document.createElement('div');
+  channelBeenKickedIconEl.textContent = 'Kicked';
+  channelBeenKickedIconEl.classList.add('been-kicked-icon');
+  channelBeenKickedIconEl.setAttribute('hidden', '');
+
   // Channel message activity counter
   const channelNickCounterEl = document.createElement('div');
   channelNickCounterEl.textContent = '0';
@@ -408,6 +414,7 @@ function createChannelEl (name) {
 
   channelTopLeftDivEl.appendChild(channelHideButtonEl);
   channelTopLeftDivEl.appendChild(channelNameDivEl);
+  channelTopLeftDivEl.appendChild(channelBeenKickedIconEl);
   channelTopLeftDivEl.appendChild(channelNickCounterEl);
   channelTopLeftDivEl.appendChild(channelMessageCounterEl);
 
@@ -1309,13 +1316,14 @@ function createChannelEl (name) {
   // Append user count to the end of the channel name string in title area
   //
   function _updateChannelTitle () {
-    let titleStr = name;
+    const titleStr = name;
     let nickCount = 0;
     const index = ircState.channels.indexOf(name.toLowerCase());
     if (index >= 0) {
       if (ircState.channelStates[index].kicked) {
-        titleStr += ' (Kicked)';
+        channelBeenKickedIconEl.removeAttribute('hidden');
       } else {
+        channelBeenKickedIconEl.setAttribute('hidden', '');
         nickCount = ircState.channelStates[index].names.length;
       }
     }
@@ -1353,8 +1361,11 @@ function createChannelEl (name) {
 
   function handleIrcStateChanged (event) {
     // console.log('Event: irc-state-changed (createChannelEl)');
+    // console.log(JSON.stringify(name, null, 2));
+    // console.log(JSON.stringify(ircState.channels));
+    // console.log(JSON.stringify(ircState.channelStates, null, 2));
     const ircStateIndex = ircState.channels.indexOf(name.toLowerCase());
-    if (ircStateIndex < 0) {
+    if ((ircStateIndex < 0) && (ircState.ircConnected)) {
       //
       // Case of channel has been pruned from the IRC client
       //
@@ -1383,7 +1394,10 @@ function createChannelEl (name) {
 
       // This removes self (own element)
       // remove the channel element from DOM
-      channelContainerDivEl.removeChild(channelMainSectionEl);
+      if (channelContainerDivEl.hasChildNodes()) {
+        console.log('removing node');
+        channelContainerDivEl.removeChild(channelMainSectionEl);
+      }
     } else {
       //
       // If channel was previously joined, then parted, then re-joined

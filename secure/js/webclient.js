@@ -442,15 +442,6 @@ function resetNotActivityIcon (index) {
   document.getElementById('noticeUnreadExistIcon').setAttribute('hidden', '');
 }
 
-// -1 indicates icon is available to be shown
-let lastChanActivityIconList = [];
-function setChanActivityIcon (index) {
-  if (lastChanActivityIconList.indexOf(index) < 0) {
-    lastChanActivityIconList.push(index);
-  }
-  document.getElementById('channelUnreadExistIcon').removeAttribute('hidden');
-}
-
 // --------------------------
 // Clear message activity ICONs by tapping icon
 // --------------------------

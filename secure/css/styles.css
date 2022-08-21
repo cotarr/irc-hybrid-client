@@ -123,6 +123,21 @@ button[disabled] {
 .annunciator-wait-icon[hidden] {
   display: none;
 }
+.been-kicked-icon {
+  background-color: #ff0000;
+  border: 0px solid black;
+  border-radius: 12px;
+  color: #ffffff;
+  display: inline-block;
+  font-weight: bold;
+  margin-left: 2px;
+  margin-right: 0px;
+  padding: 0px 3px 0px 3px;
+  text-align: center;
+}
+.been-kicked-icon[hidden] {
+display: none;
+}
 
 .bm10 {margin-bottom: 10px;}
 
