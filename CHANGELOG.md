@@ -37,6 +37,10 @@ of several windows to show a count of unread messages in the window.
 - General code cleanup  of browser code in webclient06.js (IRC Channel) and webclient07.js (Private messages)
 - Fixed - Several setInterval timers were being duplicated when reloading cache.
 
+### Changed
+
+- server/irc-client.js - In the NodeJs backend, the arrays ircState.channels[] and ircState.channelStates[] are initialized (empty) during the IRC connection process. Now these arrays are also cleared upon IRC disconnect. This change was needed for logic in the browser to properly parse the ircState object to release resources for destroyed windows. 
+
 ## [v0.2.9](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.9) 2022-08-16
 
 This is a feature upgrade to add automatic IRC server rotation. Previously, each different server definition was a stand alone configuration containing only one single IRC server address. This upgrade introduces a new integer group number property to the server definition. Group 0 is reserved for stand alone servers.

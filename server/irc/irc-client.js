@@ -780,6 +780,9 @@
         vars.ircState.ircRegistered = false;
         vars.ircState.ircIsAway = false;
         vars.ircState.nickRecoveryActive = false;
+        vars.ircState.channels = [];
+        vars.ircState.channelStates = [];
+
         // clear watchdog timer
         if (watchdogTimer) clearTimeout(watchdogTimer);
         if (hadError) {
@@ -827,6 +830,8 @@
         vars.ircState.ircRegistered = false;
         vars.ircState.ircIsAway = false;
         vars.ircState.nickRecoveryActive = false;
+        vars.ircState.channels = [];
+        vars.ircState.channelStates = [];
         if ((vars.ircState.ircConnectOn) && (vars.ircState.count.ircConnect === 0)) {
           // Case of socket error when not previously connected, cancel auto-connect
           vars.ircState.ircConnectOn = false;
@@ -1011,6 +1016,8 @@
         vars.ircState.ircRegistered = false;
         vars.ircState.ircIsAway = false;
         vars.ircState.nickRecoveryActive = false;
+        vars.ircState.channels = [];
+        vars.ircState.channelStates = [];
         if ((vars.ircState.ircConnectOn) && (vars.ircState.count.ircConnect === 0)) {
           // Case of socket error when not previously connected, cancel auto-connect
           vars.ircState.ircConnectOn = false;

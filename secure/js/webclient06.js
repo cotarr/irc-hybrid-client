@@ -651,11 +651,6 @@ function createChannelEl (name) {
             console.log(error);
           });
       }
-    } else {
-      // Special case - channel removed from outsdie this web page.
-      // Most likely you are logged into two devices.
-      // Channel is gone, remove from DOM using prune button
-      _removeChannelFromDom();
     }
   });
 
@@ -1359,21 +1354,26 @@ function createChannelEl (name) {
     return present;
   } // _nickInChannel()
 
+  //
+  // For each channel, handle changes in the ircState object
+  //
   function handleIrcStateChanged (event) {
-    // console.log('Event: irc-state-changed (createChannelEl)');
-    // console.log(JSON.stringify(name, null, 2));
+    // console.log('Event: irc-state-changed changed element: ' + name);
+    // console.log('connected ', ircState.ircConnected);
+    // console.log('name: ', name);
     // console.log(JSON.stringify(ircState.channels));
     // console.log(JSON.stringify(ircState.channelStates, null, 2));
-    const ircStateIndex = ircState.channels.indexOf(name.toLowerCase());
-    if ((ircStateIndex < 0) && (ircState.ircConnected)) {
-      //
-      // Case of channel has been pruned from the IRC client
-      //
-      // remove frontend browser state info for this channel
-      const webStateChannelsIndex = webState.channels.indexOf(name.toLowerCase());
-      if (webStateChannelsIndex >= 0) {
-        webState.channels.splice(webStateChannelsIndex, 1);
-        webState.channelStates.splice(webStateChannelsIndex, 1);
+    // console.log(JSON.stringify(webState.channels));
+    // console.log(JSON.stringify(webState.channelStates, null, 2));
+    //
+    // Internal function to release channel resources if channel is removed
+    //
+    function _removeSelfFromDOM () {
+      // remove browser resources for this channel
+      const webStateChannelIndex = webState.channels.indexOf(name.toLowerCase());
+      if (webStateChannelIndex >= 0) {
+        webState.channels.splice(webStateChannelIndex, 1);
+        webState.channelStates.splice(webStateChannelIndex, 1);
       }
       // remove interval cycle timers
       clearInterval(channelIntervalTimer);
@@ -1391,18 +1391,34 @@ function createChannelEl (name) {
         .removeEventListener('click', handleChannelUnreadExist);
       document.getElementById('channelUnreadCountDiv')
         .removeEventListener('click', handleChannelCountDivClick);
-
       // This removes self (own element)
-      // remove the channel element from DOM
-      if (channelContainerDivEl.hasChildNodes()) {
+      if (channelContainerDivEl.contains(channelMainSectionEl)) {
+        // remove the channel element from DOM
         channelContainerDivEl.removeChild(channelMainSectionEl);
       }
-    } else {
+    }
+
+    const ircStateIndex = ircState.channels.indexOf(name.toLowerCase());
+    const webStateIndex = webState.channels.indexOf(name.toLowerCase());
+
+    if ((ircState.ircConnected) && (ircStateIndex < 0) && (webStateIndex >= 0)) {
+      // console.log('pruned removing from DOM');
+      //
+      // Case of channel has been pruned from the IRC client with [Prune] button
+      _removeSelfFromDOM();
+    } else if ((!ircState.ircConnected)) {
+      // console.log('disconnected removing from DOM');
+      //
+      // Case of disconnect from IRC, any channel windows are no longer valid
+      // This function is executing due to active irc-state-changed event
+      // within the channel window scope. Therefore... remove it.
+      _removeSelfFromDOM();
+    } else if (ircState.ircConnected) {
+      // console.log('connected, no DOM changes');
       //
       // If channel was previously joined, then parted, then re-joined
       // Check for joined change to true and show channel if hidden
       //
-      const webStateIndex = webState.channels.indexOf(name.toLowerCase());
       if ((ircStateIndex >= 0) && (webStateIndex >= 0)) {
         if (ircState.channelStates[ircStateIndex].joined !==
           webState.channelStates[webStateIndex].lastJoined) {
@@ -1422,6 +1438,8 @@ function createChannelEl (name) {
       _updateChannelTitle();
       // show/hide disable or enable channel elements depend on state
       updateVisibility();
+    } else {
+      // console.log('handleIrcStateChanged: Error no options match');
     }
   };
   document.addEventListener('irc-state-changed', handleIrcStateChanged);
@@ -1822,7 +1840,10 @@ function createChannelEl (name) {
 let lastJoinedChannelCount = -1;
 let lastIrcServerIndex = -1;
 document.addEventListener('irc-state-changed', function (event) {
-  // console.log('checking for channel updates');
+  // console.log('Event irc-state-changed - global - checking for channel updates');
+  // console.log('connected ', ircState.ircConnected);
+  // console.log(JSON.stringify(ircState.channels));
+  // console.log(JSON.stringify(webState.channels));
 
   // Check list of server's channels and create new if missing.
   if (ircState.channels.length > 0) {
@@ -1835,17 +1856,8 @@ document.addEventListener('irc-state-changed', function (event) {
     };
   }
 
-  // Update count of channels in channel menu window
-  document.getElementById('activeChannelCount').textContent =
-    ircState.channels.length.toString();
-  if (ircState.channels.length > 0) {
-    document.getElementById('activeChannelCount').removeAttribute('hidden');
-  } else {
-    document.getElementById('activeChannelCount').setAttribute('hidden', '');
-  }
-
   // Check if a new channel was added, or old one /PARTed
-  // if so re-create channel join buttions from the favorite channel list
+  // if so re-create channel join buttons from the favorite channel list
   //
   let needButtonUpdate = false;
   let joinedChannelCount = 0;
@@ -1862,6 +1874,10 @@ document.addEventListener('irc-state-changed', function (event) {
     needButtonUpdate = true;
     lastIrcServerIndex = ircState.ircServerIndex;
   }
+
+  // Update count of channels in channel menu window
+  document.getElementById('activeChannelCount').textContent =
+    joinedChannelCount.toString();
 
   if (needButtonUpdate) {
     // console.log('Updating favorite channel buttons');
