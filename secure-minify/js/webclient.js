@@ -685,13 +685,14 @@ window.addEventListener('resize-custom-elements',handleResizeCustomElements);cha
 if(ircState.channels.length>0)for(let i=0;i<ircState.channels.length;i++){const name=ircState.channels[i];if(-1===webState.channels.indexOf(name.toLowerCase()))createChannelEl(name)}
 let needButtonUpdate=false;let joinedChannelCount=0;if(ircState.channels.length>0)for(let i=0;i<ircState.channels.length;i++)if(ircState.channelStates[i].joined)joinedChannelCount++
 ;if(joinedChannelCount!==lastJoinedChannelCount){needButtonUpdate=true;lastJoinedChannelCount=joinedChannelCount}if(ircState.ircServerIndex!==lastIrcServerIndex){needButtonUpdate=true
-;lastIrcServerIndex=ircState.ircServerIndex}document.getElementById('activeChannelCount').textContent=joinedChannelCount.toString();if(needButtonUpdate){
-const channelJoinButtonContainerEl=document.getElementById('channelJoinButtonContainer')
-;while(channelJoinButtonContainerEl.firstChild)channelJoinButtonContainerEl.removeChild(channelJoinButtonContainerEl.firstChild)
-;if(ircState.channelList.length>0)for(let i=0;i<ircState.channelList.length;i++){const channelIndex=ircState.channels.indexOf(ircState.channelList[i].toLowerCase())
+;lastIrcServerIndex=ircState.ircServerIndex}document.getElementById('activeChannelCount').textContent=joinedChannelCount.toString();function _handleChannelButtonClick(event){
+const channelName=document.getElementById(event.target.id).textContent;if(channelName.length>0){_sendIrcServerMessage('JOIN '+channelName);hideRawMessageWindow()}}if(needButtonUpdate){
+const channelJoinButtonContainerEl=document.getElementById('channelJoinButtonContainer');while(channelJoinButtonContainerEl.firstChild){
+channelJoinButtonContainerEl.firstChild.removeEventListener('click',_handleChannelButtonClick);channelJoinButtonContainerEl.removeChild(channelJoinButtonContainerEl.firstChild)}
+if(ircState.channelList.length>0)for(let i=0;i<ircState.channelList.length;i++){const channelIndex=ircState.channels.indexOf(ircState.channelList[i].toLowerCase())
 ;if(channelIndex<0||!ircState.channelStates[channelIndex].joined){const joinButtonEl=document.createElement('button');joinButtonEl.textContent=ircState.channelList[i]
-;joinButtonEl.classList.add('channel-button');channelJoinButtonContainerEl.appendChild(joinButtonEl);joinButtonEl.addEventListener('click',(function(){
-_sendIrcServerMessage('JOIN '+ircState.channelList[i]);hideRawMessageWindow()}))}}}}));document.getElementById('ircChannelsMainHiddenButton').addEventListener('click',(function(){
+;joinButtonEl.classList.add('channel-button');joinButtonEl.id='joinButton'+i.toString();channelJoinButtonContainerEl.appendChild(joinButtonEl)
+;joinButtonEl.addEventListener('click',_handleChannelButtonClick)}}}}));document.getElementById('ircChannelsMainHiddenButton').addEventListener('click',(function(){
 if(document.getElementById('ircChannelsMainHiddenDiv').hasAttribute('hidden')){document.getElementById('ircChannelsMainHiddenDiv').removeAttribute('hidden')
 ;document.getElementById('ircChannelsMainHiddenButton').textContent='-'}else{document.getElementById('ircChannelsMainHiddenDiv').setAttribute('hidden','')
 ;document.getElementById('ircChannelsMainHiddenButton').textContent='+'}}));function _newChannel(){const newChannel=document.getElementById('newChannelNameInputId').value

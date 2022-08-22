@@ -1386,8 +1386,9 @@ function createChannelEl (name) {
     // console.log(JSON.stringify(webState.channels));
     // console.log(JSON.stringify(webState.channelStates, null, 2));
     //
+    // ----------------------------------------------------------------------
     // Internal function to release channel resources if channel is removed
-    //
+    // ----------------------------------------------------------------------
     function _removeSelfFromDOM () {
       // remove browser resources for this channel
       const webStateChannelIndex = webState.channels.indexOf(name.toLowerCase());
@@ -1912,11 +1913,27 @@ document.addEventListener('irc-state-changed', function (event) {
   document.getElementById('activeChannelCount').textContent =
     joinedChannelCount.toString();
 
+  // Event handler for button click to open new IRC channel
+  // windows and /JOIN the channel named on the button.
+  function _handleChannelButtonClick (event) {
+    const channelName = document.getElementById(event.target.id).textContent;
+    if (channelName.length > 0) {
+      // console.log('channelName ' + channelName);
+      _sendIrcServerMessage('JOIN ' + channelName);
+      hideRawMessageWindow();
+    }
+  }
+
+  // In the case of the number of joined channels has changed,
+  // remove all channel buttons, then create them,
+  // skipping any that are currently open.
   if (needButtonUpdate) {
     // console.log('Updating favorite channel buttons');
-    // remove old button elements
+    // remove old button elements and associated event listeners
     const channelJoinButtonContainerEl = document.getElementById('channelJoinButtonContainer');
     while (channelJoinButtonContainerEl.firstChild) {
+      channelJoinButtonContainerEl.firstChild
+        .removeEventListener('click', _handleChannelButtonClick);
       channelJoinButtonContainerEl.removeChild(channelJoinButtonContainerEl.firstChild);
     }
     if (ircState.channelList.length > 0) {
@@ -1927,11 +1944,9 @@ document.addEventListener('irc-state-changed', function (event) {
           const joinButtonEl = document.createElement('button');
           joinButtonEl.textContent = ircState.channelList[i];
           joinButtonEl.classList.add('channel-button');
+          joinButtonEl.id = 'joinButton' + i.toString();
           channelJoinButtonContainerEl.appendChild(joinButtonEl);
-          joinButtonEl.addEventListener('click', function () {
-            _sendIrcServerMessage('JOIN ' + ircState.channelList[i]);
-            hideRawMessageWindow();
-          });
+          joinButtonEl.addEventListener('click', _handleChannelButtonClick);
         }
       } // next i
     }

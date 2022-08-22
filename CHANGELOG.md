@@ -9,7 +9,20 @@ and this project adheres to
 ## Next 2022-08-20
 
 This is a feature upgrade. Counter icons have been added to the top 
-of several windows to show a count of unread messages in the window.
+of several windows to show a count of unread messages in each window.
+
+In the process of incrementing counters inside event listeners for 
+dynamically generated html elements, it became apparent that 
+duplicate event listeners were being created.
+After the code changes in this edit, opening the web page to an IRC connected
+backend shows 83 event listeners plus one for each channel button.
+Thus with 4 channel buttons, the base number of event listeners is 87.
+Each IRC channel /JOIN increases the count by 29 event listeners.
+Each private message window increases the count by 21 event listeners.
+After closing windows or reconnecting to IRC, after a short time,
+the total count of event listeners in Chrome dev tools performance tab 
+appears to properly garbage collect back to the base number of 87. This appears to be 
+addressed, but hopefully didn't introduce any unrelated new issues.
 
 ### Added
 
@@ -19,7 +32,7 @@ of several windows to show a count of unread messages in the window.
 - Individual private message window
   - Added count icon showing the number of unread messages in the private message window.
 - IRC channel launch window (menu window)
-  - Added count icon showing the the number of channel windows that exist
+  - Added count icon showing the the number of joined channel windows that exist
   - Added count icon showing the total number of unread messages in all channel windows
 - Individual IRC channel window
   - Added count icon showing number of nicknames present in the IRC channel
@@ -27,19 +40,19 @@ of several windows to show a count of unread messages in the window.
   - Added red kicked icon in place of string appended to channel name.
 - Main page title bar
   - The icon for unread private messages (P) updated to show icon if private message count is > 0
-  - The icon for unread channel messages (C) updated to show icon if private message count is >0
+  - The icon for unread channel messages (C) updated to show icon if private message count is > 0
 
 ### Fixed
 
 - Fixed - Use of [Prune] button to remove channel not mirrored to concurrent browser connections.
 - Fixed - After selecting the [erase cache] button, private message windows could not be opened.
-- Fixed - Found several global event listeners that were being duplicated when refreshing the message cache. The was observed to cause multiple count increments when new messages were received and counted for the new count icons added with this upgrade.
-- General code cleanup  of browser code in webclient06.js (IRC Channel) and webclient07.js (Private messages)
+- Fixed - Addressed several global event listeners that were being duplicated when refreshing the message cache or reconnecting to the IRC network.
 - Fixed - Several setInterval timers were being duplicated when reloading cache.
+- General code cleanup  of browser code in webclient06.js (IRC Channel) and webclient07.js (Private messages)
 
 ### Changed
 
-- server/irc-client.js - In the NodeJs backend, the arrays ircState.channels[] and ircState.channelStates[] are initialized (empty) during the IRC connection process. Now these arrays are also cleared upon IRC disconnect. This change was needed for logic in the browser to properly parse the ircState object to release resources for destroyed windows. 
+- server/irc-client.js - API change. In the NodeJs backend, previously, the arrays ircState.channels[] and ircState.channelStates[] are initialized (empty) during the IRC connection process. Now these arrays are also cleared upon IRC disconnect. This change was needed for logic in the browser to properly parse the ircState object to release resources for destroyed windows. 
 
 ## [v0.2.9](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.9) 2022-08-16
 
