@@ -550,7 +550,7 @@ function createChannelEl (name) {
   // -------------------------
   // Show/Hide button handler
   // -------------------------
-  channelHideButtonEl.addEventListener('click', function () {
+  function handleChannelHideButtonElClick (event) {
     if (channelMainSectionEl.hasAttribute('opened')) {
       channelMainSectionEl.removeAttribute('opened');
       channelMainSectionEl.removeAttribute('zoom');
@@ -560,57 +560,63 @@ function createChannelEl (name) {
       clearLastZoom();
     }
     updateVisibility();
-  });
+  };
+  channelHideButtonEl.addEventListener('click', handleChannelHideButtonElClick);
 
   // -------------------------
   // Taller button handler
   // -------------------------
-  channelTallerButtonEl.addEventListener('click', function () {
+  function handleChannelTallerButtonElClick (event) {
     const newRows = parseInt(channelTextAreaEl.getAttribute('rows')) + 10;
     channelTextAreaEl.setAttribute('rows', newRows.toString());
     channelNamesDisplayEl.setAttribute('rows', newRows.toString());
     channelInputAreaEl.setAttribute('rows', '3');
-  }); // createChannelEl()
+  }; // createChannelEl()
+  channelTallerButtonEl.addEventListener('click', handleChannelTallerButtonElClick);
 
   // -------------------------
   // Normal button handler
   // -------------------------
-  channelNormalButtonEl.addEventListener('click', function () {
+  function handleChannelNormalButtonElClick (event) {
     channelTextAreaEl.setAttribute('rows', defaultHeightInRows);
     channelNamesDisplayEl.setAttribute('rows', defaultHeightInRows);
     channelInputAreaEl.setAttribute('rows', '1');
-  });
+  };
+  channelNormalButtonEl.addEventListener('click', handleChannelNormalButtonElClick);
 
   // -------------------------
   // Clear button handler
   // -------------------------
-  channelClearButtonEl.addEventListener('click', function () {
+  function handleChannelClearButtonElClick (event) {
     channelTextAreaEl.value = '';
     channelTextAreaEl.setAttribute('rows', defaultHeightInRows);
     channelNamesDisplayEl.setAttribute('rows', defaultHeightInRows);
     channelInputAreaEl.setAttribute('rows', '1');
-  });
+  };
+  channelClearButtonEl.addEventListener('click', handleChannelClearButtonElClick);
 
   // -------------------------
   // Join button handler
   // -------------------------
-  channelJoinButtonEl.addEventListener('click', function () {
+  function handleChannelJoinButtonElClick (event) {
     const message = 'JOIN ' + name;
     _sendIrcServerMessage(message);
-  });
+  };
+  channelJoinButtonEl.addEventListener('click', handleChannelJoinButtonElClick);
 
   // -------------------------
   // Part button handler
   // -------------------------
-  channelPartButtonEl.addEventListener('click', function () {
+  function handleChannelPartButtonElClick (event) {
     const message = 'PART ' + name + ' :' + ircState.progName + ' ' + ircState.progVersion;
     _sendIrcServerMessage(message);
-  });
+  };
+  channelPartButtonEl.addEventListener('click', handleChannelPartButtonElClick);
 
   // -------------------------
   // Prune button handler
   // -------------------------
-  channelPruneButtonEl.addEventListener('click', function () {
+  function handleChannelPruneButtonElClick (event) {
     // Fetch API to remove channel from backend server
     const index = ircState.channels.indexOf(name.toLowerCase());
     if (index >= 0) {
@@ -652,12 +658,13 @@ function createChannelEl (name) {
           });
       }
     }
-  });
+  };
+  channelPruneButtonEl.addEventListener('click', handleChannelPruneButtonElClick);
 
   // -------------------------
   // Refresh button handler
   // -------------------------
-  channelRefreshButtonEl.addEventListener('click', function () {
+  function handleChannelRefreshButtonElClick (event) {
     if (!webState.cacheReloadInProgress) {
       // this forces a global update which will refreesh text area
       document.dispatchEvent(new CustomEvent('update-from-cache', { bubbles: true }));
@@ -667,22 +674,24 @@ function createChannelEl (name) {
       // channelNamesDisplayEl.value = '';
       // _sendIrcServerMessage('NAMES ' + name);
     }
-  });
+  };
+  channelRefreshButtonEl.addEventListener('click', handleChannelRefreshButtonElClick);
 
   // -------------
   // send button
   // -------------
-  channelSendButtonEl.addEventListener('click', function () {
+  function handleChannelSendButtonElClick (event) {
     _sendTextToChannel(channelIndex, channelInputAreaEl);
     channelInputAreaEl.focus();
     resetMessageCount();
     activityIconInhibitTimer = activityIconInhibitTimerValue;
-  });
+  };
+  channelSendButtonEl.addEventListener('click', handleChannelSendButtonElClick);
 
   // ---------------
   // Enter pressed
   // ---------------
-  channelInputAreaEl.addEventListener('input', function (event) {
+  function handleChannelInputAreaElInput (event) {
     if (((event.inputType === 'insertText') && (event.data === null)) ||
       (event.inputType === 'insertLineBreak')) {
       // Remove EOL characters at cursor loction
@@ -691,7 +700,8 @@ function createChannelEl (name) {
       resetMessageCount();
       activityIconInhibitTimer = activityIconInhibitTimerValue;
     }
-  });
+  };
+  channelInputAreaEl.addEventListener('input', handleChannelInputAreaElInput);
 
   // ------------------------------------------------
   // Clear unread message activity ICON by click
@@ -700,31 +710,34 @@ function createChannelEl (name) {
   // This is to preserve activity icon when
   // clicking the [+] to expand the section
   // -------------------------------------------------
-  channelBottomDivEl.addEventListener('click', function () {
+  function handleChannelBottomDivElClick (event) {
     resetMessageCount();
     activityIconInhibitTimer = activityIconInhibitTimerValue;
-  });
+  };
+  channelBottomDivEl.addEventListener('click', handleChannelBottomDivElClick);
 
   // Clear unread message activity ICON by clicking this channel activity icon
-  channelMessageCounterEl.addEventListener('click', function () {
+  function handleChannelMessageCounterElClick (event) {
     resetMessageCount();
     activityIconInhibitTimer = activityIconInhibitTimerValue;
-  });
+  };
+  channelMessageCounterEl.addEventListener('click', handleChannelMessageCounterElClick);
+
   // Clear unread message activity counters when activity
   // counter in the channel menu window is clicked
-  function handleChannelCountDivClick () {
+  function handleChannelUnreadCountDivClick () {
     resetMessageCount();
   };
   document.getElementById('channelUnreadCountDiv')
-    .addEventListener('click', handleChannelCountDivClick);
+    .addEventListener('click', handleChannelUnreadCountDivClick);
 
-  // Clear unread message activity counters when activity
-  // counter at top of Main page is clicked
-  function handleChannelUnreadExist () {
+  // Clear unread message activity counters when activity icon
+  // tt top of Main page is clicked
+  function handleChannelUnreadExistIconClick () {
     resetMessageCount();
   };
   document.getElementById('channelUnreadExistIcon')
-    .addEventListener('click', handleChannelUnreadExist);
+    .addEventListener('click', handleChannelUnreadExistIconClick);
 
   function updateVisibility () {
     const index = ircState.channels.indexOf(name.toLowerCase());
@@ -830,7 +843,7 @@ function createChannelEl (name) {
   // -------------------------
   // Zoom button handler
   // -------------------------
-  channelZoomButtonEl.addEventListener('click', function () {
+  function handleChannelZoomButtonElClick (event) {
     if (channelMainSectionEl.hasAttribute('zoom')) {
       // Turn off channel zoom
       channelMainSectionEl.removeAttribute('zoom');
@@ -856,7 +869,8 @@ function createChannelEl (name) {
       // temporary comment debug zoom refresh issue
       // window.localStorage.setItem('lastZoom', JSON.stringify(lastZoomObj));
     }
-  });
+  };
+  channelZoomButtonEl.addEventListener('click', handleChannelZoomButtonElClick);
 
   // ----------------
   // show all event
@@ -978,7 +992,7 @@ function createChannelEl (name) {
   // -------------------------
   // Beep On Message checkbox handler
   // -------------------------
-  channelBeep1CBInputEl.addEventListener('click', function (e) {
+  function handleChannelBeep1CBInputElClick (event) {
     if (channelMainSectionEl.hasAttribute('beep1-enabled')) {
       channelMainSectionEl.removeAttribute('beep1-enabled');
     } else {
@@ -987,12 +1001,13 @@ function createChannelEl (name) {
     }
     updateLocalStorageBeepEnable();
     updateVisibility();
-  });
+  };
+  channelBeep1CBInputEl.addEventListener('click', handleChannelBeep1CBInputElClick);
 
   // -------------------------
   // Beep On Join checkbox handler
   // -------------------------
-  channelBeep2CBInputEl.addEventListener('click', function (e) {
+  function handleChannelBeep2CBInputElClick (event) {
     if (channelMainSectionEl.hasAttribute('beep2-enabled')) {
       channelMainSectionEl.removeAttribute('beep2-enabled');
     } else {
@@ -1001,12 +1016,13 @@ function createChannelEl (name) {
     }
     updateLocalStorageBeepEnable();
     updateVisibility();
-  });
+  };
+  channelBeep2CBInputEl.addEventListener('click', handleChannelBeep2CBInputElClick);
 
   // -------------------------
   // Beep On match my nickname checkbox handler
   // -------------------------
-  channelBeep3CBInputEl.addEventListener('click', function (e) {
+  function handleChannelBeep3CBInputElClick (event) {
     if (channelMainSectionEl.hasAttribute('beep3-enabled')) {
       channelMainSectionEl.removeAttribute('beep3-enabled');
     } else {
@@ -1015,7 +1031,8 @@ function createChannelEl (name) {
     }
     updateLocalStorageBeepEnable();
     updateVisibility();
-  });
+  };
+  channelBeep3CBInputEl.addEventListener('click', handleChannelBeep3CBInputElClick);
 
   // -----------------------
   // Cancel all beep sounds
@@ -1030,7 +1047,7 @@ function createChannelEl (name) {
   // -------------------------
   // Text Format checkbox handler
   // -------------------------
-  channelFormatCBInputEl.addEventListener('click', function () {
+  function handleChannelFormatCBInputElClick (event) {
     if (channelMainSectionEl.hasAttribute('brief-enabled')) {
       channelMainSectionEl.removeAttribute('brief-enabled');
     } else {
@@ -1044,7 +1061,8 @@ function createChannelEl (name) {
     // THis will request a new nickname list from IRC server.
     // channelNamesDisplayEl.value = '';
     // _sendIrcServerMessage('NAMES ' + name);
-  });
+  };
+  channelFormatCBInputEl.addEventListener('click', handleChannelFormatCBInputElClick);
 
   //
   // First time on page load
@@ -1060,14 +1078,16 @@ function createChannelEl (name) {
   // -------------------------
   // AutoComplete checkbox handler
   // -------------------------
-  channelAutoCompCBInputEl.addEventListener('click', function () {
+  function handleChannelAutoCompCBInputElClick (event) {
     if (channelMainSectionEl.hasAttribute('auto-comp-enabled')) {
       channelMainSectionEl.removeAttribute('auto-comp-enabled');
     } else {
       channelMainSectionEl.setAttribute('auto-comp-enabled', '');
     }
     updateVisibility();
-  });
+  };
+  channelAutoCompCBInputEl.addEventListener('click', handleChannelAutoCompCBInputElClick);
+
   // Is browser capable of auto-complete?
   // Check if beforeInput event is supported in this browser (part of InputEvent)
   if ((window.InputEvent) && (typeof InputEvent.prototype.getTargetRanges === 'function')) {
@@ -1378,19 +1398,38 @@ function createChannelEl (name) {
       // remove interval cycle timers
       clearInterval(channelIntervalTimer);
       // Remove global event listeners
+      channelHideButtonEl.removeEventListener('click', handleChannelHideButtonElClick);
+      channelTallerButtonEl.removeEventListener('click', handleChannelTallerButtonElClick);
+      channelNormalButtonEl.removeEventListener('click', handleChannelNormalButtonElClick);
+      channelClearButtonEl.removeEventListener('click', handleChannelClearButtonElClick);
+      channelJoinButtonEl.removeEventListener('click', handleChannelJoinButtonElClick);
+      channelPartButtonEl.removeEventListener('click', handleChannelPartButtonElClick);
+      channelPruneButtonEl.removeEventListener('click', handleChannelPruneButtonElClick);
+      channelRefreshButtonEl.removeEventListener('click', handleChannelRefreshButtonElClick);
+      channelSendButtonEl.removeEventListener('click', handleChannelSendButtonElClick);
+      channelInputAreaEl.removeEventListener('input', handleChannelInputAreaElInput);
+      channelBottomDivEl.removeEventListener('click', handleChannelBottomDivElClick);
+      channelMessageCounterEl.removeEventListener('click', handleChannelMessageCounterElClick);
+      document.getElementById('channelUnreadCountDiv')
+        .removeEventListener('click', handleChannelUnreadCountDivClick);
+      document.getElementById('channelUnreadExistIcon')
+        .removeEventListener('click', handleChannelUnreadExistIconClick);
+      channelZoomButtonEl.removeEventListener('click', handleChannelZoomButtonElClick);
       document.removeEventListener('show-all-divs', handleShowAllDivs);
       document.removeEventListener('hide-or-zoom', handleHideOrZoom);
+      channelBeep1CBInputEl.removeEventListener('click', handleChannelBeep1CBInputElClick);
+      channelBeep2CBInputEl.removeEventListener('click', handleChannelBeep2CBInputElClick);
+      channelBeep3CBInputEl.removeEventListener('click', handleChannelBeep3CBInputElClick);
       document.removeEventListener('cancel-beep-sounds', handleCancelBeepSounds);
+      channelFormatCBInputEl.removeEventListener('click', handleChannelFormatCBInputElClick);
+      channelAutoCompCBInputEl.removeEventListener('click', handleChannelAutoCompCBInputElClick);
+      channelInputAreaEl.removeEventListener('keydown', channelAutoComplete, false);
       document.removeEventListener('irc-state-changed', handleIrcStateChanged);
       document.removeEventListener('channel-message', handleChannelMessage);
       document.removeEventListener('erase-before-reload', handleEraseBeforeReload);
       document.removeEventListener('cache-reload-done', handleCacheReloadDone);
       document.removeEventListener('cache-reload-error', handleCacheReloadError);
       window.removeEventListener('resize-custom-elements', handleResizeCustomElements);
-      document.getElementById('channelUnreadExistIcon')
-        .removeEventListener('click', handleChannelUnreadExist);
-      document.getElementById('channelUnreadCountDiv')
-        .removeEventListener('click', handleChannelCountDivClick);
       // This removes self (own element)
       if (channelContainerDivEl.contains(channelMainSectionEl)) {
         // remove the channel element from DOM
@@ -1689,12 +1728,6 @@ function createChannelEl (name) {
     resetMessageCount();
   };
   document.addEventListener('erase-before-reload', handleEraseBeforeReload);
-
-  // This is the global activity icon in the bar at the top of the page.
-  document.getElementById('channelUnreadExistIcon').addEventListener('click', function () {
-    // Local count in channel window (to match global activity icon visibility)
-    resetMessageCount();
-  });
 
   //
   // Add cache reload message to channel window

@@ -420,7 +420,7 @@ function createPrivateMessageEl (name, parsedMessage) {
   // -------------------------
   // if closed: Window unchanged, show Data secton, show Buttons
   // if open:  Hide Window, hide Data section, Hide Buttons
-  privMsgHideButtonEl.addEventListener('click', function () {
+  function handlePrivMsgHideButtonElClick (event) {
     if (privMsgBottomDivEl.hasAttribute('hidden')) {
       privMsgBottomDivEl.removeAttribute('hidden');
       privMsgHideButtonEl.textContent = '-';
@@ -432,33 +432,37 @@ function createPrivateMessageEl (name, parsedMessage) {
       privMsgHideButtonEl.textContent = '+';
       privMsgTopRightHidableDivEl.setAttribute('hidden', '');
     }
-  });
+  };
+  privMsgHideButtonEl.addEventListener('click', handlePrivMsgHideButtonElClick);
 
   // -------------------------
   // Taller button handler
   // -------------------------
-  privMsgTallerButtonEl.addEventListener('click', function () {
+  function handlePrivMsgTallerButtonElClick (event) {
     const newRows = parseInt(privMsgTextAreaEl.getAttribute('rows')) + 5;
     privMsgTextAreaEl.setAttribute('rows', newRows.toString());
     privMsgInputAreaEl.setAttribute('rows', '3');
-  });
+  };
+  privMsgTallerButtonEl.addEventListener('click', handlePrivMsgTallerButtonElClick);
 
   // -------------------------
   // Normal button handler
   // -------------------------
-  privMsgNormalButtonEl.addEventListener('click', function () {
+  function handlePrivMsgNormalButtonElClick (event) {
     privMsgTextAreaEl.setAttribute('rows', '6');
     privMsgInputAreaEl.setAttribute('rows', '1');
-  });
+  };
+  privMsgNormalButtonEl.addEventListener('click', handlePrivMsgNormalButtonElClick);
 
   // -------------------------
   // Clear button handler
   // -------------------------
-  privMsgClearButtonEl.addEventListener('click', function () {
+  function handlePrivMsgClearButtonElClick (event) {
     privMsgTextAreaEl.value = '';
     privMsgTextAreaEl.setAttribute('rows', '6');
     privMsgInputAreaEl.setAttribute('rows', '1');
-  });
+  };
+  privMsgClearButtonEl.addEventListener('click', handlePrivMsgClearButtonElClick);
 
   // ----------------
   // show all event
@@ -487,17 +491,18 @@ function createPrivateMessageEl (name, parsedMessage) {
   // -------------
   // send button
   // -------------
-  privMsgSendButtonEl.addEventListener('click', function () {
+  function handlePrivMsgSendButtonElClick (event) {
     _sendPrivMessageToUser(name, privMsgInputAreaEl);
     privMsgInputAreaEl.focus();
     resetPrivMsgCount();
     activityIconInhibitTimer = activityIconInhibitTimerValue;
-  });
+  };
+  privMsgSendButtonEl.addEventListener('click', handlePrivMsgSendButtonElClick);
 
   // ---------------
   // Enter pressed
   // ---------------
-  privMsgInputAreaEl.addEventListener('input', function (event) {
+  function handlePrivMsgInputAreaElInput (event) {
     if (((event.inputType === 'insertText') && (event.data === null)) ||
       (event.inputType === 'insertLineBreak')) {
       // Remove EOL characters at cursor loction
@@ -506,12 +511,14 @@ function createPrivateMessageEl (name, parsedMessage) {
       resetPrivMsgCount();
       activityIconInhibitTimer = activityIconInhibitTimerValue;
     }
-  });
+  };
+  privMsgInputAreaEl.addEventListener('input', handlePrivMsgInputAreaElInput);
 
   // Clear PM activity counters when activity counter is clicked this individual PM window
-  privMsgCounterEl.addEventListener('click', function () {
+  function handlePrivMsgCounterElClick (event) {
     resetPrivMsgCount();
-  });
+  };
+  privMsgCounterEl.addEventListener('click', handlePrivMsgCounterElClick);
 
   // Clear PM activity counters when activity counter in the parent PM window is clicked
   function handlePrivMsgCountDivClick () {
@@ -520,21 +527,22 @@ function createPrivateMessageEl (name, parsedMessage) {
   document.getElementById('privMsgCountDiv').addEventListener('click', handlePrivMsgCountDivClick);
 
   // Clear PM activity counters when activity counter at top of Main page is clicked
-  function handleprivMsgUnreadExistIconClick () {
+  function handlePrivMsgUnreadExistIconClick () {
     resetPrivMsgCount();
   };
   document.getElementById('privMsgUnreadExistIcon')
-    .addEventListener('click', handleprivMsgUnreadExistIconClick);
+    .addEventListener('click', handlePrivMsgUnreadExistIconClick);
 
   // ------------------------------------------------
   // Clear message activity counter by click
   // anywhere on the lower part of the
   // dynamically created private message window
   // -------------------------------------------------
-  privMsgBottomDivEl.addEventListener('click', function () {
+  function handlePrivMsgBottomDivElClick (event) {
     resetPrivMsgCount();
     activityIconInhibitTimer = activityIconInhibitTimerValue;
-  });
+  };
+  privMsgBottomDivEl.addEventListener('click', handlePrivMsgBottomDivElClick);
 
   // Sound beep checkbox
   function updateVisibility () {
@@ -548,7 +556,7 @@ function createPrivateMessageEl (name, parsedMessage) {
   // -------------------------
   // Beep On Message checkbox handler
   // -------------------------
-  privMsgBeep1CBInputEl.addEventListener('click', function (e) {
+  function handlePrivMsgBeep1CBInputElClick (event) {
     if (privMsgSectionEl.hasAttribute('beep1-enabled')) {
       privMsgSectionEl.removeAttribute('beep1-enabled');
     } else {
@@ -556,7 +564,8 @@ function createPrivateMessageEl (name, parsedMessage) {
       playBeep3Sound();
     }
     updateVisibility();
-  });
+  };
+  privMsgBeep1CBInputEl.addEventListener('click', handlePrivMsgBeep1CBInputElClick);
 
   // -----------------------
   // Cancel all beep sounds
@@ -570,7 +579,7 @@ function createPrivateMessageEl (name, parsedMessage) {
   // if window closed,
   //  - open control window,
   //  - show window, data section and buttons.
-  function handlePrivateMessageInWindow (event) {
+  function handlePrivateMessage (event) {
     function _addText (text) {
       // append text to textarea
       privMsgTextAreaEl.value += cleanFormatting(text) + '\n';
@@ -655,7 +664,7 @@ function createPrivateMessageEl (name, parsedMessage) {
       default:
     }
   };
-  document.addEventListener('private-message', handlePrivateMessageInWindow);
+  document.addEventListener('private-message', handlePrivateMessage);
 
   // PM to be made visible on opening a new window (except on refresh)
   if (!webState.cacheReloadInProgress) {
@@ -717,25 +726,35 @@ function createPrivateMessageEl (name, parsedMessage) {
     // console.log('erase-before-reload event fired in PM window');
     // first remove cyclic timers within element
     clearInterval(iconInhibitTimer);
+
     // Next remove global event listeners
     document.removeEventListener('cache-reload-done', handleCacheReloadDone);
     document.removeEventListener('cache-reload-error', handelCacheReloadError);
     document.removeEventListener('priv-msg-hide-all', handlePrivMsgHideAll);
     document.removeEventListener('priv-msg-show-all', handlePrivMsgShowAll);
+    privMsgHideButtonEl.removeEventListener('click', handlePrivMsgHideButtonElClick);
+    privMsgTallerButtonEl.removeEventListener('click', handlePrivMsgTallerButtonElClick);
+    privMsgNormalButtonEl.removeEventListener('click', handlePrivMsgNormalButtonElClick);
+    privMsgClearButtonEl.removeEventListener('click', handlePrivMsgClearButtonElClick);
     document.removeEventListener('show-all-divs', handleShowAllDivs);
     document.removeEventListener('hide-or-zoom', handleHideOrZoom);
+    privMsgSendButtonEl.removeEventListener('click', handlePrivMsgSendButtonElClick);
+    privMsgInputAreaEl.removeEventListener('input', handlePrivMsgInputAreaElInput);
+    privMsgCounterEl.removeEventListener('click', handlePrivMsgCounterElClick);
     document.getElementById('privMsgCountDiv')
       .removeEventListener('click', handlePrivMsgCountDivClick);
     document.getElementById('privMsgUnreadExistIcon')
-      .removeEventListener('click', handleprivMsgUnreadExistIconClick);
+      .removeEventListener('click', handlePrivMsgUnreadExistIconClick);
+    privMsgBottomDivEl.removeEventListener('click', handlePrivMsgBottomDivElClick);
+    privMsgBeep1CBInputEl.removeEventListener('click', handlePrivMsgBeep1CBInputElClick);
     document.removeEventListener('cancel-beep-sounds', handleCancelBeepSounds);
-    document.removeEventListener('private-message', handlePrivateMessageInWindow);
+    document.removeEventListener('private-message', handlePrivateMessage);
     window.removeEventListener('resize-custom-elements', handleResizeCustomElements);
-    // Remove self as own event listener
     document.removeEventListener('erase-before-reload', handleEraseBeforeReload);
+
     // this PM element can now be removed from DOM externally (below)
     if (privMsgContainerDivEl.contains(privMsgSectionEl)) {
-      console.log('removeChild(privMsgSectionEl');
+      // console.log('removeChild(privMsgSectionEl');
       // remove the private message element from DOM
       privMsgContainerDivEl.removeChild(privMsgSectionEl);
     }
