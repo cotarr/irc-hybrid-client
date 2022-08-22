@@ -771,8 +771,9 @@ clearInterval(iconInhibitTimer);document.removeEventListener('cache-reload-done'
 ;document.getElementById('privMsgCountDiv').removeEventListener('click',handlePrivMsgCountDivClick)
 ;document.getElementById('privMsgUnreadExistIcon').removeEventListener('click',handleprivMsgUnreadExistIconClick);document.removeEventListener('cancel-beep-sounds',handleCancelBeepSounds)
 ;document.removeEventListener('private-message',handlePrivateMessageInWindow);window.removeEventListener('resize-custom-elements',handleResizeCustomElements)
-;document.removeEventListener('erase-before-reload',handleCacheReloadDone)}document.addEventListener('erase-before-reload',handleEraseBeforeReload)}
-document.addEventListener('private-message',(function(event){let name=event.detail.parsedMessage.nick;if(name===ircState.nickName)name=event.detail.parsedMessage.params[0]
+;document.removeEventListener('erase-before-reload',handleEraseBeforeReload);if(privMsgContainerDivEl.contains(privMsgSectionEl)){console.log('removeChild(privMsgSectionEl')
+;privMsgContainerDivEl.removeChild(privMsgSectionEl)}}document.addEventListener('erase-before-reload',handleEraseBeforeReload)}document.addEventListener('private-message',(function(event){
+let name=event.detail.parsedMessage.nick;if(name===ircState.nickName)name=event.detail.parsedMessage.params[0]
 ;if(webState.activePrivateMessageNicks.indexOf(name.toLowerCase())<0)createPrivateMessageEl(name,event.detail.parsedMessage)}));function _buildPrivateMessageText(){
 if(0===document.getElementById('userPrivMsgInputId').value.length)return;const inputAreaEl=document.getElementById('userPrivMsgInputId');const text=stripTrailingCrLf(inputAreaEl.value)
 ;if(detectMultiLineString(text)){showError('Multi-line input is not supported.');inputAreaEl.value=''}else if(0===text.length)inputAreaEl.value='';else if('/'===text.charAt(0)){
@@ -784,8 +785,7 @@ stripOneCrLfFromElement(document.getElementById('userPrivMsgInputId'));_buildPri
 stripOneCrLfFromElement(document.getElementById('userPrivMsgInputId'));_buildPrivateMessageText()}}));document.getElementById('UserPrivMsgSendButton').addEventListener('click',(function(){
 _buildPrivateMessageText()}));document.addEventListener('erase-before-reload',(function(event){document.getElementById('pmNickNameInputId').value=''
 ;document.getElementById('userPrivMsgInputId').value='';webState.activePrivateMessageNicks=[];document.getElementById('privMsgWindowCountDiv').textContent='0'
-;document.getElementById('privMsgWindowCountDiv').setAttribute('hidden','');const privMsgContainerDivEl=document.getElementById('privateMessageContainerDiv')
-;while(privMsgContainerDivEl.firstChild)privMsgContainerDivEl.removeChild(privMsgContainerDivEl.firstChild)}));document.getElementById('whoisButton').addEventListener('click',(function(){
+;document.getElementById('privMsgWindowCountDiv').setAttribute('hidden','')}));document.getElementById('whoisButton').addEventListener('click',(function(){
 if(document.getElementById('pmNickNameInputId').value.length>0){showRawMessageWindow();const message='WHOIS '+document.getElementById('pmNickNameInputId').value;_sendIrcServerMessage(message)
 ;showRawMessageWindow()}else showError('Input required')}));document.getElementById('privMsgMainHiddenButton').addEventListener('click',(function(){
 if(document.getElementById('privMsgMainHiddenDiv').hasAttribute('hidden')){document.getElementById('privMsgMainHiddenDiv').removeAttribute('hidden')

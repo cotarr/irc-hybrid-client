@@ -714,6 +714,7 @@ function createPrivateMessageEl (name, parsedMessage) {
   // This is to remove the global event listeners before destroy element
   // ---------------------------------------------------------------
   function handleEraseBeforeReload (event) {
+    // console.log('erase-before-reload event fired in PM window');
     // first remove cyclic timers within element
     clearInterval(iconInhibitTimer);
     // Next remove global event listeners
@@ -731,8 +732,13 @@ function createPrivateMessageEl (name, parsedMessage) {
     document.removeEventListener('private-message', handlePrivateMessageInWindow);
     window.removeEventListener('resize-custom-elements', handleResizeCustomElements);
     // Remove self as own event listener
-    document.removeEventListener('erase-before-reload', handleCacheReloadDone);
+    document.removeEventListener('erase-before-reload', handleEraseBeforeReload);
     // this PM element can now be removed from DOM externally (below)
+    if (privMsgContainerDivEl.contains(privMsgSectionEl)) {
+      console.log('removeChild(privMsgSectionEl');
+      // remove the private message element from DOM
+      privMsgContainerDivEl.removeChild(privMsgSectionEl);
+    }
   };
   document.addEventListener('erase-before-reload', handleEraseBeforeReload);
 }; // createPrivateMessageEl()
@@ -832,12 +838,6 @@ document.addEventListener('erase-before-reload', function (event) {
   // Clear total PM counter and window count
   document.getElementById('privMsgWindowCountDiv').textContent = '0';
   document.getElementById('privMsgWindowCountDiv').setAttribute('hidden', '');
-
-  // Remove all PM elements from containing div in DOM
-  const privMsgContainerDivEl = document.getElementById('privateMessageContainerDiv');
-  while (privMsgContainerDivEl.firstChild) {
-    privMsgContainerDivEl.removeChild(privMsgContainerDivEl.firstChild);
-  }
 });
 
 // -------------------------
