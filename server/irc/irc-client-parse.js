@@ -558,7 +558,7 @@
                     vars.ircServerReconnectChannelString = '';
                   }
                 }
-              }, 2500);
+              }, 3000);
             }
             //
             // Wait 2 second for async stuff, then ask browser to update connected status

@@ -52,7 +52,8 @@ addressed, but hopefully didn't introduce any unrelated new issues.
 
 ### Changed
 
-- server/irc-client.js - API change. In the NodeJs backend, previously, the arrays ircState.channels[] and ircState.channelStates[] are initialized (empty) during the IRC connection process. Now these arrays are also cleared upon IRC disconnect. This change was needed for logic in the browser to properly parse the ircState object to release resources for destroyed windows. 
+- server/irc-client.js - API change. In the NodeJs backend, previously, the arrays ircState.channels[] and ircState.channelStates[] are initialized (empty) during the IRC connection process. Now these arrays are also cleared upon IRC disconnect. This change was needed for logic in the browser to properly parse the ircState object to release resources for destroyed windows.
+- Extend channel disconnect and re-join timer from 2.5 to 3.0 seconds. Sequence: nickserv identify at 1.5 follow by join at 3.0 seconds.
 
 ## [v0.2.9](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.9) 2022-08-16
 
