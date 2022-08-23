@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Next 2022-08-20
+## [v0.2.10](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.10) 2022-08-22
 
 This is a feature upgrade. Counter icons have been added to the top 
 of several windows to show a count of unread messages in each window.
