@@ -44,15 +44,15 @@ document.getElementById('saveNewButton').removeAttribute('hidden');document.getE
 ;document.getElementById('disabledCheckboxId').checked=false;document.getElementById('groupInputId').value=0;document.getElementById('nameInputId').value=''
 ;document.getElementById('hostInputId').value='';document.getElementById('portInputId').value=6697;document.getElementById('tlsCheckboxId').checked=true
 ;document.getElementById('verifyCheckboxId').checked=true;document.getElementById('proxyCheckboxId').checked=false;document.getElementById('autoReconnectCheckboxId').checked=false
-;document.getElementById('loggingCheckboxId').checked=false;document.getElementById('passwordInputId').setAttribute('disabled','');document.getElementById('passwordInputId').value='(Hidden)'
-;document.getElementById('identifyNickInputId').value='';document.getElementById('identifyCommandInputId').setAttribute('disabled','')
-;document.getElementById('identifyCommandInputId').value='(Hidden)';document.getElementById('nickInputId').value='';document.getElementById('altNickInputId').value=''
-;document.getElementById('recoverNickCheckboxId').checked=false;document.getElementById('userInputId').value='';document.getElementById('realInputId').value=''
-;document.getElementById('modesInputId').value='';document.getElementById('channelListInputId').value='';resolve(null)});const populateIrcServerForm=data=>new Promise((resolve,reject)=>{
-clearIrcServerForm();document.getElementById('saveNewButton').setAttribute('hidden','');document.getElementById('saveModifiedButton').removeAttribute('hidden')
-;document.getElementById('listVisibilityDiv').setAttribute('hidden','');document.getElementById('formVisibilityDiv').removeAttribute('hidden')
-;document.getElementById('serverPasswordWarningDiv').setAttribute('hidden','');document.getElementById('nickservCommandWarningDiv').setAttribute('hidden','')
-;document.getElementById('indexInputId').value=data.index.toString()
+;document.getElementById('loggingCheckboxId').checked=false;document.getElementById('passwordInputId').setAttribute('disabled','');document.getElementById('passwordInputId').value='(Blank)'
+;document.getElementById('replacePasswordButton').removeAttribute('hidden');document.getElementById('serverPasswordWarningDiv').setAttribute('hidden','')
+;document.getElementById('identifyNickInputId').value='';document.getElementById('identifyCommandInputId').setAttribute('disabled','');document.getElementById('identifyCommandInputId').value='(blank)'
+;document.getElementById('replaceIdentifyCommandButton').removeAttribute('hidden');document.getElementById('nickservCommandWarningDiv').setAttribute('hidden','')
+;document.getElementById('nickInputId').value='';document.getElementById('altNickInputId').value='';document.getElementById('recoverNickCheckboxId').checked=false
+;document.getElementById('userInputId').value='';document.getElementById('realInputId').value='';document.getElementById('modesInputId').value='';document.getElementById('channelListInputId').value=''
+;resolve(null)});const populateIrcServerForm=data=>new Promise((resolve,reject)=>{clearIrcServerForm();document.getElementById('saveNewButton').setAttribute('hidden','')
+;document.getElementById('saveModifiedButton').removeAttribute('hidden');document.getElementById('listVisibilityDiv').setAttribute('hidden','')
+;document.getElementById('formVisibilityDiv').removeAttribute('hidden');document.getElementById('indexInputId').value=data.index.toString()
 ;if(data.disabled)document.getElementById('disabledCheckboxId').checked=true;else document.getElementById('disabledCheckboxId').checked=false
 ;if('group'in data)document.getElementById('groupInputId').value=parseInt(data.group);else document.getElementById('groupInputId').value=0;document.getElementById('nameInputId').value=data.name
 ;document.getElementById('hostInputId').value=data.host;document.getElementById('portInputId').value=parseInt(data.port)
@@ -61,9 +61,11 @@ clearIrcServerForm();document.getElementById('saveNewButton').setAttribute('hidd
 ;if(data.proxy)document.getElementById('proxyCheckboxId').checked=true;else document.getElementById('proxyCheckboxId').checked=false
 ;if(data.reconnect)document.getElementById('autoReconnectCheckboxId').checked=true;else document.getElementById('autoReconnectCheckboxId').checked=false
 ;if(data.logging)document.getElementById('loggingCheckboxId').checked=true;else document.getElementById('loggingCheckboxId').checked=false
-;document.getElementById('passwordInputId').setAttribute('disabled','');document.getElementById('passwordInputId').value='(hidden)'
-;document.getElementById('identifyNickInputId').value=data.identifyNick;document.getElementById('identifyCommandInputId').setAttribute('disabled','')
-;document.getElementById('identifyCommandInputId').value='(hidden)';document.getElementById('serverPasswordWarningDiv').setAttribute('hidden','')
+;document.getElementById('passwordInputId').setAttribute('disabled','');document.getElementById('replacePasswordButton').removeAttribute('hidden')
+;if(null===data.password)document.getElementById('passwordInputId').value='(hidden)';else document.getElementById('passwordInputId').value='(blank)'
+;document.getElementById('serverPasswordWarningDiv').setAttribute('hidden','');document.getElementById('identifyNickInputId').value=data.identifyNick
+;document.getElementById('identifyCommandInputId').setAttribute('disabled','');document.getElementById('replaceIdentifyCommandButton').removeAttribute('hidden')
+;if(null===data.identifyCommand)document.getElementById('identifyCommandInputId').value='(hidden)';else document.getElementById('identifyCommandInputId').value='(blank)'
 ;document.getElementById('nickservCommandWarningDiv').setAttribute('hidden','');document.getElementById('nickInputId').value=data.nick;document.getElementById('altNickInputId').value=data.altNick
 ;if(0===data.altNick.length)document.getElementById('recoverNickCheckboxId').checked=false;else if(data.recoverNick)document.getElementById('recoverNickCheckboxId').checked=true;else document.getElementById('recoverNickCheckboxId').checked=false
 ;document.getElementById('userInputId').value=data.user;document.getElementById('realInputId').value=data.real;document.getElementById('modesInputId').value=data.modes
@@ -116,30 +118,31 @@ verifyIconEl.classList.add('icon-true');verifyIconInnerEl.classList.add('icon-in
 td23El.appendChild(verifyIconEl);rowEl.appendChild(td23El);const td24El=document.createElement('td');const proxyIconEl=document.createElement('div')
 ;const proxyIconInnerEl=document.createElement('div');proxyIconEl.appendChild(proxyIconInnerEl);if(data[i].proxy){proxyIconEl.classList.add('icon-true')
 ;proxyIconInnerEl.classList.add('icon-inner-true')}else{proxyIconEl.classList.add('icon-false');proxyIconInnerEl.classList.add('icon-inner-false')}td24El.appendChild(proxyIconEl)
-;rowEl.appendChild(td24El);const td25El=document.createElement('td');td25El.textContent='(hidden)';rowEl.appendChild(td25El)}const td30El=document.createElement('td');td30El.textContent=data[i].nick
-;rowEl.appendChild(td30El);if(full){const td31El=document.createElement('td');td31El.textContent=data[i].altNick;rowEl.appendChild(td31El);const td32El=document.createElement('td')
-;const recoverNickIconEl=document.createElement('div');const recoverNickIconInnerEl=document.createElement('div');recoverNickIconEl.appendChild(recoverNickIconInnerEl);if(data[i].recoverNick){
-recoverNickIconEl.classList.add('icon-true');recoverNickIconInnerEl.classList.add('icon-inner-true')}else{recoverNickIconEl.classList.add('icon-false')
-;recoverNickIconInnerEl.classList.add('icon-inner-false')}td32El.appendChild(recoverNickIconEl);rowEl.appendChild(td32El);const td33El=document.createElement('td');td33El.textContent=data[i].user
-;rowEl.appendChild(td33El);const td34El=document.createElement('td');td34El.textContent=data[i].real;rowEl.appendChild(td34El);const td35El=document.createElement('td')
-;td35El.textContent=data[i].modes;rowEl.appendChild(td35El);const td40El=document.createElement('td');data[i].channelList.split(',').forEach(channel=>{const chanDiv=document.createElement('div')
-;chanDiv.textContent=channel;td40El.appendChild(chanDiv)});rowEl.appendChild(td40El);const td50El=document.createElement('td');td50El.textContent=data[i].identifyNick;rowEl.appendChild(td50El)
-;const td51El=document.createElement('td');td51El.textContent='(hidden)';rowEl.appendChild(td51El);const td60El=document.createElement('td');const reconnectIconEl=document.createElement('div')
-;const reconnectIconInnerEl=document.createElement('div');reconnectIconEl.appendChild(reconnectIconInnerEl);if(data[i].reconnect){reconnectIconEl.classList.add('icon-true')
-;reconnectIconInnerEl.classList.add('icon-inner-true')}else{reconnectIconEl.classList.add('icon-false');reconnectIconInnerEl.classList.add('icon-inner-false')}td60El.appendChild(reconnectIconEl)
-;rowEl.appendChild(td60El);const td61El=document.createElement('td');const loggingIconEl=document.createElement('div');const loggingIconInnerEl=document.createElement('div')
-;loggingIconEl.appendChild(loggingIconInnerEl);if(data[i].logging){loggingIconEl.classList.add('icon-true');loggingIconInnerEl.classList.add('icon-inner-true')}else{
-loggingIconEl.classList.add('icon-false');loggingIconInnerEl.classList.add('icon-inner-false')}td61El.appendChild(loggingIconEl);rowEl.appendChild(td61El)}if(editable){
-const td70El=document.createElement('td');const editButtonEl=document.createElement('button');editButtonEl.textContent='Edit';td70El.appendChild(editButtonEl);rowEl.appendChild(td70El)
-;const td71El=document.createElement('td');const copyButtonEl=document.createElement('button');copyButtonEl.textContent='Copy';td71El.appendChild(copyButtonEl);rowEl.appendChild(td71El)
-;const td72El=document.createElement('td');const deleteButtonEl=document.createElement('button');deleteButtonEl.textContent='Delete';td72El.appendChild(deleteButtonEl);rowEl.appendChild(td72El)
-;const td73El=document.createElement('td');const moveUpButtonEl=document.createElement('button');moveUpButtonEl.textContent='move-up';if(i>0)td73El.appendChild(moveUpButtonEl)
-;rowEl.appendChild(td73El);disabledCheckboxEl.addEventListener('click',()=>{toggleDisabled(parseInt(rowEl.getAttribute('index')))});editButtonEl.addEventListener('click',()=>{
-openIrcServerEdit(parseInt(rowEl.getAttribute('index')))});copyButtonEl.addEventListener('click',()=>{copyIrcServerToNew(parseInt(rowEl.getAttribute('index')))})
-;deleteButtonEl.addEventListener('click',()=>{deleteIrcServer(parseInt(rowEl.getAttribute('index')))});if(i>0)moveUpButtonEl.addEventListener('click',()=>{
-moveUpInList(parseInt(rowEl.getAttribute('index')))})}tableNode.appendChild(rowEl)}resolve(null)});const checkForApiError=data=>new Promise((resolve,reject)=>{
-if('success'===data.status)resolve(null);else reject(new Error('PATCH API did not return success status flag'))});const setDivVisibility=data=>{
-document.getElementById('listVisibilityDiv').removeAttribute('hidden','');document.getElementById('formVisibilityDiv').setAttribute('hidden','')
+;rowEl.appendChild(td24El);const td25El=document.createElement('td');if(null===data[i].password)td25El.textContent='(hidden)';else td25El.textContent='(blank)';rowEl.appendChild(td25El)}
+const td30El=document.createElement('td');td30El.textContent=data[i].nick;rowEl.appendChild(td30El);if(full){const td31El=document.createElement('td');td31El.textContent=data[i].altNick
+;rowEl.appendChild(td31El);const td32El=document.createElement('td');const recoverNickIconEl=document.createElement('div');const recoverNickIconInnerEl=document.createElement('div')
+;recoverNickIconEl.appendChild(recoverNickIconInnerEl);if(data[i].recoverNick){recoverNickIconEl.classList.add('icon-true');recoverNickIconInnerEl.classList.add('icon-inner-true')}else{
+recoverNickIconEl.classList.add('icon-false');recoverNickIconInnerEl.classList.add('icon-inner-false')}td32El.appendChild(recoverNickIconEl);rowEl.appendChild(td32El)
+;const td33El=document.createElement('td');td33El.textContent=data[i].user;rowEl.appendChild(td33El);const td34El=document.createElement('td');td34El.textContent=data[i].real;rowEl.appendChild(td34El)
+;const td35El=document.createElement('td');td35El.textContent=data[i].modes;rowEl.appendChild(td35El);const td40El=document.createElement('td');data[i].channelList.split(',').forEach(channel=>{
+const chanDiv=document.createElement('div');chanDiv.textContent=channel;td40El.appendChild(chanDiv)});rowEl.appendChild(td40El);const td50El=document.createElement('td')
+;td50El.textContent=data[i].identifyNick;rowEl.appendChild(td50El);const td51El=document.createElement('td')
+;if(null===data[i].identifyCommand)td51El.textContent='(hidden)';else td51El.textContent='(blank)';rowEl.appendChild(td51El);const td60El=document.createElement('td')
+;const reconnectIconEl=document.createElement('div');const reconnectIconInnerEl=document.createElement('div');reconnectIconEl.appendChild(reconnectIconInnerEl);if(data[i].reconnect){
+reconnectIconEl.classList.add('icon-true');reconnectIconInnerEl.classList.add('icon-inner-true')}else{reconnectIconEl.classList.add('icon-false');reconnectIconInnerEl.classList.add('icon-inner-false')
+}td60El.appendChild(reconnectIconEl);rowEl.appendChild(td60El);const td61El=document.createElement('td');const loggingIconEl=document.createElement('div')
+;const loggingIconInnerEl=document.createElement('div');loggingIconEl.appendChild(loggingIconInnerEl);if(data[i].logging){loggingIconEl.classList.add('icon-true')
+;loggingIconInnerEl.classList.add('icon-inner-true')}else{loggingIconEl.classList.add('icon-false');loggingIconInnerEl.classList.add('icon-inner-false')}td61El.appendChild(loggingIconEl)
+;rowEl.appendChild(td61El)}if(editable){const td70El=document.createElement('td');const editButtonEl=document.createElement('button');editButtonEl.textContent='Edit';td70El.appendChild(editButtonEl)
+;rowEl.appendChild(td70El);const td71El=document.createElement('td');const copyButtonEl=document.createElement('button');copyButtonEl.textContent='Copy';td71El.appendChild(copyButtonEl)
+;rowEl.appendChild(td71El);const td72El=document.createElement('td');const deleteButtonEl=document.createElement('button');deleteButtonEl.textContent='Delete';td72El.appendChild(deleteButtonEl)
+;rowEl.appendChild(td72El);const td73El=document.createElement('td');const moveUpButtonEl=document.createElement('button');moveUpButtonEl.textContent='move-up'
+;if(i>0)td73El.appendChild(moveUpButtonEl);rowEl.appendChild(td73El);disabledCheckboxEl.addEventListener('click',()=>{toggleDisabled(parseInt(rowEl.getAttribute('index')))})
+;editButtonEl.addEventListener('click',()=>{openIrcServerEdit(parseInt(rowEl.getAttribute('index')))});copyButtonEl.addEventListener('click',()=>{
+copyIrcServerToNew(parseInt(rowEl.getAttribute('index')))});deleteButtonEl.addEventListener('click',()=>{deleteIrcServer(parseInt(rowEl.getAttribute('index')))})
+;if(i>0)moveUpButtonEl.addEventListener('click',()=>{moveUpInList(parseInt(rowEl.getAttribute('index')))})}tableNode.appendChild(rowEl)}resolve(null)})
+;const checkForApiError=data=>new Promise((resolve,reject)=>{if('success'===data.status)resolve(null);else reject(new Error('PATCH API did not return success status flag'))})
+;const setDivVisibility=data=>{document.getElementById('listVisibilityDiv').removeAttribute('hidden','');document.getElementById('formVisibilityDiv').setAttribute('hidden','')
 ;document.getElementById('serverPasswordWarningDiv').setAttribute('hidden','');document.getElementById('nickservCommandWarningDiv').setAttribute('hidden','');if(data.ircConnected||data.ircConnecting){
 document.getElementById('createNewButton').setAttribute('hidden','');document.getElementById('warningVisibilityDiv').removeAttribute('hidden');editable=false}else{
 document.getElementById('createNewButton').removeAttribute('hidden');document.getElementById('warningVisibilityDiv').setAttribute('hidden','');editable=true}
@@ -147,9 +150,10 @@ if(data.enableSocks5Proxy)document.getElementById('ircProxyDiv').textContent='So
 ;return Promise.resolve(null)};document.getElementById('groupInfoButton').addEventListener('click',()=>{
 if(document.getElementById('groupInfoHiddenDiv').hasAttribute('hidden'))document.getElementById('groupInfoHiddenDiv').removeAttribute('hidden');else document.getElementById('groupInfoHiddenDiv').setAttribute('hidden','')
 });document.getElementById('replacePasswordButton').addEventListener('click',()=>{document.getElementById('passwordInputId').removeAttribute('disabled')
-;document.getElementById('passwordInputId').value='';document.getElementById('serverPasswordWarningDiv').removeAttribute('hidden')})
-;document.getElementById('replaceIdentifyCommandButton').addEventListener('click',()=>{document.getElementById('identifyCommandInputId').removeAttribute('disabled')
-;document.getElementById('identifyCommandInputId').value='';document.getElementById('nickservCommandWarningDiv').removeAttribute('hidden')})
+;document.getElementById('passwordInputId').value='';document.getElementById('replacePasswordButton').setAttribute('hidden','')
+;document.getElementById('serverPasswordWarningDiv').removeAttribute('hidden')});document.getElementById('replaceIdentifyCommandButton').addEventListener('click',()=>{
+document.getElementById('identifyCommandInputId').removeAttribute('disabled');document.getElementById('identifyCommandInputId').value=''
+;document.getElementById('replaceIdentifyCommandButton').setAttribute('hidden','');document.getElementById('nickservCommandWarningDiv').removeAttribute('hidden')})
 ;document.getElementById('createNewButton').addEventListener('click',()=>{_clearError();fetchServerList(0,1).then(()=>fetchServerList(0,0)).then(()=>clearIrcServerForm()).then(()=>{
 document.getElementById('listVisibilityDiv').setAttribute('hidden','');document.getElementById('formVisibilityDiv').removeAttribute('hidden')
 ;document.getElementById('serverPasswordWarningDiv').setAttribute('hidden','');document.getElementById('nickservCommandWarningDiv').setAttribute('hidden','')}).catch(err=>{

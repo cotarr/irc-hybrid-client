@@ -329,10 +329,24 @@
             tempServer.proxy = chainObject.serversFile.serverArray[i].proxy;
             tempServer.reconnect = chainObject.serversFile.serverArray[i].reconnect;
             tempServer.logging = chainObject.serversFile.serverArray[i].logging;
-            // Security: Password is not sent
-            // tempServer.password = chainObject.serversFile.serverArray[i].password;
+            // Security: Password is never sent to the browser
+            if (chainObject.serversFile.serverArray[i].password.length === 0) {
+              // No password has been set, return empty string
+              tempServer.password = '';
+            } else {
+              // else never send password, replace with NULL
+              tempServer.password = null;
+            }
             tempServer.identifyNick = chainObject.serversFile.serverArray[i].identifyNick;
-            // Security: Nickserv identify password  not sent
+            // Security: Nickserv identify password  is never sent to the browser
+            if (chainObject.serversFile.serverArray[i].identifyCommand.length === 0) {
+              // No identifyCommand has been set, return empty string
+              tempServer.identifyCommand = '';
+            } else {
+              // else never send identifyCommand, replace with NULL
+              tempServer.identifyCommand = null;
+            }
+
             // tempServer.identifyCommand = chainObject.serversFile.serverArray[i].identifyCommand;
             tempServer.nick = chainObject.serversFile.serverArray[i].nick;
             tempServer.altNick = chainObject.serversFile.serverArray[i].altNick || '';

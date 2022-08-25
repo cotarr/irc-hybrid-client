@@ -6,6 +6,30 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Next 2022-08-24
+
+### Changed
+
+- Server API
+
+Previously an IRC server definition object sent from the server to the the 
+web browser did not contain a `password` property or an `identifyCommand` property. 
+After this change, in the case where no password has been set, and empty 
+string is returned `{password: ''}`. 
+In the case where a password has been set, the password property will 
+be set to null by the API `{password: null}`. 
+This is to differentiate if a password has been set or not, without returning 
+the actual password value.
+The `identifyCommand` uses the same behavior
+
+- Web Browser
+
+In the IRC server list editing form, when viewing an IRC server definition, the 
+previous IRC server password will be displayed as `(blank)` or `(hidden)` to indicate 
+if a password has been set or not. The NickServ identify command behaves the same 
+displaying `(blank)` or `(hidden)`. Editing is the same as before. 
+Replacement values may be entered using the [Replace] button.
+
 ## [v0.2.10](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.10) 2022-08-22
 
 This is a feature upgrade. Counter icons have been added to the top 

@@ -222,10 +222,14 @@ const clearIrcServerForm = () => {
     document.getElementById('autoReconnectCheckboxId').checked = false;
     document.getElementById('loggingCheckboxId').checked = false;
     document.getElementById('passwordInputId').setAttribute('disabled', '');
-    document.getElementById('passwordInputId').value = '(Hidden)';
+    document.getElementById('passwordInputId').value = '(Blank)';
+    document.getElementById('replacePasswordButton').removeAttribute('hidden');
+    document.getElementById('serverPasswordWarningDiv').setAttribute('hidden', '');
     document.getElementById('identifyNickInputId').value = '';
     document.getElementById('identifyCommandInputId').setAttribute('disabled', '');
-    document.getElementById('identifyCommandInputId').value = '(Hidden)';
+    document.getElementById('identifyCommandInputId').value = '(blank)';
+    document.getElementById('replaceIdentifyCommandButton').removeAttribute('hidden');
+    document.getElementById('nickservCommandWarningDiv').setAttribute('hidden', '');
     document.getElementById('nickInputId').value = '';
     document.getElementById('altNickInputId').value = '';
     document.getElementById('recoverNickCheckboxId').checked = false;
@@ -249,8 +253,6 @@ const populateIrcServerForm = (data) => {
     document.getElementById('saveModifiedButton').removeAttribute('hidden');
     document.getElementById('listVisibilityDiv').setAttribute('hidden', '');
     document.getElementById('formVisibilityDiv').removeAttribute('hidden');
-    document.getElementById('serverPasswordWarningDiv').setAttribute('hidden', '');
-    document.getElementById('nickservCommandWarningDiv').setAttribute('hidden', '');
     document.getElementById('indexInputId').value = data.index.toString();
     if (data.disabled) {
       document.getElementById('disabledCheckboxId').checked = true;
@@ -292,11 +294,21 @@ const populateIrcServerForm = (data) => {
       document.getElementById('loggingCheckboxId').checked = false;
     }
     document.getElementById('passwordInputId').setAttribute('disabled', '');
-    document.getElementById('passwordInputId').value = '(hidden)';
+    document.getElementById('replacePasswordButton').removeAttribute('hidden');
+    if (data.password === null) {
+      document.getElementById('passwordInputId').value = '(hidden)';
+    } else {
+      document.getElementById('passwordInputId').value = '(blank)';
+    }
+    document.getElementById('serverPasswordWarningDiv').setAttribute('hidden', '');
     document.getElementById('identifyNickInputId').value = data.identifyNick;
     document.getElementById('identifyCommandInputId').setAttribute('disabled', '');
-    document.getElementById('identifyCommandInputId').value = ('(hidden)');
-    document.getElementById('serverPasswordWarningDiv').setAttribute('hidden', '');
+    document.getElementById('replaceIdentifyCommandButton').removeAttribute('hidden');
+    if (data.identifyCommand === null) {
+      document.getElementById('identifyCommandInputId').value = '(hidden)';
+    } else {
+      document.getElementById('identifyCommandInputId').value = '(blank)';
+    }
     document.getElementById('nickservCommandWarningDiv').setAttribute('hidden', '');
     document.getElementById('nickInputId').value = data.nick;
     document.getElementById('altNickInputId').value = data.altNick;
@@ -644,7 +656,11 @@ const buildServerListTable = (data) => {
           rowEl.appendChild(td24El);
 
           const td25El = document.createElement('td');
-          td25El.textContent = '(hidden)';
+          if (data[i].password === null) {
+            td25El.textContent = '(hidden)';
+          } else {
+            td25El.textContent = '(blank)';
+          }
           rowEl.appendChild(td25El);
         } // if (full)
 
@@ -696,7 +712,11 @@ const buildServerListTable = (data) => {
           rowEl.appendChild(td50El);
 
           const td51El = document.createElement('td');
-          td51El.textContent = '(hidden)';
+          if (data[i].identifyCommand === null) {
+            td51El.textContent = '(hidden)';
+          } else {
+            td51El.textContent = '(blank)';
+          }
           rowEl.appendChild(td51El);
 
           const td60El = document.createElement('td');
@@ -846,6 +866,7 @@ document.getElementById('groupInfoButton').addEventListener('click', () => {
 document.getElementById('replacePasswordButton').addEventListener('click', () => {
   document.getElementById('passwordInputId').removeAttribute('disabled');
   document.getElementById('passwordInputId').value = '';
+  document.getElementById('replacePasswordButton').setAttribute('hidden', '');
   document.getElementById('serverPasswordWarningDiv').removeAttribute('hidden');
 });
 
@@ -855,6 +876,7 @@ document.getElementById('replacePasswordButton').addEventListener('click', () =>
 document.getElementById('replaceIdentifyCommandButton').addEventListener('click', () => {
   document.getElementById('identifyCommandInputId').removeAttribute('disabled');
   document.getElementById('identifyCommandInputId').value = '';
+  document.getElementById('replaceIdentifyCommandButton').setAttribute('hidden', '');
   document.getElementById('nickservCommandWarningDiv').removeAttribute('hidden');
 });
 
