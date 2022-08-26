@@ -579,7 +579,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"disabled\": false,\n    \"group\": 0,\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 6667,\n    \"tls\": false,\n    \"verify\": false,\n    \"proxy\": false,\n    \"reconnect\": false,\n    \"logging\": false,\n    \"password\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"altNick\": \"myNick2\",\n    \"recoverNick\": false,\n    \"user\": \"myUser\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
+					"raw": "{\n    \"disabled\": false,\n    \"group\": 0,\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 6667,\n    \"tls\": false,\n    \"verify\": false,\n    \"proxy\": false,\n    \"reconnect\": false,\n    \"logging\": false,\n    \"password\": \"\",\n    \"saslUsername\": \"\",\n    \"saslPassword\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"altNick\": \"myNick2\",\n    \"recoverNick\": false,\n    \"user\": \"myUser\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -751,7 +751,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"index\": 0,\n    \"disabled\": false,\n    \"group\": 0,\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 6667,\n    \"tls\": false,\n    \"verify\": false,\n    \"proxy\": false,\n    \"reconnect\": false,\n    \"logging\": false,\n    \"password\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"altNick\": \"myNick2\",\n    \"recoverNick\": false,\n    \"user\": \"myUser\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
+					"raw": "{\n    \"index\": 0,\n    \"disabled\": false,\n    \"group\": 0,\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 6667,\n    \"tls\": false,\n    \"verify\": false,\n    \"proxy\": false,\n    \"reconnect\": false,\n    \"logging\": false,\n    \"password\": \"\",\n    \"saslUsername\": \"\",\n    \"saslPassword\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"altNick\": \"myNick2\",\n    \"recoverNick\": false,\n    \"user\": \"myUser\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -827,7 +827,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"disabled\": false,\n    \"group\": 0,\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 6667,\n    \"tls\": false,\n    \"verify\": false,\n    \"proxy\": false,\n    \"reconnect\": false,\n    \"logging\": false,\n    \"password\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"altNick\": \"myNick2\",\n    \"recoverNick\": false,\n    \"user\": \"myUser\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
+					"raw": "{\n    \"disabled\": false,\n    \"group\": 0,\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 6667,\n    \"tls\": false,\n    \"verify\": false,\n    \"proxy\": false,\n    \"reconnect\": false,\n    \"logging\": false,\n    \"password\": \"\",\n    \"saslUsername\": \"\",\n    \"saslPassword\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"altNick\": \"myNick2\",\n    \"recoverNick\": false,\n    \"user\": \"myUser\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -866,7 +866,15 @@
 							"    pm.expect(jsonData.port).to.eql(6667);",
 							"    pm.expect(jsonData.tls).to.eql(false);",
 							"    pm.expect(jsonData.verify).to.eql(false);",
+							"    pm.expect(jsonData.proxy).to.eql(false);",
+							"    pm.expect(jsonData.reconnect).to.eql(false);",
+							"    pm.expect(jsonData.logging).to.eql(false);",
+							"    pm.expect(jsonData.password).to.eql('');",
+							"    pm.expect(jsonData.saslUsername).to.eql('');",
+							"    pm.expect(jsonData.saslPassword).to.eql('');",
+							"    pm.expect(jsonData.saslUsername).to.eql('');",
 							"    pm.expect(jsonData.identifyNick).to.eql('');",
+							"    pm.expect(jsonData.identifyCommand).to.eql('');",
 							"    pm.expect(jsonData.nick).to.eql('myNick');",
 							"    pm.expect(jsonData.altNick).to.eql('myNick2');",
 							"    pm.expect(jsonData.recoverNick).to.eql(false);",
@@ -975,7 +983,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"index\": 9999,\n    \"disabled\": false,\n    \"group\": 0,\n    \"name\": \"local-serverxxxx\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 6667,\n    \"tls\": false,\n    \"verify\": false,\n    \"proxy\": false,\n    \"reconnect\": false,\n    \"logging\": false,\n    \"password\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"altNick\": \"myNick2\",\n    \"recoverNick\": false,\n    \"user\": \"myUser\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
+					"raw": "{\n    \"index\": 9999,\n    \"disabled\": false,\n    \"group\": 0,\n    \"name\": \"local-serverxxxx\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 6667,\n    \"tls\": false,\n    \"verify\": false,\n    \"proxy\": false,\n    \"reconnect\": false,\n    \"logging\": false,\n    \"password\": \"\",\n    \"saslUsername\": \"\",\n    \"saslPassword\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"altNick\": \"myNick2\",\n    \"recoverNick\": false,\n    \"user\": \"myUser\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -1123,7 +1131,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"index\": {{irc_server_index}},\n    \"disabled\": true,\n    \"group\": 2,\n    \"name\": \"local-server2\",\n    \"host\": \"127.0.0.2\",\n    \"port\": 6668,\n    \"tls\": true,\n    \"verify\": true,\n    \"proxy\": true,\n    \"reconnect\": true,\n    \"logging\": true,\n    \"password\": \"test1\",\n    \"identifyNick\": \"test2\",\n    \"identifyCommand\": \"test3\",\n    \"nick\": \"myNick2\",\n    \"altNick\": \"myNick3\",\n    \"recoverNick\": true,\n    \"user\": \"myUser2\",\n    \"real\": \"myRealName2\",\n    \"modes\": \"+iwww\",\n    \"channelList\": \"#test, #test2, #test3, #test4\"\n}\n",
+					"raw": "{\n    \"index\": {{irc_server_index}},\n    \"disabled\": true,\n    \"group\": 2,\n    \"name\": \"local-server2\",\n    \"host\": \"127.0.0.2\",\n    \"port\": 6668,\n    \"tls\": true,\n    \"verify\": true,\n    \"proxy\": true,\n    \"reconnect\": true,\n    \"logging\": true,\n    \"password\": \"test1\",\n    \"saslUsername\": \"testsp1\",\n    \"saslPassword\": \"testsp2\",\n    \"identifyNick\": \"test2\",\n    \"identifyCommand\": \"test3\",\n    \"nick\": \"myNick2\",\n    \"altNick\": \"myNick3\",\n    \"recoverNick\": true,\n    \"user\": \"myUser2\",\n    \"real\": \"myRealName2\",\n    \"modes\": \"+iwww\",\n    \"channelList\": \"#test, #test2, #test3, #test4\"\n}\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -1172,8 +1180,12 @@
 							"    pm.expect(jsonData.verify).to.eql(true);",
 							"    pm.expect(jsonData.proxy).to.eql(true);",
 							"    pm.expect(jsonData.reconnect).to.eql(true);",
-							"    pm.expect(jsonData.reconnect).to.eql(true);",
+							"    pm.expect(jsonData.logging).to.eql(true);",
+							"    pm.expect(jsonData.password).to.eql(null);",
+							"    pm.expect(jsonData.saslUsername).to.eql('testsp1');",
+							"    pm.expect(jsonData.saslPassword).to.eql(null);",
 							"    pm.expect(jsonData.identifyNick).to.eql('test2');",
+							"    pm.expect(jsonData.identifyCommand).to.eql(null);",
 							"    pm.expect(jsonData.nick).to.eql('myNick2');",
 							"    pm.expect(jsonData.altNick).to.eql('myNick3');",
 							"    pm.expect(jsonData.recoverNick).to.eql(true);",
@@ -1273,7 +1285,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"disabled\": false,\n    \"index\": \"{{irc_server_index}}\",\n    \"group\": 0,\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 3000,\n    \"tls\": false,\n    \"verify\": false,\n    \"proxy\": false,\n    \"reconnect\": false,\n    \"logging\": false,\n    \"password\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"altNick\": \"myNick2\",\n    \"recoverNick\": false,\n    \"user\": \"myUsername\",\n    \"real\": \"Irc Hybrid Client\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}",
+					"raw": "{\n    \"disabled\": false,\n    \"index\": \"{{irc_server_index}}\",\n    \"group\": 0,\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 3000,\n    \"tls\": false,\n    \"verify\": false,\n    \"proxy\": false,\n    \"reconnect\": false,\n    \"logging\": false,\n    \"password\": \"\",\n    \"saslUsername\": \"\",\n    \"saslPassword\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"altNick\": \"myNick2\",\n    \"recoverNick\": false,\n    \"user\": \"myUsername\",\n    \"real\": \"Irc Hybrid Client\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -1420,7 +1432,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"index\": {{irc_server_index}},\n    \"disabled\": false,\n    \"group\": 0,\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 3000,\n    \"tls\": false,\n    \"verify\": false,\n    \"proxy\": false,\n    \"reconnect\": false,\n    \"logging\": false,\n    \"password\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"altNick\": \"myNick\",\n    \"recoverNick\": false,\n    \"user\": \"myUsername\",\n    \"real\": \"Irc Hybrid Client\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}",
+					"raw": "{\n    \"index\": {{irc_server_index}},\n    \"disabled\": false,\n    \"group\": 0,\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 3000,\n    \"tls\": false,\n    \"verify\": false,\n    \"proxy\": false,\n    \"reconnect\": false,\n    \"logging\": false,\n    \"password\": \"\",\n    \"saslUsername\": \"\",\n    \"saslPassword\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"altNick\": \"myNick\",\n    \"recoverNick\": false,\n    \"user\": \"myUsername\",\n    \"real\": \"Irc Hybrid Client\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -1926,7 +1938,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"index\": {{irc_server_index}},\n    \"disabled\": false,\n    \"group\": 0,\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 3000,\n    \"tls\": false,\n    \"verify\": false,\n    \"proxy\": false,\n    \"reconnect\": false,\n    \"logging\": false,\n    \"password\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"altNick\": \"myNick2\",\n    \"recoverNick\": false,\n    \"user\": \"myUsername\",\n    \"real\": \"Irc Hybrid Client\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}",
+					"raw": "{\n    \"index\": {{irc_server_index}},\n    \"disabled\": false,\n    \"group\": 0,\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 3000,\n    \"tls\": false,\n    \"verify\": false,\n    \"proxy\": false,\n    \"reconnect\": false,\n    \"logging\": false,\n    \"password\": \"\",\n    \"saslUsername\": \"\",\n    \"saslPassword\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"altNick\": \"myNick2\",\n    \"recoverNick\": false,\n    \"user\": \"myUsername\",\n    \"real\": \"Irc Hybrid Client\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -1990,7 +2002,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"disabled\": false,\n    \"group\": 0,\n    \"name\": \"local-server\",\n    \"host\": \"invalid\",\n    \"port\": 6667,\n    \"tls\": false,\n    \"verify\": false,\n    \"proxy\": false,\n    \"password\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"user\": \"myUser\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
+					"raw": "{\n    \"disabled\": false,\n    \"group\": 0,\n    \"name\": \"local-server\",\n    \"host\": \"invalid\",\n    \"port\": 6667,\n    \"tls\": false,\n    \"verify\": false,\n    \"proxy\": false,\n    \"password\": \"\",\n    \"saslUsername\": \"\",\n    \"saslPassword\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"user\": \"myUser\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -2048,7 +2060,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"disabled\": false,\n    \"group\": 0,\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": \"invalid\",\n    \"tls\": false,\n    \"verify\": false,\n    \"proxy\": false,\n    \"password\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"user\": \"myUser\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
+					"raw": "{\n    \"disabled\": false,\n    \"group\": 0,\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": \"invalid\",\n    \"tls\": false,\n    \"verify\": false,\n    \"proxy\": false,\n    \"password\": \"\",\n    \"saslUsername\": \"\",\n    \"saslPassword\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"user\": \"myUser\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -2106,7 +2118,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"disabled\": false,\n    \"group\": 0,\n    \"name\": \"\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 6667,\n    \"tls\": false,\n    \"verify\": false,\n    \"proxy\": false,\n    \"password\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"user\": \"myUser\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
+					"raw": "{\n    \"disabled\": false,\n    \"group\": 0,\n    \"name\": \"\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 6667,\n    \"tls\": false,\n    \"verify\": false,\n    \"proxy\": false,\n    \"password\": \"\",\n    \"saslUsername\": \"\",\n    \"saslPassword\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"user\": \"myUser\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -2164,7 +2176,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"disabled\": false,\n    \"group\": 0,\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 6667,\n    \"tls\": false,\n    \"verify\": false,\n    \"proxy\": false,\n    \"password\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"\",\n    \"user\": \"myUser\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
+					"raw": "{\n    \"disabled\": false,\n    \"group\": 0,\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 6667,\n    \"tls\": false,\n    \"verify\": false,\n    \"proxy\": false,\n    \"password\": \"\",\n    \"saslUsername\": \"\",\n    \"saslPassword\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"\",\n    \"user\": \"myUser\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -2222,7 +2234,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"disabled\": false,\n    \"group\": 0,\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 6667,\n    \"tls\": false,\n    \"verify\": false,\n    \"proxy\": false,\n    \"password\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"user\": \"\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
+					"raw": "{\n    \"disabled\": false,\n    \"group\": 0,\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 6667,\n    \"tls\": false,\n    \"verify\": false,\n    \"proxy\": false,\n    \"password\": \"\",\n    \"saslUsername\": \"\",\n    \"saslPassword\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"user\": \"\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
 					"options": {
 						"raw": {
 							"language": "json"

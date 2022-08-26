@@ -22,6 +22,7 @@ The scope of the CAP negotiation will be limited to SASL authentication.
   - If new properties are not present in servers.json, they will default to empty strings without error.
 - API changes
   - Update routes and input validations to handle new properties `saslUsername` and `saslPassword`.
+  - Update postman collection for new properties in server list editor
 - Server list editor
   - Update form to edit new properties `saslUsername` and `saslPassword`.
 
