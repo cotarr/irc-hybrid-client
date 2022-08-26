@@ -154,6 +154,30 @@
               </div>
             </div>
           </div>
+          <div class="button-div">
+            <input type="text" id="saslUsernameInputId" value="">
+            <div class="input-label-right">IRC server SASL password (Optional)</div>
+          </div>
+          <div class="button-div">
+            <div>
+              <input type="text" id="saslPasswordInputId" value="">
+              <div class="input-label-right">IRC server SASL password (Optional) </div>
+              <button id="replaceSaslPasswordButton">Replace</button>
+            </div>
+            <div id="serverSaslPasswordWarningDiv">
+              <ul>
+                <li>Enter new IRC server SASL password, then press [Save] button</li>
+                <li>To clear previous entry, leave blank and press [Save] button</li>
+                <li>To abort changing the previous value, press [Cancel] button above</li>
+                <li>It is not possible to view the previous SASL password from the web browser.</li>
+                <li>SASL mechanism: only <b>plain</b> is supported.</li>
+              </ul>
+              <div class="yellow-warning-div">
+                Note: IRC server SASL passwords will be stored unencrypted in clear text
+                in &quot;servers.json&quot; located in the base folder of the web server.
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="vh20"></div>

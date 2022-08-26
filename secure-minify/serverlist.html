@@ -23,7 +23,13 @@ id="proxyCheckboxId"><div class="input-label-right">Use Socks5 Proxy if availabl
 class="input-label-right">IRC server password (Optional)</div><button id="replacePasswordButton">Replace</button></div><div id="serverPasswordWarningDiv"><ul><li>
 Enter new IRC server password, then press [Save] button</li><li>To clear previous entry, leave blank and press [Save] button</li><li>To abort changing the previous value, press [Cancel] button above
 </li><li>It is not possible to view the previous password from the web browser.</li></ul><div class="yellow-warning-div">
-Note: IRC server passwords will be stored unencrypted in clear text in &quot;servers.json&quot; located in the base folder of the web server.</div></div></div></div><div class="vh20"></div><div 
+Note: IRC server passwords will be stored unencrypted in clear text in &quot;servers.json&quot; located in the base folder of the web server.</div></div></div><div class="button-div"><input 
+type="text" id="saslUsernameInputId" value=""><div class="input-label-right">IRC server SASL password (Optional)</div></div><div class="button-div"><div><input type="text" id="saslPasswordInputId" 
+value=""><div class="input-label-right">IRC server SASL password (Optional)</div><button id="replaceSaslPasswordButton">Replace</button></div><div id="serverSaslPasswordWarningDiv"><ul><li>
+Enter new IRC server SASL password, then press [Save] button</li><li>To clear previous entry, leave blank and press [Save] button</li><li>
+To abort changing the previous value, press [Cancel] button above</li><li>It is not possible to view the previous SASL password from the web browser.</li><li>SASL mechanism: only <b>plain</b>
+ is supported.</li></ul><div class="yellow-warning-div">
+Note: IRC server SASL passwords will be stored unencrypted in clear text in &quot;servers.json&quot; located in the base folder of the web server.</div></div></div></div><div class="vh20"></div><div 
 class="input-group"><h3>User Settings</h3><div class="button-div"><input type="text" id="nickInputId" value=""><div class="input-label-right">User IRC nickname</div></div><div class="button-div">
 <input type="text" id="altNickInputId" value=""><div class="input-label-right">Alternate nickname (Disabled when blank)</div></div><div class="button-div"><input type="checkbox" 
 id="recoverNickCheckboxId"><div class="input-label-right">Attempt to auto-recover nickname from alternate.</div></div><div class="button-div"><input type="text" id="realInputId" value=""><div 

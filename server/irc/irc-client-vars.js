@@ -48,6 +48,8 @@
   // ircState hold main IRC state variables visible to browser and backend
   const ircState = {};
   let ircServerPassword = null;
+  let ircSaslUsername = null;
+  let ircSaslPassword = null;
 
   // Socks5 proxy variables
   let socks5Username = '';
@@ -169,6 +171,8 @@
     servers: servers,
     ircState: ircState,
     ircServerPassword: ircServerPassword,
+    ircSaslUsername: ircSaslUsername,
+    ircSaslPassword: ircSaslPassword,
     socks5Username: socks5Username,
     socks5Password: socks5Password,
     nsIdentifyNick: nsIdentifyNick,

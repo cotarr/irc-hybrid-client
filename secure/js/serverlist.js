@@ -40,6 +40,8 @@
 //   "reconnect": false,
 //   "logging": logging,
 //   "password": "",
+//   "saslUsername": "",
+//   "saslPassword": "",
 //   "identifyNick": "",
 //   "identifyCommand": "",
 //   "nick": "myNick",
@@ -225,6 +227,11 @@ const clearIrcServerForm = () => {
     document.getElementById('passwordInputId').value = '(Blank)';
     document.getElementById('replacePasswordButton').removeAttribute('hidden');
     document.getElementById('serverPasswordWarningDiv').setAttribute('hidden', '');
+    document.getElementById('saslUsernameInputId').value = '';
+    document.getElementById('saslPasswordInputId').setAttribute('disabled', '');
+    document.getElementById('saslPasswordInputId').value = '(Blank)';
+    document.getElementById('replaceSaslPasswordButton').removeAttribute('hidden');
+    document.getElementById('serverSaslPasswordWarningDiv').setAttribute('hidden', '');
     document.getElementById('identifyNickInputId').value = '';
     document.getElementById('identifyCommandInputId').setAttribute('disabled', '');
     document.getElementById('identifyCommandInputId').value = '(blank)';
@@ -301,6 +308,15 @@ const populateIrcServerForm = (data) => {
       document.getElementById('passwordInputId').value = '(blank)';
     }
     document.getElementById('serverPasswordWarningDiv').setAttribute('hidden', '');
+    document.getElementById('saslUsernameInputId').value = data.saslUsername;
+    document.getElementById('saslPasswordInputId').setAttribute('disabled', '');
+    document.getElementById('replaceSaslPasswordButton').removeAttribute('hidden');
+    if (data.saslPassword === null) {
+      document.getElementById('saslPasswordInputId').value = '(hidden)';
+    } else {
+      document.getElementById('saslPasswordInputId').value = '(blank)';
+    }
+    document.getElementById('serverSaslPasswordWarningDiv').setAttribute('hidden', '');
     document.getElementById('identifyNickInputId').value = data.identifyNick;
     document.getElementById('identifyCommandInputId').setAttribute('disabled', '');
     document.getElementById('replaceIdentifyCommandButton').removeAttribute('hidden');
@@ -463,6 +479,10 @@ const parseFormInputValues = () => {
     if (!(document.getElementById('passwordInputId').hasAttribute('disabled'))) {
       data.password = document.getElementById('passwordInputId').value;
     }
+    data.saslUsername = document.getElementById('saslUsernameInputId').value;
+    if (!(document.getElementById('saslPasswordInputId').hasAttribute('disabled'))) {
+      data.saslPassword = document.getElementById('saslPasswordInputId').value;
+    }
     data.identifyNick = document.getElementById('identifyNickInputId').value;
     if (!(document.getElementById('identifyCommandInputId').hasAttribute('disabled'))) {
       data.identifyCommand = document.getElementById('identifyCommandInputId').value;
@@ -532,6 +552,8 @@ const buildServerListTable = (data) => {
     if (full) columnTitles.push('verify'); // td23 .verify
     if (full) columnTitles.push('proxy'); // td24 .proxy
     if (full) columnTitles.push('password'); //  td25 .password
+    if (full) columnTitles.push('sasl username'); //  td26 .password
+    if (full) columnTitles.push('sasl password'); //  td27 .password
 
     columnTitles.push('Nick'); // td30 .nick
     if (full) columnTitles.push('Alternate'); // td32 .altNick
@@ -662,6 +684,18 @@ const buildServerListTable = (data) => {
             td25El.textContent = '(blank)';
           }
           rowEl.appendChild(td25El);
+
+          const td26El = document.createElement('td');
+          td26El.textContent = data[i].saslUsername;
+          rowEl.appendChild(td26El);
+
+          const td27El = document.createElement('td');
+          if (data[i].saslPassword === null) {
+            td27El.textContent = '(hidden)';
+          } else {
+            td27El.textContent = '(blank)';
+          }
+          rowEl.appendChild(td27El);
         } // if (full)
 
         const td30El = document.createElement('td');
@@ -868,6 +902,16 @@ document.getElementById('replacePasswordButton').addEventListener('click', () =>
   document.getElementById('passwordInputId').value = '';
   document.getElementById('replacePasswordButton').setAttribute('hidden', '');
   document.getElementById('serverPasswordWarningDiv').removeAttribute('hidden');
+});
+
+/**
+ * Replace IRC server SASL password Button Event Handler
+ */
+document.getElementById('replaceSaslPasswordButton').addEventListener('click', () => {
+  document.getElementById('saslPasswordInputId').removeAttribute('disabled');
+  document.getElementById('saslPasswordInputId').value = '';
+  document.getElementById('replaceSaslPasswordButton').setAttribute('hidden', '');
+  document.getElementById('serverSaslPasswordWarningDiv').removeAttribute('hidden');
 });
 
 /**

@@ -43,6 +43,8 @@
 //   "reconnect": false,
 //   "logging": false,
 //   "password": "",
+//   "saslUsername", "",
+//   "saslPassword", "",
 //   "identifyNick": "",
 //   "identifyCommand": "",
 //   "nick": "myNick",
@@ -302,6 +304,39 @@
   };
 
   /**
+   * Check for missing properties in each IRC server, add default if necessary
+   * The purpose is to handle upgrade from previous versions
+   * @param {Object} chainObject - Wrapper object used to pass common date through promise chain
+   * @returns {Promise} Resolve to Object (chainObject) or reject error
+   */
+  const addMissingProperties = function (chainObject) {
+    return new Promise(function (resolve, reject) {
+      // console.log(JSON.stringify(chainObject.serversFile.serverArray, null, 2));
+      // Upgrade fix, add missing properties set to default
+      if (chainObject.serversFile.serverArray.length > 0) {
+        for (let i = 0; i < chainObject.serversFile.serverArray.length; i++) {
+          if (!('group' in chainObject.serversFile.serverArray[i])) {
+            chainObject.serversFile.serverArray[i].group = 0;
+          }
+          if (!('altNick' in chainObject.serversFile.serverArray[i])) {
+            chainObject.serversFile.serverArray[i].altNick = '';
+          }
+          if (!('recoverNick' in chainObject.serversFile.serverArray[i])) {
+            chainObject.serversFile.serverArray[i].recoverNick = false;
+          }
+          if (!('saslUsername' in chainObject.serversFile.serverArray[i])) {
+            chainObject.serversFile.serverArray[i].saslUsername = '';
+          }
+          if (!('saslPassword' in chainObject.serversFile.serverArray[i])) {
+            chainObject.serversFile.serverArray[i].saslPassword = '';
+          }
+        }
+      }
+      resolve(chainObject);
+    });
+  };
+
+  /**
    * Function to serialize IRC server properties for use in API response.
    * Strings stored in arrays are converted into comma separated strings
    * Serialized IRC server object is added to chainObject as chainObject.serverArray
@@ -337,6 +372,15 @@
               // else never send password, replace with NULL
               tempServer.password = null;
             }
+            tempServer.saslUsername = chainObject.serversFile.serverArray[i].saslUsername;
+            // Security: Password is never sent to the browser
+            if (chainObject.serversFile.serverArray[i].saslPassword.length === 0) {
+              // No password has been set, return empty string
+              tempServer.saslPassword = '';
+            } else {
+              // else never send password, replace with NULL
+              tempServer.saslPassword = null;
+            }
             tempServer.identifyNick = chainObject.serversFile.serverArray[i].identifyNick;
             // Security: Nickserv identify password  is never sent to the browser
             if (chainObject.serversFile.serverArray[i].identifyCommand.length === 0) {
@@ -346,7 +390,6 @@
               // else never send identifyCommand, replace with NULL
               tempServer.identifyCommand = null;
             }
-
             // tempServer.identifyCommand = chainObject.serversFile.serverArray[i].identifyCommand;
             tempServer.nick = chainObject.serversFile.serverArray[i].nick;
             tempServer.altNick = chainObject.serversFile.serverArray[i].altNick || '';
@@ -428,6 +471,18 @@
         } else {
           // case of existing IRC server, use existing value
           tempServer.password = chainObject.serversFile.serverArray[index].password;
+        }
+      }
+      tempServer.saslUsername = req.body.saslUsername;
+      if ('saslPassword' in req.body) {
+        tempServer.saslPassword = req.body.saslPassword;
+      } else {
+        if ((!('index' in req.query)) || (req.query.index === -1)) {
+          // case of new IRC server
+          tempServer.saslPassword = '';
+        } else {
+          // case of existing IRC server, use existing value
+          tempServer.saslPassword = chainObject.serversFile.serverArray[index].saslPassword;
         }
       }
       tempServer.identifyNick = req.body.identifyNick;
@@ -744,6 +799,7 @@
     requireListWithoutLock(req, chainObject)
       .then((chainObject) => setDatabaseLock(req, chainObject))
       .then((chainObject) => readServersFile(chainObject))
+      .then((chainObject) => addMissingProperties(chainObject))
       .then((chainObject) => serializeElements(chainObject))
       .then((chainObject) => returnServerList(req, res, next, chainObject))
       .catch((err) => next(err));
@@ -757,6 +813,7 @@
     requireIrcNotConnected(chainObject)
       .then((chainObject) => requireNotLock(chainObject))
       .then((chainObject) => readServersFile(chainObject))
+      .then((chainObject) => addMissingProperties(chainObject))
       .then((chainObject) => deserializeElements(req, chainObject))
       .then((chainObject) => appendArrayElement(chainObject))
       .then((chainObject) => writeServersFile(chainObject))
@@ -773,6 +830,7 @@
       .then((chainObject) => requireLock(chainObject))
       .then((chainObject) => matchIndex(req, chainObject))
       .then((chainObject) => readServersFile(chainObject))
+      .then((chainObject) => addMissingProperties(chainObject))
       .then((chainObject) => deserializeElements(req, chainObject))
       .then((chainObject) => replaceArrayElement(req, chainObject))
       .then((chainObject) => writeServersFile(chainObject))
@@ -789,6 +847,7 @@
     requireIrcNotConnected(chainObject)
       .then((chainObject) => requireNotLock(chainObject))
       .then((chainObject) => readServersFile(chainObject))
+      .then((chainObject) => addMissingProperties(chainObject))
       .then((chainObject) => copyExistingServer(req, chainObject))
       .then((chainObject) => appendArrayElement(chainObject))
       .then((chainObject) => writeServersFile(chainObject))
@@ -804,6 +863,7 @@
     requireIrcNotConnected(chainObject)
       .then((chainObject) => requireNotLock(chainObject))
       .then((chainObject) => readServersFile(chainObject))
+      .then((chainObject) => addMissingProperties(chainObject))
       .then((chainObject) => deleteArrayElement(req, chainObject))
       .then((chainObject) => writeServersFile(chainObject))
       .then((chainObject) => returnStatus(req, res, chainObject))
@@ -824,6 +884,7 @@
       requireIrcNotConnected(chainObject)
         .then((chainObject) => requireNotLock(chainObject))
         .then((chainObject) => readServersFile(chainObject))
+        .then((chainObject) => addMissingProperties(chainObject))
         .then((chainObject) => reorderArray(req, chainObject))
         .then((chainObject) => writeServersFile(chainObject))
         .then((chainObject) => returnStatus(req, res, chainObject))
@@ -838,6 +899,7 @@
       requireIrcNotConnected(chainObject)
         .then((chainObject) => requireNotLock(chainObject))
         .then((chainObject) => readServersFile(chainObject))
+        .then((chainObject) => addMissingProperties(chainObject))
         .then((chainObject) => toggleServerDisabled(req, chainObject))
         .then((chainObject) => writeServersFile(chainObject))
         .then((chainObject) => returnStatus(req, res, chainObject))

@@ -113,6 +113,8 @@
         'reconnect',
         'logging',
         'password',
+        'saslUsername',
+        'saslPassword',
         'identifyNick',
         'identifyCommand',
         'nick',
@@ -146,6 +148,7 @@
       'proxy',
       'reconnect',
       'logging',
+      'saslUsername',
       'identifyNick',
       'nick',
       'altNick',
@@ -187,10 +190,12 @@
       .notEmpty(),
     body([
       'password',
+      'saslPassword',
       'identifyCommand'], 'Require type String').optional()
       .isString()
       .isLength({ min: 0, max: 255 }),
     body([
+      'saslUsername',
       'identifyNick',
       'altNick',
       'modes',
@@ -216,6 +221,7 @@
     body([
       'name',
       'host',
+      'saslUsername',
       'identifyNick',
       'nick',
       'altNick',
@@ -227,6 +233,7 @@
       .trim(),
     body([
       'password',
+      'saslPassword',
       'identifyCommand'])
       // remove starting and ending whitespace
       .optional()
@@ -268,6 +275,8 @@
         'reconnect',
         'logging',
         'password',
+        'saslUsername',
+        'saslPassword',
         'identifyNick',
         'identifyCommand',
         'nick',
@@ -303,6 +312,7 @@
       'proxy',
       'reconnect',
       'logging',
+      'saslUsername',
       'identifyNick',
       'nick',
       'altNick',
@@ -352,10 +362,12 @@
       .notEmpty(),
     body([
       'password',
+      'saslPassword',
       'identifyCommand'], 'Require type String').optional()
       .isString()
       .isLength({ min: 0, max: 255 }),
     body([
+      'saslUsername',
       'identifyNick',
       'altNick',
       'modes',
@@ -385,6 +397,7 @@
     body([
       'name',
       'host',
+      'saslUsername',
       'identifyNick',
       'nick',
       'altNick',
@@ -396,6 +409,7 @@
       .trim(),
     body([
       'password',
+      'saslPassword',
       'identifyCommand'])
       // remove starting and ending whitespace
       .optional()
@@ -437,6 +451,8 @@
         'reconnect',
         'logging',
         'password',
+        'saslUsername',
+        'saslPassword',
         'identifyNick',
         'identifyCommand',
         'nick',
@@ -522,6 +538,8 @@
         'reconnect',
         'logging',
         'password',
+        'saslUsername',
+        'saslPassword',
         'identifyNick',
         'identifyCommand',
         'nick',
@@ -607,6 +625,8 @@
         'reconnect',
         'logging',
         'password',
+        'saslUsername',
+        'saslPassword',
         'identifyNick',
         'identifyCommand',
         'nick',

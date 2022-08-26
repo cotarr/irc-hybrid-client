@@ -13,6 +13,8 @@
       "reconnect": false,
       "logging": false,
       "password": "",
+      "saslUsername": "",
+      "saslPassword": "",
       "identifyNick": "",
       "identifyCommand": "",
       "nick": "MyNickname",

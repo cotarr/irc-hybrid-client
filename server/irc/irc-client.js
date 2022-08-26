@@ -79,6 +79,12 @@
         if (!('recoverNick' in vars.servers.serverArray[i])) {
           vars.servers.serverArray[i].recoverNick = false;
         }
+        if (!('saslUsername' in vars.servers.serverArray[i])) {
+          vars.servers.serverArray[i].saslUsername = '';
+        }
+        if (!('saslPassword' in vars.servers.serverArray[i])) {
+          vars.servers.serverArray[i].saslPassword = '';
+        }
       }
     }
   }; // loadServerList()
@@ -147,6 +153,8 @@
     vars.ircState.ircServerRotation = false;
     ircLog.setRawMessageLogEnabled(false);
     vars.ircServerPassword = null;
+    vars.ircSaslUsername = null;
+    vars.ircSaslPassword = null;
     vars.nsIdentifyNick = null;
     vars.nsIdentifyCommand = null;
     vars.ircState.nickName = null;
@@ -203,6 +211,8 @@
         vars.servers.serverArray[vars.ircState.ircServerIndex].logging);
 
       vars.ircServerPassword = vars.servers.serverArray[vars.ircState.ircServerIndex].password;
+      vars.ircSaslUsername = vars.servers.serverArray[vars.ircState.ircServerIndex].saslUsername;
+      vars.ircSaslPassword = vars.servers.serverArray[vars.ircState.ircServerIndex].saslPassword;
       vars.nsIdentifyNick = vars.servers.serverArray[vars.ircState.ircServerIndex].identifyNick;
       vars.nsIdentifyCommand =
         vars.servers.serverArray[vars.ircState.ircServerIndex].identifyCommand;

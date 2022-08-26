@@ -6,6 +6,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Next 2022-08-25
+
+This is a feature update to add IRC server SASL authentication. 
+At this time, SASL mechanism will be limited to `plain`. 
+
+Adding SASL requires adding IRCv3 CAP negotiation
+The scope of the CAP negotiation will be limited to SASL authentication.
+
+### Added
+
+- Configuration changes
+  - Added new string property `saslUsername` to server definition in servers.json
+  - Added new string property `saslPassword` to server definition in servers.json
+  - If new properties are not present in servers.json, they will default to empty strings without error.
+- API changes
+  - Update routes and input validations to handle new properties `saslUsername` and `saslPassword`.
+- Server list editor
+  - Update form to edit new properties `saslUsername` and `saslPassword`.
+
 ## [v0.2.11](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.11) 2022-08-25
 
 ### Changed
