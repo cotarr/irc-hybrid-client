@@ -389,6 +389,29 @@ document.addEventListener('server-message', function (event) {
     case '376': // End MOTD
       break;
 
+    //
+    // IRCv3 CAP SASL authentication success messages
+    case '900':
+      displayRawMessage(
+        cleanFormatting(
+          cleanCtcpDelimiter(
+            event.detail.parsedMessage.timestamp + ' ' +
+            'AUTHENTICATE ' +
+            event.detail.parsedMessage.params[0] + ' ' +
+            event.detail.parsedMessage.params[1] + ' ' +
+            event.detail.parsedMessage.params[2] + ' ' +
+            event.detail.parsedMessage.params[3])));
+      break;
+    case '903':
+      displayRawMessage(
+        cleanFormatting(
+          cleanCtcpDelimiter(
+            event.detail.parsedMessage.timestamp + ' ' +
+            'AUTHENTICATE ' +
+            event.detail.parsedMessage.params[0] + ' ' +
+            event.detail.parsedMessage.params[1])));
+      break;
+
     case 'MODE':
       displayRawMessage(
         cleanFormatting(

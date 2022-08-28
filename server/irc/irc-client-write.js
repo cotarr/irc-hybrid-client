@@ -57,6 +57,7 @@
       const filterWords = [
         'OPER',
         'PASS',
+        'AUTHENTICATE',
         'NICKSERV',
         'NS',
         'CHANSERV',

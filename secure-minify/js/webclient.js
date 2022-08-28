@@ -870,8 +870,12 @@ const outMessage='WHOIS '+event.detail.parsedMessage.params[1]+' is away: '+even
 displayRawMessage('WHOIS --End--');break;case'322':if(4===event.detail.parsedMessage.params.length){let outMessage='LIST '+event.detail.parsedMessage.params[1]+' '+event.detail.parsedMessage.params[2]
 ;if(event.detail.parsedMessage.params[3])outMessage+=' '+event.detail.parsedMessage.params[3];displayRawMessage(cleanFormatting(cleanCtcpDelimiter(outMessage)))
 }else console.log('Error Msg 322 not have 4 parsed parameters');break;case'321':break;case'323':displayRawMessage('LIST --End--');break;case'372':_showAfterParamZero(event.detail.parsedMessage,null)
-;break;case'375':case'376':break;case'MODE':
-displayRawMessage(cleanFormatting(cleanCtcpDelimiter(event.detail.parsedMessage.timestamp+' '+'MODE '+event.detail.parsedMessage.params[0]+' '+event.detail.parsedMessage.params[1])));break;case'NICK':
+;break;case'375':case'376':break;case'900':
+displayRawMessage(cleanFormatting(cleanCtcpDelimiter(event.detail.parsedMessage.timestamp+' '+'AUTHENTICATE '+event.detail.parsedMessage.params[0]+' '+event.detail.parsedMessage.params[1]+' '+event.detail.parsedMessage.params[2]+' '+event.detail.parsedMessage.params[3])))
+;break;case'903':
+displayRawMessage(cleanFormatting(cleanCtcpDelimiter(event.detail.parsedMessage.timestamp+' '+'AUTHENTICATE '+event.detail.parsedMessage.params[0]+' '+event.detail.parsedMessage.params[1])));break
+;case'MODE':displayRawMessage(cleanFormatting(cleanCtcpDelimiter(event.detail.parsedMessage.timestamp+' '+'MODE '+event.detail.parsedMessage.params[0]+' '+event.detail.parsedMessage.params[1])));break
+;case'NICK':
 displayRawMessage(cleanFormatting(cleanCtcpDelimiter(event.detail.parsedMessage.timestamp+' '+'(No channel) '+event.detail.parsedMessage.nick+' is now known as '+event.detail.parsedMessage.params[0])))
 ;break;case'NOTICE':
 displayRawMessage(cleanFormatting(cleanCtcpDelimiter(event.detail.parsedMessage.timestamp+' '+'NOTICE '+event.detail.parsedMessage.params[0]+' '+event.detail.parsedMessage.params[1])));break

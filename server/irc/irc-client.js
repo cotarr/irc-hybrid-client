@@ -43,6 +43,7 @@
 
   const ircWrite = require('./irc-client-write');
   const ircParse = require('./irc-client-parse');
+  const ircCap = require('./irc-client-cap');
   const ircCommand = require('./irc-client-command');
   const ircMessageCache = require('./irc-client-cache');
   const vars = require('./irc-client-vars');
@@ -508,6 +509,9 @@
     setTimeout(function () {
       // check state, if error occurred this will be false.
       if (vars.ircState.ircConnecting) {
+        // IRCv3 CAP negotiation
+        ircCap.initCapNegotiation(socket);
+        // Traditional IRC Registration
         if ((vars.ircServerPassword) && (vars.ircServerPassword.length > 0)) {
           ircWrite.writeSocket(socket, 'PASS ' + vars.ircServerPassword);
         }

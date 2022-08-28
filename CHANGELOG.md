@@ -20,9 +20,19 @@ The scope of the CAP negotiation will be limited to SASL authentication.
   - Added new string property `saslUsername` to server definition in servers.json
   - Added new string property `saslPassword` to server definition in servers.json
   - If new properties are not present in servers.json, they will default to empty strings without error.
+
+- Browser changes
+  - secure/js/webclient.js - New custom notify messages for 900 and 903
+
+- Server
+  - server/irc-client-cap.js - New vile created to handle IRCv3 CAP and sasl AUTHENTICATE commands.
+  - server/irc-client-write.js - Add log file filter for AUTHENTICATE commands to keep passwords out of log file.
+  - server/irc-client-parse.js - Added IRC server message handlers for CAP, AUTHENTICATE, and numeric messages 900 to 908. These call functions in the irc-client-cap.js module.
+
 - API changes
   - Update routes and input validations to handle new properties `saslUsername` and `saslPassword`.
   - Update postman collection for new properties in server list editor
+
 - Server list editor
   - Update form to edit new properties `saslUsername` and `saslPassword`.
 

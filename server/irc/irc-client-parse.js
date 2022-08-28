@@ -35,6 +35,7 @@
   'use strict';
 
   const ircCtcp = require('./irc-client-ctcp');
+  const ircCap = require('./irc-client-cap');
   const ircWrite = require('./irc-client-write');
   const ircLog = require('./irc-client-log');
   ircLog.test = 'test';
@@ -507,6 +508,9 @@
     // -------------------------------------------------
     switch (parsedMessage.command) {
       case '001':
+        // Clean up flags from IRCv3 SASL authentication workflow
+        ircCap.closeSaslAuth();
+
         if (!vars.ircState.ircRegistered) {
           // extract my client info from last argument in 001 message
           const splitparams1 = parsedMessage.params[1].split(' ');
@@ -816,6 +820,42 @@
           vars.ircState.nickRecoveryActive = false;
           tellBrowserToRequestState();
         }
+        break;
+
+      // 900-908 CAP SASL numeric responses
+      //
+      case '900':
+      case '903':
+        ircCap.numericSuccessHandler(socket, parsedMessage);
+        break;
+      //
+      case '901':
+      case '902':
+      case '904':
+      case '905':
+      case '906':
+      case '907':
+      case '908':
+        ircCap.numericErrorHandler(socket, parsedMessage);
+        break;
+      //
+      // AUTHENTICATE - SASL authentication response
+      //
+      case 'AUTHENTICATE':
+        //
+        // Handle externally in irc-client-cap.js
+        //
+        ircCap.parseAuthMessage(socket, parsedMessage);
+        break;
+      //
+      //
+      // CAP - IRCv3 Capability negotiation
+      //
+      case 'CAP':
+        //
+        // Handle externally in irc-client-cap.js
+        //
+        ircCap.parseCapMessage(socket, parsedMessage);
         break;
       //
       case 'ERROR':
