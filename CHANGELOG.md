@@ -36,6 +36,10 @@ The scope of the CAP negotiation will be limited to SASL authentication.
 - Server list editor
   - Update form to edit new properties `saslUsername` and `saslPassword`.
 
+### Fixed
+- Several places the IRC socket was destroyed without destroying the socks5 socket when using proxy.
+
+
 ## [v0.2.11](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.11) 2022-08-25
 
 ### Changed

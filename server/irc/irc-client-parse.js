@@ -421,7 +421,7 @@
   //
   // Input: Node.js UTF-8 encoded Buffer object
   // -----------------------------------------------------------------
-  const _processIrcMessage = function (socket, messageBuffer) {
+  const _processIrcMessage = function (socket, socks5Socket, messageBuffer) {
     //
     // parse message into: prefix, command, and param array
     //
@@ -575,7 +575,15 @@
           } else {
             global.sendToBrowser(
               'webServer: Registration error, unable to parse nick!user@host from message 001\n');
-            socket.destroy();
+            if (socket) {
+              socket.destroy();
+            }
+            socket = null;
+            if (socks5Socket) {
+              socks5Socket.destroy();
+            }
+            socks5Socket = null;
+
             vars.ircState.ircConnecting = false;
             vars.ircState.ircConnected = false;
             vars.ircState.ircRegistered = false;
@@ -706,6 +714,12 @@
             if (socket) {
               socket.destroy();
             }
+            socket = null;
+            if (socks5Socket) {
+              socks5Socket.destroy();
+            }
+            socks5Socket = null;
+
             // signal browser to show an error
             vars.ircState.count.ircConnectError++;
 
@@ -770,6 +784,12 @@
             if (socket) {
               socket.destroy();
             }
+            socket = null;
+            if (socks5Socket) {
+              socks5Socket.destroy();
+            }
+            socks5Socket = null;
+
             // signal browser to show an error
             vars.ircState.count.ircConnectError++;
 
@@ -807,6 +827,12 @@
           if (socket) {
             socket.destroy();
           }
+          socket = null;
+          if (socks5Socket) {
+            socks5Socket.destroy();
+          }
+          socks5Socket = null;
+
           // signal browser to show an error
           vars.ircState.count.ircConnectError++;
 

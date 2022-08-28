@@ -606,7 +606,7 @@
             // message ignore
           } else {
             // else message processed
-            ircParse._processIrcMessage(socket, message);
+            ircParse._processIrcMessage(socket, socks5Socket, message);
           }
         }
         index = i + 1;
@@ -703,9 +703,11 @@
           if (ircSocket) {
             ircSocket.destroy();
           }
+          ircSocket = null;
           if (socks5Socket) {
             socks5Socket.destroy();
           }
+          socks5Socket = null;
           // signal browser to show an error
           vars.ircState.count.ircConnectError++;
 
@@ -873,9 +875,11 @@
         if (ircSocket) {
           ircSocket.destroy();
         }
+        ircSocket = null;
         if (socks5Socket) {
           socks5Socket.destroy();
         }
+        socks5Socket = null;
       });
     } // createIrcSocketEventListeners()
 
@@ -1053,9 +1057,11 @@
         if (ircSocket) {
           ircSocket.destroy();
         }
+        ircSocket = null;
         if (socks5Socket) {
           socks5Socket.destroy();
         }
+        socks5Socket = null;
       });
     }
   }; // connectIRC()
@@ -1078,9 +1084,11 @@
       if (ircSocket) {
         ircSocket.destroy();
       }
+      ircSocket = null;
       if (socks5Socket) {
         socks5Socket.destroy();
       }
+      socks5Socket = null;
       // signal browser to show an error
       vars.ircState.count.ircConnectError++;
 
@@ -1258,9 +1266,11 @@
       if (ircSocket) {
         ircSocket.destroy();
       }
+      ircSocket = null;
       if (socks5Socket) {
         socks5Socket.destroy();
       }
+      socks5Socket = null;
       vars.ircState.ircServerPrefix = '';
       vars.ircState.ircConnecting = false;
       vars.ircState.ircConnected = false;
@@ -1313,9 +1323,11 @@
       if (ircSocket) {
         ircSocket.destroy();
       }
+      ircSocket = null;
       if (socks5Socket) {
         socks5Socket.destroy();
       }
+      socks5Socket = null;
       // signal browser to show an error
       vars.ircState.count.ircConnectError++;
 
@@ -1345,9 +1357,11 @@
           if (ircSocket) {
             ircSocket.destroy();
           }
+          ircSocket = null;
           if (socks5Socket) {
             socks5Socket.destroy();
           }
+          socks5Socket = null;
           // signal browser to show an error
           vars.ircState.count.ircConnectError++;
 
@@ -1754,9 +1768,11 @@
     if (ircSocket) {
       ircSocket.destroy();
     }
+    ircSocket = null;
     if (socks5Socket) {
       socks5Socket.destroy();
     }
+    socks5Socket = null;
     vars.ircState.ircServerPrefix = '';
     vars.ircState.ircConnecting = false;
     vars.ircState.ircConnected = false;
