@@ -495,6 +495,13 @@
 
     tellBrowserToRequestState();
 
+    const logMsg = 'Rotated IRC server to definition ' +
+      vars.servers.serverArray[vars.ircState.ircServerIndex].name +
+      ' at index ' + vars.ircState.ircServerIndex +
+      ' using nickname ' + vars.ircState.nickName;
+    ircLog.writeIrcLog(logMsg);
+    global.sendToBrowser('webError: ' + logMsg + '\n');
+
     //
     // De-bounce disconnect for 5 seconds
     // There can be several sockets: Proxy socket, TLS socket and TCP socket.
