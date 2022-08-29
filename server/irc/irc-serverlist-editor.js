@@ -436,6 +436,7 @@
         cleanString += commaSeparatedString.charAt(i);
       }
     }
+    if (cleanString === '') return [];
     return cleanString.split(',');
   };
 
