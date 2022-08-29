@@ -325,8 +325,11 @@ document.addEventListener('server-message', function (event) {
     case '313':
     case '317':
     case '319':
+    case '330':
+    case '338':
     case '378':
     case '379':
+    case '671':
       _showAfterParamZero(event.detail.parsedMessage, 'WHOIS');
       break;
     // AWAY message
@@ -391,25 +394,10 @@ document.addEventListener('server-message', function (event) {
 
     //
     // IRCv3 CAP SASL authentication success messages
+    //
     case '900':
-      displayRawMessage(
-        cleanFormatting(
-          cleanCtcpDelimiter(
-            event.detail.parsedMessage.timestamp + ' ' +
-            'AUTHENTICATE ' +
-            event.detail.parsedMessage.params[0] + ' ' +
-            event.detail.parsedMessage.params[1] + ' ' +
-            event.detail.parsedMessage.params[2] + ' ' +
-            event.detail.parsedMessage.params[3])));
-      break;
     case '903':
-      displayRawMessage(
-        cleanFormatting(
-          cleanCtcpDelimiter(
-            event.detail.parsedMessage.timestamp + ' ' +
-            'AUTHENTICATE ' +
-            event.detail.parsedMessage.params[0] + ' ' +
-            event.detail.parsedMessage.params[1])));
+      _showAfterParamZero(event.detail.parsedMessage, null);
       break;
 
     case 'MODE':

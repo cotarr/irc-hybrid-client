@@ -864,18 +864,14 @@ document.addEventListener('server-message',(function(event){function _showAfterP
 ;let outMessage=parsedMessage.timestamp+msgString;if(title)outMessage=title+msgString;displayRawMessage(cleanFormatting(cleanCtcpDelimiter(outMessage)))}switch(event.detail.parsedMessage.command){
 case'001':case'002':case'003':case'004':_showAfterParamZero(event.detail.parsedMessage,null);break;case'005':break;case'250':case'251':case'252':case'254':case'255':case'265':
 _showAfterParamZero(event.detail.parsedMessage,null);break;case'256':case'257':case'258':case'259':_showAfterParamZero(event.detail.parsedMessage,null);break;case'315':displayRawMessage('WHO --End--')
-;break;case'352':_showAfterParamZero(event.detail.parsedMessage,'WHO');break;case'275':case'307':case'311':case'312':case'313':case'317':case'319':case'378':case'379':
+;break;case'352':_showAfterParamZero(event.detail.parsedMessage,'WHO');break;case'275':case'307':case'311':case'312':case'313':case'317':case'319':case'330':case'338':case'378':case'379':case'671':
 _showAfterParamZero(event.detail.parsedMessage,'WHOIS');break;case'301':if(3!==event.detail.parsedMessage.params.length)_showAfterParamZero(event.detail.parsedMessage,'WHOIS');else{
 const outMessage='WHOIS '+event.detail.parsedMessage.params[1]+' is away: '+event.detail.parsedMessage.params[2];displayRawMessage(cleanFormatting(cleanCtcpDelimiter(outMessage)))}break;case'318':
 displayRawMessage('WHOIS --End--');break;case'322':if(4===event.detail.parsedMessage.params.length){let outMessage='LIST '+event.detail.parsedMessage.params[1]+' '+event.detail.parsedMessage.params[2]
 ;if(event.detail.parsedMessage.params[3])outMessage+=' '+event.detail.parsedMessage.params[3];displayRawMessage(cleanFormatting(cleanCtcpDelimiter(outMessage)))
 }else console.log('Error Msg 322 not have 4 parsed parameters');break;case'321':break;case'323':displayRawMessage('LIST --End--');break;case'372':_showAfterParamZero(event.detail.parsedMessage,null)
-;break;case'375':case'376':break;case'900':
-displayRawMessage(cleanFormatting(cleanCtcpDelimiter(event.detail.parsedMessage.timestamp+' '+'AUTHENTICATE '+event.detail.parsedMessage.params[0]+' '+event.detail.parsedMessage.params[1]+' '+event.detail.parsedMessage.params[2]+' '+event.detail.parsedMessage.params[3])))
-;break;case'903':
-displayRawMessage(cleanFormatting(cleanCtcpDelimiter(event.detail.parsedMessage.timestamp+' '+'AUTHENTICATE '+event.detail.parsedMessage.params[0]+' '+event.detail.parsedMessage.params[1])));break
-;case'MODE':displayRawMessage(cleanFormatting(cleanCtcpDelimiter(event.detail.parsedMessage.timestamp+' '+'MODE '+event.detail.parsedMessage.params[0]+' '+event.detail.parsedMessage.params[1])));break
-;case'NICK':
+;break;case'375':case'376':break;case'900':case'903':_showAfterParamZero(event.detail.parsedMessage,null);break;case'MODE':
+displayRawMessage(cleanFormatting(cleanCtcpDelimiter(event.detail.parsedMessage.timestamp+' '+'MODE '+event.detail.parsedMessage.params[0]+' '+event.detail.parsedMessage.params[1])));break;case'NICK':
 displayRawMessage(cleanFormatting(cleanCtcpDelimiter(event.detail.parsedMessage.timestamp+' '+'(No channel) '+event.detail.parsedMessage.nick+' is now known as '+event.detail.parsedMessage.params[0])))
 ;break;case'NOTICE':
 displayRawMessage(cleanFormatting(cleanCtcpDelimiter(event.detail.parsedMessage.timestamp+' '+'NOTICE '+event.detail.parsedMessage.params[0]+' '+event.detail.parsedMessage.params[1])));break
