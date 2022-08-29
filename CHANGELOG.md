@@ -42,9 +42,10 @@ Other IRC networks have not been tested.
 
 ### Fixed
 
-- Server - Several places the IRC socket was destroyed without destroying the socks5 socket when using proxy.
-- Server - Fixed channel list edit API. When no channels were specified for a server definition, the PATCH and POST routes were adding one empty string to the channelList array, causing an extraneous IRC channel join button to be displayed. Re-saving an IRC server definition will remove the extraneous button.
-
+- Server
+  - Several places the IRC socket was destroyed without destroying the socks5 socket when using proxy.
+  - Fixed channel list edit API. When no channels were specified for a server definition, the PATCH and POST routes were adding one empty string to the channelList array, causing an extraneous IRC channel join button to be displayed. Re-saving an IRC server definition will remove the extraneous button.
+  - Fixed /NICK command not working properly in IRC network where 001 message ended in nick, rather than nick!user@host. Yes, the RFC says the 001 string is non-standard and should not be parsed for values, my mistake. In this case, the nick would change on IRC but not reflected in the client, breaking nickname recovery on some IRC networks.
 
 ## [v0.2.11](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.11) 2022-08-25
 

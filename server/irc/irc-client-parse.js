@@ -507,15 +507,37 @@
     // Individual ommands from IRC server are parsed here
     // -------------------------------------------------
     switch (parsedMessage.command) {
+      //
+      // 001 - RPL_WELCOME
+      //
       case '001':
+        // console.log(messageBuffer.toString('utf8'));
+        // console.log('(IRC-->) NICK parsedMessage ' + JSON.stringify(parsedMessage, null, 2));
+        //
         // Clean up flags from IRCv3 SASL authentication workflow
+        //
         ircCap.closeSaslAuth();
 
         if (!vars.ircState.ircRegistered) {
-          // extract my client info from last argument in 001 message
-          const splitparams1 = parsedMessage.params[1].split(' ');
-          const parsedNick = splitparams1[splitparams1.length - 1].split('!')[0];
-          const parsedUserhost = splitparams1[splitparams1.length - 1].split('!')[1];
+          //
+          // Extract my client info from last argument in 001 message
+          //
+          // Different IRC network handle last work of message differently
+          //   nick!nick@host  (Option 1)
+          //   nick            (Option 2)
+          //
+          let parsedNick = null;
+          let parsedUserhost = null;
+          const splitByWords = parsedMessage.params[1].split(' ');
+          const lastWord = splitByWords[splitByWords.length - 1];
+          const subWords = lastWord.split('!');
+          if (subWords.length === 1) {
+            parsedNick = subWords[0];
+            parsedUserhost = '';
+          } else {
+            parsedNick = subWords[0];
+            parsedUserhost = subWords[1];
+          }
           if (parsedNick === vars.ircState.nickName) {
             // case of successful register with nickname, set registered state
             vars.ircState.ircRegistered = true;
@@ -998,10 +1020,19 @@
         break;
 
       case 'NICK':
+        // console.log(messageBuffer.toString('utf8'));
+        // console.log('(IRC-->) NICK parsedMessage ' + JSON.stringify(parsedMessage, null, 2));
+        // console.log('vars.ircState.nickName', vars.ircState.nickName);
+        // console.log('vars.ircState.userHost', vars.ircState.userHost);
+
         // Update global state variable with new nickname
-        if ((parsedMessage.nick === vars.ircState.nickName) &&
-          (parsedMessage.host === vars.ircState.userHost)) {
+        if (parsedMessage.nick === vars.ircState.nickName) {
           vars.ircState.nickName = parsedMessage.params[0];
+          // since the nick matches, it is assumed to be your own connection.
+          // in the case where userHost was not parsed from 001 message, grab it here.
+          if (vars.ircState.userHost === '') {
+            vars.ircState.userHost = parsedMessage.host;
+          }
         }
         // Change nickname in each channel in attendance
         if (vars.ircState.channels.length > 0) {
@@ -1009,8 +1040,6 @@
           const nextNick = parsedMessage.params[0];
           _exchangeNames(previousNick, nextNick);
         }
-        // console.log('(IRC-->) NICK parsedMessage ' + JSON.stringify(parsedMessage, null, 2));
-        // console.log('vars.ircState.nickName', vars.ircState.nickName);
         if (
           // first two are to skip name changes of other users in same IRC channels
           // The vars.ircState.nickName already updated above at start of this handler
@@ -1018,6 +1047,7 @@
           //
           // If not other user NICK request
           (parsedMessage.nick === vars.servers.serverArray[vars.ircState.ircServerIndex].altNick) &&
+          // if userHost is empty string, this will not match, case of another user using altNick
           (parsedMessage.host === vars.ircState.userHost)) {
           // and... if nickname recovery active
           if ((vars.servers.serverArray[vars.ircState.ircServerIndex].recoverNick) &&
