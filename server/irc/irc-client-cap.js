@@ -28,8 +28,7 @@
   'use strict';
 
   const ircWrite = require('./irc-client-write');
-  // const ircLog = require('./irc-client-log');
-  // const ircMessageCache = require('./irc-client-cache');
+  const ircLog = require('./irc-client-log');
   const vars = require('./irc-client-vars');
 
   // saslState - Workflow step identifier
@@ -143,6 +142,9 @@
       saslState = 10;
       // Request IRC server disclose it's IRCv3 capabilities
       ircWrite.writeSocket(socket, 'CAP LS 302');
+
+      ircLog.writeIrcLog(
+        'SASL credentials found, checking to see if IRC server supports SASL authentication.');
     }
   };
 
@@ -171,7 +173,8 @@
           saslState = 999;
           // Send: CAP END
           _sendCapEndOneTimeOnly(socket);
-          global.sendToBrowser('webError: SASL authentication not supported\n');
+          global.sendToBrowser('webError: SASL authentication not supported by IRC server\n');
+          ircLog.writeIrcLog('SASL authentication not supported by IRC server');
         }
       } else if (data.error) {
         // Parsing error in response to CAP LS, for debugging
@@ -187,7 +190,8 @@
         saslState = 30;
         ircWrite.writeSocket(socket, 'AUTHENTICATE PLAIN');
       } else {
-        console.log('sasl not fund in CAP REQ/ACK response');
+        global.sendToBrowser('webError: SASL authentication does not support mechanism PLAIN\n');
+        ircLog.writeIrcLog('SASL authentication does not support mechanism PLAIN');
         saslState = 999;
       }
     } else {
@@ -213,6 +217,8 @@
         vars.ircSaslPassword).toString('base64');
       saslState = 40;
       ircWrite.writeSocket(socket, 'AUTHENTICATE ' + authString);
+      ircLog.writeIrcLog(
+        'IRC server supports SASL with mechanism PLAIN, sending SASL credentials.');
     } else {
       console.log('Error parsing SASL AUTHENTICATE PLAIN response');
       saslState = 999;
@@ -228,7 +234,7 @@
   const numericSuccessHandler = function (socket, parsedMessage) {
     // console.log('(IRC-->) parsedMessage ', JSON.stringify(parsedMessage, null, 2));
     // 900 RPL_LOGGEDIN is sent when the user’s account name is set
-    if (parsedMessage.command === '903') {
+    if (parsedMessage.command === '900') {
       if (saslState === 40) saslState = 50;
     }
     // 903 RPL_SASLSUCCESS is sent when the SASL authentication finishes successfully
@@ -264,11 +270,18 @@
     // 0 --> SASL and CAP not requested
     if (saslState !== 0) {
       // else detect success/error
+      if (saslState === 10) {
+        ircLog.writeIrcLog('IRC server did not respond to CAP LS query.');
+        global.sendToBrowser('webError: IRC server did not respond to CAP LS query\n');
+      }
       if (saslState === 60) {
         saslState = 100;
-        global.sendToBrowser('webServer: SASL authentication successful\n');
+        ircLog.writeIrcLog('SASL authentication successful.');
       } else {
-        global.sendToBrowser('webError: SASL authentication failed\n');
+        global.sendToBrowser('webError: ' +
+          'ASL authentication failed, continuing to connect without authentication\n');
+        ircLog.writeIrcLog(
+          'SASL authentication failed, continuing to connect without authentication');
       }
     }
   };

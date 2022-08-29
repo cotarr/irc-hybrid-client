@@ -378,6 +378,10 @@
       (vars.ircState.nickName === alternateNick) &&
       (configNick !== alternateNick)) {
       vars.ircState.nickName = configNick;
+      ircLog.writeIrcLog(
+        'After IRC disconnect alternate nickname was recovered to ' + configNick);
+      global.sendToBrowser(
+        'webError: After IRC disconnect alternate nickname was recovered to ' + configNick + '\n');
     } else if ((vars.ircState.nickName !== configNick) &&
       (vars.ircState.nickName !== alternateNick)) {
       if ((vars.ircState.nickName.indexOf('Guest') === 0) &&
@@ -388,6 +392,12 @@
         }
         if (!isNaN(numberSubStr)) {
           vars.ircState.nickName = configNick;
+          ircLog.writeIrcLog(
+            'After IRC disconnect nickname GUEST????? was recovered to ' +
+            configNick);
+          global.sendToBrowser('webError: ' +
+            'After IRC disconnect nickname GUEST????? was recovered to ' +
+            configNick + '\n');
         }
       }
     }

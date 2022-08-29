@@ -706,9 +706,15 @@
               vars.ircState.nickName = alternateNick;
               ircWrite.writeSocket(socket, 'NICK ' + alternateNick);
               // Only change nickname,
-              // Do not request auto recovery after 422
+              // Do not request auto recovery after 432
               // because it would require user password manually
             }, 500);
+            ircLog.writeIrcLog('Nickname error: ' + configNick +
+            ' ERRONEUSNICKNAME (432) probably NickServ nickname lock');
+            ircLog.writeIrcLog('Trying alternate nickname ' + alternateNick +
+              ' without auto-recovery');
+            global.sendToBrowser(
+              'webError: 432 Erroneous Nickname, probably NickServ services lock.\n');
           } else {
             // Else disconnect from IRC
             if (socket) {
@@ -779,6 +785,10 @@
               _activateNickRecovery();
               tellBrowserToRequestState();
             }, 500);
+            ircLog.writeIrcLog('Primary nickname ' + configNick +
+              ' in use (433), trying alternate nickname ' + alternateNick);
+            global.sendToBrowser('webError: Primary nickname ' + configNick +
+              ' in use (433), trying alternate nickname ' + alternateNick + '\n');
           } else {
             // Else alternate nickname not enabled, disconnect and wait for user input
             if (socket) {
@@ -814,6 +824,9 @@
             if (nickRecoveryWhoisCounter !== nickRecoveryWhoisResponses) {
               _cancelNickRecovery();
               tellBrowserToRequestState();
+              ircLog.writeIrcLog('Nickname recovery cancelled due to manual /NICK request');
+              global.sendToBrowser('webError: ' +
+                'Nickname recovery cancelled due to manual /NICK request\n');
             }
           }
         }
@@ -1030,11 +1043,25 @@
                   // Example: "PRIVMSG NickServ :IDENTIFY xxxxxxxx"
                   ircWrite.writeSocket(socket, vars.nsIdentifyCommand);
                 }, 500);
+                ircLog.writeIrcLog('Sending NickServ identify command after nickname recovery.');
               } // if correct nicknames
             }; // if identify active
             // even if auto-identify disabled, cancel nick recovery
             _cancelNickRecovery();
-          } // if nick recovery active
+            // Alternate message auto-recovery to primary nickname
+            if (parsedMessage.params[0] ===
+              vars.servers.serverArray[vars.ircState.ircServerIndex].nick) {
+              ircLog.writeIrcLog('Nickname has been automatically recovered to ' +
+                vars.servers.serverArray[vars.ircState.ircServerIndex].nick);
+              global.sendToBrowser('webError: Nickname has been automatically recovered to ' +
+                vars.servers.serverArray[vars.ircState.ircServerIndex].nick + '\n');
+            } else {
+              ircLog.writeIrcLog(
+                'Nickname recovery cancelled due to manual /NICK request of another nickname');
+              global.sendToBrowser('webError: ' +
+                'Nickname recovery cancelled due to manual /NICK request of another nickname\n');
+            }
+          }
         } // not NICK change for other user in channel
         tellBrowserToRequestState();
         break;
@@ -1104,6 +1131,8 @@
               // _cancelNickRecovery();
               ircWrite.writeSocket(socket, 'NICK ' + configNick);
             }, 500);
+            ircLog.writeIrcLog('Nickname ' + parsedMessage.nick +
+              ' has QUIT, attempting to recover nickname ' + configNick);
           }
         }
         break;
@@ -1143,9 +1172,13 @@
       nickRecoveryWhoisCounter = 0;
       nickRecoveryWhoisResponses = 0;
       vars.ircState.nickRecoveryActive = true;
+      ircLog.writeIrcLog('Automatic nickname recovery enabled');
     }
   }
   function _cancelNickRecovery () {
+    if (vars.ircState.nickRecoveryActive) {
+      ircLog.writeIrcLog('Automatic nickname recovery cancelled');
+    }
     nickRecoveryWhoisTimer = 0;
     nickRecoveryWhoisCounter = 0;
     nickRecoveryWhoisResponses = 0;
