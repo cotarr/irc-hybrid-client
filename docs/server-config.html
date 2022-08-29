@@ -141,9 +141,10 @@
           The [Show all columns] button will expand the table to that all IRC server properties are displayed 
           with IRC server definitions in a single table.
           Clicking the button a second time will collapse the table to it's original small size.
+          This example image is a partial view.
         </p>
         <div>
-          <img src=images/server-list-full.png width="1189" height="165"alt="Server Listing Table">
+          <img src=images/server-list-full.png width="701" height="162"alt="Server Listing Table">
         </div>
 
         <div class="install-section-title">Data Entry</div>
@@ -166,22 +167,21 @@
           then up on disconnect the client will automatically rotate IRC server 
           definitions within a server group.
         </p>        
+        <p>
+          The Label is used to provide a descriptive name for an IRC server definition.
+          The Label is not otherwise used, and it may contain any arbitrary string values.
+          If you are using a small screen smartphone, it is best to keep the Label short.
+        </p>
+        <p>
+          When the reconnect checkbox is checked, after disconnect, the IRC
+          client will attempt to reconnect to IRC. It will use the existing server
+          definition and existing nickname. Server rotation and nickname rotation 
+          are not currently available. It will attempt to re-join up to 5 channels 
+          at the time of disconnection. 
+          This feature does not support channel passwords.
+        </p>
         <div class="home-detail">
           <div class="image-text">
-
-            <p>
-              The Label is used to provide a descriptive name for an IRC server definition.
-              The Label is not otherwise used, and it may contain any arbitrary string values.
-              If you are using a small screen smartphone, it is best to keep the Label short.
-            </p>
-            <p>
-              When the reconnect checkbox is checked, after disconnect, the IRC
-              client will attempt to reconnect to IRC. It will use the existing server
-              definition and existing nickname. Server rotation and nickname rotation 
-              are not currently available. It will attempt to re-join up to 5 channels 
-              at the time of disconnection. 
-              This feature does not support channel passwords.
-            </p>
             <p>
               At this time there are no provisions to configure a server to 
               auto-connect to IRC on startup. There is no provision 
@@ -205,10 +205,24 @@
               described in the <a href="login-config.html">login config</a> section.
             </p>
             <p>
-              If password field is optional. It may used for IRC servers that require a password.
+              If IRC server password field is optional.
+              It may used for IRC servers that require a password in order to connect to the IRC network.
               The password is a write-only field and the current value may not be viewed from 
               the web page for security reasons.
-              Security note: The password is stored in plain text in the servers.json file.
+              Security note: The IRC server password is stored in plain text in the servers.json file.
+            </p>
+            <p>
+              SASL authorization is optional.
+              IRC server SASL authorization was added specifically for use with libera.chat
+              and has not been tested on any other IRC networks.
+              If both SASL username and password contain valid string values,
+              the SASL username and SASL password will be sent to the IRC server during the initial
+              connection. To disable, leave these values blank. 
+              In the event of a login failure, a standard IRC connection will be
+              attempted without SASL. The only mechanism supported at this time is PLAIN.
+              The SASL password is a write-only field and the current value may not 
+              be viewed from the web page for security reasons.
+              Security note: The SASL password is stored in plain text in the servers.json file.
             </p>
             <p>
               The IRC nickname, real name, used ID and initial modes are similar to other IRC clients.
@@ -228,7 +242,7 @@
             </p>
           </div>
           <div class="image-photo">
-            <img src=images/server-form.png width="566" height="1064"alt="Server definition form">
+            <img src=images/server-form.png width="576" height="1110"alt="Server definition form">
           </div>
         </div>  
         <p>
@@ -347,6 +361,29 @@
 
         <p>
           Security note: The optional IRC server password will be stored unencrypted 
+          in clear text in the servers.json file.
+          It is recommended to check for proper file permissions.
+        </p>
+
+        <div class="install-section-title">SASL authorization (Optional)</div>
+        <p>
+          IRC server SASL authorization was added specifically for use with libera.chat
+          and has not been tested on any other IRC networks.
+          If both SASL username and password contain valid string values,
+          the SASL username and SASL password will be sent to the IRC server during the initial
+          connection. To disable, leave these values blank. 
+          In the event of a login failure, a standard IRC connection will be
+          attempted without SASL. The only mechanism supported at this time is PLAIN.
+        </p>
+
+
+<div class="pre-div"><pre>
+  "saslUsername": "",
+  "saslPassword": "",
+</pre></div>
+
+        <p>
+          Security note: The optional SASL password will be stored unencrypted 
           in clear text in the servers.json file.
           It is recommended to check for proper file permissions.
         </p>
@@ -630,6 +667,8 @@
       "reconnect": false,
       "logging": false,
       "password": "",
+      "saslUsername": "",
+      "saslPassword": "",
       "identifyNick": "MyNickname",
       "identifyCommand": "PRIVMSG NickServ@services.dal.net :IDENTIFY xxxxxxxx",
       "nick": "MyNickname",

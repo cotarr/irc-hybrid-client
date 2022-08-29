@@ -6,13 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Next 2022-08-25
+## Next 2022-08-29
 
 This is a feature update to add IRC server SASL authentication. 
-At this time, SASL mechanism will be limited to `plain`. 
-
-Adding SASL requires adding IRCv3 CAP negotiation
+At this time, SASL mechanism will be limited to `PLAIN`. 
+Adding SASL required adding IRCv3 CAP negotiation
 The scope of the CAP negotiation will be limited to SASL authentication.
+
+Use of SASL authentication was added specifically to use with librea.chat.
+Other IRC networks have not been tested.
 
 ### Added
 
@@ -35,6 +37,8 @@ The scope of the CAP negotiation will be limited to SASL authentication.
 
 - Server list editor
   - Update form to edit new properties `saslUsername` and `saslPassword`.
+
+- /docs - Update screen captures and help files.
 
 ### Fixed
 

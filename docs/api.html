@@ -582,7 +582,7 @@ UPDATE
           Status 422 Unprocessable entity.
         </p>
         <p>
-          The fields used for IRC server password and user's NickServ command
+          The fields used for IRC server password, SASL password,  and user's NickServ command
           are write only fields. New values may be submitted, but existing values
           are not returned by the API. However, these values are stored
           un-encrypted in plain text in the servers.json file, and may be viewed there.
@@ -705,7 +705,7 @@ UPDATE
           new index will be automatically generated when the record is created.
         </p>
         <p>
-          The properties &quot;password&quot; and &quot;identifyCommand&quot;
+          The properties &quot;password&quot;, &quot;saslPassword&quot; and &quot;identifyCommand&quot;
           are optional. If the POST request includes these properties, they will be part
           of the server definition. An empty string may be submitted, such as: password:&quot;&quot; 
         </p>
@@ -724,6 +724,8 @@ UPDATE
   "reconnect": false,
   "logging": true,
   "password": "",
+  "saslUsername": "",
+  "saslPassword": "",
   "identifyNick": "",
   "identifyCommand": "",
   "nick": "MyNickName",
@@ -791,8 +793,10 @@ UPDATE
   value in the URL query parameters.
 </p>
 <p>
-  The properties &quot;password&quot; and &quot;identifyCommand&quot;
-  are optional. If the PATCH request includes these properties, 
+  The properties &quot;password&quot;, &quot;saslPassword&quot; and 
+  &quot;identifyCommand&quot; are optional. 
+  In the example below, these propertires are omitted.
+  If the PATCH request includes these properties, 
   any existing value will be replaced. If the properties are 
   omitted from the object, no changes will be made to hose properties 
   in the original record.
@@ -819,6 +823,7 @@ UPDATE
   "proxy": false,
   "reconnect": false,
   "logging": true,
+  "saslUsername": "",
   "identifyNick": "",
   "nick": "MyNickName",
   "altNick": "",
