@@ -1026,10 +1026,12 @@
         // console.log('vars.ircState.userHost', vars.ircState.userHost);
 
         // Update global state variable with new nickname
+        // if ... is this you?
         if (parsedMessage.nick === vars.ircState.nickName) {
+          // yes... it's you, switch the name
           vars.ircState.nickName = parsedMessage.params[0];
-          // since the nick matches, it is assumed to be your own connection.
-          // in the case where userHost was not parsed from 001 message, grab it here.
+          // In the case where userHost was not parsed from 001 message, grab it here.
+          // This is used below for nick recovery generating nickserv identify
           if (vars.ircState.userHost === '') {
             vars.ircState.userHost = parsedMessage.host;
           }
