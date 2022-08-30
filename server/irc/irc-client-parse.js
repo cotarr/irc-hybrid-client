@@ -517,7 +517,10 @@
         // Clean up flags from IRCv3 SASL authentication workflow
         //
         ircCap.closeSaslAuth();
-
+        //
+        // Close out nickname registration by setting flags, setting the
+        // initial user mode, and if necessary send nickserv identify command
+        //
         if (!vars.ircState.ircRegistered) {
           //
           // Extract my client info from last argument in 001 message
@@ -555,7 +558,7 @@
               }, 500);
             }
             //
-            // nickserv registration
+            // Send nickserv IDENTIFY command (if configured)
             //
             if ((vars.nsIdentifyNick.length > 0) && (vars.nsIdentifyCommand.length > 0)) {
               setTimeout(function () {
@@ -570,7 +573,7 @@
               }, 1500);
             }
             //
-            // Upon reconnect, auto-JOIN previous irc channels
+            // Upon reconnect, auto-JOIN previous IRC channels
             //
             if ((vars.ircState.ircAutoReconnect) &&
               (vars.ircState.ircConnectOn) &&
@@ -1042,6 +1045,9 @@
           const nextNick = parsedMessage.params[0];
           _exchangeNames(previousNick, nextNick);
         }
+        //
+        // NickServ IDENTIFY after nickname recovery (Ghost ping timeout)
+        //
         if (
           // first two are to skip name changes of other users in same IRC channels
           // The vars.ircState.nickName already updated above at start of this handler
@@ -1155,10 +1161,13 @@
             (parsedMessage.nick === configNick) &&
             (vars.ircState.nickName === alternateNick) &&
             (configNick !== alternateNick)) {
-            nickservIdentifyActiveFlag = true;
-            setTimeout(function () {
-              nickservIdentifyActiveFlag = false;
-            }, 10000);
+            if ((vars.nsIdentifyNick.length > 0) &&
+            (vars.nsIdentifyCommand.length > 0)) {
+              nickservIdentifyActiveFlag = true;
+              setTimeout(function () {
+                nickservIdentifyActiveFlag = false;
+              }, 10000);
+            }
             setTimeout(function () {
               // _cancelNickRecovery();
               ircWrite.writeSocket(socket, 'NICK ' + configNick);
@@ -1249,10 +1258,13 @@
               // 5 minutes until 1 hour
               if (nickRecoveryWhoisCounter > 28) nickRecoveryWhoisTimer = 900;
               // each 15 minutes until 20 + 8 + 48 = 13 hours
-              nickservIdentifyActiveFlag = true;
-              setTimeout(function () {
-                nickservIdentifyActiveFlag = false;
-              }, 10000);
+              if ((vars.nsIdentifyNick.length > 0) &&
+                (vars.nsIdentifyCommand.length > 0)) {
+                nickservIdentifyActiveFlag = true;
+                setTimeout(function () {
+                  nickservIdentifyActiveFlag = false;
+                }, 10000);
+              }
               ircWrite.writeSocket(socket, 'NICK ' + configNick);
             }
           } else {

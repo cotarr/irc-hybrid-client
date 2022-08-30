@@ -65,8 +65,6 @@
   }
 
   /**
-   * Internal function to manage edit lock variables
-   *
    * Parse responses to CAP LS
    * Store capabilities in capArray[]
    * Parse relevant CAP LS values and set flags if found
