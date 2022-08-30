@@ -47,6 +47,12 @@ Other IRC networks have not been tested.
   - Fixed channel list edit API. When no channels were specified for a server definition, the PATCH and POST routes were adding one empty string to the channelList array, causing an extraneous IRC channel join button to be displayed. Re-saving an IRC server definition will remove the extraneous button.
   - Fixed /NICK command not working properly in IRC network where 001 message ended in nick, rather than nick!user@host. Yes, the RFC says the 001 string is non-standard and should not be parsed for values, my mistake. In this case, the nick would change on IRC but not reflected in the client, breaking nickname recovery on some IRC networks.
 
+- Fixed an issue where message the cache was not cleared when changing IRC networks. If you join channel #test on one network, then change to different IRC network, message from previous  #test channel would be visible when you open it in the different network. The same issue exists for private messages with the same nickname. Fixed as follows:
+  - server/irc/irc-client.js - API POST /irc/server/ - When changing servers, checks for change in server group number. If the group changes, then clear the message cache.
+  - server/irc/irc-client.js - API POST /irc/serverlist/ - When changes are written to servers.json file and the server index is changed to 0 (existing), then (added new) if this results in a server group change, then the message cache is cleared.
+  - secure/js/webclient04.js - Browser change, using the [Prev] / [Next] buttons to send an API fetch request, upon response, emit event update-from-cache to reload cache, showing empty if cleared on the backend following a group change.
+  - secure/js/webclient10.js - Browser change, fixed, after fetching a replacement cache array from the POST /irc/cache endpoint, if the returned array was empty, i.e. emptied cache, it was previously ignored, leaving previous existing content displayed.
+
 ## [v0.2.11](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.11) 2022-08-25
 
 ### Changed

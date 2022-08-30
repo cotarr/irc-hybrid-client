@@ -71,7 +71,7 @@ function updateFromCache () {
       }
     })
     .then((responseArray) => {
-      if ((Array.isArray(responseArray)) && (responseArray.length > 0)) {
+      if (Array.isArray(responseArray)) {
         // remove dynamically created private message elements to match list
         const privMsgSessionEl = document.getElementById('privateMessageContainerDiv');
         while (privMsgSessionEl.firstChild) {
@@ -98,11 +98,13 @@ function updateFromCache () {
         //   }
         // }
         //
-        // Option 2, recieve array of utf8 string message
+        // Option 2, receive array of utf8 string message
         //
-        for (let i = 0; i < responseArray.length; i++) {
-          if (responseArray[i].length > 0) {
-            _parseBufferMessage(responseArray[i]);
+        if (responseArray.length > 0) {
+          for (let i = 0; i < responseArray.length; i++) {
+            if (responseArray[i].length > 0) {
+              _parseBufferMessage(responseArray[i]);
+            }
           }
         }
       }

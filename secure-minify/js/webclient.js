@@ -326,16 +326,17 @@ webState.webConnecting=true;updateDivVisibility();wsReconnectTimer=0;wsReconnect
 document.getElementById('cyclePrevServerButton').addEventListener('click',(function(){if(ircState.ircConnected){showError('Can not change servers while connected');return}
 const fetchURL=webServerUrl+'/irc/server';const fetchOptions={method:'POST',headers:{'CSRF-Token':csrfToken,'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify({index:-2})
 };fetch(fetchURL,fetchOptions).then(response=>{if(response.ok)return response.json();else throw new Error('Fetch status '+response.status+' '+response.statusText)}).then(responseJson=>{
-if(responseJson.error)showError(responseJson.message);else webState.lastIrcServerIndex=-2}).catch(error=>{console.log(error);showError(error.toString())})}))
-;document.getElementById('cycleNextServerButton').addEventListener('click',(function(){if(ircState.ircConnected){showError('Can not change servers while connected');return}
-const fetchURL=webServerUrl+'/irc/server';const fetchOptions={method:'POST',headers:{'CSRF-Token':csrfToken,'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify({index:-1})
-};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok)return response.json();else throw new Error('Fetch status '+response.status+' '+response.statusText)}).then(responseJson=>{
-if(responseJson.error)showError(responseJson.message);else webState.lastIrcServerIndex=-1}).catch(error=>{console.log(error);showError(error.toString())})}));function connectButtonHandler(){
-if(!checkConnect(1))return;if(ircState.ircConnected||ircState.ircConnecting||webState.ircConnecting){showError('Error: Already connected to IRC server');return}if(-1===ircState.ircServerIndex){
-showError('Empty Server List');return}if(document.getElementById('nickNameInputId').value.length<1){showError('Invalid nick name.');return}webState.ircConnecting=true;const connectObject={}
-;connectObject.nickName=document.getElementById('nickNameInputId').value;connectObject.realName=ircState.realName;connectObject.userMode=ircState.userMode;const fetchURL=webServerUrl+'/irc/connect'
-;const fetchOptions={method:'POST',headers:{'CSRF-Token':csrfToken,'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify(connectObject)}
-;fetch(fetchURL,fetchOptions).then(response=>{if(response.ok)return response.json();else{if(403===response.status)window.location.href='/login'
+if(responseJson.error)showError(responseJson.message);else{webState.lastIrcServerIndex=-2;document.dispatchEvent(new CustomEvent('update-from-cache',{bubbles:true}))}}).catch(error=>{
+console.log(error);showError(error.toString())})}));document.getElementById('cycleNextServerButton').addEventListener('click',(function(){if(ircState.ircConnected){
+showError('Can not change servers while connected');return}const fetchURL=webServerUrl+'/irc/server';const fetchOptions={method:'POST',headers:{'CSRF-Token':csrfToken,
+'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify({index:-1})};fetch(fetchURL,fetchOptions).then(response=>{
+if(response.ok)return response.json();else throw new Error('Fetch status '+response.status+' '+response.statusText)}).then(responseJson=>{if(responseJson.error)showError(responseJson.message);else{
+webState.lastIrcServerIndex=-1;document.dispatchEvent(new CustomEvent('update-from-cache',{bubbles:true}))}}).catch(error=>{console.log(error);showError(error.toString())})}))
+;function connectButtonHandler(){if(!checkConnect(1))return;if(ircState.ircConnected||ircState.ircConnecting||webState.ircConnecting){showError('Error: Already connected to IRC server');return}
+if(-1===ircState.ircServerIndex){showError('Empty Server List');return}if(document.getElementById('nickNameInputId').value.length<1){showError('Invalid nick name.');return}webState.ircConnecting=true
+;const connectObject={};connectObject.nickName=document.getElementById('nickNameInputId').value;connectObject.realName=ircState.realName;connectObject.userMode=ircState.userMode
+;const fetchURL=webServerUrl+'/irc/connect';const fetchOptions={method:'POST',headers:{'CSRF-Token':csrfToken,'Content-type':'application/json',Accept:'application/json'},
+body:JSON.stringify(connectObject)};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok)return response.json();else{if(403===response.status)window.location.href='/login'
 ;throw new Error('Fetch status '+response.status+' '+response.statusText)}}).then(responseJson=>{if(responseJson.error)showError(responseJson.message)}).catch(error=>{console.log(error)})}
 function forceDisconnectHandler(){const fetchURL=webServerUrl+'/irc/disconnect';const fetchOptions={method:'POST',headers:{'CSRF-Token':csrfToken,'Content-type':'application/json',
 Accept:'application/json'},body:JSON.stringify({})};fetch(fetchURL,fetchOptions).then(response=>{
@@ -913,16 +914,16 @@ document.getElementById('hiddenInfoDiv').removeAttribute('hidden');document.getE
 document.getElementById('hiddenInfoDiv').setAttribute('hidden','');document.getElementById('infoOpenCloseButton').textContent='+'}}));function updateFromCache(){if(webState.cacheReloadInProgress){
 console.log('Attempt cache reload, while previous in progress');return}webState.cacheReloadInProgress=true;resetNotActivityIcon();document.dispatchEvent(new CustomEvent('erase-before-reload',{
 bubbles:true,detail:{}}));const fetchURL=webServerUrl+'/irc/cache';const fetchOptions={method:'GET',headers:{Accept:'application/json'}};fetch(fetchURL,fetchOptions).then(response=>{
-if(response.ok)return response.json();else throw new Error('Fetch status '+response.status+' '+response.statusText)}).then(responseArray=>{if(Array.isArray(responseArray)&&responseArray.length>0){
+if(response.ok)return response.json();else throw new Error('Fetch status '+response.status+' '+response.statusText)}).then(responseArray=>{if(Array.isArray(responseArray)){
 const privMsgSessionEl=document.getElementById('privateMessageContainerDiv');while(privMsgSessionEl.firstChild)privMsgSessionEl.removeChild(privMsgSessionEl.firstChild);webState.lastPMNick=''
 ;webState.activePrivateMessageNicks=[];document.getElementById('noticeMessageDisplay').value='';document.getElementById('wallopsMessageDisplay').value=''
 ;document.getElementById('pmNickNameInputId').value='';document.getElementById('newChannelNameInputId').value='';document.getElementById('rawMessageDisplay').value=''
 ;document.getElementById('rawMessageInputId').value='';webState.noticeOpen=false;webState.wallopsOpen=false
-;for(let i=0;i<responseArray.length;i++)if(responseArray[i].length>0)_parseBufferMessage(responseArray[i])}const timestamp=unixTimestamp();document.dispatchEvent(new CustomEvent('cache-reload-done',{
-bubbles:true,detail:{timestamp:timestamp}}))}).catch(error=>{const timestamp=unixTimestamp();console.log(error);document.dispatchEvent(new CustomEvent('cache-reload-error',{bubbles:true,detail:{
-timestamp:timestamp}}))})}window.addEventListener('update-from-cache',(function(event){updateFromCache()}));window.addEventListener('cache-reload-done',(function(event){
-webState.cacheReloadInProgress=false}));window.addEventListener('cache-reload-error',(function(event){webState.cacheReloadInProgress=false}))
-;document.getElementById('serverTerminateButton').addEventListener('click',(function(){console.log('Requesting backend server to terminate');const fetchURL=webServerUrl+'/terminate'
+;if(responseArray.length>0)for(let i=0;i<responseArray.length;i++)if(responseArray[i].length>0)_parseBufferMessage(responseArray[i])}const timestamp=unixTimestamp()
+;document.dispatchEvent(new CustomEvent('cache-reload-done',{bubbles:true,detail:{timestamp:timestamp}}))}).catch(error=>{const timestamp=unixTimestamp();console.log(error)
+;document.dispatchEvent(new CustomEvent('cache-reload-error',{bubbles:true,detail:{timestamp:timestamp}}))})}window.addEventListener('update-from-cache',(function(event){updateFromCache()}))
+;window.addEventListener('cache-reload-done',(function(event){webState.cacheReloadInProgress=false}));window.addEventListener('cache-reload-error',(function(event){webState.cacheReloadInProgress=false
+}));document.getElementById('serverTerminateButton').addEventListener('click',(function(){console.log('Requesting backend server to terminate');const fetchURL=webServerUrl+'/terminate'
 ;const fetchOptions={method:'POST',headers:{'CSRF-Token':csrfToken,'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify({terminate:'YES'})}
 ;fetch(fetchURL,fetchOptions).then(response=>{if(response.ok)return response.json();else throw new Error('Fetch status '+response.status+' '+response.statusText)}).then(responseJson=>{
 console.log(JSON.stringify(responseJson))}).catch(error=>{showError('Terminate: Unable to connect');console.log(error)})}))

@@ -1511,6 +1511,9 @@
     vars.ircState.count.ircConnect = 0;
     vars.ircState.count.ircConnectError = 0;
 
+    // Remember last server group to check if erase cache needed.
+    const lastServerGroup = vars.ircState.ircServerGroup;
+
     // if index === -1, then cycle through servers, else use index value
     if (inputIndex === -1) {
       if (_countEnabledServers() === 1) {
@@ -1563,6 +1566,12 @@
       return next(err);
     }
 
+    // WHen changing servers, erase message cache unless server rotation group is the same
+    if ((lastServerGroup !== vars.ircState.ircServerGroup) ||
+      (vars.ircState.ircServerGroup === 0)) {
+      ircMessageCache.eraseCache();
+    }
+
     tellBrowserToRequestState();
 
     res.json({
@@ -1577,6 +1586,10 @@
   // External IRC server list editor send event after saving the file.
   //
   global.externalEvent.on('serverListChanged', function () {
+    // Remember last server group to check if erase cache needed.
+    const lastServerGroup = vars.ircState.ircServerGroup;
+
+    // Read file servers.json
     loadServerList();
 
     //
@@ -1591,6 +1604,12 @@
       vars.ircState.ircServerIndex = reloadServerIndex;
       // load definition from index var.ircState.ircServerIndex
       loadServerDefinition();
+    }
+
+    // WHen changing servers, erase message cache unless server rotation group is the same
+    if ((lastServerGroup !== vars.ircState.ircServerGroup) ||
+      (vars.ircState.ircServerGroup === 0)) {
+      ircMessageCache.eraseCache();
     }
 
     tellBrowserToRequestState();
