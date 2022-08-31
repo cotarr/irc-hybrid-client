@@ -72,11 +72,6 @@ function updateFromCache () {
     })
     .then((responseArray) => {
       if (Array.isArray(responseArray)) {
-        // remove dynamically created private message elements to match list
-        const privMsgSessionEl = document.getElementById('privateMessageContainerDiv');
-        while (privMsgSessionEl.firstChild) {
-          privMsgSessionEl.removeChild(privMsgSessionEl.firstChild);
-        }
         webState.lastPMNick = '';
         webState.activePrivateMessageNicks = [];
         document.getElementById('noticeMessageDisplay').value = '';
@@ -212,11 +207,6 @@ document.getElementById('eraseCacheButton').addEventListener('click', function (
       if (responseJson.error) {
         showError(responseJson.message);
       } else {
-        // remove dynamically created private message elements to match list
-        const privMsgSessionEl = document.getElementById('privateMessageContainerDiv');
-        while (privMsgSessionEl.firstChild) {
-          privMsgSessionEl.removeChild(privMsgSessionEl.firstChild);
-        }
         document.getElementById('noticeMessageDisplay').value = '';
         document.getElementById('wallopsMessageDisplay').value = '';
         document.getElementById('pmNickNameInputId').value = '';

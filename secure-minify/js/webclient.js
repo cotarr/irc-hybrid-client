@@ -914,8 +914,7 @@ document.getElementById('hiddenInfoDiv').removeAttribute('hidden');document.getE
 document.getElementById('hiddenInfoDiv').setAttribute('hidden','');document.getElementById('infoOpenCloseButton').textContent='+'}}));function updateFromCache(){if(webState.cacheReloadInProgress){
 console.log('Attempt cache reload, while previous in progress');return}webState.cacheReloadInProgress=true;resetNotActivityIcon();document.dispatchEvent(new CustomEvent('erase-before-reload',{
 bubbles:true,detail:{}}));const fetchURL=webServerUrl+'/irc/cache';const fetchOptions={method:'GET',headers:{Accept:'application/json'}};fetch(fetchURL,fetchOptions).then(response=>{
-if(response.ok)return response.json();else throw new Error('Fetch status '+response.status+' '+response.statusText)}).then(responseArray=>{if(Array.isArray(responseArray)){
-const privMsgSessionEl=document.getElementById('privateMessageContainerDiv');while(privMsgSessionEl.firstChild)privMsgSessionEl.removeChild(privMsgSessionEl.firstChild);webState.lastPMNick=''
+if(response.ok)return response.json();else throw new Error('Fetch status '+response.status+' '+response.statusText)}).then(responseArray=>{if(Array.isArray(responseArray)){webState.lastPMNick=''
 ;webState.activePrivateMessageNicks=[];document.getElementById('noticeMessageDisplay').value='';document.getElementById('wallopsMessageDisplay').value=''
 ;document.getElementById('pmNickNameInputId').value='';document.getElementById('newChannelNameInputId').value='';document.getElementById('rawMessageDisplay').value=''
 ;document.getElementById('rawMessageInputId').value='';webState.noticeOpen=false;webState.wallopsOpen=false
@@ -931,8 +930,7 @@ console.log(JSON.stringify(responseJson))}).catch(error=>{showError('Terminate: 
 document.dispatchEvent(new CustomEvent('erase-before-reload',{bubbles:true,detail:{}}));const fetchURL=webServerUrl+'/irc/erase';const fetchOptions={method:'POST',headers:{'CSRF-Token':csrfToken,
 'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify({erase:'YES'})};fetch(fetchURL,fetchOptions).then(response=>{
 if(response.ok)return response.json();else throw new Error('Fetch status '+response.status+' '+response.statusText)}).then(responseJson=>{if(responseJson.error)showError(responseJson.message);else{
-const privMsgSessionEl=document.getElementById('privateMessageContainerDiv');while(privMsgSessionEl.firstChild)privMsgSessionEl.removeChild(privMsgSessionEl.firstChild)
-;document.getElementById('noticeMessageDisplay').value='';document.getElementById('wallopsMessageDisplay').value='';document.getElementById('pmNickNameInputId').value=''
+document.getElementById('noticeMessageDisplay').value='';document.getElementById('wallopsMessageDisplay').value='';document.getElementById('pmNickNameInputId').value=''
 ;document.getElementById('newChannelNameInputId').value='';document.getElementById('rawMessageDisplay').value='';document.getElementById('rawMessageInputId').value='';webState.privMsgOpen=false
 ;webState.noticeOpen=false;webState.wallopsOpen=false;updateDivVisibility()}}).catch(error=>{console.log(error)})}));function detectWebUseridChanged(){let lastLoginUser=null
 ;lastLoginUser=JSON.parse(window.localStorage.getItem('lastLoginUser'));if(lastLoginUser&&lastLoginUser.userid&&lastLoginUser.userid!==webState.loginUser.userid){
