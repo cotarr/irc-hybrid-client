@@ -40,6 +40,12 @@ Other IRC networks have not been tested.
 
 - /docs - Update screen captures and help files.
 
+### Dependencies
+
+- express-rate-limit bump 6.5.1 to 6.5.2
+- helmet bump 5.1.0 to 5.1.1
+- ws 8.8.0 bump to 8.8.1
+
 ### Fixed
 
 - Server
