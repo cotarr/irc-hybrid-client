@@ -7,7 +7,7 @@ and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## Next 2022-09-01
+## [v0.2.13](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.13) 2022-09-01
 
 This is a bug fix patch.
 
@@ -36,6 +36,7 @@ Browser Changes
 - secure/js/webclient04.js - In event handlers for the [Prev] button and the [Next] button, code to manually initiate a cache reload was removed because this is handled elsewhere in response to CACHERESET websocket commands.
 - secure/js/webclient09.js - In event handlers for the [Erase Cache] button and the [Refresh] button, code to manually clear the textarea elements was removed because this is handled elsewhere in response to CACHERESET websocket commands.
 - docs/API.html - API documentation updated to include the CACHERESET command and related operation.
+
 ## [v0.2.12](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.12) 2022-08-31
 
 This is a feature update to add IRC server SASL authentication. 
