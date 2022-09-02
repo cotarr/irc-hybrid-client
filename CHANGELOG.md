@@ -7,6 +7,35 @@ and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## Next 2022-09-01
+
+This is a bug fix patch.
+
+Previously in tag v0.1.12, a code change was intended to clear the IRC message cache
+when changing from one IRC network to a different IRC network. The change in 
+IRC network is detected on the server by detecting changes in the server list group numbers.
+This caused 2 issues: First, when using the [prev] and [next] buttons to step 
+through an IRC server list that contains only servers assigned to a single group number 
+of 1 or greater, the entire message cache was being sent for each
+use of the [Prev]/[Next] button.
+Second, an edge case was found where the WallOps window and Notice window 
+were not properly cleared after changing between different IRC networks with different 
+group numbers. This patch takes a different approach to address the issue.
+
+Server Changes:
+
+- server/irc/irc-client.js - A new prefix command `CACHERESET` was defined for transmission over the websocket connection. The web server will send the CACHERESET command to all connected web browsers each time a non-empty message cache is cleared.
+
+Browser Changes
+
+- secure/js/webclient02.js - The _parseBufferMessage() function parses the new CACHERESET command from the websocket stream and fires a browser global `erase-before-reload` event.
+- secure/js/webclient02.js - Event handler for `erase-before-reload` event clears textarea elements for the WallOps window and the Notice window and alters window visibility.
+- secure/js/webclient06.js - Event handler for `erase-before-reload` event clears input elements and alter element visibility in the IRC channel window.
+- secure/js/webclient07.js - Event handler for `erase-before-reload` event clears input elements and alter element visibility in the private message window.
+- secure/js/webclient09.js - Event handler for `erase-before-reload` event clears textarea elements for the server (raw display) window.
+- secure/js/webclient04.js - In event handlers for the [Prev] button and the [Next] button, code to manually initiate a cache reload was removed because this is handled elsewhere in response to CACHERESET websocket commands.
+- secure/js/webclient09.js - In event handlers for the [Erase Cache] button and the [Refresh] button, code to manually clear the textarea elements was removed because this is handled elsewhere in response to CACHERESET websocket commands.
+- docs/API.html - API documentation updated to include the CACHERESET command and related operation.
 ## [v0.2.12](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.12) 2022-08-31
 
 This is a feature update to add IRC server SASL authentication. 

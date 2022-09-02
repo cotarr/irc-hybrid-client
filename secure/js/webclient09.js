@@ -463,6 +463,14 @@ document.addEventListener('server-message', function (event) {
 }); // server-message event handler
 
 //
+// Clear textarea before reloading cache (Server window)
+//
+document.addEventListener('erase-before-reload', function (event) {
+  document.getElementById('rawMessageDisplay').value = '';
+  document.getElementById('rawMessageInputId').value = '';
+});
+
+//
 // Add cache reload message to server window
 //
 // Example:  14:33:02 -----Cache Reload-----
@@ -478,9 +486,11 @@ document.addEventListener('cache-reload-done', function (event) {
   }
   markerString += ' ' + cacheReloadString + '\n';
 
-  document.getElementById('rawMessageDisplay').value += markerString;
-  document.getElementById('rawMessageDisplay').scrollTop =
-    document.getElementById('rawMessageDisplay').scrollHeight;
+  if (document.getElementById('rawMessageDisplay').value !== '') {
+    document.getElementById('rawMessageDisplay').value += markerString;
+    document.getElementById('rawMessageDisplay').scrollTop =
+      document.getElementById('rawMessageDisplay').scrollHeight;
+  }
 });
 
 document.addEventListener('cache-reload-error', function (event) {

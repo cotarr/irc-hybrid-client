@@ -1953,6 +1953,17 @@ document.addEventListener('irc-state-changed', function (event) {
   } // needButtonUpdate
 }); // addEventListener('irc-state-changed
 
+//
+// Erase input element before reload cache
+//
+document.addEventListener('erase-before-reload', function (event) {
+  document.getElementById('newChannelNameInputId').value = '';
+
+  document.getElementById('channelUnreadCountDiv').textContent = '0';
+  document.getElementById('channelUnreadCountDiv').setAttribute('hidden', '');
+  document.getElementById('channelUnreadExistIcon').setAttribute('hidden', '');
+});
+
 // -------------------------------------
 // IRC Channel (Open/Close) Buttons
 // -------------------------------------

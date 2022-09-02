@@ -1569,6 +1569,13 @@
     // WHen changing servers, erase message cache unless server rotation group is the same
     if ((lastServerGroup !== vars.ircState.ircServerGroup) ||
       (vars.ircState.ircServerGroup === 0)) {
+      // If previous cache is not empty,
+      // then sent command to browser over websocket to initiate actions
+      // to properly update (erase) displays.
+      if (ircMessageCache.cacheInfo().usedLines > 0) {
+        global.sendToBrowser('CACHERESET\n');
+      }
+
       ircMessageCache.eraseCache();
     }
 
@@ -1609,6 +1616,13 @@
     // WHen changing servers, erase message cache unless server rotation group is the same
     if ((lastServerGroup !== vars.ircState.ircServerGroup) ||
       (vars.ircState.ircServerGroup === 0)) {
+      // If previous cache is not empty,
+      // then sent command to browser over websocket to initiate actions
+      // to properly update (erase) displays.
+      if (ircMessageCache.cacheInfo().usedLines > 0) {
+        global.sendToBrowser('CACHERESET\n');
+      }
+
       ircMessageCache.eraseCache();
     }
 
@@ -2079,7 +2093,15 @@
       inputVerifyString = req.body.erase;
     }
     if (inputVerifyString === 'YES') {
+      // If previous cache is not empty,
+      // then sent command to browser over websocket to initiate actions
+      // to properly update (erase) displays.
+      if (ircMessageCache.cacheInfo().usedLines > 0) {
+        global.sendToBrowser('CACHERESET\n');
+      }
+
       ircMessageCache.eraseCache();
+
       res.json({ error: false });
     } else {
       const error = new Error('Bad Reqeust');

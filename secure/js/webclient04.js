@@ -66,8 +66,6 @@ document.getElementById('cyclePrevServerButton').addEventListener('click', funct
         // this will cause nickname, username and realname to update
         // in the login form upon receiving the next getUpdateState() response
         webState.lastIrcServerIndex = -2;
-        // When changing server rotate groups, message cache is erased. Update display...
-        document.dispatchEvent(new CustomEvent('update-from-cache', { bubbles: true }));
       }
     })
     .catch((error) => {
@@ -118,8 +116,6 @@ document.getElementById('cycleNextServerButton').addEventListener('click', funct
         // this will cause nickname, username and realname to update
         // in the login form upon receiving the next getUpdateState() response
         webState.lastIrcServerIndex = -1;
-        // When changing server rotate groups, message cache is erased. Update display...
-        document.dispatchEvent(new CustomEvent('update-from-cache', { bubbles: true }));
       }
     })
     .catch((error) => {

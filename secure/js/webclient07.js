@@ -853,10 +853,18 @@ document.addEventListener('erase-before-reload', function (event) {
 
   // Clear all previous PM nicknames
   webState.activePrivateMessageNicks = [];
+  webState.lastPMNick = '';
 
   // Clear total PM counter and window count
   document.getElementById('privMsgWindowCountDiv').textContent = '0';
   document.getElementById('privMsgWindowCountDiv').setAttribute('hidden', '');
+
+  document.getElementById('privMsgCountDiv').textContent = '0';
+  document.getElementById('privMsgCountDiv').setAttribute('hidden', '');
+  document.getElementById('privMsgUnreadExistIcon').setAttribute('hidden', '');
+
+  document.getElementById('privMsgMainHiddenDiv').setAttribute('hidden', '');
+  document.getElementById('privMsgMainHiddenButton').textContent = '+';
 });
 
 // -------------------------

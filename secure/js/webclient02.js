@@ -515,6 +515,15 @@ function displayNoticeMessage (parsedMessage) {
 } // displayNoticeMessage()
 
 //
+// Clear textarea before reloading cache (Notice window)
+//
+document.addEventListener('erase-before-reload', function (event) {
+  document.getElementById('noticeMessageDisplay').value = '';
+  webState.noticeOpen = false;
+  updateDivVisibility();
+});
+
+//
 // Add cache reload message to notice window
 //
 // Example:  14:33:02 -----Cache Reload-----
@@ -529,10 +538,14 @@ document.addEventListener('cache-reload-done', function (event) {
     markerString += timestampString;
   }
   markerString += ' ' + cacheReloadString + '\n';
-
-  document.getElementById('noticeMessageDisplay').value += markerString;
-  document.getElementById('noticeMessageDisplay').scrollTop =
-    document.getElementById('noticeMessageDisplay').scrollHeight;
+  //
+  // If text area is blank, leave blank
+  // If not blank, then append cache reload divider.
+  if (document.getElementById('noticeMessageDisplay').value !== '') {
+    document.getElementById('noticeMessageDisplay').value += markerString;
+    document.getElementById('noticeMessageDisplay').scrollTop =
+      document.getElementById('noticeMessageDisplay').scrollHeight;
+  }
 });
 
 document.addEventListener('cache-reload-error', function (event) {
@@ -580,6 +593,15 @@ function displayWallopsMessage (parsedMessage) {
 } // displayWallopsMessage
 
 //
+// Clear textarea before reloading cache (Wallops window)
+//
+document.addEventListener('erase-before-reload', function (event) {
+  document.getElementById('wallopsMessageDisplay').value = '';
+  webState.wallopsOpen = false;
+  updateDivVisibility();
+});
+
+//
 // Add cache reload message to wallops window
 //
 // Example:  14:33:02 -----Cache Reload-----
@@ -595,9 +617,14 @@ document.addEventListener('cache-reload-done', function (event) {
   }
   markerString += ' ' + cacheReloadString + '\n';
 
-  document.getElementById('wallopsMessageDisplay').value += markerString;
-  document.getElementById('wallopsMessageDisplay').scrollTop =
-    document.getElementById('wallopsMessageDisplay').scrollHeight;
+  //
+  // If text area is blank, leave blank
+  // If not blank, then append cache reload divider.
+  if (document.getElementById('wallopsMessageDisplay').value !== '') {
+    document.getElementById('wallopsMessageDisplay').value += markerString;
+    document.getElementById('wallopsMessageDisplay').scrollTop =
+      document.getElementById('wallopsMessageDisplay').scrollHeight;
+  }
 });
 document.addEventListener('cache-reload-error', function (event) {
   let errorString = '\n';
@@ -836,6 +863,15 @@ function _parseBufferMessage (message) {
     if (webState.showCommsMessages) {
       displayRawMessage('UPDATE');
     }
+  } else if (message === 'CACHERESET') {
+    // 3) Else check if cache has been erased on the web server
+    // This may occur when changing from one IRC network to another
+    // or requested manually in the server window.
+    // In response to this event various child window textarea will clear themselves.
+    document.dispatchEvent(new CustomEvent('erase-before-reload', { bubbles: true }));
+    if (webState.showCommsMessages) {
+      displayRawMessage('CACHERESET');
+    }
   } else if ((message.startsWith('LAG=')) && (message.length === 9)) {
     // Example message: 'LAG=1.234'
     if (webState.showCommsMessages) {
@@ -854,7 +890,7 @@ function _parseBufferMessage (message) {
       if (pingFloat > webState.lag.max) webState.lag.max = pingFloat;
     }
   } else {
-    // 3) Else, this is IRC message to be parsed for IRC browser user.
+    // 4) Else, this is IRC message to be parsed for IRC browser user.
 
     // Internal function
     function _showNotExpiredError (errStr) {

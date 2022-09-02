@@ -74,14 +74,7 @@ function updateFromCache () {
       if (Array.isArray(responseArray)) {
         webState.lastPMNick = '';
         webState.activePrivateMessageNicks = [];
-        document.getElementById('noticeMessageDisplay').value = '';
-        document.getElementById('wallopsMessageDisplay').value = '';
-        document.getElementById('pmNickNameInputId').value = '';
-        document.getElementById('newChannelNameInputId').value = '';
-        document.getElementById('rawMessageDisplay').value = '';
-        document.getElementById('rawMessageInputId').value = '';
-        webState.noticeOpen = false;
-        webState.wallopsOpen = false;
+
         //
         // Option 1, receive array of NodeJS Buffer object and convert to utf8 string messages
         //
@@ -206,17 +199,6 @@ document.getElementById('eraseCacheButton').addEventListener('click', function (
     .then((responseJson) => {
       if (responseJson.error) {
         showError(responseJson.message);
-      } else {
-        document.getElementById('noticeMessageDisplay').value = '';
-        document.getElementById('wallopsMessageDisplay').value = '';
-        document.getElementById('pmNickNameInputId').value = '';
-        document.getElementById('newChannelNameInputId').value = '';
-        document.getElementById('rawMessageDisplay').value = '';
-        document.getElementById('rawMessageInputId').value = '';
-        webState.privMsgOpen = false;
-        webState.noticeOpen = false;
-        webState.wallopsOpen = false;
-        updateDivVisibility();
       }
     })
     .catch((error) => {

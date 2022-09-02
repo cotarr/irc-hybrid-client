@@ -198,6 +198,20 @@
         </ul>
 
         <p>
+          In the case where the change in selected IRC server causes a change in IRC server group number, 
+          or if the requested IRC server number is equal to zero, the IRC message cache 
+          on the web server will be cleared. The web server will then send a 
+          &quot;CACHERESET&quot; command to all connected web browsers over the websocket connection.
+          The web browser will interpret this command as a change in IRC networks.
+          The browser will clear all relevant textarea elements in order to prevent previously received
+          messages on one IRC network from being displayed as if
+          they were received from a different IRC network. 
+          In the case where more than one web browser is concurrently connected to the 
+          web server this will force all connected web browsers will remain synchronized
+          with the empty message buffer on the web server.
+        </p>
+
+        <p>
           When the web server configuration changes to index a different IRC server,
           an "UPDATE" command is sent to the browser over the websocket stream.
           Upon receipt of the UPDATE request, the browser should perform a GET request to route /irc/getircstate.
@@ -507,7 +521,18 @@ UPDATE
         <h3>POST /irc/erase</h3>
 
         <p>
-          This API is used to delete the contents of the message cache.
+          This API is used to delete the contents of the IRC message cache.
+        </p>
+        <p>
+          If the message cache contains valid data when the erase request is received, 
+          the web server will send a &quot;CACHERESET&quot; to all connected
+          web browsers over the websocket connection.
+          The CACHERESET command will cause all connected web browsers to 
+          clear all related textarea elements.
+          This will force all browsers to remain synchronized with the
+          empty IRC message buffer on the server.
+        </p>
+        <p>
           The web server client must be disconnected from IRC to clear the cache.
           A confirmation flag of type boolean is required in an &quot;erase&quot; property
           in the POST body.
@@ -1094,6 +1119,17 @@ UPDATE
                 /irc/getircstate route to obtain a new copy of the ircState object.
                 The ircState object is parsed by the browser and the channel membership
                 name list is updated in the appropriate channel window.
+              </td>
+            </tr>
+            <tr>
+              <td>CACHERESET</td>
+              <td>
+                CACHERESET is a command that will instruct all connected web browsers to clear the 
+                content of all related textarea elements. The primary purpose is to clear 
+                content from one IRC network from being displayed after a new connection is 
+                made to a different IRC network. The CACHERESET command is sent by the server when it detects
+                a change in server group number. It is also sent to all connected web browsers 
+                in response to an API call to the /irc/erase route.
               </td>
             </tr>
             <tr>
