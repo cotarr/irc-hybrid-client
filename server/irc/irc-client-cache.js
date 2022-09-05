@@ -144,13 +144,22 @@
               // Iterate through each nickname in the channel names list
               for (let j = 0; j < channelStateObj.names.length; j++) {
                 // if nickname is a member of the IRC channel, add it to the array
-                if (channelStateObj.names[j].toLowerCase() === nick.toLocaleLowerCase()) {
+                let tempNick = channelStateObj.names[j].toLowerCase();
+                if (tempNick.charAt(0) === '@') {
+                  tempNick = tempNick.replace('@', '');
+                } else if (tempNick.charAt(0) === '+') {
+                  tempNick = tempNick.replace('+', '');
+                }
+                if (tempNick === nick.toLowerCase()) {
                   channels.push(channelStateObj.name);
                 }
               } // next j
             } // length > 0
           } // next i
         } // length > 0
+        if (channels.length === 0) {
+          channels.push('default');
+        }
         //
         // return the array of membership channel names
         return {
@@ -189,12 +198,15 @@
   ];
 
   /**
+   * Check if IRC command is in list of channel allowed cache commands
+   * If so, extract the channel name from the IRC message as a string
+   * Else return 'default' if not in the list of allowed commands.
    *
    * @param {Buffer} message - IRC server message encoded as UTF-8 Buffer.
-   * @returns {Boolean} - Returns IRC channel name associated with command, or else returns null
+   * @returns {String} - Returns IRC channel name, else returns 'default'
    */
   function _extractChannel (message) {
-    let channel = null;
+    let channel = 'default';
     // First convert to a UTF-8 string
     let messageUtf8 = null;
     if (Buffer.isBuffer(message)) messageUtf8 = message.toString('utf8');
@@ -208,31 +220,27 @@
         // In the case of JOIN messages, remove the ":"
         if (messageWords[2].toUpperCase() === 'JOIN') {
           channel = messageWords[3].replace(':', '');
+        } else if (
+          // Check if MODE command for user instead of channel
+          (messageWords[2].toUpperCase() === 'MODE') &&
+          (messageWords[3].charAt(0) !== '#')) {
+          channel = 'default';
         } else {
           channel = messageWords[3];
         }
-        //
-        // If this IRC client does not have membership in the channel specified,
-        // set the channel name to null to use the default buffer.
-        // Except, if this is a JOIN command for this client to join a new channel
-        // for the first time. In that case keep and return the channel name so the
-        // message cache buffer is created with JOIN as the first message in the cache.
-        //
-        // This is a negative (!( ... ))
-        //
-        if (!((messageWords[2].toUpperCase() === 'JOIN') &&
-          (vars.ircState.nickName === messageWords[1].split('!')[0].replace(':', '')))) {
-          if ((!channel) || (vars.ircState.channels.indexOf(channel) < 0)) {
-            channel = null;
-          }
-        }
       }
+    }
+    if ((channel !== 'default') && (channel.charAt(0) !== '#')) {
+      console.log('Illegal channel ' + channel + ' reverting to default cache');
+      channel = 'default';
     }
     // return string with channel name or else return null
     return channel;
   }
 
   const excludedMessageList = [
+    // Body of MOTD
+    '372',
     // JOIN channel Names list response
     '353',
     '366',
@@ -298,7 +306,7 @@
    * @param {Buffer} message - IRC server message encoded as UTF-8 Buffer.
    */
   function _addMessageToCacheBuffer (indexStr, messageAsBuf) {
-    if (indexStr !== 'default') {
+    if ((!(indexStr == null)) && (indexStr !== 'default')) {
       // Check if a cache buffer exists, if not, create it and fill with null
       if ((indexStr) &&
         (Object.keys(cachedArrays).indexOf(indexStr) < 0) &&
@@ -353,7 +361,13 @@
             if (i === 0) {
               messageAsStr += messageAsWords[i];
             } else if (i === 2) {
-              messageAsStr += ' cachedQUIT ' + indexStr;
+              if (indexStr === 'default') {
+                // do not reformat QUIT messages to default buffer
+                messageAsStr += ' ' + messageAsWords[i];
+              } else {
+                // Reformat message to alternate cacheQUIT pseudo IRC command and add channel name
+                messageAsStr += ' cachedQUIT ' + indexStr;
+              }
             } else {
               messageAsStr += ' ' + messageAsWords[i];
             }
@@ -389,19 +403,6 @@
   }; // addMessage()
 
   // Debug: show cache buffers each 15 seconds.
-
-  // setInterval(() => {
-  //   Object.keys(cachedArrays).forEach(function (indexStr) {
-  //     cachedArrays[indexStr].forEach(function (line) {
-  //       if (line) {
-  //         console.log(indexStr + ': ' + line.toString('utf8'));
-  //       } else {
-  //         console.log(indexStr + ': null');
-  //       }
-  //     });
-  //   });
-  //   console.log(cachedInPointers);
-  // }, 15000);
 
   /**
    * Concatenate all cache buffers into an Array of IRC messages
@@ -680,6 +681,22 @@
       ); // fs.readfile
     })(); // immediate function
   } // if (credentials.persistIrcMessageCache)
+
+  // const nodeEnv = process.env.NODE_ENV || 'development';
+  // if (nodeEnv === 'development') {
+  //   setInterval(() => {
+  //     Object.keys(cachedArrays).forEach(function (indexStr) {
+  //       cachedArrays[indexStr].forEach(function (line) {
+  //         if (line) {
+  //           console.log(indexStr + ': ' + line.toString('utf8'));
+  //         } else {
+  //           console.log(indexStr + ': null');
+  //         }
+  //       });
+  //     });
+  //     console.log(cachedInPointers);
+  //   }, 15000);
+  // }
 
   module.exports = {
     eraseCache: eraseCache,
