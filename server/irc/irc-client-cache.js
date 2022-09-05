@@ -219,14 +219,14 @@
         // In the RFC protocol, the JOIN channel name starts with a colon :
         // In the case of JOIN messages, remove the ":"
         if (messageWords[2].toUpperCase() === 'JOIN') {
-          channel = messageWords[3].replace(':', '');
+          channel = messageWords[3].replace(':', '').toLowerCase();
         } else if (
           // Check if MODE command for user instead of channel
           (messageWords[2].toUpperCase() === 'MODE') &&
           (messageWords[3].charAt(0) !== '#')) {
           channel = 'default';
         } else {
-          channel = messageWords[3];
+          channel = messageWords[3].toLowerCase();
         }
       }
     }
@@ -305,7 +305,8 @@
    * @param {String} message - String containing IRC channel name or 'default'.
    * @param {Buffer} message - IRC server message encoded as UTF-8 Buffer.
    */
-  function _addMessageToCacheBuffer (indexStr, messageAsBuf) {
+  function _addMessageToCacheBuffer (indexIn, messageAsBuf) {
+    let indexStr = indexIn.toLowerCase();
     if ((!(indexStr == null)) && (indexStr !== 'default')) {
       // Check if a cache buffer exists, if not, create it and fill with null
       if ((indexStr) &&

@@ -426,6 +426,7 @@
     // parse message into: prefix, command, and param array
     //
     const parsedMessage = _parseIrcMessage(messageBuffer);
+    // console.log('(IRC-->) messageBuffer ' + messageBuffer.toString('utf8'));
     // console.log('(IRC-->) parsedMessage ' + JSON.stringify(parsedMessage, null, 2));
 
     //
