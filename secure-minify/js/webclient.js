@@ -489,8 +489,7 @@ console.log('createChannelEl: channel already exist');return}const defaultHeight
 ;channelMainSectionEl.appendChild(channelTopSpacerDivEl);channelMainSectionEl.appendChild(channelBottomDivEl)
 ;if(channelContainerDivEl.firstChild)channelContainerDivEl.insertBefore(channelMainSectionEl,channelContainerDivEl.firstChild);else channelContainerDivEl.appendChild(channelMainSectionEl)
 ;if(ircState.channelStates[initIrcStateIndex].joined)hideRawMessageWindow();let activityIconInhibitTimer=0;const channelIntervalTimer=setInterval((function(){
-if(activityIconInhibitTimer>0)activityIconInhibitTimer--}),1e3);setTimeout((function(){
-if(0===channelTextAreaEl.value.length)if(!webState.cacheReloadInProgress)document.dispatchEvent(new CustomEvent('update-from-cache',{bubbles:true}))}),750);function updateChannelCount(){
+if(activityIconInhibitTimer>0)activityIconInhibitTimer--}),1e3);document.dispatchEvent(new CustomEvent('debounced-update-from-cache',{bubbles:true}));function updateChannelCount(){
 document.dispatchEvent(new CustomEvent('update-channel-count',{bubbles:true}))}function incrementMessageCount(){let count=parseInt(channelMessageCounterEl.textContent);count++
 ;channelMessageCounterEl.textContent=count.toString();channelMessageCounterEl.removeAttribute('hidden');updateChannelCount()}function resetMessageCount(){const count=0
 ;channelMessageCounterEl.textContent=count.toString();channelMessageCounterEl.setAttribute('hidden','');updateChannelCount()}function handleChannelHideButtonElClick(event){
@@ -928,11 +927,13 @@ if(response.ok)return response.json();else throw new Error('Fetch status '+respo
 ;webState.activePrivateMessageNicks=[];if(responseArray.length>0)for(let i=0;i<responseArray.length;i++)if(responseArray[i].length>0)_parseBufferMessage(responseArray[i])}
 const timestamp=unixTimestamp();document.dispatchEvent(new CustomEvent('cache-reload-done',{bubbles:true,detail:{timestamp:timestamp}}))}).catch(error=>{const timestamp=unixTimestamp()
 ;console.log(error);document.dispatchEvent(new CustomEvent('cache-reload-error',{bubbles:true,detail:{timestamp:timestamp}}))})}window.addEventListener('update-from-cache',(function(event){
-updateFromCache()}));window.addEventListener('cache-reload-done',(function(event){webState.cacheReloadInProgress=false}));window.addEventListener('cache-reload-error',(function(event){
-webState.cacheReloadInProgress=false}));document.getElementById('serverTerminateButton').addEventListener('click',(function(){console.log('Requesting backend server to terminate')
-;const fetchURL=webServerUrl+'/terminate';const fetchOptions={method:'POST',headers:{'CSRF-Token':csrfToken,'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify({
-terminate:'YES'})};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok)return response.json();else throw new Error('Fetch status '+response.status+' '+response.statusText)
-}).then(responseJson=>{console.log(JSON.stringify(responseJson))}).catch(error=>{showError('Terminate: Unable to connect');console.log(error)})}))
+updateFromCache()}));let updateCacheDebounceActive=false;window.addEventListener('debounced-update-from-cache',(function(event){if(!updateCacheDebounceActive){updateCacheDebounceActive=true
+;setTimeout((function(){updateCacheDebounceActive=false;if(!webState.cacheReloadInProgress)updateFromCache()}),1e3)}}));window.addEventListener('cache-reload-done',(function(event){
+webState.cacheReloadInProgress=false}));window.addEventListener('cache-reload-error',(function(event){webState.cacheReloadInProgress=false}))
+;document.getElementById('serverTerminateButton').addEventListener('click',(function(){console.log('Requesting backend server to terminate');const fetchURL=webServerUrl+'/terminate'
+;const fetchOptions={method:'POST',headers:{'CSRF-Token':csrfToken,'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify({terminate:'YES'})}
+;fetch(fetchURL,fetchOptions).then(response=>{if(response.ok)return response.json();else throw new Error('Fetch status '+response.status+' '+response.statusText)}).then(responseJson=>{
+console.log(JSON.stringify(responseJson))}).catch(error=>{showError('Terminate: Unable to connect');console.log(error)})}))
 ;document.getElementById('eraseCacheButton').addEventListener('click',(function(){if(ircState.ircConnected){showError('You must be disconnected from IRC to clear cache.');return}
 document.dispatchEvent(new CustomEvent('erase-before-reload',{bubbles:true,detail:{}}));const fetchURL=webServerUrl+'/irc/erase';const fetchOptions={method:'POST',headers:{'CSRF-Token':csrfToken,
 'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify({erase:'YES'})};fetch(fetchURL,fetchOptions).then(response=>{

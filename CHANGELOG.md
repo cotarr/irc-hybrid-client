@@ -61,9 +61,10 @@ This is needed because the raw IRC server messages are combined
 from several different IRC cache buffers. This leaves message out of chronological order.
 
 5) The message cache includes a filter than will block listed message types from being added to the cache. 
-Currently, messages related to /ADMIN /LIST /WHO and /WHOIS are filtered to save space in the cache.
+Currently, messages related to /ADMIN /LIST /WHO /WHOIS and MOTD 372 are filtered to save space in the cache.
 
 6) The persist file cache function which saves the message cache to a disk file was updated for the multiple cache buffers.
+
 
 Server files changed:
 
@@ -76,6 +77,8 @@ Browser files changed:
 - secure/js/webclient06.js - Add separate event handlers for QUIT and cachedQUIT messages.
 - secure/js/webclient09.js - Remove QUIT handler from server window display.
 - secure/js/webclient09.js - Added a sort routine to re-order strings displayed in the server window when viewed in raw server message mode. This is necessary because when refreshing cache to raw display, several cache buffers are combined, out of chronological order.
+- secure/js/webclient10.js - Added new debounce delay event handler `debounced-update-from-cache`. This is used when creating new channel windows in webclient06.js to call updateCache to pre-fill the IRC channel textarea.
+
 
 ## [v0.2.13](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.13) 2022-09-01
 

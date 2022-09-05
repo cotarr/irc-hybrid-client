@@ -485,39 +485,20 @@ function createChannelEl (name) {
     if (activityIconInhibitTimer > 0) activityIconInhibitTimer--;
   }, 1000);
 
+  // The following cache reload request is to bring the
+  // IRC channel textarea in sync with server.
+  // When first joining an IRC channel, the IRC server
+  // or NickServ/ChanServ may force some PRIVMSG or
+  // channel NOTICE that could be received by the remote client
+  // before the browser has created the new channel window.
+  // Also, there may be old messages it the message cache
+  // that were restored after a server restart.
   //
-  // This timer was added as part of the code to save and restore
-  // the web server IRC message cache across web server restarts.
-  // In the case of a server restart, the message cache is restored.
-  // However, on opening the web page in the browser, the
-  // IRC client will not be connected to IRC and the user has not joined
-  // any IRC channels. When the user does eventually re-open the
-  // previous IRC channel window, the textarea will remain blank,
-  //
-  // This timer will wait for the channel window to be created, then
-  // it will check if the text area is empty. If it is empty,
-  // an event will be fired that request the entire IRC message cache be
-  // resent to the browser, causing the channel window to be cleared,
-  // then each message in the cache is parsed as an original IRC
-  // server message, and will populate the textarea accordingly.
-  //
-  // In the case where the browser is opened, or page refreshed
-  // for the case where the user is currently a member of the channel,
-  // the contents of the text area are populated automatically,
-  // and this timer is not needed.
-  //
-  // The delay duration is a first try and may be
-  // adjusted in the future
-  //
-  setTimeout(function () {
-    // Case of un-parsed IRC server messages in the message cache.
-    if (channelTextAreaEl.value.length === 0) {
-      if (!webState.cacheReloadInProgress) {
-        // this forces a global update which will refresh text area
-        document.dispatchEvent(new CustomEvent('update-from-cache', { bubbles: true }));
-      }
-    }
-  }, 750);
+  // this forces a global update which will refresh text area
+  // If other windows are opening concurrently,
+  // this event will debounce them over 1 second delay.
+  document.dispatchEvent(
+    new CustomEvent('debounced-update-from-cache', { bubbles: true }));
 
   // -----------------------------------------------------
   // Increment channel message counter and make visible

@@ -119,6 +119,19 @@ function updateFromCache () {
 window.addEventListener('update-from-cache', function (event) {
   updateFromCache();
 });
+// updateFromCache with 1 second debounce
+let updateCacheDebounceActive = false;
+window.addEventListener('debounced-update-from-cache', function (event) {
+  if (!updateCacheDebounceActive) {
+    updateCacheDebounceActive = true;
+    setTimeout(function () {
+      updateCacheDebounceActive = false;
+      if (!webState.cacheReloadInProgress) {
+        updateFromCache();
+      }
+    }, 1000);
+  }
+});
 
 window.addEventListener('cache-reload-done', function (event) {
   webState.cacheReloadInProgress = false;
