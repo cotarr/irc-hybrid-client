@@ -68,13 +68,15 @@ Currently, messages related to /ADMIN /LIST /WHO /WHOIS and MOTD 372 are filtere
 
 Server files changed:
 
-- server/irc-cache.js - This is a complete rewrite of the cache utility including persisting contents to disk file across server restarts (described above).
+- server/irc-client-cache.js - This is a complete rewrite of the cache utility including persisting contents to disk file across server restarts (described above).
+- server/irc-client-parse.js - Added new property to ircState.channelStates[index].csName to contain a case sensitive copy of the IRC channel name obtained from the 353 NAMES response.
 
 Browser files changed:
 
 - secure/js/webclient02.js - Added `cachedQUIT` to the `ircMessageCommandDisplayFilter` to prevent display in server window. They are instead display in the channel windows.
 - secure/js/webclient02.js - Remove special code to format QUIT messages in the server window when reloading cache. Both QUIT and cachedQUIT message are sent to the channel window for parsing.
 - secure/js/webclient06.js - Add separate event handlers for QUIT and cachedQUIT messages.
+- secure/js/webclient06.js - IRC channel window, channel name now displays case sensitive csName property from ircState.channelStates[].csName.
 - secure/js/webclient09.js - Remove QUIT handler from server window display.
 - secure/js/webclient09.js - Added a sort routine to re-order strings displayed in the server window when viewed in raw server message mode. This is necessary because when refreshing cache to raw display, several cache buffers are combined, out of chronological order.
 - secure/js/webclient10.js - Added new debounce delay event handler `debounced-update-from-cache`. This is used when creating new channel windows in webclient06.js to call updateCache to pre-fill the IRC channel textarea.

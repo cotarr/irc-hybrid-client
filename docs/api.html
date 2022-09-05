@@ -389,7 +389,7 @@ by sending invalid server name with TIME request.</p>
 @time=2021-06-18T21:14:16.322Z :otherName!*@* PRIVMSG #test :I am doing fine, how are you
 @time=2021-06-18T21:15:26.412Z :myNickName!*@* PRIVMSG #test :I am fine also, I have to run
 @time=2021-06-18T21:16:03.212Z :otherName!*@* PRIVMSG #test :OK, bye for now
-@time=2021-06-18T21:21:11.393Z :Mary!newuser@1.2.3.4.example.net JOIN :#mychannel
+@time=2021-06-18T21:21:11.393Z :Mary!newuser@1.2.3.4.example.net JOIN :#MyChannel
 UPDATE
 @time=2021-06-18T21:22:20.433Z :myNickName!*@* PRIVMSG #test :Hello Mary, how are you doing?
 </pre></div>
@@ -439,7 +439,8 @@ UPDATE
     "channelStates": [
       {
         "name": "#mychannel",
-        "topic": "Welcome to #mychannel cool topic message",
+        "csName": "#MyChannel"
+        "topic": "Welcome to #MyChannel cool topic message",
         "names": [
           "@myNickName",
           "@otherName",

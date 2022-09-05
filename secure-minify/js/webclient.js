@@ -440,7 +440,7 @@ console.log('createChannelEl: channel already exist');return}const defaultHeight
 ;const channelTopSpacerDivEl=document.createElement('div');channelTopSpacerDivEl.classList.add('vh5');const channelTopRightDivEl=document.createElement('div')
 ;channelTopRightDivEl.classList.add('head-right');const channelTopRightHidableDivEl=document.createElement('div');channelTopRightHidableDivEl.classList.add('head-right-hidable-div')
 ;const channelHideButtonEl=document.createElement('button');channelHideButtonEl.textContent='-';channelHideButtonEl.classList.add('channel-button');const channelNameDivEl=document.createElement('div')
-;channelNameDivEl.textContent=ircState.channelStates[channelIndex].name;channelNameDivEl.classList.add('chan-name-div');const channelBeenKickedIconEl=document.createElement('div')
+;channelNameDivEl.textContent=ircState.channelStates[channelIndex].csName;channelNameDivEl.classList.add('chan-name-div');const channelBeenKickedIconEl=document.createElement('div')
 ;channelBeenKickedIconEl.textContent='Kicked';channelBeenKickedIconEl.classList.add('been-kicked-icon');channelBeenKickedIconEl.setAttribute('hidden','')
 ;const channelNickCounterEl=document.createElement('div');channelNickCounterEl.textContent='0';channelNickCounterEl.classList.add('nick-count')
 ;const channelMessageCounterEl=document.createElement('div');channelMessageCounterEl.textContent='0';channelMessageCounterEl.classList.add('message-count')
@@ -517,14 +517,15 @@ resetMessageCount();activityIconInhibitTimer=activityIconInhibitTimerValue}chann
 channelMessageCounterEl.addEventListener('click',handleChannelMessageCounterElClick);function handleChannelUnreadCountDivClick(){resetMessageCount()}
 document.getElementById('channelUnreadCountDiv').addEventListener('click',handleChannelUnreadCountDivClick);function handleChannelUnreadExistIconClick(){resetMessageCount()}
 document.getElementById('channelUnreadExistIcon').addEventListener('click',handleChannelUnreadExistIconClick);function updateVisibility(){const index=ircState.channels.indexOf(name.toLowerCase())
-;if(index>=0)if(channelMainSectionEl.hasAttribute('opened')){channelBottomDivEl.removeAttribute('hidden');channelHideButtonEl.textContent='-';if(ircState.channelStates[index].joined){
-channelTopicDivEl.textContent=cleanFormatting(ircState.channelStates[index].topic);channelNamesDisplayEl.removeAttribute('disabled');channelTextAreaEl.removeAttribute('disabled')
-;channelInputAreaEl.removeAttribute('disabled');channelSendButtonEl.removeAttribute('disabled');channelJoinButtonEl.setAttribute('hidden','');channelPruneButtonEl.setAttribute('hidden','')
-;channelPartButtonEl.removeAttribute('hidden')}else{channelNamesDisplayEl.setAttribute('disabled','');channelTextAreaEl.setAttribute('disabled','');channelInputAreaEl.setAttribute('disabled','')
-;channelSendButtonEl.setAttribute('disabled','');channelJoinButtonEl.removeAttribute('hidden');channelPruneButtonEl.removeAttribute('hidden');channelPartButtonEl.setAttribute('hidden','')
-;channelTopicDivEl.removeAttribute('hidden');channelBottomDiv2El.removeAttribute('hidden');channelBottomDiv3El.removeAttribute('hidden');channelBottomDiv4El.removeAttribute('hidden')
-;channelNamesDisplayEl.removeAttribute('hidden')}if(channelMainSectionEl.hasAttribute('zoom')){channelZoomButtonEl.textContent=zoomOnText;channelTopicDivEl.setAttribute('hidden','')
-;channelBottomDiv2El.setAttribute('hidden','');channelBottomDiv3El.setAttribute('hidden','');channelBottomDiv4El.setAttribute('hidden','')
+;if(index>=0){channelNameDivEl.textContent=ircState.channelStates[channelIndex].csName;if(channelMainSectionEl.hasAttribute('opened')){channelBottomDivEl.removeAttribute('hidden')
+;channelHideButtonEl.textContent='-';if(ircState.channelStates[index].joined){channelTopicDivEl.textContent=cleanFormatting(ircState.channelStates[index].topic)
+;channelNamesDisplayEl.removeAttribute('disabled');channelTextAreaEl.removeAttribute('disabled');channelInputAreaEl.removeAttribute('disabled');channelSendButtonEl.removeAttribute('disabled')
+;channelJoinButtonEl.setAttribute('hidden','');channelPruneButtonEl.setAttribute('hidden','');channelPartButtonEl.removeAttribute('hidden')}else{channelNamesDisplayEl.setAttribute('disabled','')
+;channelTextAreaEl.setAttribute('disabled','');channelInputAreaEl.setAttribute('disabled','');channelSendButtonEl.setAttribute('disabled','');channelJoinButtonEl.removeAttribute('hidden')
+;channelPruneButtonEl.removeAttribute('hidden');channelPartButtonEl.setAttribute('hidden','');channelTopicDivEl.removeAttribute('hidden');channelBottomDiv2El.removeAttribute('hidden')
+;channelBottomDiv3El.removeAttribute('hidden');channelBottomDiv4El.removeAttribute('hidden');channelNamesDisplayEl.removeAttribute('hidden')}if(channelMainSectionEl.hasAttribute('zoom')){
+channelZoomButtonEl.textContent=zoomOnText;channelTopicDivEl.setAttribute('hidden','');channelBottomDiv2El.setAttribute('hidden','');channelBottomDiv3El.setAttribute('hidden','')
+;channelBottomDiv4El.setAttribute('hidden','')
 ;if(webState.dynamic.bodyClientWidth>mobileBreakpointPx)channelNamesDisplayEl.removeAttribute('hidden');else channelNamesDisplayEl.setAttribute('hidden','')}else{
 channelZoomButtonEl.textContent=zoomOffText;channelTopicDivEl.removeAttribute('hidden');channelBottomDiv2El.removeAttribute('hidden');channelBottomDiv3El.removeAttribute('hidden')
 ;channelBottomDiv4El.removeAttribute('hidden');channelNamesDisplayEl.removeAttribute('hidden')}
@@ -534,7 +535,7 @@ if(channelMainSectionEl.hasAttribute('beep1-enabled'))channelBeep1CBInputEl.chec
 ;if(channelMainSectionEl.hasAttribute('brief-enabled'))channelFormatCBInputEl.checked=true;else channelFormatCBInputEl.checked=false
 ;if(channelMainSectionEl.hasAttribute('auto-comp-enabled'))channelAutoCompCBInputEl.checked=true;else channelAutoCompCBInputEl.checked=false}else{channelZoomButtonEl.textContent=zoomOffText
 ;channelBottomDivEl.setAttribute('hidden','');channelPruneButtonEl.setAttribute('hidden','');channelJoinButtonEl.setAttribute('hidden','');channelPartButtonEl.setAttribute('hidden','')
-;channelHideButtonEl.textContent='+'}else{channelZoomButtonEl.textContent=zoomOffText;channelBottomDivEl.setAttribute('hidden','');channelPruneButtonEl.setAttribute('hidden','')
+;channelHideButtonEl.textContent='+'}}else{channelZoomButtonEl.textContent=zoomOffText;channelBottomDivEl.setAttribute('hidden','');channelPruneButtonEl.setAttribute('hidden','')
 ;channelJoinButtonEl.setAttribute('hidden','');channelPartButtonEl.setAttribute('hidden','');channelHideButtonEl.textContent='+'}}function handleChannelZoomButtonElClick(event){
 if(channelMainSectionEl.hasAttribute('zoom')){channelMainSectionEl.removeAttribute('zoom');updateVisibility();channelTextAreaEl.scrollTop=channelTextAreaEl.scrollHeight}else{
 const timestamp=unixTimestamp();const lastZoomObj={timestamp:timestamp,zoomType:'channel',zoomValue:name.toLowerCase()};document.dispatchEvent(new CustomEvent('hide-or-zoom',{bubbles:true,

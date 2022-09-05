@@ -681,6 +681,12 @@
                 }
               }
             }
+            // update case sensitive channel name for display purposes
+            const caseSensitiveChannelName = parsedMessage.params[2];
+            if (vars.ircState.channelStates[index].name.toLowerCase() ===
+              caseSensitiveChannelName.toLowerCase()) {
+              vars.ircState.channelStates[index].csName = caseSensitiveChannelName;
+            }
           } else {
             console.log('Error message 353 for non-existent channel');
           }
@@ -962,6 +968,10 @@
       case 'JOIN':
         {
           const channelName = parsedMessage.params[0].toLowerCase();
+          let caseSensitiveChannelName = parsedMessage.params[0].toLowerCase();
+          if (caseSensitiveChannelName.toLowerCase() === parsedMessage.params[0].toLowerCase()) {
+            caseSensitiveChannelName = parsedMessage.params[0];
+          }
           const index = vars.ircState.channels.indexOf(channelName);
           if (index >= 0) {
             // case of already exist
@@ -980,6 +990,7 @@
             // case of new channel
             const chanState = {
               name: channelName,
+              csName: caseSensitiveChannelName,
               topic: '',
               names: [],
               joined: true,

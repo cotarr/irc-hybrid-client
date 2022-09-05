@@ -246,7 +246,7 @@ function createChannelEl (name) {
 
   // Top Channel name
   const channelNameDivEl = document.createElement('div');
-  channelNameDivEl.textContent = ircState.channelStates[channelIndex].name;
+  channelNameDivEl.textContent = ircState.channelStates[channelIndex].csName;
   channelNameDivEl.classList.add('chan-name-div');
 
   // CHannel has been kicked icon
@@ -723,6 +723,8 @@ function createChannelEl (name) {
   function updateVisibility () {
     const index = ircState.channels.indexOf(name.toLowerCase());
     if (index >= 0) {
+      // Update channel name with case sensitive name
+      channelNameDivEl.textContent = ircState.channelStates[channelIndex].csName;
       if (channelMainSectionEl.hasAttribute('opened')) {
         // show contents below header bar
         channelBottomDivEl.removeAttribute('hidden');
