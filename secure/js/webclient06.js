@@ -1677,14 +1677,54 @@ function createChannelEl (name) {
           }
         }
         break;
+      //
+      // QUIT, cachedQUIT
+      //
+      // QUIT messages do not include a channel name.
+      //
+      // Example: "nick!user@host QUIT :Reason for quitting"
+      //
+      // It is up to the IRC client to identify all channels where
+      // the QUIT nick is present.This is done by maintaining
+      // a list of IRC channels in ircState.channels[]
+      // and for each channel the IRC client also maintains
+      // a list of members in ircState.channelStates[].names[]
+      // QUIT activities are display if the member was present in the list.
+      //
+      // In the case where the web browser reloads content from the cache,
+      // the member list may be out of date, and the nicknames may or may not
+      // still be present in the channel. Therefore the channel name must be stored.
+      //
+      // When QUIT messages are added to the cache, the name is changed
+      // to cachedQUIT and the channel name is added.
+      //
+      // Example:  "nick!user@host cachedQUIT #channel :Reason for quitting"
+      //
+      // There is duplication with one cachedQUIT message for each
+      // channel where the nick was present.
+      //
+      // So when reloading from cache, the channel is selected by the value in the
+      // cacheQUIT message in the cache buffer rather than the current channel membership list.
+      //
+      case 'cachedQUIT':
+        // Example:  "nick!user@host cachedQUIT #channel :Reason for quitting"
+        if (parsedMessage.params[0].toLowerCase() === name.toLowerCase()) {
+          let reason = ' ';
+          if (parsedMessage.params[1]) reason = parsedMessage.params[1];
+          if (channelMainSectionEl.hasAttribute('brief-enabled')) {
+            _addText(parsedMessage.timestamp,
+              '*',
+              parsedMessage.nick + ' has quit');
+          } else {
+            _addText(parsedMessage.timestamp,
+              '*',
+              parsedMessage.nick + ' (' + parsedMessage.host + ') has quit ' +
+              '(' + reason + ')');
+          }
+        }
+        break;
       case 'QUIT':
-        // Normally QUIT messages are displayed in the channel window
-        // In the case of loading messages from cache, the list of
-        // channel membership names may not contain the nickname that quit.
-        // So, as a special case, QUIT message on refresh or load from cache
-        // will be displayed in the server window when the channel is unknown.
-        // There are 3 places in the code, search: 'QUIT':
-        //
+        // Example: "nick!user@host QUIT :Reason for quitting"
         if (_isNickInChannel(parsedMessage.nick, name)) {
           let reason = ' ';
           if (parsedMessage.params[0]) reason = parsedMessage.params[0];

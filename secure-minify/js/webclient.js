@@ -252,8 +252,8 @@ _addNoticeText(parsedMessage.timestamp+' '+'CTCP 1 Request to '+parsedMessage.pa
 ;if(i!==parsedMessage.params.length)replyContents+=' '}_addNoticeText(parsedMessage.timestamp+' '+'CTCP 2 Reply to '+parsedMessage.params[0]+': '+ctcpCommand+' '+replyContents)
 ;webState.noticeOpen=true}else if('PRIVMSG'===parsedMessage.command.toUpperCase()){_addNoticeText(parsedMessage.timestamp+' '+'CTCP 3 Request from '+parsedMessage.nick+': '+ctcpCommand+' '+ctcpRest)
 ;webState.noticeOpen=true}else{_addNoticeText(parsedMessage.timestamp+' '+'CTCP 4 Reply from '+parsedMessage.nick+': '+ctcpCommand+' '+ctcpRest);webState.noticeOpen=true}updateDivVisibility()}}
-const ircMessageCommandDisplayFilter=['331','332','333','353','366','JOIN','KICK','MODE','NICK','NOTICE','PART','PING','PONG','PRIVMSG','QUIT','TOPIC','WALLOPS'];function _parseBufferMessage(message){
-if('HEARTBEAT'===message){onHeartbeatReceived();if(webState.showCommsMessages)displayRawMessage('HEARTBEAT')}else if('UPDATE'===message){getIrcState()
+const ircMessageCommandDisplayFilter=['331','332','333','353','366','JOIN','KICK','MODE','NICK','NOTICE','PART','PING','PONG','PRIVMSG','cachedQUIT'.toUpperCase(),'QUIT','TOPIC','WALLOPS']
+;function _parseBufferMessage(message){if('HEARTBEAT'===message){onHeartbeatReceived();if(webState.showCommsMessages)displayRawMessage('HEARTBEAT')}else if('UPDATE'===message){getIrcState()
 ;if(webState.showCommsMessages)displayRawMessage('UPDATE')}else if('CACHERESET'===message){document.dispatchEvent(new CustomEvent('erase-before-reload',{bubbles:true}))
 ;if(webState.showCommsMessages)displayRawMessage('CACHERESET')}else if(message.startsWith('LAG=')&&9===message.length){if(webState.showCommsMessages)displayRawMessage(message)
 ;const pingStr=message.split('=')[1];let pingFloat=null;try{pingFloat=parseFloat(pingStr)}catch(err){pingFloat=null}if(pingFloat&&'number'===typeof pingFloat){webState.lag.last=pingFloat
@@ -277,11 +277,8 @@ const ctcpDelim=1;if(null===parsedMessage.params[1])parsedMessage.params[1]=''
 ;if(parsedMessage.params[1].charCodeAt(0)===ctcpDelim)_parseCtcpMessage(parsedMessage,message);else displayNoticeMessage(parsedMessage)}break;case'PRIVMSG':{const ctcpDelim=1
 ;if(parsedMessage.params[1].charCodeAt(0)===ctcpDelim)_parseCtcpMessage(parsedMessage,message);else{const chanPrefixIndex=channelPrefixChars.indexOf(parsedMessage.params[0].charAt(0))
 ;const channelIndex=ircState.channels.indexOf(parsedMessage.params[0].toLowerCase())
-;if(channelIndex>=0)displayChannelMessage(parsedMessage);else if(chanPrefixIndex>=0)displayFormattedServerMessage(parsedMessage,message);else displayPrivateMessage(parsedMessage)}}break;case'QUIT':{
-let pureNick=parsedMessage.nick.toLowerCase();if(nicknamePrefixChars.indexOf(pureNick.charAt(0))>=0)pureNick=pureNick.slice(1,pureNick.length);let present=false
-;if(ircState.channels.length>0)for(let i=0;i<ircState.channels.length;i++)if(ircState.channelStates[i].joined&&ircState.channelStates[i].names.length>0)for(let j=0;j<ircState.channelStates[i].names.length;j++){
-let checkNick=ircState.channelStates[i].names[j].toLowerCase();if(nicknamePrefixChars.indexOf(checkNick.charAt(0))>=0)checkNick=checkNick.slice(1,checkNick.length);if(checkNick===pureNick)present=true
-}if(present)displayChannelMessage(parsedMessage);else displayFormattedServerMessage(parsedMessage,message)}break;case'TOPIC':
+;if(channelIndex>=0)displayChannelMessage(parsedMessage);else if(chanPrefixIndex>=0)displayFormattedServerMessage(parsedMessage,message);else displayPrivateMessage(parsedMessage)}}break
+;case'cachedQUIT':case'QUIT':displayChannelMessage(parsedMessage);break;case'TOPIC':
 if(channelPrefixChars.indexOf(parsedMessage.params[0].charAt(0))>=0)displayChannelMessage(parsedMessage);else console.log('Error message TOPIC to unknown channel');break;case'WALLOPS':
 displayWallopsMessage(parsedMessage);break;default:}}}function initWebSocketAuth(callback){const fetchURL=webServerUrl+'/irc/wsauth';const fetchOptions={method:'POST',headers:{'CSRF-Token':csrfToken,
 'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify({purpose:'websocket-auth'})};fetch(fetchURL,fetchOptions).then(response=>{
@@ -663,8 +660,10 @@ const checkLine=parsedMessage.params[1].toLowerCase();if(checkLine.indexOf(ircSt
 ;lastZoomObj=JSON.parse(window.localStorage.getItem('lastZoom'))
 ;if(lastZoomObj&&lastZoomObj.zoomType&&lastZoomObj.zoomValue&&'channel'===lastZoomObj.zoomType&&lastZoomObj.zoomValue===name.toLowerCase());else if(!webState.cacheReloadInProgress)clearLastZoom()
 ;channelMainSectionEl.setAttribute('opened','');updateVisibility()
-;if(document.activeElement!==channelInputAreaEl&&document.activeElement!==channelSendButtonEl&&!webState.cacheReloadInProgress&&0===activityIconInhibitTimer)incrementMessageCount()}break;case'QUIT':
-if(_isNickInChannel(parsedMessage.nick,name)){let reason=' ';if(parsedMessage.params[0])reason=parsedMessage.params[0]
+;if(document.activeElement!==channelInputAreaEl&&document.activeElement!==channelSendButtonEl&&!webState.cacheReloadInProgress&&0===activityIconInhibitTimer)incrementMessageCount()}break
+;case'cachedQUIT':if(parsedMessage.params[0].toLowerCase()===name.toLowerCase()){let reason=' ';if(parsedMessage.params[1])reason=parsedMessage.params[1]
+;if(channelMainSectionEl.hasAttribute('brief-enabled'))_addText(parsedMessage.timestamp,'*',parsedMessage.nick+' has quit');else _addText(parsedMessage.timestamp,'*',parsedMessage.nick+' ('+parsedMessage.host+') has quit '+'('+reason+')')
+}break;case'QUIT':if(_isNickInChannel(parsedMessage.nick,name)){let reason=' ';if(parsedMessage.params[0])reason=parsedMessage.params[0]
 ;if(channelMainSectionEl.hasAttribute('brief-enabled'))_addText(parsedMessage.timestamp,'*',parsedMessage.nick+' has quit');else _addText(parsedMessage.timestamp,'*',parsedMessage.nick+' ('+parsedMessage.host+') has quit '+'('+reason+')')
 }break;case'TOPIC':if(parsedMessage.params[0].toLowerCase()===name.toLowerCase()){const newTopic=parsedMessage.params[1]
 ;if(null==newTopic)_addText(parsedMessage.timestamp,'*','Topic for '+parsedMessage.params[0]+' has been unset by "'+parsedMessage.nick);else _addText(parsedMessage.timestamp,'*','Topic for '+parsedMessage.params[0]+' changed to "'+newTopic+'" by '+parsedMessage.nick)
@@ -882,12 +881,15 @@ displayRawMessage('WHOIS --End--');break;case'322':if(4===event.detail.parsedMes
 displayRawMessage(cleanFormatting(cleanCtcpDelimiter(event.detail.parsedMessage.timestamp+' '+'MODE '+event.detail.parsedMessage.params[0]+' '+event.detail.parsedMessage.params[1])));break;case'NICK':
 displayRawMessage(cleanFormatting(cleanCtcpDelimiter(event.detail.parsedMessage.timestamp+' '+'(No channel) '+event.detail.parsedMessage.nick+' is now known as '+event.detail.parsedMessage.params[0])))
 ;break;case'NOTICE':
-displayRawMessage(cleanFormatting(cleanCtcpDelimiter(event.detail.parsedMessage.timestamp+' '+'NOTICE '+event.detail.parsedMessage.params[0]+' '+event.detail.parsedMessage.params[1])));break
-;case'QUIT':{let reason=' ';if(event.detail.parsedMessage.params[0]){reason=event.detail.parsedMessage.params[0]
-;displayRawMessage(cleanFormatting(cleanCtcpDelimiter(event.detail.parsedMessage.timestamp+' '+'(No channel) '+event.detail.parsedMessage.nick+' has quit ('+reason+')')))}}break;default:
+displayRawMessage(cleanFormatting(cleanCtcpDelimiter(event.detail.parsedMessage.timestamp+' '+'NOTICE '+event.detail.parsedMessage.params[0]+' '+event.detail.parsedMessage.params[1])));break;default:
 displayRawMessage(cleanFormatting(cleanCtcpDelimiter(substituteHmsTime(event.detail.message))))}if(!webState.cacheReloadInProgress)showRawMessageWindow()}))
 ;document.addEventListener('erase-before-reload',(function(event){document.getElementById('rawMessageDisplay').value='';document.getElementById('rawMessageInputId').value=''}))
-;document.addEventListener('cache-reload-done',(function(event){let markerString='';let timestampString=''
+;document.addEventListener('cache-reload-done',(function(event){if(webState.viewRawMessages&&!webState.showRawInHex){
+const tempRawMessages=document.getElementById('rawMessageDisplay').value.split('\n');if(tempRawMessages.length>1){const tempTimestampArray=[];const tempSortIndexArray=[]
+;const lineCount=tempRawMessages.length;for(let i=0;i<lineCount;i++){tempTimestampArray.push(new Date(tempRawMessages[i].split(' ')[0].split('=')[1]));tempSortIndexArray.push(i)}let tempIndex=0
+;for(let i=0;i<lineCount;i++)for(let j=0;j<lineCount-1;j++)if(tempTimestampArray[tempSortIndexArray[j]]>tempTimestampArray[tempSortIndexArray[j+1]]){tempIndex=tempSortIndexArray[j]
+;tempSortIndexArray[j]=tempSortIndexArray[j+1];tempSortIndexArray[j+1]=tempIndex}document.getElementById('rawMessageDisplay').value=''
+;for(let i=0;i<lineCount;i++)document.getElementById('rawMessageDisplay').value+=tempRawMessages[tempSortIndexArray[i]]+'\n'}}let markerString='';let timestampString=''
 ;if('detail'in event&&'timestamp'in event.detail)timestampString=unixTimestampToHMS(event.detail.timestamp);if(timestampString)markerString+=timestampString;markerString+=' '+cacheReloadString+'\n'
 ;if(''!==document.getElementById('rawMessageDisplay').value){document.getElementById('rawMessageDisplay').value+=markerString
 ;document.getElementById('rawMessageDisplay').scrollTop=document.getElementById('rawMessageDisplay').scrollHeight}}));document.addEventListener('cache-reload-error',(function(event){

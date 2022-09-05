@@ -830,6 +830,7 @@ const ircMessageCommandDisplayFilter = [
   'PING',
   'PONG',
   'PRIVMSG',
+  'cachedQUIT'.toUpperCase(),
   'QUIT',
   'TOPIC',
   'WALLOPS'
@@ -1079,47 +1080,37 @@ function _parseBufferMessage (message) {
         }
         break;
       //
+      // QUIT, cachedQUIT
+      //
+      // QUIT messages do not include a channel name.
+      //
+      // Example: "nick!user@host QUIT :Reason for quitting"
+      //
+      // It is up to the IRC client to identify all channels where
+      // the QUIT nick is present.This is done by maintaining
+      // a list of IRC channels in ircState.channels[]
+      // and for each channel the IRC client also maintains
+      // a list of members in ircState.channelStates[].names[]
+      // QUIT activities are display if the member was present in the list.
+      //
+      // In the case where the web browser reloads content from the cache,
+      // the member list may be out of date, and the nicknames may or may not
+      // still be present in the channel. Therefore the channel name must be stored.
+      //
+      // When QUIT messages are added to the cache, the name is changed
+      // to cachedQUIT and the channel name is added.
+      //
+      // Example:  "nick!user@host cachedQUIT #channel :Reason for quitting"
+      //
+      // There is duplication with one cachedQUIT message for each
+      // channel where the nick was present.
+      //
+      // So when reloading from cache, the channel is selected by the value in the
+      // cacheQUIT message in the cache buffer rather than the current channel membership list.
+      //
+      case 'cachedQUIT':
       case 'QUIT':
-        // Normally QUIT messages are displayed in the channel window
-        // In the case of loading messages from cache, the list of
-        // channel membership names may not contain the nickname that quit.
-        // So, as a special case, QUIT message on refresh or load from cache
-        // will be displayed in the server window when the channel is unknown.
-        // There are 3 places in the code, search: 'QUIT':
-        //
-        {
-          // ------------
-          // Is nick in ANY active channel?
-          // -----------
-          let pureNick = parsedMessage.nick.toLowerCase();
-          // if check nickname starts with an op character, remove it
-          if (nicknamePrefixChars.indexOf(pureNick.charAt(0)) >= 0) {
-            pureNick = pureNick.slice(1, pureNick.length);
-          }
-          let present = false;
-          if (ircState.channels.length > 0) {
-            for (let i = 0; i < ircState.channels.length; i++) {
-              if ((ircState.channelStates[i].joined) &&
-                (ircState.channelStates[i].names.length > 0)) {
-                for (let j = 0; j < ircState.channelStates[i].names.length; j++) {
-                  let checkNick = ircState.channelStates[i].names[j].toLowerCase();
-                  // if channel nickname start with an OP character remove it
-                  if (nicknamePrefixChars.indexOf(checkNick.charAt(0)) >= 0) {
-                    checkNick = checkNick.slice(1, checkNick.length);
-                  }
-                  if (checkNick === pureNick) present = true;
-                } // next j
-              }
-            } // next i
-          }
-          if (present) {
-            displayChannelMessage(parsedMessage);
-          } else {
-            // Note, this will duplicate message when raw server messages
-            // are enabled having one formatted and one unformatted.
-            displayFormattedServerMessage(parsedMessage, message);
-          }
-        }
+        displayChannelMessage(parsedMessage);
         break;
       case 'TOPIC':
         if (channelPrefixChars.indexOf(parsedMessage.params[0].charAt(0)) >= 0) {

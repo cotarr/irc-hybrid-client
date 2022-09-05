@@ -77,8 +77,9 @@
           This this configuration, windows on the web browser display will show real time messages as they arrive.
           Scroll features allow backwards review of messages. However, if the websocket disconnects
           from the web server, only messages in the message cache are restored. The current message
-          cache is 100 IRC server messages. This seems to be a reasonable size for general
-          smartphone use. This is not intended to be a long term offline IRC client.
+          cache is 100 IRC server messages per IRC channels up a maximum limit of 5 IRC channels. 
+          This seems to be a reasonable size for general smartphone use. 
+          This is not intended to be a long term offline IRC client.
         </p>
 
         <img src="images/network.png" height="267" width="882" alt="Network Diagram">
@@ -103,7 +104,7 @@
         <h3>Program Limitations</h3>
         <ul>
           <li>Color text not supported within chat (Color codes filtered to clean text) </li>
-          <li>Message cache limited to 100 lines (enough to ride out a smartphone screen lock)</li>
+          <li>Message cache limited to 100 lines per IRC channel up to 5 channels (enough to ride out a smartphone screen lock)</li>
           <li>Limited to one IRC user per nodejs/express instance. (i.e. Personal web server).</li>
           <li>This is a chat application, not a channel protection bot (no kick/ban enforcement)</li>
           <li>Development done in Chrome for Linux, and Chrome for IOS. Other browsers not tested.</li>

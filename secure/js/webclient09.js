@@ -429,27 +429,7 @@ document.addEventListener('server-message', function (event) {
             event.detail.parsedMessage.params[1])));
 
       break;
-    case 'QUIT':
-      // Normally QUIT messages are displayed in the channel window
-      // In the case of loading messages from cache, the list of
-      // channel membership names may not contain the nickname that quit.
-      // So, as a special case, QUIT message on refresh or load from cache
-      // will be displayed in the server window when the channel is unknown.
-      // There are 3 places in the code, search: 'QUIT':
-      //
-      {
-        let reason = ' ';
-        if (event.detail.parsedMessage.params[0]) {
-          reason = event.detail.parsedMessage.params[0];
-          displayRawMessage(
-            cleanFormatting(
-              cleanCtcpDelimiter(
-                event.detail.parsedMessage.timestamp + ' ' +
-                '(No channel) ' +
-                event.detail.parsedMessage.nick + ' has quit (' + reason + ')')));
-        }
-      }
-      break;
+    // none match, use default
     default:
       // this is catch-all, if no formatted case, then display here
       displayRawMessage(
@@ -476,6 +456,45 @@ document.addEventListener('erase-before-reload', function (event) {
 // Example:  14:33:02 -----Cache Reload-----
 //
 document.addEventListener('cache-reload-done', function (event) {
+  //
+  // If server display in raw mode, but not HEX mode, then after reloading cache
+  // sort the lines by the timestamp in the cached message.
+  // this is because multiple different cache buffers and combined
+  // when viewing the raw server messages.
+  //
+  if ((webState.viewRawMessages) && (!webState.showRawInHex)) {
+    const tempRawMessages =
+      document.getElementById('rawMessageDisplay').value.split('\n');
+    if (tempRawMessages.length > 1) {
+      const tempTimestampArray = [];
+      const tempSortIndexArray = [];
+      const lineCount = tempRawMessages.length;
+      for (let i = 0; i < lineCount; i++) {
+        // @time=2022-09-04T19:56:01.900Z :nickname!user@host JOIN :#myChannel
+        tempTimestampArray.push(new Date(
+          tempRawMessages[i].split(' ')[0].split('=')[1]
+        ));
+        tempSortIndexArray.push(i);
+      }
+      let tempIndex = 0;
+      for (let i = 0; i < lineCount; i++) {
+        for (let j = 0; j < lineCount - 1; j++) {
+          if (tempTimestampArray[tempSortIndexArray[j]] >
+            tempTimestampArray[tempSortIndexArray[j + 1]]) {
+            tempIndex = tempSortIndexArray[j];
+            tempSortIndexArray[j] = tempSortIndexArray[j + 1];
+            tempSortIndexArray[j + 1] = tempIndex;
+          }
+        } // next j
+      } // next i
+      document.getElementById('rawMessageDisplay').value = '';
+      for (let i = 0; i < lineCount; i++) {
+        document.getElementById('rawMessageDisplay').value +=
+          tempRawMessages[tempSortIndexArray[i]] + '\n';
+      }
+    }
+  } // if webState.viewRawMessages
+
   let markerString = '';
   let timestampString = '';
   if (('detail' in event) && ('timestamp' in event.detail)) {

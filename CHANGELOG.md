@@ -6,6 +6,76 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Next 2022-09-04
+
+This change is a complete rewrite of the IRC message cache module.
+
+Before Change:
+
+The purpose of the IRC message cache is to refresh the browser content on request.
+This is necessary with iPhones due to battery power concerns.
+The network and radio disconnect during the screen lock. 
+Upon reconnecting the browser, the message cache is used to replace any previous 
+content that is displayed in the web browser textarea elements.
+
+Issues with previous version.
+
+1) The message cache was limited to the last 100 IRC server messages in chronological order. 
+In the case where the browser has joined more than one channel, a conversation in one channel can 
+exceed the 100 line cache buffer size, causing older messages in other channels to exit the 
+message cache without being viewed.
+
+2) In the IRC protocol, the QUIT messages do not include the IRC channel name. It is up to the
+IRC client to maintain a list of channel members and apply the QUIT message to the proper channel(s).
+With a chronological linear message cache, orphan QUIT messages in the cache belonging
+to an IRC user who has left before the cache was restored were not able to be 
+matched to the any active channel windows, and by default were previously displayed to the server window.
+Thus after reloading the cache, it was possible to see some users JOIN but with PART messages omitted 
+and deferred to the server window.
+
+New IRC message cache module:
+
+1) The cache is now segmented into different cache buffers. There is one default message buffer for server
+messages, those messages that are not related to a specific IRC channel. 
+An independent cache buffer is now created to each 
+IRC channel up to a maximum limit. When the limit is reached, messages 
+from any additional IRC channels will share the default message cache with server messages.
+
+2) The maximum limits are 100 IRC messages per cache buffer with 6 cache buffers, one for 
+the default and one for each of 5 IRC channels. Therefore upon reloading the message cache, 
+up to 600 messages can be returned.
+
+3) A new IRC message type was created as `cachedQUIT`. The format is similar to the standard QUIT message 
+except a field has been added for the IRC channel name. This allows a method to select the proper IRC channel window when adding cached QUIT messages. Various code was updated to address concurrent use of live QUIT and cachedQUIT messages. Examples:
+
+```
+Real-time QUIT:  nick!user@host QUIT :Reason for quitting
+
+Cached QUIT:    nick!user@host cachedQUIT #channel :Reason for quitting
+Cached QUIT:    nick!user@host cachedQUIT #otherChannel :Reason for quitting
+```
+
+4) When viewing the server window in "Raw Message" format, a simple sort function was added
+to resequence the raw IRC server messages in chronological order in the server window.
+This is needed because the raw IRC server messages are combined
+from several different IRC cache buffers. This leaves message out of chronological order.
+
+5) The message cache includes a filter than will block listed message types from being added to the cache. 
+Currently, messages related to /ADMIN /LIST /WHO and /WHOIS are filtered to save space in the cache.
+
+6) The persist file cache function which saves the message cache to a disk file was updated for the multiple cache buffers.
+
+Server files changed:
+
+- server/irc-cache.js - This is a complete rewrite of the cache utility including persisting contents to disk file across server restarts (described above).
+
+Browser files changed:
+
+- secure/js/webclient02.js - Added `cachedQUIT` to the `ircMessageCommandDisplayFilter` to prevent display in server window. They are instead display in the channel windows.
+- secure/js/webclient02.js - Remove special code to format QUIT messages in the server window when reloading cache. Both QUIT and cachedQUIT message are sent to the channel window for parsing.
+- secure/js/webclient06.js - Add separate event handlers for QUIT and cachedQUIT messages.
+- secure/js/webclient09.js - Remove QUIT handler from server window display.
+- secure/js/webclient09.js - Added a sort routine to re-order strings displayed in the server window when viewed in raw server message mode. This is necessary because when refreshing cache to raw display, several cache buffers are combined, out of chronological order.
 
 ## [v0.2.13](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.13) 2022-09-01
 

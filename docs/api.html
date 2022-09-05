@@ -486,10 +486,10 @@ UPDATE
         <h3>GET /irc/cache</h3>
 
         <p>
-          The web server maintains a cache of the last 100 IRC server
+          The web server maintains a cache of IRC server messages
           messages (lines of text) in RFC 2812 format.
           Performing a GET request to /irc/cache will return a response containing
-          and array of up to 100 elements of type string. Each array string element represents
+          and array of elements of type string. Each array string element represents
           a previous cached IRC server message.
         </p>
 
@@ -503,9 +503,24 @@ UPDATE
         </p>
 
         <p>
-          The size of the cache at 100 messages is intended to ride out a screen lock.
-          it is not meant to be an offline client. Over time messages will cycle out of the
-          cache after 100 messages are received.
+          Starting with version v0.2.14, the message cache consists of one cache buffer for 
+          IRC server messages, those being messages which are not related to a specific IRC channel.
+          Additional cache buffers are created for each IRC channel up to a maximum limit.
+          When the limit is exceeded, IRC messages from extra IRC channels are 
+          cached in the default server message cache. In response to the API call, all 
+          cache buffers are concatenated before sending. A section of messages from 
+          a single IRC channel cache would be in chronological order within that IRC channel.
+          The web browser will restore the display independently for each IRC channel, so 
+          a channel window will be properly ordered. Combined, however, the overall set of messages 
+          may be out of chronological order between different cache buffers.
+        </p>
+
+        <p>
+          The size of the cache is 100 messages per buffer. There is 1 default server 
+          buffer and 5 additional IRC channel buffers.
+          Therefore up to 600 IRC messages could be returned.
+          This is intended to ride out a screen lock. It is not meant to be an offline client.
+          Over time messages will cycle out of the cache and may be lost without viewing.
         </p>
 
 <p>Example API response:</p>
@@ -516,6 +531,34 @@ UPDATE
   "@time=2021-06-18T21:15:26.949Z :myNickName!*@* PRIVMSG #test :I am fine also, I have to run",
   "@time=2021-06-18T21:16:03.949Z :otherName!*@* PRIVMSG #test :OK, bye for now"
 ]
+</pre></div>
+
+        <p>
+          In the IRC protocol, QUIT messages do not include the IRC channel name. 
+          It is up to the IRC client to maintain a list of channel members and apply 
+          the QUIT message to the proper channel(s).
+          With a chronological linear message cache, orphan QUIT messages in the cache 
+          belonging to an IRC user who has left before the cache was restored are 
+          not able to be matched to the any active channel windows.
+          To address this, in v0.1.14 a new IRC message type was created as `cachedQUIT`. 
+          The format is similar to the standard QUIT message except an additional field
+          has been added for the IRC channel name. 
+          In the cache, the cachedQUIT message is duplicated for each IRC channel.
+          As real time messages are received from the IRC server, standard QUIT messages
+          are parsed directly. When the browser content is deleted and restored from
+          the IRC message cache, the alternate cachedQUIT messages are used.
+        </p>
+
+<p>Example showing QUIT and cachedQUIT messages</p>        
+<div class="pre-div"><pre>
+
+Live message:
+@time=2022-09-04T22:24:33.083Z :nickname!~user@192.168.1.1 QUIT :"test QUIT message"
+
+Cached message with 2 IRC channels.
+@time=2022-09-04T22:24:33.082Z :nickname!~user@192.168.1.1 cachedQUIT #channelName :"test QUIT message"
+@time=2022-09-04T22:24:33.082Z :nickname!~user@192.168.1.1 cachedQUIT #otherChannel :"test QUIT message"
+
 </pre></div>
 
         <h3>POST /irc/erase</h3>
@@ -1079,7 +1122,7 @@ UPDATE
         <p>
           The backend contains list of excluded commands in an array &quot;excludedCommands = [&quot;PING&quot;, &quot;PONG&quot;].
           Messages between the backend and the IRC server that contain PING or PONG commands are not sent to the browser.
-          This is to avoid scrolling valid messages out of the 100 line message buffer.
+          This is to avoid scrolling valid messages out of the IRC message cache buffer.
         </p>
         <p>
           The websocket stream also contain command messages intended to initiate browser actions.
