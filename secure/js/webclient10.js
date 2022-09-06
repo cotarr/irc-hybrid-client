@@ -180,10 +180,10 @@ document.getElementById('serverTerminateButton').addEventListener('click', funct
 // Route:  /erase
 // ---------------------------------------
 document.getElementById('eraseCacheButton').addEventListener('click', function () {
-  if (ircState.ircConnected) {
-    showError('You must be disconnected from IRC to clear cache.');
-    return;
-  }
+  // if (ircState.ircConnected) {
+  //   showError('You must be disconnected from IRC to clear cache.');
+  //   return;
+  // }
   document.dispatchEvent(new CustomEvent('erase-before-reload',
     {
       bubbles: true,

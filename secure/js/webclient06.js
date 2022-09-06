@@ -723,8 +723,6 @@ function createChannelEl (name) {
   function updateVisibility () {
     const index = ircState.channels.indexOf(name.toLowerCase());
     if (index >= 0) {
-      // Update channel name with case sensitive name
-      channelNameDivEl.textContent = ircState.channelStates[channelIndex].csName;
       if (channelMainSectionEl.hasAttribute('opened')) {
         // show contents below header bar
         channelBottomDivEl.removeAttribute('hidden');
@@ -1324,6 +1322,8 @@ function createChannelEl (name) {
         channelBeenKickedIconEl.setAttribute('hidden', '');
         nickCount = ircState.channelStates[index].names.length;
       }
+      // Update channel name with case sensitive name
+      channelNameDivEl.textContent = ircState.channelStates[index].csName;
     }
     channelNameDivEl.textContent = titleStr;
     channelNickCounterEl.textContent = nickCount.toString();

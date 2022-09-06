@@ -53,23 +53,27 @@ Real-time QUIT:  nick!user@host QUIT :Reason for quitting
 
 Cached QUIT:    nick!user@host cachedQUIT #channel :Reason for quitting
 Cached QUIT:    nick!user@host cachedQUIT #otherChannel :Reason for quitting
+                                          ^^^^^^^^^^^^^
 ```
 
 4) When viewing the server window in "Raw Message" format, a simple sort function was added
-to resequence the raw IRC server messages in chronological order in the server window.
+to re-sequence the raw IRC server messages in chronological order in the server window.
 This is needed because the raw IRC server messages are combined
-from several different IRC cache buffers. This leaves message out of chronological order.
+from several different IRC cache buffers. This leaves messages out of chronological order.
 
 5) The message cache includes a filter than will block listed message types from being added to the cache. 
-Currently, messages related to /ADMIN /LIST /WHO /WHOIS and MOTD 372 are filtered to save space in the cache.
+Currently, messages related to /ADMIN /LIST /WHO /WHOIS /LINKS NAMES and MOTD 372 are filtered to save space in the cache (Others may be added as observed).
 
-6) The persist file cache function which saves the message cache to a disk file was updated for the multiple cache buffers.
+6) The persist file cache function which saves the message cache to a disk file was updated to support multiple cache buffers.
+
+7) The [Erase Cache] button on the server window may now be used while the IRC server is connected to the IRC network. This will clear content on all windows on all connected browsers.
 
 
 Server files changed:
 
 - server/irc-client-cache.js - This is a complete rewrite of the cache utility including persisting contents to disk file across server restarts (described above).
 - server/irc-client-parse.js - Added new property to ircState.channelStates[index].csName to contain a case sensitive copy of the IRC channel name obtained from the 353 NAMES response.
+- Other minor changes area not listed.
 
 Browser files changed:
 
@@ -78,8 +82,9 @@ Browser files changed:
 - secure/js/webclient06.js - Add separate event handlers for QUIT and cachedQUIT messages.
 - secure/js/webclient06.js - IRC channel window, channel name now displays case sensitive csName property from ircState.channelStates[].csName.
 - secure/js/webclient09.js - Remove QUIT handler from server window display.
-- secure/js/webclient09.js - Added a sort routine to re-order strings displayed in the server window when viewed in raw server message mode. This is necessary because when refreshing cache to raw display, several cache buffers are combined, out of chronological order.
+- secure/js/webclient09.js - Added a sort routine to re-order strings displayed in the server window when viewed in raw server message mode. This is necessary because when refreshing cache to raw display, several cache buffers are combined, out of chronological order. The raw HEX display is not sorted due to mixed content.
 - secure/js/webclient10.js - Added new debounce delay event handler `debounced-update-from-cache`. This is used when creating new channel windows in webclient06.js to call updateCache to pre-fill the IRC channel textarea.
+- Other minor changes are not listed.
 
 
 ## [v0.2.13](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.13) 2022-09-01

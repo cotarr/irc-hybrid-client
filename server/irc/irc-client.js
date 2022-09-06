@@ -2070,12 +2070,12 @@
   // -----------------------------------------------
   const eraseCache = function (req, res, next) {
     // Abort if connected.
-    if ((vars.ircState.ircConnected) || (vars.ircState.ircConnecting)) {
-      return res.json({
-        error: true,
-        message: 'Disconnect from IRC before clearing cache'
-      });
-    }
+    // if ((vars.ircState.ircConnected) || (vars.ircState.ircConnecting)) {
+    //   return res.json({
+    //     error: true,
+    //     message: 'Disconnect from IRC before clearing cache'
+    //   });
+    // }
     // Check for presence of extraneous keys
     const validKeys = ['erase'];
     Object.keys(req.body).forEach(function (key) {

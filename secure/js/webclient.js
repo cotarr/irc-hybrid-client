@@ -512,7 +512,7 @@ function updateDivVisibility () {
       document.getElementById('userAwayMessageId').removeAttribute('disabled');
       document.getElementById('setAwayButton').removeAttribute('disabled');
       document.getElementById('setBackButton').removeAttribute('disabled');
-      document.getElementById('eraseCacheButton').setAttribute('disabled', '');
+      // document.getElementById('eraseCacheButton').setAttribute('disabled', '');
       document.getElementById('ircDisconnectedHiddenDiv').removeAttribute('hidden');
       if (webState.noticeOpen) {
         document.getElementById('noticeSectionDiv').removeAttribute('hidden');
@@ -572,7 +572,7 @@ function updateDivVisibility () {
       document.getElementById('setAwayButton').setAttribute('disabled', '');
       document.getElementById('setBackButton').setAttribute('disabled', '');
 
-      document.getElementById('eraseCacheButton').removeAttribute('disabled');
+      // document.getElementById('eraseCacheButton').removeAttribute('disabled');
       document.getElementById('ircDisconnectedHiddenDiv').setAttribute('hidden', '');
       webState.noticeOpen = false;
       document.getElementById('noticeSectionDiv').setAttribute('hidden', '');

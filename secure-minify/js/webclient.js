@@ -85,7 +85,7 @@ if(ircState.ircIsAway)document.getElementById('ircIsAwayIconId').removeAttribute
 ;document.getElementById('nickNameInputId').setAttribute('disabled','');document.getElementById('connectButton').setAttribute('disabled','')
 ;document.getElementById('quitButton').removeAttribute('disabled');document.getElementById('userAwayMessageId').removeAttribute('disabled')
 ;document.getElementById('setAwayButton').removeAttribute('disabled');document.getElementById('setBackButton').removeAttribute('disabled')
-;document.getElementById('eraseCacheButton').setAttribute('disabled','');document.getElementById('ircDisconnectedHiddenDiv').removeAttribute('hidden')
+;document.getElementById('ircDisconnectedHiddenDiv').removeAttribute('hidden')
 ;if(webState.noticeOpen)document.getElementById('noticeSectionDiv').removeAttribute('hidden');else document.getElementById('noticeSectionDiv').setAttribute('hidden','')
 ;if(webState.wallopsOpen)document.getElementById('wallopsSectionDiv').removeAttribute('hidden');else document.getElementById('wallopsSectionDiv').setAttribute('hidden','')}else{
 if(webState.ircConnecting||ircState.ircConnecting){document.getElementById('ircConnectIconId').removeAttribute('unavailable');document.getElementById('ircConnectIconId').setAttribute('connecting','')
@@ -101,10 +101,9 @@ document.getElementById('cyclePrevServerButton').setAttribute('disabled','');doc
 ;document.getElementById('quitButton').removeAttribute('disabled')}else{document.getElementById('connectButton').removeAttribute('disabled')
 ;if(document.getElementById('waitConnectIconId').hasAttribute('hidden'))document.getElementById('quitButton').setAttribute('disabled','');else document.getElementById('quitButton').removeAttribute('disabled')
 }document.getElementById('userAwayMessageId').setAttribute('disabled','');document.getElementById('setAwayButton').setAttribute('disabled','')
-;document.getElementById('setBackButton').setAttribute('disabled','');document.getElementById('eraseCacheButton').removeAttribute('disabled')
-;document.getElementById('ircDisconnectedHiddenDiv').setAttribute('hidden','');webState.noticeOpen=false;document.getElementById('noticeSectionDiv').setAttribute('hidden','')
-;webState.wallopsOpen=false;document.getElementById('wallopsSectionDiv').setAttribute('hidden','');document.getElementById('ircChannelsMainHiddenDiv').removeAttribute('hidden')
-;document.getElementById('ircChannelsMainHiddenButton').textContent='-'}
+;document.getElementById('setBackButton').setAttribute('disabled','');document.getElementById('ircDisconnectedHiddenDiv').setAttribute('hidden','');webState.noticeOpen=false
+;document.getElementById('noticeSectionDiv').setAttribute('hidden','');webState.wallopsOpen=false;document.getElementById('wallopsSectionDiv').setAttribute('hidden','')
+;document.getElementById('ircChannelsMainHiddenDiv').removeAttribute('hidden');document.getElementById('ircChannelsMainHiddenButton').textContent='-'}
 if(ircState.disableServerListEditor)document.getElementById('editServerListButton').setAttribute('disabled','');else document.getElementById('editServerListButton').removeAttribute('disabled')
 ;document.getElementById('groupInfoHiddenDiv').setAttribute('hidden','')}else{document.getElementById('hiddenInfoDiv').setAttribute('hidden','')
 ;document.getElementById('infoOpenCloseButton').textContent='+';hideRawMessageWindow();document.getElementById('webDisconnectedVisibleDiv').removeAttribute('hidden')
@@ -517,15 +516,14 @@ resetMessageCount();activityIconInhibitTimer=activityIconInhibitTimerValue}chann
 channelMessageCounterEl.addEventListener('click',handleChannelMessageCounterElClick);function handleChannelUnreadCountDivClick(){resetMessageCount()}
 document.getElementById('channelUnreadCountDiv').addEventListener('click',handleChannelUnreadCountDivClick);function handleChannelUnreadExistIconClick(){resetMessageCount()}
 document.getElementById('channelUnreadExistIcon').addEventListener('click',handleChannelUnreadExistIconClick);function updateVisibility(){const index=ircState.channels.indexOf(name.toLowerCase())
-;if(index>=0){channelNameDivEl.textContent=ircState.channelStates[channelIndex].csName;if(channelMainSectionEl.hasAttribute('opened')){channelBottomDivEl.removeAttribute('hidden')
-;channelHideButtonEl.textContent='-';if(ircState.channelStates[index].joined){channelTopicDivEl.textContent=cleanFormatting(ircState.channelStates[index].topic)
-;channelNamesDisplayEl.removeAttribute('disabled');channelTextAreaEl.removeAttribute('disabled');channelInputAreaEl.removeAttribute('disabled');channelSendButtonEl.removeAttribute('disabled')
-;channelJoinButtonEl.setAttribute('hidden','');channelPruneButtonEl.setAttribute('hidden','');channelPartButtonEl.removeAttribute('hidden')}else{channelNamesDisplayEl.setAttribute('disabled','')
-;channelTextAreaEl.setAttribute('disabled','');channelInputAreaEl.setAttribute('disabled','');channelSendButtonEl.setAttribute('disabled','');channelJoinButtonEl.removeAttribute('hidden')
-;channelPruneButtonEl.removeAttribute('hidden');channelPartButtonEl.setAttribute('hidden','');channelTopicDivEl.removeAttribute('hidden');channelBottomDiv2El.removeAttribute('hidden')
-;channelBottomDiv3El.removeAttribute('hidden');channelBottomDiv4El.removeAttribute('hidden');channelNamesDisplayEl.removeAttribute('hidden')}if(channelMainSectionEl.hasAttribute('zoom')){
-channelZoomButtonEl.textContent=zoomOnText;channelTopicDivEl.setAttribute('hidden','');channelBottomDiv2El.setAttribute('hidden','');channelBottomDiv3El.setAttribute('hidden','')
-;channelBottomDiv4El.setAttribute('hidden','')
+;if(index>=0)if(channelMainSectionEl.hasAttribute('opened')){channelBottomDivEl.removeAttribute('hidden');channelHideButtonEl.textContent='-';if(ircState.channelStates[index].joined){
+channelTopicDivEl.textContent=cleanFormatting(ircState.channelStates[index].topic);channelNamesDisplayEl.removeAttribute('disabled');channelTextAreaEl.removeAttribute('disabled')
+;channelInputAreaEl.removeAttribute('disabled');channelSendButtonEl.removeAttribute('disabled');channelJoinButtonEl.setAttribute('hidden','');channelPruneButtonEl.setAttribute('hidden','')
+;channelPartButtonEl.removeAttribute('hidden')}else{channelNamesDisplayEl.setAttribute('disabled','');channelTextAreaEl.setAttribute('disabled','');channelInputAreaEl.setAttribute('disabled','')
+;channelSendButtonEl.setAttribute('disabled','');channelJoinButtonEl.removeAttribute('hidden');channelPruneButtonEl.removeAttribute('hidden');channelPartButtonEl.setAttribute('hidden','')
+;channelTopicDivEl.removeAttribute('hidden');channelBottomDiv2El.removeAttribute('hidden');channelBottomDiv3El.removeAttribute('hidden');channelBottomDiv4El.removeAttribute('hidden')
+;channelNamesDisplayEl.removeAttribute('hidden')}if(channelMainSectionEl.hasAttribute('zoom')){channelZoomButtonEl.textContent=zoomOnText;channelTopicDivEl.setAttribute('hidden','')
+;channelBottomDiv2El.setAttribute('hidden','');channelBottomDiv3El.setAttribute('hidden','');channelBottomDiv4El.setAttribute('hidden','')
 ;if(webState.dynamic.bodyClientWidth>mobileBreakpointPx)channelNamesDisplayEl.removeAttribute('hidden');else channelNamesDisplayEl.setAttribute('hidden','')}else{
 channelZoomButtonEl.textContent=zoomOffText;channelTopicDivEl.removeAttribute('hidden');channelBottomDiv2El.removeAttribute('hidden');channelBottomDiv3El.removeAttribute('hidden')
 ;channelBottomDiv4El.removeAttribute('hidden');channelNamesDisplayEl.removeAttribute('hidden')}
@@ -535,7 +533,7 @@ if(channelMainSectionEl.hasAttribute('beep1-enabled'))channelBeep1CBInputEl.chec
 ;if(channelMainSectionEl.hasAttribute('brief-enabled'))channelFormatCBInputEl.checked=true;else channelFormatCBInputEl.checked=false
 ;if(channelMainSectionEl.hasAttribute('auto-comp-enabled'))channelAutoCompCBInputEl.checked=true;else channelAutoCompCBInputEl.checked=false}else{channelZoomButtonEl.textContent=zoomOffText
 ;channelBottomDivEl.setAttribute('hidden','');channelPruneButtonEl.setAttribute('hidden','');channelJoinButtonEl.setAttribute('hidden','');channelPartButtonEl.setAttribute('hidden','')
-;channelHideButtonEl.textContent='+'}}else{channelZoomButtonEl.textContent=zoomOffText;channelBottomDivEl.setAttribute('hidden','');channelPruneButtonEl.setAttribute('hidden','')
+;channelHideButtonEl.textContent='+'}else{channelZoomButtonEl.textContent=zoomOffText;channelBottomDivEl.setAttribute('hidden','');channelPruneButtonEl.setAttribute('hidden','')
 ;channelJoinButtonEl.setAttribute('hidden','');channelPartButtonEl.setAttribute('hidden','');channelHideButtonEl.textContent='+'}}function handleChannelZoomButtonElClick(event){
 if(channelMainSectionEl.hasAttribute('zoom')){channelMainSectionEl.removeAttribute('zoom');updateVisibility();channelTextAreaEl.scrollTop=channelTextAreaEl.scrollHeight}else{
 const timestamp=unixTimestamp();const lastZoomObj={timestamp:timestamp,zoomType:'channel',zoomValue:name.toLowerCase()};document.dispatchEvent(new CustomEvent('hide-or-zoom',{bubbles:true,
@@ -606,9 +604,10 @@ channelInputAreaEl.value=channelInputAreaEl.value.slice(0,channelInputAreaEl.val
 ;const sortedOpList=opList.sort();const sortedOtherList=otherList.sort();if(sortedOpList.length>0)for(let i=0;i<sortedOpList.length;i++){channelNamesDisplayEl.value+=sortedOpList[i]+'\n'
 ;if(maxNickLength<sortedOpList[i].length)maxNickLength=sortedOpList[i].length}if(sortedOtherList.length>0)for(let i=0;i<sortedOtherList.length;i++){channelNamesDisplayEl.value+=sortedOtherList[i]+'\n'
 ;if(maxNickLength<sortedOtherList[i].length)maxNickLength=sortedOtherList[i].length}}}}_updateNickList();function _updateChannelTitle(){const titleStr=name;let nickCount=0
-;const index=ircState.channels.indexOf(name.toLowerCase());if(index>=0)if(ircState.channelStates[index].kicked)channelBeenKickedIconEl.removeAttribute('hidden');else{
-channelBeenKickedIconEl.setAttribute('hidden','');nickCount=ircState.channelStates[index].names.length}channelNameDivEl.textContent=titleStr;channelNickCounterEl.textContent=nickCount.toString()}
-_updateChannelTitle();function _isNickInChannel(nickString,channelString){if(!nickString||0===nickString.length)return false;if(0===ircState.channels.length)return false;let channelIndex=-1
+;const index=ircState.channels.indexOf(name.toLowerCase());if(index>=0){if(ircState.channelStates[index].kicked)channelBeenKickedIconEl.removeAttribute('hidden');else{
+channelBeenKickedIconEl.setAttribute('hidden','');nickCount=ircState.channelStates[index].names.length}channelNameDivEl.textContent=ircState.channelStates[index].csName}
+channelNameDivEl.textContent=titleStr;channelNickCounterEl.textContent=nickCount.toString()}_updateChannelTitle();function _isNickInChannel(nickString,channelString){
+if(!nickString||0===nickString.length)return false;if(0===ircState.channels.length)return false;let channelIndex=-1
 ;for(let i=0;i<ircState.channels.length;i++)if(channelString.toLowerCase()===ircState.channels[i].toLowerCase())channelIndex=i;if(channelIndex<0)return false
 ;if(0===ircState.channelStates[channelIndex].names.length)return false;let pureNick=nickString.toLowerCase()
 ;if(nicknamePrefixChars.indexOf(pureNick.charAt(0))>=0)pureNick=pureNick.slice(1,pureNick.length);let present=false;for(let i=0;i<ircState.channelStates[channelIndex].names.length;i++){
@@ -935,14 +934,14 @@ webState.cacheReloadInProgress=false}));window.addEventListener('cache-reload-er
 ;const fetchOptions={method:'POST',headers:{'CSRF-Token':csrfToken,'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify({terminate:'YES'})}
 ;fetch(fetchURL,fetchOptions).then(response=>{if(response.ok)return response.json();else throw new Error('Fetch status '+response.status+' '+response.statusText)}).then(responseJson=>{
 console.log(JSON.stringify(responseJson))}).catch(error=>{showError('Terminate: Unable to connect');console.log(error)})}))
-;document.getElementById('eraseCacheButton').addEventListener('click',(function(){if(ircState.ircConnected){showError('You must be disconnected from IRC to clear cache.');return}
-document.dispatchEvent(new CustomEvent('erase-before-reload',{bubbles:true,detail:{}}));const fetchURL=webServerUrl+'/irc/erase';const fetchOptions={method:'POST',headers:{'CSRF-Token':csrfToken,
-'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify({erase:'YES'})};fetch(fetchURL,fetchOptions).then(response=>{
-if(response.ok)return response.json();else throw new Error('Fetch status '+response.status+' '+response.statusText)}).then(responseJson=>{if(responseJson.error)showError(responseJson.message)
-}).catch(error=>{console.log(error)})}));function detectWebUseridChanged(){let lastLoginUser=null;lastLoginUser=JSON.parse(window.localStorage.getItem('lastLoginUser'))
-;if(lastLoginUser&&lastLoginUser.userid&&lastLoginUser.userid!==webState.loginUser.userid){console.log('User id changed, clearing local storage');window.localStorage.clear()}
-const newLoginTimestamp=unixTimestamp();const newLoginUser={timestamp:newLoginTimestamp,userid:webState.loginUser.userid};window.localStorage.setItem('lastLoginUser',JSON.stringify(newLoginUser))}
-function updateUsername(){const fetchURL=webServerUrl+'/userinfo';const fetchOptions={method:'GET',headers:{Accept:'application/json'}};fetch(fetchURL,fetchOptions).then(response=>{
+;document.getElementById('eraseCacheButton').addEventListener('click',(function(){document.dispatchEvent(new CustomEvent('erase-before-reload',{bubbles:true,detail:{}}))
+;const fetchURL=webServerUrl+'/irc/erase';const fetchOptions={method:'POST',headers:{'CSRF-Token':csrfToken,'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify({
+erase:'YES'})};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok)return response.json();else throw new Error('Fetch status '+response.status+' '+response.statusText)}).then(responseJson=>{
+if(responseJson.error)showError(responseJson.message)}).catch(error=>{console.log(error)})}));function detectWebUseridChanged(){let lastLoginUser=null
+;lastLoginUser=JSON.parse(window.localStorage.getItem('lastLoginUser'));if(lastLoginUser&&lastLoginUser.userid&&lastLoginUser.userid!==webState.loginUser.userid){
+console.log('User id changed, clearing local storage');window.localStorage.clear()}const newLoginTimestamp=unixTimestamp();const newLoginUser={timestamp:newLoginTimestamp,
+userid:webState.loginUser.userid};window.localStorage.setItem('lastLoginUser',JSON.stringify(newLoginUser))}function updateUsername(){const fetchURL=webServerUrl+'/userinfo';const fetchOptions={
+method:'GET',headers:{Accept:'application/json'}};fetch(fetchURL,fetchOptions).then(response=>{
 if(response.ok)return response.json();else throw new Error('Fetch status '+response.status+' '+response.statusText)}).then(responseJson=>{webState.loginUser=responseJson;detectWebUseridChanged()
 }).catch(error=>{console.log(error)})}updateUsername();document.getElementById('test1Button').addEventListener('click',(function(){console.log('Test1 button pressed.')
 ;const fetchURL=webServerUrl+'/irc/test1';const fetchOptions={method:'GET',headers:{Accept:'application/json'}};fetch(fetchURL,fetchOptions).then(response=>{
