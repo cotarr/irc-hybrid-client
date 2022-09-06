@@ -2134,7 +2134,8 @@
           comment: 'Debug: Forcing nodejs garbage collection',
           data: {
             before: before,
-            after: after
+            after: after,
+            cache: ircMessageCache.cacheInfo()
           }
         });
       }, 1000);

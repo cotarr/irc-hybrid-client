@@ -457,8 +457,9 @@
     });
     const info = {};
     info.sizeCache = cacheSize;
-    // info.sizeArray = cacheArray.length;
-    // info.inPointer = cacheInPointer;
+    info.buffers = Object.keys(cachedArrays).length;
+    // maxBuffers = channel buffers + 1 default buffer
+    info.maxBuffers = maximumChannelCaches + 1;
     info.usedLines = lines;
     info.sizeInBytes = size;
     return info;
