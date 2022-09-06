@@ -81,6 +81,7 @@ Browser files changed:
 - secure/js/webclient02.js - Remove special code to format QUIT messages in the server window when reloading cache. Both QUIT and cachedQUIT message are sent to the channel window for parsing.
 - secure/js/webclient06.js - Add separate event handlers for QUIT and cachedQUIT messages.
 - secure/js/webclient06.js - IRC channel window, channel name now displays case sensitive csName property from ircState.channelStates[].csName.
+- secure/js/webclient06.js - Opening a new IRC channel no longer automatically closes the server (raw message) window.
 - secure/js/webclient09.js - Remove QUIT handler from server window display.
 - secure/js/webclient09.js - Added a sort routine to re-order strings displayed in the server window when viewed in raw server message mode. This is necessary because when refreshing cache to raw display, several cache buffers are combined, out of chronological order. The raw HEX display is not sorted due to mixed content.
 - secure/js/webclient10.js - Added new debounce delay event handler `debounced-update-from-cache`. This is used when creating new channel windows in webclient06.js to call updateCache to pre-fill the IRC channel textarea.

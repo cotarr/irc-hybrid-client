@@ -487,33 +487,32 @@ console.log('createChannelEl: channel already exist');return}const defaultHeight
 ;channelBottomDivEl.appendChild(channelBottomDiv3El);channelBottomDivEl.appendChild(channelBottomDiv4El);channelMainSectionEl.appendChild(channelTopDivEl)
 ;channelMainSectionEl.appendChild(channelTopSpacerDivEl);channelMainSectionEl.appendChild(channelBottomDivEl)
 ;if(channelContainerDivEl.firstChild)channelContainerDivEl.insertBefore(channelMainSectionEl,channelContainerDivEl.firstChild);else channelContainerDivEl.appendChild(channelMainSectionEl)
-;if(ircState.channelStates[initIrcStateIndex].joined)hideRawMessageWindow();let activityIconInhibitTimer=0;const channelIntervalTimer=setInterval((function(){
-if(activityIconInhibitTimer>0)activityIconInhibitTimer--}),1e3);document.dispatchEvent(new CustomEvent('debounced-update-from-cache',{bubbles:true}));function updateChannelCount(){
-document.dispatchEvent(new CustomEvent('update-channel-count',{bubbles:true}))}function incrementMessageCount(){let count=parseInt(channelMessageCounterEl.textContent);count++
-;channelMessageCounterEl.textContent=count.toString();channelMessageCounterEl.removeAttribute('hidden');updateChannelCount()}function resetMessageCount(){const count=0
-;channelMessageCounterEl.textContent=count.toString();channelMessageCounterEl.setAttribute('hidden','');updateChannelCount()}function handleChannelHideButtonElClick(event){
-if(channelMainSectionEl.hasAttribute('opened')){channelMainSectionEl.removeAttribute('opened');channelMainSectionEl.removeAttribute('zoom')}else{channelMainSectionEl.setAttribute('opened','')
-;channelMainSectionEl.removeAttribute('zoom');clearLastZoom()}updateVisibility()}channelHideButtonEl.addEventListener('click',handleChannelHideButtonElClick)
-;function handleChannelTallerButtonElClick(event){const newRows=parseInt(channelTextAreaEl.getAttribute('rows'))+10;channelTextAreaEl.setAttribute('rows',newRows.toString())
-;channelNamesDisplayEl.setAttribute('rows',newRows.toString());channelInputAreaEl.setAttribute('rows','3')}channelTallerButtonEl.addEventListener('click',handleChannelTallerButtonElClick)
-;function handleChannelNormalButtonElClick(event){channelTextAreaEl.setAttribute('rows',defaultHeightInRows);channelNamesDisplayEl.setAttribute('rows',defaultHeightInRows)
-;channelInputAreaEl.setAttribute('rows','1')}channelNormalButtonEl.addEventListener('click',handleChannelNormalButtonElClick);function handleChannelClearButtonElClick(event){channelTextAreaEl.value=''
-;channelTextAreaEl.setAttribute('rows',defaultHeightInRows);channelNamesDisplayEl.setAttribute('rows',defaultHeightInRows);channelInputAreaEl.setAttribute('rows','1')}
-channelClearButtonEl.addEventListener('click',handleChannelClearButtonElClick);function handleChannelJoinButtonElClick(event){const message='JOIN '+name;_sendIrcServerMessage(message)}
-channelJoinButtonEl.addEventListener('click',handleChannelJoinButtonElClick);function handleChannelPartButtonElClick(event){const message='PART '+name+' :'+ircState.progName+' '+ircState.progVersion
-;_sendIrcServerMessage(message)}channelPartButtonEl.addEventListener('click',handleChannelPartButtonElClick);function handleChannelPruneButtonElClick(event){
-const index=ircState.channels.indexOf(name.toLowerCase());if(index>=0)if(!ircState.channelStates[index].joined){const fetchURL=webServerUrl+'/irc/prune';const fetchOptions={method:'POST',headers:{
-'CSRF-Token':csrfToken,'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify({channel:name})};fetch(fetchURL,fetchOptions).then(response=>{
-if(response.ok)return response.json();else throw new Error('Fetch status '+response.status+' '+response.statusText)}).then(responseJson=>{if(responseJson.error)showError(responseJson.message)
-}).catch(error=>{console.log(error)})}}channelPruneButtonEl.addEventListener('click',handleChannelPruneButtonElClick);function handleChannelRefreshButtonElClick(event){
-if(!webState.cacheReloadInProgress)document.dispatchEvent(new CustomEvent('update-from-cache',{bubbles:true}))}channelRefreshButtonEl.addEventListener('click',handleChannelRefreshButtonElClick)
-;function handleChannelSendButtonElClick(event){_sendTextToChannel(channelIndex,channelInputAreaEl);channelInputAreaEl.focus();resetMessageCount()
-;activityIconInhibitTimer=activityIconInhibitTimerValue}channelSendButtonEl.addEventListener('click',handleChannelSendButtonElClick);function handleChannelInputAreaElInput(event){
-if('insertText'===event.inputType&&null===event.data||'insertLineBreak'===event.inputType){stripOneCrLfFromElement(channelInputAreaEl);_sendTextToChannel(channelIndex,channelInputAreaEl)
-;resetMessageCount();activityIconInhibitTimer=activityIconInhibitTimerValue}}channelInputAreaEl.addEventListener('input',handleChannelInputAreaElInput);function handleChannelBottomDivElClick(event){
-resetMessageCount();activityIconInhibitTimer=activityIconInhibitTimerValue}channelBottomDivEl.addEventListener('click',handleChannelBottomDivElClick)
-;function handleChannelMessageCounterElClick(event){resetMessageCount();activityIconInhibitTimer=activityIconInhibitTimerValue}
-channelMessageCounterEl.addEventListener('click',handleChannelMessageCounterElClick);function handleChannelUnreadCountDivClick(){resetMessageCount()}
+;let activityIconInhibitTimer=0;const channelIntervalTimer=setInterval((function(){if(activityIconInhibitTimer>0)activityIconInhibitTimer--}),1e3)
+;document.dispatchEvent(new CustomEvent('debounced-update-from-cache',{bubbles:true}));function updateChannelCount(){document.dispatchEvent(new CustomEvent('update-channel-count',{bubbles:true}))}
+function incrementMessageCount(){let count=parseInt(channelMessageCounterEl.textContent);count++;channelMessageCounterEl.textContent=count.toString();channelMessageCounterEl.removeAttribute('hidden')
+;updateChannelCount()}function resetMessageCount(){const count=0;channelMessageCounterEl.textContent=count.toString();channelMessageCounterEl.setAttribute('hidden','');updateChannelCount()}
+function handleChannelHideButtonElClick(event){if(channelMainSectionEl.hasAttribute('opened')){channelMainSectionEl.removeAttribute('opened');channelMainSectionEl.removeAttribute('zoom')}else{
+channelMainSectionEl.setAttribute('opened','');channelMainSectionEl.removeAttribute('zoom');clearLastZoom()}updateVisibility()}
+channelHideButtonEl.addEventListener('click',handleChannelHideButtonElClick);function handleChannelTallerButtonElClick(event){const newRows=parseInt(channelTextAreaEl.getAttribute('rows'))+10
+;channelTextAreaEl.setAttribute('rows',newRows.toString());channelNamesDisplayEl.setAttribute('rows',newRows.toString());channelInputAreaEl.setAttribute('rows','3')}
+channelTallerButtonEl.addEventListener('click',handleChannelTallerButtonElClick);function handleChannelNormalButtonElClick(event){channelTextAreaEl.setAttribute('rows',defaultHeightInRows)
+;channelNamesDisplayEl.setAttribute('rows',defaultHeightInRows);channelInputAreaEl.setAttribute('rows','1')}channelNormalButtonEl.addEventListener('click',handleChannelNormalButtonElClick)
+;function handleChannelClearButtonElClick(event){channelTextAreaEl.value='';channelTextAreaEl.setAttribute('rows',defaultHeightInRows);channelNamesDisplayEl.setAttribute('rows',defaultHeightInRows)
+;channelInputAreaEl.setAttribute('rows','1')}channelClearButtonEl.addEventListener('click',handleChannelClearButtonElClick);function handleChannelJoinButtonElClick(event){const message='JOIN '+name
+;_sendIrcServerMessage(message)}channelJoinButtonEl.addEventListener('click',handleChannelJoinButtonElClick);function handleChannelPartButtonElClick(event){
+const message='PART '+name+' :'+ircState.progName+' '+ircState.progVersion;_sendIrcServerMessage(message)}channelPartButtonEl.addEventListener('click',handleChannelPartButtonElClick)
+;function handleChannelPruneButtonElClick(event){const index=ircState.channels.indexOf(name.toLowerCase());if(index>=0)if(!ircState.channelStates[index].joined){
+const fetchURL=webServerUrl+'/irc/prune';const fetchOptions={method:'POST',headers:{'CSRF-Token':csrfToken,'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify({
+channel:name})};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok)return response.json();else throw new Error('Fetch status '+response.status+' '+response.statusText)}).then(responseJson=>{
+if(responseJson.error)showError(responseJson.message)}).catch(error=>{console.log(error)})}}channelPruneButtonEl.addEventListener('click',handleChannelPruneButtonElClick)
+;function handleChannelRefreshButtonElClick(event){if(!webState.cacheReloadInProgress)document.dispatchEvent(new CustomEvent('update-from-cache',{bubbles:true}))}
+channelRefreshButtonEl.addEventListener('click',handleChannelRefreshButtonElClick);function handleChannelSendButtonElClick(event){_sendTextToChannel(channelIndex,channelInputAreaEl)
+;channelInputAreaEl.focus();resetMessageCount();activityIconInhibitTimer=activityIconInhibitTimerValue}channelSendButtonEl.addEventListener('click',handleChannelSendButtonElClick)
+;function handleChannelInputAreaElInput(event){if('insertText'===event.inputType&&null===event.data||'insertLineBreak'===event.inputType){stripOneCrLfFromElement(channelInputAreaEl)
+;_sendTextToChannel(channelIndex,channelInputAreaEl);resetMessageCount();activityIconInhibitTimer=activityIconInhibitTimerValue}}
+channelInputAreaEl.addEventListener('input',handleChannelInputAreaElInput);function handleChannelBottomDivElClick(event){resetMessageCount();activityIconInhibitTimer=activityIconInhibitTimerValue}
+channelBottomDivEl.addEventListener('click',handleChannelBottomDivElClick);function handleChannelMessageCounterElClick(event){resetMessageCount();activityIconInhibitTimer=activityIconInhibitTimerValue
+}channelMessageCounterEl.addEventListener('click',handleChannelMessageCounterElClick);function handleChannelUnreadCountDivClick(){resetMessageCount()}
 document.getElementById('channelUnreadCountDiv').addEventListener('click',handleChannelUnreadCountDivClick);function handleChannelUnreadExistIconClick(){resetMessageCount()}
 document.getElementById('channelUnreadExistIcon').addEventListener('click',handleChannelUnreadExistIconClick);function updateVisibility(){const index=ircState.channels.indexOf(name.toLowerCase())
 ;if(index>=0)if(channelMainSectionEl.hasAttribute('opened')){channelBottomDivEl.removeAttribute('hidden');channelHideButtonEl.textContent='-';if(ircState.channelStates[index].joined){
@@ -688,7 +687,7 @@ if(ircState.channels.length>0)for(let i=0;i<ircState.channels.length;i++){const 
 let needButtonUpdate=false;let joinedChannelCount=0;if(ircState.channels.length>0)for(let i=0;i<ircState.channels.length;i++)if(ircState.channelStates[i].joined)joinedChannelCount++
 ;if(joinedChannelCount!==lastJoinedChannelCount){needButtonUpdate=true;lastJoinedChannelCount=joinedChannelCount}if(ircState.ircServerIndex!==lastIrcServerIndex){needButtonUpdate=true
 ;lastIrcServerIndex=ircState.ircServerIndex}document.getElementById('activeChannelCount').textContent=joinedChannelCount.toString();function _handleChannelButtonClick(event){
-const channelName=document.getElementById(event.target.id).textContent;if(channelName.length>0){_sendIrcServerMessage('JOIN '+channelName);hideRawMessageWindow()}}if(needButtonUpdate){
+const channelName=document.getElementById(event.target.id).textContent;if(channelName.length>0)_sendIrcServerMessage('JOIN '+channelName)}if(needButtonUpdate){
 const channelJoinButtonContainerEl=document.getElementById('channelJoinButtonContainer');while(channelJoinButtonContainerEl.firstChild){
 channelJoinButtonContainerEl.firstChild.removeEventListener('click',_handleChannelButtonClick);channelJoinButtonContainerEl.removeChild(channelJoinButtonContainerEl.firstChild)}
 if(ircState.channelList.length>0)for(let i=0;i<ircState.channelList.length;i++){const channelIndex=ircState.channels.indexOf(ircState.channelList[i].toLowerCase())
@@ -701,7 +700,7 @@ if(document.getElementById('ircChannelsMainHiddenDiv').hasAttribute('hidden')){d
 ;document.getElementById('ircChannelsMainHiddenButton').textContent='-'}else{document.getElementById('ircChannelsMainHiddenDiv').setAttribute('hidden','')
 ;document.getElementById('ircChannelsMainHiddenButton').textContent='+'}}));function _newChannel(){const newChannel=document.getElementById('newChannelNameInputId').value
 ;document.getElementById('newChannelNameInputId').value='';if(newChannel.length>1&&channelPrefixChars.indexOf(newChannel.charAt(0))>=0){const message='JOIN '+newChannel;_sendIrcServerMessage(message)
-;hideRawMessageWindow()}else showError('Invalid Channel Name')}document.getElementById('newChannelNameInputId').addEventListener('input',(function(event){
+}else showError('Invalid Channel Name')}document.getElementById('newChannelNameInputId').addEventListener('input',(function(event){
 if('insertText'===event.inputType&&null===event.data||'insertLineBreak'===event.inputType)_newChannel()}));document.getElementById('newChannelButton').addEventListener('click',(function(){
 _newChannel()}));document.addEventListener('update-channel-count',(function(event){let totalCount=0;document.querySelectorAll('.channel-count-class').forEach((function(el){
 totalCount+=parseInt(el.textContent)}));document.getElementById('channelUnreadCountDiv').textContent=totalCount.toString();if(totalCount>0){

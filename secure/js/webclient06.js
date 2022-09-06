@@ -470,9 +470,9 @@ function createChannelEl (name) {
 
   // This is to make room for seeing the display.
   // If state of channel is joined, then hide raw servermessage window.
-  if (ircState.channelStates[initIrcStateIndex].joined) {
-    hideRawMessageWindow();
-  }
+  // if (ircState.channelStates[initIrcStateIndex].joined) {
+  //   hideRawMessageWindow();
+  // }
 
   // --------------------------
   // Channel specific timers
@@ -1943,7 +1943,7 @@ document.addEventListener('irc-state-changed', function (event) {
     if (channelName.length > 0) {
       // console.log('channelName ' + channelName);
       _sendIrcServerMessage('JOIN ' + channelName);
-      hideRawMessageWindow();
+      // hideRawMessageWindow();
     }
   }
 
@@ -2010,7 +2010,7 @@ function _newChannel () {
     (channelPrefixChars.indexOf(newChannel.charAt(0)) >= 0)) {
     const message = 'JOIN ' + newChannel;
     _sendIrcServerMessage(message);
-    hideRawMessageWindow();
+    // hideRawMessageWindow();
   } else {
     showError('Invalid Channel Name');
   }
