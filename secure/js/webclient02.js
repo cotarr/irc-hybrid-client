@@ -520,6 +520,7 @@ function displayNoticeMessage (parsedMessage) {
 document.addEventListener('erase-before-reload', function (event) {
   document.getElementById('noticeMessageDisplay').value = '';
   webState.noticeOpen = false;
+  document.getElementById('noticeUnreadExistIcon').setAttribute('hidden', '');
   updateDivVisibility();
 });
 

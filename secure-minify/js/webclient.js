@@ -216,9 +216,9 @@ if(parsedMessage.nick)_addText(parsedMessage.timestamp+' '+parsedMessage.nick+ni
 }else if(ircState.channels.indexOf(parsedMessage.params[0].toLowerCase())>=0)document.dispatchEvent(new CustomEvent('channel-message',{bubbles:true,detail:{parsedMessage:parsedMessage}
 }));else if(parsedMessage.nick===ircState.nickName){_addText(parsedMessage.timestamp+' [to] '+parsedMessage.params[0]+nickChannelSpacer+parsedMessage.params[1]);webState.noticeOpen=true
 ;updateDivVisibility()}}break;default:}}document.addEventListener('erase-before-reload',(function(event){document.getElementById('noticeMessageDisplay').value='';webState.noticeOpen=false
-;updateDivVisibility()}));document.addEventListener('cache-reload-done',(function(event){let markerString='';let timestampString=''
-;if('detail'in event&&'timestamp'in event.detail)timestampString=unixTimestampToHMS(event.detail.timestamp);if(timestampString)markerString+=timestampString;markerString+=' '+cacheReloadString+'\n'
-;if(''!==document.getElementById('noticeMessageDisplay').value){document.getElementById('noticeMessageDisplay').value+=markerString
+;document.getElementById('noticeUnreadExistIcon').setAttribute('hidden','');updateDivVisibility()}));document.addEventListener('cache-reload-done',(function(event){let markerString=''
+;let timestampString='';if('detail'in event&&'timestamp'in event.detail)timestampString=unixTimestampToHMS(event.detail.timestamp);if(timestampString)markerString+=timestampString
+;markerString+=' '+cacheReloadString+'\n';if(''!==document.getElementById('noticeMessageDisplay').value){document.getElementById('noticeMessageDisplay').value+=markerString
 ;document.getElementById('noticeMessageDisplay').scrollTop=document.getElementById('noticeMessageDisplay').scrollHeight}}));document.addEventListener('cache-reload-error',(function(event){
 let errorString='\n';let timestampString='';if('detail'in event&&'timestamp'in event.detail)timestampString=unixTimestampToHMS(event.detail.timestamp);if(timestampString)errorString+=timestampString
 ;errorString+=' '+cacheErrorString+'\n\n';document.getElementById('noticeMessageDisplay').value=errorString}));function displayWallopsMessage(parsedMessage){function _addText(text){
