@@ -241,22 +241,28 @@
   const excludedMessageList = [
     // Body of MOTD
     '372',
+    // TOPIC reply
+    '332',
+    '333',
     // JOIN channel Names list response
     '353',
     '366',
-    // /ADMIN
+    // ADMIN
     '256',
     '257',
     '258',
     '259',
-    // /LIST response
+    // LINKS
+    '364',
+    '365',
+    // LIST response
     '321',
     '322',
     '323',
-    // /WHO response
+    // WHO response
     '315',
     '352',
-    // /WHOIS response
+    // WHOIS response
     '275',
     '307',
     '311',
