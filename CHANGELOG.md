@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Next 2022-09-04
+## [v0.2.14](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.14) 2022-09-06
 
 This change is a complete rewrite of the IRC message cache module.
 
@@ -86,7 +86,6 @@ Browser files changed:
 - secure/js/webclient09.js - Added a sort routine to re-order strings displayed in the server window when viewed in raw server message mode. This is necessary because when refreshing cache to raw display, several cache buffers are combined, out of chronological order. The raw HEX display is not sorted due to mixed content.
 - secure/js/webclient10.js - Added new debounce delay event handler `debounced-update-from-cache`. This is used when creating new channel windows in webclient06.js to call updateCache to pre-fill the IRC channel textarea.
 - Other minor changes are not listed.
-
 
 ## [v0.2.13](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.13) 2022-09-01
 
