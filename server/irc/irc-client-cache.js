@@ -231,7 +231,6 @@
       }
     }
     if ((channel !== 'default') && (channel.charAt(0) !== '#')) {
-      console.log('Illegal channel ' + channel + ' reverting to default cache');
       channel = 'default';
     }
     // return string with channel name or else return null
