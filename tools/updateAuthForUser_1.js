@@ -19,7 +19,13 @@ if (credentials.configVersion > 2) {
   process.exit(1);
 }
 
-// previous versoin used salt as a key value pair. The hash was sha256.
+if (credentials.enableRemoteLogin === true) {
+  console.log('Error: A new local web server password may not be assigned because the program' +
+    ' is configured for remote login in credentials.json, enableRemoteLogin: true.');
+  process.exit(1);
+}
+
+// previous version used salt as a key value pair. The hash was sha256.
 // The new version uses bcrypt where salt in incorporated into the hash.
 // Running this on a version 1 config will automatically update the format by removing salt.
 //

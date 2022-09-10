@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Next 2022-09-09
+
+### Added
+
+- tools/showIrcLog.js - Added simple utility to view the log file filtered by channel
+
+### Changed
+- tools/updateAuthForUser_1.js - Added check to utility script to produce error message when credentials.json is configured for external login.
+
 ## [v0.2.15](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.15) 2022-09-07
 
 Removed debug console.log() in server code.

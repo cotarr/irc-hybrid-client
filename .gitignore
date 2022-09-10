@@ -3,4 +3,5 @@ credentials*
 servers*
 push*
 logs/
+tools/showIrcLogTimeZone.json
 *.bak
