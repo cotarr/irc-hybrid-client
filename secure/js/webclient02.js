@@ -164,6 +164,26 @@ const timestampToHMS = function (timeString) {
   }
   return outString;
 };
+// --------------------------------------------------------
+// Convert string with IRCv3 timestamp to HH:MM:SS string
+// --------------------------------------------------------
+const timestampToYMD = function (timeString) {
+  let outString = '';
+  if (timeString.length === 0) {
+    outString = null;
+  } else {
+    if (timeString.indexOf('@time=') === 0) {
+      const timeObj = new Date(timeString.slice(6, timeString.length));
+      outString += timeObj.getFullYear().toString().padStart(4, '0') + '-';
+      // Month start at 0
+      outString += (timeObj.getMonth() + 1).toString().padStart(2, '0') + '-';
+      outString += timeObj.getDate().toString().padStart(2, '0');
+    } else {
+      outString = null;
+    }
+  }
+  return outString;
+};
 
 // ----------------------------------------------------------------
 // Convert unix timestamp in seconds to HH:MM:SS string local time
@@ -234,9 +254,11 @@ function _parseIrcMessage (message) {
       timeString += messageString.charAt(i);
       i++;
     }
-    const outString = timestampToHMS(timeString);
+    const outStringHMS = timestampToHMS(timeString);
+    const outStringYMD = timestampToYMD(timeString);
     return {
-      data: outString,
+      dataHMS: outStringHMS,
+      dataYMD: outStringYMD,
       nextIndex: i + 1
     };
   }
@@ -343,6 +365,7 @@ function _parseIrcMessage (message) {
   //  Line composed of 3 parts, prefix, command, params
   //
   let timestamp = null;
+  let datestamp = null;
   let prefix = null;
   let extNick = null;
   let extHost = null;
@@ -356,7 +379,8 @@ function _parseIrcMessage (message) {
 
   // 1) Extract timestamp
   temp = _extractTimeString(temp.nextIndex, end, messageString);
-  timestamp = temp.data;
+  timestamp = temp.dataHMS;
+  datestamp = temp.dataYMD;
 
   // 2) Check if prefix exist, if exit parse value, return nextIndex
   temp = _isColonString(temp.nextIndex, messageString);
@@ -398,6 +422,7 @@ function _parseIrcMessage (message) {
   // console.log(prefix, command, JSON.stringify(params));
   return {
     timestamp: timestamp,
+    datestamp: datestamp,
     prefix: prefix,
     nick: extNick,
     host: extHost,

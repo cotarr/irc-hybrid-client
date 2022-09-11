@@ -186,27 +186,29 @@ function cleanFormatting(inString){const formattingChars=[2,7,15,17,22,29,30,31]
 ;const l=inString.length;if(0===l)return outString;let i=0;while(i<l)if(i<l&&inString.charCodeAt(i)===ctcpDelim)i++;else{if(i<l)outString+=inString.charAt(i);i++}return outString}
 const timestampToHMS=function(timeString){let outString='';if(0===timeString.length)outString=null;else if(0===timeString.indexOf('@time=')){
 const timeObj=new Date(timeString.slice(6,timeString.length));outString+=timeObj.getHours().toString().padStart(2,'0')+':';outString+=timeObj.getMinutes().toString().padStart(2,'0')+':'
-;outString+=timeObj.getSeconds().toString().padStart(2,'0')}else outString=null;return outString};const unixTimestampToHMS=function(seconds){let outString=''
-;if('number'===typeof seconds&&Number.isInteger(seconds)&&seconds>1e9&&seconds<1e12){const timeObj=new Date(1e3*seconds);let language
-;if(window.navigator.languages)language=window.navigator.languages[0];else language=window.navigator.userLanguage||window.navigator.language||'en-US';outString=timeObj.toLocaleTimeString(language,{
-hour12:false})}else outString=null;return outString};const timestampToUnixSeconds=function(timeString){let outSeconds=null
+;outString+=timeObj.getSeconds().toString().padStart(2,'0')}else outString=null;return outString};const timestampToYMD=function(timeString){let outString=''
+;if(0===timeString.length)outString=null;else if(0===timeString.indexOf('@time=')){const timeObj=new Date(timeString.slice(6,timeString.length))
+;outString+=timeObj.getFullYear().toString().padStart(4,'0')+'-';outString+=(timeObj.getMonth()+1).toString().padStart(2,'0')+'-';outString+=timeObj.getDate().toString().padStart(2,'0')
+}else outString=null;return outString};const unixTimestampToHMS=function(seconds){let outString='';if('number'===typeof seconds&&Number.isInteger(seconds)&&seconds>1e9&&seconds<1e12){
+const timeObj=new Date(1e3*seconds);let language;if(window.navigator.languages)language=window.navigator.languages[0];else language=window.navigator.userLanguage||window.navigator.language||'en-US'
+;outString=timeObj.toLocaleTimeString(language,{hour12:false})}else outString=null;return outString};const timestampToUnixSeconds=function(timeString){let outSeconds=null
 ;if(0===timeString.length)outSeconds=null;else if(0===timeString.indexOf('@time=')){const timeObj=new Date(timeString.slice(6,timeString.length));outSeconds=parseInt(timeObj.valueOf()/1e3)
 }else outSeconds=null;return outSeconds};function _parseIrcMessage(message){function _extractTimeString(start,end,messageString){let i=start;let timeString=''
-;while(' '!==messageString.charAt(i)&&i<=end){timeString+=messageString.charAt(i);i++}const outString=timestampToHMS(timeString);return{data:outString,nextIndex:i+1}}
-function _isColonString(start,messageString){if(':'===messageString.charAt(start))return{isColonStr:true,nextIndex:start+1};else return{isColonStr:false,nextIndex:start}}
-function _extractMidString(start,end,messageString){let i=start;let outString='';while(' '!==messageString.charAt(i)&&i<=end){outString+=messageString.charAt(i);i++}
+;while(' '!==messageString.charAt(i)&&i<=end){timeString+=messageString.charAt(i);i++}const outStringHMS=timestampToHMS(timeString);const outStringYMD=timestampToYMD(timeString);return{
+dataHMS:outStringHMS,dataYMD:outStringYMD,nextIndex:i+1}}function _isColonString(start,messageString){if(':'===messageString.charAt(start))return{isColonStr:true,nextIndex:start+1};else return{
+isColonStr:false,nextIndex:start}}function _extractMidString(start,end,messageString){let i=start;let outString='';while(' '!==messageString.charAt(i)&&i<=end){outString+=messageString.charAt(i);i++}
 if(0===outString.length)outString=null;return{data:outString,nextIndex:i+1}}function _extractFinalString(start,end,messageString){let i=start;let outString='';while(i<=end){
 outString+=messageString.charAt(i);i++}if(0===outString.length)outString=null;return{data:outString,nextIndex:i+1}}function _extractNickname(inText){
 if(inText)if(inText.indexOf('!')>=0&&inText.indexOf('@')>=0&&inText.indexOf('!')<inText.indexOf('@')){const nick=inText.split('!')[0];return nick}else return null;else return null}
 function _extractHostname(inText){if(inText)if(inText.indexOf('!')>=0&&inText.indexOf('@')>=0&&inText.indexOf('!')<inText.indexOf('@')){const host=inText.split('!')[1];return host
-}else return null;else return null}let timestamp=null;let prefix=null;let extNick=null;let extHost=null;let command=null;const params=[];const messageString=message.toString()
-;const end=messageString.length-1;let temp={nextIndex:0};temp=_extractTimeString(temp.nextIndex,end,messageString);timestamp=temp.data;temp=_isColonString(temp.nextIndex,messageString)
-;if(temp.isColonStr){temp=_extractMidString(temp.nextIndex,end,messageString);prefix=temp.data;extNick=_extractNickname(temp.data);extHost=_extractHostname(temp.data)}
-temp=_extractMidString(temp.nextIndex,end,messageString);command=temp.data;let done=false;while(!done)if(temp.nextIndex>end)done=true;else{temp=_isColonString(temp.nextIndex,messageString)
-;if(temp.isColonStr){temp=_extractFinalString(temp.nextIndex,end,messageString);params.push(temp.data);done=true}else{temp=_extractMidString(temp.nextIndex,end,messageString)
-;if(temp.data&&temp.data.length>0)params.push(temp.data);else done=true}}return{timestamp:timestamp,prefix:prefix,nick:extNick,host:extHost,command:command,params:params}}
-function displayChannelMessage(parsedMessage){document.dispatchEvent(new CustomEvent('channel-message',{bubbles:true,detail:{parsedMessage:parsedMessage}}))}
-function displayPrivateMessage(parsedMessage){document.dispatchEvent(new CustomEvent('private-message',{bubbles:true,detail:{parsedMessage:parsedMessage}}))}
+}else return null;else return null}let timestamp=null;let datestamp=null;let prefix=null;let extNick=null;let extHost=null;let command=null;const params=[];const messageString=message.toString()
+;const end=messageString.length-1;let temp={nextIndex:0};temp=_extractTimeString(temp.nextIndex,end,messageString);timestamp=temp.dataHMS;datestamp=temp.dataYMD
+;temp=_isColonString(temp.nextIndex,messageString);if(temp.isColonStr){temp=_extractMidString(temp.nextIndex,end,messageString);prefix=temp.data;extNick=_extractNickname(temp.data)
+;extHost=_extractHostname(temp.data)}temp=_extractMidString(temp.nextIndex,end,messageString);command=temp.data;let done=false;while(!done)if(temp.nextIndex>end)done=true;else{
+temp=_isColonString(temp.nextIndex,messageString);if(temp.isColonStr){temp=_extractFinalString(temp.nextIndex,end,messageString);params.push(temp.data);done=true}else{
+temp=_extractMidString(temp.nextIndex,end,messageString);if(temp.data&&temp.data.length>0)params.push(temp.data);else done=true}}return{timestamp:timestamp,datestamp:datestamp,prefix:prefix,
+nick:extNick,host:extHost,command:command,params:params}}function displayChannelMessage(parsedMessage){document.dispatchEvent(new CustomEvent('channel-message',{bubbles:true,detail:{
+parsedMessage:parsedMessage}}))}function displayPrivateMessage(parsedMessage){document.dispatchEvent(new CustomEvent('private-message',{bubbles:true,detail:{parsedMessage:parsedMessage}}))}
 function displayNoticeMessage(parsedMessage){function _addText(text){document.getElementById('noticeMessageDisplay').value+=cleanFormatting(text)+'\n'
 ;if(!webState.cacheReloadInProgress)document.getElementById('noticeMessageDisplay').scrollTop=document.getElementById('noticeMessageDisplay').scrollHeight}switch(parsedMessage.command){case'NOTICE':{
 const ctcpDelim=1
@@ -434,24 +436,25 @@ if(ircState.ircConnected&&ircState.ircIsAway)_sendIrcServerMessage('AWAY')}),1e3
 console.log('createChannelEl: channel already exist');return}const defaultHeightInRows='17';webState.channels.push(name.toLowerCase())
 ;const initIrcStateIndex=ircState.channels.indexOf(name.toLowerCase());webState.channelStates.push({lastJoined:ircState.channelStates[initIrcStateIndex].joined});let maxNickLength=0
 ;const channelIndex=ircState.channels.indexOf(name.toLowerCase());const channelContainerDivEl=document.getElementById('channelContainerDiv');const channelMainSectionEl=document.createElement('div')
-;channelMainSectionEl.classList.add('color-channel');channelMainSectionEl.classList.add('aa-section-div');const channelTopDivEl=document.createElement('div')
-;channelTopDivEl.classList.add('channel-top-div');channelTopDivEl.classList.add('head-flex');const channelTopLeftDivEl=document.createElement('div');channelTopLeftDivEl.classList.add('head-left')
-;const channelTopSpacerDivEl=document.createElement('div');channelTopSpacerDivEl.classList.add('vh5');const channelTopRightDivEl=document.createElement('div')
-;channelTopRightDivEl.classList.add('head-right');const channelTopRightHidableDivEl=document.createElement('div');channelTopRightHidableDivEl.classList.add('head-right-hidable-div')
-;const channelHideButtonEl=document.createElement('button');channelHideButtonEl.textContent='-';channelHideButtonEl.classList.add('channel-button');const channelNameDivEl=document.createElement('div')
-;channelNameDivEl.textContent=ircState.channelStates[channelIndex].csName;channelNameDivEl.classList.add('chan-name-div');const channelBeenKickedIconEl=document.createElement('div')
-;channelBeenKickedIconEl.textContent='Kicked';channelBeenKickedIconEl.classList.add('been-kicked-icon');channelBeenKickedIconEl.setAttribute('hidden','')
-;const channelNickCounterEl=document.createElement('div');channelNickCounterEl.textContent='0';channelNickCounterEl.classList.add('nick-count')
-;const channelMessageCounterEl=document.createElement('div');channelMessageCounterEl.textContent='0';channelMessageCounterEl.classList.add('message-count')
-;channelMessageCounterEl.classList.add('channel-count-class');channelMessageCounterEl.setAttribute('hidden','');const channelTallerButtonEl=document.createElement('button')
-;channelTallerButtonEl.textContent='Taller';channelTallerButtonEl.classList.add('channel-button');const channelNormalButtonEl=document.createElement('button')
-;channelNormalButtonEl.textContent='Normal';channelNormalButtonEl.classList.add('channel-button');const channelClearButtonEl=document.createElement('button');channelClearButtonEl.textContent='Clear'
-;channelClearButtonEl.classList.add('channel-button');const channelBottomDivEl=document.createElement('div');channelBottomDivEl.classList.add('channel-bottom-div')
-;const channelTopicDivEl=document.createElement('div');channelTopicDivEl.textContent=cleanFormatting(ircState.channelStates[channelIndex].topic);channelTopicDivEl.classList.add('chan-topic-div')
-;const channelNamesCharWidth=20;const channelNamesDisplayEl=document.createElement('textarea');channelNamesDisplayEl.classList.add('channel-names-display')
-;channelNamesDisplayEl.setAttribute('cols',channelNamesCharWidth.toString());channelNamesDisplayEl.setAttribute('rows',defaultHeightInRows);channelNamesDisplayEl.setAttribute('spellCheck','false')
-;channelNamesDisplayEl.setAttribute('readonly','');const channelTextAreaEl=document.createElement('textarea');const channelTextAreaId='chan'+channelIndex.toString()+'TextAreaId'
-;channelTextAreaEl.id=channelTextAreaId;channelTextAreaEl.setAttribute('cols','30');channelTextAreaEl.setAttribute('rows',defaultHeightInRows);channelTextAreaEl.setAttribute('spellCheck','false')
+;channelMainSectionEl.classList.add('color-channel');channelMainSectionEl.classList.add('aa-section-div');channelMainSectionEl.setAttribute('lastDate','0000-00-00')
+;const channelTopDivEl=document.createElement('div');channelTopDivEl.classList.add('channel-top-div');channelTopDivEl.classList.add('head-flex');const channelTopLeftDivEl=document.createElement('div')
+;channelTopLeftDivEl.classList.add('head-left');const channelTopSpacerDivEl=document.createElement('div');channelTopSpacerDivEl.classList.add('vh5')
+;const channelTopRightDivEl=document.createElement('div');channelTopRightDivEl.classList.add('head-right');const channelTopRightHidableDivEl=document.createElement('div')
+;channelTopRightHidableDivEl.classList.add('head-right-hidable-div');const channelHideButtonEl=document.createElement('button');channelHideButtonEl.textContent='-'
+;channelHideButtonEl.classList.add('channel-button');const channelNameDivEl=document.createElement('div');channelNameDivEl.textContent=ircState.channelStates[channelIndex].csName
+;channelNameDivEl.classList.add('chan-name-div');const channelBeenKickedIconEl=document.createElement('div');channelBeenKickedIconEl.textContent='Kicked'
+;channelBeenKickedIconEl.classList.add('been-kicked-icon');channelBeenKickedIconEl.setAttribute('hidden','');const channelNickCounterEl=document.createElement('div')
+;channelNickCounterEl.textContent='0';channelNickCounterEl.classList.add('nick-count');const channelMessageCounterEl=document.createElement('div');channelMessageCounterEl.textContent='0'
+;channelMessageCounterEl.classList.add('message-count');channelMessageCounterEl.classList.add('channel-count-class');channelMessageCounterEl.setAttribute('hidden','')
+;const channelTallerButtonEl=document.createElement('button');channelTallerButtonEl.textContent='Taller';channelTallerButtonEl.classList.add('channel-button')
+;const channelNormalButtonEl=document.createElement('button');channelNormalButtonEl.textContent='Normal';channelNormalButtonEl.classList.add('channel-button')
+;const channelClearButtonEl=document.createElement('button');channelClearButtonEl.textContent='Clear';channelClearButtonEl.classList.add('channel-button')
+;const channelBottomDivEl=document.createElement('div');channelBottomDivEl.classList.add('channel-bottom-div');const channelTopicDivEl=document.createElement('div')
+;channelTopicDivEl.textContent=cleanFormatting(ircState.channelStates[channelIndex].topic);channelTopicDivEl.classList.add('chan-topic-div');const channelNamesCharWidth=20
+;const channelNamesDisplayEl=document.createElement('textarea');channelNamesDisplayEl.classList.add('channel-names-display');channelNamesDisplayEl.setAttribute('cols',channelNamesCharWidth.toString())
+;channelNamesDisplayEl.setAttribute('rows',defaultHeightInRows);channelNamesDisplayEl.setAttribute('spellCheck','false');channelNamesDisplayEl.setAttribute('readonly','')
+;const channelTextAreaEl=document.createElement('textarea');const channelTextAreaId='chan'+channelIndex.toString()+'TextAreaId';channelTextAreaEl.id=channelTextAreaId
+;channelTextAreaEl.setAttribute('cols','30');channelTextAreaEl.setAttribute('rows',defaultHeightInRows);channelTextAreaEl.setAttribute('spellCheck','false')
 ;channelTextAreaEl.setAttribute('readonly','');const channelBottomDiv1El=document.createElement('div');channelBottomDiv1El.classList.add('button-div')
 ;const channelInputAreaEl=document.createElement('textarea');const channelInputAreaId='chan'+channelIndex.toString()+'InputInputId';channelInputAreaEl.id=channelInputAreaId
 ;channelInputAreaEl.setAttribute('cols','120');channelInputAreaEl.setAttribute('rows','1');channelInputAreaEl.classList.add('va-middle');channelInputAreaEl.classList.add('rm5')
@@ -497,22 +500,23 @@ channelHideButtonEl.addEventListener('click',handleChannelHideButtonElClick);fun
 ;channelTextAreaEl.setAttribute('rows',newRows.toString());channelNamesDisplayEl.setAttribute('rows',newRows.toString());channelInputAreaEl.setAttribute('rows','3')}
 channelTallerButtonEl.addEventListener('click',handleChannelTallerButtonElClick);function handleChannelNormalButtonElClick(event){channelTextAreaEl.setAttribute('rows',defaultHeightInRows)
 ;channelNamesDisplayEl.setAttribute('rows',defaultHeightInRows);channelInputAreaEl.setAttribute('rows','1')}channelNormalButtonEl.addEventListener('click',handleChannelNormalButtonElClick)
-;function handleChannelClearButtonElClick(event){channelTextAreaEl.value='';channelTextAreaEl.setAttribute('rows',defaultHeightInRows);channelNamesDisplayEl.setAttribute('rows',defaultHeightInRows)
-;channelInputAreaEl.setAttribute('rows','1')}channelClearButtonEl.addEventListener('click',handleChannelClearButtonElClick);function handleChannelJoinButtonElClick(event){const message='JOIN '+name
-;_sendIrcServerMessage(message)}channelJoinButtonEl.addEventListener('click',handleChannelJoinButtonElClick);function handleChannelPartButtonElClick(event){
-const message='PART '+name+' :'+ircState.progName+' '+ircState.progVersion;_sendIrcServerMessage(message)}channelPartButtonEl.addEventListener('click',handleChannelPartButtonElClick)
-;function handleChannelPruneButtonElClick(event){const index=ircState.channels.indexOf(name.toLowerCase());if(index>=0)if(!ircState.channelStates[index].joined){
-const fetchURL=webServerUrl+'/irc/prune';const fetchOptions={method:'POST',headers:{'CSRF-Token':csrfToken,'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify({
-channel:name})};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok)return response.json();else throw new Error('Fetch status '+response.status+' '+response.statusText)}).then(responseJson=>{
-if(responseJson.error)showError(responseJson.message)}).catch(error=>{console.log(error)})}}channelPruneButtonEl.addEventListener('click',handleChannelPruneButtonElClick)
-;function handleChannelRefreshButtonElClick(event){if(!webState.cacheReloadInProgress)document.dispatchEvent(new CustomEvent('update-from-cache',{bubbles:true}))}
-channelRefreshButtonEl.addEventListener('click',handleChannelRefreshButtonElClick);function handleChannelSendButtonElClick(event){_sendTextToChannel(channelIndex,channelInputAreaEl)
-;channelInputAreaEl.focus();resetMessageCount();activityIconInhibitTimer=activityIconInhibitTimerValue}channelSendButtonEl.addEventListener('click',handleChannelSendButtonElClick)
-;function handleChannelInputAreaElInput(event){if('insertText'===event.inputType&&null===event.data||'insertLineBreak'===event.inputType){stripOneCrLfFromElement(channelInputAreaEl)
-;_sendTextToChannel(channelIndex,channelInputAreaEl);resetMessageCount();activityIconInhibitTimer=activityIconInhibitTimerValue}}
-channelInputAreaEl.addEventListener('input',handleChannelInputAreaElInput);function handleChannelBottomDivElClick(event){resetMessageCount();activityIconInhibitTimer=activityIconInhibitTimerValue}
-channelBottomDivEl.addEventListener('click',handleChannelBottomDivElClick);function handleChannelMessageCounterElClick(event){resetMessageCount();activityIconInhibitTimer=activityIconInhibitTimerValue
-}channelMessageCounterEl.addEventListener('click',handleChannelMessageCounterElClick);function handleChannelUnreadCountDivClick(){resetMessageCount()}
+;function handleChannelClearButtonElClick(event){channelTextAreaEl.value='';channelMainSectionEl.setAttribute('lastDate','0000-00-00');channelTextAreaEl.setAttribute('rows',defaultHeightInRows)
+;channelNamesDisplayEl.setAttribute('rows',defaultHeightInRows);channelInputAreaEl.setAttribute('rows','1')}channelClearButtonEl.addEventListener('click',handleChannelClearButtonElClick)
+;function handleChannelJoinButtonElClick(event){const message='JOIN '+name;_sendIrcServerMessage(message)}channelJoinButtonEl.addEventListener('click',handleChannelJoinButtonElClick)
+;function handleChannelPartButtonElClick(event){const message='PART '+name+' :'+ircState.progName+' '+ircState.progVersion;_sendIrcServerMessage(message)}
+channelPartButtonEl.addEventListener('click',handleChannelPartButtonElClick);function handleChannelPruneButtonElClick(event){const index=ircState.channels.indexOf(name.toLowerCase())
+;if(index>=0)if(!ircState.channelStates[index].joined){const fetchURL=webServerUrl+'/irc/prune';const fetchOptions={method:'POST',headers:{'CSRF-Token':csrfToken,'Content-type':'application/json',
+Accept:'application/json'},body:JSON.stringify({channel:name})};fetch(fetchURL,fetchOptions).then(response=>{
+if(response.ok)return response.json();else throw new Error('Fetch status '+response.status+' '+response.statusText)}).then(responseJson=>{if(responseJson.error)showError(responseJson.message)
+}).catch(error=>{console.log(error)})}}channelPruneButtonEl.addEventListener('click',handleChannelPruneButtonElClick);function handleChannelRefreshButtonElClick(event){
+if(!webState.cacheReloadInProgress)document.dispatchEvent(new CustomEvent('update-from-cache',{bubbles:true}))}channelRefreshButtonEl.addEventListener('click',handleChannelRefreshButtonElClick)
+;function handleChannelSendButtonElClick(event){_sendTextToChannel(channelIndex,channelInputAreaEl);channelInputAreaEl.focus();resetMessageCount()
+;activityIconInhibitTimer=activityIconInhibitTimerValue}channelSendButtonEl.addEventListener('click',handleChannelSendButtonElClick);function handleChannelInputAreaElInput(event){
+if('insertText'===event.inputType&&null===event.data||'insertLineBreak'===event.inputType){stripOneCrLfFromElement(channelInputAreaEl);_sendTextToChannel(channelIndex,channelInputAreaEl)
+;resetMessageCount();activityIconInhibitTimer=activityIconInhibitTimerValue}}channelInputAreaEl.addEventListener('input',handleChannelInputAreaElInput);function handleChannelBottomDivElClick(event){
+resetMessageCount();activityIconInhibitTimer=activityIconInhibitTimerValue}channelBottomDivEl.addEventListener('click',handleChannelBottomDivElClick)
+;function handleChannelMessageCounterElClick(event){resetMessageCount();activityIconInhibitTimer=activityIconInhibitTimerValue}
+channelMessageCounterEl.addEventListener('click',handleChannelMessageCounterElClick);function handleChannelUnreadCountDivClick(){resetMessageCount()}
 document.getElementById('channelUnreadCountDiv').addEventListener('click',handleChannelUnreadCountDivClick);function handleChannelUnreadExistIconClick(){resetMessageCount()}
 document.getElementById('channelUnreadExistIcon').addEventListener('click',handleChannelUnreadExistIconClick);function updateVisibility(){const index=ircState.channels.indexOf(name.toLowerCase())
 ;if(index>=0)if(channelMainSectionEl.hasAttribute('opened')){channelBottomDivEl.removeAttribute('hidden');channelHideButtonEl.textContent='-';if(ircState.channelStates[index].joined){
@@ -637,7 +641,9 @@ webState.channelStates[webStateIndex].lastJoined=ircState.channelStates[ircState
 document.addEventListener('irc-state-changed',handleIrcStateChanged);function handleChannelMessage(event){function _addText(timestamp,nick,text){let out=''
 ;if(channelMainSectionEl.hasAttribute('brief-enabled')){out=timestamp+' ';if('*'===nick)out+=nick+nickChannelSpacer;else out+=nick+nickChannelSpacer+'\n';out+=cleanFormatting(text)+'\n\n'
 }else out=timestamp+' '+nick.padStart(maxNickLength,' ')+nickChannelSpacer+cleanFormatting(text)+'\n';channelTextAreaEl.value+=out
-;if(!webState.cacheReloadInProgress)channelTextAreaEl.scrollTop=channelTextAreaEl.scrollHeight}const parsedMessage=event.detail.parsedMessage;switch(parsedMessage.command){case'KICK':
+;if(!webState.cacheReloadInProgress)channelTextAreaEl.scrollTop=channelTextAreaEl.scrollHeight}const parsedMessage=event.detail.parsedMessage
+;if(parsedMessage.params[0].toLowerCase()===name.toLowerCase())if(channelMainSectionEl.getAttribute('lastDate')!==parsedMessage.datestamp){
+channelMainSectionEl.setAttribute('lastDate',parsedMessage.datestamp);channelTextAreaEl.value+='\n=== '+parsedMessage.datestamp+' ===\n\n'}switch(parsedMessage.command){case'KICK':
 if(parsedMessage.params[0].toLowerCase()===name.toLowerCase()){let reason=' ';if(parsedMessage.params[2])reason=parsedMessage.params[2]
 ;if(channelMainSectionEl.hasAttribute('brief-enabled'))_addText(parsedMessage.timestamp,'*',parsedMessage.nick+' has kicked '+parsedMessage.params[1]);else _addText(parsedMessage.timestamp,'*',parsedMessage.nick+' has kicked '+parsedMessage.params[1]+' ('+reason+')')
 }break;case'JOIN':if(parsedMessage.params[0].toLowerCase()===name.toLowerCase()){
@@ -665,10 +671,11 @@ const checkLine=parsedMessage.params[1].toLowerCase();if(checkLine.indexOf(ircSt
 ;if(channelMainSectionEl.hasAttribute('brief-enabled'))_addText(parsedMessage.timestamp,'*',parsedMessage.nick+' has quit');else _addText(parsedMessage.timestamp,'*',parsedMessage.nick+' ('+parsedMessage.host+') has quit '+'('+reason+')')
 }break;case'TOPIC':if(parsedMessage.params[0].toLowerCase()===name.toLowerCase()){const newTopic=parsedMessage.params[1]
 ;if(null==newTopic)_addText(parsedMessage.timestamp,'*','Topic for '+parsedMessage.params[0]+' has been unset by "'+parsedMessage.nick);else _addText(parsedMessage.timestamp,'*','Topic for '+parsedMessage.params[0]+' changed to "'+newTopic+'" by '+parsedMessage.nick)
-}break;default:}}document.addEventListener('channel-message',handleChannelMessage);function handleEraseBeforeReload(event){channelTextAreaEl.value='';channelInputAreaEl.value='';resetMessageCount()}
-document.addEventListener('erase-before-reload',handleEraseBeforeReload);function handleCacheReloadDone(event){let markerString='';let timestampString=''
-;if('detail'in event&&'timestamp'in event.detail)timestampString=unixTimestampToHMS(event.detail.timestamp);if(timestampString)markerString+=timestampString;markerString+=' '+cacheReloadString+'\n'
-;if(channelMainSectionEl.hasAttribute('brief-enabled'))markerString+='\n';channelTextAreaEl.value+=markerString;let lastZoomObj=null;lastZoomObj=JSON.parse(window.localStorage.getItem('lastZoom'))
+}break;default:}}document.addEventListener('channel-message',handleChannelMessage);function handleEraseBeforeReload(event){channelTextAreaEl.value='';channelInputAreaEl.value=''
+;channelMainSectionEl.setAttribute('lastDate','0000-00-00');resetMessageCount()}document.addEventListener('erase-before-reload',handleEraseBeforeReload);function handleCacheReloadDone(event){
+let markerString='';let timestampString='';if('detail'in event&&'timestamp'in event.detail)timestampString=unixTimestampToHMS(event.detail.timestamp);if(timestampString)markerString+=timestampString
+;markerString+=' '+cacheReloadString+'\n';if(channelMainSectionEl.hasAttribute('brief-enabled'))markerString+='\n';channelTextAreaEl.value+=markerString;let lastZoomObj=null
+;lastZoomObj=JSON.parse(window.localStorage.getItem('lastZoom'))
 ;if(lastZoomObj&&lastZoomObj.zoomType&&lastZoomObj.zoomValue&&'channel'===lastZoomObj.zoomType&&lastZoomObj.zoomValue===name.toLowerCase()){const now=unixTimestamp()
 ;if('timestamp'in lastZoomObj&&now-lastZoomObj.timestamp<86400){const newZoomObj={timestamp:now,zoomType:'channel',zoomValue:name.toLowerCase()};setTimeout((function(){
 document.dispatchEvent(new CustomEvent('hide-or-zoom',{bubbles:true,detail:newZoomObj}))}),100)}}else channelTextAreaEl.scrollTop=channelTextAreaEl.scrollHeight}

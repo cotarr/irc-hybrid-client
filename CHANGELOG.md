@@ -11,6 +11,8 @@ and this project adheres to
 ### Added
 
 - tools/showIrcLog.js - Added simple utility to view the log file filtered by channel
+- secure/webclient02.js - Added property `datestamp` to parsedMessage object for use in displaying date of a message.
+- secure/webclient06.js - New feature, when date changes print the calendar date in the channel window to show date change.
 
 ### Changed
 - tools/updateAuthForUser_1.js - Added check to utility script to produce error message when credentials.json is configured for external login.

@@ -214,6 +214,7 @@ function createChannelEl (name) {
   const channelMainSectionEl = document.createElement('div');
   channelMainSectionEl.classList.add('color-channel');
   channelMainSectionEl.classList.add('aa-section-div');
+  channelMainSectionEl.setAttribute('lastDate', '0000-00-00');
 
   // Top Element (non-hidden element)
   const channelTopDivEl = document.createElement('div');
@@ -570,6 +571,8 @@ function createChannelEl (name) {
   // -------------------------
   function handleChannelClearButtonElClick (event) {
     channelTextAreaEl.value = '';
+    // needed to display date on first message
+    channelMainSectionEl.setAttribute('lastDate', '0000-00-00');
     channelTextAreaEl.setAttribute('rows', defaultHeightInRows);
     channelNamesDisplayEl.setAttribute('rows', defaultHeightInRows);
     channelInputAreaEl.setAttribute('rows', '1');
@@ -1496,6 +1499,15 @@ function createChannelEl (name) {
     const parsedMessage = event.detail.parsedMessage;
     // console.log('Event channel-message: ' + JSON.stringify(parsedMessage, null, 2));
 
+    // With each message, if date has changed, print the new date value
+    if (parsedMessage.params[0].toLowerCase() === name.toLowerCase()) {
+      if (channelMainSectionEl.getAttribute('lastDate') !== parsedMessage.datestamp) {
+        channelMainSectionEl.setAttribute('lastDate', parsedMessage.datestamp);
+        channelTextAreaEl.value +=
+          '\n=== ' + parsedMessage.datestamp + ' ===\n\n';
+      }
+    }
+
     switch (parsedMessage.command) {
       //
       // TODO cases for channel closed or other error
@@ -1748,6 +1760,8 @@ function createChannelEl (name) {
     // console.log('Event erase-before-reload');
     channelTextAreaEl.value = '';
     channelInputAreaEl.value = '';
+    // needed to update date on first line printed
+    channelMainSectionEl.setAttribute('lastDate', '0000-00-00');
     // Local count in channel window (to match global activity icon visibility)
     resetMessageCount();
   };
