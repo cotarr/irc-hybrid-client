@@ -447,17 +447,23 @@
     const outArray = [];
     const arrayNameList = Object.keys(cachedArrays);
     arrayNameList.forEach(function (indexStr) {
-      let cacheOutPointer = cachedInPointers[indexStr];
-      for (let i = 0; i < cacheSize; i++) {
-        if ((cachedArrays[indexStr][cacheOutPointer]) &&
-          (cachedArrays[indexStr][cacheOutPointer].length > 0)) {
-          // Option 1 to send array of utf8 encoded Buffer objects
-          outArray.push(cachedArrays[indexStr][cacheOutPointer]);
-          // Option 2 to send array of utf8 strings
-          // outArray.push(cachedArrays[indexStr][cacheOutPointer].toString('utf8'));
+      // Check if channel buffer is listed in ircState.channels
+      // If a channel is pruned, removed from ircState.channels
+      // then filter the list by skipping the buffer for the pruned channel.
+      if ((vars.ircState.channels.indexOf(indexStr) >= 0) ||
+        (indexStr === 'default')) {
+        let cacheOutPointer = cachedInPointers[indexStr];
+        for (let i = 0; i < cacheSize; i++) {
+          if ((cachedArrays[indexStr][cacheOutPointer]) &&
+            (cachedArrays[indexStr][cacheOutPointer].length > 0)) {
+            // Option 1 to send array of utf8 encoded Buffer objects
+            outArray.push(cachedArrays[indexStr][cacheOutPointer]);
+            // Option 2 to send array of utf8 strings
+            // outArray.push(cachedArrays[indexStr][cacheOutPointer].toString('utf8'));
+          }
+          cacheOutPointer++;
+          if (cacheOutPointer >= cacheSize) cacheOutPointer = 0;
         }
-        cacheOutPointer++;
-        if (cacheOutPointer >= cacheSize) cacheOutPointer = 0;
       }
     });
     return outArray;
