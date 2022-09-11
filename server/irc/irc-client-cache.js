@@ -149,10 +149,8 @@
               for (let j = 0; j < channelStateObj.names.length; j++) {
                 // if nickname is a member of the IRC channel, add it to the array
                 let tempNick = channelStateObj.names[j].toLowerCase();
-                if (tempNick.charAt(0) === '@') {
-                  tempNick = tempNick.replace('@', '');
-                } else if (tempNick.charAt(0) === '+') {
-                  tempNick = tempNick.replace('+', '');
+                if (vars.nicknamePrefixChars.indexOf(tempNick.charAt(0)) >= 0) {
+                  tempNick = tempNick.slice(1, tempNick.length);
                 }
                 if (tempNick === nick.toLowerCase()) {
                   channels.push(channelStateObj.name);
@@ -186,11 +184,88 @@
     }
   } // _parseQuitChannels()
 
+  /**
+   * Parse IRC message to determine if it is NICK command.
+   * In the case of a NICK command, generate an Array containing
+   * a list of IRC channels where the previous nickname has membership.
+   *
+   * @param {Buffer} message - IRC server message encoded as UTF-8 Buffer.
+   * @returns {Object} - Returns object with isNick flag and Array of IRC channels
+   */
+  function _parseNickChannels (message) {
+    // First convert to a UTF-8 string
+    let messageUtf8 = null;
+    if (Buffer.isBuffer(message)) messageUtf8 = message.toString('utf8');
+    if (typeof message === 'string') messageUtf8 = message;
+    // then separate the string into an array of words
+    const messageWords = messageUtf8.split(' ');
+    if (messageWords.length > 2) {
+      // check if the command word is NICK?
+      if (
+        // messageWords[1] is optional prefix ':xxxx'
+        (messageWords[1].charAt(0) === ':') &&
+        // Since word[1] is a prefix, then word[2] must be the command
+        (messageWords[2].toUpperCase() === 'NICK') &&
+        (messageWords[3].charAt(0) === ':')) {
+        // Yes, it is a NICK command, next get the previous IRC nickname
+        const nick = messageWords[1].split('!')[0].replace(':', '');
+        const channels = [];
+        if (vars.ircState.channelStates.length > 0) {
+          // Iterate through each IRC channel
+          for (let i = 0; i < vars.ircState.channelStates.length; i++) {
+            const channelStateObj = vars.ircState.channelStates[i];
+            if (channelStateObj.names.length > 0) {
+              // Iterate through each nickname in the channel names list
+              for (let j = 0; j < channelStateObj.names.length; j++) {
+                // if nickname is a member of the IRC channel, add it to the array
+                let tempNick = channelStateObj.names[j].toLowerCase();
+                if (vars.nicknamePrefixChars.indexOf(tempNick.charAt(0)) >= 0) {
+                  tempNick = tempNick.slice(1, tempNick.length);
+                }
+                if (tempNick === nick.toLowerCase()) {
+                  channels.push(channelStateObj.name);
+                }
+              } // next j
+            } // length > 0
+          } // next i
+        } // length > 0
+        //
+        // Case of own nickname being changed,
+        // add separate listing to the cache
+        if (vars.ircState.nickName.toLowerCase() === nick.toLowerCase()) {
+          channels.push('default');
+        }
+        // fallback, always something in server window
+        if (channels.length === 0) {
+          channels.push('default');
+        }
+        //
+        // return the array of membership channel names
+        return {
+          isNick: true,
+          channels: channels
+        };
+      } else {
+        // Case of not NICK message, should be displayed
+        return {
+          isNick: false,
+          channels: []
+        };
+      }
+    } else {
+      // case of un-parsable message, should be displayed
+      return {
+        isNick: false,
+        channels: []
+      };
+    }
+  } // _parseNickChannels()
+
   //
   // _channelCommands is a list of IRC server commands
   // that should be segregated to a dedicated channel cache buffer.
   //
-  // QUIT is not included due to special case handling
+  // QUIT and NICK are not included due to special case handling
   const _channelCommands = [
     'JOIN',
     'KICK',
@@ -367,12 +442,16 @@
    * @param {String} message - String containing IRC channel name or 'default'.
    */
   const addMessage = function (message) {
-    // Edge case, quit message does not contain channel name, may refer to multiple channels
-    // see parsedQuitChannels above...
+    // Edge case, QUIT and NICK messages do not contain channel name, may refer to multiple channels
+    // see parsedQuitChannels, parsedNickChannels above...
     //
     // parsedQuitChannels contains an array of IRC channel names
     // where the nickname has channel membership
     const parsedQuitChannels = _parseQuitChannels(message);
+    // parsedNickChannels contains an array of IRC channel names
+    // where the nickname has channel membership
+    const parsedNickChannels = _parseNickChannels(message);
+
     // Is IRC message a QUIT message?
     if (parsedQuitChannels.isQuit) {
       // Special case of IRC QUIT message, one user can be in multiple channels at the same time
@@ -416,8 +495,44 @@
           _addMessageToCacheBuffer('default', messageAsBuf);
         }
       });
+    } else if (parsedNickChannels.isNick) {
+      // Special case of IRC NICK message, one user can be in multiple channels at the same time
+      //
+      // iterate each array element (each cache buffer) and
+      // then duplicate the NICK message to that cache buffer
+      parsedNickChannels.channels.forEach(function (indexStr) {
+        // Modify the NICK message before caching duplicate copies
+        // 1) Change "NIC" to "cachedNick"
+        // 2) Insert new nickname as string value
+        // Example:  ":oldNick!user@host cachedNICK #channel :newNick
+        let messageAsStr = null;
+        if (Buffer.isBuffer(message)) messageAsStr = message.toString('utf8');
+        if (typeof message === 'string') messageAsStr = message;
+        const messageAsWords = messageAsStr.split(' ');
+        messageAsStr = '';
+        if (messageAsWords.length > 0) {
+          for (let i = 0; i < messageAsWords.length; i++) {
+            if (i === 0) {
+              messageAsStr += messageAsWords[i];
+            } else if (i === 2) {
+              messageAsStr += ' cachedNICK ' + indexStr;
+            } else {
+              messageAsStr += ' ' + messageAsWords[i];
+            }
+          }
+        }
+        const messageAsBuf = Buffer.from(messageAsStr, 'utf8');
+        // save it to the cache buffer
+        if (Object.keys(cachedArrays).indexOf(indexStr) >= 0) {
+          // console.log('Adding NICK to ' + indexStr + ' cache buffer');
+          _addMessageToCacheBuffer(indexStr, messageAsBuf);
+        } else {
+          // console.log('Adding NICK to default cache buffer');
+          _addMessageToCacheBuffer('default', messageAsBuf);
+        }
+      });
     } else {
-      // Case of not a QUIT message, this is a simple case.
+      // Case of not a QUIT or NICK message, this is a simple case.
 
       // Type conversion to UTF-8 encoded Buffer
       let messageAsBuf = null;

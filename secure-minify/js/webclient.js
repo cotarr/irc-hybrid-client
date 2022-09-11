@@ -257,7 +257,7 @@ _addNoticeText(parsedMessage.timestamp+' '+'CTCP 1 Request to '+parsedMessage.pa
 ;if(i!==parsedMessage.params.length)replyContents+=' '}_addNoticeText(parsedMessage.timestamp+' '+'CTCP 2 Reply to '+parsedMessage.params[0]+': '+ctcpCommand+' '+replyContents)
 ;webState.noticeOpen=true}else if('PRIVMSG'===parsedMessage.command.toUpperCase()){_addNoticeText(parsedMessage.timestamp+' '+'CTCP 3 Request from '+parsedMessage.nick+': '+ctcpCommand+' '+ctcpRest)
 ;webState.noticeOpen=true}else{_addNoticeText(parsedMessage.timestamp+' '+'CTCP 4 Reply from '+parsedMessage.nick+': '+ctcpCommand+' '+ctcpRest);webState.noticeOpen=true}updateDivVisibility()}}
-const ircMessageCommandDisplayFilter=['331','332','333','353','366','JOIN','KICK','MODE','NICK','NOTICE','PART','PING','PONG','PRIVMSG','cachedQUIT'.toUpperCase(),'QUIT','TOPIC','WALLOPS']
+const ircMessageCommandDisplayFilter=['331','332','333','353','366','JOIN','KICK','MODE','cachedNICK'.toUpperCase(),'NICK','NOTICE','PART','PING','PONG','PRIVMSG','cachedQUIT'.toUpperCase(),'QUIT','TOPIC','WALLOPS']
 ;function _parseBufferMessage(message){if('HEARTBEAT'===message){onHeartbeatReceived();if(webState.showCommsMessages)displayRawMessage('HEARTBEAT')}else if('UPDATE'===message){getIrcState()
 ;if(webState.showCommsMessages)displayRawMessage('UPDATE')}else if('CACHERESET'===message){document.dispatchEvent(new CustomEvent('erase-before-reload',{bubbles:true}))
 ;if(webState.showCommsMessages)displayRawMessage('CACHERESET')}else if(message.startsWith('LAG=')&&9===message.length){if(webState.showCommsMessages)displayRawMessage(message)
@@ -271,14 +271,10 @@ const parsedMessage=_parseIrcMessage(message);if(webState.viewRawMessages){if(we
 ;if(parseInt(parsedMessage.command)>=400&&parseInt(parsedMessage.command)<500)_showNotExpiredError(message.slice(12,message.length));switch(parsedMessage.command){case'ERROR':
 if(!ircState.ircRegistered&&1===parsedMessage.params.length)if(!webState.cacheReloadInProgress)showError('ERROR '+parsedMessage.params[0]);break;case'KICK':displayChannelMessage(parsedMessage);break
 ;case'JOIN':displayChannelMessage(parsedMessage);break;case'MODE':if(parsedMessage.params[0]===ircState.nickName){if(!webState.viewRawMessages)displayFormattedServerMessage(parsedMessage,message)
-}else if(channelPrefixChars.indexOf(parsedMessage.params[0].charAt(0))>=0)displayChannelMessage(parsedMessage);else console.log('Error message MODE to unknown recipient');break;case'NICK':{
-let pureNick1=parsedMessage.nick.toLowerCase();if(nicknamePrefixChars.indexOf(pureNick1.charAt(0))>=0)pureNick1=pureNick1.slice(1,pureNick1.length);let pureNick2=parsedMessage.params[0].toLowerCase()
-;if(nicknamePrefixChars.indexOf(pureNick2.charAt(0))>=0)pureNick2=pureNick2.slice(1,pureNick2.length);let present=false
-;if(ircState.channels.length>0)for(let i=0;i<ircState.channels.length;i++)if(ircState.channelStates[i].joined&&ircState.channelStates[i].names.length>0)for(let j=0;j<ircState.channelStates[i].names.length;j++){
-let checkNick=ircState.channelStates[i].names[j].toLowerCase();if(nicknamePrefixChars.indexOf(checkNick.charAt(0))>=0)checkNick=checkNick.slice(1,checkNick.length)
-;if(checkNick===pureNick1)present=true;if(checkNick===pureNick2)present=true}if(present)displayChannelMessage(parsedMessage);else displayFormattedServerMessage(parsedMessage,message)}break;case'PART':
-displayChannelMessage(parsedMessage);break;case'NOTICE':if(!parsedMessage.nick||0===parsedMessage.nick.length){if(!webState.viewRawMessages)displayFormattedServerMessage(parsedMessage,message)}else{
-const ctcpDelim=1;if(null===parsedMessage.params[1])parsedMessage.params[1]=''
+}else if(channelPrefixChars.indexOf(parsedMessage.params[0].charAt(0))>=0)displayChannelMessage(parsedMessage);else console.log('Error message MODE to unknown recipient');break;case'cachedNICK':
+displayChannelMessage(parsedMessage);displayFormattedServerMessage(parsedMessage,message);break;case'NICK':displayChannelMessage(parsedMessage);displayFormattedServerMessage(parsedMessage,message)
+;break;case'PART':displayChannelMessage(parsedMessage);break;case'NOTICE':if(!parsedMessage.nick||0===parsedMessage.nick.length){
+if(!webState.viewRawMessages)displayFormattedServerMessage(parsedMessage,message)}else{const ctcpDelim=1;if(null===parsedMessage.params[1])parsedMessage.params[1]=''
 ;if(parsedMessage.params[1].charCodeAt(0)===ctcpDelim)_parseCtcpMessage(parsedMessage,message);else displayNoticeMessage(parsedMessage)}break;case'PRIVMSG':{const ctcpDelim=1
 ;if(parsedMessage.params[1].charCodeAt(0)===ctcpDelim)_parseCtcpMessage(parsedMessage,message);else{const chanPrefixIndex=channelPrefixChars.indexOf(parsedMessage.params[0].charAt(0))
 ;const channelIndex=ircState.channels.indexOf(parsedMessage.params[0].toLowerCase())
@@ -655,7 +651,8 @@ if(channelMainSectionEl.hasAttribute('brief-enabled'))_addText(parsedMessage.tim
 ;if(channelMainSectionEl.hasAttribute('beep2-enabled')&&!webState.cacheReloadInProgress)playBeep1Sound();channelBottomDivEl.removeAttribute('hidden');channelHideButtonEl.textContent='-'}break
 ;case'MODE':
 if(parsedMessage.params[0].toLowerCase()===name.toLowerCase())if(parsedMessage.nick)_addText(parsedMessage.timestamp,'*','Mode '+JSON.stringify(parsedMessage.params)+' by '+parsedMessage.nick);else _addText(parsedMessage.timestamp,'*','Mode '+JSON.stringify(parsedMessage.params)+' by '+parsedMessage.prefix)
-;break;case'NICK':{let present=false;if(_isNickInChannel(parsedMessage.nick,name))present=true;if(_isNickInChannel(parsedMessage.params[0],name))present=true
+;break;case'cachedNICK':if(name.toLowerCase()===parsedMessage.params[0].toLowerCase())_addText(parsedMessage.timestamp,'*',parsedMessage.nick+' is now known as '+parsedMessage.params[1]);break
+;case'NICK':{let present=false;if(_isNickInChannel(parsedMessage.nick,name))present=true;if(_isNickInChannel(parsedMessage.params[0],name))present=true
 ;if(present)_addText(parsedMessage.timestamp,'*',parsedMessage.nick+' is now known as '+parsedMessage.params[0])}break;case'NOTICE':if(parsedMessage.params[0].toLowerCase()===name.toLowerCase()){
 _addText(parsedMessage.timestamp,'*','Notice('+parsedMessage.nick+' to '+parsedMessage.params[0]+') '+parsedMessage.params[1]);channelBottomDivEl.removeAttribute('hidden')
 ;channelHideButtonEl.textContent='-'
@@ -895,8 +892,11 @@ displayRawMessage('WHOIS --End--');break;case'322':if(4===event.detail.parsedMes
 ;if(event.detail.parsedMessage.params[3])outMessage+=' '+event.detail.parsedMessage.params[3];displayRawMessage(cleanFormatting(cleanCtcpDelimiter(outMessage)))
 }else console.log('Error Msg 322 not have 4 parsed parameters');break;case'321':break;case'323':displayRawMessage('LIST --End--');break;case'372':_showAfterParamZero(event.detail.parsedMessage,null)
 ;break;case'375':case'376':break;case'900':case'903':_showAfterParamZero(event.detail.parsedMessage,null);break;case'MODE':
-displayRawMessage(cleanFormatting(cleanCtcpDelimiter(event.detail.parsedMessage.timestamp+' '+'MODE '+event.detail.parsedMessage.params[0]+' '+event.detail.parsedMessage.params[1])));break;case'NICK':
-displayRawMessage(cleanFormatting(cleanCtcpDelimiter(event.detail.parsedMessage.timestamp+' '+'(No channel) '+event.detail.parsedMessage.nick+' is now known as '+event.detail.parsedMessage.params[0])))
+displayRawMessage(cleanFormatting(cleanCtcpDelimiter(event.detail.parsedMessage.timestamp+' '+'MODE '+event.detail.parsedMessage.params[0]+' '+event.detail.parsedMessage.params[1])));break
+;case'cachedNICK':
+if('default'===event.detail.parsedMessage.params[0])displayRawMessage(cleanFormatting(cleanCtcpDelimiter(event.detail.parsedMessage.timestamp+' '+event.detail.parsedMessage.nick+' is now known as '+event.detail.parsedMessage.params[1])))
+;break;case'NICK':
+if(ircState.nickName.toLowerCase()===event.detail.parsedMessage.nick.toLowerCase())displayRawMessage(cleanFormatting(cleanCtcpDelimiter(event.detail.parsedMessage.timestamp+' '+event.detail.parsedMessage.nick+' is now known as '+event.detail.parsedMessage.params[0])))
 ;break;case'NOTICE':
 displayRawMessage(cleanFormatting(cleanCtcpDelimiter(event.detail.parsedMessage.timestamp+' '+'NOTICE '+event.detail.parsedMessage.params[0]+' '+event.detail.parsedMessage.params[1])));break;default:
 displayRawMessage(cleanFormatting(cleanCtcpDelimiter(substituteHmsTime(event.detail.message))))}if(!webState.cacheReloadInProgress)showRawMessageWindow()}))

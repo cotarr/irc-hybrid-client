@@ -8,15 +8,18 @@ and this project adheres to
 
 ## Next 2022-09-09
 
+### Fixed
+
+- User nickname changes using NICK command were not parsed into the correct IRC channel cache buffer. This was fixed by caching a pseudo-command `cachedNICK` command. This included some cleanup of message cache parsing code.
+
 ### Added
 
 - Added simple command line utility `tools/showIrcLog.js` to view the log file filtered by channel
 - Added property `datestamp` to parsedMessage object for use in displaying date of a message.
-- New feature, when date changes between the previous message timestamp and the current message timestamp, print the calendar date as a text divider in the server, wallops, notice, private message, and IRC channel windows.
+- New feature, when date changes between the previous message timestamp and the current message timestamp, print the calendar date as a text divider in the server, wallops, notice, private message, and IRC channel windows. Currently, a newline character is added before and after the line with the date, but this may be changed depending how it looks.
 
 ### Changed
 - tools/updateAuthForUser_1.js - Added check to utility script to produce error message when credentials.json is configured for external login.
-- server/irc-client-cache.js - Improve IRC message parsing when selecting messages to add to the message cache.
 - server/irc-client-cache.js - Add filter so IRC channel buffers that have been "pruned" will not be returned with a cache update.
 - server/irc-client-cache.js - API call to POST /irc/prune will now delete IRC channel cache buffer if exists.
 

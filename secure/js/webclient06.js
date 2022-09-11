@@ -1564,6 +1564,16 @@ function createChannelEl (name) {
           }
         }
         break;
+      case 'cachedNICK':
+        // ------------
+        // Is previous nick or new nick in ANY active channel?
+        // -----------
+        if (name.toLowerCase() === parsedMessage.params[0].toLowerCase()) {
+          _addText(parsedMessage.timestamp,
+            '*',
+            parsedMessage.nick + ' is now known as ' + parsedMessage.params[1]);
+        }
+        break;
       case 'NICK':
         {
           // ------------

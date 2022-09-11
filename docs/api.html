@@ -473,6 +473,9 @@ UPDATE
         <p>
           This is used to remove a non-joined IRC channel from the active channel list.
           Trying to prune a channel while present in the channel will cause an error.
+          Pruning a channel will delete any IRC message cache buffer associated with the pruned channel.
+        </p>
+        <p>
           The request body shall contain the property &quot;channel&quot; of type string
           containing the channel name.
         </p>
@@ -549,16 +552,23 @@ UPDATE
           are parsed directly. When the browser content is deleted and restored from
           the IRC message cache, the alternate cachedQUIT messages are used.
         </p>
+        <p>
+          In v0.2.16, similar code was added for the NICK command. A new IRC 
+          message cachedNICK was created. The NICK message is duplicated
+          for each IRC channel where the NICK is applicable.
+        </p>
 
-<p>Example showing QUIT and cachedQUIT messages</p>        
+<p>Example showing QUIT, cachedQUIT, NICK, and cachedNick messages</p>        
 <div class="pre-div"><pre>
 
 Live message:
-@time=2022-09-04T22:24:33.083Z :nickname!~user@192.168.1.1 QUIT :"test QUIT message"
+@time=2022-09-04T22:24:33.083Z :nickname!~user@192.168.1.1 QUIT :test QUIT message
+@time=2022-09-04T22:25:22.144Z :oldNickname!~user@192.168.1.1 NICK :newNickname
 
 Cached message with 2 IRC channels.
-@time=2022-09-04T22:24:33.082Z :nickname!~user@192.168.1.1 cachedQUIT #channelName :"test QUIT message"
-@time=2022-09-04T22:24:33.082Z :nickname!~user@192.168.1.1 cachedQUIT #otherChannel :"test QUIT message"
+@time=2022-09-04T22:24:33.082Z :nickname!~user@192.168.1.1 cachedQUIT #channelName :test QUIT message
+@time=2022-09-04T22:24:33.082Z :nickname!~user@192.168.1.1 cachedQUIT #otherChannel :test QUIT message
+@time=2022-09-04T22:25:22.144Z :oldNickname!~user@192.168.1.1 cachedNICK #channelName :newNickname
 
 </pre></div>
 

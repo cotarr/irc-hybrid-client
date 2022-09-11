@@ -420,16 +420,28 @@ document.addEventListener('server-message', function (event) {
             event.detail.parsedMessage.params[0] + ' ' +
             event.detail.parsedMessage.params[1])));
       break;
-    case 'NICK':
-      displayRawMessage(
-        cleanFormatting(
-          cleanCtcpDelimiter(
-            event.detail.parsedMessage.timestamp + ' ' +
-            '(No channel) ' +
-            event.detail.parsedMessage.nick + ' is now known as ' +
-            event.detail.parsedMessage.params[0])));
+    case 'cachedNICK':
+      // Own nickname changes will be cached as channel = default
+      if (event.detail.parsedMessage.params[0] === 'default') {
+        displayRawMessage(
+          cleanFormatting(
+            cleanCtcpDelimiter(
+              event.detail.parsedMessage.timestamp + ' ' +
+              event.detail.parsedMessage.nick + ' is now known as ' +
+              event.detail.parsedMessage.params[1])));
+      }
       break;
-
+    case 'NICK':
+      // Only display own nickname changes in server window
+      if (ircState.nickName.toLowerCase() === event.detail.parsedMessage.nick.toLowerCase()) {
+        displayRawMessage(
+          cleanFormatting(
+            cleanCtcpDelimiter(
+              event.detail.parsedMessage.timestamp + ' ' +
+              event.detail.parsedMessage.nick + ' is now known as ' +
+              event.detail.parsedMessage.params[0])));
+      }
+      break;
     case 'NOTICE':
       displayRawMessage(
         cleanFormatting(
