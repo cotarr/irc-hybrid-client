@@ -119,7 +119,9 @@ const jsTimestampToHMS = function (timestampStr) {
 function _extractPrivMsg (inStr) {
   const wordArray = inStr.split(' ');
   if (wordArray.length > 4) {
-    if ((wordArray[2].toUpperCase() === 'PRIVMSG') &&
+    if (
+      (wordArray[1].charAt(0) === ':') &&
+      (wordArray[2].toUpperCase() === 'PRIVMSG') &&
       (wordArray[3].toLowerCase() === channelNameFilter)) {
       // Print date only when changes
       const dateYMD = jsTimestampToYMD(wordArray[0]);
@@ -130,10 +132,15 @@ function _extractPrivMsg (inStr) {
       const timeHMS = jsTimestampToHMS(wordArray[0]);
       const nick = wordArray[1].split('!')[0].replace(':', '');
       const mesg = inStr
+        // timestamp
         .replace(wordArray[0] + ' ', '')
+        // prefix
         .replace(wordArray[1] + ' ', '')
+        // command
         .replace(wordArray[2] + ' ', '')
+        // #channel
         .replace(wordArray[3] + ' ', '')
+        // remove ending param separator (:This is message content)
         .replace(':', '');
       let pad = ' ';
       const nickWidth = 15;

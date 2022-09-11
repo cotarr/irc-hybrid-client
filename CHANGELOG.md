@@ -14,6 +14,7 @@ and this project adheres to
 
 ### Changed
 - tools/updateAuthForUser_1.js - Added check to utility script to produce error message when credentials.json is configured for external login.
+- server/irc-client-cache.js - Improve IRC message parsing when selecting messages to add to the message cache.
 
 ## [v0.2.15](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.15) 2022-09-07
 

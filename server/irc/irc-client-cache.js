@@ -93,7 +93,7 @@
   // ----------------------
   // In the IRC protocol, QUIT message do not contain an IRC channel names.
   //
-  // Example: "nick!user@host QUIT :Reason for quitting"
+  // Example: ":nick!user@host QUIT :Reason for quitting"
   //
   // It is up to the IRC client to identify all channels where the QUIT nick is present.
   // This is done by maintaining a list of IRC channels in ircState.channels[].
@@ -108,7 +108,7 @@
   // to a normal QUIT message except the channel name is added.
   // The message is duplicated for each IRC channel.
   //
-  // Example:  "nick!user@host cachedQUIT #channel :Reason for quitting"
+  // Example:  ":nick!user@host cachedQUIT #channel :Reason for quitting"
   //
   // As real time messages are received from the IRC server, standard QUIT messages
   // are parsed directly. When the browser content is deleted and restored from
@@ -118,7 +118,7 @@
   /**
    * Parse IRC message to determine if it is QUIT command.
    * In the case of a QUIT command, generate an Array containing
-   * a list of IRC channels where the QUIT nickname has memebership.
+   * a list of IRC channels where the QUIT nickname has membership.
    *
    * @param {Buffer} message - IRC server message encoded as UTF-8 Buffer.
    * @returns {Object} - Returns object with isQuit flag and Array of IRC channels
@@ -132,7 +132,11 @@
     const messageWords = messageUtf8.split(' ');
     if (messageWords.length > 1) {
       // check if the command word is QUIT?
-      if (messageWords[2].toUpperCase() === 'QUIT') {
+      if (
+        // messageWords[1] is optional prefix ':xxxx'
+        (messageWords[1].charAt(0) === ':') &&
+        // Since word[1] is a prefix, then word[2] must be the command
+        (messageWords[2].toUpperCase() === 'QUIT')) {
         // Yes, it is a QUIT command, next get the associated IRC nickname
         const nick = messageWords[1].split('!')[0].replace(':', '');
         const channels = [];
@@ -218,15 +222,33 @@
         // Check if the command word is JOIN?
         // In the RFC protocol, the JOIN channel name starts with a colon :
         // In the case of JOIN messages, remove the ":"
-        if (messageWords[2].toUpperCase() === 'JOIN') {
+        if (
+          // messageWords[1] is optional prefix ':xxxx'
+          (messageWords[1].charAt(0) === ':') &&
+          // Since word[1] is a prefix, then word[2] must be the command
+          (messageWords[2].toUpperCase() === 'JOIN') &&
+          // And it is a valid channel name
+          (messageWords[3].length > 2) &&
+          (messageWords[3].charAt(1) === '#')) {
+          // remove colon from JOIN :#channel
           channel = messageWords[3].replace(':', '').toLowerCase();
         } else if (
-          // Check if MODE command for user instead of channel
+          // messageWords[1] is optional prefix ':xxxx'
+          (messageWords[1].charAt(0) === ':') &&
+          // Since word[1] is a prefix, then word[2] must be the command
           (messageWords[2].toUpperCase() === 'MODE') &&
+          // Check if MODE command for user instead of channel
           (messageWords[3].charAt(0) !== '#')) {
           channel = 'default';
-        } else {
+        } else if (
+          // make sure this is :prefix command #channel ...
+          (messageWords[1].charAt(0) === ':') &&
+          // and check if valid channel name
+          (messageWords[3].length > 1) &&
+          (messageWords[3].charAt(0) === '#')) {
           channel = messageWords[3].toLowerCase();
+        } else {
+          channel = 'default';
         }
       }
     }
@@ -268,6 +290,7 @@
     '312',
     '313',
     '317',
+    '318',
     '319',
     '330',
     '338',
@@ -292,7 +315,11 @@
     // then separate the string into an array of words
     const messageWords = messageUtf8.split(' ');
     if ((excludedMessageList.length > 0) && (messageWords.length > 1)) {
-      if (excludedMessageList.indexOf(messageWords[2].toUpperCase()) >= 0) {
+      if (
+        // messageWords[1] is optional prefix ':xxxx'
+        (messageWords[1].charAt(0) === ':') &&
+        // Since word[1] is a prefix, then word[2] must be the command
+        (excludedMessageList.indexOf(messageWords[2].toUpperCase()) >= 0)) {
         // case of found, false === don't show message
         return false;
       } else {
@@ -356,7 +383,7 @@
         // Modify the QUIT message before caching duplicate copies
         // 1) Change "QUIT" to "cachedQUIT"
         // 2) Insert channel name as string value
-        // Example:  "nick!user@host cachedQUIT #channel :Reason for quitting"
+        // Example:  ":nick!user@host cachedQUIT #channel :Reason for quitting"
         let messageAsStr = null;
         if (Buffer.isBuffer(message)) messageAsStr = message.toString('utf8');
         if (typeof message === 'string') messageAsStr = message;
