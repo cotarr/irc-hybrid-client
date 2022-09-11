@@ -182,6 +182,7 @@ function createPrivateMessageEl (name, parsedMessage) {
   const privMsgSectionEl = document.createElement('div');
   privMsgSectionEl.classList.add('aa-section-div');
   privMsgSectionEl.classList.add('color-pm');
+  privMsgSectionEl.setAttribute('lastDate', '0000-00-00');
 
   // Top Element (non-hidden element)
   const privMsgTopDivEl = document.createElement('div');
@@ -310,6 +311,16 @@ function createPrivateMessageEl (name, parsedMessage) {
   privMsgSectionEl.appendChild(privMsgBottomDivEl);
 
   privMsgContainerDivEl.appendChild(privMsgSectionEl);
+
+  // ------------------------------------------------------------
+  // Add initial date divider message, this is repeated below for
+  // for addition incoming PM
+  // ------------------------------------------------------------
+  if (privMsgSectionEl.getAttribute('lastDate') !== parsedMessage.datestamp) {
+    privMsgSectionEl.setAttribute('lastDate', parsedMessage.datestamp);
+    privMsgTextAreaEl.value +=
+      '\n=== ' + parsedMessage.datestamp + ' ===\n\n';
+  }
 
   // -------------------------------------------
   // Add initial message, special case of opening new window
@@ -459,6 +470,7 @@ function createPrivateMessageEl (name, parsedMessage) {
   // -------------------------
   function handlePrivMsgClearButtonElClick (event) {
     privMsgTextAreaEl.value = '';
+    privMsgSectionEl.setAttribute('lastDate', '0000-00-00');
     privMsgTextAreaEl.setAttribute('rows', '6');
     privMsgInputAreaEl.setAttribute('rows', '1');
   };
@@ -590,6 +602,24 @@ function createPrivateMessageEl (name, parsedMessage) {
     }
     const parsedMessage = event.detail.parsedMessage;
     // console.log('Event private-message: ' + JSON.stringify(parsedMessage, null, 2));
+
+    // With each message, if date has changed, print the new date value
+    // Two places, see above for opening new window with date divider
+    if (
+      // case of this is outgoing message from me
+      (parsedMessage.params[0].toLowerCase() === name.toLowerCase()) ||
+      // case of incoming message from others.
+      (
+        (parsedMessage.params[0].toLowerCase() !== name.toLowerCase()) &&
+        (parsedMessage.nick.toLowerCase() === name.toLowerCase())
+      )) {
+      if (privMsgSectionEl.getAttribute('lastDate') !== parsedMessage.datestamp) {
+        privMsgSectionEl.setAttribute('lastDate', parsedMessage.datestamp);
+        privMsgTextAreaEl.value +=
+          '\n=== ' + parsedMessage.datestamp + ' ===\n\n';
+      }
+    }
+
     switch (parsedMessage.command) {
       //
       // TODO cases for user left IRC or other error

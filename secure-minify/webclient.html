@@ -69,9 +69,9 @@ id="socks5EnabledCheckboxDot"></div></div><span>Connect using socks5 proxy</span
 id="nickNameInputId" value=""><div class="input-label-right">Nickname</div></div><div class="button-div"><span>User: </span><span id="userNameInputId"></span> <span>Real:</span> <span 
 id="realNameInputId"></span> <span>Mode:</span> <span id="userModeInputId"></span></div></div><div class="vh10"></div><div class="button-div"><input type="text" id="userAwayMessageId" size="20" 
 value="AFK"> <button id="setAwayButton">Away</button> <button id="setBackButton">Back</button></div><div class="vh10"></div><div class="button-div"><button id="connectButton">Connect IRC</button> 
-<button id="quitButton">Disconnect IRC</button></div></div></div></div><div><div class="aa-section-div color-raw" id="rawSectionDiv"><div class="head-flex"><div class="head-left"><button 
-class="notice-button" id="rawHiddenElementsButton">-</button> <span>Server</span></div><div class="head-center"></div><div class="head-right"><div id="rawHeadRightButtons"><button 
-id="rawTallerButton">Taller</button> <button id="rawNormalButton">Normal</button> <button id="rawClearButton">Clear</button></div></div></div><div id="rawHiddenElements"><div><textarea 
+<button id="quitButton">Disconnect IRC</button></div></div></div></div><div><div class="aa-section-div color-raw" id="rawSectionDiv" lastdate="0000-00-00"><div class="head-flex"><div 
+class="head-left"><button class="notice-button" id="rawHiddenElementsButton">-</button> <span>Server</span></div><div class="head-center"></div><div class="head-right"><div id="rawHeadRightButtons">
+<button id="rawTallerButton">Taller</button> <button id="rawNormalButton">Normal</button> <button id="rawClearButton">Clear</button></div></div></div><div id="rawHiddenElements"><div><textarea 
 id="rawMessageDisplay" cols="120" rows="10" spellcheck="false" readonly="readonly"></textarea></div><div id="hideRawButtons"><div class="button-div"><textarea class="va-middle" spellcheck="false" 
 id="rawMessageInputId" cols="83" rows="1"></textarea> <button class="va-middle" id="sendRawMessageButton">Send</button></div><div class="button-div"><button id="loadFromCacheButton">Refresh</button> 
 <button id="eraseCacheButton">Erase Cache</button> <button id="showDebugButton">More...</button></div><div id="hiddenDebugDiv" hidden><div class="button-div"><input class="raw-cb-cb" type="checkbox" 
@@ -83,19 +83,19 @@ id="viewRawMessagesCheckbox"> <span class="raw-cb-span">View-Raw</span> <input c
 </button> <button id="serverTerminateButton">Die Web Server</button></div><div class="button-div"><button id="recalcPageWidthButtonId">Recalc Page Width</button> <button id="variablesButtonId">
 Show Variables</button></div><div class="variables-div" id="variablesDivId" hidden><pre id="variablesPreId"></pre></div></div></div><div class="program-version-div"><span><a 
 href="https://cotarr.github.io/irc-hybrid-client">irc-hybrid-client</a></span> <span id="programVersionDiv"></span></div></div></div></div><div id="webDisconnectedHiddenDiv2" hidden><div 
-id="ircDisconnectedHiddenDiv" hidden><div class="aa-section-div color-wallops" id="wallopsSectionDiv" hidden><div class="head-flex"><div class="head-left"><button class="notice-button" 
-id="wallopsCloseButton">-</button> <span>Wallops</span></div><div class="head-center"></div><div class="head-right"><button id="wallopsTallerButton">Taller</button> <button id="wallopsNormalButton">
-Normal</button> <button id="wallopsClearButton">Clear</button></div></div><textarea id="wallopsMessageDisplay" cols="120" rows="5" spellcheck="false" readonly="readonly"></textarea></div><div 
-class="aa-section-div color-notice" id="noticeSectionDiv" hidden><div class="head-flex"><div class="head-left"><button class="notice-button" id="closeNoticeButton">-</button> <span>Notice</span></div>
-<div class="head-center"></div><div class="head-right"><button id="noticeTallerButton">Taller</button> <button id="noticeNormalButton">Normal</button> <button id="noticeClearButton">Clear</button>
-</div></div><textarea id="noticeMessageDisplay" cols="120" rows="5" spellcheck="false" readonly="readonly"></textarea></div><div class="aa-section-div color-pm" id="privMsgSectionDiv"><div><button 
-id="privMsgMainHiddenButton">+</button> <span>Private Messages</span><div class="pm-window-count" id="privMsgWindowCountDiv" hidden>0</div><div class="message-count" id="privMsgCountDiv" hidden>0
-</div></div><div id="privMsgMainHiddenDiv" hidden><div class="vh10"></div><div class="button-div"><div class="input-label-left">Private Msg to</div><input type="text" id="pmNickNameInputId" size="12" 
-value=""> <button id="whoisButton">Whois</button></div><div class="vh10"></div><div class="button-div"><textarea class="va-middle" id="userPrivMsgInputId" cols="83" rows="1"></textarea> <button 
-class="va-middle" id="UserPrivMsgSendButton">Send</button></div></div></div><div id="privateMessageContainerDiv"></div><div class="aa-section-div color-channel" id="channelMenuDiv"><div><button 
-id="ircChannelsMainHiddenButton">+</button> <span>IRC Channels</span><div class="channel-window-count" id="activeChannelCount">0</div><div class="message-count" id="channelUnreadCountDiv" hidden>0
-</div></div><div id="ircChannelsMainHiddenDiv"><div class="vh10"></div><div class="button-div"><textarea class="va-middle" id="newChannelNameInputId" cols="20" rows="1"></textarea> <button 
-class="va-middle" id="newChannelButton" class="rm20">Join Channel</button></div><div class="button-div" id="channelJoinButtonContainer"></div></div></div><div id="channelContainerDiv"></div></div>
-</div><div id="webDisconnectedVisibleDiv" hidden><div class="reconnect-div" id="reconnectDivId"><h2>Disconnected from Web Server</h2><div class="button-div"><button 
-id="manualWebSocketReconnectButton">Reconnect to Web Site</button> <button id="stopWebSocketReconnectButton">Stop</button></div><pre class="reconnect-status-div" id="reconnectStatusDiv"></pre></div>
-</div></div><div id="rulerDiv"></div></body></html>
+id="ircDisconnectedHiddenDiv" hidden><div class="aa-section-div color-wallops" id="wallopsSectionDiv" lastdate="0000-00-00" hidden><div class="head-flex"><div class="head-left"><button 
+class="notice-button" id="wallopsCloseButton">-</button> <span>Wallops</span></div><div class="head-center"></div><div class="head-right"><button id="wallopsTallerButton">Taller</button> <button 
+id="wallopsNormalButton">Normal</button> <button id="wallopsClearButton">Clear</button></div></div><textarea id="wallopsMessageDisplay" cols="120" rows="5" spellcheck="false" readonly="readonly">
+</textarea></div><div class="aa-section-div color-notice" id="noticeSectionDiv" lastdate="0000-00-00" hidden><div class="head-flex"><div class="head-left"><button class="notice-button" 
+id="closeNoticeButton">-</button> <span>Notice</span></div><div class="head-center"></div><div class="head-right"><button id="noticeTallerButton">Taller</button> <button id="noticeNormalButton">Normal
+</button> <button id="noticeClearButton">Clear</button></div></div><textarea id="noticeMessageDisplay" cols="120" rows="5" spellcheck="false" readonly="readonly"></textarea></div><div 
+class="aa-section-div color-pm" id="privMsgSectionDiv"><div><button id="privMsgMainHiddenButton">+</button> <span>Private Messages</span><div class="pm-window-count" id="privMsgWindowCountDiv" hidden>
+0</div><div class="message-count" id="privMsgCountDiv" hidden>0</div></div><div id="privMsgMainHiddenDiv" hidden><div class="vh10"></div><div class="button-div"><div class="input-label-left">
+Private Msg to</div><input type="text" id="pmNickNameInputId" size="12" value=""> <button id="whoisButton">Whois</button></div><div class="vh10"></div><div class="button-div"><textarea 
+class="va-middle" id="userPrivMsgInputId" cols="83" rows="1"></textarea> <button class="va-middle" id="UserPrivMsgSendButton">Send</button></div></div></div><div id="privateMessageContainerDiv"></div>
+<div class="aa-section-div color-channel" id="channelMenuDiv"><div><button id="ircChannelsMainHiddenButton">+</button> <span>IRC Channels</span><div class="channel-window-count" 
+id="activeChannelCount">0</div><div class="message-count" id="channelUnreadCountDiv" hidden>0</div></div><div id="ircChannelsMainHiddenDiv"><div class="vh10"></div><div class="button-div"><textarea 
+class="va-middle" id="newChannelNameInputId" cols="20" rows="1"></textarea> <button class="va-middle" id="newChannelButton" class="rm20">Join Channel</button></div><div class="button-div" 
+id="channelJoinButtonContainer"></div></div></div><div id="channelContainerDiv"></div></div></div><div id="webDisconnectedVisibleDiv" hidden><div class="reconnect-div" id="reconnectDivId"><h2>
+Disconnected from Web Server</h2><div class="button-div"><button id="manualWebSocketReconnectButton">Reconnect to Web Site</button> <button id="stopWebSocketReconnectButton">Stop</button></div><pre 
+class="reconnect-status-div" id="reconnectStatusDiv"></pre></div></div></div><div id="rulerDiv"></div></body></html>

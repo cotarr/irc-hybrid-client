@@ -277,6 +277,17 @@ document.addEventListener('server-message', function (event) {
         cleanCtcpDelimiter(outMessage)));
   }
 
+  // for each message, if date has changed, display a date separator
+  if ((!webState.viewRawMessages) && (!webState.showRawInHex)) {
+    if (document.getElementById('rawSectionDiv').getAttribute('lastDate') !==
+      event.detail.parsedMessage.datestamp) {
+      document.getElementById('rawSectionDiv').setAttribute('lastDate',
+        event.detail.parsedMessage.datestamp);
+      document.getElementById('rawMessageDisplay').value +=
+        '\n=== ' + event.detail.parsedMessage.datestamp + ' ===\n\n';
+    }
+  }
+
   switch (event.detail.parsedMessage.command) {
     //
     // Server First connect messages
@@ -448,6 +459,7 @@ document.addEventListener('server-message', function (event) {
 document.addEventListener('erase-before-reload', function (event) {
   document.getElementById('rawMessageDisplay').value = '';
   document.getElementById('rawMessageInputId').value = '';
+  document.getElementById('rawSectionDiv').setAttribute('lastDate', '0000-00-00');
 });
 
 //
@@ -543,6 +555,7 @@ document.getElementById('rawClearButton').addEventListener('click', function () 
   document.getElementById('rawMessageDisplay').value = '';
   document.getElementById('rawMessageDisplay').setAttribute('rows', '10');
   document.getElementById('rawMessageInputId').value = '';
+  document.getElementById('rawSectionDiv').setAttribute('lastDate', '0000-00-00');
 });
 // -------------------------
 // raw Taller button handler

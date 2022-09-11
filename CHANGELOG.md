@@ -10,9 +10,9 @@ and this project adheres to
 
 ### Added
 
-- tools/showIrcLog.js - Added simple utility to view the log file filtered by channel
-- secure/webclient02.js - Added property `datestamp` to parsedMessage object for use in displaying date of a message.
-- secure/webclient06.js - New feature, when date changes print the calendar date in the channel window to show date change.
+- Added simple command line utility `tools/showIrcLog.js` to view the log file filtered by channel
+- Added property `datestamp` to parsedMessage object for use in displaying date of a message.
+- New feature, when date changes between the previous message timestamp and the current message timestamp, print the calendar date as a text divider in the server, wallops, notice, private message, and IRC channel windows.
 
 ### Changed
 - tools/updateAuthForUser_1.js - Added check to utility script to produce error message when credentials.json is configured for external login.

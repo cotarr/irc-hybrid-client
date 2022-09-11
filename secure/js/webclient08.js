@@ -38,6 +38,7 @@ document.getElementById('closeNoticeButton').addEventListener('click', function 
 // -------------------------
 document.getElementById('noticeClearButton').addEventListener('click', function () {
   document.getElementById('noticeMessageDisplay').value = '';
+  document.getElementById('noticeSectionDiv').setAttribute('lastDate', '0000-00-00');
   document.getElementById('noticeMessageDisplay').setAttribute('rows', '5');
 });
 
@@ -78,6 +79,7 @@ document.getElementById('wallopsCloseButton').addEventListener('click', function
 // -------------------------
 document.getElementById('wallopsClearButton').addEventListener('click', function () {
   document.getElementById('wallopsMessageDisplay').value = '';
+  document.getElementById('wallopsSectionDiv').setAttribute('lastDate', '0000-00-00');
   document.getElementById('wallopsMessageDisplay').setAttribute('rows', '5');
 });
 

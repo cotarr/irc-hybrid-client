@@ -480,6 +480,15 @@ function displayNoticeMessage (parsedMessage) {
         document.getElementById('noticeMessageDisplay').scrollHeight;
     }
   }
+
+  if (document.getElementById('noticeSectionDiv').getAttribute('lastDate') !==
+    parsedMessage.datestamp) {
+    document.getElementById('noticeSectionDiv').setAttribute('lastDate',
+      parsedMessage.datestamp);
+    document.getElementById('noticeMessageDisplay').value +=
+      '\n=== ' + parsedMessage.datestamp + ' ===\n\n';
+  }
+
   // console.log('parsedMessage ' + JSON.stringify(parsedMessage, null, 2));
   switch (parsedMessage.command) {
     case 'NOTICE':
@@ -544,6 +553,7 @@ function displayNoticeMessage (parsedMessage) {
 //
 document.addEventListener('erase-before-reload', function (event) {
   document.getElementById('noticeMessageDisplay').value = '';
+  document.getElementById('noticeSectionDiv').setAttribute('lastDate', '0000-00-00');
   webState.noticeOpen = false;
   document.getElementById('noticeUnreadExistIcon').setAttribute('hidden', '');
   updateDivVisibility();
@@ -599,6 +609,14 @@ function displayWallopsMessage (parsedMessage) {
         document.getElementById('wallopsMessageDisplay').scrollHeight;
     }
   }
+
+  if (document.getElementById('wallopsSectionDiv').getAttribute('lastDate') !==
+    parsedMessage.datestamp) {
+    document.getElementById('wallopsSectionDiv').setAttribute('lastDate',
+      parsedMessage.datestamp);
+    document.getElementById('wallopsMessageDisplay').value +=
+      '\n=== ' + parsedMessage.datestamp + ' ===\n\n';
+  }
   // console.log('Priv Msg: ' + JSON.stringify(parsedMessage, null, 2));
   switch (parsedMessage.command) {
     case 'WALLOPS':
@@ -623,6 +641,7 @@ function displayWallopsMessage (parsedMessage) {
 //
 document.addEventListener('erase-before-reload', function (event) {
   document.getElementById('wallopsMessageDisplay').value = '';
+  document.getElementById('wallopsSectionDiv').setAttribute('lastDate', '0000-00-00');
   webState.wallopsOpen = false;
   updateDivVisibility();
 });
