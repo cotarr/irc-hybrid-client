@@ -435,7 +435,20 @@
     } // isQuit
   }; // addMessage()
 
-  // Debug: show cache buffers each 15 seconds.
+  /**
+   * Delete IRC channel cache buffer for POST /irc/prune route.
+   *
+   * @param {String} channelStr - Name of IRC channel to delete cache buffer
+   */
+  const pruneChannelCache = function (channelStr) {
+    if ((!(channelStr == null)) && (channelStr.length > 0) &&
+      (channelStr !== 'default')) {
+      if ((channelStr in cachedArrays) && (channelStr in cachedInPointers)) {
+        delete cachedArrays[channelStr];
+        delete cachedInPointers[channelStr];
+      }
+    }
+  };
 
   /**
    * Concatenate all cache buffers into an Array of IRC messages
@@ -741,6 +754,7 @@
   module.exports = {
     eraseCache: eraseCache,
     addMessage: addMessage,
+    pruneChannelCache: pruneChannelCache,
     allMessages: allMessages,
     cacheInfo: cacheInfo
   };

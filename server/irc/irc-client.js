@@ -2031,6 +2031,7 @@
           // prune the channel from arrays
           vars.ircState.channels.splice(index, 1);
           vars.ircState.channelStates.splice(index, 1);
+          ircMessageCache.pruneChannelCache(inputChannel);
           tellBrowserToRequestState();
           res.json({
             error: false
