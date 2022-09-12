@@ -6,11 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Next 2022-09-09
+## [v0.2.16](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.16) 2022-09-11
 
 ### Fixed
 
-- User nickname changes using NICK command were not parsed into the correct IRC channel cache buffer. This was fixed by caching a pseudo-command `cachedNICK` command. This included some cleanup of message cache parsing code.
+- Fixed: User nickname changes using NICK command were not parsed into the correct IRC channel cache buffer. Other users could be seen JOINing and PARTing a channel, but reloading the message cache would move these messages to the server window. This was fixed by caching a pseudo-command `cachedNICK`. This included some general cleanup of message cache parsing code.
 
 ### Added
 
