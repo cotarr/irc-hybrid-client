@@ -842,8 +842,13 @@
               ); // fs.writeFile()
             } // if ((decoded) && (!decoded.hasBeenUsed)) {
           } else {
-            console.log(err || err.toString());
-            process.exit(1);
+            if (err.code === 'ENOENT') {
+              // If file does not exist, this is not an error, leave the cache empty.
+              console.log('Message cache: File not found. Starting with empty cache');
+            } else {
+              console.log(err || err.toString());
+              process.exit(1);
+            }
           }
         } // callback function
       ); // fs.readfile
