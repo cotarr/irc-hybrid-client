@@ -312,15 +312,24 @@ sudo certbot certonly --standalone -d abcd.example.com
           Configuration of a custom directory location is not supported in this version.
         </p>
         <ul>
-          <li>auth.log - Web page user authentication.</li>
+          <li>auth.log - Web page user authentication. This file contains 
+            user login to the web server, which is infrequent, so this
+            file tends to remain small.
+          </li>
 
           <li>access.log - HTTP access requests.
-          By default, the log is filtered to show only errors (http status code>= 400)
-          This is configured in the morgan options.</li>
+            By default all HTTP requests are logged. 
+            Therefore, the access.log file can become quite large.
+            If desired, logging can be limited using a filter to log only errors as 
+            described in the Login Config section.
+          </li>
 
           <li>irc.log - This is a log of all IRC server messages in raw format.
-          This can become quite large.
-          It is primarily intended for debugging, and should probably be left disabled.</li>
+            The IRC log can be enabled or disabled for each IRC server definition 
+            as explained in the Server Config section.
+            The file can become quite large.
+            It is primarily intended for debugging, and should probably be left disabled.
+        </li>
         </ul>
         </p>
         <p>

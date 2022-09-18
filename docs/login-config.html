@@ -348,6 +348,21 @@ fi
   "persistIrcMessageCache": true,
 </pre></div>
 
+        <div class="install-section-title">HTTP Access Log Filter</div>
+        <p>
+          HTTP requests are logged to logs/access.log. If the configuration property 
+          accessLogOnlyErrors is false or the property does not exist the HTTP 
+          access log will include all HTTP requests, 
+          else the access log will be filtered include only HTTP errors (status >= 400).
+        </p>
+        <p>
+          If the web server is started with NODE_ENV=development or NODE_DEBUG_LOG=1,
+          the the accessLogOnlyErrors property will be ignored and all HTTP requests will be visible.
+        </p>
+
+<div class="pre-div"><pre>
+  "accessLogOnlyErrors": false,
+</pre></div>
 
         <div class="install-section-title">Assign Login Password</div>
         <p>
@@ -427,11 +442,17 @@ Enter new password:<blue-example>zuwa79xoJxLJ</blue-example>
   "port": 3003,
   "cookieSecret": "xxxxxxxxxxxxxxxx",
   "sessionExpireAfterSec": 86400,
+  "sessionRollingCookie": false,
+  "sessionEnableRedis": false,
+  "sessionRedisPrefix": "irc001:",
+  "sessionRedisPassword": "",
   "instanceNumber": 0,
   "securityContact": "mailto:security@example.com",
   "securityExpires": "Fri, 1 Apr 2022 08:00:00 -0600",
   "pidFilename": "/home/user1/tmp/ircHybridClient.PID",
   "disableServerListEditor": false,
+  "persistIrcMessageCache": false,
+  "accessLogOnlyErrors": false,
   "loginUsers": [<yellow-example>
     {
       "userid": 1,
@@ -439,7 +460,9 @@ Enter new password:<blue-example>zuwa79xoJxLJ</blue-example>
       "name": "user1",
       "hash": "$2a$10$kvW6dwBpWKkZzcMBuKLI4OlEVoI6guWu.yewp8AHK4DGS3OjMWcPq"
     }</yellow-example>
-  ]
+  ],
+  "enableRemoteLogin": false,
+  "enableSocks5Proxy": false
 }
 </pre></div>
         <p>

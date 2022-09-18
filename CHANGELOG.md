@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Next
+
+### Changed
+
+Note: This may increase the size of the log files.
+
+- Added new property `accessLogOnlyErrors` to credentials.json. If property is false or property does not exist the http access log (logs/access.log) will include all HTTP requests, else the access log will include only HTTP errors (status >= 400). Previously, only errors were logged by default.
+
 ## [v0.2.17](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.17) 2022-09-13
 
 ### Fixed

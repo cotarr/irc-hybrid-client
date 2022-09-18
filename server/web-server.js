@@ -122,6 +122,7 @@ if (nodeEnv === 'production') {
 // HTTP access log
 //
 const accessLogFilename = path.join(__dirname, '../logs/access.log');
+const accessLogOnlyErrors = credentials.accessLogOnlyErrors || false;
 if ((nodeEnv === 'development') || (nodeDebugLog)) {
   console.log('Access log: (console)');
   app.use(logger(':date[iso] :remote-addr :status :method :http-version :req[host]:url', {
@@ -136,7 +137,7 @@ if ((nodeEnv === 'development') || (nodeDebugLog)) {
     }),
     // Log only errors, comment out this next part to see all traffic
     skip: function (req, res) {
-      return (res.statusCode < 400);
+      return ((res.statusCode < 400) && (accessLogOnlyErrors));
     }
   }));
 }

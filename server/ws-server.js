@@ -29,12 +29,15 @@
 
 const ws = require('ws');
 const isValidUTF8 = require('utf-8-validate');
+const fs = require('node:fs');
 
 const authorizeWebSocket = require('./middlewares/ws-authorize').authorizeWebSocket;
 const customLog = require('./middlewares/ws-authorize').customLog;
 
 const nodeEnv = process.env.NODE_ENV || 'development';
 const nodeDebugLog = process.env.NODE_DEBUG_LOG || 0;
+
+const credentials = JSON.parse(fs.readFileSync('./credentials.json', 'utf8'));
 
 // ----------------------------------------
 // Set up a headless websocket server
@@ -77,9 +80,9 @@ global.sendToBrowser = function (message) {
   }
   if (!isValidUTF8(out)) {
     out = null;
-    console.log('sendToBrowser() failed UTF-8 validtion');
+    console.log('sendToBrowser() failed UTF-8 validation');
   }
-  // zero not allowed as avalid character
+  // zero not allowed as a valid character
   if (out.includes(0)) {
     out = null;
     console.log('sendToBrowser() failed zero byte validation');
@@ -124,7 +127,9 @@ const wsOnUpgrade = function (request, socket, head) {
   }
   if (upgradePath === '/irc/ws') {
     if (authorizeWebSocket(request)) {
-      if ((nodeEnv === 'development') || (nodeDebugLog)) {
+      // logged into access.log with IP address:
+      //      2022-09-18T12:12:58.585Z 1.2.3.4 websocket-connection /irc/ws
+      if ((nodeEnv === 'development') || (nodeDebugLog) || (!credentials.accessLogOnlyErrors)) {
         customLog(request, 'websocket-connection');
       }
       wsServer.handleUpgrade(request, socket, head, function (socket) {
