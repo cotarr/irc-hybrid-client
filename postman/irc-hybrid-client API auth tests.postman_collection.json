@@ -1928,7 +1928,532 @@
 			"response": []
 		},
 		{
-			"name": "4.12 /terminate confirm fail",
+			"name": "4.12 /irc/serverlist fail",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 403\", function () {",
+							"    pm.response.to.have.status(403);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/vnd.api+json",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "{{server_URL}}/irc/serverlist",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"serverlist"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "4.13 /irc/serverlist fail",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 403\", function () {",
+							"    pm.response.to.have.status(403);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "CSRF-Token",
+						"value": "{{csrf_token}}",
+						"type": "default"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "default"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"disabled\": false,\n    \"group\": 0,\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 6667,\n    \"tls\": false,\n    \"verify\": false,\n    \"proxy\": false,\n    \"reconnect\": false,\n    \"logging\": false,\n    \"password\": \"\",\n    \"saslUsername\": \"\",\n    \"saslPassword\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"altNick\": \"myNick2\",\n    \"recoverNick\": false,\n    \"user\": \"myUser\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server_URL}}/irc/serverlist",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"serverlist"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "4.14 /irc/serverlist (set edit lock) fail",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 403\", function () {",
+							"    pm.response.to.have.status(403);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.test(\"Global variable exists: irc_server_index\", function () {",
+							"    let index = pm.globals.get('irc_server_index');",
+							"    if (typeof index !== 'number') {",
+							"        console.log('Global variable irc_server_index does not exist');",
+							"        throw new Error('Global variable irc_server_index does not exist');",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/vnd.api+json",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "{{server_URL}}/irc/serverlist?index={{irc_server_index}}&lock=1",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"serverlist"
+					],
+					"query": [
+						{
+							"key": "index",
+							"value": "{{irc_server_index}}"
+						},
+						{
+							"key": "lock",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "4.15 /irc/serverlist fail",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 403\", function () {",
+							"    pm.response.to.have.status(403);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.test(\"Global variable exists: irc_server_index\", function () {",
+							"    let index = pm.globals.get('irc_server_index');",
+							"    if (typeof index !== 'number') {",
+							"        console.log('Global variable irc_server_index does not exist');",
+							"        throw new Error('Global variable irc_server_index does not exist');",
+							"    }",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "CSRF-Token",
+						"value": "{{csrf_token}}",
+						"type": "default"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "default"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"index\": {{irc_server_index}},\n    \"disabled\": true,\n    \"group\": 2,\n    \"name\": \"local-server2\",\n    \"host\": \"127.0.0.2\",\n    \"port\": 6668,\n    \"tls\": true,\n    \"verify\": true,\n    \"proxy\": true,\n    \"reconnect\": true,\n    \"logging\": true,\n    \"password\": \"test1\",\n    \"saslUsername\": \"testsp1\",\n    \"saslPassword\": \"testsp2\",\n    \"identifyNick\": \"test2\",\n    \"identifyCommand\": \"test3\",\n    \"nick\": \"myNick2\",\n    \"altNick\": \"myNick3\",\n    \"recoverNick\": true,\n    \"user\": \"myUser2\",\n    \"real\": \"myRealName2\",\n    \"modes\": \"+iwww\",\n    \"channelList\": \"#test, #test2, #test3, #test4\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server_URL}}/irc/serverlist?index={{irc_server_index}}",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"serverlist"
+					],
+					"query": [
+						{
+							"key": "index",
+							"value": "{{irc_server_index}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "4.16 /irc/serverlist fail",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 403\", function () {",
+							"    pm.response.to.have.status(403);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.test(\"Global variable exists: irc_server_index\", function () {",
+							"    let index = pm.globals.get('irc_server_index');",
+							"    if (typeof index !== 'number') {",
+							"        console.log('Global variable irc_server_index does not exist');",
+							"        throw new Error('Global variable irc_server_index does not exist');",
+							"    }",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "CSRF-Token",
+						"value": "{{csrf_token}}",
+						"type": "default"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "default"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"index\": {{irc_server_index}},\n    \"disabled\": false,\n    \"group\": 0,\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 3000,\n    \"tls\": false,\n    \"verify\": false,\n    \"proxy\": false,\n    \"reconnect\": false,\n    \"logging\": false,\n    \"password\": \"\",\n    \"saslUsername\": \"\",\n    \"saslPassword\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"altNick\": \"myNick\",\n    \"recoverNick\": false,\n    \"user\": \"myUsername\",\n    \"real\": \"Irc Hybrid Client\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server_URL}}/irc/serverlist?index={{irc_server_index}}",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"serverlist"
+					],
+					"query": [
+						{
+							"key": "index",
+							"value": "{{irc_server_index}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "4.17 /irc/serverlist fail",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 403\", function () {",
+							"    pm.response.to.have.status(403);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "COPY",
+				"header": [
+					{
+						"key": "CSRF-Token",
+						"value": "{{csrf_token}}",
+						"type": "default"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "default"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"index\": 0\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server_URL}}/irc/serverlist?index=0",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"serverlist"
+					],
+					"query": [
+						{
+							"key": "index",
+							"value": "0"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "4.18 /irc/serverlist fail",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 403\", function () {",
+							"    pm.response.to.have.status(403);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.test(\"Global variable exists: irc_server_index\", function () {",
+							"    let index = pm.globals.get('irc_server_index');",
+							"    if (typeof index !== 'number') {",
+							"        console.log('Global variable irc_server_index does not exist');",
+							"        throw new Error('Global variable irc_server_index does not exist');",
+							"    }",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "CSRF-Token",
+						"value": "{{csrf_token}}",
+						"type": "default"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "default"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"index\": {{irc_server_index}},\n    \"disabled\": false,\n    \"group\": 0,\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 3000,\n    \"tls\": false,\n    \"verify\": false,\n    \"proxy\": false,\n    \"reconnect\": false,\n    \"logging\": false,\n    \"password\": \"\",\n    \"saslUsername\": \"\",\n    \"saslPassword\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"altNick\": \"myNick2\",\n    \"recoverNick\": false,\n    \"user\": \"myUsername\",\n    \"real\": \"Irc Hybrid Client\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server_URL}}/irc/serverlist?index={{irc_server_index}}",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"serverlist"
+					],
+					"query": [
+						{
+							"key": "index",
+							"value": "{{irc_server_index}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "4.19 /irc/serverlist/tools fail",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 403\", function () {",
+							"    pm.response.to.have.status(403);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "CSRF-Token",
+						"value": "{{csrf_token}}",
+						"type": "default"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "default"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"index\": {{irc_server_index}},\n    \"action\": \"move-up\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server_URL}}/irc/serverlist/tools?index={{irc_server_index}}",
+					"host": [
+						"{{server_URL}}"
+					],
+					"path": [
+						"irc",
+						"serverlist",
+						"tools"
+					],
+					"query": [
+						{
+							"key": "index",
+							"value": "{{irc_server_index}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "4.20 /terminate confirm fail",
 			"event": [
 				{
 					"listen": "test",

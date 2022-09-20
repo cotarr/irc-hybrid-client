@@ -284,10 +284,11 @@
 						"exec": [
 							"//",
 							"// Postman can not connect a websocket",
-							"// If the auth succeds, then the attempt will return a 400 Bad Request",
+							"// If the auth succeds, then the attempt will return a 405 Method Not Allowed",
+							"// Note: In early versions of irc-hybrid-client, it returned 400 Bad Request (probable library change)",
 							"// If the auth fails, the attempt will return a 401 Unauthorized.",
 							"pm.test(\"Status code is 400 Unauthorized\", function () {",
-							"    pm.response.to.have.status(400);",
+							"    pm.response.to.have.status(405);",
 							"});",
 							"",
 							"",

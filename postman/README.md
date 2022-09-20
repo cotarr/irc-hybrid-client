@@ -43,10 +43,11 @@ the API requests individually, it is recommended to use a dedicated IRC test ser
 * Postman settings: General: automatically follow redirects = OFF
 
 # Setup
-* There are three collections:
+* There are four collections:
   * File: `postman/irc-hybrid-client API auth tests.postman_collection.json`
-  * File: `postman/irc-hybrid-client websocket auth tests.postman_collection.json`
   * File: `postman/irc-hybrid-client message debug.postman_collection.json`
+  * File: `postman/irc-hybrid-client server config.postman_collection`
+  * File: `postman/irc-hybrid-client websocket auth tests.postman_collection.json`
 * There is one environment
   * File `postman/irc-hybrid-client.postman_environment.json`
 * Assign a temporary user/password in the web server for testing.
@@ -73,28 +74,10 @@ List of tests
 * 1.3 Confirm one secure route is blocked
 * 2.1-2.12 User login requests that are expected to fail.
 * 3.1-3.3 Successful user web login
-* 4.1-4.12 Logout, then confirm authorization blocks access to each API route.
+* 4.1-4.20 Logout, then confirm authorization blocks access to each API route.
 
-# 2 irc-hybrid-client websocket auth tests
+# 2 Manual Debug
 
-Postman is not capable to open a websocket. Attempting to perform a standard API request
-on a websocket connection will therefore return a status 400 bad request.
-The tests in this section are intended to check authorization of the
-websocket connection upgrade request. A blocked connection upgrade request should be
-expected to return a status 401 Unauthorized. A successful connection upgrade request
-is expected to return status 400 Bad Request.
-
-List of tests
-
-* 5.1 Clear old sessions.
-* 5.2-5.3 Successful user login
-* 5.4 Tell server to expect websocket connection (hash + expiration time)
-* 5.5 Attempt to open websocket upgrade request as GET request expected to return 400 Bad Request (successful authorization)
-* 6.1 Tell server to expect a new websocket connection (hash + expiration time)
-* 6.2-6.4 Logout, login, postman now has different cookie.
-* 6.5 Attempt to open websocket upgrade request in case of cookie hash does not match previously saved value (failed authorization)
-
-# 3 Manual Debug
 This collection was used during manual debugging to exercise different POST requests for the purpose of manually checking API function and data validation.
 
 In most cases, the response to the request is returned asynchronously as stream data via the web-socket. The web browser should be simultaneously logged into the server. Some of the GET requests are not included in this collection.
@@ -116,6 +99,32 @@ If the tests are executed in order, the follow will be exercised:
 * 8.13 Disconnect backend from IRC
 * 8.14 Clear the message cache.
 * 8.16 Terminate (Die) the backend web server.
+
+# 3 server config API tests
+
+This is a series of tests that will use the /irc/serverlist API to edit
+the list of available IRC servers. When run in sequence a new server will be 
+created (POST), modified (PATCH), removed (DELETE), and duplicated (COPY).
+These test functionality, not access control which is tested in another set.
+
+# 4 irc-hybrid-client websocket auth tests
+
+Postman is not capable to open a websocket. Attempting to perform a standard API request
+on a websocket connection will therefore return a status 400 bad request.
+The tests in this section are intended to check authorization of the
+websocket connection upgrade request. A blocked connection upgrade request should be
+expected to return a status 401 Unauthorized. A successful connection upgrade request
+is expected to return status 405 Method Not Allowed.
+
+List of tests
+
+* 5.1 Clear old sessions.
+* 5.2-5.3 Successful user login
+* 5.4 Tell server to expect websocket connection (hash + expiration time)
+* 5.5 Attempt to open websocket upgrade request as GET request expected to return 405 Method Not Allowed (successful authorization)
+* 6.1 Tell server to expect a new websocket connection (hash + expiration time)
+* 6.2-6.4 Logout, login, postman now has different cookie.
+* 6.5 Attempt to open websocket upgrade request in case of cookie hash does not match previously saved value (failed authorization)
 
 # Remote Login Collection
 
