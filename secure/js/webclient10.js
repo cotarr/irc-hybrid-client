@@ -198,7 +198,7 @@ document.getElementById('eraseCacheButton').addEventListener('click', function (
       'Content-type': 'application/json',
       Accept: 'application/json'
     },
-    body: JSON.stringify({ erase: 'YES' })
+    body: JSON.stringify({ erase: 'CACHE' })
   };
   fetch(fetchURL, fetchOptions)
     .then((response) => {

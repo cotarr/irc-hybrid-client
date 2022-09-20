@@ -587,14 +587,18 @@ Cached message with 2 IRC channels.
           empty IRC message buffer on the server.
         </p>
         <p>
-          A confirmation flag of type boolean is required in an &quot;erase&quot; property
-          in the POST body.
+          A target specifier is required in an &quot;erase&quot; property
+          in the POST body. Valid values are:
         </p>
-
+        <ul>
+          <li>
+            CACHE - Erase entire IRC server message cache.
+          </li>
+        </ul>
 <p>POST Request Body:</p>
 <div class="pre-div"><pre>
 {
-  "erase": "YES"
+  "erase": "CACHE"
 }
 </pre></div>
 

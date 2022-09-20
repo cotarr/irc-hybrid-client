@@ -1082,7 +1082,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"erase\": \"YES\"\n}\n",
+					"raw": "{\n  \"erase\": \"CACHE\"\n}\n",
 					"options": {
 						"raw": {
 							"language": "json"

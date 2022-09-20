@@ -2065,7 +2065,7 @@
   // Input: confirmation of command
   //
   //  req.body{
-  //    "erase": "YES"
+  //    "erase": "CACHE"
   //  }
   //
   // -----------------------------------------------
@@ -2093,7 +2093,7 @@
       (req.body.erase.length < 16)) {
       inputVerifyString = req.body.erase;
     }
-    if (inputVerifyString === 'YES') {
+    if (inputVerifyString === 'CACHE') {
       // If previous cache is not empty,
       // then sent command to browser over websocket to initiate actions
       // to properly update (erase) displays.

@@ -954,7 +954,7 @@ webState.cacheReloadInProgress=false}));window.addEventListener('cache-reload-er
 console.log(JSON.stringify(responseJson))}).catch(error=>{showError('Terminate: Unable to connect');console.log(error)})}))
 ;document.getElementById('eraseCacheButton').addEventListener('click',(function(){document.dispatchEvent(new CustomEvent('erase-before-reload',{bubbles:true,detail:{}}))
 ;const fetchURL=webServerUrl+'/irc/erase';const fetchOptions={method:'POST',headers:{'CSRF-Token':csrfToken,'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify({
-erase:'YES'})};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok)return response.json();else throw new Error('Fetch status '+response.status+' '+response.statusText)}).then(responseJson=>{
+erase:'CACHE'})};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok)return response.json();else throw new Error('Fetch status '+response.status+' '+response.statusText)}).then(responseJson=>{
 if(responseJson.error)showError(responseJson.message)}).catch(error=>{console.log(error)})}));function detectWebUseridChanged(){let lastLoginUser=null
 ;lastLoginUser=JSON.parse(window.localStorage.getItem('lastLoginUser'));if(lastLoginUser&&lastLoginUser.userid&&lastLoginUser.userid!==webState.loginUser.userid){
 console.log('User id changed, clearing local storage');window.localStorage.clear()}const newLoginTimestamp=unixTimestamp();const newLoginUser={timestamp:newLoginTimestamp,

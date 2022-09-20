@@ -10,6 +10,7 @@ and this project adheres to
 
 ### Changed
 
+- API Change - The request to erase the entire memory cache using route /irc/erase has changed the value of the body property from YES to CACHE, body contents: {"erase": "CACHE"}. The purpose of the change is in preparation to add additional granular erase requests.
 - Update some of the postman tests
 
 ## [v0.2.18](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.18) 2022-09-19
