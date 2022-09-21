@@ -2068,6 +2068,8 @@
   //    "erase": "CACHE"
   //  }
   //
+  // Valid erase targets: CACHE, NOTICE, WALLOPS
+  //
   // -----------------------------------------------
   const eraseCache = function (req, res, next) {
     // Abort if connected.
@@ -2100,12 +2102,20 @@
       if (ircMessageCache.cacheInfo().usedLines > 0) {
         global.sendToBrowser('CACHERESET\n');
       }
-
       ircMessageCache.eraseCache();
-
+      res.json({ error: false });
+    } else if (inputVerifyString === 'WALLOPS') {
+      ircMessageCache.eraseCacheWallops();
+      // tell browser to pull a fresh copy of the cache
+      global.sendToBrowser('CACHEPULL\n');
+      res.json({ error: false });
+    } else if (inputVerifyString === 'NOTICE') {
+      ircMessageCache.eraseCacheNotices();
+      // tell browser to pull a fresh copy of the cache
+      global.sendToBrowser('CACHEPULL\n');
       res.json({ error: false });
     } else {
-      const error = new Error('Bad Reqeust');
+      const error = new Error('Bad Request');
       error.status = 400;
       error.message = 'Error parsing confirmation property';
       return next(error);

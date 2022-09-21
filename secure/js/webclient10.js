@@ -215,7 +215,8 @@ document.getElementById('eraseCacheButton').addEventListener('click', function (
       }
     })
     .catch((error) => {
-      console.log(error);
+      // console.log(error);
+      showError(error.toString());
     });
 });
 

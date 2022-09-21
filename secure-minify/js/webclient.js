@@ -260,7 +260,8 @@ _addNoticeText(parsedMessage.timestamp+' '+'CTCP 1 Request to '+parsedMessage.pa
 const ircMessageCommandDisplayFilter=['331','332','333','353','366','JOIN','KICK','MODE','cachedNICK'.toUpperCase(),'NICK','NOTICE','PART','PING','PONG','PRIVMSG','cachedQUIT'.toUpperCase(),'QUIT','TOPIC','WALLOPS']
 ;function _parseBufferMessage(message){if('HEARTBEAT'===message){onHeartbeatReceived();if(webState.showCommsMessages)displayRawMessage('HEARTBEAT')}else if('UPDATE'===message){getIrcState()
 ;if(webState.showCommsMessages)displayRawMessage('UPDATE')}else if('CACHERESET'===message){document.dispatchEvent(new CustomEvent('erase-before-reload',{bubbles:true}))
-;if(webState.showCommsMessages)displayRawMessage('CACHERESET')}else if(message.startsWith('LAG=')&&9===message.length){if(webState.showCommsMessages)displayRawMessage(message)
+;if(webState.showCommsMessages)displayRawMessage('CACHERESET')}else if('CACHEPULL'===message){document.dispatchEvent(new CustomEvent('update-from-cache',{bubbles:true}))
+;if(webState.showCommsMessages)displayRawMessage('CACHEPULL')}else if(message.startsWith('LAG=')&&9===message.length){if(webState.showCommsMessages)displayRawMessage(message)
 ;const pingStr=message.split('=')[1];let pingFloat=null;try{pingFloat=parseFloat(pingStr)}catch(err){pingFloat=null}if(pingFloat&&'number'===typeof pingFloat){webState.lag.last=pingFloat
 ;if(pingFloat<webState.lag.min)webState.lag.min=pingFloat;if(pingFloat>webState.lag.max)webState.lag.max=pingFloat}}else{function _showNotExpiredError(errStr){const timeNow=new Date
 ;const timeNowSeconds=parseInt(timeNow/1e3);const timeMessageSeconds=timestampToUnixSeconds(message.split(' ')[0]);if(timeNowSeconds-timeMessageSeconds<errorExpireSeconds)showError(errStr)}
@@ -835,20 +836,24 @@ document.getElementById('privMsgMainHiddenDiv').removeAttribute('hidden');docume
 ;document.getElementById('privMsgCountDiv').textContent=totalCount.toString();if(totalCount>0){document.getElementById('privMsgCountDiv').removeAttribute('hidden')
 ;document.getElementById('privMsgUnreadExistIcon').removeAttribute('hidden')}else{document.getElementById('privMsgCountDiv').setAttribute('hidden','')
 ;document.getElementById('privMsgUnreadExistIcon').setAttribute('hidden','')}}));document.getElementById('closeNoticeButton').addEventListener('click',(function(){webState.noticeOpen=false
-;updateDivVisibility()}));document.getElementById('noticeClearButton').addEventListener('click',(function(){document.getElementById('noticeMessageDisplay').value=''
-;document.getElementById('noticeSectionDiv').setAttribute('lastDate','0000-00-00');document.getElementById('noticeMessageDisplay').setAttribute('rows','5')}))
-;document.getElementById('noticeTallerButton').addEventListener('click',(function(){const newRows=parseInt(document.getElementById('noticeMessageDisplay').getAttribute('rows'))+5
-;document.getElementById('noticeMessageDisplay').setAttribute('rows',newRows.toString())}));document.getElementById('noticeNormalButton').addEventListener('click',(function(){
-document.getElementById('noticeMessageDisplay').setAttribute('rows','5')}));document.getElementById('noticeSectionDiv').addEventListener('click',(function(){resetNotActivityIcon()}))
-;document.getElementById('wallopsCloseButton').addEventListener('click',(function(){webState.wallopsOpen=false;updateDivVisibility()}))
-;document.getElementById('wallopsClearButton').addEventListener('click',(function(){document.getElementById('wallopsMessageDisplay').value=''
-;document.getElementById('wallopsSectionDiv').setAttribute('lastDate','0000-00-00');document.getElementById('wallopsMessageDisplay').setAttribute('rows','5')}))
-;document.getElementById('wallopsTallerButton').addEventListener('click',(function(){const newRows=parseInt(document.getElementById('wallopsMessageDisplay').getAttribute('rows'))+5
-;document.getElementById('wallopsMessageDisplay').setAttribute('rows',newRows.toString())}));document.getElementById('wallopsNormalButton').addEventListener('click',(function(){
-document.getElementById('wallopsMessageDisplay').setAttribute('rows','5')}));function _parseInputForIRCCommands(textAreaEl){const text=stripTrailingCrLf(textAreaEl.value)
-;if(detectMultiLineString(text)){textAreaEl.value='';showError('Multi-line input is not supported.')}else if(text.length>0){const commandAction=textCommandParser({inputString:text,
-originType:'generic',originName:null});textAreaEl.value='';if(commandAction.error){showError(commandAction.message);return}else{
-if(commandAction.ircMessage&&commandAction.ircMessage.length>0)_sendIrcServerMessage(commandAction.ircMessage);return}}textAreaEl.value=''}
+;updateDivVisibility()}));document.getElementById('noticeEraseButton').addEventListener('click',(function(){document.getElementById('noticeSectionDiv').setAttribute('lastDate','0000-00-00')
+;document.getElementById('noticeMessageDisplay').setAttribute('rows','5');const fetchURL=webServerUrl+'/irc/erase';const fetchOptions={method:'POST',headers:{'CSRF-Token':csrfToken,
+'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify({erase:'NOTICE'})};fetch(fetchURL,fetchOptions).then(response=>{
+if(response.ok)return response.json();else throw new Error('Fetch status '+response.status+' '+response.statusText)}).then(responseJson=>{if(responseJson.error)showError(responseJson.message)
+}).catch(error=>{showError(error.toString())})}));document.getElementById('noticeTallerButton').addEventListener('click',(function(){
+const newRows=parseInt(document.getElementById('noticeMessageDisplay').getAttribute('rows'))+5;document.getElementById('noticeMessageDisplay').setAttribute('rows',newRows.toString())}))
+;document.getElementById('noticeNormalButton').addEventListener('click',(function(){document.getElementById('noticeMessageDisplay').setAttribute('rows','5')}))
+;document.getElementById('noticeSectionDiv').addEventListener('click',(function(){resetNotActivityIcon()}));document.getElementById('wallopsCloseButton').addEventListener('click',(function(){
+webState.wallopsOpen=false;updateDivVisibility()}));document.getElementById('wallopsEraseButton').addEventListener('click',(function(){
+document.getElementById('wallopsSectionDiv').setAttribute('lastDate','0000-00-00');document.getElementById('wallopsMessageDisplay').setAttribute('rows','5');const fetchURL=webServerUrl+'/irc/erase'
+;const fetchOptions={method:'POST',headers:{'CSRF-Token':csrfToken,'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify({erase:'WALLOPS'})}
+;fetch(fetchURL,fetchOptions).then(response=>{if(response.ok)return response.json();else throw new Error('Fetch status '+response.status+' '+response.statusText)}).then(responseJson=>{
+if(responseJson.error)showError(responseJson.message)}).catch(error=>{showError(error.toString())})}));document.getElementById('wallopsTallerButton').addEventListener('click',(function(){
+const newRows=parseInt(document.getElementById('wallopsMessageDisplay').getAttribute('rows'))+5;document.getElementById('wallopsMessageDisplay').setAttribute('rows',newRows.toString())}))
+;document.getElementById('wallopsNormalButton').addEventListener('click',(function(){document.getElementById('wallopsMessageDisplay').setAttribute('rows','5')}))
+;function _parseInputForIRCCommands(textAreaEl){const text=stripTrailingCrLf(textAreaEl.value);if(detectMultiLineString(text)){textAreaEl.value='';showError('Multi-line input is not supported.')
+}else if(text.length>0){const commandAction=textCommandParser({inputString:text,originType:'generic',originName:null});textAreaEl.value='';if(commandAction.error){showError(commandAction.message)
+;return}else{if(commandAction.ircMessage&&commandAction.ircMessage.length>0)_sendIrcServerMessage(commandAction.ircMessage);return}}textAreaEl.value=''}
 document.getElementById('sendRawMessageButton').addEventListener('click',(function(){_parseInputForIRCCommands(document.getElementById('rawMessageInputId'))
 ;document.getElementById('rawMessageInputId').focus()}));document.getElementById('rawMessageInputId').addEventListener('input',(function(event){
 if('insertText'===event.inputType&&null===event.data||'insertLineBreak'===event.inputType){stripOneCrLfFromElement(document.getElementById('rawMessageInputId'))
@@ -955,7 +960,7 @@ console.log(JSON.stringify(responseJson))}).catch(error=>{showError('Terminate: 
 ;document.getElementById('eraseCacheButton').addEventListener('click',(function(){document.dispatchEvent(new CustomEvent('erase-before-reload',{bubbles:true,detail:{}}))
 ;const fetchURL=webServerUrl+'/irc/erase';const fetchOptions={method:'POST',headers:{'CSRF-Token':csrfToken,'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify({
 erase:'CACHE'})};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok)return response.json();else throw new Error('Fetch status '+response.status+' '+response.statusText)}).then(responseJson=>{
-if(responseJson.error)showError(responseJson.message)}).catch(error=>{console.log(error)})}));function detectWebUseridChanged(){let lastLoginUser=null
+if(responseJson.error)showError(responseJson.message)}).catch(error=>{showError(error.toString())})}));function detectWebUseridChanged(){let lastLoginUser=null
 ;lastLoginUser=JSON.parse(window.localStorage.getItem('lastLoginUser'));if(lastLoginUser&&lastLoginUser.userid&&lastLoginUser.userid!==webState.loginUser.userid){
 console.log('User id changed, clearing local storage');window.localStorage.clear()}const newLoginTimestamp=unixTimestamp();const newLoginUser={timestamp:newLoginTimestamp,
 userid:webState.loginUser.userid};window.localStorage.setItem('lastLoginUser',JSON.stringify(newLoginUser))}function updateUsername(){const fetchURL=webServerUrl+'/userinfo';const fetchOptions={

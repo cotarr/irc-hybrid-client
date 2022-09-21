@@ -576,23 +576,47 @@ Cached message with 2 IRC channels.
 
         <p>
           This API is used to delete the contents of the IRC message cache.
+          The entire message cache may be erased and reinitialized, or
+          specific message types may be erased from the cache.
         </p>
         <p>
-          If the message cache contains valid data when the erase request is received, 
-          the web server will send a &quot;CACHERESET&quot; to all connected
-          web browsers over the websocket connection.
-          The CACHERESET command will cause all connected web browsers to 
-          clear all related textarea elements.
-          This will force all browsers to remain synchronized with the
-          empty IRC message buffer on the server.
+          When the web browser connects to the web server, the entire message 
+          cache is sent to the browser. In the browser, different windows will open 
+          automatically to display different types of data, such as
+          IRC channel PRIMVSG messages, PM messages, NOTICES and WALLOPS messages.
+          There was a tendency to open extraneous windows to display past 
+          IRC messages that were no longer relevant, making the browser interface 
+          cluttered with extra windows. The API allows cached data for specific 
+          windows to be deleted independently. This in turn eliminates unnecessary
+          browser windows from being opened.
         </p>
         <p>
-          A target specifier is required in an &quot;erase&quot; property
+          A target specifier is required to determine the scope of the erase function.
+          The target specifier in an &quot;erase&quot; property
           in the POST body. Valid values are:
         </p>
         <ul>
           <li>
             CACHE - Erase entire IRC server message cache.
+            If the message cache contains valid data when the erase request is received, 
+            the web server will send a &quot;CACHERESET&quot; command to all connected
+            web browsers over the websocket connection.
+            The CACHERESET command will cause all connected web browsers to 
+            clear all related textarea elements.
+          </li>
+          <li>
+            WALLOPS - This will identify and erase WALLOPS message in the default message cache.
+            The web server then sends a &quot;CACHEPULL&quot; command to all 
+            connected web browsers over the websocket connection.
+            The CACHEPULL command will cause all connected web browsers to reload 
+            the entire message cache and update textarea elements accordingly.
+          </li>
+          <li>
+            NOTICE - This will identify and erase NOTICE message in the default message cache.
+            The web server then sends a &quot;CACHEPULL&quot; command to all 
+            connected web browsers over the websocket connection.
+            The CACHEPULL command will cause all connected web browsers to reload 
+            the entire message cache and update textarea elements accordingly.
           </li>
         </ul>
 <p>POST Request Body:</p>
@@ -1187,6 +1211,18 @@ Cached message with 2 IRC channels.
                 made to a different IRC network. The CACHERESET command is sent by the server when it detects
                 a change in server group number. It is also sent to all connected web browsers 
                 in response to an API call to the /irc/erase route.
+              </td>
+            </tr>
+            <tr>
+              <td>CACHEPULL</td>
+              <td>
+                CACHEPULL is a command will instruct all connected web browsers
+                to reload the entire message cache from the web server and update
+                all textarea elements accordingly.
+                The CACHEPULL command is sent by the server when one specific part of the 
+                IRC message cache has been erased using the POST /irc/erase route.
+                This will allow extraneous windows to be removed after the 
+                content is no longer relevant and has been deleted from the message cache.
               </td>
             </tr>
             <tr>

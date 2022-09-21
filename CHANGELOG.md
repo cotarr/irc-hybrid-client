@@ -8,10 +8,16 @@ and this project adheres to
 
 ## Next
 
+In the previous versions, the wallops and notice windows included "Clear" buttons used to temporarily blank the content textarea element, however refreshing the cache would restore the previous content. The labels of the buttons have been changed from Clear to "Erase". The Erase buttons send a request to the web server to find and clear related IRC server messages from the message cache, then request all connected web browsers to update the display accordingly.
+The intent is to reduce the number of extraneous windows by deleting old content.
+
 ### Changed
 
-- API Change - The request to erase the entire memory cache using route /irc/erase has changed the value of the body property from YES to CACHE, body contents: {"erase": "CACHE"}. The purpose of the change is in preparation to add additional granular erase requests.
-- Update some of the postman tests
+- API Change - The request to erase the entire memory cache using route /irc/erase has changed the value of the body property from YES to `CACHE`, body contents: {"erase": "CACHE"}. The purpose of the change is in preparation to add additional granular erase requests.
+- API Change - New target `NOTICE` for /irc/erase endpoint to find and delete NOTICE messages from the default cache.
+- API Change - New target `WALLOPS` for /irc/erase endpoint to find and delete NOTICE messages from the default cache.
+- A new websocket command `CACHEPULL` was defined for transmission over the websocket connection. The web server will send the CACHEPULL command to all connected web browsers each time the cache is modified erasing portions of the cache. In response, all browsers will refresh the cache and update the display textarea elements.
+- Update some of the postman tests to reflect API changes listed here.
 
 ## [v0.2.18](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.18) 2022-09-19
 

@@ -34,13 +34,41 @@ document.getElementById('closeNoticeButton').addEventListener('click', function 
 });
 
 // -------------------------
-// Notice Clear button handler
+// Notice Erase button handler
 // -------------------------
-document.getElementById('noticeClearButton').addEventListener('click', function () {
-  document.getElementById('noticeMessageDisplay').value = '';
+document.getElementById('noticeEraseButton').addEventListener('click', function () {
   document.getElementById('noticeSectionDiv').setAttribute('lastDate', '0000-00-00');
   document.getElementById('noticeMessageDisplay').setAttribute('rows', '5');
-});
+
+  const fetchURL = webServerUrl + '/irc/erase';
+  const fetchOptions = {
+    method: 'POST',
+    headers: {
+      'CSRF-Token': csrfToken,
+      'Content-type': 'application/json',
+      Accept: 'application/json'
+    },
+    body: JSON.stringify({ erase: 'NOTICE' })
+  };
+  fetch(fetchURL, fetchOptions)
+    .then((response) => {
+      // console.log(response.status);
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error('Fetch status ' + response.status + ' ' + response.statusText);
+      }
+    })
+    .then((responseJson) => {
+      if (responseJson.error) {
+        showError(responseJson.message);
+      }
+    })
+    .catch((error) => {
+      // console.log(error);
+      showError(error.toString());
+    });
+}); // notice erase button
 
 // -------------------------
 // Notice Taller button handler
@@ -75,13 +103,40 @@ document.getElementById('wallopsCloseButton').addEventListener('click', function
 });
 
 // -------------------------
-// Wallops Clear button handler
+// Wallops Erase button handler
 // -------------------------
-document.getElementById('wallopsClearButton').addEventListener('click', function () {
-  document.getElementById('wallopsMessageDisplay').value = '';
+document.getElementById('wallopsEraseButton').addEventListener('click', function () {
   document.getElementById('wallopsSectionDiv').setAttribute('lastDate', '0000-00-00');
   document.getElementById('wallopsMessageDisplay').setAttribute('rows', '5');
-});
+  const fetchURL = webServerUrl + '/irc/erase';
+  const fetchOptions = {
+    method: 'POST',
+    headers: {
+      'CSRF-Token': csrfToken,
+      'Content-type': 'application/json',
+      Accept: 'application/json'
+    },
+    body: JSON.stringify({ erase: 'WALLOPS' })
+  };
+  fetch(fetchURL, fetchOptions)
+    .then((response) => {
+      // console.log(response.status);
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error('Fetch status ' + response.status + ' ' + response.statusText);
+      }
+    })
+    .then((responseJson) => {
+      if (responseJson.error) {
+        showError(responseJson.message);
+      }
+    })
+    .catch((error) => {
+      // console.log(error);
+      showError(error.toString());
+    });
+}); // wallops erase button
 
 // -------------------------
 // Wallops Taller button handler

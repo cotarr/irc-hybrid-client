@@ -919,7 +919,16 @@ function _parseBufferMessage (message) {
     if (webState.showCommsMessages) {
       displayRawMessage('CACHERESET');
     }
+  } else if (message === 'CACHEPULL') {
+    // 4) Else check if cache has been modified on the web server
+    // This may occur when erasing partial contents of the cache
+    // In response to this event the cache will be reloaded in all browsers
+    document.dispatchEvent(new CustomEvent('update-from-cache', { bubbles: true }));
+    if (webState.showCommsMessages) {
+      displayRawMessage('CACHEPULL');
+    }
   } else if ((message.startsWith('LAG=')) && (message.length === 9)) {
+    // 5) IRC server lag measurement for display
     // Example message: 'LAG=1.234'
     if (webState.showCommsMessages) {
       displayRawMessage(message);
@@ -937,7 +946,7 @@ function _parseBufferMessage (message) {
       if (pingFloat > webState.lag.max) webState.lag.max = pingFloat;
     }
   } else {
-    // 4) Else, this is IRC message to be parsed for IRC browser user.
+    // 6) Else, this is IRC message to be parsed for IRC browser user.
 
     // Internal function
     function _showNotExpiredError (errStr) {

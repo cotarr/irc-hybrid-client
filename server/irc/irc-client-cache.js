@@ -85,6 +85,47 @@
     }
   };
 
+  /**
+   * Find WALLOPS messages in cache and delete them
+   * This is an external API method for this module
+   */
+  const eraseCacheWallops = function () {
+    if (cachedArrays.default.length === cacheSize) {
+      for (let i = 0; i < cacheSize; i++) {
+        if (!(cachedArrays.default[i] == null)) {
+          // Line is stored in array as type utf-8 encoded Buffer
+          const lineWords = cachedArrays.default[i].toString('utf8').split(' ');
+          if ((lineWords.length > 3) && (lineWords[2].toUpperCase() === 'WALLOPS')) {
+            // erase the array element
+            cachedArrays.default[i] = null;
+          }
+        }
+      }
+    }
+  };
+
+  /**
+   * Find NOTICE messages in cache and delete them
+   * This is an external API method for this module
+   */
+  const eraseCacheNotices = function () {
+    if (cachedArrays.default.length === cacheSize) {
+      for (let i = 0; i < cacheSize; i++) {
+        if (!(cachedArrays.default[i] == null)) {
+          // Line is stored in array as type utf-8 encoded Buffer
+          const lineWords = cachedArrays.default[i].toString('utf8').split(' ');
+          if ((lineWords.length > 4) && (lineWords[2].toUpperCase() === 'NOTICE')) {
+            // Check that this user notice, not a channel notice message
+            if (vars.channelPrefixChars.indexOf(lineWords[3].charAt(0)) < 0) {
+              // erase the array element
+              cachedArrays.default[i] = null;
+            }
+          }
+        }
+      }
+    }
+  };
+
   // On program start, initialize the message cache buffers
   eraseCache();
 
@@ -875,6 +916,8 @@
 
   module.exports = {
     eraseCache: eraseCache,
+    eraseCacheWallops: eraseCacheWallops,
+    eraseCacheNotices: eraseCacheNotices,
     addMessage: addMessage,
     pruneChannelCache: pruneChannelCache,
     allMessages: allMessages,
