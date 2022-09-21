@@ -85,6 +85,9 @@
     }
   };
 
+  // On program start, initialize the message cache buffers
+  eraseCache();
+
   /**
    * Find WALLOPS messages in cache and delete them
    * This is an external API method for this module
@@ -149,9 +152,6 @@
       }
     }
   };
-
-  // On program start, initialize the message cache buffers
-  eraseCache();
 
   // ----------------------
   // Notes on QUIT messages

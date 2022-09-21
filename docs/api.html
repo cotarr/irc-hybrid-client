@@ -473,7 +473,9 @@ UPDATE
         <p>
           This is used to remove a non-joined IRC channel from the active channel list.
           Trying to prune a channel while present in the channel will cause an error.
-          Pruning a channel will delete any IRC message cache buffer associated with the pruned channel.
+          Pruning a channel will delete the IRC message cache buffer associated with the pruned channel.
+          In the case where the maximum count of IRC channel message buffers was exceeded, the prune 
+          function will erase channel messages from the default IRC message cache.
         </p>
         <p>
           The request body shall contain the property &quot;channel&quot; of type string
@@ -591,7 +593,7 @@ Cached message with 2 IRC channels.
           IRC channel PRIMVSG messages, PM messages, NOTICES and WALLOPS messages.
           There was a tendency to open extraneous panels to display past 
           IRC messages that were no longer relevant, making the browser interface 
-          cluttered with extra panels. The API allows cached data for specific 
+          cluttered with extra panels. This API allows cached data for specific 
           panels to be deleted independently. This in turn eliminates unnecessary
           browser panels from being opened automatically.
         </p>
