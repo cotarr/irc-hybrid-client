@@ -126,6 +126,30 @@
     }
   };
 
+  /**
+   * Find all PRIVMSG messages in cache
+   * Check if they are channel or user PM, erase if user PM
+   * This is an external API method for this module
+   */
+  const eraseCacheUserPM = function () {
+    if (cachedArrays.default.length === cacheSize) {
+      for (let i = 0; i < cacheSize; i++) {
+        if (!(cachedArrays.default[i] == null)) {
+          // Line is stored in array as type utf-8 encoded Buffer
+          const lineWords = cachedArrays.default[i].toString('utf8').split(' ');
+          if ((lineWords.length > 4) && (lineWords[2].toUpperCase() === 'PRIVMSG')) {
+            // Check that this user PRIVMSG (private message),
+            // and it is not a channel PRIVMSG command (public message)
+            if (vars.channelPrefixChars.indexOf(lineWords[3].charAt(0)) < 0) {
+              // erase the array element
+              cachedArrays.default[i] = null;
+            }
+          }
+        }
+      }
+    }
+  };
+
   // On program start, initialize the message cache buffers
   eraseCache();
 
@@ -918,6 +942,7 @@
     eraseCache: eraseCache,
     eraseCacheWallops: eraseCacheWallops,
     eraseCacheNotices: eraseCacheNotices,
+    eraseCacheUserPM: eraseCacheUserPM,
     addMessage: addMessage,
     pruneChannelCache: pruneChannelCache,
     allMessages: allMessages,

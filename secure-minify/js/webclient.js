@@ -119,15 +119,17 @@ if(ircState.disableServerListEditor)document.getElementById('editServerListButto
 ;document.getElementById('userAwayMessageId').setAttribute('disabled','');document.getElementById('setAwayButton').setAttribute('disabled','')
 ;document.getElementById('setBackButton').setAttribute('disabled','');document.getElementById('groupInfoHiddenDiv').setAttribute('hidden','')}}
 document.addEventListener('show-all-divs',(function(event){document.getElementById('hideLoginSection').removeAttribute('hidden');document.getElementById('hideLoginSectionButton').textContent='-'
-;document.getElementById('privMsgMainHiddenDiv').removeAttribute('hidden');document.getElementById('privMsgMainHiddenButton').textContent='-'
-;document.getElementById('ircChannelsMainHiddenDiv').removeAttribute('hidden');document.getElementById('ircChannelsMainHiddenButton').textContent='-';showRawMessageWindow();webState.noticeOpen=true
-;webState.wallopsOpen=true;document.getElementById('noticeSectionDiv').removeAttribute('hidden');document.getElementById('wallopsSectionDiv').removeAttribute('hidden')}))
+;document.getElementById('privMsgHeaderHiddenDiv').removeAttribute('hidden');document.getElementById('privMsgMainHiddenDiv').removeAttribute('hidden')
+;document.getElementById('privMsgMainHiddenButton').textContent='-';document.getElementById('ircChannelsMainHiddenDiv').removeAttribute('hidden')
+;document.getElementById('ircChannelsMainHiddenButton').textContent='-';showRawMessageWindow();webState.noticeOpen=true;webState.wallopsOpen=true
+;document.getElementById('noticeSectionDiv').removeAttribute('hidden');document.getElementById('wallopsSectionDiv').removeAttribute('hidden')}))
 ;document.addEventListener('hide-or-zoom',(function(event){document.getElementById('hideLoginSection').setAttribute('hidden','');document.getElementById('hideLoginSectionButton').textContent='+'
-;document.getElementById('privMsgMainHiddenDiv').setAttribute('hidden','');document.getElementById('privMsgMainHiddenButton').textContent='+'
-;document.getElementById('ircChannelsMainHiddenDiv').setAttribute('hidden','');document.getElementById('ircChannelsMainHiddenButton').textContent='+';hideRawMessageWindow();webState.noticeOpen=false
-;document.getElementById('noticeSectionDiv').setAttribute('hidden','');webState.wallopsOpen=false;document.getElementById('wallopsSectionDiv').setAttribute('hidden','')
-;document.getElementById('hiddenInfoDiv').setAttribute('hidden','');document.getElementById('infoOpenCloseButton').textContent='+'}));function setVariablesShowingIRCDisconnected(){
-document.getElementById('headerUser').textContent='';document.getElementById('headerServer').textContent='';document.dispatchEvent(new CustomEvent('cancel-beep-sounds',{bubbles:true}))
+;document.getElementById('privMsgHeaderHiddenDiv').setAttribute('hidden','');document.getElementById('privMsgMainHiddenDiv').setAttribute('hidden','')
+;document.getElementById('privMsgMainHiddenButton').textContent='+';document.getElementById('ircChannelsMainHiddenDiv').setAttribute('hidden','')
+;document.getElementById('ircChannelsMainHiddenButton').textContent='+';hideRawMessageWindow();webState.noticeOpen=false;document.getElementById('noticeSectionDiv').setAttribute('hidden','')
+;webState.wallopsOpen=false;document.getElementById('wallopsSectionDiv').setAttribute('hidden','');document.getElementById('hiddenInfoDiv').setAttribute('hidden','')
+;document.getElementById('infoOpenCloseButton').textContent='+'}));function setVariablesShowingIRCDisconnected(){document.getElementById('headerUser').textContent=''
+;document.getElementById('headerServer').textContent='';document.dispatchEvent(new CustomEvent('cancel-beep-sounds',{bubbles:true}))
 ;const channelContainerDivEl=document.getElementById('channelContainerDiv');while(channelContainerDivEl.firstChild)channelContainerDivEl.removeChild(channelContainerDivEl.firstChild)
 ;webState.channels=[];webState.channelStates=[];webState.lag={last:0,min:9999,max:0}}const heartbeatExpirationTimeSeconds=15;let heartbeatUpCounter=0;function resetHeartbeatTimer(){
 heartbeatUpCounter=0}function onHeartbeatReceived(){heartbeatUpCounter=0}function heartbeatTimerTickHandler(){heartbeatUpCounter++
@@ -788,16 +790,18 @@ privMsgSectionEl.setAttribute('lastDate',parsedMessage.datestamp);privMsgTextAre
 if(parsedMessage.nick===ircState.nickName){if(parsedMessage.params[0].toLowerCase()===name.toLowerCase()){
 if('isPmCtcpAction'in parsedMessage)_addText(parsedMessage.timestamp+pmNameSpacer+parsedMessage.nick+' '+parsedMessage.params[1]);else _addText(parsedMessage.timestamp+' '+parsedMessage.nick+pmNameSpacer+parsedMessage.params[1])
 ;if(privMsgSectionEl.hasAttribute('beep1-enabled')&&!webState.cacheReloadInProgress)playBeep3Sound();privMsgSectionEl.removeAttribute('hidden');privMsgBottomDivEl.removeAttribute('hidden')
-;privMsgHideButtonEl.textContent='-';privMsgTopRightHidableDivEl.removeAttribute('hidden');document.getElementById('privMsgMainHiddenDiv').removeAttribute('hidden')
-;document.getElementById('privMsgMainHiddenButton').textContent='-'}}else if(parsedMessage.nick.toLowerCase()===name.toLowerCase()){
+;privMsgHideButtonEl.textContent='-';privMsgTopRightHidableDivEl.removeAttribute('hidden');document.getElementById('privMsgHeaderHiddenDiv').removeAttribute('hidden')
+;document.getElementById('privMsgMainHiddenDiv').removeAttribute('hidden');document.getElementById('privMsgMainHiddenButton').textContent='-'}
+}else if(parsedMessage.nick.toLowerCase()===name.toLowerCase()){
 if('isPmCtcpAction'in parsedMessage)_addText(parsedMessage.timestamp+pmNameSpacer+parsedMessage.nick+' '+parsedMessage.params[1]);else _addText(parsedMessage.timestamp+' '+parsedMessage.nick+pmNameSpacer+parsedMessage.params[1])
 ;if(privMsgSectionEl.hasAttribute('beep1-enabled')&&!webState.cacheReloadInProgress)playBeep3Sound();privMsgSectionEl.removeAttribute('hidden');privMsgBottomDivEl.removeAttribute('hidden')
 ;privMsgHideButtonEl.textContent='-';privMsgTopRightHidableDivEl.removeAttribute('hidden');if(!webState.cacheReloadInProgress)clearLastZoom()
-;document.getElementById('privMsgMainHiddenDiv').removeAttribute('hidden');document.getElementById('privMsgMainHiddenButton').textContent='-'
+;document.getElementById('privMsgHeaderHiddenDiv').removeAttribute('hidden');document.getElementById('privMsgMainHiddenDiv').removeAttribute('hidden')
+;document.getElementById('privMsgMainHiddenButton').textContent='-'
 ;if(document.activeElement!==privMsgInputAreaEl&&document.activeElement!==privMsgSendButtonEl&&!webState.cacheReloadInProgress&&0===activityIconInhibitTimer)incrementPrivMsgCount()}break;default:}}
-document.addEventListener('private-message',handlePrivateMessage);if(!webState.cacheReloadInProgress)incrementPrivMsgCount();document.getElementById('privMsgMainHiddenDiv').removeAttribute('hidden')
-;document.getElementById('privMsgMainHiddenButton').textContent='-';const adjustPMInputToWidowWidth=function(){const mar1=webState.dynamic.commonMargin
-;const mar2=webState.dynamic.commonMargin+5+webState.dynamic.sendButtonWidthPx;privMsgTextAreaEl.setAttribute('cols',calcInputAreaColSize(mar1))
+document.addEventListener('private-message',handlePrivateMessage);if(!webState.cacheReloadInProgress)incrementPrivMsgCount();document.getElementById('privMsgHeaderHiddenDiv').removeAttribute('hidden')
+;document.getElementById('privMsgMainHiddenDiv').removeAttribute('hidden');document.getElementById('privMsgMainHiddenButton').textContent='-';const adjustPMInputToWidowWidth=function(){
+const mar1=webState.dynamic.commonMargin;const mar2=webState.dynamic.commonMargin+5+webState.dynamic.sendButtonWidthPx;privMsgTextAreaEl.setAttribute('cols',calcInputAreaColSize(mar1))
 ;privMsgInputAreaEl.setAttribute('cols',calcInputAreaColSize(mar2))};function handleResizeCustomElements(event){if(webState.dynamic.inputAreaCharWidthPx)adjustPMInputToWidowWidth()}
 window.addEventListener('resize-custom-elements',handleResizeCustomElements);adjustPMInputToWidowWidth();setTimeout(adjustPMInputToWidowWidth,150);function handleEraseBeforeReload(event){
 clearInterval(iconInhibitTimer);document.removeEventListener('cache-reload-done',handleCacheReloadDone);document.removeEventListener('cache-reload-error',handelCacheReloadError)
@@ -825,18 +829,23 @@ _buildPrivateMessageText()}));document.addEventListener('erase-before-reload',(f
 ;document.getElementById('userPrivMsgInputId').value='';webState.activePrivateMessageNicks=[];webState.lastPMNick='';document.getElementById('privMsgWindowCountDiv').textContent='0'
 ;document.getElementById('privMsgWindowCountDiv').setAttribute('hidden','');document.getElementById('privMsgCountDiv').textContent='0'
 ;document.getElementById('privMsgCountDiv').setAttribute('hidden','');document.getElementById('privMsgUnreadExistIcon').setAttribute('hidden','')
-;document.getElementById('privMsgMainHiddenDiv').setAttribute('hidden','');document.getElementById('privMsgMainHiddenButton').textContent='+'}))
-;document.getElementById('whoisButton').addEventListener('click',(function(){if(document.getElementById('pmNickNameInputId').value.length>0){showRawMessageWindow()
-;const message='WHOIS '+document.getElementById('pmNickNameInputId').value;_sendIrcServerMessage(message);showRawMessageWindow()}else showError('Input required')}))
-;document.getElementById('privMsgMainHiddenButton').addEventListener('click',(function(){if(document.getElementById('privMsgMainHiddenDiv').hasAttribute('hidden')){
-document.getElementById('privMsgMainHiddenDiv').removeAttribute('hidden');document.getElementById('privMsgMainHiddenButton').textContent='-'
-;document.dispatchEvent(new CustomEvent('priv-msg-show-all',{bubbles:true}))}else{document.getElementById('privMsgMainHiddenDiv').setAttribute('hidden','')
-;document.getElementById('privMsgMainHiddenButton').textContent='+';document.dispatchEvent(new CustomEvent('priv-msg-hide-all',{bubbles:true}))}}))
-;document.addEventListener('update-pm-count',(function(event){let totalCount=0;document.querySelectorAll('.pm-count-class').forEach((function(el){totalCount+=parseInt(el.textContent)}))
-;document.getElementById('privMsgCountDiv').textContent=totalCount.toString();if(totalCount>0){document.getElementById('privMsgCountDiv').removeAttribute('hidden')
-;document.getElementById('privMsgUnreadExistIcon').removeAttribute('hidden')}else{document.getElementById('privMsgCountDiv').setAttribute('hidden','')
-;document.getElementById('privMsgUnreadExistIcon').setAttribute('hidden','')}}));document.getElementById('closeNoticeButton').addEventListener('click',(function(){webState.noticeOpen=false
-;updateDivVisibility()}));document.getElementById('noticeEraseButton').addEventListener('click',(function(){document.getElementById('noticeSectionDiv').setAttribute('lastDate','0000-00-00')
+;document.getElementById('privMsgHeaderHiddenDiv').setAttribute('hidden','');document.getElementById('privMsgMainHiddenDiv').setAttribute('hidden','')
+;document.getElementById('privMsgMainHiddenButton').textContent='+'}));document.getElementById('privMsgHeaderHiddenDiv').addEventListener('click',(function(){const fetchURL=webServerUrl+'/irc/erase'
+;const fetchOptions={method:'POST',headers:{'CSRF-Token':csrfToken,'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify({erase:'PRIVMSG'})}
+;fetch(fetchURL,fetchOptions).then(response=>{if(response.ok)return response.json();else throw new Error('Fetch status '+response.status+' '+response.statusText)}).then(responseJson=>{
+if(responseJson.error)showError(responseJson.message)}).catch(error=>{showError(error.toString())})}));document.getElementById('whoisButton').addEventListener('click',(function(){
+if(document.getElementById('pmNickNameInputId').value.length>0){showRawMessageWindow();const message='WHOIS '+document.getElementById('pmNickNameInputId').value;_sendIrcServerMessage(message)
+;showRawMessageWindow()}else showError('Input required')}));document.getElementById('privMsgMainHiddenButton').addEventListener('click',(function(){
+if(document.getElementById('privMsgMainHiddenDiv').hasAttribute('hidden')){document.getElementById('privMsgHeaderHiddenDiv').removeAttribute('hidden')
+;document.getElementById('privMsgMainHiddenDiv').removeAttribute('hidden');document.getElementById('privMsgMainHiddenButton').textContent='-'
+;document.dispatchEvent(new CustomEvent('priv-msg-show-all',{bubbles:true}))}else{document.getElementById('privMsgHeaderHiddenDiv').setAttribute('hidden','')
+;document.getElementById('privMsgMainHiddenDiv').setAttribute('hidden','');document.getElementById('privMsgMainHiddenButton').textContent='+'
+;document.dispatchEvent(new CustomEvent('priv-msg-hide-all',{bubbles:true}))}}));document.addEventListener('update-pm-count',(function(event){let totalCount=0
+;document.querySelectorAll('.pm-count-class').forEach((function(el){totalCount+=parseInt(el.textContent)}));document.getElementById('privMsgCountDiv').textContent=totalCount.toString()
+;if(totalCount>0){document.getElementById('privMsgCountDiv').removeAttribute('hidden');document.getElementById('privMsgUnreadExistIcon').removeAttribute('hidden')}else{
+document.getElementById('privMsgCountDiv').setAttribute('hidden','');document.getElementById('privMsgUnreadExistIcon').setAttribute('hidden','')}}))
+;document.getElementById('closeNoticeButton').addEventListener('click',(function(){webState.noticeOpen=false;updateDivVisibility()}))
+;document.getElementById('noticeEraseButton').addEventListener('click',(function(){document.getElementById('noticeSectionDiv').setAttribute('lastDate','0000-00-00')
 ;document.getElementById('noticeMessageDisplay').setAttribute('rows','5');const fetchURL=webServerUrl+'/irc/erase';const fetchOptions={method:'POST',headers:{'CSRF-Token':csrfToken,
 'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify({erase:'NOTICE'})};fetch(fetchURL,fetchOptions).then(response=>{
 if(response.ok)return response.json();else throw new Error('Fetch status '+response.status+' '+response.statusText)}).then(responseJson=>{if(responseJson.error)showError(responseJson.message)

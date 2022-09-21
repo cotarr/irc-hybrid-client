@@ -580,20 +580,25 @@ Cached message with 2 IRC channels.
           specific message types may be erased from the cache.
         </p>
         <p>
+          The primary purpose for cache erase is to remove previous content
+          when changing from one IRC network to a different IRC network.
+        </p>
+        <p>
+          The erase function may also be used to manage the number of panels in the web browser.
           When the web browser connects to the web server, the entire message 
-          cache is sent to the browser. In the browser, different windows will open 
+          cache is sent to the browser. In the browser, different panels will open 
           automatically to display different types of data, such as
           IRC channel PRIMVSG messages, PM messages, NOTICES and WALLOPS messages.
-          There was a tendency to open extraneous windows to display past 
+          There was a tendency to open extraneous panels to display past 
           IRC messages that were no longer relevant, making the browser interface 
-          cluttered with extra windows. The API allows cached data for specific 
-          windows to be deleted independently. This in turn eliminates unnecessary
-          browser windows from being opened.
+          cluttered with extra panels. The API allows cached data for specific 
+          panels to be deleted independently. This in turn eliminates unnecessary
+          browser panels from being opened automatically.
         </p>
         <p>
           A target specifier is required to determine the scope of the erase function.
-          The target specifier in an &quot;erase&quot; property
-          in the POST body. Valid values are:
+          The target specifier in an &quot;erase&quot; property in the body of the POST request.
+          Valid values are:
         </p>
         <ul>
           <li>
@@ -618,8 +623,16 @@ Cached message with 2 IRC channels.
             The CACHEPULL command will cause all connected web browsers to reload 
             the entire message cache and update textarea elements accordingly.
           </li>
+          <li>
+            PRIVMSG - This will identify and erase all user PRIVMSG messages 
+            in the default message cache. Channel PRIVMSG message will not be erased.
+            The web server then sends a &quot;CACHEPULL&quot; command to all 
+            connected web browsers over the websocket connection.
+            The CACHEPULL command will cause all connected web browsers to reload 
+            the entire message cache and update textarea elements accordingly.
+          </li>
         </ul>
-<p>POST Request Body:</p>
+<p>Example POST Request Body:</p>
 <div class="pre-div"><pre>
 {
   "erase": "CACHE"

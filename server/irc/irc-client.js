@@ -2068,7 +2068,7 @@
   //    "erase": "CACHE"
   //  }
   //
-  // Valid erase targets: CACHE, NOTICE, WALLOPS
+  // Valid erase targets: CACHE, NOTICE, WALLOPS, PRIVMSG
   //
   // -----------------------------------------------
   const eraseCache = function (req, res, next) {
@@ -2111,6 +2111,11 @@
       res.json({ error: false });
     } else if (inputVerifyString === 'NOTICE') {
       ircMessageCache.eraseCacheNotices();
+      // tell browser to pull a fresh copy of the cache
+      global.sendToBrowser('CACHEPULL\n');
+      res.json({ error: false });
+    } else if (inputVerifyString === 'PRIVMSG') {
+      ircMessageCache.eraseCacheUserPM();
       // tell browser to pull a fresh copy of the cache
       global.sendToBrowser('CACHEPULL\n');
       res.json({ error: false });

@@ -647,6 +647,7 @@ function createPrivateMessageEl (name, parsedMessage) {
             privMsgHideButtonEl.textContent = '-';
             privMsgTopRightHidableDivEl.removeAttribute('hidden');
             // also show control section div
+            document.getElementById('privMsgHeaderHiddenDiv').removeAttribute('hidden');
             document.getElementById('privMsgMainHiddenDiv').removeAttribute('hidden');
             document.getElementById('privMsgMainHiddenButton').textContent = '-';
           }
@@ -674,6 +675,7 @@ function createPrivateMessageEl (name, parsedMessage) {
             }
 
             // also show control section div
+            document.getElementById('privMsgHeaderHiddenDiv').removeAttribute('hidden');
             document.getElementById('privMsgMainHiddenDiv').removeAttribute('hidden');
             document.getElementById('privMsgMainHiddenButton').textContent = '-';
 
@@ -703,6 +705,7 @@ function createPrivateMessageEl (name, parsedMessage) {
 
   // Do this when creating the PM element for this user.
   // Show control window, so open/close buttons are in sync
+  document.getElementById('privMsgHeaderHiddenDiv').removeAttribute('hidden');
   document.getElementById('privMsgMainHiddenDiv').removeAttribute('hidden');
   document.getElementById('privMsgMainHiddenButton').textContent = '-';
 
@@ -893,8 +896,43 @@ document.addEventListener('erase-before-reload', function (event) {
   document.getElementById('privMsgCountDiv').setAttribute('hidden', '');
   document.getElementById('privMsgUnreadExistIcon').setAttribute('hidden', '');
 
+  document.getElementById('privMsgHeaderHiddenDiv').setAttribute('hidden', '');
   document.getElementById('privMsgMainHiddenDiv').setAttribute('hidden', '');
   document.getElementById('privMsgMainHiddenButton').textContent = '+';
+});
+
+// -------------------------
+// [Erase All PM] button handler
+// -------------------------
+document.getElementById('privMsgHeaderHiddenDiv').addEventListener('click', function () {
+  const fetchURL = webServerUrl + '/irc/erase';
+  const fetchOptions = {
+    method: 'POST',
+    headers: {
+      'CSRF-Token': csrfToken,
+      'Content-type': 'application/json',
+      Accept: 'application/json'
+    },
+    body: JSON.stringify({ erase: 'PRIVMSG' })
+  };
+  fetch(fetchURL, fetchOptions)
+    .then((response) => {
+      // console.log(response.status);
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error('Fetch status ' + response.status + ' ' + response.statusText);
+      }
+    })
+    .then((responseJson) => {
+      if (responseJson.error) {
+        showError(responseJson.message);
+      }
+    })
+    .catch((error) => {
+      // console.log(error);
+      showError(error.toString());
+    });
 });
 
 // -------------------------
@@ -916,10 +954,12 @@ document.getElementById('whoisButton').addEventListener('click', function () {
 // -------------------------------------
 document.getElementById('privMsgMainHiddenButton').addEventListener('click', function () {
   if (document.getElementById('privMsgMainHiddenDiv').hasAttribute('hidden')) {
+    document.getElementById('privMsgHeaderHiddenDiv').removeAttribute('hidden');
     document.getElementById('privMsgMainHiddenDiv').removeAttribute('hidden');
     document.getElementById('privMsgMainHiddenButton').textContent = '-';
     document.dispatchEvent(new CustomEvent('priv-msg-show-all', { bubbles: true }));
   } else {
+    document.getElementById('privMsgHeaderHiddenDiv').setAttribute('hidden', '');
     document.getElementById('privMsgMainHiddenDiv').setAttribute('hidden', '');
     document.getElementById('privMsgMainHiddenButton').textContent = '+';
     document.dispatchEvent(new CustomEvent('priv-msg-hide-all', { bubbles: true }));

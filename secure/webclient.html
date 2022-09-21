@@ -411,11 +411,20 @@ a raw command to the IRC server directly.
           </div>
 
           <div class="aa-section-div color-pm" id="privMsgSectionDiv">
-            <div>
-              <button id="privMsgMainHiddenButton">+</button>
-              <span>Private Messages</span>
-              <div class="pm-window-count" id="privMsgWindowCountDiv" hidden>0</div>
-              <div class="message-count" id="privMsgCountDiv" hidden>0</div>
+            <div class='head-flex'>
+              <div class="head-left">
+                <div>
+                  <button id="privMsgMainHiddenButton">+</button>
+                  <span>Private Messages</span>
+                  <div class="pm-window-count" id="privMsgWindowCountDiv" hidden>0</div>
+                  <div class="message-count" id="privMsgCountDiv" hidden>0</div>
+                </div>
+              </div>
+              <div class="head-right">
+                <div id="privMsgHeaderHiddenDiv" hidden>
+                  <button>Erase All PM</button>
+                </div>
+              </div>
             </div>
             <div id="privMsgMainHiddenDiv" hidden>
               <div class="vh10"></div>

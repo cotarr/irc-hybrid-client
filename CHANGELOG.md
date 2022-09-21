@@ -8,8 +8,10 @@ and this project adheres to
 
 ## Next
 
-In the previous versions, the wallops and notice windows included "Clear" buttons used to temporarily blank the content textarea element, however refreshing the cache would restore the previous content. The labels of the buttons have been changed from Clear to "Erase". The Erase buttons send a request to the web server to find and clear related IRC server messages from the message cache, then request all connected web browsers to update the display accordingly.
-The intent is to reduce the number of extraneous windows by deleting old content.
+The general intent of this change is to reduce the number of extraneous panels 
+by providing a mechanism to delete old content form the IRC message cache.
+
+In the previous versions, the wallops, notice, and private message panels included "Clear" buttons used to temporarily blank the content of textarea elements. However refreshing the cache would restore the previous content, causing panels to open. The labels of the buttons have been changed. The [Clear] buttons simply blank content temporarily. The [Erase] buttons send a request to the web server to find and clear related IRC server messages from the message cache, then request all connected web browsers to update the display accordingly.
 
 ### Changed
 
@@ -17,6 +19,7 @@ The intent is to reduce the number of extraneous windows by deleting old content
 - API Change - New target `NOTICE` for /irc/erase endpoint to find and delete NOTICE messages from the default cache.
 - API Change - New target `WALLOPS` for /irc/erase endpoint to find and delete NOTICE messages from the default cache.
 - A new websocket command `CACHEPULL` was defined for transmission over the websocket connection. The web server will send the CACHEPULL command to all connected web browsers each time the cache is modified erasing portions of the cache. In response, all browsers will refresh the cache and update the display textarea elements.
+- API Change - New target `PRIVMSG` for /irc/erase endpoint to find and delete all user PRMVMSG messages from the default cache. IRC channel PRIVMSG messages are not erased.
 - Update some of the postman tests to reflect API changes listed here.
 
 ## [v0.2.18](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.18) 2022-09-19
