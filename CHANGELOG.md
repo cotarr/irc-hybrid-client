@@ -9,7 +9,7 @@ and this project adheres to
 ## Next
 
 The general intent of this change is to reduce the number of extraneous panels 
-by providing a mechanism to delete old content form the IRC message cache.
+by providing a mechanism to delete old content from the IRC message cache.
 
 In the previous versions, the wallops, notice, and private message panels included "Clear" buttons used to temporarily blank the content of textarea elements. However refreshing the cache would restore the previous content, causing panels to open. The labels of the buttons have been changed. The [Clear] buttons simply blank content temporarily. The [Erase] buttons send a request to the web server to find and clear related IRC server messages from the message cache, then request all connected web browsers to update the display accordingly.
 
@@ -20,6 +20,7 @@ In the previous versions, the wallops, notice, and private message panels includ
 - API Change - New target `WALLOPS` for /irc/erase endpoint to find and delete NOTICE messages from the default cache.
 - A new websocket command `CACHEPULL` was defined for transmission over the websocket connection. The web server will send the CACHEPULL command to all connected web browsers each time the cache is modified erasing portions of the cache. In response, all browsers will refresh the cache and update the display textarea elements.
 - API Change - New target `PRIVMSG` for /irc/erase endpoint to find and delete all user PRMVMSG messages from the default cache. IRC channel PRIVMSG messages are not erased.
+- Update the /irc/prune function. In the case where number of individual channel cache buffers is exceeded, messages are cached in the default cache. With this change, these messages are now pruned from the default cache by the /irc/prune route.
 - Update some of the postman tests to reflect API changes listed here.
 
 ## [v0.2.18](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.18) 2022-09-19

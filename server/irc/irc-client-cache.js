@@ -626,8 +626,43 @@
     if ((!(channelStr == null)) && (channelStr.length > 0) &&
       (channelStr !== 'default')) {
       if ((channelStr in cachedArrays) && (channelStr in cachedInPointers)) {
+        // Case of channel message cached in own array buffer
         delete cachedArrays[channelStr];
         delete cachedInPointers[channelStr];
+      } else {
+        // Case of maximum channel buffer count exceeded, and
+        // channel messages were stored in the default cache array
+        if (cachedArrays.default.length === cacheSize) {
+          for (let i = 0; i < cacheSize; i++) {
+            if (!(cachedArrays.default[i] == null)) {
+              // Valid message types:
+              // Note JOIN is special case
+              const validCachedChanMsgs = [
+                'KICK',
+                'MODE',
+                'NOTICE',
+                'PART',
+                'PRIVMSG',
+                'TOPIC',
+                'cachedNICK'.toUpperCase(),
+                'cachedQUIT'.toUpperCase()
+              ];
+              // Line is stored in array as type utf-8 encoded Buffer
+              const lineWords = cachedArrays.default[i].toString('utf8').split(' ');
+              if (lineWords.length >= 4) {
+                if ((validCachedChanMsgs.indexOf(lineWords[2].toUpperCase()) >= 0) &&
+                  (lineWords[3].toLowerCase() === channelStr.toLowerCase())) {
+                  // erase the array element
+                  cachedArrays.default[i] = null;
+                } else if ((lineWords[2].toUpperCase() === 'JOIN') &&
+                (lineWords[3].toLowerCase() === (':' + channelStr.toLowerCase()))) {
+                  // Special case with colon character:  nick!user@host JOIN :#channel
+                  cachedArrays.default[i] = null;
+                }
+              }
+            }
+          }
+        }
       }
     }
   };
