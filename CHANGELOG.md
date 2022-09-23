@@ -6,11 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Next
+## [v0.2.20](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.20) 2022-09-23
 
 ### Changed
 
-- Increased maximum value of credentials.instanceNumber from 100 to 65535. No configuration changes are needed for this change. This is not intended to increase the number of concurrent servers, but rather to allow the instance number to match the port number. This will make debugging of multiple servers easier. The instance number is converted to string and appended to the cookie name. So for example, if you are using port 3000, you can set the instanceNumber to 3000, then the cookie name would be "irc-hybrid-client-3000" matching the port number.
+- Increased maximum value of credentials.instanceNumber from 100 to 65535. No configuration changes are needed for this change. 
+
+This is not intended to increase the number of concurrent servers, but rather to allow the option for the instanceNumber to match the port number. This will make debugging of multiple servers easier. The instanceNumber is a positive integer of type Number. The instanceNumber is converted to a string and appended to the cookie name. For example, if you are using multiple servers on ports 3801 and 3802, you can set the instanceNumbers to 3801 and 3802, then during debugging the cookie names would easy to identify by server by observing the cookie name in the web browser, "irc-hybrid-client-3801". This is optional, and instanceNumber may remain sequential as (1, 2, 3 ... ).
 
 ## [v0.2.19](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.19) 2022-09-21
 
