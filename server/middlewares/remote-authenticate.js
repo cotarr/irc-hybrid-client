@@ -534,7 +534,7 @@
     if (req.session) {
       let cookieName = 'irc-hybrid-client';
       if (('instanceNumber' in credentials) && (Number.isInteger(credentials.instanceNumber)) &&
-        (credentials.instanceNumber >= 0) && (credentials.instanceNumber < 100)) {
+        (credentials.instanceNumber >= 0) && (credentials.instanceNumber < 65536)) {
         cookieName = 'irc-hybrid-client-' + credentials.instanceNumber.toString();
       }
       const cookieOptions = {

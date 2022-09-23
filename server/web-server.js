@@ -77,7 +77,7 @@ if (credentials.enableRemoteLogin) {
 // Also set cookieName in ws-authorize.js, user-authenticate and remote-authenticate.js
 let cookieName = 'irc-hybrid-client';
 if (('instanceNumber' in credentials) && (Number.isInteger(credentials.instanceNumber)) &&
-  (credentials.instanceNumber >= 0) && (credentials.instanceNumber < 100)) {
+  (credentials.instanceNumber >= 0) && (credentials.instanceNumber < 65536)) {
   cookieName = 'irc-hybrid-client-' + credentials.instanceNumber.toString();
 }
 
