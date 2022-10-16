@@ -16,6 +16,7 @@ On DALnet, fixed auto-restart after net-split was not properly detecting the nic
 
 ### Changed
 
+- Update helmet@6.0.0
 - Dev dependencies, updated eslint@8.25.0 including eslint dependencies
 
 ### Changed

@@ -197,7 +197,6 @@ if (credentials.tls) {
 // Cross-Origin-Embedder-Policy: require-corp
 // Cross-Origin-Opener-Policy: same-origin
 // Cross-Origin-Resource-Policy: same-origin
-// Expect-CT: max-age=0
 // Origin-Agent-Cluster: ?1
 // Referrer-Policy: no-referrer
 // Strict-Transport-Security: max-age=15552000; includeSubDomains
