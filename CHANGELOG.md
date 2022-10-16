@@ -12,12 +12,12 @@ and this project adheres to
 
 On DALnet, fixed auto-restart after net-split was not properly detecting the nick collision.
 
-## [v0.2.20](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.20) 2022-09-23
-
 ### Changed
 
-- Update helmet@6.0.0
-- Dev dependencies, updated eslint@8.25.0 including eslint dependencies
+- Update dependencies: helmet@6.0.0, express@4.18.2, express-rate-limit@6.6.0, ws@8.9.0
+- Update dev dependencies: eslint@8.25.0 including eslint dependencies
+
+## [v0.2.20](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.20) 2022-09-23
 
 ### Changed
 
