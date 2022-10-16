@@ -940,8 +940,17 @@
             // These string match may need some adjustment for different type of IRC server.
             //
             if (parsedMessage.params[0].toUpperCase().indexOf('KILL') >= 0) {
-              ircLog.writeIrcLog('KILL detected from IRC server');
-              abortFlag = true;
+              // Case of KILL by IRC server, abort auto-restart
+              // Exceptions:  Nickname Collision
+              if (parsedMessage.params[0].toUpperCase().indexOf('NICK COLLISION') >= 0) {
+                ircLog.writeIrcLog(
+                  'KILL detected from IRC server (Possible net-split nick collision)');
+                // In case of KILL due to nick collision, do not abort auto-reconnect
+              } else {
+                ircLog.writeIrcLog('KILL detected from IRC server');
+                // Else after KILL for unknown reason, disable auto-reconnect
+                abortFlag = true;
+              }
             }
             if (parsedMessage.params[0].toUpperCase().indexOf('ACCESS DENIED') >= 0) {
               ircLog.writeIrcLog('Access denied detected from IRC server');
