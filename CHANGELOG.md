@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Next
+
+### Changed
+
+The keyboard keys to trigger auto-complete for IRC channel text input has been changed.
+In the case of smartphone mode where the "Brief" checkbox is checked, auto-complete 
+can be triggered by either (tab) or (space-space). In the case of desktop browser mode 
+where the "Brief" is not checked, double space is disabled, and auto-complete is 
+triggered only by the (tab) key.
+
 ## [v0.2.21](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.21) 2022-10-16
 
 ### Fixed

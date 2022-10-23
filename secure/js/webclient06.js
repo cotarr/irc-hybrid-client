@@ -379,7 +379,8 @@ function createChannelEl (name) {
   channelAutoCompCBInputEl.setAttribute('type', 'checkbox');
   const channelAutoCompCBTitleEl = document.createElement('span');
   channelAutoCompCBTitleEl.classList.add('channel-cb-span');
-  channelAutoCompCBTitleEl.textContent = 'Auto-complete (tab, space-space)';
+  // Checkbox title updated dynamically to show enabled auto-complete keys
+  channelAutoCompCBTitleEl.textContent = 'Auto-complete';
 
   // button-div
   const channelBottomDiv4El = document.createElement('div');
@@ -509,7 +510,7 @@ function createChannelEl (name) {
     // so that all IRC channels can be summed
     document.dispatchEvent(new CustomEvent('update-channel-count', { bubbles: true }));
   };
-  // Incrfement counter, and show count icon if needed
+  // Increment counter, and show count icon if needed
   function incrementMessageCount () {
     let count = parseInt(channelMessageCounterEl.textContent);
     count++;
@@ -796,8 +797,10 @@ function createChannelEl (name) {
         }
         if (channelMainSectionEl.hasAttribute('brief-enabled')) {
           channelFormatCBInputEl.checked = true;
+          channelAutoCompCBTitleEl.textContent = 'Auto-complete (tab, space-space)';
         } else {
           channelFormatCBInputEl.checked = false;
+          channelAutoCompCBTitleEl.textContent = 'Auto-complete (tab)';
         }
         if (channelMainSectionEl.hasAttribute('auto-comp-enabled')) {
           channelAutoCompCBInputEl.checked = true;
@@ -1037,7 +1040,7 @@ function createChannelEl (name) {
     } else {
       channelMainSectionEl.setAttribute('brief-enabled', '');
     }
-    // updateVisibility();
+    updateVisibility();
 
     // this forces a global update which will refreesh text area
     document.dispatchEvent(new CustomEvent('update-from-cache', { bubbles: true }));
@@ -1200,12 +1203,17 @@ function createChannelEl (name) {
           _autoCompleteInputElement(snippet);
         }
       } else {
-        // following space character, default to channel name
         if (channelInputAreaEl.value.toUpperCase() === '/PART ' + name.toUpperCase() + ' ') {
+          // First auto-completes /PART
+          // Second auto-completes channel name
+          // Third auto-completes program version
           channelInputAreaEl.value += ircState.progName + ' ' + ircState.progVersion;
         } else if (channelInputAreaEl.value.toUpperCase() === '/QUIT ') {
+          // First auto-completes /QUIT
+          // Second auto-completes program version
           channelInputAreaEl.value += ircState.progName + ' ' + ircState.progVersion;
         } else {
+          // Tab auto-completes channel name
           channelInputAreaEl.value += name;
         }
         channelInputAreaEl.value += String.fromCharCode(trailingSpaceKey);
@@ -1214,7 +1222,9 @@ function createChannelEl (name) {
     } // case of tab key
     //
     // Case of space key to autocomplete on space-space
-    if ((e.keyCode) && (e.keyCode === autoCompleteSpaceKey)) {
+    // Auto-complete with space is only active with format: brief
+    if ((e.keyCode) && (e.keyCode === autoCompleteSpaceKey) &&
+      (channelMainSectionEl.hasAttribute('brief-enabled'))) {
       if (channelInputAreaEl.value.length > 0) {
         // if previous characters is space (and this key is space too)
         if (channelInputAreaEl.value.charCodeAt(channelInputAreaEl.value.length - 1) ===
@@ -1229,10 +1239,16 @@ function createChannelEl (name) {
             channelInputAreaEl.value =
               channelInputAreaEl.value.slice(0, channelInputAreaEl.value.length - 1);
             if (channelInputAreaEl.value.toUpperCase() === '/PART ' + name.toUpperCase() + ' ') {
+            // First auto-completes /PART
+            // Second auto-completes channel name
+            // Third auto-completes program version
               channelInputAreaEl.value += ircState.progName + ' ' + ircState.progVersion;
             } else if (channelInputAreaEl.value.toUpperCase() === '/QUIT ') {
+            // First auto-completes /QUIT
+            // Second auto-completes program version
               channelInputAreaEl.value += ircState.progName + ' ' + ircState.progVersion;
             } else {
+              // space auto-completes channel name
               channelInputAreaEl.value += name;
             }
             channelInputAreaEl.value += String.fromCharCode(trailingSpaceKey);

@@ -472,7 +472,7 @@ console.log('createChannelEl: channel already exist');return}const defaultHeight
 ;channelFormatCBInputEl.setAttribute('type','checkbox');const channelFormatCBTitleEl=document.createElement('span');channelFormatCBTitleEl.classList.add('channel-cb-span')
 ;channelFormatCBTitleEl.textContent='Brief';const channelAutoCompCBInputEl=document.createElement('input');channelAutoCompCBInputEl.classList.add('channel-cb-cb')
 ;channelAutoCompCBInputEl.setAttribute('type','checkbox');const channelAutoCompCBTitleEl=document.createElement('span');channelAutoCompCBTitleEl.classList.add('channel-cb-span')
-;channelAutoCompCBTitleEl.textContent='Auto-complete (tab, space-space)';const channelBottomDiv4El=document.createElement('div');channelBottomDiv4El.classList.add('button-div')
+;channelAutoCompCBTitleEl.textContent='Auto-complete';const channelBottomDiv4El=document.createElement('div');channelBottomDiv4El.classList.add('button-div')
 ;const channelBeep1CBInputEl=document.createElement('input');channelBeep1CBInputEl.classList.add('channel-cb-cb');channelBeep1CBInputEl.setAttribute('type','checkbox')
 ;const channelBeep1CBTitleEl=document.createElement('span');channelBeep1CBTitleEl.classList.add('channel-cb-span');channelBeep1CBTitleEl.textContent='Line-beep'
 ;const channelBeep2CBInputEl=document.createElement('input');channelBeep2CBInputEl.classList.add('channel-cb-cb');channelBeep2CBInputEl.setAttribute('type','checkbox')
@@ -535,16 +535,17 @@ channelZoomButtonEl.textContent=zoomOffText;channelTopicDivEl.removeAttribute('h
 ;channelBottomDiv4El.removeAttribute('hidden');channelNamesDisplayEl.removeAttribute('hidden')}
 if(channelMainSectionEl.hasAttribute('beep1-enabled'))channelBeep1CBInputEl.checked=true;else channelBeep1CBInputEl.checked=false
 ;if(channelMainSectionEl.hasAttribute('beep2-enabled'))channelBeep2CBInputEl.checked=true;else channelBeep2CBInputEl.checked=false
-;if(channelMainSectionEl.hasAttribute('beep3-enabled'))channelBeep3CBInputEl.checked=true;else channelBeep3CBInputEl.checked=false
-;if(channelMainSectionEl.hasAttribute('brief-enabled'))channelFormatCBInputEl.checked=true;else channelFormatCBInputEl.checked=false
-;if(channelMainSectionEl.hasAttribute('auto-comp-enabled'))channelAutoCompCBInputEl.checked=true;else channelAutoCompCBInputEl.checked=false}else{channelZoomButtonEl.textContent=zoomOffText
-;channelBottomDivEl.setAttribute('hidden','');channelPruneButtonEl.setAttribute('hidden','');channelJoinButtonEl.setAttribute('hidden','');channelPartButtonEl.setAttribute('hidden','')
-;channelHideButtonEl.textContent='+'}else{channelZoomButtonEl.textContent=zoomOffText;channelBottomDivEl.setAttribute('hidden','');channelPruneButtonEl.setAttribute('hidden','')
-;channelJoinButtonEl.setAttribute('hidden','');channelPartButtonEl.setAttribute('hidden','');channelHideButtonEl.textContent='+'}}function handleChannelZoomButtonElClick(event){
-if(channelMainSectionEl.hasAttribute('zoom')){channelMainSectionEl.removeAttribute('zoom');updateVisibility();channelTextAreaEl.scrollTop=channelTextAreaEl.scrollHeight}else{
-const timestamp=unixTimestamp();const lastZoomObj={timestamp:timestamp,zoomType:'channel',zoomValue:name.toLowerCase()};document.dispatchEvent(new CustomEvent('hide-or-zoom',{bubbles:true,
-detail:lastZoomObj}))}}channelZoomButtonEl.addEventListener('click',handleChannelZoomButtonElClick);function handleShowAllDivs(event){channelMainSectionEl.removeAttribute('zoom')
-;channelMainSectionEl.setAttribute('opened','');updateVisibility()}document.addEventListener('show-all-divs',handleShowAllDivs);function handleHideOrZoom(event){
+;if(channelMainSectionEl.hasAttribute('beep3-enabled'))channelBeep3CBInputEl.checked=true;else channelBeep3CBInputEl.checked=false;if(channelMainSectionEl.hasAttribute('brief-enabled')){
+channelFormatCBInputEl.checked=true;channelAutoCompCBTitleEl.textContent='Auto-complete (tab, space-space)'}else{channelFormatCBInputEl.checked=false
+;channelAutoCompCBTitleEl.textContent='Auto-complete (tab)'}if(channelMainSectionEl.hasAttribute('auto-comp-enabled'))channelAutoCompCBInputEl.checked=true;else channelAutoCompCBInputEl.checked=false
+}else{channelZoomButtonEl.textContent=zoomOffText;channelBottomDivEl.setAttribute('hidden','');channelPruneButtonEl.setAttribute('hidden','');channelJoinButtonEl.setAttribute('hidden','')
+;channelPartButtonEl.setAttribute('hidden','');channelHideButtonEl.textContent='+'}else{channelZoomButtonEl.textContent=zoomOffText;channelBottomDivEl.setAttribute('hidden','')
+;channelPruneButtonEl.setAttribute('hidden','');channelJoinButtonEl.setAttribute('hidden','');channelPartButtonEl.setAttribute('hidden','');channelHideButtonEl.textContent='+'}}
+function handleChannelZoomButtonElClick(event){if(channelMainSectionEl.hasAttribute('zoom')){channelMainSectionEl.removeAttribute('zoom');updateVisibility()
+;channelTextAreaEl.scrollTop=channelTextAreaEl.scrollHeight}else{const timestamp=unixTimestamp();const lastZoomObj={timestamp:timestamp,zoomType:'channel',zoomValue:name.toLowerCase()}
+;document.dispatchEvent(new CustomEvent('hide-or-zoom',{bubbles:true,detail:lastZoomObj}))}}channelZoomButtonEl.addEventListener('click',handleChannelZoomButtonElClick)
+;function handleShowAllDivs(event){channelMainSectionEl.removeAttribute('zoom');channelMainSectionEl.setAttribute('opened','');updateVisibility()}
+document.addEventListener('show-all-divs',handleShowAllDivs);function handleHideOrZoom(event){
 if(event.detail&&event.detail.zoomType&&event.detail.zoomValue&&'channel'===event.detail.zoomType&&event.detail.zoomValue===name.toLowerCase()){
 const index=ircState.channels.indexOf(name.toLowerCase());if(index>=0)if(ircState.channelStates[index].joined){channelMainSectionEl.setAttribute('zoom','')
 ;channelMainSectionEl.setAttribute('opened','');updateVisibility();channelTextAreaEl.scrollTop=channelTextAreaEl.scrollHeight;return}}channelMainSectionEl.removeAttribute('zoom')
@@ -568,7 +569,7 @@ if(channelMainSectionEl.hasAttribute('beep3-enabled'))channelMainSectionEl.remov
 updateLocalStorageBeepEnable();updateVisibility()}channelBeep3CBInputEl.addEventListener('click',handleChannelBeep3CBInputElClick);function handleCancelBeepSounds(event){
 channelMainSectionEl.removeAttribute('beep1-enabled');channelMainSectionEl.removeAttribute('beep2-enabled');channelMainSectionEl.removeAttribute('beep3-enabled')}
 document.addEventListener('cancel-beep-sounds',handleCancelBeepSounds);function handleChannelFormatCBInputElClick(event){
-if(channelMainSectionEl.hasAttribute('brief-enabled'))channelMainSectionEl.removeAttribute('brief-enabled');else channelMainSectionEl.setAttribute('brief-enabled','')
+if(channelMainSectionEl.hasAttribute('brief-enabled'))channelMainSectionEl.removeAttribute('brief-enabled');else channelMainSectionEl.setAttribute('brief-enabled','');updateVisibility()
 ;document.dispatchEvent(new CustomEvent('update-from-cache',{bubbles:true}))}channelFormatCBInputEl.addEventListener('click',handleChannelFormatCBInputElClick)
 ;if(webState.dynamic.bodyClientWidth<mobileBreakpointPx){channelMainSectionEl.setAttribute('brief-enabled','');channelFormatCBInputEl.checked=true}else{
 channelMainSectionEl.removeAttribute('brief-enabled');channelFormatCBInputEl.checked=false}function handleChannelAutoCompCBInputElClick(event){
@@ -598,7 +599,7 @@ let snippet='';const snippetArray=channelInputAreaEl.value.split(' ');if(snippet
 if(e.keyCode===autoCompleteTabKey&&snippet.length>0)_autoCompleteInputElement(snippet)}else{
 if(channelInputAreaEl.value.toUpperCase()==='/PART '+name.toUpperCase()+' ')channelInputAreaEl.value+=ircState.progName+' '+ircState.progVersion;else if('/QUIT '===channelInputAreaEl.value.toUpperCase())channelInputAreaEl.value+=ircState.progName+' '+ircState.progVersion;else channelInputAreaEl.value+=name
 ;channelInputAreaEl.value+=String.fromCharCode(trailingSpaceKey)}e.preventDefault()}
-if(e.keyCode&&e.keyCode===autoCompleteSpaceKey)if(channelInputAreaEl.value.length>0)if(channelInputAreaEl.value.charCodeAt(channelInputAreaEl.value.length-1)===autoCompleteSpaceKey)if(channelInputAreaEl.value.length>1&&channelInputAreaEl.value.charCodeAt(channelInputAreaEl.value.length-2)===autoCompleteSpaceKey){
+if(e.keyCode&&e.keyCode===autoCompleteSpaceKey&&channelMainSectionEl.hasAttribute('brief-enabled'))if(channelInputAreaEl.value.length>0)if(channelInputAreaEl.value.charCodeAt(channelInputAreaEl.value.length-1)===autoCompleteSpaceKey)if(channelInputAreaEl.value.length>1&&channelInputAreaEl.value.charCodeAt(channelInputAreaEl.value.length-2)===autoCompleteSpaceKey){
 channelInputAreaEl.value=channelInputAreaEl.value.slice(0,channelInputAreaEl.value.length-1)
 ;if(channelInputAreaEl.value.toUpperCase()==='/PART '+name.toUpperCase()+' ')channelInputAreaEl.value+=ircState.progName+' '+ircState.progVersion;else if('/QUIT '===channelInputAreaEl.value.toUpperCase())channelInputAreaEl.value+=ircState.progName+' '+ircState.progVersion;else channelInputAreaEl.value+=name
 ;channelInputAreaEl.value+=String.fromCharCode(trailingSpaceKey);e.preventDefault()}else{channelInputAreaEl.value=channelInputAreaEl.value.slice(0,channelInputAreaEl.value.length-1);let snippet=''
