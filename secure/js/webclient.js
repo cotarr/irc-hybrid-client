@@ -274,6 +274,7 @@ function playBeep3Sound () {
 //
 function areBeepsConfigured () {
   let isAnyBeepEnabled = false;
+  // Beeps in channel windows
   let beepEnableChanArray = null;
   beepEnableChanArray = JSON.parse(window.localStorage.getItem('beepEnableChanArray'));
   if ((beepEnableChanArray) &&
@@ -284,6 +285,15 @@ function areBeepsConfigured () {
         if (beepEnableChanArray[i].beep2) isAnyBeepEnabled = true;
         if (beepEnableChanArray[i].beep3) isAnyBeepEnabled = true;
       }
+    }
+  }
+  // Beeps in private message windows
+  let beepEnableObj = null;
+  beepEnableObj = JSON.parse(window.localStorage.getItem('privMsgBeep'));
+  if ((beepEnableObj) &&
+    (typeof beepEnableObj === 'object')) {
+    if (beepEnableObj.beep) {
+      isAnyBeepEnabled = true;
     }
   }
   return isAnyBeepEnabled;
@@ -301,12 +311,12 @@ function userInitiatedAudioPlay () {
   document.getElementById('enableAudioButton').setAttribute('hidden', '');
   // check if beep enabled in window.localStorage
   if (areBeepsConfigured()) {
-    playBeep2Sound();
-    setTimeout(playBeep1Sound, 500);
-    // beep3 not included because it is private message and not auto-eabled.
+    setTimeout(playBeep2Sound, 100);
+    setTimeout(playBeep3Sound, 600);
+    setTimeout(playBeep1Sound, 950);
   }
 } // userInitiatedAudioPlay()
-// click event for buttion in header bar
+// click event for button in header bar
 document.getElementById('enableAudioButton').addEventListener('click', userInitiatedAudioPlay);
 // Show button to enable sound in case browser localStorage has enabled beeps
 if (areBeepsConfigured()) {

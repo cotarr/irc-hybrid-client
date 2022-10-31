@@ -579,6 +579,29 @@ function createPrivateMessageEl (name, parsedMessage) {
   };
   privMsgBeep1CBInputEl.addEventListener('click', handlePrivMsgBeep1CBInputElClick);
 
+  // ----------------------------------
+  // On creating a new PM chat element
+  // initialize the audio line-beep setting
+  //
+  // Note, reloading from cache destroys and creates
+  // new PM elements, and will re-initialize
+  // ----------------------------------
+  function initPrivMsgBeep1CB () {
+    // Check the global setting
+    if (document.getElementById('privMsgSectionDiv').hasAttribute('beep-enabled')) {
+      // case of enabled globally, enable for new/refreshed element
+      privMsgSectionEl.setAttribute('beep1-enabled', '');
+      if (!webState.cacheReloadInProgress) {
+        playBeep3Sound();
+      }
+    } else {
+      // else disabled globally
+      privMsgSectionEl.removeAttribute('beep1-enabled');
+    }
+    updateVisibility();
+  };
+  initPrivMsgBeep1CB();
+
   // -----------------------
   // Cancel all beep sounds
   // -----------------------
@@ -900,6 +923,57 @@ document.addEventListener('erase-before-reload', function (event) {
   document.getElementById('privMsgMainHiddenDiv').setAttribute('hidden', '');
   document.getElementById('privMsgMainHiddenButton').textContent = '+';
 });
+
+// ---------------------------------------------------
+// Load Private Message beep enable from local storage
+// ---------------------------------------------------
+function loadBeepEnable () {
+  // Default disabled
+  document.getElementById('openPmWithBeepCheckbox').checked = false;
+  document.getElementById('privMsgSectionDiv').removeAttribute('beep-enabled');
+
+  let beepEnableObj = null;
+  beepEnableObj = JSON.parse(window.localStorage.getItem('privMsgBeep'));
+  if ((beepEnableObj) &&
+    (typeof beepEnableObj === 'object')) {
+    if (beepEnableObj.beep) {
+      document.getElementById('openPmWithBeepCheckbox').checked = true;
+      document.getElementById('privMsgSectionDiv').setAttribute('beep-enabled', '');
+    } else {
+      document.getElementById('openPmWithBeepCheckbox').checked = false;
+      document.getElementById('privMsgSectionDiv').removeAttribute('beep-enabled');
+    }
+  }
+}
+// do on creating new channel element
+loadBeepEnable();
+
+// ---------------------------------------
+// Event handler for open with line-beep checkbox
+// ---------------------------------------
+function handleOpenWithBeepCBClick (event) {
+  const now = unixTimestamp();
+  if (document.getElementById('openPmWithBeepCheckbox').checked) {
+    document.getElementById('privMsgSectionDiv').setAttribute('beep-enabled', '');
+    window.localStorage.setItem('privMsgBeep', JSON.stringify(
+      {
+        timestamp: now,
+        beep: true
+      }
+    ));
+    playBeep3Sound();
+  } else {
+    document.getElementById('privMsgSectionDiv').removeAttribute('beep-enabled');
+    window.localStorage.setItem('privMsgBeep', JSON.stringify(
+      {
+        timestamp: now,
+        beep: false
+      }
+    ));
+  }
+};
+document.getElementById('openPmWithBeepCheckbox')
+  .addEventListener('click', handleOpenWithBeepCBClick);
 
 // -------------------------
 // [Erase All PM] button handler

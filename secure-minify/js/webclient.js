@@ -47,8 +47,9 @@ beep2.play().catch((function(error){if('NotAllowedError'===error.name);else cons
 beep3.play().catch((function(error){if('NotAllowedError'===error.name)console.info('playBeep3Sound() '+audioPromiseErrorStr);else console.error(error)}));beep3InhibitTimer=5}}
 function areBeepsConfigured(){let isAnyBeepEnabled=false;let beepEnableChanArray=null;beepEnableChanArray=JSON.parse(window.localStorage.getItem('beepEnableChanArray'))
 ;if(beepEnableChanArray&&Array.isArray(beepEnableChanArray))if(beepEnableChanArray.length>0)for(let i=0;i<beepEnableChanArray.length;i++){if(beepEnableChanArray[i].beep1)isAnyBeepEnabled=true
-;if(beepEnableChanArray[i].beep2)isAnyBeepEnabled=true;if(beepEnableChanArray[i].beep3)isAnyBeepEnabled=true}return isAnyBeepEnabled}function userInitiatedAudioPlay(){
-document.getElementById('enableAudioButton').setAttribute('hidden','');if(areBeepsConfigured()){playBeep2Sound();setTimeout(playBeep1Sound,500)}}
+;if(beepEnableChanArray[i].beep2)isAnyBeepEnabled=true;if(beepEnableChanArray[i].beep3)isAnyBeepEnabled=true}let beepEnableObj=null;beepEnableObj=JSON.parse(window.localStorage.getItem('privMsgBeep'))
+;if(beepEnableObj&&'object'===typeof beepEnableObj)if(beepEnableObj.beep)isAnyBeepEnabled=true;return isAnyBeepEnabled}function userInitiatedAudioPlay(){
+document.getElementById('enableAudioButton').setAttribute('hidden','');if(areBeepsConfigured()){setTimeout(playBeep2Sound,100);setTimeout(playBeep3Sound,600);setTimeout(playBeep1Sound,950)}}
 document.getElementById('enableAudioButton').addEventListener('click',userInitiatedAudioPlay);if(areBeepsConfigured())document.getElementById('enableAudioButton').removeAttribute('hidden')
 ;const errorExpireSeconds=5;let errorRemainSeconds=0;function clearError(){const errorDivEl=document.getElementById('errorDiv');errorDivEl.setAttribute('hidden','')
 ;const errorContentDivEl=document.getElementById('errorContentDiv');while(errorContentDivEl.firstChild)errorContentDivEl.removeChild(errorContentDivEl.firstChild);errorRemainSeconds=0}
@@ -783,9 +784,11 @@ document.getElementById('privMsgUnreadExistIcon').addEventListener('click',handl
 ;activityIconInhibitTimer=activityIconInhibitTimerValue}privMsgBottomDivEl.addEventListener('click',handlePrivMsgBottomDivElClick);function updateVisibility(){
 if(privMsgSectionEl.hasAttribute('beep1-enabled'))privMsgBeep1CBInputEl.checked=true;else privMsgBeep1CBInputEl.checked=false}function handlePrivMsgBeep1CBInputElClick(event){
 if(privMsgSectionEl.hasAttribute('beep1-enabled'))privMsgSectionEl.removeAttribute('beep1-enabled');else{privMsgSectionEl.setAttribute('beep1-enabled','');playBeep3Sound()}updateVisibility()}
-privMsgBeep1CBInputEl.addEventListener('click',handlePrivMsgBeep1CBInputElClick);function handleCancelBeepSounds(event){privMsgSectionEl.removeAttribute('beep1-enabled')}
-document.addEventListener('cancel-beep-sounds',handleCancelBeepSounds);function handlePrivateMessage(event){function _addText(text){privMsgTextAreaEl.value+=cleanFormatting(text)+'\n'
-;if(!webState.cacheReloadInProgress)privMsgTextAreaEl.scrollTop=privMsgTextAreaEl.scrollHeight}const parsedMessage=event.detail.parsedMessage
+privMsgBeep1CBInputEl.addEventListener('click',handlePrivMsgBeep1CBInputElClick);function initPrivMsgBeep1CB(){if(document.getElementById('privMsgSectionDiv').hasAttribute('beep-enabled')){
+privMsgSectionEl.setAttribute('beep1-enabled','');if(!webState.cacheReloadInProgress)playBeep3Sound()}else privMsgSectionEl.removeAttribute('beep1-enabled');updateVisibility()}initPrivMsgBeep1CB()
+;function handleCancelBeepSounds(event){privMsgSectionEl.removeAttribute('beep1-enabled')}document.addEventListener('cancel-beep-sounds',handleCancelBeepSounds);function handlePrivateMessage(event){
+function _addText(text){privMsgTextAreaEl.value+=cleanFormatting(text)+'\n';if(!webState.cacheReloadInProgress)privMsgTextAreaEl.scrollTop=privMsgTextAreaEl.scrollHeight}
+const parsedMessage=event.detail.parsedMessage
 ;if(parsedMessage.params[0].toLowerCase()===name.toLowerCase()||parsedMessage.params[0].toLowerCase()!==name.toLowerCase()&&parsedMessage.nick.toLowerCase()===name.toLowerCase())if(privMsgSectionEl.getAttribute('lastDate')!==parsedMessage.datestamp){
 privMsgSectionEl.setAttribute('lastDate',parsedMessage.datestamp);privMsgTextAreaEl.value+='\n=== '+parsedMessage.datestamp+' ===\n\n'}switch(parsedMessage.command){case'PRIVMSG':
 if(parsedMessage.nick===ircState.nickName){if(parsedMessage.params[0].toLowerCase()===name.toLowerCase()){
@@ -831,22 +834,29 @@ _buildPrivateMessageText()}));document.addEventListener('erase-before-reload',(f
 ;document.getElementById('privMsgWindowCountDiv').setAttribute('hidden','');document.getElementById('privMsgCountDiv').textContent='0'
 ;document.getElementById('privMsgCountDiv').setAttribute('hidden','');document.getElementById('privMsgUnreadExistIcon').setAttribute('hidden','')
 ;document.getElementById('privMsgHeaderHiddenDiv').setAttribute('hidden','');document.getElementById('privMsgMainHiddenDiv').setAttribute('hidden','')
-;document.getElementById('privMsgMainHiddenButton').textContent='+'}));document.getElementById('privMsgHeaderHiddenDiv').addEventListener('click',(function(){const fetchURL=webServerUrl+'/irc/erase'
-;const fetchOptions={method:'POST',headers:{'CSRF-Token':csrfToken,'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify({erase:'PRIVMSG'})}
-;fetch(fetchURL,fetchOptions).then(response=>{if(response.ok)return response.json();else throw new Error('Fetch status '+response.status+' '+response.statusText)}).then(responseJson=>{
-if(responseJson.error)showError(responseJson.message)}).catch(error=>{showError(error.toString())})}));document.getElementById('whoisButton').addEventListener('click',(function(){
-if(document.getElementById('pmNickNameInputId').value.length>0){showRawMessageWindow();const message='WHOIS '+document.getElementById('pmNickNameInputId').value;_sendIrcServerMessage(message)
-;showRawMessageWindow()}else showError('Input required')}));document.getElementById('privMsgMainHiddenButton').addEventListener('click',(function(){
-if(document.getElementById('privMsgMainHiddenDiv').hasAttribute('hidden')){document.getElementById('privMsgHeaderHiddenDiv').removeAttribute('hidden')
-;document.getElementById('privMsgMainHiddenDiv').removeAttribute('hidden');document.getElementById('privMsgMainHiddenButton').textContent='-'
-;document.dispatchEvent(new CustomEvent('priv-msg-show-all',{bubbles:true}))}else{document.getElementById('privMsgHeaderHiddenDiv').setAttribute('hidden','')
-;document.getElementById('privMsgMainHiddenDiv').setAttribute('hidden','');document.getElementById('privMsgMainHiddenButton').textContent='+'
-;document.dispatchEvent(new CustomEvent('priv-msg-hide-all',{bubbles:true}))}}));document.addEventListener('update-pm-count',(function(event){let totalCount=0
-;document.querySelectorAll('.pm-count-class').forEach((function(el){totalCount+=parseInt(el.textContent)}));document.getElementById('privMsgCountDiv').textContent=totalCount.toString()
-;if(totalCount>0){document.getElementById('privMsgCountDiv').removeAttribute('hidden');document.getElementById('privMsgUnreadExistIcon').removeAttribute('hidden')}else{
-document.getElementById('privMsgCountDiv').setAttribute('hidden','');document.getElementById('privMsgUnreadExistIcon').setAttribute('hidden','')}}))
-;document.getElementById('closeNoticeButton').addEventListener('click',(function(){webState.noticeOpen=false;updateDivVisibility()}))
-;document.getElementById('noticeEraseButton').addEventListener('click',(function(){document.getElementById('noticeSectionDiv').setAttribute('lastDate','0000-00-00')
+;document.getElementById('privMsgMainHiddenButton').textContent='+'}));function loadBeepEnable(){document.getElementById('openPmWithBeepCheckbox').checked=false
+;document.getElementById('privMsgSectionDiv').removeAttribute('beep-enabled');let beepEnableObj=null;beepEnableObj=JSON.parse(window.localStorage.getItem('privMsgBeep'))
+;if(beepEnableObj&&'object'===typeof beepEnableObj)if(beepEnableObj.beep){document.getElementById('openPmWithBeepCheckbox').checked=true
+;document.getElementById('privMsgSectionDiv').setAttribute('beep-enabled','')}else{document.getElementById('openPmWithBeepCheckbox').checked=false
+;document.getElementById('privMsgSectionDiv').removeAttribute('beep-enabled')}}loadBeepEnable();function handleOpenWithBeepCBClick(event){const now=unixTimestamp()
+;if(document.getElementById('openPmWithBeepCheckbox').checked){document.getElementById('privMsgSectionDiv').setAttribute('beep-enabled','');window.localStorage.setItem('privMsgBeep',JSON.stringify({
+timestamp:now,beep:true}));playBeep3Sound()}else{document.getElementById('privMsgSectionDiv').removeAttribute('beep-enabled');window.localStorage.setItem('privMsgBeep',JSON.stringify({timestamp:now,
+beep:false}))}}document.getElementById('openPmWithBeepCheckbox').addEventListener('click',handleOpenWithBeepCBClick)
+;document.getElementById('privMsgHeaderHiddenDiv').addEventListener('click',(function(){const fetchURL=webServerUrl+'/irc/erase';const fetchOptions={method:'POST',headers:{'CSRF-Token':csrfToken,
+'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify({erase:'PRIVMSG'})};fetch(fetchURL,fetchOptions).then(response=>{
+if(response.ok)return response.json();else throw new Error('Fetch status '+response.status+' '+response.statusText)}).then(responseJson=>{if(responseJson.error)showError(responseJson.message)
+}).catch(error=>{showError(error.toString())})}));document.getElementById('whoisButton').addEventListener('click',(function(){if(document.getElementById('pmNickNameInputId').value.length>0){
+showRawMessageWindow();const message='WHOIS '+document.getElementById('pmNickNameInputId').value;_sendIrcServerMessage(message);showRawMessageWindow()}else showError('Input required')}))
+;document.getElementById('privMsgMainHiddenButton').addEventListener('click',(function(){if(document.getElementById('privMsgMainHiddenDiv').hasAttribute('hidden')){
+document.getElementById('privMsgHeaderHiddenDiv').removeAttribute('hidden');document.getElementById('privMsgMainHiddenDiv').removeAttribute('hidden')
+;document.getElementById('privMsgMainHiddenButton').textContent='-';document.dispatchEvent(new CustomEvent('priv-msg-show-all',{bubbles:true}))}else{
+document.getElementById('privMsgHeaderHiddenDiv').setAttribute('hidden','');document.getElementById('privMsgMainHiddenDiv').setAttribute('hidden','')
+;document.getElementById('privMsgMainHiddenButton').textContent='+';document.dispatchEvent(new CustomEvent('priv-msg-hide-all',{bubbles:true}))}}))
+;document.addEventListener('update-pm-count',(function(event){let totalCount=0;document.querySelectorAll('.pm-count-class').forEach((function(el){totalCount+=parseInt(el.textContent)}))
+;document.getElementById('privMsgCountDiv').textContent=totalCount.toString();if(totalCount>0){document.getElementById('privMsgCountDiv').removeAttribute('hidden')
+;document.getElementById('privMsgUnreadExistIcon').removeAttribute('hidden')}else{document.getElementById('privMsgCountDiv').setAttribute('hidden','')
+;document.getElementById('privMsgUnreadExistIcon').setAttribute('hidden','')}}));document.getElementById('closeNoticeButton').addEventListener('click',(function(){webState.noticeOpen=false
+;updateDivVisibility()}));document.getElementById('noticeEraseButton').addEventListener('click',(function(){document.getElementById('noticeSectionDiv').setAttribute('lastDate','0000-00-00')
 ;document.getElementById('noticeMessageDisplay').setAttribute('rows','5');const fetchURL=webServerUrl+'/irc/erase';const fetchOptions={method:'POST',headers:{'CSRF-Token':csrfToken,
 'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify({erase:'NOTICE'})};fetch(fetchURL,fetchOptions).then(response=>{
 if(response.ok)return response.json();else throw new Error('Fetch status '+response.status+' '+response.statusText)}).then(responseJson=>{if(responseJson.error)showError(responseJson.message)

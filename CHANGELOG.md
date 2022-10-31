@@ -6,6 +6,30 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Next
+
+### Added
+
+The purpose of this change is to provide capability for an audio beep sound when
+a new private message is received prior to opening a private message window.
+
+Previously, the line-beep checkbox in a private message element was initialized to 
+not checked when a new PM was started, or when the cache was reloaded.
+A new checkbox was added to the private message parent element to 
+provide a global setting for the line-beep setting for new private message windows.
+This global setting is persisted to the web browser localStorage.
+
+Note: Refreshing data from message cache will destroy and re-create new PM elements.
+Therefore the line beep will revert to the global setting on reload. This is not optimal.
+However, simply saving a list of private message nick names to the browser localStorage
+may be a privacy issue, and was not implemented intentionally.
+
+The +Audio button which is used as the specified user interaction to enable audio playback 
+was updated to include the private message beep. Otherwise, audio playback is 
+blocked by browser policy until a user interaction occurs.
+
+The /docs folder was updated with screenshot and description.
+
 ## [v0.2.22](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.22) 2022-10-22
 
 ### Changed
