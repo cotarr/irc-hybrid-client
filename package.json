@@ -1,6 +1,6 @@
 {
   "name": "irc-hybrid-client",
-  "version": "0.2.22",
+  "version": "0.2.23",
   "description": "Single user hybrid IRC client using JavaScript front end and Node/Express backend",
   "main": "bin/www",
   "scripts": {
