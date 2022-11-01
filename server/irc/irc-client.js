@@ -928,7 +928,8 @@
       // --------------------------------------------------------------------------
       const options = {
         port: vars.ircState.ircServerPort,
-        host: vars.ircState.ircServerHost
+        host: vars.ircState.ircServerHost,
+        minVersion: 'TLSv1.2'
       };
       options.rejectUnauthorized = vars.ircState.ircTLSVerify;
       if (vars.ircState.ircTLSVerify) {
@@ -988,10 +989,9 @@
 
       const tlsOptions = {
         socket: null,
-        servername: 'door4.cotarr.net',
-        rejectUnauthorized: vars.ircState.ircTLSVerify,
         minVersion: 'TLSv1.2'
       };
+      tlsOptions.rejectUnauthorized = vars.ircState.ircTLSVerify;
       if (tlsOptions.rejectUnauthorized) {
         tlsOptions.servername = vars.ircState.ircServerHost;
       }

@@ -30,6 +30,23 @@ blocked by browser policy until a user interaction occurs.
 
 The /docs folder was updated with screenshot and description.
 
+## Next
+
+### Changed
+
+For TLS connections to IRC server that do not user the socks5 proxy,
+the minimum TLS version has been set to `minVersion: 'TLSv1.2'`. 
+TLS connections using the socks5 proxy were already set to 1.2.
+This was an omission, and it was set to be consistent with TLS minimum version options 
+at other places in this program. If you were previously using TLS 1.1 or earlier,
+this might be a breaking change.
+
+Removed extraneous hard coded hostname in IRC socket TLS verify options for
+the case where TLS is enabled connecting through a socks5 proxy connection.
+This should not be a functional change, because the TLS option had been assigned twice, 
+with the correct value from the server configuration replacing the hardcoded value
+before opening the TLS socket.
+
 ## [v0.2.22](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.22) 2022-10-22
 
 ### Changed
