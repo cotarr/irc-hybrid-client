@@ -919,6 +919,14 @@
         port: vars.ircState.ircServerPort,
         host: vars.ircState.ircServerHost
       };
+      // Options to bind a specific IP address to the IRC connections
+      // Warning, this will block IPV4 or IPV6 that does not
+      // match the family of the specified address.
+      if (('ircSocketLocalAddress' in credentials) &&
+        (typeof credentials.ircSocketLocalAddress === 'string') &&
+        (credentials.ircSocketLocalAddress.length > 0)) {
+        options.localAddress = credentials.ircSocketLocalAddress;
+      }
       ircSocket = net.connect(options);
       _createIrcSocketEventListeners(ircSocket);
     } else if ((vars.ircState.ircTLSEnabled) && (!ircProxyInUse)) {
@@ -934,6 +942,14 @@
       options.rejectUnauthorized = vars.ircState.ircTLSVerify;
       if (vars.ircState.ircTLSVerify) {
         options.servername = vars.ircState.ircServerHost;
+      }
+      // Options to bind a specific IP address to the IRC connections
+      // Warning, this will block IPV4 or IPV6 that does not
+      // match the family of the specified address.
+      if (('ircSocketLocalAddress' in credentials) &&
+        (typeof credentials.ircSocketLocalAddress === 'string') &&
+        (credentials.ircSocketLocalAddress.length > 0)) {
+        options.localAddress = credentials.ircSocketLocalAddress;
       }
       ircSocket = tls.connect(options);
       _createIrcSocketEventListeners(ircSocket);

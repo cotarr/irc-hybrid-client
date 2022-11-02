@@ -6,6 +6,62 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Next
+
+### Added
+
+(Optional) For host machines with multiple IP addresses, the outbound IRC socket may now
+be bound to a specific local IP address. This will be the IP address shown
+to other IRC users who use the /WHOIS command on your nickname.
+
+The intention of this changes is to allow multiple IRC clients on 
+the same server to each use different unique IPV6 address.
+Many commercial VPS servers are capable of multiple IPV6 addresses within a specified range.
+Multiple IPV4 address are less common, but IPV4 will work if configured.
+
+Change:
+
+* Added new property "ircSocketLocalAddress" of type string to credentials.json.
+* To disable the local address, set the property to an empty string.
+
+Comments:
+
+Backward compatibility: No configuration changes are required unless you 
+choose to optionally bind an IP address. If the new property does not exist, outbound IRC socket
+connection will use the interface and IP address provided by the operating system.
+
+Address Family Issue: When an IPV4 or IPV6 address is specified as the IRC socket local address, 
+all connections to IRC servers must use the same IPV4 or IPV6 family.
+Example: an IPV4 local socket may not connect to an IPV6 IRC server.
+Additionally, this may cause an issue for domain names that resolve to both IPV4 and IPV6 addresses.
+Many IRC networks provide family specific IRC domain names, such as `ipv6.dal.net` on DALnet.
+
+Scope:
+
+This change applies to IRC socket connections, both normal (6667) and TLS (6697) that directly 
+connect to IRC servers without using the socks5 proxy configuration. In the case where 
+the socks5 proxy is configured, the local address configuration property is ignored.
+
+This change does not impact the NodeJs web server. When the web server and 
+websocket server are started, they will listen on all configured interfaces.
+Example: A web browser with an IPV4 connection to the irc-hybrid-client can be 
+connected to an IPV6 IRC server using a local IPV6 address bound to the interface.
+
+### Changed
+
+For TLS connections to IRC server that do not user the socks5 proxy,
+the minimum TLS version has been set to `minVersion: 'TLSv1.2'`. 
+TLS connections using the socks5 proxy were already set to 1.2.
+This was an omission, and it was set to be consistent with TLS minimum version options 
+at other places in this program. If you are connecting to an IRC server
+with TLS 1.1 or earlier, this might be a breaking change.
+
+Code clean up: Removed an extraneous hard coded hostname in the IRC socket TLS options for
+the case where TLS is enabled connecting through a socks5 proxy connection.
+This should not be a functional change, because the TLS option had been assigned twice, 
+with the correct value from the server configuration used to replace the erroneous 
+hardcoded value before the TLS socket was connected.
+
 ## [v0.2.23](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.23) 2022-10-31
 
 ### Added
@@ -29,23 +85,6 @@ was updated to include the private message beep. Otherwise, audio playback is
 blocked by browser policy until a user interaction occurs.
 
 The /docs folder was updated with screenshot and description.
-
-## Next
-
-### Changed
-
-For TLS connections to IRC server that do not user the socks5 proxy,
-the minimum TLS version has been set to `minVersion: 'TLSv1.2'`. 
-TLS connections using the socks5 proxy were already set to 1.2.
-This was an omission, and it was set to be consistent with TLS minimum version options 
-at other places in this program. If you were previously using TLS 1.1 or earlier,
-this might be a breaking change.
-
-Removed extraneous hard coded hostname in IRC socket TLS verify options for
-the case where TLS is enabled connecting through a socks5 proxy connection.
-This should not be a functional change, because the TLS option had been assigned twice, 
-with the correct value from the server configuration replacing the hardcoded value
-before opening the TLS socket.
 
 ## [v0.2.22](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.22) 2022-10-22
 
