@@ -47,6 +47,8 @@ websocket server are started, they will listen on all configured interfaces.
 Example: A web browser with an IPV4 connection to the irc-hybrid-client can be 
 connected to an IPV6 IRC server using a local IPV6 address bound to the interface.
 
+Updated /docs with configuration instructions.
+
 ### Changed
 
 For TLS connections to IRC server that do not user the socks5 proxy,

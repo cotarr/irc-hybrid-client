@@ -462,7 +462,8 @@ Enter new password:<blue-example>zuwa79xoJxLJ</blue-example>
     }</yellow-example>
   ],
   "enableRemoteLogin": false,
-  "enableSocks5Proxy": false
+  "enableSocks5Proxy": false,
+  "ircSocketLocalAddress": ""
 }
 </pre></div>
         <p>
@@ -548,6 +549,46 @@ cd ..
           Socks5 socket connections are handled internally using the npm package 
           <a href="https://github.com/mattcg/socks5-client">socks5-client</a>.
         </p>
+
+        <div class="vh-20"></div>
+        <div class="desc-title">
+          IRC Socket Local Address
+        </div>
+        <p>
+          For host machines with multiple IP addresses, the outbound IRC socket may be bound to a specific local IP address.
+          This will be the IP address shown to other IRC users who use the /WHOIS command on your nickname.
+        </p>
+        <p>
+          The intention of this feature is to allow multiple IRC clients on 
+          the same server to each use different unique IPV6 address.
+          Many commercial VPS servers are capable of multiple IPV6 addresses within a specified range.
+          Multiple IPV4 address are less common, but IPV4 will work if configured.
+        </p>
+        <p>
+          When an IPV4 or IPV6 address is specified as the IRC socket local address, 
+          all connections to IRC servers must use the same IPV4 or IPV6 family.
+          It is possible that this may cause an issue for domain names that resolve to both IPV4 and IPV6 addresses.
+          Many IRC networks provide family specific IRC domain names, such as &quot;ipv6.dal.net&quot; on DALnet.
+        </p>
+        <p>
+          The IRC socket local address does not impact the NodeJs web server. When the web server and 
+          websocket server are started, they will listen on all configured interfaces.
+        </p>
+        <p>
+          When the IRC client is configured to use an optional socks5 proxy, the local IP address is ignored.
+        </p>
+        <p>
+          To bind a local IP address to the IRC socket, set the &quot;ircSocketLocalAddress&quot; property
+          to a string value containing a valid IPV4 or IPV6 numeric IP address.
+          This feature is optional and it may be disabled by setting ircSocketLocalAddress to an empty string.
+          For backward compatibility, if the property is not present, the feature is disabled and no error will be generated.
+        </p>
+
+<div class="pre-div"><pre>
+  {
+    "ircSocketLocalAddress": "fc00:10::1000"
+  } 
+  </pre></div>
 
         <div class="vh-20"></div>
         <div class="desc-title">
