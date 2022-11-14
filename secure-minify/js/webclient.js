@@ -436,44 +436,48 @@ message:'Command "/'+parsedCommand.command+'" unknown command.',ircMessage:null}
 inputString:text,originType:'channel',originName:ircState.channelStates[channelIndex].name});textAreaEl.value='';if(commandAction.error){showError(commandAction.message);return}else{
 if(commandAction.ircMessage&&commandAction.ircMessage.length>0)_sendIrcServerMessage(commandAction.ircMessage);return}}if(ircState.ircConnected&&ircState.ircIsAway)setTimeout((function(){
 if(ircState.ircConnected&&ircState.ircIsAway)_sendIrcServerMessage('AWAY')}),1e3);const message='PRIVMSG '+ircState.channelStates[channelIndex].name+' :'+text;_sendIrcServerMessage(message)
-;textAreaEl.value=''}textAreaEl.value=''}const mobileBreakpointPx=600;function createChannelEl(name){if(webState.channels.indexOf(name.toLowerCase())>=0){
-console.log('createChannelEl: channel already exist');return}const defaultHeightInRows='17';webState.channels.push(name.toLowerCase())
-;const initIrcStateIndex=ircState.channels.indexOf(name.toLowerCase());webState.channelStates.push({lastJoined:ircState.channelStates[initIrcStateIndex].joined});let maxNickLength=0
-;const channelIndex=ircState.channels.indexOf(name.toLowerCase());const channelContainerDivEl=document.getElementById('channelContainerDiv');const channelMainSectionEl=document.createElement('div')
-;channelMainSectionEl.classList.add('color-channel');channelMainSectionEl.classList.add('aa-section-div');channelMainSectionEl.setAttribute('lastDate','0000-00-00')
-;const channelTopDivEl=document.createElement('div');channelTopDivEl.classList.add('channel-top-div');channelTopDivEl.classList.add('head-flex');const channelTopLeftDivEl=document.createElement('div')
-;channelTopLeftDivEl.classList.add('head-left');const channelTopSpacerDivEl=document.createElement('div');channelTopSpacerDivEl.classList.add('vh5')
-;const channelTopRightDivEl=document.createElement('div');channelTopRightDivEl.classList.add('head-right');const channelTopRightHidableDivEl=document.createElement('div')
-;channelTopRightHidableDivEl.classList.add('head-right-hidable-div');const channelHideButtonEl=document.createElement('button');channelHideButtonEl.textContent='-'
-;channelHideButtonEl.classList.add('channel-button');const channelNameDivEl=document.createElement('div');channelNameDivEl.textContent=ircState.channelStates[channelIndex].csName
-;channelNameDivEl.classList.add('chan-name-div');const channelBeenKickedIconEl=document.createElement('div');channelBeenKickedIconEl.textContent='Kicked'
-;channelBeenKickedIconEl.classList.add('been-kicked-icon');channelBeenKickedIconEl.setAttribute('hidden','');const channelNickCounterEl=document.createElement('div')
-;channelNickCounterEl.textContent='0';channelNickCounterEl.classList.add('nick-count');const channelMessageCounterEl=document.createElement('div');channelMessageCounterEl.textContent='0'
-;channelMessageCounterEl.classList.add('message-count');channelMessageCounterEl.classList.add('channel-count-class');channelMessageCounterEl.setAttribute('hidden','')
-;const channelTallerButtonEl=document.createElement('button');channelTallerButtonEl.textContent='Taller';channelTallerButtonEl.classList.add('channel-button')
-;const channelNormalButtonEl=document.createElement('button');channelNormalButtonEl.textContent='Normal';channelNormalButtonEl.classList.add('channel-button')
-;const channelClearButtonEl=document.createElement('button');channelClearButtonEl.textContent='Clear';channelClearButtonEl.classList.add('channel-button')
-;const channelBottomDivEl=document.createElement('div');channelBottomDivEl.classList.add('channel-bottom-div');const channelTopicDivEl=document.createElement('div')
-;channelTopicDivEl.textContent=cleanFormatting(ircState.channelStates[channelIndex].topic);channelTopicDivEl.classList.add('chan-topic-div');const channelNamesCharWidth=20
-;const channelNamesDisplayEl=document.createElement('textarea');channelNamesDisplayEl.classList.add('channel-names-display');channelNamesDisplayEl.setAttribute('cols',channelNamesCharWidth.toString())
-;channelNamesDisplayEl.setAttribute('rows',defaultHeightInRows);channelNamesDisplayEl.setAttribute('spellCheck','false');channelNamesDisplayEl.setAttribute('readonly','')
-;const channelTextAreaEl=document.createElement('textarea');const channelTextAreaId='chan'+channelIndex.toString()+'TextAreaId';channelTextAreaEl.id=channelTextAreaId
-;channelTextAreaEl.setAttribute('cols','30');channelTextAreaEl.setAttribute('rows',defaultHeightInRows);channelTextAreaEl.setAttribute('spellCheck','false')
+;textAreaEl.value=''}textAreaEl.value=''}function _splitMultiLinePaste(multiLineContent){if('string'!==typeof multiLineContent)return[];if(0===multiLineContent.length)return[];const outArray=[]
+;const inArray=multiLineContent.split('\n');if(inArray.length>0)for(let i=0;i<inArray.length;i++)if(inArray[i].replace('\r','').length>0)outArray.push(inArray[i].replace('\r',''));return outArray}
+const mobileBreakpointPx=600;function createChannelEl(name){if(webState.channels.indexOf(name.toLowerCase())>=0){console.log('createChannelEl: channel already exist');return}
+const defaultHeightInRows='17';webState.channels.push(name.toLowerCase());const initIrcStateIndex=ircState.channels.indexOf(name.toLowerCase());webState.channelStates.push({
+lastJoined:ircState.channelStates[initIrcStateIndex].joined});let maxNickLength=0;const channelIndex=ircState.channels.indexOf(name.toLowerCase())
+;const channelContainerDivEl=document.getElementById('channelContainerDiv');const channelMainSectionEl=document.createElement('div');channelMainSectionEl.classList.add('color-channel')
+;channelMainSectionEl.classList.add('aa-section-div');channelMainSectionEl.setAttribute('lastDate','0000-00-00');const channelTopDivEl=document.createElement('div')
+;channelTopDivEl.classList.add('channel-top-div');channelTopDivEl.classList.add('head-flex');const channelTopLeftDivEl=document.createElement('div');channelTopLeftDivEl.classList.add('head-left')
+;const channelTopSpacerDivEl=document.createElement('div');channelTopSpacerDivEl.classList.add('vh5');const channelTopRightDivEl=document.createElement('div')
+;channelTopRightDivEl.classList.add('head-right');const channelTopRightHidableDivEl=document.createElement('div');channelTopRightHidableDivEl.classList.add('head-right-hidable-div')
+;const channelHideButtonEl=document.createElement('button');channelHideButtonEl.textContent='-';channelHideButtonEl.classList.add('channel-button');const channelNameDivEl=document.createElement('div')
+;channelNameDivEl.textContent=ircState.channelStates[channelIndex].csName;channelNameDivEl.classList.add('chan-name-div');const channelBeenKickedIconEl=document.createElement('div')
+;channelBeenKickedIconEl.textContent='Kicked';channelBeenKickedIconEl.classList.add('been-kicked-icon');channelBeenKickedIconEl.setAttribute('hidden','')
+;const channelNickCounterEl=document.createElement('div');channelNickCounterEl.textContent='0';channelNickCounterEl.classList.add('nick-count')
+;const channelMessageCounterEl=document.createElement('div');channelMessageCounterEl.textContent='0';channelMessageCounterEl.classList.add('message-count')
+;channelMessageCounterEl.classList.add('channel-count-class');channelMessageCounterEl.setAttribute('hidden','');const channelTallerButtonEl=document.createElement('button')
+;channelTallerButtonEl.textContent='Taller';channelTallerButtonEl.classList.add('channel-button');const channelNormalButtonEl=document.createElement('button')
+;channelNormalButtonEl.textContent='Normal';channelNormalButtonEl.classList.add('channel-button');const channelClearButtonEl=document.createElement('button');channelClearButtonEl.textContent='Clear'
+;channelClearButtonEl.classList.add('channel-button');const channelBottomDivEl=document.createElement('div');channelBottomDivEl.classList.add('channel-bottom-div')
+;const channelTopicDivEl=document.createElement('div');channelTopicDivEl.textContent=cleanFormatting(ircState.channelStates[channelIndex].topic);channelTopicDivEl.classList.add('chan-topic-div')
+;const channelNamesCharWidth=20;const channelNamesDisplayEl=document.createElement('textarea');channelNamesDisplayEl.classList.add('channel-names-display')
+;channelNamesDisplayEl.setAttribute('cols',channelNamesCharWidth.toString());channelNamesDisplayEl.setAttribute('rows',defaultHeightInRows);channelNamesDisplayEl.setAttribute('spellCheck','false')
+;channelNamesDisplayEl.setAttribute('readonly','');const channelTextAreaEl=document.createElement('textarea');const channelTextAreaId='chan'+channelIndex.toString()+'TextAreaId'
+;channelTextAreaEl.id=channelTextAreaId;channelTextAreaEl.setAttribute('cols','30');channelTextAreaEl.setAttribute('rows',defaultHeightInRows);channelTextAreaEl.setAttribute('spellCheck','false')
 ;channelTextAreaEl.setAttribute('readonly','');const channelBottomDiv1El=document.createElement('div');channelBottomDiv1El.classList.add('button-div')
 ;const channelInputAreaEl=document.createElement('textarea');const channelInputAreaId='chan'+channelIndex.toString()+'InputInputId';channelInputAreaEl.id=channelInputAreaId
 ;channelInputAreaEl.setAttribute('cols','120');channelInputAreaEl.setAttribute('rows','1');channelInputAreaEl.classList.add('va-middle');channelInputAreaEl.classList.add('rm5')
 ;const channelSendButtonEl=document.createElement('button');channelSendButtonEl.textContent='Send';channelSendButtonEl.classList.add('va-middle')
-;const channelBottomDiv2El=document.createElement('div');channelBottomDiv2El.classList.add('button-div');const channelJoinButtonEl=document.createElement('button')
+;const channelBottomDiv2El=document.createElement('div');channelBottomDiv2El.setAttribute('hidden','');channelBottomDiv2El.classList.add('button-div')
+;const channelMultiLineSendSpanEl=document.createElement('span');channelMultiLineSendSpanEl.classList.add('channel-button');channelMultiLineSendSpanEl.textContent='Clipboard (0 lines)'
+;const channelMultiLineSendButtonEl=document.createElement('button');channelMultiLineSendButtonEl.classList.add('channel-button');channelMultiLineSendButtonEl.textContent='Send as multi-line'
+;const channelBottomDiv3El=document.createElement('div');channelBottomDiv3El.classList.add('button-div');const channelJoinButtonEl=document.createElement('button')
 ;channelJoinButtonEl.textContent='Join';channelJoinButtonEl.classList.add('channel-button');const channelPruneButtonEl=document.createElement('button');channelPruneButtonEl.textContent='Prune'
 ;channelPruneButtonEl.classList.add('channel-button');const channelPartButtonEl=document.createElement('button');channelPartButtonEl.textContent='Leave'
 ;channelPartButtonEl.classList.add('channel-button');const channelZoomButtonEl=document.createElement('button');const zoomOffText='Zoom';const zoomOnText='Un-zoom'
 ;channelZoomButtonEl.textContent=zoomOffText;channelZoomButtonEl.classList.add('channel-button');const channelRefreshButtonEl=document.createElement('button')
-;channelRefreshButtonEl.textContent='Refresh';channelRefreshButtonEl.classList.add('channel-button');const channelBottomDiv3El=document.createElement('div')
-;channelBottomDiv3El.classList.add('button-div');const channelFormatCBInputEl=document.createElement('input');channelFormatCBInputEl.classList.add('channel-cb-cb')
+;channelRefreshButtonEl.textContent='Refresh';channelRefreshButtonEl.classList.add('channel-button');const channelBottomDiv4El=document.createElement('div')
+;channelBottomDiv4El.classList.add('button-div');const channelFormatCBInputEl=document.createElement('input');channelFormatCBInputEl.classList.add('channel-cb-cb')
 ;channelFormatCBInputEl.setAttribute('type','checkbox');const channelFormatCBTitleEl=document.createElement('span');channelFormatCBTitleEl.classList.add('channel-cb-span')
 ;channelFormatCBTitleEl.textContent='Brief';const channelAutoCompCBInputEl=document.createElement('input');channelAutoCompCBInputEl.classList.add('channel-cb-cb')
 ;channelAutoCompCBInputEl.setAttribute('type','checkbox');const channelAutoCompCBTitleEl=document.createElement('span');channelAutoCompCBTitleEl.classList.add('channel-cb-span')
-;channelAutoCompCBTitleEl.textContent='Auto-complete';const channelBottomDiv4El=document.createElement('div');channelBottomDiv4El.classList.add('button-div')
+;channelAutoCompCBTitleEl.textContent='Auto-complete';const channelBottomDiv5El=document.createElement('div');channelBottomDiv5El.classList.add('button-div')
 ;const channelBeep1CBInputEl=document.createElement('input');channelBeep1CBInputEl.classList.add('channel-cb-cb');channelBeep1CBInputEl.setAttribute('type','checkbox')
 ;const channelBeep1CBTitleEl=document.createElement('span');channelBeep1CBTitleEl.classList.add('channel-cb-span');channelBeep1CBTitleEl.textContent='Line-beep'
 ;const channelBeep2CBInputEl=document.createElement('input');channelBeep2CBInputEl.classList.add('channel-cb-cb');channelBeep2CBInputEl.setAttribute('type','checkbox')
@@ -484,14 +488,15 @@ console.log('createChannelEl: channel already exist');return}const defaultHeight
 ;channelTopLeftDivEl.appendChild(channelNickCounterEl);channelTopLeftDivEl.appendChild(channelMessageCounterEl);channelTopRightHidableDivEl.appendChild(channelJoinButtonEl)
 ;channelTopRightHidableDivEl.appendChild(channelPruneButtonEl);channelTopRightHidableDivEl.appendChild(channelPartButtonEl);channelTopRightHidableDivEl.appendChild(channelZoomButtonEl)
 ;channelTopRightDivEl.appendChild(channelTopRightHidableDivEl);channelTopDivEl.appendChild(channelTopLeftDivEl);channelTopDivEl.appendChild(channelTopRightDivEl)
-;channelBottomDiv1El.appendChild(channelInputAreaEl);channelBottomDiv1El.appendChild(channelSendButtonEl);channelBottomDiv2El.appendChild(channelRefreshButtonEl)
-;channelBottomDiv2El.appendChild(channelClearButtonEl);channelBottomDiv2El.appendChild(channelTallerButtonEl);channelBottomDiv2El.appendChild(channelNormalButtonEl)
-;channelBottomDiv3El.appendChild(channelFormatCBInputEl);channelBottomDiv3El.appendChild(channelFormatCBTitleEl);channelBottomDiv3El.appendChild(channelAutoCompCBInputEl)
-;channelBottomDiv3El.appendChild(channelAutoCompCBTitleEl);channelBottomDiv4El.appendChild(channelBeep1CBInputEl);channelBottomDiv4El.appendChild(channelBeep1CBTitleEl)
-;channelBottomDiv4El.appendChild(channelBeep2CBInputEl);channelBottomDiv4El.appendChild(channelBeep2CBTitleEl);channelBottomDiv4El.appendChild(channelBeep3CBInputEl)
-;channelBottomDiv4El.appendChild(channelBeep3CBTitleEl);channelBottomDivEl.appendChild(channelTopicDivEl);channelBottomDivEl.appendChild(channelNamesDisplayEl)
-;channelBottomDivEl.appendChild(channelTextAreaEl);channelBottomDivEl.appendChild(channelBottomDiv1El);channelBottomDivEl.appendChild(channelBottomDiv2El)
-;channelBottomDivEl.appendChild(channelBottomDiv3El);channelBottomDivEl.appendChild(channelBottomDiv4El);channelMainSectionEl.appendChild(channelTopDivEl)
+;channelBottomDiv1El.appendChild(channelInputAreaEl);channelBottomDiv1El.appendChild(channelSendButtonEl);channelBottomDiv2El.appendChild(channelMultiLineSendSpanEl)
+;channelBottomDiv2El.appendChild(channelMultiLineSendButtonEl);channelBottomDiv3El.appendChild(channelRefreshButtonEl);channelBottomDiv3El.appendChild(channelClearButtonEl)
+;channelBottomDiv3El.appendChild(channelTallerButtonEl);channelBottomDiv3El.appendChild(channelNormalButtonEl);channelBottomDiv4El.appendChild(channelFormatCBInputEl)
+;channelBottomDiv4El.appendChild(channelFormatCBTitleEl);channelBottomDiv4El.appendChild(channelAutoCompCBInputEl);channelBottomDiv4El.appendChild(channelAutoCompCBTitleEl)
+;channelBottomDiv5El.appendChild(channelBeep1CBInputEl);channelBottomDiv5El.appendChild(channelBeep1CBTitleEl);channelBottomDiv5El.appendChild(channelBeep2CBInputEl)
+;channelBottomDiv5El.appendChild(channelBeep2CBTitleEl);channelBottomDiv5El.appendChild(channelBeep3CBInputEl);channelBottomDiv5El.appendChild(channelBeep3CBTitleEl)
+;channelBottomDivEl.appendChild(channelTopicDivEl);channelBottomDivEl.appendChild(channelNamesDisplayEl);channelBottomDivEl.appendChild(channelTextAreaEl)
+;channelBottomDivEl.appendChild(channelBottomDiv1El);channelBottomDivEl.appendChild(channelBottomDiv2El);channelBottomDivEl.appendChild(channelBottomDiv3El)
+;channelBottomDivEl.appendChild(channelBottomDiv4El);channelBottomDivEl.appendChild(channelBottomDiv5El);channelMainSectionEl.appendChild(channelTopDivEl)
 ;channelMainSectionEl.appendChild(channelTopSpacerDivEl);channelMainSectionEl.appendChild(channelBottomDivEl)
 ;if(channelContainerDivEl.firstChild)channelContainerDivEl.insertBefore(channelMainSectionEl,channelContainerDivEl.firstChild);else channelContainerDivEl.appendChild(channelMainSectionEl)
 ;let activityIconInhibitTimer=0;const channelIntervalTimer=setInterval((function(){if(activityIconInhibitTimer>0)activityIconInhibitTimer--}),1e3)
@@ -514,11 +519,22 @@ Accept:'application/json'},body:JSON.stringify({channel:name})};fetch(fetchURL,f
 if(response.ok)return response.json();else throw new Error('Fetch status '+response.status+' '+response.statusText)}).then(responseJson=>{if(responseJson.error)showError(responseJson.message)
 }).catch(error=>{console.log(error)})}}channelPruneButtonEl.addEventListener('click',handleChannelPruneButtonElClick);function handleChannelRefreshButtonElClick(event){
 if(!webState.cacheReloadInProgress)document.dispatchEvent(new CustomEvent('update-from-cache',{bubbles:true}))}channelRefreshButtonEl.addEventListener('click',handleChannelRefreshButtonElClick)
-;function handleChannelSendButtonElClick(event){_sendTextToChannel(channelIndex,channelInputAreaEl);channelInputAreaEl.focus();resetMessageCount()
-;activityIconInhibitTimer=activityIconInhibitTimerValue}channelSendButtonEl.addEventListener('click',handleChannelSendButtonElClick);function handleChannelInputAreaElInput(event){
+;function handleChannelInputAreaElPaste(event){if(_splitMultiLinePaste(event.clipboardData.getData('text')).length>1){
+channelMultiLineSendSpanEl.textContent='Clipboard ('+_splitMultiLinePaste(event.clipboardData.getData('text')).length+' lines)';channelBottomDiv2El.removeAttribute('hidden')}}
+channelInputAreaEl.addEventListener('paste',handleChannelInputAreaElPaste);function handleMultiLineSendButtonClick(event){const multiLineArray=_splitMultiLinePaste(channelInputAreaEl.value)
+;if(multiLineArray.length>100){channelBottomDiv2El.setAttribute('hidden','');channelInputAreaEl.value='';showError('Maximum multi-line clipboard paste 100 Lines')}else{
+const lastIrcConnect=ircState.times.ircConnect;const lastWebConnect=webState.times.webConnect;let abortedFlag=false;const delayIntervalMs=2e3;let delayMs=0;if(multiLineArray.length>0){
+channelInputAreaEl.value=multiLineArray[0];for(let i=0;i<multiLineArray.length;i++){delayMs+=delayIntervalMs;setTimeout((function(){let okToSend=false
+;if(ircState.ircConnected&&lastIrcConnect===ircState.times.ircConnect&&lastWebConnect===webState.times.webConnect&&!abortedFlag)okToSend=true;if(okToSend){
+const index=ircState.channels.indexOf(name.toLowerCase());if(index>=0)if(!ircState.channelStates[index].joined)okToSend=false;if(!channelMainSectionEl.hasAttribute('opened'))okToSend=false}
+if(!okToSend)abortedFlag=true;else{const message='PRIVMSG '+ircState.channelStates[channelIndex].name+' :'+multiLineArray[i];_sendIrcServerMessage(message)
+;if(i!==multiLineArray.length-1)channelInputAreaEl.value=multiLineArray[i+1];else channelInputAreaEl.value=''}}),delayMs)}channelBottomDiv2El.setAttribute('hidden','')
+}else channelBottomDiv2El.setAttribute('hidden','')}}channelMultiLineSendButtonEl.addEventListener('click',handleMultiLineSendButtonClick);function handleChannelSendButtonElClick(event){
+_sendTextToChannel(channelIndex,channelInputAreaEl);channelInputAreaEl.focus();resetMessageCount();activityIconInhibitTimer=activityIconInhibitTimerValue;channelBottomDiv2El.setAttribute('hidden','')}
+channelSendButtonEl.addEventListener('click',handleChannelSendButtonElClick);function handleChannelInputAreaElInput(event){
 if('insertText'===event.inputType&&null===event.data||'insertLineBreak'===event.inputType){stripOneCrLfFromElement(channelInputAreaEl);_sendTextToChannel(channelIndex,channelInputAreaEl)
-;resetMessageCount();activityIconInhibitTimer=activityIconInhibitTimerValue}}channelInputAreaEl.addEventListener('input',handleChannelInputAreaElInput);function handleChannelBottomDivElClick(event){
-resetMessageCount();activityIconInhibitTimer=activityIconInhibitTimerValue}channelBottomDivEl.addEventListener('click',handleChannelBottomDivElClick)
+;resetMessageCount();activityIconInhibitTimer=activityIconInhibitTimerValue;channelBottomDiv2El.setAttribute('hidden','')}}channelInputAreaEl.addEventListener('input',handleChannelInputAreaElInput)
+;function handleChannelBottomDivElClick(event){resetMessageCount();activityIconInhibitTimer=activityIconInhibitTimerValue}channelBottomDivEl.addEventListener('click',handleChannelBottomDivElClick)
 ;function handleChannelMessageCounterElClick(event){resetMessageCount();activityIconInhibitTimer=activityIconInhibitTimerValue}
 channelMessageCounterEl.addEventListener('click',handleChannelMessageCounterElClick);function handleChannelUnreadCountDivClick(){resetMessageCount()}
 document.getElementById('channelUnreadCountDiv').addEventListener('click',handleChannelUnreadCountDivClick);function handleChannelUnreadExistIconClick(){resetMessageCount()}
@@ -528,25 +544,25 @@ channelTopicDivEl.textContent=cleanFormatting(ircState.channelStates[index].topi
 ;channelInputAreaEl.removeAttribute('disabled');channelSendButtonEl.removeAttribute('disabled');channelJoinButtonEl.setAttribute('hidden','');channelPruneButtonEl.setAttribute('hidden','')
 ;channelPartButtonEl.removeAttribute('hidden')}else{channelNamesDisplayEl.setAttribute('disabled','');channelTextAreaEl.setAttribute('disabled','');channelInputAreaEl.setAttribute('disabled','')
 ;channelSendButtonEl.setAttribute('disabled','');channelJoinButtonEl.removeAttribute('hidden');channelPruneButtonEl.removeAttribute('hidden');channelPartButtonEl.setAttribute('hidden','')
-;channelTopicDivEl.removeAttribute('hidden');channelBottomDiv2El.removeAttribute('hidden');channelBottomDiv3El.removeAttribute('hidden');channelBottomDiv4El.removeAttribute('hidden')
-;channelNamesDisplayEl.removeAttribute('hidden')}if(channelMainSectionEl.hasAttribute('zoom')){channelZoomButtonEl.textContent=zoomOnText;channelTopicDivEl.setAttribute('hidden','')
-;channelBottomDiv2El.setAttribute('hidden','');channelBottomDiv3El.setAttribute('hidden','');channelBottomDiv4El.setAttribute('hidden','')
+;channelTopicDivEl.removeAttribute('hidden');channelBottomDiv2El.setAttribute('hidden','');channelBottomDiv3El.removeAttribute('hidden');channelBottomDiv4El.removeAttribute('hidden')
+;channelBottomDiv5El.removeAttribute('hidden');channelNamesDisplayEl.removeAttribute('hidden')}if(channelMainSectionEl.hasAttribute('zoom')){channelZoomButtonEl.textContent=zoomOnText
+;channelTopicDivEl.setAttribute('hidden','');channelBottomDiv3El.setAttribute('hidden','');channelBottomDiv4El.setAttribute('hidden','');channelBottomDiv5El.setAttribute('hidden','')
 ;if(webState.dynamic.bodyClientWidth>mobileBreakpointPx)channelNamesDisplayEl.removeAttribute('hidden');else channelNamesDisplayEl.setAttribute('hidden','')}else{
-channelZoomButtonEl.textContent=zoomOffText;channelTopicDivEl.removeAttribute('hidden');channelBottomDiv2El.removeAttribute('hidden');channelBottomDiv3El.removeAttribute('hidden')
-;channelBottomDiv4El.removeAttribute('hidden');channelNamesDisplayEl.removeAttribute('hidden')}
+channelZoomButtonEl.textContent=zoomOffText;channelTopicDivEl.removeAttribute('hidden');channelBottomDiv3El.removeAttribute('hidden');channelBottomDiv4El.removeAttribute('hidden')
+;channelBottomDiv5El.removeAttribute('hidden');channelNamesDisplayEl.removeAttribute('hidden')}
 if(channelMainSectionEl.hasAttribute('beep1-enabled'))channelBeep1CBInputEl.checked=true;else channelBeep1CBInputEl.checked=false
 ;if(channelMainSectionEl.hasAttribute('beep2-enabled'))channelBeep2CBInputEl.checked=true;else channelBeep2CBInputEl.checked=false
 ;if(channelMainSectionEl.hasAttribute('beep3-enabled'))channelBeep3CBInputEl.checked=true;else channelBeep3CBInputEl.checked=false;if(channelMainSectionEl.hasAttribute('brief-enabled')){
 channelFormatCBInputEl.checked=true;channelAutoCompCBTitleEl.textContent='Auto-complete (tab, space-space)'}else{channelFormatCBInputEl.checked=false
 ;channelAutoCompCBTitleEl.textContent='Auto-complete (tab)'}if(channelMainSectionEl.hasAttribute('auto-comp-enabled'))channelAutoCompCBInputEl.checked=true;else channelAutoCompCBInputEl.checked=false
 }else{channelZoomButtonEl.textContent=zoomOffText;channelBottomDivEl.setAttribute('hidden','');channelPruneButtonEl.setAttribute('hidden','');channelJoinButtonEl.setAttribute('hidden','')
-;channelPartButtonEl.setAttribute('hidden','');channelHideButtonEl.textContent='+'}else{channelZoomButtonEl.textContent=zoomOffText;channelBottomDivEl.setAttribute('hidden','')
-;channelPruneButtonEl.setAttribute('hidden','');channelJoinButtonEl.setAttribute('hidden','');channelPartButtonEl.setAttribute('hidden','');channelHideButtonEl.textContent='+'}}
-function handleChannelZoomButtonElClick(event){if(channelMainSectionEl.hasAttribute('zoom')){channelMainSectionEl.removeAttribute('zoom');updateVisibility()
-;channelTextAreaEl.scrollTop=channelTextAreaEl.scrollHeight}else{const timestamp=unixTimestamp();const lastZoomObj={timestamp:timestamp,zoomType:'channel',zoomValue:name.toLowerCase()}
-;document.dispatchEvent(new CustomEvent('hide-or-zoom',{bubbles:true,detail:lastZoomObj}))}}channelZoomButtonEl.addEventListener('click',handleChannelZoomButtonElClick)
-;function handleShowAllDivs(event){channelMainSectionEl.removeAttribute('zoom');channelMainSectionEl.setAttribute('opened','');updateVisibility()}
-document.addEventListener('show-all-divs',handleShowAllDivs);function handleHideOrZoom(event){
+;channelPartButtonEl.setAttribute('hidden','');channelBottomDiv2El.setAttribute('hidden','');channelHideButtonEl.textContent='+'}else{channelZoomButtonEl.textContent=zoomOffText
+;channelBottomDivEl.setAttribute('hidden','');channelPruneButtonEl.setAttribute('hidden','');channelJoinButtonEl.setAttribute('hidden','');channelPartButtonEl.setAttribute('hidden','')
+;channelBottomDiv2El.setAttribute('hidden','');channelHideButtonEl.textContent='+'}}function handleChannelZoomButtonElClick(event){if(channelMainSectionEl.hasAttribute('zoom')){
+channelMainSectionEl.removeAttribute('zoom');updateVisibility();channelTextAreaEl.scrollTop=channelTextAreaEl.scrollHeight}else{const timestamp=unixTimestamp();const lastZoomObj={timestamp:timestamp,
+zoomType:'channel',zoomValue:name.toLowerCase()};document.dispatchEvent(new CustomEvent('hide-or-zoom',{bubbles:true,detail:lastZoomObj}))}}
+channelZoomButtonEl.addEventListener('click',handleChannelZoomButtonElClick);function handleShowAllDivs(event){channelMainSectionEl.removeAttribute('zoom')
+;channelMainSectionEl.setAttribute('opened','');updateVisibility()}document.addEventListener('show-all-divs',handleShowAllDivs);function handleHideOrZoom(event){
 if(event.detail&&event.detail.zoomType&&event.detail.zoomValue&&'channel'===event.detail.zoomType&&event.detail.zoomValue===name.toLowerCase()){
 const index=ircState.channels.indexOf(name.toLowerCase());if(index>=0)if(ircState.channelStates[index].joined){channelMainSectionEl.setAttribute('zoom','')
 ;channelMainSectionEl.setAttribute('opened','');updateVisibility();channelTextAreaEl.scrollTop=channelTextAreaEl.scrollHeight;return}}channelMainSectionEl.removeAttribute('zoom')
@@ -626,7 +642,8 @@ let checkNick=ircState.channelStates[channelIndex].names[i].toLowerCase();if(nic
 ;channelNormalButtonEl.removeEventListener('click',handleChannelNormalButtonElClick);channelClearButtonEl.removeEventListener('click',handleChannelClearButtonElClick)
 ;channelJoinButtonEl.removeEventListener('click',handleChannelJoinButtonElClick);channelPartButtonEl.removeEventListener('click',handleChannelPartButtonElClick)
 ;channelPruneButtonEl.removeEventListener('click',handleChannelPruneButtonElClick);channelRefreshButtonEl.removeEventListener('click',handleChannelRefreshButtonElClick)
-;channelSendButtonEl.removeEventListener('click',handleChannelSendButtonElClick);channelInputAreaEl.removeEventListener('input',handleChannelInputAreaElInput)
+;channelSendButtonEl.removeEventListener('click',handleChannelSendButtonElClick);channelMultiLineSendButtonEl.removeEventListener('click',handleMultiLineSendButtonClick)
+;channelInputAreaEl.removeEventListener('input',handleChannelInputAreaElInput);channelInputAreaEl.removeEventListener('paste',handleChannelInputAreaElPaste)
 ;channelBottomDivEl.removeEventListener('click',handleChannelBottomDivElClick);channelMessageCounterEl.removeEventListener('click',handleChannelMessageCounterElClick)
 ;document.getElementById('channelUnreadCountDiv').removeEventListener('click',handleChannelUnreadCountDivClick)
 ;document.getElementById('channelUnreadExistIcon').removeEventListener('click',handleChannelUnreadExistIconClick);channelZoomButtonEl.removeEventListener('click',handleChannelZoomButtonElClick)
@@ -738,18 +755,22 @@ console.log('createPrivateMessageEl: Private message element already exist');ret
 ;privMsgNormalButtonEl.classList.add('channel-button');const privMsgClearButtonEl=document.createElement('button');privMsgClearButtonEl.textContent='Clear'
 ;privMsgClearButtonEl.classList.add('channel-button');const privMsgBottomDivEl=document.createElement('div');const privMsgTextAreaEl=document.createElement('textarea')
 ;const privMsgTextAreaId='privMsg'+privMsgIndex.toString()+'TextAreaId';privMsgTextAreaEl.id=privMsgTextAreaId;privMsgTextAreaEl.setAttribute('cols','120');privMsgTextAreaEl.setAttribute('rows','6')
-;privMsgTextAreaEl.setAttribute('spellCheck','false');privMsgTextAreaEl.setAttribute('readonly','');const privMsgButtonDiv1El=document.createElement('div')
-;privMsgButtonDiv1El.classList.add('button-div');const privMsgInputAreaEl=document.createElement('textarea');const privMsgInputAreaId='privMsg'+privMsgIndex.toString()+'InputAreaId'
+;privMsgTextAreaEl.setAttribute('spellCheck','false');privMsgTextAreaEl.setAttribute('readonly','');const privMsgBottomDiv1El=document.createElement('div')
+;privMsgBottomDiv1El.classList.add('button-div');const privMsgInputAreaEl=document.createElement('textarea');const privMsgInputAreaId='privMsg'+privMsgIndex.toString()+'InputAreaId'
 ;privMsgInputAreaEl.id=privMsgInputAreaId;privMsgInputAreaEl.classList.add('va-middle');privMsgInputAreaEl.classList.add('rm5');privMsgInputAreaEl.setAttribute('cols','120')
 ;privMsgInputAreaEl.setAttribute('rows','1');const privMsgSendButtonEl=document.createElement('button');privMsgSendButtonEl.textContent='Send';privMsgSendButtonEl.classList.add('va-middle')
+;const privMsgBottomDiv2El=document.createElement('div');privMsgBottomDiv2El.setAttribute('hidden','');privMsgBottomDiv2El.classList.add('button-div')
+;const privMsgMultiLineSendSpanEl=document.createElement('span');privMsgMultiLineSendSpanEl.classList.add('privMsg-button');privMsgMultiLineSendSpanEl.textContent='Clipboard (0 lines)'
+;const privMsgMultiLineSendButtonEl=document.createElement('button');privMsgMultiLineSendButtonEl.classList.add('privMsg-button');privMsgMultiLineSendButtonEl.textContent='Send as multi-line'
 ;const privMsgBottomDiv4El=document.createElement('div');privMsgBottomDiv4El.classList.add('button-div');const privMsgBeep1CBInputEl=document.createElement('input')
 ;privMsgBeep1CBInputEl.classList.add('pm-cb-cb');privMsgBeep1CBInputEl.setAttribute('type','checkbox');const privMsgBeep1CBTitleEl=document.createElement('span')
 ;privMsgBeep1CBTitleEl.classList.add('pm-cb-span');privMsgBeep1CBTitleEl.textContent='Line-beep';privMsgTopLeftDivEl.appendChild(privMsgHideButtonEl);privMsgTopLeftDivEl.appendChild(privMsgNameDivEl)
 ;privMsgTopLeftDivEl.appendChild(privMsgCounterEl);privMsgTopRightHidableDivEl.appendChild(privMsgTallerButtonEl);privMsgTopRightHidableDivEl.appendChild(privMsgNormalButtonEl)
 ;privMsgTopRightHidableDivEl.appendChild(privMsgClearButtonEl);privMsgTopRightDivEl.appendChild(privMsgTopRightHidableDivEl);privMsgTopDivEl.appendChild(privMsgTopLeftDivEl)
-;privMsgTopDivEl.appendChild(privMsgTopRightDivEl);privMsgButtonDiv1El.appendChild(privMsgInputAreaEl);privMsgButtonDiv1El.appendChild(privMsgSendButtonEl)
-;privMsgBottomDiv4El.appendChild(privMsgBeep1CBInputEl);privMsgBottomDiv4El.appendChild(privMsgBeep1CBTitleEl);privMsgBottomDivEl.appendChild(privMsgTextAreaEl)
-;privMsgBottomDivEl.appendChild(privMsgButtonDiv1El);privMsgBottomDivEl.appendChild(privMsgBottomDiv4El);privMsgSectionEl.appendChild(privMsgTopDivEl);privMsgSectionEl.appendChild(privMsgBottomDivEl)
+;privMsgTopDivEl.appendChild(privMsgTopRightDivEl);privMsgBottomDiv1El.appendChild(privMsgInputAreaEl);privMsgBottomDiv1El.appendChild(privMsgSendButtonEl)
+;privMsgBottomDiv2El.appendChild(privMsgMultiLineSendSpanEl);privMsgBottomDiv2El.appendChild(privMsgMultiLineSendButtonEl);privMsgBottomDiv4El.appendChild(privMsgBeep1CBInputEl)
+;privMsgBottomDiv4El.appendChild(privMsgBeep1CBTitleEl);privMsgBottomDivEl.appendChild(privMsgTextAreaEl);privMsgBottomDivEl.appendChild(privMsgBottomDiv1El)
+;privMsgBottomDivEl.appendChild(privMsgBottomDiv2El);privMsgBottomDivEl.appendChild(privMsgBottomDiv4El);privMsgSectionEl.appendChild(privMsgTopDivEl);privMsgSectionEl.appendChild(privMsgBottomDivEl)
 ;privMsgContainerDivEl.appendChild(privMsgSectionEl);if(privMsgSectionEl.getAttribute('lastDate')!==parsedMessage.datestamp){privMsgSectionEl.setAttribute('lastDate',parsedMessage.datestamp)
 ;privMsgTextAreaEl.value+='\n=== '+parsedMessage.datestamp+' ===\n\n'}privMsgTextAreaEl.value+=parsedMessage.timestamp+' '+parsedMessage.nick+pmNameSpacer+cleanFormatting(parsedMessage.params[1])+'\n'
 ;if(!webState.cacheReloadInProgress)privMsgTextAreaEl.scrollTop=privMsgTextAreaEl.scrollHeight;let activityIconInhibitTimer=0;const iconInhibitTimer=setInterval((function(){
@@ -774,11 +795,22 @@ privMsgNormalButtonEl.addEventListener('click',handlePrivMsgNormalButtonElClick)
 privMsgClearButtonEl.addEventListener('click',handlePrivMsgClearButtonElClick);function handleShowAllDivs(event){privMsgBottomDivEl.removeAttribute('hidden');privMsgHideButtonEl.textContent='-'
 ;privMsgTopRightHidableDivEl.removeAttribute('hidden');privMsgSectionEl.removeAttribute('hidden')}document.addEventListener('show-all-divs',handleShowAllDivs);function handleHideOrZoom(event){
 privMsgBottomDivEl.setAttribute('hidden','');privMsgHideButtonEl.textContent='+';privMsgTopRightHidableDivEl.setAttribute('hidden','');privMsgSectionEl.setAttribute('hidden','')}
-document.addEventListener('hide-or-zoom',handleHideOrZoom);function handlePrivMsgSendButtonElClick(event){_sendPrivMessageToUser(name,privMsgInputAreaEl);privMsgInputAreaEl.focus();resetPrivMsgCount()
-;activityIconInhibitTimer=activityIconInhibitTimerValue}privMsgSendButtonEl.addEventListener('click',handlePrivMsgSendButtonElClick);function handlePrivMsgInputAreaElInput(event){
+document.addEventListener('hide-or-zoom',handleHideOrZoom);function handleprivMsgInputAreaElPaste(event){if(_splitMultiLinePaste(event.clipboardData.getData('text')).length>1){
+privMsgMultiLineSendSpanEl.textContent='Clipboard ('+_splitMultiLinePaste(event.clipboardData.getData('text')).length+' lines)';privMsgBottomDiv2El.removeAttribute('hidden')}}
+privMsgInputAreaEl.addEventListener('paste',handleprivMsgInputAreaElPaste);function handleMultiLineSendButtonClick(event){const multiLineArray=_splitMultiLinePaste(privMsgInputAreaEl.value)
+;if(multiLineArray.length>100){privMsgBottomDiv2El.setAttribute('hidden','');privMsgInputAreaEl.value='';showError('Maximum multi-line clipboard paste 100 Lines')}else{
+const lastIrcConnect=ircState.times.ircConnect;const lastWebConnect=webState.times.webConnect;let abortedFlag=false;const delayIntervalMs=2e3;let delayMs=0;if(multiLineArray.length>0){
+privMsgInputAreaEl.value=multiLineArray[0];for(let i=0;i<multiLineArray.length;i++){delayMs+=delayIntervalMs;setTimeout((function(){let okToSend=false
+;if(ircState.ircConnected&&lastIrcConnect===ircState.times.ircConnect&&lastWebConnect===webState.times.webConnect&&!abortedFlag)okToSend=true;if(okToSend){
+if(privMsgBottomDivEl.hasAttribute('hidden'))okToSend=false;if(webState.activePrivateMessageNicks.indexOf(name)<0)okToSend=false}if(!okToSend)abortedFlag=true;else{
+const message='PRIVMSG '+name+' :'+multiLineArray[i];_sendIrcServerMessage(message);if(i!==multiLineArray.length-1)privMsgInputAreaEl.value=multiLineArray[i+1];else privMsgInputAreaEl.value=''}
+}),delayMs)}privMsgBottomDiv2El.setAttribute('hidden','')}else{privMsgBottomDiv2El.setAttribute('hidden','');privMsgInputAreaEl.value=''}}}
+privMsgMultiLineSendButtonEl.addEventListener('click',handleMultiLineSendButtonClick);function handlePrivMsgSendButtonElClick(event){_sendPrivMessageToUser(name,privMsgInputAreaEl)
+;privMsgInputAreaEl.focus();resetPrivMsgCount();activityIconInhibitTimer=activityIconInhibitTimerValue;privMsgBottomDiv2El.setAttribute('hidden','')}
+privMsgSendButtonEl.addEventListener('click',handlePrivMsgSendButtonElClick);function handlePrivMsgInputAreaElInput(event){
 if('insertText'===event.inputType&&null===event.data||'insertLineBreak'===event.inputType){stripOneCrLfFromElement(privMsgInputAreaEl);_sendPrivMessageToUser(name,privMsgInputAreaEl)
-;resetPrivMsgCount();activityIconInhibitTimer=activityIconInhibitTimerValue}}privMsgInputAreaEl.addEventListener('input',handlePrivMsgInputAreaElInput);function handlePrivMsgCounterElClick(event){
-resetPrivMsgCount()}privMsgCounterEl.addEventListener('click',handlePrivMsgCounterElClick);function handlePrivMsgCountDivClick(){resetPrivMsgCount()}
+;resetPrivMsgCount();activityIconInhibitTimer=activityIconInhibitTimerValue;privMsgBottomDiv2El.setAttribute('hidden','')}}privMsgInputAreaEl.addEventListener('input',handlePrivMsgInputAreaElInput)
+;function handlePrivMsgCounterElClick(event){resetPrivMsgCount()}privMsgCounterEl.addEventListener('click',handlePrivMsgCounterElClick);function handlePrivMsgCountDivClick(){resetPrivMsgCount()}
 document.getElementById('privMsgCountDiv').addEventListener('click',handlePrivMsgCountDivClick);function handlePrivMsgUnreadExistIconClick(){resetPrivMsgCount()}
 document.getElementById('privMsgUnreadExistIcon').addEventListener('click',handlePrivMsgUnreadExistIconClick);function handlePrivMsgBottomDivElClick(event){resetPrivMsgCount()
 ;activityIconInhibitTimer=activityIconInhibitTimerValue}privMsgBottomDivEl.addEventListener('click',handlePrivMsgBottomDivElClick);function updateVisibility(){
@@ -813,7 +845,8 @@ clearInterval(iconInhibitTimer);document.removeEventListener('cache-reload-done'
 ;privMsgHideButtonEl.removeEventListener('click',handlePrivMsgHideButtonElClick);privMsgTallerButtonEl.removeEventListener('click',handlePrivMsgTallerButtonElClick)
 ;privMsgNormalButtonEl.removeEventListener('click',handlePrivMsgNormalButtonElClick);privMsgClearButtonEl.removeEventListener('click',handlePrivMsgClearButtonElClick)
 ;document.removeEventListener('show-all-divs',handleShowAllDivs);document.removeEventListener('hide-or-zoom',handleHideOrZoom)
-;privMsgSendButtonEl.removeEventListener('click',handlePrivMsgSendButtonElClick);privMsgInputAreaEl.removeEventListener('input',handlePrivMsgInputAreaElInput)
+;privMsgSendButtonEl.removeEventListener('click',handlePrivMsgSendButtonElClick);privMsgMultiLineSendButtonEl.removeEventListener('click',handleMultiLineSendButtonClick)
+;privMsgInputAreaEl.removeEventListener('input',handlePrivMsgInputAreaElInput);privMsgInputAreaEl.removeEventListener('paste',handleprivMsgInputAreaElPaste)
 ;privMsgCounterEl.removeEventListener('click',handlePrivMsgCounterElClick);document.getElementById('privMsgCountDiv').removeEventListener('click',handlePrivMsgCountDivClick)
 ;document.getElementById('privMsgUnreadExistIcon').removeEventListener('click',handlePrivMsgUnreadExistIconClick);privMsgBottomDivEl.removeEventListener('click',handlePrivMsgBottomDivElClick)
 ;privMsgBeep1CBInputEl.removeEventListener('click',handlePrivMsgBeep1CBInputElClick);document.removeEventListener('cancel-beep-sounds',handleCancelBeepSounds)

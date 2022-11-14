@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Next
+
+### Added
+
+- Added multi-line clipboard past to IRC channel and private message. When a multi-line clipboard past is detected, a confirmation dialog is made visible. A dedicated button labeled [Send as multi-line] appears. Activating this button will queue the waiting message for transmission to the IRC server, 1 line each 2 seconds, maximum 100 lines. Each line is previewed in the input textarea before sending. Various events will abort the multi-line send, including hide the channel/PM window, disconnect from IRC server, leave IRC channel. This is implemented entirely in the browser, so if an issue arises during a paste, simply refresh the browser page to clear everything related to multi-line paste.
+
 ## [v0.2.24](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.24) 2022-11-02
 
 ### Added

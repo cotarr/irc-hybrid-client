@@ -90,6 +90,28 @@ function _sendTextToChannel (channelIndex, textAreaEl) {
   textAreaEl.value = '';
 }; // _sendTextToChannel
 
+// ----------------------------
+// Internal function
+// Accepts one multi-line string
+// Returns array of strings containing lines of clipboard paste
+//
+// Note: this is also used in private messages in webclient07.js
+// ----------------------------
+function _splitMultiLinePaste (multiLineContent) {
+  if (typeof multiLineContent !== 'string') return [];
+  if (multiLineContent.length === 0) return [];
+  const outArray = [];
+  const inArray = multiLineContent.split('\n');
+  if (inArray.length > 0) {
+    for (let i = 0; i < inArray.length; i++) {
+      if (inArray[i].replace('\r', '').length > 0) {
+        outArray.push(inArray[i].replace('\r', ''));
+      }
+    }
+  }
+  return outArray;
+}; // _splitMultiLinePaste
+
 // -----------------------------------------------------------------
 // This shows the page layout hierarchy for private message sections
 // -----------------------------------------------------------------
@@ -143,16 +165,19 @@ function _sendTextToChannel (channelIndex, textAreaEl) {
 // --------- textarea (channelInputAreaEl)
 // --------- button (channelSendButtonEl)
 // -------- div (channelBottomDiv2El)
+// --------- span (channelMultiLineSendSpanEl)
+// --------- button (channelMultiLineSendButtonEl)
+// -------- div (channelBottomDiv3El)
 // --------- button (channelRefreshButtonEl)
 // --------- button (channelClearButtonEl)
 // --------- button (channelTallerButtonEl)
 // --------- button (channelNormalButtonEl)
-// -------- div (channelBottomDiv3El)
+// -------- div (channelBottomDiv4El)
 // --------- input/checkbox (channelFormatCBInputEl)
 // --------- span
 // --------- input/checkbox (channelAutoCompCBInputEl)
 // --------- span
-// -------- div (channelBottomDiv4El)
+// -------- div (channelBottomDiv5El)
 // --------- input/checkbox (channelBeep1CBInputEl)
 // --------- span
 // --------- input/checkbox (channelBeep3CBInputEl)
@@ -330,9 +355,24 @@ function createChannelEl (name) {
   channelSendButtonEl.textContent = 'Send';
   channelSendButtonEl.classList.add('va-middle');
 
-  // button-div
+  // div to hold multi-line paste notice and button
   const channelBottomDiv2El = document.createElement('div');
+  channelBottomDiv2El.setAttribute('hidden', '');
   channelBottomDiv2El.classList.add('button-div');
+
+  // Span holding notice message of multi-line paste from clipboard
+  const channelMultiLineSendSpanEl = document.createElement('span');
+  channelMultiLineSendSpanEl.classList.add('channel-button');
+  channelMultiLineSendSpanEl.textContent = 'Clipboard (0 lines)';
+
+  // send button for multi-line paste
+  const channelMultiLineSendButtonEl = document.createElement('button');
+  channelMultiLineSendButtonEl.classList.add('channel-button');
+  channelMultiLineSendButtonEl.textContent = 'Send as multi-line';
+
+  // button-div
+  const channelBottomDiv3El = document.createElement('div');
+  channelBottomDiv3El.classList.add('button-div');
 
   // join button
   const channelJoinButtonEl = document.createElement('button');
@@ -362,8 +402,8 @@ function createChannelEl (name) {
   channelRefreshButtonEl.classList.add('channel-button');
 
   // button-div
-  const channelBottomDiv3El = document.createElement('div');
-  channelBottomDiv3El.classList.add('button-div');
+  const channelBottomDiv4El = document.createElement('div');
+  channelBottomDiv4El.classList.add('button-div');
 
   // Text Format checkbox
   const channelFormatCBInputEl = document.createElement('input');
@@ -383,8 +423,8 @@ function createChannelEl (name) {
   channelAutoCompCBTitleEl.textContent = 'Auto-complete';
 
   // button-div
-  const channelBottomDiv4El = document.createElement('div');
-  channelBottomDiv4El.classList.add('button-div');
+  const channelBottomDiv5El = document.createElement('div');
+  channelBottomDiv5El.classList.add('button-div');
 
   // beep on message checkbox
   const channelBeep1CBInputEl = document.createElement('input');
@@ -434,22 +474,25 @@ function createChannelEl (name) {
   channelBottomDiv1El.appendChild(channelInputAreaEl);
   channelBottomDiv1El.appendChild(channelSendButtonEl);
 
-  channelBottomDiv2El.appendChild(channelRefreshButtonEl);
-  channelBottomDiv2El.appendChild(channelClearButtonEl);
-  channelBottomDiv2El.appendChild(channelTallerButtonEl);
-  channelBottomDiv2El.appendChild(channelNormalButtonEl);
+  channelBottomDiv2El.appendChild(channelMultiLineSendSpanEl);
+  channelBottomDiv2El.appendChild(channelMultiLineSendButtonEl);
 
-  channelBottomDiv3El.appendChild(channelFormatCBInputEl);
-  channelBottomDiv3El.appendChild(channelFormatCBTitleEl);
-  channelBottomDiv3El.appendChild(channelAutoCompCBInputEl);
-  channelBottomDiv3El.appendChild(channelAutoCompCBTitleEl);
+  channelBottomDiv3El.appendChild(channelRefreshButtonEl);
+  channelBottomDiv3El.appendChild(channelClearButtonEl);
+  channelBottomDiv3El.appendChild(channelTallerButtonEl);
+  channelBottomDiv3El.appendChild(channelNormalButtonEl);
 
-  channelBottomDiv4El.appendChild(channelBeep1CBInputEl);
-  channelBottomDiv4El.appendChild(channelBeep1CBTitleEl);
-  channelBottomDiv4El.appendChild(channelBeep2CBInputEl);
-  channelBottomDiv4El.appendChild(channelBeep2CBTitleEl);
-  channelBottomDiv4El.appendChild(channelBeep3CBInputEl);
-  channelBottomDiv4El.appendChild(channelBeep3CBTitleEl);
+  channelBottomDiv4El.appendChild(channelFormatCBInputEl);
+  channelBottomDiv4El.appendChild(channelFormatCBTitleEl);
+  channelBottomDiv4El.appendChild(channelAutoCompCBInputEl);
+  channelBottomDiv4El.appendChild(channelAutoCompCBTitleEl);
+
+  channelBottomDiv5El.appendChild(channelBeep1CBInputEl);
+  channelBottomDiv5El.appendChild(channelBeep1CBTitleEl);
+  channelBottomDiv5El.appendChild(channelBeep2CBInputEl);
+  channelBottomDiv5El.appendChild(channelBeep2CBTitleEl);
+  channelBottomDiv5El.appendChild(channelBeep3CBInputEl);
+  channelBottomDiv5El.appendChild(channelBeep3CBTitleEl);
 
   channelBottomDivEl.appendChild(channelTopicDivEl);
   channelBottomDivEl.appendChild(channelNamesDisplayEl);
@@ -458,6 +501,7 @@ function createChannelEl (name) {
   channelBottomDivEl.appendChild(channelBottomDiv2El);
   channelBottomDivEl.appendChild(channelBottomDiv3El);
   channelBottomDivEl.appendChild(channelBottomDiv4El);
+  channelBottomDivEl.appendChild(channelBottomDiv5El);
 
   channelMainSectionEl.appendChild(channelTopDivEl);
   channelMainSectionEl.appendChild(channelTopSpacerDivEl);
@@ -662,6 +706,94 @@ function createChannelEl (name) {
   };
   channelRefreshButtonEl.addEventListener('click', handleChannelRefreshButtonElClick);
 
+  // -----------------------
+  // Detect paste event,
+  // Check clipboard, if multi-line, make multi-line send button visible
+  // -----------------------
+  function handleChannelInputAreaElPaste (event) {
+    if (_splitMultiLinePaste(event.clipboardData.getData('text')).length > 1) {
+      // Make multi-line clipboard past notice visible and show button
+      channelMultiLineSendSpanEl.textContent = 'Clipboard (' +
+      _splitMultiLinePaste(event.clipboardData.getData('text')).length + ' lines)';
+      channelBottomDiv2El.removeAttribute('hidden');
+    };
+  }; // handleChannelInputAreaElPaste()
+  channelInputAreaEl.addEventListener('paste', handleChannelInputAreaElPaste);
+
+  // -------------
+  // Event handler for clipboard
+  // multi-line paste, Send button
+  // -------------
+  function handleMultiLineSendButtonClick (event) {
+    const multiLineArray = _splitMultiLinePaste(channelInputAreaEl.value);
+    if (multiLineArray.length > 100) {
+      channelBottomDiv2El.setAttribute('hidden', '');
+      channelInputAreaEl.value = '';
+      showError('Maximum multi-line clipboard paste 100 Lines');
+    } else {
+      // initialize state flags
+      const lastIrcConnect = ircState.times.ircConnect;
+      const lastWebConnect = webState.times.webConnect;
+      let abortedFlag = false;
+      // Avoid flood detect with delay timer, milliseconds per line sent
+      const delayIntervalMs = 2000;
+      let delayMs = 0;
+      if (multiLineArray.length > 0) {
+        // Show each line in inputArea while waiting for timer
+        channelInputAreaEl.value = multiLineArray[0];
+        // Loop through lines creating a timer for each line
+        for (let i = 0; i < multiLineArray.length; i++) {
+          delayMs += delayIntervalMs;
+          setTimeout(function () {
+            let okToSend = false;
+            if (
+              // First, are we connected to IRC server?
+              (ircState.ircConnected) &&
+              // And, not re-connected IRC
+              (lastIrcConnect === ircState.times.ircConnect) &&
+              // And, not re-connected Webserver
+              (lastWebConnect === webState.times.webConnect) &&
+              // And, not aborted
+              (!abortedFlag)) {
+              okToSend = true;
+            }
+            if (okToSend) {
+              const index = ircState.channels.indexOf(name.toLowerCase());
+              if (index >= 0) {
+                // Is client still JOIN to the IRC channel?
+                if (!ircState.channelStates[index].joined) okToSend = false;
+                // and channel window not hidden with [-] button
+              }
+              if (!channelMainSectionEl.hasAttribute('opened')) okToSend = false;
+            }
+            if (!okToSend) {
+              // once not ok, don't try again
+              abortedFlag = true;
+            } else {
+              // Send message to IRC channel
+              const message = 'PRIVMSG ' +
+                ircState.channelStates[channelIndex].name +
+              ' :' + multiLineArray[i];
+              _sendIrcServerMessage(message);
+              if (i !== multiLineArray.length - 1) {
+                // Show each line in inputArea while waiting for timer
+                channelInputAreaEl.value = multiLineArray[i + 1];
+              } else {
+                channelInputAreaEl.value = '';
+              }
+            } // send to channel
+          }, delayMs); // timer
+        } // next i
+        // timers created, now hide button
+        channelBottomDiv2El.setAttribute('hidden', '');
+      } else {
+        // case of single line paste, hide div without action
+        channelBottomDiv2El.setAttribute('hidden', '');
+      }
+    } // case of less than max allowed lines
+  } // handleMultiLineSendButtonClick()
+  channelMultiLineSendButtonEl.addEventListener('click', handleMultiLineSendButtonClick);
+
   // -------------
   // send button
   // -------------
@@ -670,6 +802,8 @@ function createChannelEl (name) {
     channelInputAreaEl.focus();
     resetMessageCount();
     activityIconInhibitTimer = activityIconInhibitTimerValue;
+    // clear multi-line paste notice if present
+    channelBottomDiv2El.setAttribute('hidden', '');
   };
   channelSendButtonEl.addEventListener('click', handleChannelSendButtonElClick);
 
@@ -679,11 +813,13 @@ function createChannelEl (name) {
   function handleChannelInputAreaElInput (event) {
     if (((event.inputType === 'insertText') && (event.data === null)) ||
       (event.inputType === 'insertLineBreak')) {
-      // Remove EOL characters at cursor loction
+      // Remove EOL characters at cursor location
       stripOneCrLfFromElement(channelInputAreaEl);
       _sendTextToChannel(channelIndex, channelInputAreaEl);
       resetMessageCount();
       activityIconInhibitTimer = activityIconInhibitTimerValue;
+      // hide notice for multi-line clipboard paste
+      channelBottomDiv2El.setAttribute('hidden', '');
     }
   };
   channelInputAreaEl.addEventListener('input', handleChannelInputAreaElInput);
@@ -753,9 +889,10 @@ function createChannelEl (name) {
           channelPartButtonEl.setAttribute('hidden', '');
 
           channelTopicDivEl.removeAttribute('hidden');
-          channelBottomDiv2El.removeAttribute('hidden');
+          channelBottomDiv2El.setAttribute('hidden', '');
           channelBottomDiv3El.removeAttribute('hidden');
           channelBottomDiv4El.removeAttribute('hidden');
+          channelBottomDiv5El.removeAttribute('hidden');
           channelNamesDisplayEl.removeAttribute('hidden');
         } // not joined
 
@@ -763,9 +900,9 @@ function createChannelEl (name) {
         if (channelMainSectionEl.hasAttribute('zoom')) {
           channelZoomButtonEl.textContent = zoomOnText;
           channelTopicDivEl.setAttribute('hidden', '');
-          channelBottomDiv2El.setAttribute('hidden', '');
           channelBottomDiv3El.setAttribute('hidden', '');
           channelBottomDiv4El.setAttribute('hidden', '');
+          channelBottomDiv5El.setAttribute('hidden', '');
           if (webState.dynamic.bodyClientWidth > mobileBreakpointPx) {
             channelNamesDisplayEl.removeAttribute('hidden');
           } else {
@@ -774,9 +911,9 @@ function createChannelEl (name) {
         } else {
           channelZoomButtonEl.textContent = zoomOffText;
           channelTopicDivEl.removeAttribute('hidden');
-          channelBottomDiv2El.removeAttribute('hidden');
           channelBottomDiv3El.removeAttribute('hidden');
           channelBottomDiv4El.removeAttribute('hidden');
+          channelBottomDiv5El.removeAttribute('hidden');
           channelNamesDisplayEl.removeAttribute('hidden');
         }
 
@@ -814,6 +951,7 @@ function createChannelEl (name) {
         channelPruneButtonEl.setAttribute('hidden', '');
         channelJoinButtonEl.setAttribute('hidden', '');
         channelPartButtonEl.setAttribute('hidden', '');
+        channelBottomDiv2El.setAttribute('hidden', '');
         channelHideButtonEl.textContent = '+';
       }
     } else {
@@ -823,6 +961,7 @@ function createChannelEl (name) {
       channelPruneButtonEl.setAttribute('hidden', '');
       channelJoinButtonEl.setAttribute('hidden', '');
       channelPartButtonEl.setAttribute('hidden', '');
+      channelBottomDiv2El.setAttribute('hidden', '');
       channelHideButtonEl.textContent = '+';
     }
   } // updateVisibility()
@@ -1042,7 +1181,7 @@ function createChannelEl (name) {
     }
     updateVisibility();
 
-    // this forces a global update which will refreesh text area
+    // this forces a global update which will refresh text area
     document.dispatchEvent(new CustomEvent('update-from-cache', { bubbles: true }));
 
     // THis will request a new nickname list from IRC server.
@@ -1410,7 +1549,9 @@ function createChannelEl (name) {
       channelPruneButtonEl.removeEventListener('click', handleChannelPruneButtonElClick);
       channelRefreshButtonEl.removeEventListener('click', handleChannelRefreshButtonElClick);
       channelSendButtonEl.removeEventListener('click', handleChannelSendButtonElClick);
+      channelMultiLineSendButtonEl.removeEventListener('click', handleMultiLineSendButtonClick);
       channelInputAreaEl.removeEventListener('input', handleChannelInputAreaElInput);
+      channelInputAreaEl.removeEventListener('paste', handleChannelInputAreaElPaste);
       channelBottomDivEl.removeEventListener('click', handleChannelBottomDivElClick);
       channelMessageCounterEl.removeEventListener('click', handleChannelMessageCounterElClick);
       document.getElementById('channelUnreadCountDiv')
@@ -1614,12 +1755,12 @@ function createChannelEl (name) {
             'Notice(' +
             parsedMessage.nick + ' to ' + parsedMessage.params[0] + ') ' + parsedMessage.params[1]);
 
-          // Upon channel notice, make sectino visible.
+          // Upon channel notice, make section visible.
           channelBottomDivEl.removeAttribute('hidden');
           channelHideButtonEl.textContent = '-';
 
           // Message activity Icon
-          // If focus not <textarea> elment,
+          // If focus not <textarea> element,
           // and focus not message send button
           // and NOT reload from cache in progress (timer not zero)
           // then display incoming message activity icon
@@ -1873,7 +2014,7 @@ function createChannelEl (name) {
     const mar1 = webState.dynamic.commonMargin;
     // pixel width mar2 is reserved space on edges of input area with send button added
     const mar2 = webState.dynamic.commonMargin + 5 + webState.dynamic.sendButtonWidthPx;
-    // pixed width mar3 is reserved space on edges of input area with channel nickname list on sides
+    // pixel width mar3 is reserved space on edges of input area with channel nickname list on sides
 
     // get size of nickname list element
     const nicknameListPixelWidth = webState.dynamic.inputAreaSideWidthPx +

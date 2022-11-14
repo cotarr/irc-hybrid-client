@@ -123,9 +123,12 @@ function _sendPrivMessageToUser (targetNickname, textAreaEl) {
 // ---------- button (privMsgClearButtonEl)
 // ------- div (privMsgBottomDivEl)              <---- Hidable, lower half
 // -------- textarea (privMsgTextAreaEl)
-// -------- div (privMsgButtonDiv1El)
+// -------- div (privMsgBottomDiv1El)
 // --------- textarea (privMsgInputAreaEl)
 // --------- button (privMsgSendButtonEl)
+// -------- div (privMsgButtonDiv2El)
+// --------- span (privMsgMultiLineSendSpanEl)
+// --------- button (privMsgMultiLineSendButtonEl)
 // -------- div (privMsgBottomDiv4El)
 // --------- input/checkbox (privMsgBeep1CBInputEl)
 // --------- span (privMsgBeep1CBTitleEl)
@@ -249,11 +252,11 @@ function createPrivateMessageEl (name, parsedMessage) {
   privMsgTextAreaEl.setAttribute('spellCheck', 'false');
   privMsgTextAreaEl.setAttribute('readonly', '');
 
-  // button-div
-  const privMsgButtonDiv1El = document.createElement('div');
-  privMsgButtonDiv1El.classList.add('button-div');
+  // div to hold textarea input element
+  const privMsgBottomDiv1El = document.createElement('div');
+  privMsgBottomDiv1El.classList.add('button-div');
 
-  // signle line user input
+  // single line user input
   const privMsgInputAreaEl = document.createElement('textarea');
   const privMsgInputAreaId = 'privMsg' + privMsgIndex.toString() + 'InputAreaId';
   privMsgInputAreaEl.id = privMsgInputAreaId;
@@ -266,6 +269,21 @@ function createPrivateMessageEl (name, parsedMessage) {
   const privMsgSendButtonEl = document.createElement('button');
   privMsgSendButtonEl.textContent = 'Send';
   privMsgSendButtonEl.classList.add('va-middle');
+
+  // div to hold multi-line paste notice and button
+  const privMsgBottomDiv2El = document.createElement('div');
+  privMsgBottomDiv2El.setAttribute('hidden', '');
+  privMsgBottomDiv2El.classList.add('button-div');
+
+  // Span holding notice message of multi-line paste from clipboard
+  const privMsgMultiLineSendSpanEl = document.createElement('span');
+  privMsgMultiLineSendSpanEl.classList.add('privMsg-button');
+  privMsgMultiLineSendSpanEl.textContent = 'Clipboard (0 lines)';
+
+  // send button for multi-line paste
+  const privMsgMultiLineSendButtonEl = document.createElement('button');
+  privMsgMultiLineSendButtonEl.classList.add('privMsg-button');
+  privMsgMultiLineSendButtonEl.textContent = 'Send as multi-line';
 
   // button-div
   const privMsgBottomDiv4El = document.createElement('div');
@@ -297,14 +315,18 @@ function createPrivateMessageEl (name, parsedMessage) {
   // privMsgTopDivEl.appendChild(privMsgTopCenterDivEl);
   privMsgTopDivEl.appendChild(privMsgTopRightDivEl);
 
-  privMsgButtonDiv1El.appendChild(privMsgInputAreaEl);
-  privMsgButtonDiv1El.appendChild(privMsgSendButtonEl);
+  privMsgBottomDiv1El.appendChild(privMsgInputAreaEl);
+  privMsgBottomDiv1El.appendChild(privMsgSendButtonEl);
+
+  privMsgBottomDiv2El.appendChild(privMsgMultiLineSendSpanEl);
+  privMsgBottomDiv2El.appendChild(privMsgMultiLineSendButtonEl);
 
   privMsgBottomDiv4El.appendChild(privMsgBeep1CBInputEl);
   privMsgBottomDiv4El.appendChild(privMsgBeep1CBTitleEl);
 
   privMsgBottomDivEl.appendChild(privMsgTextAreaEl);
-  privMsgBottomDivEl.appendChild(privMsgButtonDiv1El);
+  privMsgBottomDivEl.appendChild(privMsgBottomDiv1El);
+  privMsgBottomDivEl.appendChild(privMsgBottomDiv2El);
   privMsgBottomDivEl.appendChild(privMsgBottomDiv4El);
 
   privMsgSectionEl.appendChild(privMsgTopDivEl);
@@ -429,7 +451,7 @@ function createPrivateMessageEl (name, parsedMessage) {
   // -------------------------
   // How/Hide button handler
   // -------------------------
-  // if closed: Window unchanged, show Data secton, show Buttons
+  // if closed: Window unchanged, show Data section, show Buttons
   // if open:  Hide Window, hide Data section, Hide Buttons
   function handlePrivMsgHideButtonElClick (event) {
     if (privMsgBottomDivEl.hasAttribute('hidden')) {
@@ -500,6 +522,89 @@ function createPrivateMessageEl (name, parsedMessage) {
   };
   document.addEventListener('hide-or-zoom', handleHideOrZoom);
 
+  // -----------------------
+  // Detect paste event,
+  // Check clipboard, if multi-line, make multi-line send button visible
+  // -----------------------
+  function handleprivMsgInputAreaElPaste (event) {
+    if (_splitMultiLinePaste(event.clipboardData.getData('text')).length > 1) {
+      // Make multi-line clilpboard past notice visible and show button
+      privMsgMultiLineSendSpanEl.textContent = 'Clipboard (' +
+      _splitMultiLinePaste(event.clipboardData.getData('text')).length + ' lines)';
+      privMsgBottomDiv2El.removeAttribute('hidden');
+    };
+  }; // handleprivMsgInputAreaElPaste()
+  privMsgInputAreaEl.addEventListener('paste', handleprivMsgInputAreaElPaste);
+
+  // -------------
+  // Event handler for clipboard
+  // multi-line paste, Send button
+  // -------------
+  function handleMultiLineSendButtonClick (event) {
+    const multiLineArray = _splitMultiLinePaste(privMsgInputAreaEl.value);
+    if (multiLineArray.length > 100) {
+      privMsgBottomDiv2El.setAttribute('hidden', '');
+      privMsgInputAreaEl.value = '';
+      showError('Maximum multi-line clipboard paste 100 Lines');
+    } else {
+      // initialize state flags
+      const lastIrcConnect = ircState.times.ircConnect;
+      const lastWebConnect = webState.times.webConnect;
+      let abortedFlag = false;
+      // Avoid flood detect with delay timer, milliseconds per line sent
+      const delayIntervalMs = 2000;
+      let delayMs = 0;
+      if (multiLineArray.length > 0) {
+        // Show each line in inputArea while waiting for timer
+        privMsgInputAreaEl.value = multiLineArray[0];
+        for (let i = 0; i < multiLineArray.length; i++) {
+          delayMs += delayIntervalMs;
+          setTimeout(function () {
+            let okToSend = false;
+            if (
+              // First, are we connected to IRC server?
+              (ircState.ircConnected) &&
+              // And, not re-connected IRC
+              (lastIrcConnect === ircState.times.ircConnect) &&
+              // And, not re-connected Webserver
+              (lastWebConnect === webState.times.webConnect) &&
+              // And, not aborted
+              (!abortedFlag)) {
+              okToSend = true;
+            }
+            if (okToSend) {
+              // PM window minimized
+              if (privMsgBottomDivEl.hasAttribute('hidden')) okToSend = false;
+              // PM name not in active PM list
+              if (webState.activePrivateMessageNicks.indexOf(name) < 0) okToSend = false;
+            }
+            if (!okToSend) {
+              // once not ok, don't try again
+              abortedFlag = true;
+            } else {
+              // SEnd private message to user
+              const message = 'PRIVMSG ' + name +
+                ' :' + multiLineArray[i];
+              _sendIrcServerMessage(message);
+              if (i !== multiLineArray.length - 1) {
+                // Show each line in inputArea while waiting for timer
+                privMsgInputAreaEl.value = multiLineArray[i + 1];
+              } else {
+                privMsgInputAreaEl.value = '';
+              }
+            } // send private message
+          }, delayMs); // timer
+        } // next i
+        privMsgBottomDiv2El.setAttribute('hidden', '');
+      } else {
+        // case of not multi-line exceed maximum length
+        privMsgBottomDiv2El.setAttribute('hidden', '');
+        privMsgInputAreaEl.value = '';
+      }
+    } // case of less than max allowed lines
+  } // handleMultiLineSendButtonClick()
+  privMsgMultiLineSendButtonEl.addEventListener('click', handleMultiLineSendButtonClick);
+
   // -------------
   // send button
   // -------------
@@ -508,6 +613,7 @@ function createPrivateMessageEl (name, parsedMessage) {
     privMsgInputAreaEl.focus();
     resetPrivMsgCount();
     activityIconInhibitTimer = activityIconInhibitTimerValue;
+    privMsgBottomDiv2El.setAttribute('hidden', '');
   };
   privMsgSendButtonEl.addEventListener('click', handlePrivMsgSendButtonElClick);
 
@@ -517,11 +623,12 @@ function createPrivateMessageEl (name, parsedMessage) {
   function handlePrivMsgInputAreaElInput (event) {
     if (((event.inputType === 'insertText') && (event.data === null)) ||
       (event.inputType === 'insertLineBreak')) {
-      // Remove EOL characters at cursor loction
+      // Remove EOL characters at cursor location
       stripOneCrLfFromElement(privMsgInputAreaEl);
       _sendPrivMessageToUser(name, privMsgInputAreaEl);
       resetPrivMsgCount();
       activityIconInhibitTimer = activityIconInhibitTimerValue;
+      privMsgBottomDiv2El.setAttribute('hidden', '');
     }
   };
   privMsgInputAreaEl.addEventListener('input', handlePrivMsgInputAreaElInput);
@@ -744,7 +851,7 @@ function createPrivateMessageEl (name, parsedMessage) {
     const mar1 = webState.dynamic.commonMargin;
     // pixel width mar2 is reserved space on edges of input area with send button added
     const mar2 = webState.dynamic.commonMargin + 5 + webState.dynamic.sendButtonWidthPx;
-    // pixed width mar3 is reserved space on edges of input area with channel nickname list on sides
+    // pixel width mar3 is reserved space on edges of input area with channel nickname list on sides
 
     privMsgTextAreaEl.setAttribute('cols', calcInputAreaColSize(mar1));
     privMsgInputAreaEl.setAttribute('cols', calcInputAreaColSize(mar2));
@@ -795,7 +902,9 @@ function createPrivateMessageEl (name, parsedMessage) {
     document.removeEventListener('show-all-divs', handleShowAllDivs);
     document.removeEventListener('hide-or-zoom', handleHideOrZoom);
     privMsgSendButtonEl.removeEventListener('click', handlePrivMsgSendButtonElClick);
+    privMsgMultiLineSendButtonEl.removeEventListener('click', handleMultiLineSendButtonClick);
     privMsgInputAreaEl.removeEventListener('input', handlePrivMsgInputAreaElInput);
+    privMsgInputAreaEl.removeEventListener('paste', handleprivMsgInputAreaElPaste);
     privMsgCounterEl.removeEventListener('click', handlePrivMsgCounterElClick);
     document.getElementById('privMsgCountDiv')
       .removeEventListener('click', handlePrivMsgCountDivClick);
@@ -888,12 +997,12 @@ function _buildPrivateMessageText () {
 }; // _buildPrivateMessageText ()
 document.getElementById('userPrivMsgInputId').addEventListener('input', function (event) {
   if ((event.inputType === 'insertText') && (event.data === null)) {
-    // Remove EOL characters at cursor loction
+    // Remove EOL characters at cursor location
     stripOneCrLfFromElement(document.getElementById('userPrivMsgInputId'));
     _buildPrivateMessageText();
   }
   if (event.inputType === 'insertLineBreak') {
-    // Remove EOL characters at cursor loction
+    // Remove EOL characters at cursor location
     stripOneCrLfFromElement(document.getElementById('userPrivMsgInputId'));
     _buildPrivateMessageText();
   }
@@ -976,7 +1085,7 @@ document.getElementById('openPmWithBeepCheckbox')
   .addEventListener('click', handleOpenWithBeepCBClick);
 
 // -------------------------
-// [Erase All PM] button handler
+// [Erase All  PM] button handler
 // -------------------------
 document.getElementById('privMsgHeaderHiddenDiv').addEventListener('click', function () {
   const fetchURL = webServerUrl + '/irc/erase';
