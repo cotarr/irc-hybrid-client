@@ -104,8 +104,8 @@ function _splitMultiLinePaste (multiLineContent) {
   const inArray = multiLineContent.split('\n');
   if (inArray.length > 0) {
     for (let i = 0; i < inArray.length; i++) {
-      if (inArray[i].replace('\r', '').length > 0) {
-        outArray.push(inArray[i].replace('\r', ''));
+      if (inArray[i].replace(String.fromCharCode(13), '').length > 0) {
+        outArray.push(inArray[i].replace(String.fromCharCode(13), ''));
       }
     }
   }
