@@ -104,6 +104,8 @@ function _splitMultiLinePaste (multiLineContent) {
   const inArray = multiLineContent.split('\n');
   if (inArray.length > 0) {
     for (let i = 0; i < inArray.length; i++) {
+      // In the event a windows computer presents \r\n, remove the \r
+      // Changed from '\r' to String.fromCharCode(13) to address CodeQL warning.
       if (inArray[i].replace(String.fromCharCode(13), '').length > 0) {
         outArray.push(inArray[i].replace(String.fromCharCode(13), ''));
       }
