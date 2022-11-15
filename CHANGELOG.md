@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Next
+## [v0.2.27](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.27) 2022-11-15
 
 ### Changed
 
@@ -16,7 +16,7 @@ and this project adheres to
 
 - Added new property `serveHtmlHelpDocs` to the configuration file credentials.json. If this property exists and is set to true, the help documentation in the repository /docs folder will be included in the web server at path /irc/docs/. User login is required to view the help pages. This is completely optional. To save disk space, it is not necessary to include the /docs folder in web server deployment, nor is it necessary to serve the folder, even if present. Upgrade note: No configuration change is necessary. If the property is not present due to older configuration format, no error will be issued and the pages will not be served.
 
-- Added bash script restart.sh. The script is intended for use after changes to credentials.son, this is run manually to kill the previous instance by PID and restart the NodeJs instance of irc-hybrid-client. Instruction for restart.sh added to /doc.
+- Added bash script restart.sh. The script is intended for use after changes to credentials.json. The script is run manually to kill the previous instance by PID and restart the NodeJs instance of irc-hybrid-client. Instructions for restart.sh added to /doc.
 
 ## [v0.2.26](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.26) 2022-11-14
 
