@@ -437,10 +437,10 @@ inputString:text,originType:'channel',originName:ircState.channelStates[channelI
 if(commandAction.ircMessage&&commandAction.ircMessage.length>0)_sendIrcServerMessage(commandAction.ircMessage);return}}if(ircState.ircConnected&&ircState.ircIsAway)setTimeout((function(){
 if(ircState.ircConnected&&ircState.ircIsAway)_sendIrcServerMessage('AWAY')}),1e3);const message='PRIVMSG '+ircState.channelStates[channelIndex].name+' :'+text;_sendIrcServerMessage(message)
 ;textAreaEl.value=''}textAreaEl.value=''}function _splitMultiLinePaste(multiLineContent){if('string'!==typeof multiLineContent)return[];if(0===multiLineContent.length)return[];const outArray=[]
-;const inArray=multiLineContent.split('\n')
-;if(inArray.length>0)for(let i=0;i<inArray.length;i++)if(inArray[i].replace(String.fromCharCode(13),'').length>0)outArray.push(inArray[i].replace(String.fromCharCode(13),''));return outArray}
-const mobileBreakpointPx=600;function createChannelEl(name){if(webState.channels.indexOf(name.toLowerCase())>=0){console.log('createChannelEl: channel already exist');return}
-const defaultHeightInRows='17';webState.channels.push(name.toLowerCase());const initIrcStateIndex=ircState.channels.indexOf(name.toLowerCase());webState.channelStates.push({
+;const inArray=multiLineContent.split('\n');if(inArray.length>0)for(let i=0;i<inArray.length;i++){let nextLine=inArray[i];if(nextLine.length>0){
+if(13===nextLine.charCodeAt(nextLine.length-1))nextLine=nextLine.slice(0,nextLine.length-1);if(nextLine.length>0)outArray.push(nextLine)}}return outArray}const mobileBreakpointPx=600
+;function createChannelEl(name){if(webState.channels.indexOf(name.toLowerCase())>=0){console.log('createChannelEl: channel already exist');return}const defaultHeightInRows='17'
+;webState.channels.push(name.toLowerCase());const initIrcStateIndex=ircState.channels.indexOf(name.toLowerCase());webState.channelStates.push({
 lastJoined:ircState.channelStates[initIrcStateIndex].joined});let maxNickLength=0;const channelIndex=ircState.channels.indexOf(name.toLowerCase())
 ;const channelContainerDivEl=document.getElementById('channelContainerDiv');const channelMainSectionEl=document.createElement('div');channelMainSectionEl.classList.add('color-channel')
 ;channelMainSectionEl.classList.add('aa-section-div');channelMainSectionEl.setAttribute('lastDate','0000-00-00');const channelTopDivEl=document.createElement('div')
