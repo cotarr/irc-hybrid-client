@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Next
+
+### Added
+
+- Added bash script restart.sh. The script is intended for use after changes to credentials.son, this is run manually to kill the previous instance by PID and restart the NodeJs instance of irc-hybrid-client. Instruction for restart.sh added to /doc.
+
 ## [v0.2.26](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.26) 2022-11-14
 
 ### Changed 

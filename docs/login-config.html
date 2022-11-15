@@ -254,6 +254,26 @@
   "pidFilename": "/home/user1/tmp/ircHybridClient.PID",
 </pre></div>
 
+        <div class="install-section-title">Restart using PID file</div>
+        <p>
+          After making changes to the configuration in credentials.json, 
+          it is necessary to stop and restart the irc-hybrid-client web server
+          to load the new configuration.
+        </p>
+        <p>
+          Assuming a PID filename (previous section) has been configured 
+          and contains a full path name, a bash script &quot;restart.sh&quot; 
+          may be executed from the base folder of the repository to retrieve the PID number, 
+          kill previous irc-hybrid-client instance, and launch a new
+          instance of the irc-hybrid-client web server.
+        </p>
+        <p>
+          This script requires the Linux &quot;jq&quot; utility for parsing JSON content.
+          The jq linux package may be installed using &quot;apt-get install jq&quot; in Debian or Ubuntu.
+          The restart.sh utility is intended to be run manually to assist with editing 
+          of credentials.json. It is not intended to be run from cron.
+        </p>
+
         <div class="install-section-title">Disable Server List Editor Web Page</div>
         <p>
           The boolean property &quot;disableServerListEditor&quot;
