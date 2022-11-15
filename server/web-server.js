@@ -598,6 +598,14 @@ if (nodeEnv === 'production') secureDir = path.join(__dirname, '../secure-minify
 console.log('Serving files from: ' + secureDir);
 app.use('/irc', userAuth.authorizeOrFail, express.static(secureDir));
 
+//
+// Optionally server /docs folder to /irc/docs
+//
+if (credentials.serveHtmlHelpDocs) {
+  const docsDir = path.join(__dirname, '../docs');
+  app.use('/irc/docs', userAuth.authorizeOrFail, express.static(docsDir));
+}
+
 // ---------------------------------
 //    E R R O R   H A N D L E R S
 // ---------------------------------

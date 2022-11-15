@@ -483,7 +483,8 @@ Enter new password:<blue-example>zuwa79xoJxLJ</blue-example>
   ],
   "enableRemoteLogin": false,
   "enableSocks5Proxy": false,
-  "ircSocketLocalAddress": ""
+  "ircSocketLocalAddress": "",
+  "serveHtmlHelpDocs": false
 }
 </pre></div>
         <p>
@@ -505,6 +506,33 @@ cd ..
           copy/paste the entire javascript object as an additional javascript object in the array.
           Use care to maintain valid JSON format with commas and braces.
         </p>
+
+        <div class="install-section-title">Serve HTML Help Files</div>
+        <p>
+          The git repository includes a /docs folder containing static HTML files with help documentation.
+          These are available on GitHub Pages. Optionally, the /docs repository folder
+          maybe be included locally within the irc-hybrid-client web server at path &quot;/irc/docs/&quot;. 
+          This is completely optional. To save disk space, it is not necessary to include the /docs folder 
+          in web server deployment, nor is it necessary to serve the folder, even if present.
+        </p>
+        <p>
+          Proper login will be required prior to viewing the help pages.
+          To login, first visit /irc/webclient.html to enter your username and password, 
+          then change the path to /irc/docs/ in the URL.
+          Unauthorized requests will return status 403 Forbidden.
+        </p>
+        <p>
+          To enable the /docs file folder to be available at web path /irc/docs, set the 
+          serveHtmlHelpDocs property to true. If the property does not exist
+          due to an earlier version of credentials.json, no error will 
+          be issued and the files will not be served.
+        </p>
+<div class="pre-div"><pre>
+{
+  "serveHtmlHelpDocs": true
+}
+</pre></div>
+
 
         <div class="vh-20"></div>
         <div class="desc-title">
