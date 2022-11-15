@@ -8,6 +8,10 @@ and this project adheres to
 
 ## Next
 
+### Changed
+
+- webclient06.js - The _splitMultiLinePaste() function used to split clipboard content into an array of strings was rewritten to better address mixed Unix and MS Windows end of line characters (LF) and (CR+LF). This is an improved fix to GitHub CodeQL warning in v0.2.25.
+
 ### Added
 
 - Added new property `serveHtmlHelpDocs` to the configuration file credentials.json. If this property exists and is set to true, the help documentation in the repository /docs folder will be included in the web server at path /irc/docs/. User login is required to view the help pages. This is completely optional. To save disk space, it is not necessary to include the /docs folder in web server deployment, nor is it necessary to serve the folder, even if present. Upgrade note: No configuration change is necessary. If the property is not present due to older configuration format, no error will be issued and the pages will not be served.

@@ -93,7 +93,8 @@ function _sendTextToChannel (channelIndex, textAreaEl) {
 // ----------------------------
 // Internal function
 // Accepts one multi-line string
-// Returns array of strings containing lines of clipboard paste
+// Returns array of strings
+// End of line characters LF or CR+LF are removed.
 //
 // Note: this is also used in private messages in webclient07.js
 // ----------------------------
@@ -101,13 +102,23 @@ function _splitMultiLinePaste (multiLineContent) {
   if (typeof multiLineContent !== 'string') return [];
   if (multiLineContent.length === 0) return [];
   const outArray = [];
+  // Split each line from clipboard content into array strings using '\n' (LF)
   const inArray = multiLineContent.split('\n');
   if (inArray.length > 0) {
+    // loop through each string
     for (let i = 0; i < inArray.length; i++) {
-      // In the event a windows computer presents \r\n, remove the \r
-      // Changed from '\r' to String.fromCharCode(13) to address CodeQL warning.
-      if (inArray[i].replace(String.fromCharCode(13), '').length > 0) {
-        outArray.push(inArray[i].replace(String.fromCharCode(13), ''));
+      let nextLine = inArray[i];
+      if (nextLine.length > 0) {
+        // If this is a MS Windows string, it may end in '\r\n' (CR+LF)
+        // The \n is already removed by the previous .split('\n')
+        // In the case of a Windows format string, the '\r' CR may remain.
+        //
+        // Does string end in '\r' (CR)
+        if (nextLine.charCodeAt(nextLine.length - 1) === 13) {
+          // Case of windows string format, remove the CR
+          nextLine = nextLine.slice(0, nextLine.length - 1);
+        }
+        if (nextLine.length > 0) outArray.push(nextLine);
       }
     }
   }
