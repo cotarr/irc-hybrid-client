@@ -460,8 +460,29 @@ document.addEventListener('server-message', function (event) {
           cleanCtcpDelimiter(
             substituteHmsTime(event.detail.message))));
   } // switch
+  //
+  // If closed, open the server window to display the server message
+  //
   if (!webState.cacheReloadInProgress) {
-    showRawMessageWindow();
+    //
+    // Do not open and display server window for these commands.
+    //
+    // 'NICK' (users changing nickname in channel is opening the server window
+    //
+    const inhibitCommandList = [
+      'NICK'
+    ];
+    if (('detail' in event) && ('parsedMessage' in event.detail) &&
+      ('command' in event.detail.parsedMessage) &&
+      (typeof event.detail.parsedMessage.command === 'string') &&
+      (event.detail.parsedMessage.command.length > 0)) {
+      if (inhibitCommandList.indexOf(event.detail.parsedMessage.command.toUpperCase()) < 0) {
+        // Not in inhibit list, go ahead and open server window, else leave closed
+        showRawMessageWindow();
+      }
+    } else {
+      showRawMessageWindow();
+    }
   }
 }); // server-message event handler
 

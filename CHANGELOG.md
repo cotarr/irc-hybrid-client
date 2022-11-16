@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
+## Next
+
+### Changed
+
+- Added an IRC command filter to inhibit the server window from auto-opening when a user in an IRC channel changes their name with the 'NICK' command. This is address an annoying situation occurring when a user changes their nickname, causing the browser to scroll the page.
 ## [v0.2.27](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.27) 2022-11-15
 
 ### Changed

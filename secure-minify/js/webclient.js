@@ -958,7 +958,9 @@ if('default'===event.detail.parsedMessage.params[0])displayRawMessage(cleanForma
 if(ircState.nickName.toLowerCase()===event.detail.parsedMessage.nick.toLowerCase())displayRawMessage(cleanFormatting(cleanCtcpDelimiter(event.detail.parsedMessage.timestamp+' '+event.detail.parsedMessage.nick+' is now known as '+event.detail.parsedMessage.params[0])))
 ;break;case'NOTICE':
 displayRawMessage(cleanFormatting(cleanCtcpDelimiter(event.detail.parsedMessage.timestamp+' '+'NOTICE '+event.detail.parsedMessage.params[0]+' '+event.detail.parsedMessage.params[1])));break;default:
-displayRawMessage(cleanFormatting(cleanCtcpDelimiter(substituteHmsTime(event.detail.message))))}if(!webState.cacheReloadInProgress)showRawMessageWindow()}))
+displayRawMessage(cleanFormatting(cleanCtcpDelimiter(substituteHmsTime(event.detail.message))))}if(!webState.cacheReloadInProgress){const inhibitCommandList=['NICK']
+;if('detail'in event&&'parsedMessage'in event.detail&&'command'in event.detail.parsedMessage&&'string'===typeof event.detail.parsedMessage.command&&event.detail.parsedMessage.command.length>0){
+if(inhibitCommandList.indexOf(event.detail.parsedMessage.command.toUpperCase())<0)showRawMessageWindow()}else showRawMessageWindow()}}))
 ;document.addEventListener('erase-before-reload',(function(event){document.getElementById('rawMessageDisplay').value='';document.getElementById('rawMessageInputId').value=''
 ;document.getElementById('rawSectionDiv').setAttribute('lastDate','0000-00-00')}));document.addEventListener('cache-reload-done',(function(event){if(webState.viewRawMessages&&!webState.showRawInHex){
 const tempRawMessages=document.getElementById('rawMessageDisplay').value.split('\n');if(tempRawMessages.length>1){const tempTimestampArray=[];const tempSortIndexArray=[]
