@@ -12,6 +12,9 @@ and this project adheres to
 ### Changed
 
 - Added an IRC command filter to inhibit the server window from auto-opening when a user in an IRC channel changes their name with the 'NICK' command. This is address an annoying situation occurring when a user changes their nickname, causing the browser to scroll the page.
+
+restart.sh script - Change: Extract optional property 'instanceNumber' from credentials.json. The instance number is added to the command line used to start the server as a command line argument. The irc-hybrid-client program does not accept any command line arguments, so placing the optional argument in the command line will be ignored. This is useful with the 'ps' command when multiple instances of irc-hybrid-client are run on the same server.
+
 ## [v0.2.27](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.27) 2022-11-15
 
 ### Changed

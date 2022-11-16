@@ -2,6 +2,8 @@
 #
 # Script to kill and restart irc-hybrid-client
 #
+# Usage:  ./restart.sh
+#
 # This script is intended to restart the NodeJs web server after
 # changes to the configuration files: credentials.json
 #
@@ -33,6 +35,12 @@ if ! [ -f /usr/bin/jq ] ; then
   exit 1
 fi
 
+# Get Optional Instance Number 
+INSTANCENO=$(cat credentials.json | jq -r ".instanceNumber")
+if [ "$INSTANCENO" == "null" ] ; then
+  INSTANCENO=""
+fi
+
 # Get PID filename
 PIDFILE=$(cat credentials.json | jq -r ".pidFilename")
 if [ -z "$PIDFILE" ] ; then
@@ -52,7 +60,7 @@ fi
 
 # All prerequisites met, go ahead and kill the previous process
 if [ -n "$KILLPID" ] ; then
-  echo "Killing process $KILLPID node bin/www (irc-hybrid-client-004)"
+  echo "Killing process $KILLPID node bin/www $INSTANCENO"
   kill -SIGTERM  $KILLPID
 fi
 
@@ -60,10 +68,25 @@ fi
 sleep 2
 
 # Launch new instance of irc-hybrid-client
+#
+#   '--expose-gc' (Optional) - Used to monitor memory usage (Server, More, button [Test-1])
+#
+#   '$INSTANCENO' (Optional) - Numeric identifier used when multiple 
+#        instances are run on the same server. The irc-hybrid-client 
+#        does not accept any command line arguments so the instance number is igonred.
+#        This may be useful in the 'ps' command to identify proper instance.
+#
+#   '&>> logs/node.log' (Optional) - In the event that NodeJs prints errors to 
+#        stdout or errout, they would be capture in this file.
+#        In normal use, only the program start notices should be present
+#
 export NODE_ENV="production"
-node --expose-gc bin/www &>> logs/node.log &
+/usr/bin/node --expose-gc bin/www $INSTANCENO &>> logs/node.log &
 
 sleep 2
 
 # Show results by tail log file
-tail -20 logs/node.log
+
+if ! [ -f logs/node.log ] ; then
+  tail -20 logs/node.log
+fi
