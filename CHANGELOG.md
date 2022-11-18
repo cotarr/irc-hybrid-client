@@ -11,11 +11,36 @@ and this project adheres to
 ### Added
 
 - Added 5 second web server timeout for new connections to perform TLS handshake
-- Added 5 second web server timeout for web browser to complete client HTTP request and headers.
+- Added 5 second web server timeout for web browser to complete the initial HTTP request.
+
+Discussion: This is an update to the Node/Express HTTP server configuration
+to address the case where a web browser TCP connection to the web server 
+could wait indefinitely for a valid http request.
+If no http request were to sent to the web server, the connection 
+could be held open without a time limit. This could use system resources
+posing a potential denial of service risk. This risk should be mitigated by this patch.
+
+However, the socket server is dual purpose, listening for both traditional http requests
+and also listening for websocket connection requests in order to pass
+real time IRC server messages to the web browser over the websocket as a stream.
+
+Lack of a timeout does not appear to have been a risk for the websocket server.
+The connection sequence is explained in the comments in server/middlewares/ws-authorize.js module. An authorized http request must be issued prior to attempting a web socket 
+connection. This schedules a 10 second connection window for the websocket server.
+When the websocket connection request is initiated, if the cookie of the 
+websocket request not match the cookie that scheduled the request,
+or the 10 second time limit has been exceeded, the websocket request is immediately 
+disconnected, closing the TCP socket from the server end.
+
+The alternate question, can changing the socket server timeout or the TLS handshake timeout
+adversely impact the websocket connections? An instance of irc-hybrid-client
+with timeout patch has been use on DALnet for 24 hours.
+No unusual websocket issues have been seen in the logs.
 
 ### Changed
 
-- Fixed typo in restart.sh now tailing log file
+- Fixed typo in restart.sh, was not tailing log file
+- Full proof read of the /docs web page content with numerous minor corrections and additions. 
 
 ## [v0.2.28](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.28) 2022-11-16
 

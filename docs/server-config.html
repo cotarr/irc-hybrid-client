@@ -103,33 +103,34 @@
           The server list editor web page will present the current list of IRC server definitions in table format.
           The list is loaded from the servers.json file in the base folder of the web server.
           The left most column indicates the server index position in the list.
-          The server definition at index number 0 is the default definition 
-          that will be selected when the application is started.
+          The server definition with the lowest index number that is not disabled will be
+          the default definition that will be selected when the application is started.
           In the far right column, [move-up] buttons may be used to re-order the list.
         </p>
         <p>
           The disable checkbox is used to prevent an individual server from 
           being selected using the [Next], [Prev] buttons in the web client.
-          This checkbox may be activated here in the table.
+          The disabled checkbox is the only property that may be modified 
+          from within in the server list table.
         </p>
         <p>
           The &quot;group&quot; column shows an integer group number. 
           Groups are used to configure and define a common group of IRC server definitions.
           Different IRC servers can be rotated after disconnect from the IRC network.
           Group 0 is reserved for stand alone servers.
-          In the case where the group number is 1 or greater a rotation group is defined. 
-          If more than 2 server in a group are not disabled and have reconnect enabled, 
-          then up on disconnect the client will automatically rotate IRC server 
-          definitions within a server group.
+          In the case where the group number is 1 or greater, a rotation group is defined. 
+          If more than 2 server in a group are not disabled and both have the 
+          reconnect property enabled, then upon disconnect, the client will 
+          automatically rotate IRC server definitions within a server group.
         </p>
         <p>
           The [Return to IRC Client] button is a hyper-link back to the IRC client URL at /irc/webclient.html.
         </p>
         <p>
-          The [Copy] button will duplicate the selected IRC server definition and add the 
+          The [Copy] button will duplicate the associated IRC server definition and add the 
           copy to the bottom of the list.
         </p><p>
-          The [Delete] button will remove the selected IRC server from the list.
+          The [Delete] button will remove the associated IRC server from the list.
         </p><p>
           The [Edit] button will open a user input form as shown below in the next section.
           The [Create New IRC Server] button will open the same form populated with some default values.
@@ -162,10 +163,10 @@
           Groups are used to configure and define a common group of IRC server definitions.
           Different IRC servers can be rotated after disconnect from the IRC network.
           Group 0 is reserved for stand alone servers.
-          In the case where the group number is 1 or greater a rotation group is defined. 
-          If more than 2 server in a group are not disabled and have reconnect enabled, 
-          then up on disconnect the client will automatically rotate IRC server 
-          definitions within a server group.
+          In the case where the group number is 1 or greater, a rotation group is defined. 
+          If more than 2 server in a group are not disabled and both have the reconnect
+          property enabled, then up on disconnect the client will automatically 
+          rotate IRC server definitions within a server group.
         </p>        
         <p>
           The Label is used to provide a descriptive name for an IRC server definition.
@@ -174,19 +175,23 @@
         </p>
         <p>
           When the reconnect checkbox is checked, after disconnect, the IRC
-          client will attempt to reconnect to IRC. It will use the existing server
-          definition and existing nickname. Server rotation and nickname rotation 
-          are not currently available. It will attempt to re-join up to 5 channels 
-          at the time of disconnection. 
+          client will attempt to reconnect to IRC. For the first try, it will use 
+          the existing server definition and existing nickname. 
+          In the case where first reconnect 
+          attempt using the same IRC server and nickname fails, if additional 
+          IRC servers have been defined within a Group, other IRC server 
+          definitions will be tried. Upon reconnect, it will attempt to 
+          re-join up to 5 channels that were open at the time of disconnection. 
           This feature does not support channel passwords.
+        </p>
+        <p>
+          At this time there are no provisions to configure a server to 
+          auto-connect to IRC on startup. There is no provision 
+          to auto-join channels on startup
         </p>
         <div class="home-detail">
           <div class="image-text">
             <p>
-              At this time there are no provisions to configure a server to 
-              auto-connect to IRC on startup. There is no provision 
-              to auto-join channels on startup
-            </p><p>
               When the log checkbox is checked, the raw IRC messages from the IRC server
               are written the file &quot;irc.log&quot; located in the logs folder.
               Caution should be used as logging of passwords or other bot credentials
@@ -209,7 +214,8 @@
               It may used for IRC servers that require a password in order to connect to the IRC network.
               The password is a write-only field and the current value may not be viewed from 
               the web page for security reasons.
-              Security note: The IRC server password is stored in plain text in the servers.json file.
+              Security note: The IRC server password is stored in plain text in 
+              the servers.json file, and it may be viewed there.
             </p>
             <p>
               SASL authorization is optional.
@@ -222,7 +228,8 @@
               attempted without SASL. The only mechanism supported at this time is PLAIN.
               The SASL password is a write-only field and the current value may not 
               be viewed from the web page for security reasons.
-              Security note: The SASL password is stored in plain text in the servers.json file.
+              Security note: The SASL password is stored in plain text in the 
+              servers.json file, and it may be viewed there.
             </p>
             <p>
               The IRC nickname, real name, used ID and initial modes are similar to other IRC clients.
@@ -278,7 +285,7 @@
         <p>
           Each of the curley braces { } within the array is a javascript object
           with one object for each server definition.
-          Note the server objects are separated by commas, except the last
+          Note the server objects are separated by commas, except the last server.
         </p>
 <pre><yellow-example>
   "serverArray": [
@@ -303,7 +310,7 @@
           being selected using the [Next], [Prev] buttons in the web client.
         </p>
         <p>
-          The &quot;group&quot; column shows an integer group number. 
+          The &quot;group&quot; property contains an integer group number. 
           Groups are used to configure and define a common group of IRC server definitions.
           Different IRC servers can be rotated after disconnect from the IRC network.
           Group 0 is reserved for stand alone servers.
@@ -398,13 +405,19 @@
           page of the documentation. If the socks5 proxy is disabled globally,
           the proxy property is ignored.
         </p>
+
         <p>
-          When the &quot;reconnect&quot; property is set to true, the backend web server will
-          attempt to reconnect to the IRC server after it has been disconnected.
-          It will attempt to re-join up to 5 channels at the time of disconnection.
-          This feature does not support channel passwords. There is no provision to 
-          rotate multiple IRC server addresses, and the original server address will be used.
+          When the &quot;reconnect&quot; property is set to true, after disconnect, the IRC
+          client will attempt to reconnect to IRC. For the first try, it will use 
+          the existing server definition and existing nickname. 
+          In the case where first reconnect attempt using the same IRC 
+          server and nickname fails, if additional IRC servers have been 
+          defined within a Group, other IRC server 
+          definitions will be tried. Upon reconnect, it will attempt to 
+          re-join up to 5 channels that were open at the time of disconnection. 
+          This feature does not support channel passwords.
         </p>
+
         <p>
           When the &quot;logging&quot; property is set to true, IRC messages 
           are written to the &quot;logs/irc.log&quot; file located with the backend web server.
@@ -518,7 +531,9 @@
         <p>
           If the IRC server auto-reconnect is enabled as discussed below, then upon
           a successful re-connect to the irc server, up to 5 irc channels
-          will be automatically rejoined.
+          will be automatically rejoined. The IRC channels eligible to be automatically 
+          rejoined is based on channels open at the time of disconnect. 
+          Automatic rejoin of channels has no relationship to the defined channelList array.
         </p>
 
 <div class="pre-div"><pre>

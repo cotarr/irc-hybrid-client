@@ -93,6 +93,7 @@
           This HTML, CSS and browser JavaScript was written and debugged
           using the Chrome web browser running under Linux, and using
           the mobile Chrome browser on an Apple iPhone 8 Plus.
+          The default Chrome fonts are used.
           Therefore, Chrome is the recommended browser and 
           other browsers may exhibit minor font and page layout issues.
         </p>
@@ -279,15 +280,15 @@ sudo certbot certonly --standalone -d abcd.example.com
         <p>
           If you prefer to use restricted port 443 for your webserver, it would be recommended
           to place the IRC client on an alternate non-privileged port, then use
-          iptables rules to exchange port numbers to 443 as packets cross the firewall.
+          iptables or nftables firewall rules to exchange port numbers to 443 as packets cross the firewall.
           This will improve security by keeping the IRC client in a non-privileged account.
-          It would be necessary to temporarily remove these iptables rules to
-          use certbot to renew the TLS certificates.
+          It would be necessary to temporarily remove these firewall rules when using
+          certbot to renew the TLS certificates.
         </p>
         <p>
           In summary, one inbound TCP connection and one outbound TCP connection are
           required to pass the firewall.
-          There should be no other other network connections to this IRC client.
+          There should be no other other network connections related to this IRC client.
         </p>
 
         <div class="install-section-title">8 - File Permissions</div>
@@ -299,6 +300,11 @@ sudo certbot certonly --standalone -d abcd.example.com
           The &quot;credentials.json&quot; and &quot;servers.json&quot; files
           are recommended to be 0o600 (drw-------).
         </p>
+        <p>
+          Since GitHub supports other operating systems like MS Windows as well as others,
+          the file permissions flags may not map perfectly during the git clone operations.
+          It is always a good idea to review permissions after a clone.
+        </p>
 
         <div class="install-section-title">9 - Log Files</div>
         <p>
@@ -306,9 +312,9 @@ sudo certbot certonly --standalone -d abcd.example.com
           If you use logging, monitor file size as necessary.
         </p>
         <p>
-          When the program first starts, if not existing, it will create a
-          &quot;logs&quot; folder. If you have enabled logging,
-          the log files will be written to this folder in the current working directory.
+          When the program first starts, if not existing, a &quot;/logs/&quot; folder will be created
+          automatically. If you have enabled logging,
+          the log files will be written to the /logs folder in the base folder of the repository.
           Configuration of a custom directory location is not supported in this version.
         </p>
         <ul>
@@ -329,9 +335,16 @@ sudo certbot certonly --standalone -d abcd.example.com
             as explained in the Server Config section.
             The file can become quite large.
             It is primarily intended for debugging, and should probably be left disabled.
-        </li>
+          </li>
+          <li>
+            node.log (Optional) - In the event that a server encounters an unexpected error,
+            error messages may be printed to stdout or errout. These may be captured for 
+            later review by redirecting irc-hybrid-client output to a file, in this case the optional node.log file.
+            The next section shows an example where the output is captured to a node.log.
+          </li>
         </ul>
         </p>
+       
         <p>
           If the program is started with environment variable NODE_ENV=development, 
           all logging will be redirected to the console. In a production situation 
@@ -378,10 +391,46 @@ node bin/www
           launch to the program into the background by appending an &quot&amp&quot.
           Attempting this from a script or from cron may require full file pathnames.
           Systems may vary, but it would look something like this:
-          &quot;node bin/www &amp>> logs/node.log &&quot;
+        </p>
+<div class="pre-div"><pre>
+/usr/bin/node bin/www &amp;>> logs/node.log &
+</pre></div>
+        <p>
+          Optional:
+        </p>
+        <p>
+          If running multiple instances of irc-hybrid-client, you have probably assigned 
+          a different port number and instanceNumber for each instance of irc-hybrid-client
+          on the same server. It can be useful to assign the instanceNumber to 
+          be the same as the port number. This will help identify cookies with servers.
+          When listing running processes with the ps command, different instances can be
+          identified using a custom command line to launch the app.
+        </p>
+        <p>
+          It is safe to add the  instance number to the command line as a command line argument. 
+          The irc-hybrid-client program does not accept any command line arguments,
+          so placing the optional argument in the command line will be ignored.
+          This is useful with the 'ps' command when multiple instances of
+          irc-hybrid-client are run on the same server. In this example
+          both the port and instance number are set to 4301. The following
+          command line can be used to launch the program with the 
+          optional identifier as a command line argument.
+        </p>
+<div class="pre-div"><pre>
+/usr/bin/node bin/www 4301 &amp;>> logs/node.log &
+</pre></div> 
+        <p>
+          Using the bash command &quot;ps x&quot; would identify the matching 
+          process containing &quot;4301&quot; as in the following:
         </p>
 
-        <div class="install-section-title">11 - Minify and bundle (Optional)</div>
+<div class="pre-div"><pre>
+51910 pts/0    Sl     0:07 /usr/bin/node bin/www 4301
+55240 pts/0    Sl     0:04 /usr/bin/node bin/www 4312
+</pre></div> 
+
+
+<div class="install-section-title">11 - Minify and bundle (Optional)</div>
         <p>
           This section is optional. This repository contains both minified and
           original un-minified files.
@@ -413,7 +462,7 @@ node bin/www
           stopping the server, changing to the repository folder and typing the following:
         </p>
 <div class="pre-div"><pre>
-git pull
+git pull --ff-only
 npm ci
 </pre></div>
 

@@ -102,6 +102,14 @@
             </p>
             A: No. The application is limited to one IRC network connection at a time.
             You can sign out of IRC and switch between different IRC networks using the [Next] button.
+            <br><br>
+            However, a single user can be present on multiple IRC network by 
+            running multiple instances of the irc-hybrid-client program concurrently.
+            Each web server is required listen on a different port number. 
+            This would provide a different browser bookmark URL (host:port) for each instance.
+            Therefore different IRC networks could be attended in different browser tabs.
+            Refer to the Login Config section to properly set &quot;instanceNumber&quot; to 
+            manage unique cookies when running multiple irc-hybrid-client instances.
           </a></td></tr>
 
           <tr><td><a name="concurrent">
@@ -123,7 +131,7 @@
             <p>
               Q: Does the program use cookies?<br>
             </p>
-            A: Yes. During normal use web browser http requests are
+            A: Yes. Web browser HTTP requests are
             authorized using session cookies for purposes of access control.
             This is disclosed on the login form. No additional persistent
             identifiers are used.

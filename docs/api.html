@@ -51,7 +51,7 @@
           The web browser IRC client operates on IRC messages received from the backend
           NodeJs web server. These are RFC 2812 standard IRC messages.
           Some non-standard (outside RFC 2812) messages are passed over the websocket
-          as described below.
+          for control purposes as described below.
         </p>
 
         <p>
@@ -368,10 +368,10 @@ by sending invalid server name with TIME request.</p>
         </p>
 
         <p>
-          The web browser should listen for websocket stream message containing a string matching &quot;UPDATE&quot;.
+          The web browser should listen for a websocket stream message containing a string matching &quot;UPDATE&quot;.
           When an UPDATE is received as a single line message delimited by 0x10,0x13, (...&#92;r&#92;nUPDATE&#92;r&#92;n...)
           the browser javascript should fetch a GET request to the /irc/getircstate route.
-          The browser should then parse the state object for change and update the user interface as needed.
+          The browser should then parse the state object for changes and update the user interface as needed.
         </p>
 
         <p>
@@ -699,7 +699,7 @@ Cached message with 2 IRC channels.
           which are used to perform various tasks.
         </p>
         <p>
-          Error that occur during input validation checking will return 
+          Errors that occur during input validation checking will return 
           Status 422 Unprocessable entity.
         </p>
         <p>
@@ -1278,7 +1278,7 @@ Cached message with 2 IRC channels.
                 when troubleshooting software errors.
                 These outgoing messages can be viewed in the IRC client Server window
                 by clicking checkboxes for [x]View-Raw and [x]Add-Comms.
-                These are outgoing messages. There is assurance the IRC server accepted them without error.
+                These are outgoing messages. There is no assurance the IRC server accepted them without error.
                 Therefore, these messages should be considered as informational only for debug purposes.
                 Messages starting with &quot;--&gt;&quot; should not be parsed by the browser for content.
                 As shown in the following example,
@@ -1343,9 +1343,9 @@ HEARTBEAT
           This program's API debug collection can be imported into Postman from the cloned repository
           located at
           &quot;/postman/irc-hybrid-client message debug.postman_collection.json&quot;.
-        </p>
+        </p>  
         <p>
-          Two additional Postman collections are included that allow testing of
+          Several additional Postman collections are included that allow testing of
           access restrictions of the API routes and testing of websocket authorization.
           Documentation on authorization testing is available in the README.md which is
           located in the directory with the exported collections, as well as comments within the
@@ -1364,7 +1364,8 @@ HEARTBEAT
         </p>
         <h4>1C Postman Environment</h4>
         <p>
-          Create a postman environment and create the following variables.
+          Create a postman environment and create the following variables. 
+          A postman environment suitable for testing is included in the repository.
         </p>
         <ul>
           <li>server_URL</li>

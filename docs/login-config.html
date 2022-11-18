@@ -105,7 +105,8 @@
         <p>
           If you prefer to use restricted port 443 for your webserver, it would be recommended
           to place the IRC client on an alternate non-privileged port, then use
-          iptables rules to exchange port numbers to 443 as packets cross the firewall.
+          iptables or nftables firewall rules to exchange 
+          port numbers to 443 as packets cross the firewall.
         </p>
 <div class="pre-div"><pre>
   "port": 3003,
@@ -143,6 +144,11 @@
           The instanceNumber property is used to make the cookie name unique.
           The instanceNumber should be an integer between 0 and 65535.
           The instanceNumber should be unique for each instance running on a web server.
+        </p>
+        <p>
+          When running multiple servers, one suggested option would be to optinally set the 
+          instance number to the same value as the port number. This makes the cookies 
+          easy to identify.
         </p>
         <p>
           Security Caution:
@@ -254,7 +260,7 @@
   "pidFilename": "/home/user1/tmp/ircHybridClient.PID",
 </pre></div>
 
-        <div class="install-section-title">Restart using PID file</div>
+        <div class="install-section-title">Restart using PID file (Optional)</div>
         <p>
           After making changes to the configuration in credentials.json, 
           it is necessary to stop and restart the irc-hybrid-client web server
@@ -325,7 +331,7 @@
           data converted to an array of type utf-8 String to file `logs/savedMessageCache.json`. 
         </p>
         <p>
-          As the web server is restarted, it will to asynchronously read the cache file. 
+          As the web server is restarted, it will asynchronously read the cache file. 
           If the timestamp age is 300 seconds or less (5 minutes),
           the cache pointer and cache data is restored as Array of type Buffer. 
           Cache data is then removed from the file.
@@ -336,6 +342,16 @@
           server in group 0 will clear the cache. Therefore, the selected server to have cache restored 
           upon restarting the web server must be the first server in the list (the default server), or else in a group of servers 
           of the same group number at the start of the list.
+        </p>
+        <p>
+          Regarding server reboot, if the distribution of Linux does not send a 
+          SIGINT or SIGTERM to the irc-hybrid-client process before shutdown, then the cache 
+          will not be written. Debian seem to send a SIGKILL different signal before shutdown.
+          According to the NodeJs documentation
+          &quot;SIGKILL cannot have a listener installed, it will unconditionally 
+          terminate Node.js on all platforms.&quot;. Therefore to preserve the cache across 
+          server reboots, it may be necessary to issue a SIGINT or SIGTERM manually 
+          immediately before server shutdown for reboot. This could be scripted.
         </p>
         <p>
           This feature may be used to write bash scripts
@@ -356,7 +372,11 @@ if [ -n "$PID_NUMBER" ] ; then
   kill -SIGTERM $PID_NUMBER
 fi
 </pre></div>
-
+        <p>
+          There is a bash script &quot;restart.sh&quot; that can 
+          be used to restart after changes were made to credentials.json. 
+          This may be used as a further example.
+        </p>
         <p>
           In the file example-credentials.json, a new boolean
           property `persistIrcMessageCache` will enable auto-save
@@ -509,9 +529,10 @@ cd ..
 
         <div class="install-section-title">Serve HTML Help Files</div>
         <p>
-          The git repository includes a /docs folder containing static HTML files with help documentation.
-          These are available on GitHub Pages. Optionally, the /docs repository folder
-          maybe be included locally within the irc-hybrid-client web server at path &quot;/irc/docs/&quot;. 
+          The git repository includes a /docs folder (this web page) containing static HTML
+          files with help documentation. These are available on GitHub Pages.
+          Optionally, the /docs repository folder maybe be included 
+          locally within the irc-hybrid-client web server at path &quot;/irc/docs/&quot;. 
           This is completely optional. To save disk space, it is not necessary to include the /docs folder 
           in web server deployment, nor is it necessary to serve the folder, even if present.
         </p>
@@ -685,13 +706,14 @@ cd ..
           </p>
           <ul>
             <li>
-              To avoid cookie overlap, different domain names should be created for 
-              the authorization server each irc-hybrid-client instance, such as: 
-              auth.example.com, irc1.example.com an irc2.example.com.
+              To avoid cookie overlap, a unique domain name should be created for 
+              the authorization server that is different from any of the irc-hybrid-client 
+              domain names. Example: auth.example.com, irc1.example.com.
             </li>
             <li>
               If more than 1 irc-hybrid-client is installed on the same physical 
-              computer, each irc-hybrid-client must use a different network port number.
+              computer, each irc-hybrid-client must use a different network port number
+              and a different instanceNumber.
             </li>
             <li>
               The collab-auth authorization server must be installed, 
@@ -815,6 +837,7 @@ cd ..
           When set to true, remote login is enabled.
         </p>
         <p>
+          remoteAuthHost: This is the address of the remote authorization server.
           Hostnames must specify http or https. When using non-standard port numbers, 
           the port should be specified. With TLS standard port 443 the port may be omitted.
         </p>
