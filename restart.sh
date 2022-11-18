@@ -87,6 +87,6 @@ sleep 2
 
 # Show results by tail log file
 
-if ! [ -f logs/node.log ] ; then
+if [ -f logs/node.log ] ; then
   tail -20 logs/node.log
 fi

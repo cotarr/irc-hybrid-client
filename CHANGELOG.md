@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Next
+
+### Added
+
+- Added 5 second web server timeout for new connections to perform TLS handshake
+- Added 5 second web server timeout for web browser to complete client HTTP request and headers.
+
+### Changed
+
+- Fixed typo in restart.sh now tailing log file
+
 ## [v0.2.28](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.28) 2022-11-16
 
 ### Changed

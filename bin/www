@@ -54,7 +54,8 @@ if (credentials.tls) {
   const options = {
     key: fs.readFileSync(credentials.serverTlsKey),
     cert: fs.readFileSync(credentials.serverTlsCert),
-    minVersion: 'TLSv1.2'
+    minVersion: 'TLSv1.2',
+    handshakeTimeout: 5000
   };
   server = https.createServer(options, app);
 } else {
@@ -67,6 +68,18 @@ let port = 3003;
 if (('port' in credentials) && (parseInt(credentials.port) !== 0)) {
   port = parseInt(credentials.port);
 }
+
+// See TLS/SSL handshakeTimeout above
+//
+// Timeout to receive entire client request
+server.requestTimeout = 5000;
+
+// Socket idle timeout
+server.timeout = 5000;
+
+// Time for additional requests
+server.keepAliveTimeout = 5000;
+
 server.listen(port);
 
 server.on('listening', function () {
@@ -93,7 +106,7 @@ server.on('error', function (error) {
     throw error;
   }
   if (error.code === 'EACCES') {
-    console.log('Port requires elevated privledges');
+    console.log('Port requires elevated privileges');
     process.exit(1);
   }
   if (error.code === 'EADDRINUSE') {
