@@ -852,8 +852,8 @@
           // Expect a 1 to 1 match,  /NICK --> 433
           // If out of sync, abort
           if (vars.ircState.nickRecoveryActive) {
-            nickRecoveryWhoisResponses++;
-            if (nickRecoveryWhoisCounter !== nickRecoveryWhoisResponses) {
+            nickRecoveryReqNickResponses++;
+            if (nickRecoveryReqNickCounter !== nickRecoveryReqNickResponses) {
               _cancelNickRecovery();
               tellBrowserToRequestState();
               ircLog.writeIrcLog('Nickname recovery cancelled due to manual /NICK request');
@@ -1222,17 +1222,17 @@
   // Alternate Nickname and Nickname Auto-recovery
   // --------------------------------------------------
 
-  let nickRecoveryWhoisTimer = 0;
-  let nickRecoveryWhoisCounter = 0;
-  let nickRecoveryWhoisResponses = 0;
+  let nickRecoveryReqNickTimer = 0;
+  let nickRecoveryReqNickCounter = 0;
+  let nickRecoveryReqNickResponses = 0;
 
   function _activateNickRecovery () {
     if ((vars.servers.serverArray[vars.ircState.ircServerIndex].recoverNick) &&
       (vars.servers.serverArray[vars.ircState.ircServerIndex].altNick.length > 0)) {
       // first time duration
-      nickRecoveryWhoisTimer = 60;
-      nickRecoveryWhoisCounter = 0;
-      nickRecoveryWhoisResponses = 0;
+      nickRecoveryReqNickTimer = 60;
+      nickRecoveryReqNickCounter = 0;
+      nickRecoveryReqNickResponses = 0;
       vars.ircState.nickRecoveryActive = true;
       ircLog.writeIrcLog('Automatic nickname recovery enabled');
     }
@@ -1241,15 +1241,15 @@
     if (vars.ircState.nickRecoveryActive) {
       ircLog.writeIrcLog('Automatic nickname recovery cancelled');
     }
-    nickRecoveryWhoisTimer = 0;
-    nickRecoveryWhoisCounter = 0;
-    nickRecoveryWhoisResponses = 0;
+    nickRecoveryReqNickTimer = 0;
+    nickRecoveryReqNickCounter = 0;
+    nickRecoveryReqNickResponses = 0;
     vars.ircState.nickRecoveryActive = false;
   }
 
   // this is called from main module irc-client.js to insert TCP socket object
   function recoverNickTimerTick (socket) {
-    if (nickRecoveryWhoisTimer > 0) {
+    if (nickRecoveryReqNickTimer > 0) {
       const configNick = vars.servers.serverArray[vars.ircState.ircServerIndex].nick;
       const alternateNick = vars.servers.serverArray[vars.ircState.ircServerIndex].altNick;
       if (!vars.ircState.ircConnected) {
@@ -1264,20 +1264,20 @@
         _cancelNickRecovery();
         tellBrowserToRequestState();
       }
-      if (nickRecoveryWhoisTimer > 0) {
-        nickRecoveryWhoisTimer--;
-        if (nickRecoveryWhoisTimer === 0) {
-          nickRecoveryWhoisCounter++;
-          if (nickRecoveryWhoisCounter < 76) {
+      if (nickRecoveryReqNickTimer > 0) {
+        nickRecoveryReqNickTimer--;
+        if (nickRecoveryReqNickTimer === 0) {
+          nickRecoveryReqNickCounter++;
+          if (nickRecoveryReqNickCounter < 76) {
             if ((alternateNick.length > 0) &&
               (vars.ircState.nickName === alternateNick) &&
               (vars.servers.serverArray[vars.ircState.ircServerIndex].recoverNick) &&
               (configNick !== alternateNick)) {
-              nickRecoveryWhoisTimer = 60;
+              nickRecoveryReqNickTimer = 60;
               // each 1 minute until 20 minutes
-              if (nickRecoveryWhoisCounter > 20) nickRecoveryWhoisTimer = 300;
+              if (nickRecoveryReqNickCounter > 20) nickRecoveryReqNickTimer = 300;
               // 5 minutes until 1 hour
-              if (nickRecoveryWhoisCounter > 28) nickRecoveryWhoisTimer = 900;
+              if (nickRecoveryReqNickCounter > 28) nickRecoveryReqNickTimer = 900;
               // each 15 minutes until 20 + 8 + 48 = 13 hours
               if ((vars.nsIdentifyNick.length > 0) &&
                 (vars.nsIdentifyCommand.length > 0)) {
