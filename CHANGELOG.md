@@ -67,8 +67,10 @@ IDENTIFY handler.
 Changes:
 
 - Code used to parse the user host address was removed from the initial server 001 message.
+- Added new property `ircState.connectHost`. In the case where the 001 message contained a client IP addrress or hostname, the value is saved to the ircState property userHost. The value is not currently used, but it may be useful in the future for cases where actual IP is different from privacy IP.
 - Code was added to the JOIN command handler to check if ircState.userHost is blank, and if blank parse the userHost for the case where nickname matches current value. This was an add-on, and there were no changes to the existing /JOIN handler functionality.
-- The server NICK message handler was not changed.
+- server/irc-client.js - multiple places, clear userHost and connectHost property upon disconnect or start new connections.
+- server/irc-client-parse.js - multiple places, clear userHost and connectHost property upon disconnect or start new connections.
 
 ## [v0.2.29](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.29) 2022-11-18
 

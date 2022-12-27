@@ -531,9 +531,17 @@
           //   nick            (Option 2)
           //
           let parsedNick = null;
+          let connectHost = '';
           const splitByWords = parsedMessage.params[1].split(' ');
           const lastWord = splitByWords[splitByWords.length - 1];
           const subWords = lastWord.split('!');
+          if (subWords.length === 1) {
+            parsedNick = subWords[0];
+            connectHost = '';
+          } else {
+            parsedNick = subWords[0];
+            connectHost = subWords[1];
+          }
           parsedNick = subWords[0];
           if (parsedNick === vars.ircState.nickName) {
             // case of successful register with nickname, set registered state
@@ -545,6 +553,8 @@
             // V0.2.30 Fix nickname recovery on reconnect
             // To handle +H privacy IP on DALnet, the userHost is now parsed later.
             vars.ircState.userHost = '';
+            // In case of privacy IP address, this may be actual IP address
+            if (connectHost != null) vars.ircState.connectHost = connectHost;
             //
             // set user mode
             //
@@ -611,6 +621,8 @@
             vars.ircState.ircRegistered = false;
             vars.ircState.ircIsAway = false;
             vars.ircState.nickRecoveryActive = false;
+            vars.ircState.userHost = '';
+            vars.ircState.connectHost = '';
             tellBrowserToRequestState();
           }
         } else {
@@ -766,6 +778,8 @@
             vars.ircState.ircIsAway = false;
             vars.ircState.nickRecoveryActive = false;
             vars.ircServerReconnectChannelString = '';
+            vars.ircState.userHost = '';
+            vars.ircState.connectHost = '';
             tellBrowserToRequestState();
           }
         } // ! ircRegistered
@@ -840,6 +854,8 @@
             vars.ircState.ircIsAway = false;
             vars.ircState.nickRecoveryActive = false;
             vars.ircServerReconnectChannelString = '';
+            vars.ircState.userHost = '';
+            vars.ircState.connectHost = '';
             tellBrowserToRequestState();
           }
         } else {
@@ -915,6 +931,8 @@
           vars.ircState.ircRegistered = false;
           vars.ircState.ircIsAway = false;
           vars.ircState.nickRecoveryActive = false;
+          vars.ircState.userHost = '';
+          vars.ircState.connectHost = '';
           tellBrowserToRequestState();
         }
         break;
@@ -1036,8 +1054,8 @@
             tellBrowserToRequestState();
           }
           //
-          // Option to grab hostname for use elsewhere
-          // for use in nickname recovery after auto reconnect.
+          // Option to grab hostname for use elsewhere.
+          // userHost is used in nickname recovery after auto reconnect.
           //
           // Are you the initiator of the /JOIN request?
           if (parsedMessage.nick === vars.ircState.nickName) {
@@ -1113,7 +1131,7 @@
           //
           // If not other user NICK request
           (parsedMessage.nick === vars.servers.serverArray[vars.ircState.ircServerIndex].altNick) &&
-          // if userHost is empty string, this will not match, case of another user using altNick
+          (vars.ircState.userHost !== '') &&
           (parsedMessage.host === vars.ircState.userHost)) {
           // and... if nickname recovery active
           if ((vars.servers.serverArray[vars.ircState.ircServerIndex].recoverNick) &&

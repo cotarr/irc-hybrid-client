@@ -129,6 +129,8 @@
   vars.ircState.ircRegistered = false;
   vars.ircState.ircIsAway = false;
   vars.ircState.nickRecoveryActive = false;
+  vars.ircState.userHost = '';
+  vars.ircState.connectHost = '';
 
   // Note: ircAutoReconnect moved from global setting to server setting
   // vars.ircState.ircAutoReconnect = vars.servers.ircAutoReconnect;
@@ -166,6 +168,7 @@
     vars.ircState.channelList = [];
     // some dynamic vars
     vars.ircState.userHost = '';
+    vars.ircState.connectHost = '';
     vars.ircState.ircServerPrefix = '';
   };
 
@@ -379,9 +382,9 @@
       (configNick !== alternateNick)) {
       vars.ircState.nickName = configNick;
       ircLog.writeIrcLog(
-        'After IRC disconnect alternate nickname was recovered to ' + configNick);
+        'After IRC disconnect alternate nickname was restored to ' + configNick);
       global.sendToBrowser(
-        'webError: After IRC disconnect alternate nickname was recovered to ' + configNick + '\n');
+        'webError: After IRC disconnect alternate nickname was restored to ' + configNick + '\n');
     } else if ((vars.ircState.nickName !== configNick) &&
       (vars.ircState.nickName !== alternateNick)) {
       if ((vars.ircState.nickName.indexOf('Guest') === 0) &&
@@ -548,6 +551,8 @@
         vars.ircState.ircRegistered = false;
         vars.ircState.ircIsAway = false;
         vars.ircState.nickRecoveryActive = false;
+        vars.ircState.userHost = '';
+        vars.ircState.connectHost = '';
         tellBrowserToRequestState();
       }
       // reset the state variables
@@ -734,6 +739,8 @@
           vars.ircState.ircRegistered = false;
           vars.ircState.ircIsAway = false;
           vars.ircState.nickRecoveryActive = false;
+          vars.ircState.userHost = '';
+          vars.ircState.connectHost = '';
           global.sendToBrowser('UPDATE\nwebError: IRC server timeout while connecting\n');
           ircLog.writeIrcLog('IRC server timeout while connecting');
         }
@@ -813,6 +820,8 @@
         vars.ircState.ircRegistered = false;
         vars.ircState.ircIsAway = false;
         vars.ircState.nickRecoveryActive = false;
+        vars.ircState.userHost = '';
+        vars.ircState.connectHost = '';
         vars.ircState.channels = [];
         vars.ircState.channelStates = [];
 
@@ -863,6 +872,8 @@
         vars.ircState.ircRegistered = false;
         vars.ircState.ircIsAway = false;
         vars.ircState.nickRecoveryActive = false;
+        vars.ircState.userHost = '';
+        vars.ircState.connectHost = '';
         vars.ircState.channels = [];
         vars.ircState.channelStates = [];
         if ((vars.ircState.ircConnectOn) && (vars.ircState.count.ircConnect === 0)) {
@@ -1067,6 +1078,8 @@
         vars.ircState.ircRegistered = false;
         vars.ircState.ircIsAway = false;
         vars.ircState.nickRecoveryActive = false;
+        vars.ircState.userHost = '';
+        vars.ircState.connectHost = '';
         vars.ircState.channels = [];
         vars.ircState.channelStates = [];
         if ((vars.ircState.ircConnectOn) && (vars.ircState.count.ircConnect === 0)) {
@@ -1131,6 +1144,8 @@
       vars.ircState.ircRegistered = false;
       vars.ircState.ircIsAway = false;
       vars.ircState.nickRecoveryActive = false;
+      vars.ircState.userHost = '';
+      vars.ircState.connectHost = '';
 
       if ((vars.ircState.ircConnectOn) && (vars.ircState.count.ircConnect === 0)) {
         // Case of socket error when not previously connected, cancel auto-connect
@@ -1310,6 +1325,8 @@
       vars.ircState.ircRegistered = false;
       vars.ircState.ircIsAway = false;
       vars.ircState.nickRecoveryActive = false;
+      vars.ircState.userHost = '';
+      vars.ircState.connectHost = '';
       tellBrowserToRequestState();
       return;
     }
@@ -1331,6 +1348,8 @@
       vars.ircState.ircRegistered = false;
       vars.ircState.ircIsAway = false;
       vars.ircState.nickRecoveryActive = false;
+      vars.ircState.userHost = '';
+      vars.ircState.connectHost = '';
 
       //
       // This will create the socket and connect it.
@@ -1370,6 +1389,8 @@
       vars.ircState.ircRegistered = false;
       vars.ircState.ircIsAway = false;
       vars.ircState.nickRecoveryActive = false;
+      vars.ircState.userHost = '';
+      vars.ircState.connectHost = '';
       global.sendToBrowser('UPDATE\nwebError: IRC server activity watchdog expired\n');
       ircLog.writeIrcLog('IRC server activity watchdog expired');
     }
@@ -1404,6 +1425,8 @@
           vars.ircState.ircRegistered = false;
           vars.ircState.ircIsAway = false;
           vars.ircState.nickRecoveryActive = false;
+          vars.ircState.userHost = '';
+          vars.ircState.connectHost = '';
           global.sendToBrowser('UPDATE\nwebError: IRC server not responding to client PING\n');
           ircLog.writeIrcLog('IRC server not responding to client PING');
         }
@@ -1782,6 +1805,8 @@
     vars.ircState.ircRegistered = false;
     vars.ircState.ircIsAway = false;
     vars.ircState.nickRecoveryActive = false;
+    vars.ircState.userHost = '';
+    vars.ircState.connectHost = '';
 
     // Set flag, used in automatic restart
     vars.ircState.ircConnectOn = true;
@@ -1845,6 +1870,8 @@
     vars.ircState.ircRegistered = false;
     vars.ircState.ircIsAway = false;
     vars.ircState.nickRecoveryActive = false;
+    vars.ircState.userHost = '';
+    vars.ircState.connectHost = '';
     tellBrowserToRequestState();
     res.json({ error: false });
   }; // disconnectHandler()

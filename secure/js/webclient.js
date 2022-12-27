@@ -87,7 +87,9 @@ var ircState = {
   userName: '',
   realName: '',
   userMode: '',
+
   userHost: '',
+  connectHost: '',
 
   channels: [],
   channelStates: [],
