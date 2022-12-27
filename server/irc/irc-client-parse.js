@@ -849,7 +849,37 @@
         } else {
           // else case of vars.ircState.ircRegistered === true
           //
-          // Expect a 1 to 1 match,  /NICK --> 433
+          // Expect a 1 to 1 match,  /NICK --> 433 or 437
+          // If out of sync, abort
+          if (vars.ircState.nickRecoveryActive) {
+            nickRecoveryReqNickResponses++;
+            if (nickRecoveryReqNickCounter !== nickRecoveryReqNickResponses) {
+              _cancelNickRecovery();
+              tellBrowserToRequestState();
+              ircLog.writeIrcLog('Nickname recovery cancelled due to manual /NICK request');
+              global.sendToBrowser('webError: ' +
+                'Nickname recovery cancelled due to manual /NICK request\n');
+            }
+          }
+        }
+        break;
+      //
+      // 437 ERR_UNAVAILRESOURCE "<nick/channel> :Nick/channel is temporarily unavailable"
+      //
+      // On DALnet, there is a ChanServ xflag to restrict a user from talking
+      // for a specified period of time after /JOIN a channel.
+      //
+      // /QUOTE CHANSERV XFLAG <#channel-name> TALK_CONNECT_TIME:<time-in-seconds>
+      //
+      // DALnet apparently blocks /NICK nickname changes at the server level
+      // when a user is within the restricted time period of a channel.
+      // Attempting to change the nickname results in 437 error code.
+      //
+      case '437':
+        // Connect to IRC has failed, nickname change temporarily blocked by services
+        if (vars.ircState.ircRegistered) {
+          //
+          // Expect a 1 to 1 match,  /NICK --> 433 or 437
           // If out of sync, abort
           if (vars.ircState.nickRecoveryActive) {
             nickRecoveryReqNickResponses++;
@@ -1182,6 +1212,9 @@
             (parsedMessage.nick === configNick) &&
             (vars.ircState.nickName === alternateNick) &&
             (configNick !== alternateNick)) {
+            // nickRecoveryReqNickCounter is used by 433 and 437 response handler
+            // to match /NICK requests and responses
+            nickRecoveryReqNickCounter++;
             if ((vars.nsIdentifyNick.length > 0) &&
             (vars.nsIdentifyCommand.length > 0)) {
               nickservIdentifyActiveFlag = true;
@@ -1267,6 +1300,8 @@
       if (nickRecoveryReqNickTimer > 0) {
         nickRecoveryReqNickTimer--;
         if (nickRecoveryReqNickTimer === 0) {
+          // nickRecoveryReqNickCounter is used by 433 and 437 response handler
+          // to match /NICK requests and responses
           nickRecoveryReqNickCounter++;
           if (nickRecoveryReqNickCounter < 76) {
             if ((alternateNick.length > 0) &&

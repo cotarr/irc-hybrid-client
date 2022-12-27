@@ -6,6 +6,48 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Next
+
+### Fixed
+
+Issue: This client has the capability to respond to a server disconnect with 
+automated IRC server reconnect snf automated re-join of IRC channels.
+If the primary nickname is still connected as a ghost, the program includes  
+nickname recovery and NickServ IDENTIFY after reconnect.
+
+On DALnet, it was observed that the irc-hybrid-client would occasionally abort the 
+nickname recovery prior to issuing the NickServ IDENTIFY causing a 
+forced nickname change to GUEST12345.
+
+On DALnet, there is a ChanServ xflag to restrict a user from talking 
+for a specified period of time after /JOINing a channel. 
+It appears that during this delay, user /NICK requests will cause in the following DALnet error: 
+
+`437 MyNick #MyChannel :Cannot change nickname while banned or moderated on channel`
+
+The RFC 437 defininition:
+
+`437 ERR_UNAVAILRESOURCE <nick/channel> :Nick/channel is temporarily unavailable`
+
+File: server/irc-client-parse.js - During nickname recovery /NICK requests 
+are initiated by either a /QUIT of the primary nickname or the /NICK is issued 
+periodically by a timer. There is are 2 counter variables to monitor 1 to 1 correspondence 
+between /NICK requests for the primary nickname and 433 responses to /NICK requests.
+Therefore on DALnet the unexpected and unhandled  437 response caused the 
+counter to go out of synchronization causing cancelling of the nickname auto-recovery.
+
+Changes: Added 437 message handler. The 437 code is a copy/paste of code from the 433 message handler
+to increment and check the /NICK response counters to keep in sync with the /NICK request counter.
+The /QUIT message handler was modified by adding code to increment the counter so both 
+the timer loop and then /QUIT events will both increment the counter prior to issuing a /NICK request.
+This way, if either the /QUIT event or the timer event generates a blocked /NICK request, 
+the timer loop will remain active issuing future /NICK requests to recover the primary nickname.
+
+Some related variables were also renamed to more descriptive names.
+
+Note: This is a difficult error to reproduce due to timing interactions with IRC servers, NickServ and ChanServ.
+Further observation during use will be required to determine if the issue is fully resolved.
+
 ## [v0.2.29](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.29) 2022-11-18
 
 ### Added
