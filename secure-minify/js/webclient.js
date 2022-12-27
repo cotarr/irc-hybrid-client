@@ -27,8 +27,8 @@ SOFTWARE.
 const channelPrefixChars='@#+!';const nicknamePrefixChars='~&@%+';const nickChannelSpacer=' | ';const pmNameSpacer=' - ';const activityIconInhibitTimerValue=10
 ;const cacheReloadString='-----IRC Cache Reload-----';const cacheErrorString='-----IRC Cache Error-----';const csrfToken=document.querySelector('meta[name="csrf-token"]').getAttribute('content')
 ;var ircState={ircConnectOn:false,ircConnecting:false,ircConnected:false,ircRegistered:false,ircIsAway:false,ircAutoReconnect:false,lastPing:'0.000',ircServerName:'',ircServerHost:'',
-ircServerPort:6667,ircTLSEnabled:false,ircServerIndex:0,ircServerPrefix:'',channelList:[],nickName:'',userName:'',realName:'',userMode:'',userHost:'',channels:[],channelStates:[],progVersion:'0.0.0',
-progName:'',times:{programRun:0,ircConnect:0},count:{ircConnect:0,ircConnectError:0},websocketCount:0};document.getElementById('webConnectIconId').removeAttribute('connected')
+ircServerPort:6667,ircTLSEnabled:false,ircServerIndex:0,ircServerPrefix:'',channelList:[],nickName:'',userName:'',realName:'',userMode:'',userHost:'',connectHost:'',channels:[],channelStates:[],
+progVersion:'0.0.0',progName:'',times:{programRun:0,ircConnect:0},count:{ircConnect:0,ircConnectError:0},websocketCount:0};document.getElementById('webConnectIconId').removeAttribute('connected')
 ;document.getElementById('ircConnectIconId').removeAttribute('connected');document.getElementById('webConnectIconId').removeAttribute('connecting')
 ;document.getElementById('ircConnectIconId').removeAttribute('connecting');const webState={};webState.loginUser={};webState.webConnectOn=true;webState.webConnected=false;webState.webConnecting=false
 ;webState.ircConnecting=false;webState.websocketCount=0;webState.noticeOpen=false;webState.wallopsOpen=false;webState.viewRawMessages=false;webState.showRawInHex=false;webState.showCommsMessages=false
