@@ -531,24 +531,20 @@
           //   nick            (Option 2)
           //
           let parsedNick = null;
-          let parsedUserhost = null;
           const splitByWords = parsedMessage.params[1].split(' ');
           const lastWord = splitByWords[splitByWords.length - 1];
           const subWords = lastWord.split('!');
-          if (subWords.length === 1) {
-            parsedNick = subWords[0];
-            parsedUserhost = '';
-          } else {
-            parsedNick = subWords[0];
-            parsedUserhost = subWords[1];
-          }
+          parsedNick = subWords[0];
           if (parsedNick === vars.ircState.nickName) {
             // case of successful register with nickname, set registered state
             vars.ircState.ircRegistered = true;
             vars.ircState.times.ircConnect = vars.unixTimestamp();
             vars.ircState.count.ircConnect++;
             vars.ircState.ircServerPrefix = parsedMessage.prefix;
-            vars.ircState.userHost = parsedUserhost;
+            //
+            // V0.2.30 Fix nickname recovery on reconnect
+            // To handle +H privacy IP on DALnet, the userHost is now parsed later.
+            vars.ircState.userHost = '';
             //
             // set user mode
             //
@@ -1038,6 +1034,17 @@
             vars.ircState.channels.push(channelName);
             vars.ircState.channelStates.push(chanState);
             tellBrowserToRequestState();
+          }
+          //
+          // Option to grab hostname for use elsewhere
+          // for use in nickname recovery after auto reconnect.
+          //
+          // Are you the initiator of the /JOIN request?
+          if (parsedMessage.nick === vars.ircState.nickName) {
+            // Yes it is you, grab the userHost
+            if (vars.ircState.userHost === '') {
+              vars.ircState.userHost = parsedMessage.host;
+            }
           }
         }
         break;

@@ -10,9 +10,13 @@ and this project adheres to
 
 ### Fixed
 
-Issue: This client has the capability to respond to a server disconnect with 
-automated IRC server reconnect snf automated re-join of IRC channels.
-If the primary nickname is still connected as a ghost, the program includes  
+This patch is to fix 2 issues with nickname recovery after disconnect
+
+Issue 1
+
+This client has the capability to respond to a server disconnect with 
+automated IRC server reconnect and automated re-join of IRC channels. 
+If the primary nickname is still connected as a ghost, the program includes 
 nickname recovery and NickServ IDENTIFY after reconnect.
 
 On DALnet, it was observed that the irc-hybrid-client would occasionally abort the 
@@ -45,8 +49,26 @@ the timer loop will remain active issuing future /NICK requests to recover the p
 
 Some related variables were also renamed to more descriptive names.
 
-Note: This is a difficult error to reproduce due to timing interactions with IRC servers, NickServ and ChanServ.
-Further observation during use will be required to determine if the issue is fully resolved.
+Issue 2
+
+Recently, DALnet has implemented a user privacy IP address +H flag. This results in a 
+user having 2 userHost values, one for the actual IP address or hostname, and a second 
+for the privacy IP address.
+
+File: server/irc-client-parse.js - The userHost value is used as part of the nickname recovery 
+to confirm the alternate nickname belongs to this instance. Previously the userHost was 
+parsed from the initial 001 message. Not all IRC server software includes the host 
+in the 001 message, so if blank, alternately the host was parsed from the first NICK message 
+that match a valid nickname. Once parsed, the value was static. This broke the automatic NickServ IDENTIFY feature 
+when a DALnet user was set to +H privacy address, because the 001 message included the actual IP/host 
+and the later NICK message included the privacy address. This mis-match blocked the NickServ 
+IDENTIFY handler.
+
+Changes:
+
+- Code used to parse the user host address was removed from the initial server 001 message.
+- Code was added to the JOIN command handler to check if ircState.userHost is blank, and if blank parse the userHost for the case where nickname matches current value. This was an add-on, and there were no changes to the existing /JOIN handler functionality.
+- The server NICK message handler was not changed.
 
 ## [v0.2.29](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.29) 2022-11-18
 
