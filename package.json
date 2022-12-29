@@ -1,6 +1,6 @@
 {
   "name": "irc-hybrid-client",
-  "version": "0.2.30",
+  "version": "0.2.31",
   "description": "Single user hybrid IRC client using JavaScript front end and Node/Express backend",
   "main": "bin/www",
   "scripts": {
@@ -44,6 +44,7 @@
     "eslint-config-standard": "^17.0.0",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-n": "^15.3.0",
-    "eslint-plugin-promise": "^6.1.0"
+    "eslint-plugin-promise": "^6.1.0",
+    "json5": "^2.2.2"
   }
 }
