@@ -17,7 +17,7 @@ Issue 1
 This client has the capability to respond to a server disconnect with 
 automated IRC server reconnect and automated re-join of IRC channels. 
 If the primary nickname is still connected as a ghost, the program includes 
-nickname recovery and NickServ IDENTIFY after reconnect.
+nickname recovery (when free) and NickServ IDENTIFY after /NICK command.
 
 On DALnet, it was observed that the irc-hybrid-client would occasionally abort the 
 nickname recovery prior to issuing the NickServ IDENTIFY causing a 
@@ -29,7 +29,7 @@ It appears that during this delay, user /NICK requests will cause in the followi
 
 `437 MyNick #MyChannel :Cannot change nickname while banned or moderated on channel`
 
-The RFC 437 defininition:
+The RFC Error 437 definition:
 
 `437 ERR_UNAVAILRESOURCE <nick/channel> :Nick/channel is temporarily unavailable`
 
