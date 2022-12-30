@@ -292,12 +292,21 @@ if (credentials.sessionEnableRedis) {
   console.log('Using redis for session storage');
   sessionStore.redis = require('redis');
   sessionStore.RedisStore = require('connect-redis')(session);
-  const redisClientOptions = {};
+  const redisClientOptions = {
+    // legacyMode is  required to use redis v4 with connect-redis and express-session
+    legacyMode: true
+  };
   // must match /etc/redis/redis.conf "requirepass <password>"
   if ((credentials.sessionRedisPassword) && (credentials.sessionRedisPassword > 0)) {
     redisClientOptions.password = credentials.sessionRedisPassword;
   }
   sessionStore.redisClient = sessionStore.redis.createClient(redisClientOptions);
+  sessionStore.redisClient.connect()
+    .catch((err) => {
+      console.log('redis-server error: ', err.toString());
+      // fatal error
+      process.exit(1);
+    });
   const redisStoreOptions = {
     client: sessionStore.redisClient,
     prefix: credentials.sessionRedisPrefix || 'irc:'

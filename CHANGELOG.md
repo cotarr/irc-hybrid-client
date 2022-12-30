@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Next
+
+### Changed
+
+Updated npm module redis from v3 to v4. Redis is an optional key/value store that can be used to 
+persist login session cookie data across server restarts.
+The package connect-redis supports both redis versions v3 and v4, however since redis v4 is promise based
+some code changes were required in web-server.js.
+
 ## [v0.2.32](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.32) 2022-12-30
 
 - Eslint - Completely removed eslint and reinstalled eslint from scratch. Bumped json5@1.0.1 to json5@1.0.2 which was just released today as version 1 backport to fix the prototype pollution security issue with json5@1.0.1. This will reverse the previous commit (v0.2.31) that manually installed json5@2.2.2 over 1.0.1 to clear the alert. Again, eslint is a development dependency that does not load in production.
