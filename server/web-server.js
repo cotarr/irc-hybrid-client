@@ -40,7 +40,7 @@ const session = require('express-session');
 const logger = require('morgan');
 const helmet = require('helmet');
 const compression = require('compression');
-const csrf = require('csurf');
+const csrf = require('@dr.pogodin/csurf');
 const csrfProtection = csrf({ cookie: false });
 const app = express();
 

@@ -12,7 +12,7 @@
 
   const fs = require('fs');
   const path = require('path');
-  const csrf = require('csurf');
+  const csrf = require('@dr.pogodin/csurf');
   const csrfProtection = csrf({ cookie: false });
   const express = require('express');
   const router = express.Router();
