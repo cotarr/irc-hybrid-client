@@ -192,14 +192,10 @@ var wsocket = null;
 // Default beep sound (Max 1 per 5 seconds)
 // -------------------------------------------
 //
-// new Audio returns a Promise
-//
-// 1300 Hz 0.20 Amplitude 0.250 sec
-const beep1 = new Audio('sounds/short-beep1.mp3');
-// 850 Hz 0.20 Amplitude 0.400 Sec
-const beep2 = new Audio('sounds/short-beep2.mp3');
-// 1175 Hz 0.20 Amplitude 0.250 Sec
-const beep3 = new Audio('sounds/short-beep3.mp3');
+// Place holder
+let beep1 = null;
+let beep2 = null;
+let beep3 = null;
 
 let beep1InhibitTimer = 0;
 let beep2InhibitTimer = 0;
@@ -223,6 +219,16 @@ const audioPromiseErrorStr =
   'because user must interact with page or manually play sound first.';
 
 function playBeep1Sound () {
+  if (!beep1) {
+    // `new Audio` returns a Promise
+    //
+    if (ircState.customBeepSounds) {
+      beep1 = new Audio('sounds/custom-beep1.mp3');
+    } else {
+      // 1300 Hz 0.20 Amplitude 0.250 sec
+      beep1 = new Audio('sounds/short-beep1.mp3');
+    }
+  }
   if (beep1InhibitTimer === 0) {
     // Note: Chrome requires user interact with page before playing media
     // Chrome on IOS requires manually selecting button to play sound first time.
@@ -235,6 +241,8 @@ function playBeep1Sound () {
       .catch(function (error) {
         if (error.name === 'NotAllowedError') {
           console.info('playBeep1Sound() ' + audioPromiseErrorStr);
+        } else if (error.name === 'NotSupportedError') {
+          console.log('Audio download not available.');
         } else {
           console.error(error);
         }
@@ -244,11 +252,21 @@ function playBeep1Sound () {
 }
 
 function playBeep2Sound () {
+  if (!beep2) {
+    if (ircState.customBeepSounds) {
+      beep2 = new Audio('sounds/custom-beep2.mp3');
+    } else {
+      // 850 Hz 0.20 Amplitude 0.400 Sec
+      beep2 = new Audio('sounds/short-beep2.mp3');
+    }
+  }
   if (beep2InhibitTimer === 0) {
     beep2.play().catch(function (error) {
       if (error.name === 'NotAllowedError') {
         // Duplicate: use error message from beep1
         // console.info('playBeep2Sound() ' + audioPromiseErrorStr);
+      } else if (error.name === 'NotSupportedError') {
+        console.log('Audio download not available.');
       } else {
         console.error(error);
       }
@@ -257,10 +275,20 @@ function playBeep2Sound () {
   }
 }
 function playBeep3Sound () {
+  if (!beep3) {
+    if (ircState.customBeepSounds) {
+      beep3 = new Audio('sounds/custom-beep3.mp3');
+    } else {
+      // 1175 Hz 0.20 Amplitude 0.250 Sec
+      beep3 = new Audio('sounds/short-beep3.mp3');
+    }
+  }
   if (beep3InhibitTimer === 0) {
     beep3.play().catch(function (error) {
       if (error.name === 'NotAllowedError') {
         console.info('playBeep3Sound() ' + audioPromiseErrorStr);
+      } else if (error.name === 'NotSupportedError') {
+        console.log('Audio download not available.');
       } else {
         console.error(error);
       }

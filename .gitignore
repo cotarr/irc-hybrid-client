@@ -1,6 +1,8 @@
 node_modules
 credentials*
 servers*
+secure/sounds/custom-beep*
+secure-minify/sounds/custom-beep*
 push*
 logs/
 tools/showIrcLogTimeZone.json

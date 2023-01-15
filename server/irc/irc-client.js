@@ -316,8 +316,15 @@
   vars.ircState.websocketCount = 0;
 
   // Used to disable or hide buttons in IRC client page
+  vars.ircState.disableServerListEditor = false;
   if (credentials.disableServerListEditor) {
     vars.ircState.disableServerListEditor = true;
+  }
+
+  // Designate alternate set of sound file filenames for browser download
+  vars.ircState.customBeepSounds = false;
+  if (credentials.customBeepSounds) {
+    vars.ircState.customBeepSounds = true;
   }
 
   // ircLog.setRawMessageLogEnabled(vars.servers.rawMessageLog);

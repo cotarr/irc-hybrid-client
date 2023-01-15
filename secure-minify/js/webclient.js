@@ -37,15 +37,18 @@ webStateCalls:0};webState.cacheReloadInProgress=false;webState.lag={last:0,min:9
 lastDevicePixelRatio:1,bodyClientWidth:document.querySelector('body').clientWidth,lastClientWidth:document.querySelector('body').clientWidth}
 ;if(window.devicePixelRatio)webState.dynamic.lastDevicePixelRatio=window.devicePixelRatio;let webServerUrl='https://';let webSocketUrl='wss://';if('http:'===document.location.protocol){
 webServerUrl='http://';webSocketUrl='ws://'}webServerUrl+=window.location.hostname+':'+window.location.port;webSocketUrl+=window.location.hostname+':'+window.location.port;var wsocket=null
-;const beep1=new Audio('sounds/short-beep1.mp3');const beep2=new Audio('sounds/short-beep2.mp3');const beep3=new Audio('sounds/short-beep3.mp3');let beep1InhibitTimer=0;let beep2InhibitTimer=0
-;let beep3InhibitTimer=0;function beepTimerTick(){if(beep1InhibitTimer>0)beep1InhibitTimer--;if(beep2InhibitTimer>0)beep2InhibitTimer--;if(beep3InhibitTimer>0)beep3InhibitTimer--}
-function inhibitBeep(seconds){beep1InhibitTimer=seconds;beep2InhibitTimer=seconds;beep3InhibitTimer=seconds}
-const audioPromiseErrorStr='Browser policy has blocked Audio.play() '+'because user must interact with page or manually play sound first.';function playBeep1Sound(){if(0===beep1InhibitTimer){
-beep1.play().then((function(){document.getElementById('enableAudioButton').setAttribute('hidden','')})).catch((function(error){
-if('NotAllowedError'===error.name)console.info('playBeep1Sound() '+audioPromiseErrorStr);else console.error(error)}));beep1InhibitTimer=5}}function playBeep2Sound(){if(0===beep2InhibitTimer){
-beep2.play().catch((function(error){if('NotAllowedError'===error.name);else console.error(error)}));beep2InhibitTimer=5}}function playBeep3Sound(){if(0===beep3InhibitTimer){
-beep3.play().catch((function(error){if('NotAllowedError'===error.name)console.info('playBeep3Sound() '+audioPromiseErrorStr);else console.error(error)}));beep3InhibitTimer=5}}
-function areBeepsConfigured(){let isAnyBeepEnabled=false;let beepEnableChanArray=null;beepEnableChanArray=JSON.parse(window.localStorage.getItem('beepEnableChanArray'))
+;let beep1=null;let beep2=null;let beep3=null;let beep1InhibitTimer=0;let beep2InhibitTimer=0;let beep3InhibitTimer=0;function beepTimerTick(){if(beep1InhibitTimer>0)beep1InhibitTimer--
+;if(beep2InhibitTimer>0)beep2InhibitTimer--;if(beep3InhibitTimer>0)beep3InhibitTimer--}function inhibitBeep(seconds){beep1InhibitTimer=seconds;beep2InhibitTimer=seconds;beep3InhibitTimer=seconds}
+const audioPromiseErrorStr='Browser policy has blocked Audio.play() '+'because user must interact with page or manually play sound first.';function playBeep1Sound(){
+if(!beep1)if(ircState.customBeepSounds)beep1=new Audio('sounds/custom-beep1.mp3');else beep1=new Audio('sounds/short-beep1.mp3');if(0===beep1InhibitTimer){beep1.play().then((function(){
+document.getElementById('enableAudioButton').setAttribute('hidden','')})).catch((function(error){
+if('NotAllowedError'===error.name)console.info('playBeep1Sound() '+audioPromiseErrorStr);else if('NotSupportedError'===error.name)console.log('Audio download not available.');else console.error(error)
+}));beep1InhibitTimer=5}}function playBeep2Sound(){if(!beep2)if(ircState.customBeepSounds)beep2=new Audio('sounds/custom-beep2.mp3');else beep2=new Audio('sounds/short-beep2.mp3')
+;if(0===beep2InhibitTimer){beep2.play().catch((function(error){
+if('NotAllowedError'===error.name);else if('NotSupportedError'===error.name)console.log('Audio download not available.');else console.error(error)}));beep2InhibitTimer=5}}function playBeep3Sound(){
+if(!beep3)if(ircState.customBeepSounds)beep3=new Audio('sounds/custom-beep3.mp3');else beep3=new Audio('sounds/short-beep3.mp3');if(0===beep3InhibitTimer){beep3.play().catch((function(error){
+if('NotAllowedError'===error.name)console.info('playBeep3Sound() '+audioPromiseErrorStr);else if('NotSupportedError'===error.name)console.log('Audio download not available.');else console.error(error)
+}));beep3InhibitTimer=5}}function areBeepsConfigured(){let isAnyBeepEnabled=false;let beepEnableChanArray=null;beepEnableChanArray=JSON.parse(window.localStorage.getItem('beepEnableChanArray'))
 ;if(beepEnableChanArray&&Array.isArray(beepEnableChanArray))if(beepEnableChanArray.length>0)for(let i=0;i<beepEnableChanArray.length;i++){if(beepEnableChanArray[i].beep1)isAnyBeepEnabled=true
 ;if(beepEnableChanArray[i].beep2)isAnyBeepEnabled=true;if(beepEnableChanArray[i].beep3)isAnyBeepEnabled=true}let beepEnableObj=null;beepEnableObj=JSON.parse(window.localStorage.getItem('privMsgBeep'))
 ;if(beepEnableObj&&'object'===typeof beepEnableObj)if(beepEnableObj.beep)isAnyBeepEnabled=true;return isAnyBeepEnabled}function userInitiatedAudioPlay(){
