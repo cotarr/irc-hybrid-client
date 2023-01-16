@@ -504,7 +504,8 @@ Enter new password:<blue-example>zuwa79xoJxLJ</blue-example>
   "enableRemoteLogin": false,
   "enableSocks5Proxy": false,
   "ircSocketLocalAddress": "",
-  "serveHtmlHelpDocs": false
+  "serveHtmlHelpDocs": false,
+  "customBeepSounds": false
 }
 </pre></div>
         <p>
@@ -548,12 +549,54 @@ cd ..
           due to an earlier version of credentials.json, no error will 
           be issued and the files will not be served.
         </p>
+
 <div class="pre-div"><pre>
 {
   "serveHtmlHelpDocs": true
 }
 </pre></div>
 
+        <div class="install-section-title">Optional Custom Sound Files</div>
+
+        <p>
+          The irc-hybrid-client program includes 3 sound files used to generate 
+          "beep" sounds when triggered by channel messages, own nickname, and 
+          private messages. The default sound files are named short-beep1.mp3,
+          short-beep2.mp3, and short-beep3.mp3. Although the replacement files 
+          of the same filenames can be substituted manually, this could cause
+          a merge conflict during git pull/merge operations.
+          Three alternate custom filenames have been defined. The custom filenames 
+          have been included in the .gitignore file to avoid git merge conflicts.
+        </p>
+        <p>
+          The optional custom sound files may be used in either development version 
+          or the production minified version with files in the following locations.
+        </p>
+
+<pre>
+secure-minify/sounds/custom-beep1.mp3 (Channel message, join)
+secure-minify/sounds/custom-beep2.mp3 (Match Own Nickname)
+secure-minify/sounds/custom-beep3.mp3 (Private Message)
+
+secure/sounds/custom-beep1.mp3 (Channel message, join)
+secure/sounds/custom-beep2.mp3 (Match Own Nickname)
+secure/sounds/custom-beep3.mp3 (Private Message)
+</pre>
+
+        <p>
+          To enable the optional custom sounds set the &quot;customBeepSounds&quot; 
+          property to true in the credentials.json file. 
+          For backward compatibility, if this property does not exist
+          in credentials.json due to an upgrade from previous version the default 
+          sound filenames will be used and no error will be generated.
+        </p> 
+
+<div class="pre-div"><pre>
+{
+  "customBeepSounds": true
+}
+</pre></div>
+          
 
         <div class="vh-20"></div>
         <div class="desc-title">

@@ -18,7 +18,8 @@ Use of custom files is optional.
 - Added `custom-beep*` to .gitignore so optional custom sound files (if present) do not impact with git pull/merge operations when updating cloned deployments.
 - Added new boolean property `customBeepSounds` to credentials.json.
 - Added new boolean property `customBeepSounds` to the ircState object. 
-- Modified browser code so athe if property `customBeepSounds` set to true, then short-beep1.mp3, short-beep2.mp3 and short-beep3.mp3 will be replaced with custom-beep1.mp3, custom-beep2.mp3 and custom-beep3.mp3. Either /secure/sounds/ or /secure-minify/sounds/ may contain custom files depending on environment.
+- Modified browser code so that if property `customBeepSounds` set to true, then short-beep1.mp3, short-beep2.mp3 and short-beep3.mp3 will be replaced with custom-beep1.mp3, custom-beep2.mp3 and custom-beep3.mp3. Either /secure/sounds/ or /secure-minify/sounds/ may contain custom files depending on environment.
+- Modified browser code so that sound files do not load from server unless sounds are configured and requested.
 - The related repository irc-hybrid-client-dev-tools was updated to exclude the custom sound filenames from the build minify process.
 
 ## [v0.2.34](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.34) 2023-01-01
