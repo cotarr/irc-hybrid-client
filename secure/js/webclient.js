@@ -564,6 +564,13 @@ function updateDivVisibility () {
       } else {
         document.getElementById('wallopsSectionDiv').setAttribute('hidden', '');
       }
+      if (webState.channels.length === 0) {
+        document.getElementById('ircChannelsMainHiddenDiv').removeAttribute('hidden');
+        document.getElementById('ircChannelsMainHiddenButton').textContent = '-';
+      } else {
+        document.getElementById('ircChannelsMainHiddenDiv').setAttribute('hidden', '');
+        document.getElementById('ircChannelsMainHiddenButton').textContent = '+';
+      }
     } else {
       //
       // IRC Server Disconnected

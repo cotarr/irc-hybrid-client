@@ -91,7 +91,9 @@ if(ircState.ircIsAway)document.getElementById('ircIsAwayIconId').removeAttribute
 ;document.getElementById('setAwayButton').removeAttribute('disabled');document.getElementById('setBackButton').removeAttribute('disabled')
 ;document.getElementById('ircDisconnectedHiddenDiv').removeAttribute('hidden')
 ;if(webState.noticeOpen)document.getElementById('noticeSectionDiv').removeAttribute('hidden');else document.getElementById('noticeSectionDiv').setAttribute('hidden','')
-;if(webState.wallopsOpen)document.getElementById('wallopsSectionDiv').removeAttribute('hidden');else document.getElementById('wallopsSectionDiv').setAttribute('hidden','')}else{
+;if(webState.wallopsOpen)document.getElementById('wallopsSectionDiv').removeAttribute('hidden');else document.getElementById('wallopsSectionDiv').setAttribute('hidden','')
+;if(0===webState.channels.length){document.getElementById('ircChannelsMainHiddenDiv').removeAttribute('hidden');document.getElementById('ircChannelsMainHiddenButton').textContent='-'}else{
+document.getElementById('ircChannelsMainHiddenDiv').setAttribute('hidden','');document.getElementById('ircChannelsMainHiddenButton').textContent='+'}}else{
 if(webState.ircConnecting||ircState.ircConnecting){document.getElementById('ircConnectIconId').removeAttribute('unavailable');document.getElementById('ircConnectIconId').setAttribute('connecting','')
 ;document.getElementById('ircConnectIconId').removeAttribute('connected')}else{document.getElementById('ircConnectIconId').removeAttribute('unavailable')
 ;document.getElementById('ircConnectIconId').removeAttribute('connecting');document.getElementById('ircConnectIconId').removeAttribute('connected')}

@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Next 2023-02-26
+
+### Changed
+
+- IRC channels panel will now auto-hide after joining at least 1 channel.
+- Renamed "IRC Channels" panel to "Join IRC Channels".
+
 ## [v0.2.35](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.35) 2023-01-16
 
 ### Added
