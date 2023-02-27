@@ -12,6 +12,7 @@ and this project adheres to
 
 - IRC channels panel will now auto-hide after joining at least 1 channel.
 - Renamed "IRC Channels" panel to "Join IRC Channels".
+- Receiving PRIVMSG where channel name does not match any open channels will no longer un-hide the server panel. This is to address DALnet XFLAG AUTOMSG messages.
 - Upgrade dependencies: express-validator@6.15.0 node-fetch@2.6.9 redis@4.6.5 utf-8-validate@6.0.3 ws@8.12.1
 
 ## [v0.2.35](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.35) 2023-01-16

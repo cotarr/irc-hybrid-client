@@ -470,7 +470,8 @@ document.addEventListener('server-message', function (event) {
     // 'NICK' (users changing nickname in channel is opening the server window
     //
     const inhibitCommandList = [
-      'NICK'
+      'NICK',
+      'PRIVMSG'
     ];
     if (('detail' in event) && ('parsedMessage' in event.detail) &&
       ('command' in event.detail.parsedMessage) &&
