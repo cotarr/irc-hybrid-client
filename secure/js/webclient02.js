@@ -514,7 +514,9 @@ function displayNoticeMessage (parsedMessage) {
               parsedMessage.prefix + nickChannelSpacer +
                 parsedMessage.params[1]);
             }
-            webState.noticeOpen = true;
+            if (!webState.cacheReloadInProgress) {
+              webState.noticeOpen = true;
+            }
             updateDivVisibility();
 
             // Message activity Icon
@@ -554,7 +556,6 @@ function displayNoticeMessage (parsedMessage) {
 document.addEventListener('erase-before-reload', function (event) {
   document.getElementById('noticeMessageDisplay').value = '';
   document.getElementById('noticeSectionDiv').setAttribute('lastDate', '0000-00-00');
-  webState.noticeOpen = false;
   document.getElementById('noticeUnreadExistIcon').setAttribute('hidden', '');
   updateDivVisibility();
 });
@@ -623,10 +624,11 @@ function displayWallopsMessage (parsedMessage) {
       if (parsedMessage.nick) {
         _addText(parsedMessage.timestamp + ' ' +
           parsedMessage.nick + nickChannelSpacer + parsedMessage.params[0]);
-        webState.wallopsOpen = true;
       } else {
         _addText(parsedMessage.timestamp + ' ' +
           parsedMessage.prefix + nickChannelSpacer + parsedMessage.params[0]);
+      }
+      if (!webState.cacheReloadInProgress) {
         webState.wallopsOpen = true;
       }
       updateDivVisibility();
@@ -642,7 +644,6 @@ function displayWallopsMessage (parsedMessage) {
 document.addEventListener('erase-before-reload', function (event) {
   document.getElementById('wallopsMessageDisplay').value = '';
   document.getElementById('wallopsSectionDiv').setAttribute('lastDate', '0000-00-00');
-  webState.wallopsOpen = false;
   updateDivVisibility();
 });
 
@@ -802,7 +803,9 @@ function _parseCtcpMessage (parsedMessage, message) {
         _addNoticeText(parsedMessage.timestamp + ' ' +
         'CTCP 1 Request to ' + parsedMessage.params[0] + ': ' +
         ctcpCommand + ' ' + ctcpRest);
-        webState.noticeOpen = true;
+        if (!webState.cacheReloadInProgress) {
+          webState.noticeOpen = true;
+        }
       } else {
         // case of echo my CTCP reply to other client
         //
@@ -824,7 +827,9 @@ function _parseCtcpMessage (parsedMessage, message) {
         _addNoticeText(parsedMessage.timestamp + ' ' +
         'CTCP 2 Reply to ' + parsedMessage.params[0] + ': ' +
         ctcpCommand + ' ' + replyContents);
-        webState.noticeOpen = true;
+        if (!webState.cacheReloadInProgress) {
+          webState.noticeOpen = true;
+        }
       }
     } else {
       // case of ctcp message/reply for other remote IRC client
@@ -833,14 +838,18 @@ function _parseCtcpMessage (parsedMessage, message) {
         _addNoticeText(parsedMessage.timestamp + ' ' +
         'CTCP 3 Request from ' + parsedMessage.nick + ': ' +
         ctcpCommand + ' ' + ctcpRest);
-        webState.noticeOpen = true;
+        if (!webState.cacheReloadInProgress) {
+          webState.noticeOpen = true;
+        }
       } else {
         // case of showing remote response to my CTCP request
         _addNoticeText(parsedMessage.timestamp + ' ' +
         'CTCP 4 Reply from ' +
         parsedMessage.nick + ': ' +
         ctcpCommand + ' ' + ctcpRest);
-        webState.noticeOpen = true;
+        if (!webState.cacheReloadInProgress) {
+          webState.noticeOpen = true;
+        }
       }
     }
     updateDivVisibility();

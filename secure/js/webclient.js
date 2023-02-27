@@ -621,10 +621,6 @@ function updateDivVisibility () {
 
       // document.getElementById('eraseCacheButton').removeAttribute('disabled');
       document.getElementById('ircDisconnectedHiddenDiv').setAttribute('hidden', '');
-      webState.noticeOpen = false;
-      document.getElementById('noticeSectionDiv').setAttribute('hidden', '');
-      webState.wallopsOpen = false;
-      document.getElementById('wallopsSectionDiv').setAttribute('hidden', '');
       // next time visible, show channel join options
       document.getElementById('ircChannelsMainHiddenDiv').removeAttribute('hidden');
       document.getElementById('ircChannelsMainHiddenButton').textContent = '-';

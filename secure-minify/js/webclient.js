@@ -107,8 +107,7 @@ document.getElementById('cyclePrevServerButton').setAttribute('disabled','');doc
 ;document.getElementById('quitButton').removeAttribute('disabled')}else{document.getElementById('connectButton').removeAttribute('disabled')
 ;if(document.getElementById('waitConnectIconId').hasAttribute('hidden'))document.getElementById('quitButton').setAttribute('disabled','');else document.getElementById('quitButton').removeAttribute('disabled')
 }document.getElementById('userAwayMessageId').setAttribute('disabled','');document.getElementById('setAwayButton').setAttribute('disabled','')
-;document.getElementById('setBackButton').setAttribute('disabled','');document.getElementById('ircDisconnectedHiddenDiv').setAttribute('hidden','');webState.noticeOpen=false
-;document.getElementById('noticeSectionDiv').setAttribute('hidden','');webState.wallopsOpen=false;document.getElementById('wallopsSectionDiv').setAttribute('hidden','')
+;document.getElementById('setBackButton').setAttribute('disabled','');document.getElementById('ircDisconnectedHiddenDiv').setAttribute('hidden','')
 ;document.getElementById('ircChannelsMainHiddenDiv').removeAttribute('hidden');document.getElementById('ircChannelsMainHiddenButton').textContent='-'}
 if(ircState.disableServerListEditor)document.getElementById('editServerListButton').setAttribute('disabled','');else document.getElementById('editServerListButton').removeAttribute('disabled')
 ;document.getElementById('groupInfoHiddenDiv').setAttribute('hidden','')}else{document.getElementById('hiddenInfoDiv').setAttribute('hidden','')
@@ -223,12 +222,12 @@ if(document.getElementById('noticeSectionDiv').getAttribute('lastDate')!==parsed
 ;document.getElementById('noticeMessageDisplay').value+='\n=== '+parsedMessage.datestamp+' ===\n\n'}switch(parsedMessage.command){case'NOTICE':{const ctcpDelim=1
 ;if(2===parsedMessage.params.length&&parsedMessage.params[1].charCodeAt(0)===ctcpDelim||3===parsedMessage.params.length&&parsedMessage.params[2].charCodeAt(0)===ctcpDelim);else if(parsedMessage.params[0]===ircState.nickName){
 if(parsedMessage.nick)_addText(parsedMessage.timestamp+' '+parsedMessage.nick+nickChannelSpacer+parsedMessage.params[1]);else _addText(parsedMessage.timestamp+' '+parsedMessage.prefix+nickChannelSpacer+parsedMessage.params[1])
-;webState.noticeOpen=true;updateDivVisibility();if(!webState.cacheReloadInProgress)setNotActivityIcon()
+;if(!webState.cacheReloadInProgress)webState.noticeOpen=true;updateDivVisibility();if(!webState.cacheReloadInProgress)setNotActivityIcon()
 }else if(ircState.channels.indexOf(parsedMessage.params[0].toLowerCase())>=0)document.dispatchEvent(new CustomEvent('channel-message',{bubbles:true,detail:{parsedMessage:parsedMessage}
 }));else if(parsedMessage.nick===ircState.nickName){_addText(parsedMessage.timestamp+' [to] '+parsedMessage.params[0]+nickChannelSpacer+parsedMessage.params[1]);webState.noticeOpen=true
 ;updateDivVisibility()}}break;default:}}document.addEventListener('erase-before-reload',(function(event){document.getElementById('noticeMessageDisplay').value=''
-;document.getElementById('noticeSectionDiv').setAttribute('lastDate','0000-00-00');webState.noticeOpen=false;document.getElementById('noticeUnreadExistIcon').setAttribute('hidden','')
-;updateDivVisibility()}));document.addEventListener('cache-reload-done',(function(event){let markerString='';let timestampString=''
+;document.getElementById('noticeSectionDiv').setAttribute('lastDate','0000-00-00');document.getElementById('noticeUnreadExistIcon').setAttribute('hidden','');updateDivVisibility()}))
+;document.addEventListener('cache-reload-done',(function(event){let markerString='';let timestampString=''
 ;if('detail'in event&&'timestamp'in event.detail)timestampString=unixTimestampToHMS(event.detail.timestamp);if(timestampString)markerString+=timestampString;markerString+=' '+cacheReloadString+'\n'
 ;if(''!==document.getElementById('noticeMessageDisplay').value){document.getElementById('noticeMessageDisplay').value+=markerString
 ;document.getElementById('noticeMessageDisplay').scrollTop=document.getElementById('noticeMessageDisplay').scrollHeight}}));document.addEventListener('cache-reload-error',(function(event){
@@ -237,13 +236,13 @@ let errorString='\n';let timestampString='';if('detail'in event&&'timestamp'in e
 document.getElementById('wallopsMessageDisplay').value+=cleanFormatting(text)+'\n'
 ;if(!webState.cacheReloadInProgress)document.getElementById('wallopsMessageDisplay').scrollTop=document.getElementById('wallopsMessageDisplay').scrollHeight}
 if(document.getElementById('wallopsSectionDiv').getAttribute('lastDate')!==parsedMessage.datestamp){document.getElementById('wallopsSectionDiv').setAttribute('lastDate',parsedMessage.datestamp)
-;document.getElementById('wallopsMessageDisplay').value+='\n=== '+parsedMessage.datestamp+' ===\n\n'}switch(parsedMessage.command){case'WALLOPS':if(parsedMessage.nick){
-_addText(parsedMessage.timestamp+' '+parsedMessage.nick+nickChannelSpacer+parsedMessage.params[0]);webState.wallopsOpen=true}else{
-_addText(parsedMessage.timestamp+' '+parsedMessage.prefix+nickChannelSpacer+parsedMessage.params[0]);webState.wallopsOpen=true}updateDivVisibility();break;default:}}
-document.addEventListener('erase-before-reload',(function(event){document.getElementById('wallopsMessageDisplay').value=''
-;document.getElementById('wallopsSectionDiv').setAttribute('lastDate','0000-00-00');webState.wallopsOpen=false;updateDivVisibility()}));document.addEventListener('cache-reload-done',(function(event){
-let markerString='';let timestampString='';if('detail'in event&&'timestamp'in event.detail)timestampString=unixTimestampToHMS(event.detail.timestamp);if(timestampString)markerString+=timestampString
-;markerString+=' '+cacheReloadString+'\n';if(''!==document.getElementById('wallopsMessageDisplay').value){document.getElementById('wallopsMessageDisplay').value+=markerString
+;document.getElementById('wallopsMessageDisplay').value+='\n=== '+parsedMessage.datestamp+' ===\n\n'}switch(parsedMessage.command){case'WALLOPS':
+if(parsedMessage.nick)_addText(parsedMessage.timestamp+' '+parsedMessage.nick+nickChannelSpacer+parsedMessage.params[0]);else _addText(parsedMessage.timestamp+' '+parsedMessage.prefix+nickChannelSpacer+parsedMessage.params[0])
+;if(!webState.cacheReloadInProgress)webState.wallopsOpen=true;updateDivVisibility();break;default:}}document.addEventListener('erase-before-reload',(function(event){
+document.getElementById('wallopsMessageDisplay').value='';document.getElementById('wallopsSectionDiv').setAttribute('lastDate','0000-00-00');updateDivVisibility()}))
+;document.addEventListener('cache-reload-done',(function(event){let markerString='';let timestampString=''
+;if('detail'in event&&'timestamp'in event.detail)timestampString=unixTimestampToHMS(event.detail.timestamp);if(timestampString)markerString+=timestampString;markerString+=' '+cacheReloadString+'\n'
+;if(''!==document.getElementById('wallopsMessageDisplay').value){document.getElementById('wallopsMessageDisplay').value+=markerString
 ;document.getElementById('wallopsMessageDisplay').scrollTop=document.getElementById('wallopsMessageDisplay').scrollHeight}}));document.addEventListener('cache-reload-error',(function(event){
 let errorString='\n';let timestampString='';if('detail'in event&&'timestamp'in event.detail)timestampString=unixTimestampToHMS(event.detail.timestamp);if(timestampString)errorString+=timestampString
 ;errorString+=' '+cacheErrorString+'\n\n';document.getElementById('wallopsMessageDisplay').value=errorString}));function displayRawMessage(inString){
@@ -260,11 +259,13 @@ const chanPrefixIndex=channelPrefixChars.indexOf(parsedMessage.params[0].charAt(
 parsedMessage.params[1]=parsedMessage.nick+' '+ctcpRest;parsedMessage.nick='*';displayChannelMessage(parsedMessage)
 }else if(chanPrefixIndex>=0)displayFormattedServerMessage(parsedMessage,message);else{parsedMessage.params[1]=ctcpRest;parsedMessage.isPmCtcpAction=true;displayPrivateMessage(parsedMessage)}}else{
 if(parsedMessage.nick===ircState.nickName)if('PRIVMSG'===parsedMessage.command.toUpperCase()){
-_addNoticeText(parsedMessage.timestamp+' '+'CTCP 1 Request to '+parsedMessage.params[0]+': '+ctcpCommand+' '+ctcpRest);webState.noticeOpen=true}else{let replyContents=''
-;if(parsedMessage.params.length>2)for(let i=2;i<parsedMessage.params.length;i++)if(parsedMessage.params[i].charCodeAt(0)!==ctcpDelim){replyContents+=cleanCtcpDelimiter(parsedMessage.params[i])
-;if(i!==parsedMessage.params.length)replyContents+=' '}_addNoticeText(parsedMessage.timestamp+' '+'CTCP 2 Reply to '+parsedMessage.params[0]+': '+ctcpCommand+' '+replyContents)
-;webState.noticeOpen=true}else if('PRIVMSG'===parsedMessage.command.toUpperCase()){_addNoticeText(parsedMessage.timestamp+' '+'CTCP 3 Request from '+parsedMessage.nick+': '+ctcpCommand+' '+ctcpRest)
-;webState.noticeOpen=true}else{_addNoticeText(parsedMessage.timestamp+' '+'CTCP 4 Reply from '+parsedMessage.nick+': '+ctcpCommand+' '+ctcpRest);webState.noticeOpen=true}updateDivVisibility()}}
+_addNoticeText(parsedMessage.timestamp+' '+'CTCP 1 Request to '+parsedMessage.params[0]+': '+ctcpCommand+' '+ctcpRest);if(!webState.cacheReloadInProgress)webState.noticeOpen=true}else{
+let replyContents='';if(parsedMessage.params.length>2)for(let i=2;i<parsedMessage.params.length;i++)if(parsedMessage.params[i].charCodeAt(0)!==ctcpDelim){
+replyContents+=cleanCtcpDelimiter(parsedMessage.params[i]);if(i!==parsedMessage.params.length)replyContents+=' '}
+_addNoticeText(parsedMessage.timestamp+' '+'CTCP 2 Reply to '+parsedMessage.params[0]+': '+ctcpCommand+' '+replyContents);if(!webState.cacheReloadInProgress)webState.noticeOpen=true
+}else if('PRIVMSG'===parsedMessage.command.toUpperCase()){_addNoticeText(parsedMessage.timestamp+' '+'CTCP 3 Request from '+parsedMessage.nick+': '+ctcpCommand+' '+ctcpRest)
+;if(!webState.cacheReloadInProgress)webState.noticeOpen=true}else{_addNoticeText(parsedMessage.timestamp+' '+'CTCP 4 Reply from '+parsedMessage.nick+': '+ctcpCommand+' '+ctcpRest)
+;if(!webState.cacheReloadInProgress)webState.noticeOpen=true}updateDivVisibility()}}
 const ircMessageCommandDisplayFilter=['331','332','333','353','366','JOIN','KICK','MODE','cachedNICK'.toUpperCase(),'NICK','NOTICE','PART','PING','PONG','PRIVMSG','cachedQUIT'.toUpperCase(),'QUIT','TOPIC','WALLOPS']
 ;function _parseBufferMessage(message){if('HEARTBEAT'===message){onHeartbeatReceived();if(webState.showCommsMessages)displayRawMessage('HEARTBEAT')}else if('UPDATE'===message){getIrcState()
 ;if(webState.showCommsMessages)displayRawMessage('UPDATE')}else if('CACHERESET'===message){document.dispatchEvent(new CustomEvent('erase-before-reload',{bubbles:true}))

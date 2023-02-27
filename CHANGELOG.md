@@ -8,11 +8,24 @@ and this project adheres to
 
 ## Next 2023-02-26
 
-### Changed
 
-- IRC channels panel will now auto-hide after joining at least 1 channel.
+The following changes are to address the situation where /JOIN a new
+IRC channel can trigger a cache reload, which in turn can cause the 
+server panel, wallops panel, or notice panel to un-hide.
+The intention of this change is to keep them hidden.
+Private Message (PM) panel has not been changed and 
+PM panels will still open on a cache reload if present in the cache.
+
+Reminder, the [+All] button will show all the panels.
+
+### Changed
+ 
+- Inhibit hide/un-hide of Notice panel during cache reload.
+- Inhibit hide/un-hide of Wallops panel during cache reload.
+- Inhibit un-hide of server panel when receiving channel name not matching a channel. This is to address DALnet XFLAG AUTOMSG messages that arrive before channel JOIN is processed.
+- Auto-hide IRC Channels panel after joining at least 1 channel.
 - Renamed "IRC Channels" panel to "Join IRC Channels".
-- Receiving PRIVMSG where channel name does not match any open channels will no longer un-hide the server panel. This is to address DALnet XFLAG AUTOMSG messages.
+
 - Upgrade dependencies: express-validator@6.15.0 node-fetch@2.6.9 redis@4.6.5 utf-8-validate@6.0.3 ws@8.12.1
 
 ## [v0.2.35](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.35) 2023-01-16

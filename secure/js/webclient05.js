@@ -828,7 +828,7 @@ function textCommandParser (inputObj) {
     default:
   }
 
-  // parsing complete. Opon success, ircMessage will contain IRC command
+  // parsing complete. Upon success, ircMessage will contain IRC command
   // If so, send it to IRC server.
   if (ircMessage) {
     return {
