@@ -759,7 +759,6 @@ console.log('createPrivateMessageEl: Private message element already exist');ret
 ;privMsgCounterEl.classList.add('message-count');privMsgCounterEl.classList.add('pm-count-class');privMsgCounterEl.setAttribute('hidden','')
 ;const privMsgTallerButtonEl=document.createElement('button');privMsgTallerButtonEl.textContent='Taller';privMsgTallerButtonEl.classList.add('channel-button')
 ;const privMsgNormalButtonEl=document.createElement('button');privMsgNormalButtonEl.textContent='Normal';privMsgNormalButtonEl.classList.add('channel-button')
-;const privMsgClearButtonEl=document.createElement('button');privMsgClearButtonEl.textContent='Clear';privMsgClearButtonEl.classList.add('channel-button')
 ;const privMsgBottomDivEl=document.createElement('div');const privMsgTextAreaEl=document.createElement('textarea');const privMsgTextAreaId='privMsg'+privMsgIndex.toString()+'TextAreaId'
 ;privMsgTextAreaEl.id=privMsgTextAreaId;privMsgTextAreaEl.setAttribute('cols','120');privMsgTextAreaEl.setAttribute('rows','6');privMsgTextAreaEl.setAttribute('spellCheck','false')
 ;privMsgTextAreaEl.setAttribute('readonly','');const privMsgBottomDiv1El=document.createElement('div');privMsgBottomDiv1El.classList.add('button-div')
@@ -773,12 +772,12 @@ console.log('createPrivateMessageEl: Private message element already exist');ret
 ;privMsgBeep1CBInputEl.classList.add('pm-cb-cb');privMsgBeep1CBInputEl.setAttribute('type','checkbox');const privMsgBeep1CBTitleEl=document.createElement('span')
 ;privMsgBeep1CBTitleEl.classList.add('pm-cb-span');privMsgBeep1CBTitleEl.textContent='Line-beep';privMsgTopLeftDivEl.appendChild(privMsgHideButtonEl);privMsgTopLeftDivEl.appendChild(privMsgNameDivEl)
 ;privMsgTopLeftDivEl.appendChild(privMsgCounterEl);privMsgTopRightHidableDivEl.appendChild(privMsgTallerButtonEl);privMsgTopRightHidableDivEl.appendChild(privMsgNormalButtonEl)
-;privMsgTopRightHidableDivEl.appendChild(privMsgClearButtonEl);privMsgTopRightDivEl.appendChild(privMsgTopRightHidableDivEl);privMsgTopDivEl.appendChild(privMsgTopLeftDivEl)
-;privMsgTopDivEl.appendChild(privMsgTopRightDivEl);privMsgBottomDiv1El.appendChild(privMsgInputAreaEl);privMsgBottomDiv1El.appendChild(privMsgSendButtonEl)
-;privMsgBottomDiv2El.appendChild(privMsgMultiLineSendSpanEl);privMsgBottomDiv2El.appendChild(privMsgMultiLineSendButtonEl);privMsgBottomDiv4El.appendChild(privMsgBeep1CBInputEl)
-;privMsgBottomDiv4El.appendChild(privMsgBeep1CBTitleEl);privMsgBottomDivEl.appendChild(privMsgTextAreaEl);privMsgBottomDivEl.appendChild(privMsgBottomDiv1El)
-;privMsgBottomDivEl.appendChild(privMsgBottomDiv2El);privMsgBottomDivEl.appendChild(privMsgBottomDiv4El);privMsgSectionEl.appendChild(privMsgTopDivEl);privMsgSectionEl.appendChild(privMsgBottomDivEl)
-;privMsgContainerDivEl.appendChild(privMsgSectionEl);if(privMsgSectionEl.getAttribute('lastDate')!==parsedMessage.datestamp){privMsgSectionEl.setAttribute('lastDate',parsedMessage.datestamp)
+;privMsgTopRightDivEl.appendChild(privMsgTopRightHidableDivEl);privMsgTopDivEl.appendChild(privMsgTopLeftDivEl);privMsgTopDivEl.appendChild(privMsgTopRightDivEl)
+;privMsgBottomDiv1El.appendChild(privMsgInputAreaEl);privMsgBottomDiv1El.appendChild(privMsgSendButtonEl);privMsgBottomDiv2El.appendChild(privMsgMultiLineSendSpanEl)
+;privMsgBottomDiv2El.appendChild(privMsgMultiLineSendButtonEl);privMsgBottomDiv4El.appendChild(privMsgBeep1CBInputEl);privMsgBottomDiv4El.appendChild(privMsgBeep1CBTitleEl)
+;privMsgBottomDivEl.appendChild(privMsgTextAreaEl);privMsgBottomDivEl.appendChild(privMsgBottomDiv1El);privMsgBottomDivEl.appendChild(privMsgBottomDiv2El)
+;privMsgBottomDivEl.appendChild(privMsgBottomDiv4El);privMsgSectionEl.appendChild(privMsgTopDivEl);privMsgSectionEl.appendChild(privMsgBottomDivEl);privMsgContainerDivEl.appendChild(privMsgSectionEl)
+;if(privMsgSectionEl.getAttribute('lastDate')!==parsedMessage.datestamp){privMsgSectionEl.setAttribute('lastDate',parsedMessage.datestamp)
 ;privMsgTextAreaEl.value+='\n=== '+parsedMessage.datestamp+' ===\n\n'}privMsgTextAreaEl.value+=parsedMessage.timestamp+' '+parsedMessage.nick+pmNameSpacer+cleanFormatting(parsedMessage.params[1])+'\n'
 ;if(!webState.cacheReloadInProgress)privMsgTextAreaEl.scrollTop=privMsgTextAreaEl.scrollHeight;let activityIconInhibitTimer=0;const iconInhibitTimer=setInterval((function(){
 if(activityIconInhibitTimer>0)activityIconInhibitTimer--}),1e3);function updateTotalPmCount(){document.dispatchEvent(new CustomEvent('update-pm-count',{bubbles:true}))}
@@ -798,11 +797,9 @@ privMsgBottomDivEl.removeAttribute('hidden');privMsgHideButtonEl.textContent='-'
 ;function handlePrivMsgTallerButtonElClick(event){const newRows=parseInt(privMsgTextAreaEl.getAttribute('rows'))+5;privMsgTextAreaEl.setAttribute('rows',newRows.toString())
 ;privMsgInputAreaEl.setAttribute('rows','3')}privMsgTallerButtonEl.addEventListener('click',handlePrivMsgTallerButtonElClick);function handlePrivMsgNormalButtonElClick(event){
 privMsgTextAreaEl.setAttribute('rows','6');privMsgInputAreaEl.setAttribute('rows','1')}privMsgNormalButtonEl.addEventListener('click',handlePrivMsgNormalButtonElClick)
-;function handlePrivMsgClearButtonElClick(event){privMsgTextAreaEl.value='';privMsgSectionEl.setAttribute('lastDate','0000-00-00');privMsgTextAreaEl.setAttribute('rows','6')
-;privMsgInputAreaEl.setAttribute('rows','1')}privMsgClearButtonEl.addEventListener('click',handlePrivMsgClearButtonElClick);function handleShowAllDivs(event){
-privMsgBottomDivEl.removeAttribute('hidden');privMsgHideButtonEl.textContent='-';privMsgTopRightHidableDivEl.removeAttribute('hidden');privMsgSectionEl.removeAttribute('hidden')}
-document.addEventListener('show-all-divs',handleShowAllDivs);function handleHideOrZoom(event){privMsgBottomDivEl.setAttribute('hidden','');privMsgHideButtonEl.textContent='+'
-;privMsgTopRightHidableDivEl.setAttribute('hidden','');privMsgSectionEl.setAttribute('hidden','')}document.addEventListener('hide-or-zoom',handleHideOrZoom)
+;function handleShowAllDivs(event){privMsgBottomDivEl.removeAttribute('hidden');privMsgHideButtonEl.textContent='-';privMsgTopRightHidableDivEl.removeAttribute('hidden')
+;privMsgSectionEl.removeAttribute('hidden')}document.addEventListener('show-all-divs',handleShowAllDivs);function handleHideOrZoom(event){privMsgBottomDivEl.setAttribute('hidden','')
+;privMsgHideButtonEl.textContent='+';privMsgTopRightHidableDivEl.setAttribute('hidden','');privMsgSectionEl.setAttribute('hidden','')}document.addEventListener('hide-or-zoom',handleHideOrZoom)
 ;function handleprivMsgInputAreaElPaste(event){if(_splitMultiLinePaste(event.clipboardData.getData('text')).length>1){
 privMsgMultiLineSendSpanEl.textContent='Clipboard ('+_splitMultiLinePaste(event.clipboardData.getData('text')).length+' lines)';privMsgBottomDiv2El.removeAttribute('hidden')}}
 privMsgInputAreaEl.addEventListener('paste',handleprivMsgInputAreaElPaste);function handleMultiLineSendButtonClick(event){const multiLineArray=_splitMultiLinePaste(privMsgInputAreaEl.value)
@@ -858,11 +855,11 @@ if('-'===privMsgHideButtonEl.textContent)listOfOpenPMPanels.push(privMsgNameDivE
 ;document.removeEventListener('cache-reload-done',handleCacheReloadDone);document.removeEventListener('cache-reload-error',handelCacheReloadError)
 ;document.removeEventListener('priv-msg-hide-all',handlePrivMsgHideAll);document.removeEventListener('priv-msg-show-all',handlePrivMsgShowAll)
 ;privMsgHideButtonEl.removeEventListener('click',handlePrivMsgHideButtonElClick);privMsgTallerButtonEl.removeEventListener('click',handlePrivMsgTallerButtonElClick)
-;privMsgNormalButtonEl.removeEventListener('click',handlePrivMsgNormalButtonElClick);privMsgClearButtonEl.removeEventListener('click',handlePrivMsgClearButtonElClick)
-;document.removeEventListener('show-all-divs',handleShowAllDivs);document.removeEventListener('hide-or-zoom',handleHideOrZoom)
-;privMsgSendButtonEl.removeEventListener('click',handlePrivMsgSendButtonElClick);privMsgMultiLineSendButtonEl.removeEventListener('click',handleMultiLineSendButtonClick)
-;privMsgInputAreaEl.removeEventListener('input',handlePrivMsgInputAreaElInput);privMsgInputAreaEl.removeEventListener('paste',handleprivMsgInputAreaElPaste)
-;privMsgCounterEl.removeEventListener('click',handlePrivMsgCounterElClick);document.getElementById('privMsgCountDiv').removeEventListener('click',handlePrivMsgCountDivClick)
+;privMsgNormalButtonEl.removeEventListener('click',handlePrivMsgNormalButtonElClick);document.removeEventListener('show-all-divs',handleShowAllDivs)
+;document.removeEventListener('hide-or-zoom',handleHideOrZoom);privMsgSendButtonEl.removeEventListener('click',handlePrivMsgSendButtonElClick)
+;privMsgMultiLineSendButtonEl.removeEventListener('click',handleMultiLineSendButtonClick);privMsgInputAreaEl.removeEventListener('input',handlePrivMsgInputAreaElInput)
+;privMsgInputAreaEl.removeEventListener('paste',handleprivMsgInputAreaElPaste);privMsgCounterEl.removeEventListener('click',handlePrivMsgCounterElClick)
+;document.getElementById('privMsgCountDiv').removeEventListener('click',handlePrivMsgCountDivClick)
 ;document.getElementById('privMsgUnreadExistIcon').removeEventListener('click',handlePrivMsgUnreadExistIconClick);privMsgBottomDivEl.removeEventListener('click',handlePrivMsgBottomDivElClick)
 ;privMsgBeep1CBInputEl.removeEventListener('click',handlePrivMsgBeep1CBInputElClick);document.removeEventListener('cancel-beep-sounds',handleCancelBeepSounds)
 ;document.removeEventListener('private-message',handlePrivateMessage);window.removeEventListener('resize-custom-elements',handleResizeCustomElements)

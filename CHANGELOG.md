@@ -36,6 +36,7 @@ Reminder, the [+All] button can be pressed any time to show all hidden panels.
 - The [Erase All PM] button is visible only if at least 1 private message panel exists
 - Pressing the [+] button on the Private Message whois/send panel will make all existing PM panels visible.
 - Pressing the [-] button on the Private Message whois/send panel will make all PM panels hidden.
+- Remove the [Clear] button from individual PM panel. This was a local DOM clear and did not change cache. Use the [Erase All PM] button instead to erase PM messages from cache.
 
 ### Fixed
 

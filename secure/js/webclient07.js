@@ -124,7 +124,6 @@ function _sendPrivMessageToUser (targetNickname, textAreaEl) {
 // --------- div (privMsgTopRightHidableDivEl)  <--- Hidable
 // ---------- button (privMsgTallerButtonEl)
 // ---------- button (privMsgNormalButtonEl)
-// ---------- button (privMsgClearButtonEl)
 // ------- div (privMsgBottomDivEl)              <---- Hidable, lower half
 // -------- textarea (privMsgTextAreaEl)
 // -------- div (privMsgBottomDiv1El)
@@ -240,11 +239,6 @@ function createPrivateMessageEl (name, parsedMessage) {
   privMsgNormalButtonEl.textContent = 'Normal';
   privMsgNormalButtonEl.classList.add('channel-button');
 
-  // Clear button
-  const privMsgClearButtonEl = document.createElement('button');
-  privMsgClearButtonEl.textContent = 'Clear';
-  privMsgClearButtonEl.classList.add('channel-button');
-
   // Bottom Element (optionally hidden)
   const privMsgBottomDivEl = document.createElement('div');
 
@@ -312,7 +306,6 @@ function createPrivateMessageEl (name, parsedMessage) {
 
   privMsgTopRightHidableDivEl.appendChild(privMsgTallerButtonEl);
   privMsgTopRightHidableDivEl.appendChild(privMsgNormalButtonEl);
-  privMsgTopRightHidableDivEl.appendChild(privMsgClearButtonEl);
 
   privMsgTopRightDivEl.appendChild(privMsgTopRightHidableDivEl);
 
@@ -499,17 +492,6 @@ function createPrivateMessageEl (name, parsedMessage) {
     privMsgInputAreaEl.setAttribute('rows', '1');
   };
   privMsgNormalButtonEl.addEventListener('click', handlePrivMsgNormalButtonElClick);
-
-  // -------------------------
-  // Clear button handler
-  // -------------------------
-  function handlePrivMsgClearButtonElClick (event) {
-    privMsgTextAreaEl.value = '';
-    privMsgSectionEl.setAttribute('lastDate', '0000-00-00');
-    privMsgTextAreaEl.setAttribute('rows', '6');
-    privMsgInputAreaEl.setAttribute('rows', '1');
-  };
-  privMsgClearButtonEl.addEventListener('click', handlePrivMsgClearButtonElClick);
 
   // ----------------
   // show all event
@@ -959,7 +941,6 @@ function createPrivateMessageEl (name, parsedMessage) {
     privMsgHideButtonEl.removeEventListener('click', handlePrivMsgHideButtonElClick);
     privMsgTallerButtonEl.removeEventListener('click', handlePrivMsgTallerButtonElClick);
     privMsgNormalButtonEl.removeEventListener('click', handlePrivMsgNormalButtonElClick);
-    privMsgClearButtonEl.removeEventListener('click', handlePrivMsgClearButtonElClick);
     document.removeEventListener('show-all-divs', handleShowAllDivs);
     document.removeEventListener('hide-or-zoom', handleHideOrZoom);
     privMsgSendButtonEl.removeEventListener('click', handlePrivMsgSendButtonElClick);
