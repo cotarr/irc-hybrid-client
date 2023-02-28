@@ -94,13 +94,17 @@ function _sendPrivMessageToUser (targetNickname, textAreaEl) {
 // ----- div (noticeSectionDiv)
 
 // ++++++++++++ Static Private Message +++++++++++++
-// ----- div (privMsgSectionDiv)
-// ------ div ( ) No id
-// ------- button (privMsgMainHiddenButton)
-// ------- span ( ) No id button label
-// ------- div (privMsgWindowCountDiv)
-// ------- div (privMsgCountDiv)
-// ------ div (privMsgMainHiddenDiv)
+// ----- div (privMsgSectionDiv)   <-- Hidable
+// ------ div ( ) No id (class head-flex)
+// ------- div ( ) No id (class head left)
+// -------- button (privMsgMainHiddenButton)
+// -------- span ( ) No id button label
+// -------- div (privMsgWindowCountDiv)
+// -------- div (privMsgCountDiv)
+// ------- div ( ) No id (class head-right)
+// -------- div (privMsgMainHiddenDiv)  <-- Hidable, event handler for erase all button
+// --------- button ( ) No Id Erase All PM button (event handler in parent div)
+// ------ div (privMsgHeaderEraseAllDiv) <--- Hidable, div for whois and initial PM send
 // ------- div ( ) No id, button div
 // -------- input (pmNickNameInputId)
 // -------- button (whoisButton)
@@ -117,7 +121,7 @@ function _sendPrivMessageToUser (targetNickname, textAreaEl) {
 // --------- div (rivMsgNameDivEl)
 // --------- div (privMsgCounterEl)
 // -------- div (privMsgTopRightDivEl)
-// --------- div (privMsgTopRightHidableDivEl)
+// --------- div (privMsgTopRightHidableDivEl)  <--- Hidable
 // ---------- button (privMsgTallerButtonEl)
 // ---------- button (privMsgNormalButtonEl)
 // ---------- button (privMsgClearButtonEl)
@@ -174,6 +178,7 @@ function createPrivateMessageEl (name, parsedMessage) {
   document.getElementById('privMsgWindowCountDiv').textContent =
     webState.activePrivateMessageNicks.length.toString();
   document.getElementById('privMsgWindowCountDiv').removeAttribute('hidden');
+  document.getElementById('privMsgHeaderEraseAllDiv').removeAttribute('hidden');
 
   // console.log('Creating private message Element for ' + name);
   const privMsgIndex = webState.activePrivateMessageNicks.indexOf(name.toLowerCase());
@@ -403,6 +408,9 @@ function createPrivateMessageEl (name, parsedMessage) {
   // Example:  14:33:02 -----Cache Reload-----
   //
   function handleCacheReloadDone (event) {
+    // Clear temporary array so next asynchronous API cache reload
+    // can start with an empty array.
+    listOfOpenPMPanels = [];
     let markerString = '';
     let timestampString = '';
     if (('detail' in event) && ('timestamp' in event.detail)) {
@@ -420,6 +428,9 @@ function createPrivateMessageEl (name, parsedMessage) {
   document.addEventListener('cache-reload-done', handleCacheReloadDone);
 
   function handelCacheReloadError (event) {
+    // Clear temporary array so next asynchronous API cache reload
+    // can start with an empty array.
+    listOfOpenPMPanels = [];
     let errorString = '\n';
     let timestampString = '';
     if (('detail' in event) && ('timestamp' in event.detail)) {
@@ -459,8 +470,10 @@ function createPrivateMessageEl (name, parsedMessage) {
       privMsgHideButtonEl.textContent = '-';
       privMsgTopRightHidableDivEl.removeAttribute('hidden');
       clearLastZoom();
+      // collapse input area of PM whois/send panel
+      document.getElementById('privMsgMainHiddenDiv').setAttribute('hidden', '');
+      document.getElementById('privMsgMainHiddenButton').textContent = '+';
     } else {
-      privMsgSectionEl.setAttribute('hidden', '');
       privMsgBottomDivEl.setAttribute('hidden', '');
       privMsgHideButtonEl.textContent = '+';
       privMsgTopRightHidableDivEl.setAttribute('hidden', '');
@@ -614,6 +627,9 @@ function createPrivateMessageEl (name, parsedMessage) {
     resetPrivMsgCount();
     activityIconInhibitTimer = activityIconInhibitTimerValue;
     privMsgBottomDiv2El.setAttribute('hidden', '');
+    // Collapse PM whois/send panel after sending message
+    document.getElementById('privMsgMainHiddenDiv').setAttribute('hidden', '');
+    document.getElementById('privMsgMainHiddenButton').textContent = '+';
   };
   privMsgSendButtonEl.addEventListener('click', handlePrivMsgSendButtonElClick);
 
@@ -629,6 +645,9 @@ function createPrivateMessageEl (name, parsedMessage) {
       resetPrivMsgCount();
       activityIconInhibitTimer = activityIconInhibitTimerValue;
       privMsgBottomDiv2El.setAttribute('hidden', '');
+      // Collapse PM whois/send panel after sending message
+      document.getElementById('privMsgMainHiddenDiv').setAttribute('hidden', '');
+      document.getElementById('privMsgMainHiddenButton').textContent = '+';
     }
   };
   privMsgInputAreaEl.addEventListener('input', handlePrivMsgInputAreaElInput);
@@ -722,6 +741,7 @@ function createPrivateMessageEl (name, parsedMessage) {
   //  - open control window,
   //  - show window, data section and buttons.
   function handlePrivateMessage (event) {
+    // console.log(JSON.stringify(event.detail, null, 2));
     function _addText (text) {
       // append text to textarea
       privMsgTextAreaEl.value += cleanFormatting(text) + '\n';
@@ -771,15 +791,25 @@ function createPrivateMessageEl (name, parsedMessage) {
               (!webState.cacheReloadInProgress)) {
               playBeep3Sound();
             }
-            // Upon privMsg message, make sectino visible.
-            privMsgSectionEl.removeAttribute('hidden');
-            privMsgBottomDivEl.removeAttribute('hidden');
-            privMsgHideButtonEl.textContent = '-';
-            privMsgTopRightHidableDivEl.removeAttribute('hidden');
-            // also show control section div
-            document.getElementById('privMsgHeaderHiddenDiv').removeAttribute('hidden');
-            document.getElementById('privMsgMainHiddenDiv').removeAttribute('hidden');
-            document.getElementById('privMsgMainHiddenButton').textContent = '-';
+            // Upon privMsg message, make section visible, unless reload in progress
+            if (!webState.cacheReloadInProgress) {
+              privMsgSectionEl.removeAttribute('hidden');
+              privMsgBottomDivEl.removeAttribute('hidden');
+              privMsgHideButtonEl.textContent = '-';
+              privMsgTopRightHidableDivEl.removeAttribute('hidden');
+            } else {
+              if (listOfOpenPMPanels.indexOf(name.toLowerCase()) >= 0) {
+                privMsgSectionEl.removeAttribute('hidden');
+                privMsgBottomDivEl.removeAttribute('hidden');
+                privMsgHideButtonEl.textContent = '-';
+                privMsgTopRightHidableDivEl.removeAttribute('hidden');
+              } else {
+                privMsgSectionEl.setAttribute('hidden', '');
+                privMsgBottomDivEl.setAttribute('hidden', '');
+                privMsgHideButtonEl.textContent = '+';
+                privMsgTopRightHidableDivEl.setAttribute('hidden', '');
+              }
+            }
           }
         } else {
           // case of incoming message from others.
@@ -795,19 +825,28 @@ function createPrivateMessageEl (name, parsedMessage) {
               (!webState.cacheReloadInProgress)) {
               playBeep3Sound();
             }
-            // Upon privMsg message, make sectino visible.
-            privMsgSectionEl.removeAttribute('hidden');
-            privMsgBottomDivEl.removeAttribute('hidden');
-            privMsgHideButtonEl.textContent = '-';
-            privMsgTopRightHidableDivEl.removeAttribute('hidden');
+            // Upon privMsg message, make section visible, unless reload in progress
+            if (!webState.cacheReloadInProgress) {
+              privMsgSectionEl.removeAttribute('hidden');
+              privMsgBottomDivEl.removeAttribute('hidden');
+              privMsgHideButtonEl.textContent = '-';
+              privMsgTopRightHidableDivEl.removeAttribute('hidden');
+            } else {
+              if (listOfOpenPMPanels.indexOf(name.toLowerCase()) >= 0) {
+                privMsgSectionEl.removeAttribute('hidden');
+                privMsgBottomDivEl.removeAttribute('hidden');
+                privMsgHideButtonEl.textContent = '-';
+                privMsgTopRightHidableDivEl.removeAttribute('hidden');
+              } else {
+                privMsgSectionEl.setAttribute('hidden', '');
+                privMsgBottomDivEl.setAttribute('hidden', '');
+                privMsgHideButtonEl.textContent = '+';
+                privMsgTopRightHidableDivEl.setAttribute('hidden', '');
+              }
+            }
             if (!webState.cacheReloadInProgress) {
               clearLastZoom();
             }
-
-            // also show control section div
-            document.getElementById('privMsgHeaderHiddenDiv').removeAttribute('hidden');
-            document.getElementById('privMsgMainHiddenDiv').removeAttribute('hidden');
-            document.getElementById('privMsgMainHiddenButton').textContent = '-';
 
             // Message activity Icon
             // If focus not <inputarea> elment,
@@ -834,10 +873,25 @@ function createPrivateMessageEl (name, parsedMessage) {
   }
 
   // Do this when creating the PM element for this user.
-  // Show control window, so open/close buttons are in sync
-  document.getElementById('privMsgHeaderHiddenDiv').removeAttribute('hidden');
-  document.getElementById('privMsgMainHiddenDiv').removeAttribute('hidden');
-  document.getElementById('privMsgMainHiddenButton').textContent = '-';
+  // Hide control window, so open/close buttons are in sync
+  document.getElementById('privMsgMainHiddenDiv').setAttribute('hidden', '');
+  document.getElementById('privMsgMainHiddenButton').textContent = '+';
+
+  // In case of cache reload
+  // Persist open window from array of PM nicknames.
+  if (webState.cacheReloadInProgress) {
+    if (listOfOpenPMPanels.indexOf(name.toLowerCase()) >= 0) {
+      privMsgSectionEl.removeAttribute('hidden');
+      privMsgBottomDivEl.removeAttribute('hidden');
+      privMsgHideButtonEl.textContent = '-';
+      privMsgTopRightHidableDivEl.removeAttribute('hidden');
+    } else {
+      privMsgSectionEl.setAttribute('hidden', '');
+      privMsgBottomDivEl.setAttribute('hidden', '');
+      privMsgHideButtonEl.textContent = '+';
+      privMsgTopRightHidableDivEl.setAttribute('hidden', '');
+    }
+  }
 
   // -----------------------------------------------------------
   // Setup textarea elements as dynamically resizable
@@ -887,6 +941,13 @@ function createPrivateMessageEl (name, parsedMessage) {
   // ---------------------------------------------------------------
   function handleEraseBeforeReload (event) {
     // console.log('erase-before-reload event fired in PM window');
+    // Case of visible PM panel the show/hide button has minus sign [-]
+    // Before performing API cache reload, add PM nickname to temporary
+    // array of nicknames for use during cache reload to set panel visibility.
+    if (privMsgHideButtonEl.textContent === '-') {
+      listOfOpenPMPanels.push(privMsgNameDivEl.textContent.toLowerCase());
+    }
+
     // first remove cyclic timers within element
     clearInterval(iconInhibitTimer);
 
@@ -1023,12 +1084,12 @@ document.addEventListener('erase-before-reload', function (event) {
   // Clear total PM counter and window count
   document.getElementById('privMsgWindowCountDiv').textContent = '0';
   document.getElementById('privMsgWindowCountDiv').setAttribute('hidden', '');
+  document.getElementById('privMsgHeaderEraseAllDiv').setAttribute('hidden', '');
 
   document.getElementById('privMsgCountDiv').textContent = '0';
   document.getElementById('privMsgCountDiv').setAttribute('hidden', '');
   document.getElementById('privMsgUnreadExistIcon').setAttribute('hidden', '');
 
-  document.getElementById('privMsgHeaderHiddenDiv').setAttribute('hidden', '');
   document.getElementById('privMsgMainHiddenDiv').setAttribute('hidden', '');
   document.getElementById('privMsgMainHiddenButton').textContent = '+';
 });
@@ -1087,7 +1148,7 @@ document.getElementById('openPmWithBeepCheckbox')
 // -------------------------
 // [Erase All  PM] button handler
 // -------------------------
-document.getElementById('privMsgHeaderHiddenDiv').addEventListener('click', function () {
+document.getElementById('privMsgHeaderEraseAllDiv').addEventListener('click', function () {
   const fetchURL = webServerUrl + '/irc/erase';
   const fetchOptions = {
     method: 'POST',
@@ -1137,12 +1198,10 @@ document.getElementById('whoisButton').addEventListener('click', function () {
 // -------------------------------------
 document.getElementById('privMsgMainHiddenButton').addEventListener('click', function () {
   if (document.getElementById('privMsgMainHiddenDiv').hasAttribute('hidden')) {
-    document.getElementById('privMsgHeaderHiddenDiv').removeAttribute('hidden');
     document.getElementById('privMsgMainHiddenDiv').removeAttribute('hidden');
     document.getElementById('privMsgMainHiddenButton').textContent = '-';
     document.dispatchEvent(new CustomEvent('priv-msg-show-all', { bubbles: true }));
   } else {
-    document.getElementById('privMsgHeaderHiddenDiv').setAttribute('hidden', '');
     document.getElementById('privMsgMainHiddenDiv').setAttribute('hidden', '');
     document.getElementById('privMsgMainHiddenButton').textContent = '+';
     document.dispatchEvent(new CustomEvent('priv-msg-hide-all', { bubbles: true }));

@@ -6,25 +6,31 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Next 2023-02-26
+## Next 2023-02-28
 
+In a previous upgrade, the operation of /JOIN an IRC channel 
+now triggers a API call for an API cache reload.
+The cache reload had the unintended consequence of causing 
+various hidden panels to become visible.
+This in turn caused the page to scroll and show extraneous panels.
+The general intention of this change is to keep hidden panels
+hidden including Server, Wallops, Notice and Private-Message (PM) panels.
 
-The following changes are to address the situation where /JOIN a new
-IRC channel can trigger a cache reload, which in turn can cause the 
-server panel, wallops panel, or notice panel to un-hide.
-The intention of this change is to keep them hidden.
-Private Message (PM) panel has not been changed and 
-PM panels will still open on a cache reload if present in the cache.
-
-Reminder, the [+All] button will show all the panels.
+Reminder, the [+All] button can be pressed any time to show all hidden panels.
 
 ### Changed
  
 - Inhibit hide/un-hide of Notice panel during cache reload.
 - Inhibit hide/un-hide of Wallops panel during cache reload.
-- Inhibit un-hide of server panel when receiving channel name not matching a channel. This is to address DALnet XFLAG AUTOMSG messages that arrive before channel JOIN is processed.
+- Inhibit un-hide of server panel when receiving channel name not matching a channel. This is to address an asynchronous timing issue caused when DALnet XFLAG AUTOMSG messages arrive and are parsed before channel creation has been completed.
 - Auto-hide IRC Channels panel after joining at least 1 channel.
 - Renamed "IRC Channels" panel to "Join IRC Channels".
+
+- Collapse PM whois/send panel after sending initial PM, or expanding any collapsed PM panel.
+- An API cache reload will temporarily create an array of nicknames of open PM panels, then set visibility of PM panels during cache reload based on stored array nicknames. 
+- The [Erase All PM] button is visible only if at least 1 private message panel exists
+- Pressing the [+] button on the private message whois/send panel will make all existing PM panels visible.
+- Pressing the [-] button on the private message whois/send panel will make all PM panels hidden.
 
 - Upgrade dependencies: express-validator@6.15.0 node-fetch@2.6.9 redis@4.6.5 utf-8-validate@6.0.3 ws@8.12.1
 

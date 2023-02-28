@@ -171,6 +171,9 @@ if (window.devicePixelRatio) {
   webState.dynamic.lastDevicePixelRatio = window.devicePixelRatio;
 }
 
+// Private message, temporary open PM windows across reload
+var listOfOpenPMPanels = [];
+
 // -------------------------------
 // Build URL from page location
 // -------------------------------
@@ -673,7 +676,6 @@ document.addEventListener('show-all-divs', function (event) {
   // document.getElementById('errorDiv').removeAttribute('hidden');
   document.getElementById('hideLoginSection').removeAttribute('hidden');
   document.getElementById('hideLoginSectionButton').textContent = '-';
-  document.getElementById('privMsgHeaderHiddenDiv').removeAttribute('hidden');
   document.getElementById('privMsgMainHiddenDiv').removeAttribute('hidden');
   document.getElementById('privMsgMainHiddenButton').textContent = '-';
   document.getElementById('ircChannelsMainHiddenDiv').removeAttribute('hidden');
@@ -701,7 +703,6 @@ document.addEventListener('hide-or-zoom', function (event) {
   // document.getElementById('errorDiv').setAttribute('hidden', '');
   document.getElementById('hideLoginSection').setAttribute('hidden', '');
   document.getElementById('hideLoginSectionButton').textContent = '+';
-  document.getElementById('privMsgHeaderHiddenDiv').setAttribute('hidden', '');
   document.getElementById('privMsgMainHiddenDiv').setAttribute('hidden', '');
   document.getElementById('privMsgMainHiddenButton').textContent = '+';
   document.getElementById('ircChannelsMainHiddenDiv').setAttribute('hidden', '');
