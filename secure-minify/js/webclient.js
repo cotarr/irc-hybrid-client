@@ -906,8 +906,8 @@ document.getElementById('privMsgMainHiddenDiv').removeAttribute('hidden');docume
 ;updateDivVisibility()}));document.getElementById('noticeEraseButton').addEventListener('click',(function(){document.getElementById('noticeSectionDiv').setAttribute('lastDate','0000-00-00')
 ;document.getElementById('noticeMessageDisplay').setAttribute('rows','5');const fetchURL=webServerUrl+'/irc/erase';const fetchOptions={method:'POST',headers:{'CSRF-Token':csrfToken,
 'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify({erase:'NOTICE'})};fetch(fetchURL,fetchOptions).then(response=>{
-if(response.ok)return response.json();else throw new Error('Fetch status '+response.status+' '+response.statusText)}).then(responseJson=>{if(responseJson.error)showError(responseJson.message)
-}).catch(error=>{showError(error.toString())})}));document.getElementById('noticeTallerButton').addEventListener('click',(function(){
+if(response.ok)return response.json();else throw new Error('Fetch status '+response.status+' '+response.statusText)}).then(responseJson=>{if(responseJson.error)showError(responseJson.message);else{
+webState.noticeOpen=false;updateDivVisibility()}}).catch(error=>{showError(error.toString())})}));document.getElementById('noticeTallerButton').addEventListener('click',(function(){
 const newRows=parseInt(document.getElementById('noticeMessageDisplay').getAttribute('rows'))+5;document.getElementById('noticeMessageDisplay').setAttribute('rows',newRows.toString())}))
 ;document.getElementById('noticeNormalButton').addEventListener('click',(function(){document.getElementById('noticeMessageDisplay').setAttribute('rows','5')}))
 ;document.getElementById('noticeSectionDiv').addEventListener('click',(function(){resetNotActivityIcon()}));document.getElementById('wallopsCloseButton').addEventListener('click',(function(){
@@ -915,12 +915,13 @@ webState.wallopsOpen=false;updateDivVisibility()}));document.getElementById('wal
 document.getElementById('wallopsSectionDiv').setAttribute('lastDate','0000-00-00');document.getElementById('wallopsMessageDisplay').setAttribute('rows','5');const fetchURL=webServerUrl+'/irc/erase'
 ;const fetchOptions={method:'POST',headers:{'CSRF-Token':csrfToken,'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify({erase:'WALLOPS'})}
 ;fetch(fetchURL,fetchOptions).then(response=>{if(response.ok)return response.json();else throw new Error('Fetch status '+response.status+' '+response.statusText)}).then(responseJson=>{
-if(responseJson.error)showError(responseJson.message)}).catch(error=>{showError(error.toString())})}));document.getElementById('wallopsTallerButton').addEventListener('click',(function(){
-const newRows=parseInt(document.getElementById('wallopsMessageDisplay').getAttribute('rows'))+5;document.getElementById('wallopsMessageDisplay').setAttribute('rows',newRows.toString())}))
-;document.getElementById('wallopsNormalButton').addEventListener('click',(function(){document.getElementById('wallopsMessageDisplay').setAttribute('rows','5')}))
-;function _parseInputForIRCCommands(textAreaEl){const text=stripTrailingCrLf(textAreaEl.value);if(detectMultiLineString(text)){textAreaEl.value='';showError('Multi-line input is not supported.')
-}else if(text.length>0){const commandAction=textCommandParser({inputString:text,originType:'generic',originName:null});textAreaEl.value='';if(commandAction.error){showError(commandAction.message)
-;return}else{if(commandAction.ircMessage&&commandAction.ircMessage.length>0)_sendIrcServerMessage(commandAction.ircMessage);return}}textAreaEl.value=''}
+if(responseJson.error)showError(responseJson.message);else{webState.wallopsOpen=false;updateDivVisibility()}}).catch(error=>{showError(error.toString())})}))
+;document.getElementById('wallopsTallerButton').addEventListener('click',(function(){const newRows=parseInt(document.getElementById('wallopsMessageDisplay').getAttribute('rows'))+5
+;document.getElementById('wallopsMessageDisplay').setAttribute('rows',newRows.toString())}));document.getElementById('wallopsNormalButton').addEventListener('click',(function(){
+document.getElementById('wallopsMessageDisplay').setAttribute('rows','5')}));function _parseInputForIRCCommands(textAreaEl){const text=stripTrailingCrLf(textAreaEl.value)
+;if(detectMultiLineString(text)){textAreaEl.value='';showError('Multi-line input is not supported.')}else if(text.length>0){const commandAction=textCommandParser({inputString:text,
+originType:'generic',originName:null});textAreaEl.value='';if(commandAction.error){showError(commandAction.message);return}else{
+if(commandAction.ircMessage&&commandAction.ircMessage.length>0)_sendIrcServerMessage(commandAction.ircMessage);return}}textAreaEl.value=''}
 document.getElementById('sendRawMessageButton').addEventListener('click',(function(){_parseInputForIRCCommands(document.getElementById('rawMessageInputId'))
 ;document.getElementById('rawMessageInputId').focus()}));document.getElementById('rawMessageInputId').addEventListener('input',(function(event){
 if('insertText'===event.inputType&&null===event.data||'insertLineBreak'===event.inputType){stripOneCrLfFromElement(document.getElementById('rawMessageInputId'))

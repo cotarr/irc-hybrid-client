@@ -25,6 +25,8 @@ Reminder, the [+All] button can be pressed any time to show all hidden panels.
  
 - Inhibit both hide and un-hide of Notice panel during cache reload.
 - Inhibit both hide and un-hide of Wallops panel during cache reload.
+- Close Wallops panel after erase.
+- Close Notice panel after erase.
 - Inhibit un-hide of server panel when receiving channel name not matching a channel. This is to address an asynchronous timing issue caused when DALnet XFLAG AUTOMSG messages arrive and are parsed before channel creation has been completed.
 - Auto-hide IRC Channels panel after joining at least 1 channel.
 - Renamed "IRC Channels" panel to "Join IRC Channels".

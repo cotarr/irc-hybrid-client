@@ -62,6 +62,10 @@ document.getElementById('noticeEraseButton').addEventListener('click', function 
     .then((responseJson) => {
       if (responseJson.error) {
         showError(responseJson.message);
+      } else {
+        // erase successful, close the panel
+        webState.noticeOpen = false;
+        updateDivVisibility();
       }
     })
     .catch((error) => {
@@ -130,6 +134,10 @@ document.getElementById('wallopsEraseButton').addEventListener('click', function
     .then((responseJson) => {
       if (responseJson.error) {
         showError(responseJson.message);
+      } else {
+        // erase successful, close the panel
+        webState.wallopsOpen = false;
+        updateDivVisibility();
       }
     })
     .catch((error) => {
