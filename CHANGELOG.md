@@ -21,7 +21,8 @@ Server, Wallops, Notice and Private-Message (PM) panels.
 
 Reminder, the [+All] button can be pressed any time to show all hidden panels.
 
-### Changed
+## [v0.2.36](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.36) 2023-02-28
+
  
 - Inhibit both hide and un-hide of Notice panel during cache reload.
 - Inhibit both hide and un-hide of Wallops panel during cache reload.
