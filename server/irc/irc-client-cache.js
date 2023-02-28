@@ -109,6 +109,8 @@
 
   /**
    * Find NOTICE messages in cache and delete them
+   * Find CTCP requests that are not an ACTION and delete them.
+   *
    * This is an external API method for this module
    */
   const eraseCacheNotices = function () {
@@ -123,6 +125,16 @@
               // erase the array element
               cachedArrays.default[i] = null;
             }
+          } else if ((lineWords.length > 4) && (lineWords[2].toUpperCase() === 'PRIVMSG')) {
+            // Check if this is CTCP request sent as PRIVMSG that is not an ACTION
+            // 58 = : and 1 = CTCP delimiter
+            if ((lineWords[4].length > 1) &&
+              (lineWords[4].charCodeAt(0) === 58) &&
+              (lineWords[4].charCodeAt(1) === 1) &&
+              (lineWords[4].toUpperCase().indexOf('ACTION') < 0)) {
+              // erase the array element
+              cachedArrays.default[i] = null;
+            }
           }
         }
       }
@@ -130,8 +142,10 @@
   };
 
   /**
-   * Find all PRIVMSG messages in cache
-   * Check if they are channel or user PM, erase if user PM
+   * Find all PRIVMSG messages in cache, then...
+   * A) Determine if they are channel or user PM, erase if user PM
+   * B) Determine if it is a CTCP request that an not an ACTION and erase
+   *
    * This is an external API method for this module
    */
   const eraseCacheUserPM = function () {
@@ -143,7 +157,21 @@
           if ((lineWords.length > 4) && (lineWords[2].toUpperCase() === 'PRIVMSG')) {
             // Check that this user PRIVMSG (private message),
             // and it is not a channel PRIVMSG command (public message)
-            if (vars.channelPrefixChars.indexOf(lineWords[3].charAt(0)) < 0) {
+            if ((vars.channelPrefixChars.indexOf(lineWords[3].charAt(0)) < 0) &&
+              (lineWords[4].length > 1) &&
+              (
+                // ... check if it is not CTCP request sent as PRIVMSG
+                (
+                  (lineWords[4].charCodeAt(0) === 58) &&
+                  (lineWords[4].charCodeAt(1) !== 1)
+                ) ||
+                // ... or ... check if it a CTCP request that is an ACTION
+                (
+                  (lineWords[4].charCodeAt(0) === 58) &&
+                  (lineWords[4].charCodeAt(1) === 1) &&
+                  (lineWords[4].toUpperCase().indexOf('ACTION') >= 0)
+                )
+              )) {
               // erase the array element
               cachedArrays.default[i] = null;
             }

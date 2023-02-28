@@ -8,29 +8,47 @@ and this project adheres to
 
 ## Next 2023-02-28
 
+Overview
+
 In a previous upgrade, the operation of /JOIN an IRC channel 
 now triggers a API call for an API cache reload.
 The cache reload had the unintended consequence of causing 
 various hidden panels to become visible.
 This in turn caused the page to scroll and show extraneous panels.
 The general intention of this change is to keep hidden panels
-hidden including Server, Wallops, Notice and Private-Message (PM) panels.
+hidden during API cache reload. This includes 
+Server, Wallops, Notice and Private-Message (PM) panels.
 
 Reminder, the [+All] button can be pressed any time to show all hidden panels.
 
 ### Changed
  
-- Inhibit hide/un-hide of Notice panel during cache reload.
-- Inhibit hide/un-hide of Wallops panel during cache reload.
+- Inhibit both hide and un-hide of Notice panel during cache reload.
+- Inhibit both hide and un-hide of Wallops panel during cache reload.
 - Inhibit un-hide of server panel when receiving channel name not matching a channel. This is to address an asynchronous timing issue caused when DALnet XFLAG AUTOMSG messages arrive and are parsed before channel creation has been completed.
 - Auto-hide IRC Channels panel after joining at least 1 channel.
 - Renamed "IRC Channels" panel to "Join IRC Channels".
 
-- Collapse PM whois/send panel after sending initial PM, or expanding any collapsed PM panel.
-- An API cache reload will temporarily create an array of nicknames of open PM panels, then set visibility of PM panels during cache reload based on stored array nicknames. 
+- Collapse Private Message whois/send panel after sending initial PM, or expanding any collapsed PM panel.
+- Added: the API cache reload will temporarily create an array of nicknames of open PM panels, then set visibility of PM panels during cache reload based on stored array nicknames. 
 - The [Erase All PM] button is visible only if at least 1 private message panel exists
-- Pressing the [+] button on the private message whois/send panel will make all existing PM panels visible.
-- Pressing the [-] button on the private message whois/send panel will make all PM panels hidden.
+- Pressing the [+] button on the Private Message whois/send panel will make all existing PM panels visible.
+- Pressing the [-] button on the Private Message whois/send panel will make all PM panels hidden.
+
+### Fixed
+
+Issue: CTCP requests are sent as a PRIVMSG, but the CTCP 
+responses are returned to the user as a NOTICE. 
+Function buttons used to erase NOTICE messages were leaving 
+the CTCP request in the PM cache.
+Function buttons to erase all PM messages also erased 
+CTCP response NOTICE messages.
+
+Fixed: On the server side in irc-client-cache.js, filters were added
+to the NOTICE and PRIVMSG erase API request to properly 
+select erase messages.
+
+### Dependencies
 
 - Upgrade dependencies: express-validator@6.15.0 node-fetch@2.6.9 redis@4.6.5 utf-8-validate@6.0.3 ws@8.12.1
 
