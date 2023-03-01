@@ -874,6 +874,7 @@ function createChannelEl (name) {
     .addEventListener('click', handleChannelUnreadExistIconClick);
 
   function updateVisibility () {
+    // console.log(name, 'updateVisibility', channelMainSectionEl);
     const index = ircState.channels.indexOf(name.toLowerCase());
     if (index >= 0) {
       if (channelMainSectionEl.hasAttribute('opened')) {
@@ -1026,7 +1027,14 @@ function createChannelEl (name) {
   // If event.detail.zoomValue === channel name string
   // -----------------------------------------------------------
   function handleHideOrZoom (event) {
-    // console.log('hide-or-zoom ' + JSON.stringify(event.detail, null, 2));
+    console.log('hide-or-zoom ' + JSON.stringify(event.detail, null, 2));
+    //
+    // event {
+    //   "timestamp": 1677679210,
+    //   "zoomType": "channel",
+    //   "zoomValue": "#mychannel"
+    // }
+    //
     if ((event.detail) &&
       (event.detail.zoomType) &&
       (event.detail.zoomValue) &&
@@ -1620,8 +1628,10 @@ function createChannelEl (name) {
           webState.channelStates[webStateIndex].lastJoined) {
           if ((ircState.channelStates[ircStateIndex].joined) &&
             (!webState.channelStates[webStateIndex].lastJoined)) {
-            channelBottomDivEl.removeAttribute('hidden');
-            channelHideButtonEl.textContent = '-';
+            if (!webState.cacheReloadInProgress) {
+              channelMainSectionEl.setAttribute('opened', '');
+            }
+            updateVisibility();
             // channelTopRightHidableDivEl.removeAttribute('hidden');
           }
           webState.channelStates[webStateIndex].lastJoined =
@@ -1713,9 +1723,11 @@ function createChannelEl (name) {
             (!webState.cacheReloadInProgress)) {
             playBeep1Sound();
           }
-          // Upon channel make, make section visible.
-          channelBottomDivEl.removeAttribute('hidden');
-          channelHideButtonEl.textContent = '-';
+          // If channel panel is closed, open it up when a new person joins
+          if (!webState.cacheReloadInProgress) {
+            channelMainSectionEl.setAttribute('opened', '');
+          }
+          updateVisibility();
         }
         break;
       case 'MODE':
@@ -1769,8 +1781,11 @@ function createChannelEl (name) {
             parsedMessage.nick + ' to ' + parsedMessage.params[0] + ') ' + parsedMessage.params[1]);
 
           // Upon channel notice, make section visible.
-          channelBottomDivEl.removeAttribute('hidden');
-          channelHideButtonEl.textContent = '-';
+          // If channel panel is closed, open it up when a new person joins
+          if (!webState.cacheReloadInProgress) {
+            channelMainSectionEl.setAttribute('opened', '');
+          }
+          updateVisibility();
 
           // Message activity Icon
           // If focus not <textarea> element,
@@ -1835,8 +1850,10 @@ function createChannelEl (name) {
               clearLastZoom();
             }
           }
-
-          channelMainSectionEl.setAttribute('opened', '');
+          // If channel panel is closed, open it up receiving new message
+          if (!webState.cacheReloadInProgress) {
+            channelMainSectionEl.setAttribute('opened', '');
+          }
           updateVisibility();
 
           // Message activity Icon
@@ -2082,7 +2099,7 @@ function createChannelEl (name) {
   // dynamically size again.
   //
   setTimeout(adjustChannelInputToWidowWidth, 100);
-};
+}; // function createChannelEl
 
 // ----------------------------------------------------------------------
 // A change in state occurred, check if new channel need to be created.

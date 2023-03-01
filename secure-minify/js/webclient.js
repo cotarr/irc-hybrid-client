@@ -569,7 +569,8 @@ channelMainSectionEl.removeAttribute('zoom');updateVisibility();channelTextAreaE
 zoomType:'channel',zoomValue:name.toLowerCase()};document.dispatchEvent(new CustomEvent('hide-or-zoom',{bubbles:true,detail:lastZoomObj}))}}
 channelZoomButtonEl.addEventListener('click',handleChannelZoomButtonElClick);function handleShowAllDivs(event){channelMainSectionEl.removeAttribute('zoom')
 ;channelMainSectionEl.setAttribute('opened','');updateVisibility()}document.addEventListener('show-all-divs',handleShowAllDivs);function handleHideOrZoom(event){
-if(event.detail&&event.detail.zoomType&&event.detail.zoomValue&&'channel'===event.detail.zoomType&&event.detail.zoomValue===name.toLowerCase()){
+console.log('hide-or-zoom '+JSON.stringify(event.detail,null,2))
+;if(event.detail&&event.detail.zoomType&&event.detail.zoomValue&&'channel'===event.detail.zoomType&&event.detail.zoomValue===name.toLowerCase()){
 const index=ircState.channels.indexOf(name.toLowerCase());if(index>=0)if(ircState.channelStates[index].joined){channelMainSectionEl.setAttribute('zoom','')
 ;channelMainSectionEl.setAttribute('opened','');updateVisibility();channelTextAreaEl.scrollTop=channelTextAreaEl.scrollHeight;return}}channelMainSectionEl.removeAttribute('zoom')
 ;channelMainSectionEl.removeAttribute('opened');updateVisibility()}document.addEventListener('hide-or-zoom',handleHideOrZoom);function updateLocalStorageBeepEnable(){const now=unixTimestamp()
@@ -664,8 +665,8 @@ let checkNick=ircState.channelStates[channelIndex].names[i].toLowerCase();if(nic
 const ircStateIndex=ircState.channels.indexOf(name.toLowerCase());const webStateIndex=webState.channels.indexOf(name.toLowerCase())
 ;if(ircState.ircConnected&&ircStateIndex<0&&webStateIndex>=0)_removeSelfFromDOM();else if(!ircState.ircConnected)_removeSelfFromDOM();else if(ircState.ircConnected){
 if(ircStateIndex>=0&&webStateIndex>=0)if(ircState.channelStates[ircStateIndex].joined!==webState.channelStates[webStateIndex].lastJoined){
-if(ircState.channelStates[ircStateIndex].joined&&!webState.channelStates[webStateIndex].lastJoined){channelBottomDivEl.removeAttribute('hidden');channelHideButtonEl.textContent='-'}
-webState.channelStates[webStateIndex].lastJoined=ircState.channelStates[ircStateIndex].joined}_updateNickList();_updateChannelTitle();updateVisibility()}}
+if(ircState.channelStates[ircStateIndex].joined&&!webState.channelStates[webStateIndex].lastJoined){if(!webState.cacheReloadInProgress)channelMainSectionEl.setAttribute('opened','');updateVisibility()
+}webState.channelStates[webStateIndex].lastJoined=ircState.channelStates[ircStateIndex].joined}_updateNickList();_updateChannelTitle();updateVisibility()}}
 document.addEventListener('irc-state-changed',handleIrcStateChanged);function handleChannelMessage(event){function _addText(timestamp,nick,text){let out=''
 ;if(channelMainSectionEl.hasAttribute('brief-enabled')){out=timestamp+' ';if('*'===nick)out+=nick+nickChannelSpacer;else out+=nick+nickChannelSpacer+'\n';out+=cleanFormatting(text)+'\n\n'
 }else out=timestamp+' '+nick.padStart(maxNickLength,' ')+nickChannelSpacer+cleanFormatting(text)+'\n';channelTextAreaEl.value+=out
@@ -676,14 +677,14 @@ if(parsedMessage.params[0].toLowerCase()===name.toLowerCase()){let reason=' ';if
 ;if(channelMainSectionEl.hasAttribute('brief-enabled'))_addText(parsedMessage.timestamp,'*',parsedMessage.nick+' has kicked '+parsedMessage.params[1]);else _addText(parsedMessage.timestamp,'*',parsedMessage.nick+' has kicked '+parsedMessage.params[1]+' ('+reason+')')
 }break;case'JOIN':if(parsedMessage.params[0].toLowerCase()===name.toLowerCase()){
 if(channelMainSectionEl.hasAttribute('brief-enabled'))_addText(parsedMessage.timestamp,'*',parsedMessage.nick+' has joined');else _addText(parsedMessage.timestamp,'*',parsedMessage.nick+' ('+parsedMessage.host+') has joined')
-;if(channelMainSectionEl.hasAttribute('beep2-enabled')&&!webState.cacheReloadInProgress)playBeep1Sound();channelBottomDivEl.removeAttribute('hidden');channelHideButtonEl.textContent='-'}break
-;case'MODE':
+;if(channelMainSectionEl.hasAttribute('beep2-enabled')&&!webState.cacheReloadInProgress)playBeep1Sound();if(!webState.cacheReloadInProgress)channelMainSectionEl.setAttribute('opened','')
+;updateVisibility()}break;case'MODE':
 if(parsedMessage.params[0].toLowerCase()===name.toLowerCase())if(parsedMessage.nick)_addText(parsedMessage.timestamp,'*','Mode '+JSON.stringify(parsedMessage.params)+' by '+parsedMessage.nick);else _addText(parsedMessage.timestamp,'*','Mode '+JSON.stringify(parsedMessage.params)+' by '+parsedMessage.prefix)
 ;break;case'cachedNICK':if(name.toLowerCase()===parsedMessage.params[0].toLowerCase())_addText(parsedMessage.timestamp,'*',parsedMessage.nick+' is now known as '+parsedMessage.params[1]);break
 ;case'NICK':{let present=false;if(_isNickInChannel(parsedMessage.nick,name))present=true;if(_isNickInChannel(parsedMessage.params[0],name))present=true
 ;if(present)_addText(parsedMessage.timestamp,'*',parsedMessage.nick+' is now known as '+parsedMessage.params[0])}break;case'NOTICE':if(parsedMessage.params[0].toLowerCase()===name.toLowerCase()){
-_addText(parsedMessage.timestamp,'*','Notice('+parsedMessage.nick+' to '+parsedMessage.params[0]+') '+parsedMessage.params[1]);channelBottomDivEl.removeAttribute('hidden')
-;channelHideButtonEl.textContent='-'
+_addText(parsedMessage.timestamp,'*','Notice('+parsedMessage.nick+' to '+parsedMessage.params[0]+') '+parsedMessage.params[1])
+;if(!webState.cacheReloadInProgress)channelMainSectionEl.setAttribute('opened','');updateVisibility()
 ;if(document.activeElement!==channelInputAreaEl&&document.activeElement!==channelSendButtonEl&&!webState.cacheReloadInProgress&&0===activityIconInhibitTimer)incrementMessageCount()}break;case'PART':
 if(parsedMessage.params[0].toLowerCase()===name.toLowerCase()){let reason=' ';if(parsedMessage.params[1])reason=parsedMessage.params[1]
 ;if(channelMainSectionEl.hasAttribute('brief-enabled'))_addText(parsedMessage.timestamp,'*',parsedMessage.nick+' has left');else _addText(parsedMessage.timestamp,'*',parsedMessage.nick+' ('+parsedMessage.host+') has left '+'('+reason+')')
@@ -692,7 +693,7 @@ if(parsedMessage.params[0].toLowerCase()===name.toLowerCase()){let reason=' ';if
 const checkLine=parsedMessage.params[1].toLowerCase();if(checkLine.indexOf(ircState.nickName.toLowerCase())>=0&&!webState.cacheReloadInProgress)setTimeout(playBeep2Sound,250)}let lastZoomObj=null
 ;lastZoomObj=JSON.parse(window.localStorage.getItem('lastZoom'))
 ;if(lastZoomObj&&lastZoomObj.zoomType&&lastZoomObj.zoomValue&&'channel'===lastZoomObj.zoomType&&lastZoomObj.zoomValue===name.toLowerCase());else if(!webState.cacheReloadInProgress)clearLastZoom()
-;channelMainSectionEl.setAttribute('opened','');updateVisibility()
+;if(!webState.cacheReloadInProgress)channelMainSectionEl.setAttribute('opened','');updateVisibility()
 ;if(document.activeElement!==channelInputAreaEl&&document.activeElement!==channelSendButtonEl&&!webState.cacheReloadInProgress&&0===activityIconInhibitTimer)incrementMessageCount()}break
 ;case'cachedQUIT':if(parsedMessage.params[0].toLowerCase()===name.toLowerCase()){let reason=' ';if(parsedMessage.params[1])reason=parsedMessage.params[1]
 ;if(channelMainSectionEl.hasAttribute('brief-enabled'))_addText(parsedMessage.timestamp,'*',parsedMessage.nick+' has quit');else _addText(parsedMessage.timestamp,'*',parsedMessage.nick+' ('+parsedMessage.host+') has quit '+'('+reason+')')

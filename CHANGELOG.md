@@ -6,7 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Next 2023-02-28
+## Next 2023-01-03
+
+### Changed
+
+Following on to the previous change yesterday, in v0.2.36, this will persist
+the collapsed or expanded state of each channel panel during an 
+API cache reload.
+
+## [v0.2.36](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.36) 2023-02-28
 
 Overview
 
@@ -21,8 +29,7 @@ Server, Wallops, Notice and Private-Message (PM) panels.
 
 Reminder, the [+All] button can be pressed any time to show all hidden panels.
 
-## [v0.2.36](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.36) 2023-02-28
-
+### Changed
  
 - Inhibit both hide and un-hide of Notice panel during cache reload.
 - Inhibit both hide and un-hide of Wallops panel during cache reload.
