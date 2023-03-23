@@ -25,6 +25,9 @@
 //
 //                       M A I N   M O D U L E
 //
+
+const { logRotationInterval } = require('./irc-client-log');
+
 // -----------------------------------------------------------------------------
 (function () {
   'use strict';
@@ -339,12 +342,17 @@
   } else {
     ircLog.writeIrcLog('-----------------------------------------');
     ircLog.writeIrcLog('Starting ' + vars.ircState.progName + ' ' + vars.ircState.progVersion);
-    console.log('IRC raw message log filename: ' + ircLog.ircLogFilename);
-    console.log('Caution: IRC raw message log not pruned for size, monitor your file size.');
-    if (ircLog.getRawMessageLogEnabled()) {
-      console.log('IRC raw message log enabled.');
+    if (logRotationInterval.length > 1) {
+      console.log('IRC raw message log filename: ' + ircLog.ircLogFilename +
+        ' (Rotate: ' + logRotationInterval + ')');
     } else {
-      console.log('IRC raw message log disabled');
+      console.log('IRC raw message log filename: ' + ircLog.ircLogFilename);
+      console.log('Caution: Log rotation disabled. Please monitor log file size.');
+    }
+    if (ircLog.getRawMessageLogEnabled()) {
+      console.log('IRC raw message log enabled for selected IRC server (servers.json).');
+    } else {
+      console.log('IRC raw message log disabled for selected IRC server (servers.json)');
     }
   }
 

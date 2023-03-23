@@ -6,6 +6,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Next 2023-03-22
+
+### Added
+
+Added log file rotation using npm package rotating-file-stream.
+This will allow log file log rotation similar to Linux system files.
+For example: irc.log will be rotated to irc.log.1, irc.log.2 up to irc.log.5,
+Older files will be discarded during rotation.
+File rotation applies to the HTTP access log (access.log) and 
+the raw message IRC log (irc.log). The file auth.log where 
+user login history is recorded is not rotated.
+
+Log file rotation is enabled assigning the "logRotationInterval"
+property in credentials.json to the proper string value.
+Log rotate time units (s, m, h, d) are used to specify the interval 
+string. (Example: '5m', '2h', '1d').
+
 ## [v0.2.37](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.37) 2023-03-01
 
 ### Changed

@@ -30,26 +30,71 @@
 
   const path = require('path');
   const fs = require('fs');
+  const rotatingFileStream = require('rotating-file-stream');
 
-  const logFolder = path.join(__dirname, '../../logs');
-
-  try {
-    if (!fs.existsSync(logFolder)) {
-      console.log('Log folder not found, creating folder...');
-      fs.mkdirSync(logFolder);
-      fs.chmodSync(logFolder, 0o700);
-    }
-  } catch (err) {
-    console.log('Unable to create log folder');
-    console.error(err);
-    process.exit(1);
-  }
-
-  const accessLogFilename = path.join(__dirname, '../../logs/access.log');
-  const ircLogFilename = path.join(__dirname, '../../logs/irc.log');
+  const credentials = JSON.parse(fs.readFileSync('./credentials.json', 'utf8'));
 
   const nodeEnv = process.env.NODE_ENV || 'development';
   const nodeDebugLog = process.env.NODE_DEBUG_LOG || 0;
+
+  const logFolder = path.join(__dirname, '../../logs');
+  const accessLogFilename = path.join(__dirname, '../../logs/access.log');
+  const ircLogFilename = path.join(__dirname, '../../logs/irc.log');
+
+  const accessLogOnlyErrors = credentials.accessLogOnlyErrors || false;
+  // logRotationInterval type string, example: '5m', '12h', '7d'
+  const logRotationInterval = credentials.logRotationInterval || '';
+
+  if ((nodeEnv === 'production') && (!nodeDebugLog)) {
+    try {
+      if (!fs.existsSync(logFolder)) {
+        console.log('Log folder not found, creating folder...');
+        fs.mkdirSync(logFolder);
+        fs.chmodSync(logFolder, 0o700);
+      }
+    } catch (err) {
+      console.log('Unable to create log folder');
+      console.error(err);
+      process.exit(1);
+    }
+  }
+
+  const logConfig = {};
+  logConfig.format = ':date[iso] :remote-addr :status :method :http-version :req[host]:url';
+  logConfig.options = {};
+
+  // for start up message
+  let logStream = '(console)';
+  if ((nodeEnv !== 'development') && (!nodeDebugLog)) {
+    // for start up message
+    logStream = accessLogFilename;
+    // Function to write log entries to file as option property
+    if (logRotationInterval.length > 1) {
+      // Function to write log entries to file as option property
+      logConfig.options.stream = rotatingFileStream.createStream(accessLogFilename, {
+        encoding: 'utf8',
+        mode: 0o644,
+        interval: logRotationInterval,
+        rotate: 5,
+        initialRotation: false
+      });
+      logStream += ' (Rotate: ' + logRotationInterval + ')';
+    } else {
+      logConfig.options.stream = fs.createWriteStream(accessLogFilename, {
+        encoding: 'utf8',
+        mode: 0o644,
+        flags: 'a'
+      });
+    }
+    if (accessLogOnlyErrors) {
+      logStream += ' (Errors Only)';
+      logConfig.options.skip = function (req, res) {
+        return (res.statusCode < 400);
+      };
+    }
+  }
+  // This shows at server start up to console out
+  console.log('HTTP Access Log: ' + logStream);
 
   const writeAccessLog = function (logString) {
     //
@@ -64,25 +109,28 @@
     if ((nodeEnv === 'development') || (nodeDebugLog)) {
       console.log(logEntry);
     } else {
-      fs.writeFile(
-        accessLogFilename,
-        logEntry + '\n',
-        {
-          encoding: 'utf8',
-          mode: 0o600,
-          flag: 'a'
-        },
-        function (err) {
-          if (err) {
-            // in case disk full, kill server
-            throw new Error('Error writing ' + accessLogFilename);
-          }
-        }
-      );
+      logConfig.options.stream.write(logEntry + '\n');
     }
   };
 
   let rawMessageLogEnabled = false;
+
+  let ircLogStream = null;
+  if (logRotationInterval.length > 1) {
+    logConfig.options.stream = rotatingFileStream.createStream(ircLogFilename, {
+      encoding: 'utf8',
+      mode: 0o644,
+      interval: logRotationInterval,
+      rotate: 5,
+      initialRotation: false
+    });
+  } else {
+    ircLogStream = fs.createWriteStream(ircLogFilename, {
+      encoding: 'utf8',
+      mode: 0o644,
+      flags: 'a'
+    });
+  }
 
   const writeIrcLog = function (inBuffer) {
     //
@@ -98,22 +146,8 @@
     if ((nodeEnv === 'development') || (nodeDebugLog)) {
       console.log(logEntry);
     } else {
-      if (rawMessageLogEnabled) {
-        fs.writeFile(
-          ircLogFilename,
-          logEntry + '\n',
-          {
-            encoding: 'utf8',
-            mode: 0o600,
-            flag: 'a'
-          },
-          function (err) {
-            if (err) {
-              // in case disk full, kill server
-              throw new Error('Error writing ' + ircLogFilename);
-            }
-          }
-        );
+      if ((ircLogStream) && (rawMessageLogEnabled)) {
+        ircLogStream.write(logEntry + '\n');
       };
     }
   };
@@ -127,11 +161,13 @@
     return rawMessageLogEnabled;
   };
   module.exports = {
+    logConfig: logConfig,
     writeAccessLog: writeAccessLog,
     writeIrcLog: writeIrcLog,
     setRawMessageLogEnabled: setRawMessageLogEnabled,
     getRawMessageLogEnabled: getRawMessageLogEnabled,
     accessLogFilename: accessLogFilename,
-    ircLogFilename: ircLogFilename
+    ircLogFilename: ircLogFilename,
+    logRotationInterval: logRotationInterval
   };
 })();

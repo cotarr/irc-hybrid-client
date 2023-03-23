@@ -53,7 +53,6 @@
 (function () {
   'use strict';
 
-  const path = require('path');
   const fs = require('fs');
   const crypto = require('crypto');
   const signature = require('cookie-signature');
@@ -63,8 +62,9 @@
   const cookieSecret = credentials.cookieSecret;
   // console.log('cookieSecret ' + cookieSecret);
 
-  const nodeEnv = process.env.NODE_ENV || 'development';
-  const nodeDebugLog = process.env.NODE_DEBUG_LOG || 0;
+  const ircLog = require('../irc/irc-client-log');
+
+  // const nodeEnv = process.env.NODE_ENV || 'development';
 
   // Also set cookieName in web-server.js
   let cookieName = 'irc-hybrid-client';
@@ -76,17 +76,15 @@
   //
   // Custom log file (Option: setup to fail2ban to block IP addresses)
   //
-  const authLogFilename = path.join(__dirname, '../../logs/access.log');
   const customLog = function (request, logString) {
     //
     // build log text string
     //
-    const now = new Date();
-    let logEntry = now.toISOString();
+    let logEntry = '';
     if (('connection' in request) && ('remoteAddress' in request.connection)) {
-      logEntry += ' ' + request.connection.remoteAddress;
+      logEntry += request.connection.remoteAddress;
     } else {
-      logEntry += ' NOADDRESS';
+      logEntry += 'NOADDRESS';
     }
     logEntry += ' ' + logString;
     if ('url' in request) {
@@ -95,25 +93,7 @@
     //
     // Append string to file
     //
-    if ((nodeEnv === 'development') || (nodeDebugLog)) {
-      console.log(logEntry);
-    } else {
-      fs.writeFile(
-        authLogFilename,
-        logEntry + '\n',
-        {
-          encoding: 'utf8',
-          mode: 0o600,
-          flag: 'a'
-        },
-        function (err) {
-          if (err) {
-            // in case disk full, kill server
-            throw new Error('Error writing auth.log');
-          }
-        }
-      );
-    }
+    ircLog.writeAccessLog(logEntry);
   };
 
   //

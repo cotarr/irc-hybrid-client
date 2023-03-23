@@ -48,6 +48,7 @@ const app = express();
 const ircClient = require('./irc/irc-client');
 const ircServerListValidations = require('./irc/irc-serverlist-validations');
 const ircServerListEditor = require('./irc/irc-serverlist-editor');
+const ircLog = require('./irc/irc-client-log');
 
 // TLS certificate filenames
 // Web username, password credentials
@@ -94,7 +95,6 @@ const sessionExpireAfterMs = 1000 * sessionExpireAfterSec;
 // console.log('sessionExpireAfterMs ' + sessionExpireAfterMs);
 
 const nodeEnv = process.env.NODE_ENV || 'development';
-const nodeDebugLog = process.env.NODE_DEBUG_LOG || 0;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -118,29 +118,10 @@ if (nodeEnv === 'production') {
   app.use(compression());
 }
 
-//
+// ------------------
 // HTTP access log
-//
-const accessLogFilename = path.join(__dirname, '../logs/access.log');
-const accessLogOnlyErrors = credentials.accessLogOnlyErrors || false;
-if ((nodeEnv === 'development') || (nodeDebugLog)) {
-  console.log('Access log: (console)');
-  app.use(logger(':date[iso] :remote-addr :status :method :http-version :req[host]:url', {
-  }));
-} else {
-  console.log('Access log: ' + accessLogFilename + ' (Errors only)');
-  app.use(logger(':date[iso] :remote-addr :status :method :http-version :req[host]:url', {
-    stream: fs.createWriteStream(accessLogFilename, {
-      encoding: 'utf8',
-      mode: 0o600,
-      flags: 'a'
-    }),
-    // Log only errors, comment out this next part to see all traffic
-    skip: function (req, res) {
-      return ((res.statusCode < 400) && (accessLogOnlyErrors));
-    }
-  }));
-}
+// ------------------
+app.use(logger(ircLog.logConfig.format, ircLog.logConfig.options));
 
 // ------------------------------
 // Content Security Policy (CSP)
