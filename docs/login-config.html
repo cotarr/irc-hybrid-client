@@ -410,15 +410,16 @@ fi
           The file auth.log is not subject to log file rotation
         </p>
         <p>
-          Log file rotation is enabled assigning the &quot;logRotationInterval&quot;
+          Log file rotation is enabled by assigning the &quot;logRotationInterval&quot;
           property in credentials.json to the proper string value.
-          Log rotate time units (s, m, h, d) are used to specify the interval 
+          Log rotate available time units (s, m, h, d) are used to specify the interval 
           string. (Example: '5m', '2h', '1d').
-          This will allow access log file log rotation similar to Linux system files.
+          This will allow log file log rotation similar to Linux system files.
         </p>
         <p>
-          If the web server is started with NODE_ENV=development or NODE_DEBUG_LOG=1, 
-          all log output will be directed to stdout.
+          If the web server is started with env variable NODE_DEBUG_LOG=1, 
+          all log output will be directed to stdout. This is useful to view the 
+          logs in real time when debugging a server when NODE_ENV===production.
         </p>
 
 <div class="pre-div"><pre>

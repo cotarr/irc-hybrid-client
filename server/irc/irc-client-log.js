@@ -45,6 +45,9 @@
   // logRotationInterval type string, example: '5m', '12h', '7d'
   const logRotationInterval = credentials.logRotationInterval || '';
 
+  //
+  // If the logs/ folder does not exist, create it, abort on error
+  //
   if ((nodeEnv === 'production') && (!nodeDebugLog)) {
     try {
       if (!fs.existsSync(logFolder)) {
@@ -60,9 +63,10 @@
   }
 
   const logConfig = {};
+
+  // Format and options apply to the 'morgan' npm package, implemented in web-server.js
   logConfig.format = ':date[iso] :remote-addr :status :method :http-version :req[host]:url';
   logConfig.options = {};
-
   // for start up message
   let logStream = '(console)';
   if ((nodeEnv !== 'development') && (!nodeDebugLog)) {
@@ -80,12 +84,14 @@
       });
       logStream += ' (Rotate: ' + logRotationInterval + ')';
     } else {
+      // Else, log filename rotation disabled, use native fs module
       logConfig.options.stream = fs.createWriteStream(accessLogFilename, {
         encoding: 'utf8',
         mode: 0o644,
         flags: 'a'
       });
     }
+    // HTTP access log filter, used by morgan in web-server.js
     if (accessLogOnlyErrors) {
       logStream += ' (Errors Only)';
       logConfig.options.skip = function (req, res) {
@@ -95,7 +101,12 @@
   }
   // This shows at server start up to console out
   console.log('HTTP Access Log: ' + logStream);
-
+  //
+  // This method is primarily intended to allow
+  // web-socket connection events to be logged
+  // in the same access.log has HTTP requests.
+  // Web socket connections are managed in ws-server.js
+  //
   const writeAccessLog = function (logString) {
     //
     // build log text string
@@ -113,6 +124,12 @@
     }
   };
 
+  //
+  // The raw message log includes text messages sent from
+  // the IRC server to the IRC client (web server).
+  // For context, some outgoing messages and user requests
+  // are also logged.
+  //
   let rawMessageLogEnabled = false;
 
   let ircLogStream = null;

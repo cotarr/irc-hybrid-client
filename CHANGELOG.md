@@ -11,7 +11,7 @@ and this project adheres to
 ### Added
 
 Added log file rotation using npm package rotating-file-stream.
-This will allow log file log rotation similar to Linux system files.
+This will allow log file rotation similar to Linux system files.
 For example: irc.log will be rotated to irc.log.1, irc.log.2 up to irc.log.5,
 Older files will be discarded during rotation.
 File rotation applies to the HTTP access log (access.log) and 
@@ -20,8 +20,12 @@ user login history is recorded is not rotated.
 
 Log file rotation is enabled assigning the "logRotationInterval"
 property in credentials.json to the proper string value.
-Log rotate time units (s, m, h, d) are used to specify the interval 
+Log rotate available time units (s, m, h, d) are used to specify the interval 
 string. (Example: '5m', '2h', '1d').
+
+For backward compatibility, if the logRotationInterval is missing, 
+the program will write log files without filename rotation, consistent with 
+logging functionality in the previous version.
 
 ## [v0.2.37](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.37) 2023-03-01
 
