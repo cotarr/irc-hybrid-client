@@ -117,7 +117,7 @@
 
   let ircLogStream = null;
   if (logRotationInterval.length > 1) {
-    logConfig.options.stream = rotatingFileStream.createStream(ircLogFilename, {
+    ircLogStream = rotatingFileStream.createStream(ircLogFilename, {
       encoding: 'utf8',
       mode: 0o644,
       interval: logRotationInterval,
