@@ -25,7 +25,9 @@ to the redis server. All routes would return status 500.
 
 - Upgrade connect-redis@7.0.1. The upgrade from connect-redis v6 required code changes in web-server.js to fix breaking changes in connect-redis v7.
 
-- Upgrade npm packages: @dr.pogodin/csurf cookie-signature node-fetch ws 
+- Upgrade npm packages: @dr.pogodin/csurf cookie-signature node-fetch ws
+
+- Erase and regenerate new package-lock.json in npm lock file version 3 format.
 
 ## [v0.2.38](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.38) 2023-03-25
 
