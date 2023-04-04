@@ -1010,7 +1010,10 @@ if(document.getElementById('showRawInHexCheckbox').checked)webState.showRawInHex
 ;document.getElementById('showCommsCheckbox').addEventListener('click',(function(){
 if(document.getElementById('showCommsCheckbox').checked)webState.showCommsMessages=true;else webState.showCommsMessages=false;document.dispatchEvent(new CustomEvent('update-from-cache',{bubbles:true
 }))}));document.getElementById('infoOpenCloseButton').addEventListener('click',(function(){if(document.getElementById('hiddenInfoDiv').hasAttribute('hidden')){
-document.getElementById('hiddenInfoDiv').removeAttribute('hidden');document.getElementById('infoOpenCloseButton').textContent='-'}else{
+document.getElementById('hiddenInfoDiv').removeAttribute('hidden');document.getElementById('infoOpenCloseButton').textContent='-'
+;if(!document.getElementById('infoSectionDiv').hasAttribute('docs-enabled')){document.getElementById('infoSectionDiv').setAttribute('docs-enabled','0');const docsTestUrl='/irc/docs/index.html'
+;const fetchOptions={method:'HEAD',headers:{Accept:'text/html'}};fetch(docsTestUrl,fetchOptions).then(response=>{if(response.ok){
+document.getElementById('infoSectionDiv').setAttribute('docs-enabled','1');document.getElementById('viewDocsButtonDiv').removeAttribute('hidden')}})}}else{
 document.getElementById('hiddenInfoDiv').setAttribute('hidden','');document.getElementById('infoOpenCloseButton').textContent='+'}}));function updateFromCache(){if(webState.cacheReloadInProgress){
 console.log('Attempt cache reload, while previous in progress');return}webState.cacheReloadInProgress=true;resetNotActivityIcon();document.dispatchEvent(new CustomEvent('erase-before-reload',{
 bubbles:true,detail:{}}));const fetchURL=webServerUrl+'/irc/cache';const fetchOptions={method:'GET',headers:{Accept:'application/json'}};fetch(fetchURL,fetchOptions).then(response=>{
