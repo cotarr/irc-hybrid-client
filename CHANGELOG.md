@@ -29,6 +29,20 @@ to the redis server. All routes would return status 500.
 
 - Erase and regenerate new package-lock.json in npm lock file version 3 format.
 
+### Added
+
+Issue: The "/docs" folder of the git repository can be optionally
+served in the "/irc/docs/" route of the web server if
+configured in the credentials.json file. However, there are no 
+links on the irc client web page that can be used to view the documentation.
+
+Browser Change: Added an irc-hybrid-client "View Documentation" button to the Info/License 
+section of the web page. The button is a link to /irc/docs/index.html.
+Upon the first time the Info/License section is un-collapsed,
+a test HTTP fetch request is performed to determine if /irc/docs/ is
+available on the web server. The visibility of the 
+documentation button set accordingly.
+
 ## [v0.2.38](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.38) 2023-03-25
 
 ### Added
