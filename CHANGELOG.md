@@ -21,6 +21,10 @@ A password string length check was fixed in web-server.js.
 This bug prevented the npm package "redis" from connecting 
 to the redis server. All routes would return status 500.
 
+### Changed
+
+- Upgrade connect-redis@7.0.1. The upgrade from connect-redis v6 required code changes in web-server.js to fix breaking changes in connect-redis v7.
+
 ## [v0.2.38](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.38) 2023-03-25
 
 ### Added

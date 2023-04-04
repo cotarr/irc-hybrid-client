@@ -272,11 +272,8 @@ if (credentials.sessionEnableRedis) {
   // Clear all:  FLUSHALL
   console.log('Using redis for session storage');
   sessionStore.redis = require('redis');
-  sessionStore.RedisStore = require('connect-redis')(session);
-  const redisClientOptions = {
-    // legacyMode is  required to use redis v4 with connect-redis and express-session
-    legacyMode: true
-  };
+  sessionStore.RedisStore = require('connect-redis').default;
+  const redisClientOptions = {};
   // must match /etc/redis/redis.conf "requirepass <password>"
   if ((credentials.sessionRedisPassword) && (credentials.sessionRedisPassword.length > 0)) {
     redisClientOptions.password = credentials.sessionRedisPassword;
@@ -310,7 +307,7 @@ if (credentials.sessionEnableRedis) {
 //
 // Cookies issued and session store created
 // -----------------------------------------------------------------
-app.use('/', session(sessionOptions));
+app.use(session(sessionOptions));
 
 // --------------------------------------------
 // Rate limit http requests

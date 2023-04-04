@@ -1,6 +1,6 @@
 {
   "name": "irc-hybrid-client",
-  "version": "0.2.38",
+  "version": "0.2.39-dev",
   "description": "Single user hybrid IRC client using JavaScript front end and Node/Express backend",
   "main": "bin/www",
   "scripts": {
@@ -22,7 +22,7 @@
     "@dr.pogodin/csurf": "^1.12.2",
     "bcryptjs": "^2.4.3",
     "compression": "^1.7.4",
-    "connect-redis": "^6.1.3",
+    "connect-redis": "^7.0.1",
     "cookie": "^0.5.0",
     "cookie-parser": "^1.4.6",
     "cookie-signature": "^1.2.0",
