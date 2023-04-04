@@ -6,6 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Next
+
+### Fixed
+
+Issue: In the case were the redis server is configured to require a
+password with `requirepass xxxxxxx` in /etc/redis/redis.conf and
+a redis password is set in credentials.json (sessionRedisPassword),
+the web server would return status 500. The browser would display
+"NOAUTH Authentication required".
+
+Fixed: 
+A password string length check was fixed in web-server.js.
+This bug prevented the npm package "redis" from connecting 
+to the redis server. All routes would return status 500.
+
 ## [v0.2.38](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.38) 2023-03-25
 
 ### Added

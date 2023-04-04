@@ -278,7 +278,7 @@ if (credentials.sessionEnableRedis) {
     legacyMode: true
   };
   // must match /etc/redis/redis.conf "requirepass <password>"
-  if ((credentials.sessionRedisPassword) && (credentials.sessionRedisPassword > 0)) {
+  if ((credentials.sessionRedisPassword) && (credentials.sessionRedisPassword.length > 0)) {
     redisClientOptions.password = credentials.sessionRedisPassword;
   }
   sessionStore.redisClient = sessionStore.redis.createClient(redisClientOptions);
