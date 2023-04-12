@@ -74,12 +74,10 @@
    */
   const eraseCache = function () {
     // console.log('Cache Erased');
-    cachedInPointers = {
-      default: 0
-    };
-    cachedArrays = {
-      default: []
-    };
+    cachedInPointers = Object.create(null);
+    cachedInPointers.default = 0;
+    cachedArrays = Object.create(null);
+    cachedArrays.default = [];
     for (let i = 0; i < cacheSize; i++) {
       cachedArrays.default.push(null);
     }
@@ -804,7 +802,7 @@
     // timestamp in seconds
     const timestamp = parseInt(now.getTime() / 1000);
 
-    const stringArrays = {};
+    const stringArrays = Object.create(null);
     const arrayNameList = Object.keys(cachedArrays);
     arrayNameList.forEach(function (indexStr) {
       stringArrays[indexStr] = [];

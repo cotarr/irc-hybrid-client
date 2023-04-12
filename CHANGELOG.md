@@ -15,6 +15,16 @@ a private message panel would not be sent for the case where the
 PM nickname contains upper case characters. This issue did not 
 impact channel panel copy/paste functionality.
 
+### Changed
+
+As security improvement in the web server, the javascript object 
+used to hold the IRC message cache is now created 
+using `Object.create(null)` rather than assignment to an 
+object literal so the object will not have a prototype 
+that could be modified. (Note: strings obtained externally from the 
+IRC server containing channel names beginning with "#" or "@" 
+are being used to create keys in the IRC message cache object.)
+
 ## [v0.2.39](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.39) 2023-04-05
 
 ### Fixed
