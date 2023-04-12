@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Next v0.2.40-dev 2022-04-12
+## [v0.2.40](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.40) 2023-04-12
 
 ### Fixed
 
@@ -22,8 +22,14 @@ used to hold the IRC message cache is now created
 using `Object.create(null)` rather than assignment to an 
 object literal so the object will not have a prototype 
 that could be modified. (Note: strings obtained externally from the 
-IRC server containing channel names beginning with "#" or "@" 
-are being used to create keys in the IRC message cache object.)
+IRC server containing channel names are being used to create keys 
+in the IRC message cache object. This was unlikely to have been a 
+significant risk because "__proto__" would not be a valid
+IRC channel name which must begin with "#" or "@" characters. 
+It is safer practice to create the object this way.)
+
+- Updated npm packages.
+- Erase and regenerate package-lock.json
 
 ## [v0.2.39](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.39) 2023-04-05
 
