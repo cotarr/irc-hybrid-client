@@ -808,7 +808,7 @@ privMsgInputAreaEl.addEventListener('paste',handleprivMsgInputAreaElPaste);funct
 const lastIrcConnect=ircState.times.ircConnect;const lastWebConnect=webState.times.webConnect;let abortedFlag=false;const delayIntervalMs=2e3;let delayMs=0;if(multiLineArray.length>0){
 privMsgInputAreaEl.value=multiLineArray[0];for(let i=0;i<multiLineArray.length;i++){delayMs+=delayIntervalMs;setTimeout((function(){let okToSend=false
 ;if(ircState.ircConnected&&lastIrcConnect===ircState.times.ircConnect&&lastWebConnect===webState.times.webConnect&&!abortedFlag)okToSend=true;if(okToSend){
-if(privMsgBottomDivEl.hasAttribute('hidden'))okToSend=false;if(webState.activePrivateMessageNicks.indexOf(name)<0)okToSend=false}if(!okToSend)abortedFlag=true;else{
+if(privMsgBottomDivEl.hasAttribute('hidden'))okToSend=false;if(webState.activePrivateMessageNicks.indexOf(name.toLowerCase())<0)okToSend=false}if(!okToSend)abortedFlag=true;else{
 const message='PRIVMSG '+name+' :'+multiLineArray[i];_sendIrcServerMessage(message);if(i!==multiLineArray.length-1)privMsgInputAreaEl.value=multiLineArray[i+1];else privMsgInputAreaEl.value=''}
 }),delayMs)}privMsgBottomDiv2El.setAttribute('hidden','')}else{privMsgBottomDiv2El.setAttribute('hidden','');privMsgInputAreaEl.value=''}}}
 privMsgMultiLineSendButtonEl.addEventListener('click',handleMultiLineSendButtonClick);function handlePrivMsgSendButtonElClick(event){_sendPrivMessageToUser(name,privMsgInputAreaEl)
