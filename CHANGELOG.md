@@ -24,7 +24,7 @@ object literal so the object will not have a prototype
 that could be modified. (Note: strings obtained externally from the 
 IRC server containing channel names are being used to create keys 
 in the IRC message cache object. This was unlikely to have been a 
-significant risk because "__proto__" would not be a valid
+significant risk because `__proto__` would not be a valid
 IRC channel name which must begin with "#" or "@" characters. 
 It is safer practice to create the object this way.)
 
