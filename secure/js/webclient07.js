@@ -571,7 +571,9 @@ function createPrivateMessageEl (name, parsedMessage) {
               // PM window minimized
               if (privMsgBottomDivEl.hasAttribute('hidden')) okToSend = false;
               // PM name not in active PM list
-              if (webState.activePrivateMessageNicks.indexOf(name) < 0) okToSend = false;
+              if (webState.activePrivateMessageNicks.indexOf(name.toLowerCase()) < 0) {
+                okToSend = false;
+              }
             }
             if (!okToSend) {
               // once not ok, don't try again
