@@ -788,6 +788,9 @@ secure/sounds/custom-beep3.mp3 (Private Message)
           </p>
           <ul>
             <li>
+              The web server requires NodeJs version v18.0.0 or greater.
+            </li>
+            <li>
               To avoid cookie overlap, a unique domain name should be created for 
               the authorization server that is different from any of the irc-hybrid-client 
               domain names. Example: auth.example.com, irc1.example.com.
@@ -948,7 +951,7 @@ secure/sounds/custom-beep3.mp3 (Private Message)
     "remoteClientSecret": "xxxxxxxxxxxxxxxxxxxxxxxx",
     "remoteScope": [
       <yellow-example>"irc.all"</yellow-example>,
-      irc.demo1
+      "irc.demo1"
     ]
   }
   </pre></div>    

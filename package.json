@@ -1,6 +1,6 @@
 {
   "name": "irc-hybrid-client",
-  "version": "0.2.40",
+  "version": "0.2.41dev",
   "description": "Single user hybrid IRC client using JavaScript front end and Node/Express backend",
   "main": "bin/www",
   "scripts": {
@@ -33,7 +33,6 @@
     "helmet": "^6.1.5",
     "memorystore": "^1.6.7",
     "morgan": "^1.10.0",
-    "node-fetch": "^2.6.9",
     "redis": "^4.6.5",
     "rotating-file-stream": "^3.1.0",
     "socks5-client": "^1.2.8",

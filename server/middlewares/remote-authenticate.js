@@ -55,7 +55,6 @@
   // node native modules
   const fs = require('fs');
   const path = require('path');
-  const fetch = require('node-fetch');
 
   const credentials = JSON.parse(fs.readFileSync('./credentials.json', 'utf8'));
 
@@ -69,6 +68,72 @@
 
   const nodeEnv = process.env.NODE_ENV || 'development';
   const nodeDebugLog = process.env.NODE_DEBUG_LOG || 0;
+
+  //
+  // At program startup, validate the credentials.json file for required properties.
+  //
+  if ((!Object.hasOwn(credentials, 'remoteAuthHost')) ||
+    (credentials.remoteAuthHost.length < 1)) {
+    console.log(
+      'Error: Remote login, "remoteAuthHost" is a required property, credentials.json');
+    process.exit(1);
+  } else if ((!Object.hasOwn(credentials, 'remoteCallbackHost')) ||
+    (credentials.remoteCallbackHost.length < 1)) {
+    console.log(
+      'Error: Remote login, "remoteCallbackHost" is a required property, credentials.json');
+    process.exit(1);
+  } else if ((!Object.hasOwn(credentials, 'remoteClientId')) ||
+    (credentials.remoteClientId.length < 1)) {
+    console.log(
+      'Error: Remote login, "remoteClientId" is a required property, credentials.json');
+    process.exit(1);
+  } else if ((!Object.hasOwn(credentials, 'remoteClientSecret')) ||
+    (credentials.remoteClientSecret.length < 1)) {
+    console.log(
+      'Error: Remote login, "remoteClientSecret" is a required property, credentials.json');
+    process.exit(1);
+  } else if (!Object.hasOwn(credentials, 'remoteScope')) {
+    console.log(
+      'Error: Remote login, "remoteScope" is a required property, credentials.json');
+    process.exit(1);
+  } else {
+    let scopeExist = false;
+    if (Array.isArray(credentials.remoteScope)) {
+      if ((credentials.remoteScope.length > 0) &&
+        (credentials.remoteScope[0].length > 0)) {
+        scopeExist = true;
+      }
+    } else {
+      if ((typeof credentials.remoteScope === 'string') &&
+        (credentials.remoteScope.length > 0)) {
+        scopeExist = true;
+      }
+    }
+    if (!scopeExist) {
+      console.log('Error: Remote login, "remoteScope" is a required property, credentials.json');
+      process.exit(1);
+    }
+  }
+
+  //
+  // At program startup, validate minimum nodejs version
+  // Starting in NodeJs V18, the fetch() API is supported natively.
+  //
+  // process.version returns a string in the format "v18.16.0"
+  const nodeJsVersion = parseInt(process.version.split('.')[0].replace('v', ''));
+  if (nodeJsVersion < 18) {
+    const nodeUpgradeMessage =
+      '\nUpgrade note: Starting with irc-hybrid-client v0.2.41, ' +
+      'when configured with enableRemoteLogin === true, the module ' +
+      'remote_authenticate.js uses the NodeJs native fetch() API. ' +
+      'This is only available in NodeJs Version v18.0.0. or greater. ' +
+      'This server appears to be running ' + process.version + '. ' +
+      'The default configuration with internal user login does not ' +
+      'require NodeJs v18. ' +
+      '(See v0.2.41 CHANGELOG.md.)\n';
+    console.log(nodeUpgradeMessage);
+    process.exit(1);
+  }
 
   //
   // Custom log file (Option: setup to fail2ban to block IP addresses)
@@ -121,9 +186,9 @@
   // Setup authentication variables inside session
   //
   const _initSession = function (req) {
-    if (req.session) {
-      if (!(req.session.sessionAuth)) {
-        req.session.sessionAuth = {};
+    if (Object.hasOwn(req, 'session')) {
+      if (!Object.hasOwn(req.session, 'sessionAuth')) {
+        req.session.sessionAuth = Object.create(null);
         req.session.sessionAuth.authorized = false;
       }
     }
@@ -145,8 +210,10 @@
 
     let authorized = false;
     const timeNowSeconds = Math.floor(Date.now() / 1000);
-    if ((req.session) && (req.session.sessionAuth)) {
-      if (req.session.sessionAuth.authorized) {
+    if ((Object.hasOwn(req, 'session')) &&
+      (Object.hasOwn(req.session, 'sessionAuth')) &&
+      (Object.hasOwn(req.session.sessionAuth), 'authorized')) {
+      if (req.session.sessionAuth.authorized === true) {
         if (req.session.sessionAuth.sessionExpireTimeSec) {
           if (timeNowSeconds < req.session.sessionAuth.sessionExpireTimeSec) {
             authorized = true;
@@ -165,14 +232,13 @@
   // Mark the session as not authorized
   //
   const _removeAuthorizationFromSession = function (req) {
-    if (req.session) {
+    if (Object.hasOwn(req, 'session')) {
       _initSession(req);
       if (req.session.sessionAuth) {
         delete req.session.sessionAuth.sessionExpireTimeSec;
         delete req.session.sessionAuth.user;
         delete req.session.sessionAuth.name;
         delete req.session.sessionAuth.userid;
-        // delete req.session.sessionAuth.scopes;
         delete req.session.sessionAuth.previousFailTimeSec;
         req.session.sessionAuth.authorized = false;
       }
@@ -230,19 +296,19 @@
       for (let i = 0; i < credentials.remoteScope.length; i++) {
         if (i > 0) {
           // Delimit with escaped space characters
-          scopeString += '%20' + credentials.remoteScope[i];
+          scopeString += ' ' + credentials.remoteScope[i];
         } else {
           scopeString += credentials.remoteScope[i];
         }
       }
     }
-    res.redirect(
+    res.redirect(encodeURI(
       credentials.remoteAuthHost +
       '/dialog/authorize?' +
       'redirect_uri=' + credentials.remoteCallbackHost + '/login/callback' + '&' +
       'response_type=code&' +
       'client_id=' + credentials.remoteClientId + '&' +
-      'scope=' + scopeString);
+      'scope=' + scopeString));
   };
 
   //
@@ -253,19 +319,19 @@
 
   // Function will regenerate a new session and cookie
   // Returns Promise resolving to null
-  // Throws error if unable to regnerate and rejects promise
+  // Throws error if unable to regenerate and rejects promise
   //
   // It is a general security practice to update session upon change in permission.
   //
-  const _regenerateSessionCookie = function (req) {
+  const _regenerateSessionCookie = function (req, chain) {
     return new Promise(
       (resolve, reject) => {
         req.session.regenerate(function (err) {
           if (err) {
             reject(err);
           } else {
-            // return value not used
-            resolve(null);
+            // return chain object unmodified
+            resolve(chain);
           };
         });
       }
@@ -282,9 +348,9 @@
   // Validation failure: generate response status 400 bad request
   // Otherwise internal server error.
   // ---------------------------------------------------------
-  const _extractCallbackAuthCode = function (req, res) {
+  const _extractCallbackAuthCode = function (req, chain) {
     return new Promise(function (resolve, reject) {
-      if (req.query) {
+      if (Object.hasOwn(req, 'query')) {
         // query input validation
         if ((typeof req.query === 'object') &&
           (Object.keys(req.query).length === 1) &&
@@ -293,10 +359,14 @@
           (req.query.code.length > 0) &&
           (req.query.code.length < 80)) {
           // Extract Oauth 2.0 authorization code
-          resolve(req.query.code);
+          chain.code = req.query.code;
+          // return chain object with result
+          resolve(chain);
         } else {
           console.log('Error: _extractCallbackAuthCode() req.query failed input validation');
-          return res.status(400).send('Bad Request');
+          const err = new Error('Authorization code validation error');
+          err.status = 400;
+          reject(err);
         }
       } else {
         const err = new Error('query param not found in req object');
@@ -310,15 +380,20 @@
   // Validate that required properties exist after
   // exchanging authorization code for new access token
   // ------------------------------------------------------
-  const _validateTokenResponse = function (tokenResponse) {
+  const _validateTokenResponse = function (chain) {
     return new Promise(function (resolve, reject) {
-      if ((!(tokenResponse == null)) &&
-        ('token_type' in tokenResponse) && (tokenResponse.token_type === 'Bearer') &&
-        ('grant_type' in tokenResponse) && (tokenResponse.grant_type === 'authorization_code') &&
-        ('expires_in' in tokenResponse) && (parseInt(tokenResponse.expires_in) > 0) &&
-        ('access_token' in tokenResponse) && (typeof tokenResponse.access_token === 'string') &&
-        (tokenResponse.access_token.length > 0)) {
-        resolve(tokenResponse);
+      if ((Object.hasOwn(chain, 'tokenResponse')) &&
+        (!(chain.tokenResponse == null)) &&
+        (Object.hasOwn(chain.tokenResponse, 'token_type')) &&
+        (chain.tokenResponse.token_type === 'Bearer') &&
+        (Object.hasOwn(chain.tokenResponse, 'grant_type')) &&
+        (chain.tokenResponse.grant_type === 'authorization_code') &&
+        (Object.hasOwn(chain.tokenResponse, 'expires_in')) &&
+        (parseInt(chain.tokenResponse.expires_in) > 0) &&
+        (Object.hasOwn(chain.tokenResponse, 'access_token')) &&
+        (typeof chain.tokenResponse.access_token === 'string') &&
+        (chain.tokenResponse.access_token.length > 0)) {
+        resolve(chain);
       } else {
         const err = new Error('Error parsing authorization_code response');
         console.log(err.message);
@@ -333,31 +408,37 @@
   // At minimum, one scope from each must match.
   // Return 403 Forbidden if scope is insufficient
   // ------------------------------------------------------
-  const _authorizeTokenScope = function (res, tokenMetaData) {
-    // console.log('tokenMetaData.scope ', tokenMetaData.scope);
+  const _authorizeTokenScope = function (chain) {
+    // console.log('chain.tokenMetaData.scope ', chain.tokenMetaData.scope);
     // console.log('credentials.remoteScope ', credentials.remoteScope);
     return new Promise(function (resolve, reject) {
-      if ((!(tokenMetaData == null)) &&
-        ('active' in tokenMetaData) && (tokenMetaData.active === true) &&
-        ('scope' in tokenMetaData) && (Array.isArray(tokenMetaData.scope))) {
+      if ((Object.hasOwn(chain, 'tokenMetaData')) &&
+        (!(chain.tokenMetaData == null)) &&
+        (Object.hasOwn(chain.tokenMetaData, 'active')) &&
+        (chain.tokenMetaData.active === true) &&
+        (Object.hasOwn(chain.tokenMetaData, 'scope')) &&
+        (Array.isArray(chain.tokenMetaData.scope))) {
         let scopeFound = false;
         // Case 1 remoteScope is type String
         if (typeof credentials.remoteScope === 'string') {
-          if (tokenMetaData.scope.indexOf(credentials.remoteScope) >= 0) {
+          if (chain.tokenMetaData.scope.indexOf(credentials.remoteScope) >= 0) {
             scopeFound = true;
           }
           // Case 2, remoteScope is Array of Strings
         } else if (Array.isArray(credentials.remoteScope)) {
           credentials.remoteScope.forEach(function (scopeString) {
-            if (tokenMetaData.scope.indexOf(scopeString) >= 0) {
+            if (chain.tokenMetaData.scope.indexOf(scopeString) >= 0) {
               scopeFound = true;
             }
           });
         }
         if (scopeFound) {
-          resolve(tokenMetaData);
+          resolve(chain);
         } else {
-          return res.status(403).send('Forbidden - User access_token insufficient scope.');
+          console.log('User access token insufficient scope');
+          const err = new Error('User access token insufficient scope');
+          err.status = 403;
+          reject(err);
         }
       } else {
         const err = new Error('Error parsing introspect response meta-data');
@@ -370,23 +451,21 @@
   // -------------------------------------------------------------------
   // After all authentication is complete, mark session as authorized.
   // -------------------------------------------------------------------
-  const _setSessionAuthorized = function (req, res, tokenMetaData) {
+  const _setSessionAuthorized = function (req, chain) {
     return new Promise(function (resolve, reject) {
       const timeNowSeconds = Math.floor(Date.now() / 1000);
       _initSession(req);
       req.session.sessionAuth.authorized = true;
-      req.session.sessionAuth.user = tokenMetaData.user.username;
-      req.session.sessionAuth.name = tokenMetaData.user.name;
-      req.session.sessionAuth.userid = tokenMetaData.user.id;
+      req.session.sessionAuth.user = chain.tokenMetaData.user.username;
+      req.session.sessionAuth.name = chain.tokenMetaData.user.name;
+      req.session.sessionAuth.userid = chain.tokenMetaData.user.id;
       req.session.sessionAuth.sessionExpireTimeSec = timeNowSeconds + sessionExpireAfterSec;
       //
       // add to log file
       //
       customLog(req, 'Login ' + req.session.sessionAuth.user);
-      //
-      // Redirect to landing page after successful login
-      //
-      return res.redirect('/irc/webclient.html');
+
+      resolve(chain);
     });
   };
 
@@ -401,19 +480,22 @@
   //
   // Returns promise
   // -----------------------------------------------------------------------
-  const _introspectAccessToken = function (responseObj, code) {
+  const _introspectAccessToken = function (chain) {
     // OAuth2 authorization server
     const fetchUrl = credentials.remoteAuthHost + '/oauth/introspect';
 
+    const fetchController = new AbortController();
+
     const body = {
-      access_token: responseObj.access_token,
+      access_token: chain.tokenResponse.access_token,
       client_id: credentials.remoteClientId,
       client_secret: credentials.remoteClientSecret
     };
 
     const fetchOptions = {
       method: 'POST',
-      timeout: 5000,
+      redirect: 'error',
+      signal: fetchController.signal,
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json'
@@ -421,10 +503,12 @@
       body: JSON.stringify(body)
     };
 
+    chain.introspectFetchTimerId = setTimeout(() => fetchController.abort(), 5000);
+
     // Return Promise
     return fetch(fetchUrl, fetchOptions)
       .then((response) => {
-        if (response.ok) {
+        if (response.status === 200) {
           return response.json();
         } else {
           throw new Error('Fetch status ' + response.status + ' ' +
@@ -432,8 +516,10 @@
         }
       })
       .then((introspectResponse) => {
-        // console.log('interspectResponse ', introspectResponse);
-        return introspectResponse;
+        // console.log('introspectResponse ', introspectResponse);
+        if (chain.introspectFetchTimerId) clearTimeout(chain.introspectFetchTimerId);
+        chain.tokenMetaData = introspectResponse;
+        return chain;
       });
   };
 
@@ -443,12 +529,14 @@
   //
   // Returns promise
   // ---------------------------------------------------------------
-  const _fetchNewAccessToken = function (code) {
+  const _fetchNewAccessToken = function (chain) {
     // OAuth2 authorization server
     const fetchUrl = credentials.remoteAuthHost + '/oauth/token';
 
+    const fetchController = new AbortController();
+
     const body = {
-      code: code,
+      code: chain.code,
       redirect_uri: credentials.remoteCallbackHost + '/login/callback',
       client_id: credentials.remoteClientId,
       client_secret: credentials.remoteClientSecret,
@@ -457,7 +545,8 @@
 
     const fetchOptions = {
       method: 'POST',
-      timeout: 5000,
+      redirect: 'error',
+      signal: fetchController.signal,
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json'
@@ -465,10 +554,12 @@
       body: JSON.stringify(body)
     };
 
+    chain.tokenFetchTimerId = setTimeout(() => fetchController.abort(), 5000);
+
     // Return Promise
     return fetch(fetchUrl, fetchOptions)
       .then((response) => {
-        if (response.ok) {
+        if (response.status === 200) {
           return response.json();
         } else {
           throw new Error('Fetch status ' + response.status + ' ' +
@@ -477,7 +568,9 @@
       })
       .then((tokenResponse) => {
         // console.log(tokenResponse);
-        return tokenResponse;
+        if (chain.tokenFetchTimerId) clearTimeout(chain.tokenFetchTimerId);
+        chain.tokenResponse = tokenResponse;
+        return chain;
       });
   };
 
@@ -496,28 +589,24 @@
   // 7) Redirect to single page application at /irc/webclient.html
   // -------------------------------------------------------------------------------
   const exchangeAuthCode = function (req, res, next) {
+    const chainObj = Object.create(null);
     // Calling _regenerateSessionCookie returns promise
-    _regenerateSessionCookie(req)
-      .then(function () {
-        return _extractCallbackAuthCode(req, res);
+    _regenerateSessionCookie(req, chainObj)
+      .then((chain) => _extractCallbackAuthCode(req, chain))
+      .then((chain) => _fetchNewAccessToken(chain))
+      .then((chain) => _validateTokenResponse(chain))
+      .then((chain) => _introspectAccessToken(chain))
+      .then((chain) => _authorizeTokenScope(chain))
+      .then((chain) => _setSessionAuthorized(req, chain))
+      .then((chain) => {
+        // Success...
+        return res.redirect('/irc/webclient.html');
       })
-      .then(function (authCode) {
-        return _fetchNewAccessToken(authCode);
-      })
-      .then(function (tokenResponse) {
-        return _validateTokenResponse(tokenResponse);
-      })
-      .then(function (tokenResponse) {
-        return _introspectAccessToken(tokenResponse);
-      })
-      .then(function (tokenMetaData) {
-        return _authorizeTokenScope(res, tokenMetaData);
-      })
-      .then(function (tokenMetaData) {
-        return _setSessionAuthorized(req, res, tokenMetaData);
-      })
-      .catch(function (err) {
-        return next(err.message || err);
+      .catch((err) => {
+        // Failure...
+        if (chainObj.introspectFetchTimerId) clearTimeout(chainObj.introspectFetchTimerId);
+        if (chainObj.tokenFetchTimerId) clearTimeout(chainObj.tokenFetchTimerId);
+        return next(err);
       });
   };
 
@@ -527,13 +616,16 @@
   const logout = function (req, res, next) {
     // if logged in then add to logfile
     let user;
-    if ((req.session) && (req.session.sessionAuth) && (req.session.sessionAuth.authorized)) {
+    if ((Object.hasOwn(req, 'session')) &&
+      (Object.hasOwn(req.session, 'sessionAuth')) &&
+      (req.session.sessionAuth.authorized)) {
       customLog(req, 'Logout ' + req.session.sessionAuth.user);
       user = req.session.sessionAuth.user;
     }
-    if (req.session) {
+    if (Object.hasOwn(req, 'session')) {
       let cookieName = 'irc-hybrid-client';
-      if (('instanceNumber' in credentials) && (Number.isInteger(credentials.instanceNumber)) &&
+      if ((Object.hasOwn(credentials, 'instanceNumber')) &&
+        (Number.isInteger(credentials.instanceNumber)) &&
         (credentials.instanceNumber >= 0) && (credentials.instanceNumber < 65536)) {
         cookieName = 'irc-hybrid-client-' + credentials.instanceNumber.toString();
       }
@@ -574,15 +666,16 @@
   // Route: GET /userinfo
   // -----------------------------
   const getUserInfo = function (req, res, next) {
-    if ((req.session) && (req.session.sessionAuth) &&
-      (req.session.sessionAuth.user) &&
-      (req.session.sessionAuth.authorized)) {
+    if ((Object.hasOwn(req, 'session')) &&
+      (Object.hasOwn(req.session, 'sessionAuth')) &&
+      (Object.hasOwn(req.session.sessionAuth, 'user')) &&
+      (Object.hasOwn(req.session.sessionAuth, 'authorized')) &&
+      (req.session.sessionAuth.authorized === true)) {
       // Return user information
-      const userInfo = {};
+      const userInfo = Object.create(null);
       userInfo.user = req.session.sessionAuth.user;
       userInfo.name = req.session.sessionAuth.name;
       userInfo.userid = req.session.sessionAuth.userid;
-      // userInfo.scopes = req.session.sessionAuth.scopes;
       res.json(userInfo);
     } else {
       res.status(404).send('404 Not Found');
@@ -592,11 +685,11 @@
   // Route: GET /login.css
   // -----------------------
   const loginStyleSheet = function (req, res, next) {
-    fs.readFile('./server/fragments/login.css', 'utf8', function (err, privacyStr) {
+    fs.readFile('./server/fragments/login.css', 'utf8', function (err, styleSheetStr) {
       if (err) {
         next(); // fall through to 404
       } else {
-        res.set('Content-Type', 'text/css').send(privacyStr);
+        res.set('Content-Type', 'text/css').send(styleSheetStr);
       }
     });
   };

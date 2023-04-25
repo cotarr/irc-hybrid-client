@@ -6,6 +6,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
+## Next v0.2.41dev 2023-04-24
+
+The NPM package node-fetch has moved on. The current version only 
+supports Import Modules. Version 2 of node-fetch for CommonJS require() modules
+does not seem to be in active development. Concurrently, NodeJs now 
+supports the native fetch() API, similar to the web browser.
+The node-fetch module was only used for the optional remote login 
+configuration to exchange authorization codes and access tokens.
+In the irc-hybrid-client module server/middlewares/remote-authenticate.js
+the module node-fetch has been removed and fetch() calls will 
+use the native fetch() API in NodeJs.
+
+- The "node-fetch" has been removed from package.json as a dependency.
+- To use remote login (oauth2) NodeJs minimum version is v18.0.0.
+
+Note: this only impacts the optional remote login configuration.
+Use of the default internal user login may use older versions of NodeJs.
+
 ## [v0.2.40](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.40) 2023-04-12
 
 ### Fixed
