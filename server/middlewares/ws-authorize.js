@@ -68,7 +68,8 @@
 
   // Also set cookieName in web-server.js
   let cookieName = 'irc-hybrid-client';
-  if (('instanceNumber' in credentials) && (Number.isInteger(credentials.instanceNumber)) &&
+  if ((Object.hasOwn(credentials, 'instanceNumber')) &&
+    (Number.isInteger(credentials.instanceNumber)) &&
     (credentials.instanceNumber >= 0) && (credentials.instanceNumber < 65536)) {
     cookieName = 'irc-hybrid-client-' + credentials.instanceNumber.toString();
   }
@@ -117,7 +118,9 @@
   // ------------------------------------------------------
   const authorizeWebSocket = function (request) {
     // Check if header contains cookies
-    if (('headers' in request) && ('cookie' in request.headers)) {
+    // Odd, "headers" appears to be a prototype method, not an object property
+    if ((request.headers) &&
+      (Object.hasOwn(request.headers, 'cookie'))) {
       // decode cookies into array of un-escaped strings
       const cookies = cookie.parse(request.headers.cookie);
       // console.log(JSON.stringify(cookies, null, 2));
@@ -126,8 +129,8 @@
       // console.log(raw);
       if (raw) {
         // check prefix to verify it has signature
-        if (raw.substr(0, 2) === 's:') {
-          // console.log(raw.substr(0, 2));
+        if ((raw.length > 2) && (raw.substring(0, 2) === 's:')) {
+          // console.log(raw.substring(0, 2));
           // Validate signature using cookie-signature module
           const result = signature.unsign(raw.slice(2), cookieSecret);
           // check if signature was valid
@@ -139,10 +142,12 @@
             // and that 10 second expiration time is not exceeded.
             //
             const timeNow = parseInt(Date.now() / 1000); // seconds
-            if (('webSocketAuth' in global) &&
-              ('cookie' in global.webSocketAuth) &&
+            if ((Object.hasOwn(global, 'webSocketAuth')) &&
+              (Object.hasOwn(global.webSocketAuth, 'cookie')) &&
               (safeCompare(result, global.webSocketAuth.cookie)) &&
               (timeNow < global.webSocketAuth.expire)) {
+              // Finished checking cookie, delete it
+              delete global.webSocketAuth;
               // console.log('websocket verified by cookie auth');
               return true;
             } else {

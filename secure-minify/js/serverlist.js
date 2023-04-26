@@ -28,15 +28,15 @@ let full=false;let editable=false;const _clearError=()=>{const errorDivEl=docume
 ;while(errorDivEl.firstChild)errorDivEl.removeChild(errorDivEl.firstChild);document.getElementById('showRefreshButtonDiv').setAttribute('hidden','')};const _showError=errorString=>{
 const errorDivEl=document.getElementById('errorDiv');errorDivEl.removeAttribute('hidden');const errorMessageEl=document.createElement('div')
 ;errorMessageEl.textContent=errorString||'Error: unknown error (4712)';errorDivEl.appendChild(errorMessageEl);document.getElementById('showRefreshButtonDiv').removeAttribute('hidden')
-;window.scrollTo(0,document.querySelector('body').scrollHeight)};const fetchIrcState=()=>{const fetchURL=encodeURI('/irc/getircstate');const fetchOptions={method:'GET',credentials:'include',headers:{
+;window.scrollTo(0,document.querySelector('body').scrollHeight)};const fetchIrcState=()=>{const fetchURL=encodeURI('/irc/getircstate');const fetchOptions={method:'GET',headers:{
 Accept:'application/json'}};return fetch(fetchURL,fetchOptions).then(response=>{
 if(response.ok)return response.json();else throw new Error('Fetch status '+response.status+' '+response.statusText+' '+fetchURL)})};const fetchServerList=(index,lock)=>{let urlStr='/irc/serverlist'
-;if(index>=0){urlStr+='?index='+index.toString();if(lock>=0)urlStr+='&lock='+lock.toString()}const fetchURL=encodeURI(urlStr);const fetchOptions={method:'GET',credentials:'include',headers:{
-Accept:'application/json'}};return fetch(fetchURL,fetchOptions).then(response=>{if(response.ok)return response.json();else if(409===response.status){
-const err=new Error('IRC Connected or Database Locked');err.status=409;throw err}else if(405===response.status){const err=new Error('Server List Editor Disabled');err.status=405;throw err
+;if(index>=0){urlStr+='?index='+index.toString();if(lock>=0)urlStr+='&lock='+lock.toString()}const fetchURL=encodeURI(urlStr);const fetchOptions={method:'GET',headers:{Accept:'application/json'}}
+;return fetch(fetchURL,fetchOptions).then(response=>{if(response.ok)return response.json();else if(409===response.status){const err=new Error('IRC Connected or Database Locked');err.status=409
+;throw err}else if(405===response.status){const err=new Error('Server List Editor Disabled');err.status=405;throw err
 }else throw new Error('Fetch status '+response.status+' '+response.statusText+' '+fetchURL)})};const submitServer=(body,method,index)=>{
 const csrfToken=document.querySelector('meta[name="csrf-token"]').getAttribute('content');let baseUrl='/irc/serverlist';if('action'in body)baseUrl='/irc/serverlist/tools'
-;if(-1!==index)baseUrl+='?index='+index.toString();const fetchURL=encodeURI(baseUrl);const fetchOptions={method:method,credentials:'include',headers:{'CSRF-Token':csrfToken,Accept:'application/json',
+;if(-1!==index)baseUrl+='?index='+index.toString();const fetchURL=encodeURI(baseUrl);const fetchOptions={method:method,headers:{'CSRF-Token':csrfToken,Accept:'application/json',
 'Content-Type':'application/json'},body:JSON.stringify(body)};return fetch(fetchURL,fetchOptions).then(response=>{if(response.ok)return response.json();else if(409===response.status){
 const err=new Error('IRC Connected or Database Locked');err.status=409;throw err}else if(422===response.status){const err=new Error('Unprocessable Entity');err.status=422;throw err
 }else throw new Error('Fetch status '+response.status+' '+response.statusText+' '+fetchURL)})};const clearIrcServerForm=()=>new Promise((resolve,reject)=>{

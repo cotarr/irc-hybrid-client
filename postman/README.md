@@ -51,12 +51,14 @@ the API requests individually, it is recommended to use a dedicated IRC test ser
 * There is one environment
   * File `postman/irc-hybrid-client.postman_environment.json`
 * Assign a temporary user/password in the web server for testing.
-* In Postman, import enviornment above, or create a environment with the variables listed above.
+* In Postman, import environment above, or create a environment with the variables listed above.
 * Set values to the temporary user/password and server URL.
 * Suggest manual delete irc-hybrid-client cookie from postman before running tests.
 * The tests are time dependent so it is recommended to run the entire collection using the runner.
 
 # 1 irc-hybrid-client API authorization tests
+
+* It is necessary to run collection "irc-hybrid-client server config" before running this collection
 
 This is a collection of postman tests associated with the
 conventional GET and POST methods used to issue IRC client

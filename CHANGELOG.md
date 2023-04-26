@@ -9,21 +9,50 @@ and this project adheres to
 
 ## Next v0.2.41dev 2023-04-24
 
-The NPM package node-fetch has moved on. The current version only 
-supports Import Modules. Version 2 of node-fetch for CommonJS require() modules
-does not seem to be in active development. Concurrently, NodeJs now 
-supports the native fetch() API, similar to the web browser.
+### Changed (web server)
+
+Performed a general code clean up in the web server login authentication
+modules: 
+
+- server/middlewares/remote-authentication.js
+- server/middlewares/user-authenticate.js
+- server/middlewares/ws-authorize.js.
+
+### Changed (web server)
+
+The NPM package node-fetch has moved on. The current version only supports 
+Import Modules. Legacy version 2 of node-fetch for CommonJS require() 
+modules does not seem to be in active development. Concurrently, NodeJs 
+now supports the native fetch() API, similar to the web browser.
 The node-fetch module was only used for the optional remote login 
-configuration to exchange authorization codes and access tokens.
+configuration to exchange authorization codes and validate access tokens.
 In the irc-hybrid-client module server/middlewares/remote-authenticate.js
-the module node-fetch has been removed and fetch() calls will 
-use the native fetch() API in NodeJs.
+the HTTP fetch requests have been updated to use the NodeJs native 
+fetch() API.
 
 - The "node-fetch" has been removed from package.json as a dependency.
 - To use remote login (oauth2) NodeJs minimum version is v18.0.0.
 
-Note: this only impacts the optional remote login configuration.
-Use of the default internal user login may use older versions of NodeJs.
+Note: the fetch() upgrade only impacts the optional remote login 
+configuration (oauth2). Use of the default internal 
+login (user, password form) may still use run under older 
+versions of NodeJs, probably Node V14+.
+
+### Tests update
+
+Postman tests were run to make sure they still worked properly.
+Updated postman collection "irc-hybrid-client API auth tests"
+to provide more descriptive error when global variable is 
+missing and how to fix it.
+
+### Changed (Browser)
+
+Removed `credentials: include` from fetch() options in 
+the server list editor secure/js/serverlist.js. This was a 
+copy paste error. The web browser will now fall back to 
+the browser default value `credentials: same-origin`. 
+This was not likely an issue because the Content Security 
+Policy (CSP) prevents cross origin requests altogether.
 
 ## [v0.2.40](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.40) 2023-04-12
 

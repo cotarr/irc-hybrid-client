@@ -97,7 +97,6 @@ const fetchIrcState = () => {
   const fetchURL = encodeURI('/irc/getircstate');
   const fetchOptions = {
     method: 'GET',
-    credentials: 'include',
     headers: {
       Accept: 'application/json'
     }
@@ -130,7 +129,6 @@ const fetchServerList = (index, lock) => {
   const fetchURL = encodeURI(urlStr);
   const fetchOptions = {
     method: 'GET',
-    credentials: 'include',
     headers: {
       Accept: 'application/json'
     }
@@ -173,7 +171,6 @@ const submitServer = (body, method, index) => {
   const fetchURL = encodeURI(baseUrl);
   const fetchOptions = {
     method: method,
-    credentials: 'include',
     headers: {
       'CSRF-Token': csrfToken,
       Accept: 'application/json',

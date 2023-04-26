@@ -234,7 +234,7 @@
   const _removeAuthorizationFromSession = function (req) {
     if (Object.hasOwn(req, 'session')) {
       _initSession(req);
-      if (req.session.sessionAuth) {
+      if (Object.hasOwn(req.session, 'sessionAuth')) {
         delete req.session.sessionAuth.sessionExpireTimeSec;
         delete req.session.sessionAuth.user;
         delete req.session.sessionAuth.name;
@@ -629,13 +629,16 @@
         (credentials.instanceNumber >= 0) && (credentials.instanceNumber < 65536)) {
         cookieName = 'irc-hybrid-client-' + credentials.instanceNumber.toString();
       }
-      const cookieOptions = {
-        maxAge: req.session.cookie.originalMaxAge,
-        expires: req.session.cookie.expires,
-        secure: req.session.cookie.secure,
-        httpOnly: req.session.cookie.httpOnly,
-        path: req.session.cookie.path
-      };
+      let cookieOptions = null;
+      if (Object.hasOwn(req.session, 'cookie')) {
+        cookieOptions = {
+          maxAge: req.session.cookie.originalMaxAge,
+          expires: req.session.cookie.expires,
+          secure: req.session.cookie.secure,
+          httpOnly: req.session.cookie.httpOnly,
+          path: req.session.cookie.path
+        };
+      }
       _removeAuthorizationFromSession(req);
       req.session.destroy(function (err) {
         if (err) {
@@ -643,7 +646,9 @@
         }
       });
       // this clears cookie contents, but not clear cookie
-      res.clearCookie(cookieName, cookieOptions);
+      if (cookieOptions != null) {
+        res.clearCookie(cookieName, cookieOptions);
+      }
     }
     let tempHtml = 'Browser was not logged in.';
     if (user) {

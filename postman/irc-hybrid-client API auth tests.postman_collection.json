@@ -20,6 +20,25 @@
 						],
 						"type": "text/javascript"
 					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.test('\"Prerequisite collection not run prior: \"irc-hybrid-client server config\"', function () {",
+							"    let index = pm.globals.get('irc_server_index');",
+							"    // console.log('index', typeof index);",
+							"    if (typeof index !== 'number') {",
+							"        // abort all remaining tests",
+							"        postman.setNextRequest(null);",
+							"        console.log('Global variable irc_server_index does not exist.');",
+							"        throw new Error('Global variable irc_server_index does not exist.');",
+							"    }",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
 				}
 			],
 			"request": {
@@ -2043,9 +2062,10 @@
 						"exec": [
 							"pm.test(\"Global variable exists: irc_server_index\", function () {",
 							"    let index = pm.globals.get('irc_server_index');",
+							"    console.log('index', typeof index);",
 							"    if (typeof index !== 'number') {",
-							"        console.log('Global variable irc_server_index does not exist');",
-							"        throw new Error('Global variable irc_server_index does not exist');",
+							"        console.log('Global variable irc_server_index does not exist.');",
+							"        throw new Error('Global variable irc_server_index does not exist.');",
 							"    }",
 							"});"
 						],

@@ -421,20 +421,20 @@ app.get('/secure', userAuth.authorizeOrFail, (req, res) => res.json({ secure: 'o
 //
 // There may be some risk in this because the cookie in this
 // function originally came from the client browser.
+// But the risk is low, because an IRC user is unique.
+// Only a single IRC user will have a valid login to
+// the backend web server. It is not a multi-user web server.
 //
 // This route and function exchanges cookie value
 // and expiration timestamp with the webscket module
-// for independant (manual) cookie validation
+// for independent (manual) cookie validation
 // for the websocket upgrade request.
 //
 // Data stored globally, time expiration 10 seconds.
 //
 // -----------------------------------------
 app.post('/irc/wsauth', userAuth.authorizeOrFail, csrfProtection, function (req, res, next) {
-  global.webSocketAuth = {
-    expire: 0,
-    cookie: ''
-  };
+  delete global.webSocketAuth;
   // requires cookie-parser
   if ('signedCookies' in req) {
     const cookieValue = req.signedCookies[cookieName];

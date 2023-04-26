@@ -108,9 +108,9 @@
   // Setup authentication variables inside session
   //
   const _initSession = function (req) {
-    if (req.session) {
-      if (!(req.session.sessionAuth)) {
-        req.session.sessionAuth = {};
+    if (Object.hasOwn(req, 'session')) {
+      if (!Object.hasOwn(req.session, 'sessionAuth')) {
+        req.session.sessionAuth = Object.create(null);
         req.session.sessionAuth.authorized = false;
       }
     }
@@ -132,8 +132,10 @@
 
     let authorized = false;
     const timeNowSeconds = Math.floor(Date.now() / 1000);
-    if ((req.session) && (req.session.sessionAuth)) {
-      if (req.session.sessionAuth.authorized) {
+    if ((Object.hasOwn(req, 'session')) &&
+      (Object.hasOwn(req.session, 'sessionAuth')) &&
+      (Object.hasOwn(req.session.sessionAuth, 'authorized'))) {
+      if (req.session.sessionAuth.authorized === true) {
         if (req.session.sessionAuth.sessionExpireTimeSec) {
           if (timeNowSeconds < req.session.sessionAuth.sessionExpireTimeSec) {
             authorized = true;
@@ -152,14 +154,13 @@
   // Mark the session as not authorized
   //
   const _removeAuthorizationFromSession = function (req) {
-    if (req.session) {
+    if (Object.hasOwn(req, 'session')) {
       _initSession(req);
-      if (req.session.sessionAuth) {
+      if (Object.hasOwn(req.session, 'sessionAuth')) {
         delete req.session.sessionAuth.sessionExpireTimeSec;
         delete req.session.sessionAuth.user;
         delete req.session.sessionAuth.name;
         delete req.session.sessionAuth.userid;
-        // delete req.session.sessionAuth.scopes;
         delete req.session.sessionAuth.previousFailTimeSec;
         req.session.sessionAuth.authorized = false;
       }
@@ -169,7 +170,7 @@
   // Remove temporary login data from session.
   //
   const _removeLoginNonceFromSession = function (req) {
-    if (req.session) {
+    if (Object.hasOwn(req, 'session')) {
       _initSession(req);
       if (req.session.sessionAuth) {
         delete req.session.sessionAuth.loginNonce;
@@ -219,7 +220,7 @@
     return nonce;
   };
 
-  const sanatizeString = function (inString) {
+  const sanitizeStringInput = function (inString) {
     let sanitizedString = '';
     const allowedChars =
       'abcdefghijklmnoqprstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -261,7 +262,8 @@
     // Copy existing session properties to new session
     const csrfSecret = req.session.csrfSecret;
     let sessionAuth = null;
-    if ((req.session.sessionAuth) && (typeof req.session.sessionAuth === 'object')) {
+    if ((Object.hasOwn(req.session, 'sessionAuth')) &&
+      (typeof req.session.sessionAuth === 'object')) {
       // deep copy object so obsolete session does not have reference for garbage collection
       sessionAuth = JSON.parse(JSON.stringify(req.session.sessionAuth));
     }
@@ -276,23 +278,28 @@
         // wrap in try to catch errors
         try {
           // Check if browser cookies enabled and a session has been establised.
-          if ((req.signedCookies) && (req.session) && (req.session.sessionAuth)) {
-          // remove previous credentials if there are any
+          if ((Object.hasOwn(req, 'signedCookies')) &&
+            (Object.hasOwn(req, 'session')) &&
+            (Object.hasOwn(req.session, 'sessionAuth'))) {
+            // remove previous credentials if there are any
             _removeAuthorizationFromSession(req);
             const timeNowSeconds = Math.floor(Date.now() / 1000);
             // make sure all expected data has been supplied, else bad request error
             let inputNonce = '';
             let inputUser = '';
             let inputPassword = '';
-            if (('query' in req) && ('nonce' in req.query) &&
+            if ((Object.hasOwn(req, 'query')) &&
+              (Object.hasOwn(req.query, 'nonce')) &&
               (typeof req.query.nonce === 'string')) {
               inputNonce = req.query.nonce.toString('utf8');
             }
-            if (('body' in req) && ('user' in req.body) &&
+            if ((Object.hasOwn(req, 'body')) &&
+              (Object.hasOwn(req.body, 'user')) &&
               (typeof req.body.user === 'string')) {
               inputUser = req.body.user.toString('utf8');
             }
-            if (('body' in req) && ('password' in req.body) &&
+            if ((Object.hasOwn(req, 'body')) &&
+              (Object.hasOwn(req.body, 'password')) &&
               (typeof req.body.password === 'string')) {
               inputPassword = req.body.password.toString('utf8');
             }
@@ -308,7 +315,7 @@
               //
               // Query user array to find index to matching user.
               //
-              const postedUser = sanatizeString(inputUser);
+              const postedUser = sanitizeStringInput(inputUser);
               let userIndex = -1;
               for (let i = 0; i < userArray.length; i++) {
                 if (userArray[i].user === postedUser) {
@@ -323,7 +330,8 @@
                 return res.redirect('/login');
               }
 
-              if ((!(req.session.sessionAuth.loginNonce)) ||
+              if ((!Object.hasOwn(req.session, 'sessionAuth')) ||
+                (!Object.hasOwn(req.session.sessionAuth, 'loginNonce')) ||
                 (!(safeCompare(inputNonce, req.session.sessionAuth.loginNonce)))) {
                 customLog(req, 'Bad login nonce invalid');
                 _removeLoginNonceFromSession(req);
@@ -332,7 +340,8 @@
                 return res.redirect('/login');
               }
 
-              if ((!(req.session.sessionAuth.loginExpireTimeSec)) ||
+              if ((!Object.hasOwn(req.session, 'sessionAuth')) ||
+                (!Object.hasOwn(req.session.sessionAuth, 'loginExpireTimeSec')) ||
                 (timeNowSeconds >= req.session.sessionAuth.loginExpireTimeSec)) {
                 customLog(req, 'Bad login time limit exceeded');
                 _removeLoginNonceFromSession(req);
@@ -456,23 +465,30 @@
   const logout = function (req, res, next) {
     // if logged in then add to logfile
     let user;
-    if ((req.session) && (req.session.sessionAuth) && (req.session.sessionAuth.authorized)) {
+    if ((Object.hasOwn(req, 'session')) &&
+      (Object.hasOwn(req.session, 'sessionAuth')) &&
+      (Object.hasOwn(req.session.sessionAuth, 'authorized')) &&
+      (req.session.sessionAuth.authorized === true)) {
       customLog(req, 'Logout ' + req.session.sessionAuth.user);
       user = req.session.sessionAuth.user;
     }
-    if (req.session) {
+    if (Object.hasOwn(req, 'session')) {
       let cookieName = 'irc-hybrid-client';
-      if (('instanceNumber' in credentials) && (Number.isInteger(credentials.instanceNumber)) &&
+      if ((Object.hasOwn(credentials, 'instanceNumber')) &&
+        (Number.isInteger(credentials.instanceNumber)) &&
         (credentials.instanceNumber >= 0) && (credentials.instanceNumber < 65536)) {
         cookieName = 'irc-hybrid-client-' + credentials.instanceNumber.toString();
       }
-      const cookieOptions = {
-        maxAge: req.session.cookie.originalMaxAge,
-        expires: req.session.cookie.expires,
-        secure: req.session.cookie.secure,
-        httpOnly: req.session.cookie.httpOnly,
-        path: req.session.cookie.path
-      };
+      let cookieOptions = null;
+      if (Object.hasOwn(req.session, 'cookie')) {
+        cookieOptions = {
+          maxAge: req.session.cookie.originalMaxAge,
+          expires: req.session.cookie.expires,
+          secure: req.session.cookie.secure,
+          httpOnly: req.session.cookie.httpOnly,
+          path: req.session.cookie.path
+        };
+      }
       _removeAuthorizationFromSession(req);
       req.session.destroy(function (err) {
         if (err) {
@@ -480,7 +496,9 @@
         }
       });
       // this clears cookie contents, but not clear cookie
-      res.clearCookie(cookieName, cookieOptions);
+      if (cookieOptions != null) {
+        res.clearCookie(cookieName, cookieOptions);
+      }
     }
     let tempHtml = 'Browser was not logged in.';
     if (user) {
@@ -493,9 +511,11 @@
   // Route: GET /userinfo
   // -----------------------------
   const getUserInfo = function (req, res, next) {
-    if ((req.session) && (req.session.sessionAuth) &&
-      (req.session.sessionAuth.user) &&
-      (req.session.sessionAuth.authorized)) {
+    if ((Object.hasOwn(req, 'session')) &&
+      (Object.hasOwn(req.session, 'sessionAuth')) &&
+      (Object.hasOwn(req.session.sessionAuth, 'user')) &&
+      (Object.hasOwn(req.session.sessionAuth, 'authorized')) &&
+      (req.session.sessionAuth.authorized === true)) {
       // Return user information
       const userInfo = {};
       userInfo.user = req.session.sessionAuth.user;
