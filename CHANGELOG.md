@@ -18,31 +18,32 @@ modules:
 - server/middlewares/user-authenticate.js
 - server/middlewares/ws-authorize.js.
 
-### Changed (web server)
+### Changed (web server with remote login)
 
-The NPM package node-fetch has moved on. The current version only supports 
-Import Modules. Legacy version 2 of node-fetch for CommonJS require() 
-modules does not seem to be in active development. Concurrently, NodeJs 
-now supports the native fetch() API, similar to the web browser.
-The node-fetch module was only used for the optional remote login 
-configuration to exchange authorization codes and validate access tokens.
-In the irc-hybrid-client module server/middlewares/remote-authenticate.js
-the HTTP fetch requests have been updated to use the NodeJs native 
-fetch() API.
+This change refers only to the optional remote login (oauth2) configuration.
+The default internal web login (user/password) does not use 
+the node-fetch module so therefore not impacted.
 
-- The "node-fetch" has been removed from package.json as a dependency.
-- To use remote login (oauth2) NodeJs minimum version is v18.0.0.
+When configured for remote login, HTTP requests are issued to 
+exchange authorization codes and validate access tokens. 
+This program has been using an older legacy version 2 of "node-fetch"
+because the current version of the "node-fetch" has dropped 
+support for CommonJs modules. 
 
-Note: the fetch() upgrade only impacts the optional remote login 
-configuration (oauth2). Use of the default internal 
-login (user, password form) may still use run under older 
-versions of NodeJs, probably Node V14+.
+Starting with Node v18.0.0 a new fetch() API
+was added to NodeJs, similar to the browser window.fetch() API.
+
+As of this upgrade, when configured for remote login,
+the program will check if the new fetch() api is available.
+If available it will be used, otherwise the legacy 
+node-fetch version 2 NPM module will be loaded automatically.
+In the future, node v18 or greater may be required for remote login.
 
 ### Tests update
 
 Postman tests were run to make sure they still worked properly.
 Updated postman collection "irc-hybrid-client API auth tests"
-to provide more descriptive error when global variable is 
+to provide more descriptive error when a postman global variable is 
 missing and how to fix it.
 
 ### Changed (Browser)

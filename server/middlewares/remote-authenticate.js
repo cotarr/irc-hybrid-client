@@ -116,23 +116,22 @@
   }
 
   //
-  // At program startup, validate minimum nodejs version
-  // Starting in NodeJs V18, the fetch() API is supported natively.
+  // At program startup, check if native fetch() exists.
+  // If the fetch() API is not found, load legacy v2
+  // of the node-fetch package.
   //
-  // process.version returns a string in the format "v18.16.0"
-  const nodeJsVersion = parseInt(process.version.split('.')[0].replace('v', ''));
-  if (nodeJsVersion < 18) {
+  // eslint-disable-next-line no-use-before-define
+  if ((typeof fetch).toString() !== 'function') {
     const nodeUpgradeMessage =
-      '\nUpgrade note: Starting with irc-hybrid-client v0.2.41, ' +
-      'when configured with enableRemoteLogin === true, the module ' +
-      'remote_authenticate.js uses the NodeJs native fetch() API. ' +
-      'This is only available in NodeJs Version v18.0.0. or greater. ' +
-      'This server appears to be running ' + process.version + '. ' +
-      'The default configuration with internal user login does not ' +
-      'require NodeJs v18. ' +
-      '(See v0.2.41 CHANGELOG.md.)\n';
+    '+-----------------------------------------------------------\n' +
+    '| During startup, the fetch() API was not detected. For backward\n' +
+    '| compatibility, the legacy NPM module "node-fetch" v2 was loaded.\n' +
+    '| In version v18.0.0 NodeJs introduced a native fetch() API.\n' +
+    '| In the future, NodeJs v18 or greater may be required when\n' +
+    '| using the optional remote login. (CHANGELOG v0.2.41)\n' +
+    '+-----------------------------------------------------------';
     console.log(nodeUpgradeMessage);
-    process.exit(1);
+    global.fetch = require('node-fetch');
   }
 
   //
