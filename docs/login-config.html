@@ -788,9 +788,6 @@ secure/sounds/custom-beep3.mp3 (Private Message)
           </p>
           <ul>
             <li>
-              The web server requires NodeJs version v18.0.0 or greater.
-            </li>
-            <li>
               To avoid cookie overlap, a unique domain name should be created for 
               the authorization server that is different from any of the irc-hybrid-client 
               domain names. Example: auth.example.com, irc1.example.com.
@@ -803,6 +800,13 @@ secure/sounds/custom-beep3.mp3 (Private Message)
             <li>
               The collab-auth authorization server must be installed, 
               running and tested. (<a href="https://cotarr.github.io/collab-auth/">Documentation</a>)
+            </li>
+            <li>
+              NodeJs version v18.0.0 or greater is preferred for use of the native fetch() API.
+              At program start, if the native fetch() API is not detected, for backward compatibility, 
+              the NPM legacy package "node-fetch" Version 2.0 will be loaded.
+              Note: The default web login (user/password) does not use the backend fetch API so 
+              earlier versions of NodeJs should work.
             </li>
           </ul>
         <p>
