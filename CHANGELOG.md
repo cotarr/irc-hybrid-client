@@ -37,7 +37,9 @@ As of this upgrade, when configured for remote login,
 the program will check if the new fetch() api is available.
 If available it will be used, otherwise the legacy 
 node-fetch version 2 NPM module will be loaded automatically.
-In the future, node v18 or greater may be required for remote login.
+In the future, node v18 or greater may be required for remote login
+and "node-fetch" may be dropped from package.json.
+This would clear node-fetch outdated package messages.
 
 ### Tests update
 
@@ -45,6 +47,20 @@ Postman tests were run to make sure they still worked properly.
 Updated postman collection "irc-hybrid-client API auth tests"
 to provide more descriptive error when a postman global variable is 
 missing and how to fix it.
+
+### Upgraded (web server)
+
+The package "express-validator" was upgraded from v6 to v7.
+The express-validator is used to perform input validation
+when submitting data from the server list editor.
+Various syntax changes were required in irc-server-list-validations.js
+in order to accommodate breaking changes in v6 to v7 change.
+The schema of the error messages was changed by the upgrade to v7. 
+These error changes do not impact the IRC web frontend.
+If you are using the backend web server independent 
+of the web frontend, this could be an issue, so refer to
+the express-validator docs.
+
 
 ### Changed (Browser)
 
