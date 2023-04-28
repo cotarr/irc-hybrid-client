@@ -61,6 +61,7 @@ If you are using the backend web server independent
 of the web frontend, this could be an issue, so refer to
 the express-validator docs.
 
+Minor version upgrades on packages eslint@8.39.0, redis@4.6.6
 
 ### Changed (Browser)
 
