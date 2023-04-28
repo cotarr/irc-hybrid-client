@@ -7,7 +7,7 @@ and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## Next v0.2.41dev 2023-04-24
+## [v0.2.41](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.41) 2023-04-28
 
 ### Changed (web server)
 
