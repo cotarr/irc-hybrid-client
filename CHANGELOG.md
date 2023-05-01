@@ -7,6 +7,18 @@ and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [v0.2.42](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.42) 2023-05-01
+
+- Node v16 or greater is now required for the web server backend.
+
+Changes in v0.2.41 broke Node v14. The package.json was updated to specify Node >=16.
+The README and /docs were updated to specify Node v16 as minimum version.
+
+### Changed
+
+In followup to the express-validator v7 upgrade in v0.2.41, a custom validation error was updated
+so the schema of the error object will match express-validator v7 format.
+
 ## [v0.2.41](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.41) 2023-04-28
 
 ### Changed (web server)

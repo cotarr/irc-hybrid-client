@@ -79,8 +79,9 @@ exports.checkExtraneousKeys = function (req, allowKeys, location) {
     for (const key of keys) {
       if (allowKeys.indexOf(key) < 0) {
         req.locals.errors.push({
+          type: 'field',
           msg: 'Invalid param',
-          param: key,
+          path: key,
           location: locationString
         });
       }
@@ -103,8 +104,9 @@ exports.checkExtraneousKeys = function (req, allowKeys, location) {
     const queryKeys = Object.keys(req.query);
     for (const key of queryKeys) {
       req.locals.errors.push({
+        type: 'field',
         msg: 'Invalid param',
-        param: key,
+        path: key,
         location: 'query'
       });
     } // next key

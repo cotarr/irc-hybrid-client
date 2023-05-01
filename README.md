@@ -33,6 +33,8 @@ The steps listed here are a minimal installation guide for
 people very familiar with deploying Node.js/Express servers.
 It is recommended to follow the documentation installation instructions instead.
 
+- Backend web server requires Node v16 or greater.
+
 ```bash
 # clone the github repository
 git clone https://github.com/cotarr/irc-hybrid-client.git

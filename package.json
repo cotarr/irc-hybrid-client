@@ -1,8 +1,11 @@
 {
   "name": "irc-hybrid-client",
-  "version": "0.2.41",
+  "version": "0.2.42",
   "description": "Single user hybrid IRC client using JavaScript front end and Node/Express backend",
   "main": "bin/www",
+  "engines": {
+    "node": ">=16"
+  },
   "scripts": {
     "lint": "npx eslint secure/js/*.js server/*/*.js server/*.js bin/www tools/*.js",
     "test": "echo \"Error: no test specified\" && exit 1",

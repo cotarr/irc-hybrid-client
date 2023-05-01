@@ -65,6 +65,19 @@
 
         <div class="install-section-title">System Requirements (Server)</div>
         <p>
+          NodeJs: As of irc-hybrid-client v0.2.41, the backend web 
+          server requires Node version 16 or greater.
+          Node 18 is currently used for development.
+          Node 18 may be required as minimum version the future.
+        </p>
+        <p>
+          The application was developed in a virtual machine 
+          running Debian-11 with the web server running Node v18. 
+          The author deploys it for personal use in a cloud VPS 
+          single-core droplets with 500MB RAM running Debian 10 and Debian 11.
+          It has also run on a RaspberryPi 3 and 4 behind a home network NAT router.
+        </p>
+        <p>
           No formal security evaluation has been performed.
           As a security consideration, it is recommended to run the web
           server in a non-privileged shell without root access.
@@ -76,23 +89,11 @@
           the server to use TLS certificates to protect passwords using
           SSL/TLS encryption.
         </p>
-        <p>
-          The application was developed in a virtual machine running
-          Debian-10. The author deploys it for personal use in a
-          cloud VPS single-core droplet with 500MB RAM running Debian 10.
-          It has also run during debugging on a RaspberryPi 3 and 4
-          behind a NAT router.
-        </p>
-        <p>
-          The program has run without errors under Node.js versions 12, 14, and 16
-          and npm versions 7 and 8.
-          Other versions of Node.js have not been tried.
-        </p>
         <div class="install-section-title">System Requirements (Browser)</div>
         <p>
           This HTML, CSS and browser JavaScript was written and debugged
           using the Chrome web browser running under Linux, and using
-          the mobile Chrome browser on an Apple iPhone 8 Plus.
+          the mobile Chrome browser on an Apple iPhone.
           The default Chrome fonts are used.
           Therefore, Chrome is the recommended browser and 
           other browsers may exhibit minor font and page layout issues.
