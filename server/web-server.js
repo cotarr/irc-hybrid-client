@@ -126,15 +126,15 @@ app.use(logger(ircLog.logConfig.format, ircLog.logConfig.options));
 // ------------------------------
 // Content Security Policy (CSP)
 // ------------------------------
-// -- Helmet CSP defaults v5.0.1 --
+// -- Helmet CSP defaults v7.0.0 --
 //
 // default-src 'self';
 // base-uri 'self';
-// block-all-mixed-content;
 // font-src 'self' https: data:;
 // form-action 'self';
 // frame-ancestors 'self';
-// img-src 'self' data:;object-src 'none';
+// img-src 'self' data:;
+// object-src 'none';
 // script-src 'self';
 // script-src-attr 'none';
 // style-src 'self' https: 'unsafe-inline';
@@ -173,9 +173,8 @@ if (credentials.tls) {
 // ----------------------------------------
 // HTTP Security Headers
 // ----------------------------------------
-// -- Helmet Default headers Helmet v5.0.1 --
+// -- Helmet Default headers v7.0.0 --
 //
-// Cross-Origin-Embedder-Policy: require-corp
 // Cross-Origin-Opener-Policy: same-origin
 // Cross-Origin-Resource-Policy: same-origin
 // Origin-Agent-Cluster: ?1
@@ -192,8 +191,8 @@ if (credentials.tls) {
 
 // ----------------------------------------
 app.use(helmet({
-  frameguard: { action: 'deny' },
-  hidePoweredBy: false,
+  xFrameOptions: { action: 'deny' },
+  xPoweredBy: false,
   referrerPolicy: { policy: 'no-referrer' },
   contentSecurityPolicy: contentSecurityPolicy
 }));
