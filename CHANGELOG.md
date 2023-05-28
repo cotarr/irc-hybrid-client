@@ -8,11 +8,30 @@ and this project adheres to
 
 ## Next v0.2.43dev 2023-05-28
 
+### Updated
+
+- Updated helmet from v6 to helmet@7.0.0 with edits in server/web-server.js
+- Bumped versions connect-redis@7.1.0, node-fetch@2.6.11
+- Bumped dev dependency eslint and it's dependents to current version
+
 ### Changed
 
-- Updated from v6 to helmet@7.0.0 with edits in server/web-server.js
-- Bumped versions connect-redis@7.1.0, node-fetch@2.6.11
-- Bumped dev dependency eslint and it's dependents
+The log file rotation introduced in v0.2.38 did not work out as planned.
+Although minutes and hours are based on a time divisor, intervals specified in days 
+are based on a simple timer that is re-initialized each time 
+the server is restarted. Unfortunately, if the server is restarted 
+more frequently than the rotation period, then no rotation will occur.
+For more information on rotation, refer to the NPM package README
+for [rotating-file-stream](https://github.com/iccicci/rotating-file-stream#readme).
+
+To address this file size was added as a rotation property.
+The configuration now supports optional properties for
+"logRotationInterval" and "logRotationSize".
+The file size allowable units are ("B", "K", "M", "G"), 
+example: "1M" to limit each rotated file to 1 megabyte.
+Configuration may use interval, size, both, 
+or neither. The example-credentials.json and /docs have been 
+updated with revised instructions.
 
 ## [v0.2.42](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.42) 2023-05-01
 

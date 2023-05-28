@@ -44,6 +44,7 @@
   const accessLogOnlyErrors = credentials.accessLogOnlyErrors || false;
   // logRotationInterval type string, example: '5m', '12h', '7d'
   const logRotationInterval = credentials.logRotationInterval || '';
+  const logRotationSize = credentials.logRotationSize || '';
 
   //
   // If the logs/ folder does not exist, create it, abort on error
@@ -73,16 +74,26 @@
     // for start up message
     logStream = accessLogFilename;
     // Function to write log entries to file as option property
-    if (logRotationInterval.length > 1) {
-      // Function to write log entries to file as option property
-      logConfig.options.stream = rotatingFileStream.createStream(accessLogFilename, {
+    if (((logRotationInterval) && (logRotationInterval.length > 1)) ||
+      ((logRotationSize) && (logRotationSize.length > 1))) {
+      const rotateOptions = {
         encoding: 'utf8',
         mode: 0o644,
-        interval: logRotationInterval,
-        rotate: 5,
-        initialRotation: false
-      });
-      logStream += ' (Rotate: ' + logRotationInterval + ')';
+        rotate: 5
+      };
+      logStream += ' (Rotate';
+      // Rotation by time interval
+      if ((logRotationInterval) && (logRotationInterval.length > 1)) {
+        rotateOptions.interval = logRotationInterval;
+        logStream += ' interval:' + logRotationInterval;
+      }
+      // Rotation by log file size
+      if ((logRotationSize) && (logRotationSize.length > 1)) {
+        rotateOptions.size = logRotationSize;
+        logStream += ' size:' + logRotationSize;
+      }
+      logStream += ')';
+      logConfig.options.stream = rotatingFileStream.createStream(accessLogFilename, rotateOptions);
     } else {
       // Else, log filename rotation disabled, use native fs module
       logConfig.options.stream = fs.createWriteStream(accessLogFilename, {
@@ -133,14 +144,21 @@
   let rawMessageLogEnabled = false;
 
   let ircLogStream = null;
-  if (logRotationInterval.length > 1) {
-    ircLogStream = rotatingFileStream.createStream(ircLogFilename, {
+  if (((logRotationInterval) && (logRotationInterval.length > 1)) ||
+    ((logRotationSize) && (logRotationSize.length > 1))) {
+    const ircRotateOptions = {
       encoding: 'utf8',
       mode: 0o644,
-      interval: logRotationInterval,
-      rotate: 5,
-      initialRotation: false
-    });
+      rotate: 5
+    };
+    if ((logRotationInterval) && (logRotationInterval.length > 1)) {
+      ircRotateOptions.interval = logRotationInterval;
+    }
+    // Rotation by log file size
+    if ((logRotationSize) && (logRotationSize.length > 1)) {
+      ircRotateOptions.size = logRotationSize;
+    }
+    ircLogStream = rotatingFileStream.createStream(ircLogFilename, ircRotateOptions);
   } else {
     ircLogStream = fs.createWriteStream(ircLogFilename, {
       encoding: 'utf8',
@@ -185,6 +203,7 @@
     getRawMessageLogEnabled: getRawMessageLogEnabled,
     accessLogFilename: accessLogFilename,
     ircLogFilename: ircLogFilename,
-    logRotationInterval: logRotationInterval
+    logRotationInterval: logRotationInterval,
+    logRotationSize: logRotationSize
   };
 })();

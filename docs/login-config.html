@@ -388,7 +388,7 @@ fi
   "persistIrcMessageCache": true,
 </pre></div>
 
-        <div class="install-section-title">Log File Rotation</div>
+        <div class="install-section-title">Log Files and File Rotation</div>
         <p>
           Logging to disk file is enabled when the server is started 
           with NODE_ENV=production, otherwise logging is sent to stdout.
@@ -401,7 +401,8 @@ fi
           create access.log.1, access.log.2 up to access.log.5.
         </p>
         <p>
-          IRC raw message log events will be written to the file &quot;logs/irc.log&quot;.
+          IRC raw message log events, if enabled in individual server configuration, 
+          will be written to the file &quot;logs/irc.log&quot;.
           If log file rotation is enabled, linux logrotate type rotation will 
           create irc.log.1, irc.log.2 up to irc.log.5.
         </p>
@@ -410,11 +411,21 @@ fi
           The file auth.log is not subject to log file rotation
         </p>
         <p>
-          Log file rotation is enabled by assigning the &quot;logRotationInterval&quot;
-          property in credentials.json to the proper string value.
-          Log rotate available time units (s, m, h, d) are used to specify the interval 
+          Optional log file rotation may enabled by assigning the &quot;logRotationInterval&quot;
+          property or the &quot;logRotationSize&quot; property in 
+          credentials.json to the proper string value.
+          Log rotate time interval available time units (s, m, h, d) are used to specify the interval 
           string. (Example: '5m', '2h', '1d').
-          This will allow log file log rotation similar to Linux system files.
+          Minutes and hours are a time divisor, but the day interval is a simple timer 
+          that is re-initialized each time the application is restarted.
+          Log rotate file size available time units (B, K, M, G) are used to specify the file size 
+          string. (Example: '100K', '1M'). Optionally either interval, size, both, or neither
+          may be used. This will allow log file log rotation similar to Linux system files.
+          For more information see 
+          <a href="https://github.com/iccicci/rotating-file-stream#readme">rotating-file-stream</a> 
+          documentation. In the case where neither interval nor size properties exist 
+          or both are empty strings, then no log rotation will occur, and file size management 
+          must be done manually.,
         </p>
         <p>
           If the web server is started with env variable NODE_DEBUG_LOG=1, 
@@ -424,6 +435,7 @@ fi
 
 <div class="pre-div"><pre>
   "logRotationInterval": "7d",
+  "logRotationSize": "1M",
 </pre></div>
 
         <div class="install-section-title">HTTP Access Log Filter</div>

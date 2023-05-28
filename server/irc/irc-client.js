@@ -25,9 +25,6 @@
 //
 //                       M A I N   M O D U L E
 //
-
-const { logRotationInterval } = require('./irc-client-log');
-
 // -----------------------------------------------------------------------------
 (function () {
   'use strict';
@@ -338,21 +335,31 @@ const { logRotationInterval } = require('./irc-client-log');
 
   // report log file status
   if ((nodeEnv === 'development') || (nodeDebugLog)) {
-    console.log('IRC raw message log enabled: (console)');
+    console.log('IRC raw message log: (console)');
   } else {
     ircLog.writeIrcLog('-----------------------------------------');
     ircLog.writeIrcLog('Starting ' + vars.ircState.progName + ' ' + vars.ircState.progVersion);
-    if (logRotationInterval.length > 1) {
-      console.log('IRC raw message log filename: ' + ircLog.ircLogFilename +
-        ' (Rotate: ' + logRotationInterval + ')');
+    if (((ircLog.logRotationInterval) && (ircLog.logRotationInterval.length > 1)) ||
+      ((ircLog.logRotationSize) && (ircLog.logRotationSize.length > 1))) {
+      let logMessage = 'IRC raw message log: ' + ircLog.ircLogFilename + ' (Rotate:';
+      // Rotation by time interval
+      if ((ircLog.logRotationInterval) && (ircLog.logRotationInterval.length > 1)) {
+        logMessage += ' interval:' + ircLog.logRotationInterval;
+      }
+      // Rotation by log file size
+      if ((ircLog.logRotationSize) && (ircLog.logRotationSize.length > 1)) {
+        logMessage += ' size:' + ircLog.logRotationSize;
+      }
+      logMessage += ')';
+      console.log(logMessage);
     } else {
-      console.log('IRC raw message log filename: ' + ircLog.ircLogFilename);
+      console.log('IRC raw message log: ' + ircLog.ircLogFilename);
       console.log('Caution: Log rotation disabled. Please monitor log file size.');
     }
     if (ircLog.getRawMessageLogEnabled()) {
-      console.log('IRC raw message log enabled for selected IRC server (servers.json).');
+      console.log('IRC raw message log enabled for currently selected IRC server (servers.json).');
     } else {
-      console.log('IRC raw message log disabled for selected IRC server (servers.json)');
+      console.log('IRC raw message log disabled for currently selected IRC server (servers.json)');
     }
   }
 
