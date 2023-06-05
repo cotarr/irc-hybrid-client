@@ -6,6 +6,43 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v0.2.44-dev 2023-06-05
+
+This next update has 2 primary goals:
+
+- 1. Convert the Node web server from CommonJS modules to ECMAScript modules.
+
+The motivation for converting server package format to ES Modules is to 
+allow import of NPM modules that no longer publish a CommonJS package format.
+
+- 2. Add new capability to manage web server configuration using UNIX environment variables.
+
+The motivation for use of environment variables is to simplify configuration where the 
+web server is deployed in a container. 
+
+The introduction of two concurrent configuration schemes may introduce 
+some security questions. Configuration of security related properties
+could contain ambiguous conflicting values between the two configuration methods.
+At this time, the primary source of configuration will continue to use the 
+existing method using the local file credentials.json as the primary configuration source.
+For configuration properties that have not been defined in credentials.json, 
+the server will parse environment variables to obtain a fallback values.
+If configuration properties are not found in either, then
+a new module server/config/index.mjs will contain default values.
+In the long term, the credentials.json config file may be deprecated 
+to standardize all of the server configuration with environment variables.
+
+### Changes
+
+Several existing backend modules are wrapped in functions.
+In order to upgrade to ES Modules, the function wrappers will be removed.
+This is a large text edit with no code changes.
+This is being done before code changes so the actual changes to 
+convert CommonJS to ES modules can be more easily seen in the diffs.
+
+
+
+
 ## [v0.2.43](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.43) 2023-05-28
 
 ### Updated
