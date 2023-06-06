@@ -7,3 +7,4 @@ push*
 logs/
 tools/showIrcLogTimeZone.json
 *.bak
+.env

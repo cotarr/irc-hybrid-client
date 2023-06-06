@@ -26,23 +26,30 @@
 // -----------------------------------------------------------------------------
 'use strict';
 
-const path = require('path');
-const fs = require('fs');
-const rotatingFileStream = require('rotating-file-stream');
+import path from 'path';
+import { fileURLToPath } from 'url';
+import fs from 'fs';
+import rotatingFileStream from 'rotating-file-stream';
 
-const credentials = JSON.parse(fs.readFileSync('./credentials.json', 'utf8'));
+import config, { nodeEnv } from '../config/index.mjs';
 
-const nodeEnv = process.env.NODE_ENV || 'development';
+// Custom case for use with ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const nodeDebugLog = process.env.NODE_DEBUG_LOG || 0;
 
 const logFolder = path.join(__dirname, '../../logs');
-const accessLogFilename = path.join(__dirname, '../../logs/access.log');
-const ircLogFilename = path.join(__dirname, '../../logs/irc.log');
 
-const accessLogOnlyErrors = credentials.accessLogOnlyErrors || false;
+export const accessLogFilename = path.join(__dirname, '../../logs/access.log');
+export const ircLogFilename = path.join(__dirname, '../../logs/irc.log');
+
 // logRotationInterval type string, example: '5m', '12h', '7d'
-const logRotationInterval = credentials.logRotationInterval || '';
-const logRotationSize = credentials.logRotationSize || '';
+export const logRotationInterval = config.server.logRotationInterval || '';
+// logRotationSize type string, example '1K', '10M'
+export const logRotationSize = config.server.logRotationSize || '';
+
+const accessLogOnlyErrors = config.server.accessLogOnlyErrors || false;
 
 //
 // If the logs/ folder does not exist, create it, abort on error
@@ -61,13 +68,14 @@ if ((nodeEnv === 'production') && (!nodeDebugLog)) {
   }
 }
 
-const logConfig = {};
-
 // Format and options apply to the 'morgan' npm package, implemented in web-server.js
-logConfig.format = ':date[iso] :remote-addr :status :method :http-version :req[host]:url';
-logConfig.options = {};
+export const accessLogFormat =
+  ':date[iso] :remote-addr :status :method :http-version :req[host]:url';
+
+export const accessLogOptions = {};
 // for start up message
 let logStream = '(console)';
+let accessLogStream = null;
 if ((nodeEnv !== 'development') && (!nodeDebugLog)) {
   // for start up message
   logStream = accessLogFilename;
@@ -91,32 +99,36 @@ if ((nodeEnv !== 'development') && (!nodeDebugLog)) {
       logStream += ' size:' + logRotationSize;
     }
     logStream += ')';
-    logConfig.options.stream = rotatingFileStream.createStream(accessLogFilename, rotateOptions);
+    accessLogStream = rotatingFileStream.createStream(accessLogFilename, rotateOptions);
+    accessLogOptions.stream = accessLogStream;
   } else {
     // Else, log filename rotation disabled, use native fs module
-    logConfig.options.stream = fs.createWriteStream(accessLogFilename, {
+    accessLogStream = fs.createWriteStream(accessLogFilename, {
       encoding: 'utf8',
       mode: 0o644,
       flags: 'a'
     });
+    accessLogOptions.stream = accessLogStream;
   }
   // HTTP access log filter, used by morgan in web-server.js
   if (accessLogOnlyErrors) {
     logStream += ' (Errors Only)';
-    logConfig.options.skip = function (req, res) {
+    accessLogOptions.skip = function (req, res) {
       return (res.statusCode < 400);
     };
   }
-}
+} // if nodeEng === ...
+
 // This shows at server start up to console out
 console.log('HTTP Access Log: ' + logStream);
+
 //
 // This method is primarily intended to allow
 // web-socket connection events to be logged
 // in the same access.log has HTTP requests.
 // Web socket connections are managed in ws-server.js
 //
-const writeAccessLog = function (logString) {
+export const writeAccessLog = function (logString) {
   //
   // build log text string
   //
@@ -129,7 +141,7 @@ const writeAccessLog = function (logString) {
   if ((nodeEnv === 'development') || (nodeDebugLog)) {
     console.log(logEntry);
   } else {
-    logConfig.options.stream.write(logEntry + '\n');
+    accessLogStream.write(logEntry + '\n');
   }
 };
 
@@ -142,30 +154,32 @@ const writeAccessLog = function (logString) {
 let rawMessageLogEnabled = false;
 
 let ircLogStream = null;
-if (((logRotationInterval) && (logRotationInterval.length > 1)) ||
-  ((logRotationSize) && (logRotationSize.length > 1))) {
-  const ircRotateOptions = {
-    encoding: 'utf8',
-    mode: 0o644,
-    rotate: 5
-  };
-  if ((logRotationInterval) && (logRotationInterval.length > 1)) {
-    ircRotateOptions.interval = logRotationInterval;
+if ((nodeEnv !== 'development') && (!nodeDebugLog)) {
+  if (((logRotationInterval) && (logRotationInterval.length > 1)) ||
+    ((logRotationSize) && (logRotationSize.length > 1))) {
+    const ircRotateOptions = {
+      encoding: 'utf8',
+      mode: 0o644,
+      rotate: 5
+    };
+    if ((logRotationInterval) && (logRotationInterval.length > 1)) {
+      ircRotateOptions.interval = logRotationInterval;
+    }
+    // Rotation by log file size
+    if ((logRotationSize) && (logRotationSize.length > 1)) {
+      ircRotateOptions.size = logRotationSize;
+    }
+    ircLogStream = rotatingFileStream.createStream(ircLogFilename, ircRotateOptions);
+  } else {
+    ircLogStream = fs.createWriteStream(ircLogFilename, {
+      encoding: 'utf8',
+      mode: 0o644,
+      flags: 'a'
+    });
   }
-  // Rotation by log file size
-  if ((logRotationSize) && (logRotationSize.length > 1)) {
-    ircRotateOptions.size = logRotationSize;
-  }
-  ircLogStream = rotatingFileStream.createStream(ircLogFilename, ircRotateOptions);
-} else {
-  ircLogStream = fs.createWriteStream(ircLogFilename, {
-    encoding: 'utf8',
-    mode: 0o644,
-    flags: 'a'
-  });
 }
 
-const writeIrcLog = function (inBuffer) {
+export const writeIrcLog = function (inBuffer) {
   //
   // build log text string
   //
@@ -185,22 +199,24 @@ const writeIrcLog = function (inBuffer) {
   }
 };
 
-const setRawMessageLogEnabled = function (flag) {
+export const setRawMessageLogEnabled = function (flag) {
   if (typeof flag === 'boolean') {
     rawMessageLogEnabled = flag;
   }
 };
-const getRawMessageLogEnabled = function () {
+export const getRawMessageLogEnabled = function () {
   return rawMessageLogEnabled;
 };
-module.exports = {
-  logConfig: logConfig,
-  writeAccessLog: writeAccessLog,
-  writeIrcLog: writeIrcLog,
-  setRawMessageLogEnabled: setRawMessageLogEnabled,
-  getRawMessageLogEnabled: getRawMessageLogEnabled,
-  accessLogFilename: accessLogFilename,
-  ircLogFilename: ircLogFilename,
-  logRotationInterval: logRotationInterval,
-  logRotationSize: logRotationSize
+
+export default {
+  accessLogFormat,
+  accessLogOptions,
+  writeAccessLog,
+  writeIrcLog,
+  setRawMessageLogEnabled,
+  getRawMessageLogEnabled,
+  accessLogFilename,
+  ircLogFilename,
+  logRotationInterval,
+  logRotationSize
 };

@@ -1,39 +1,16 @@
 #!/usr/bin/env node
 
-// This will set a new login user/password
+// This is a tool to generate bcrypt user hash when using environment variables for configuration.
+// - This will generate string output that can be copy/pasted, containing user hash
 // - This must be run from the tools folder to find credentials.json
 //
 //
 // To run:
 //    cd tools
-//    node updateAuthForUser_1.js
+//    node genEnvVarAuthForUser_1.mjs
 //
-const readline = require('readline');
-const fs = require('fs');
-const bcrypt = require('bcryptjs');
-
-const credentials = JSON.parse(fs.readFileSync('../credentials.json', 'utf8'));
-
-if (credentials.configVersion > 2) {
-  console.log('credentials.json error: configVersion unrecognized value');
-  process.exit(1);
-}
-
-if (credentials.enableRemoteLogin === true) {
-  console.log('Error: A new local web server password may not be assigned because the program' +
-    ' is configured for remote login in credentials.json, enableRemoteLogin: true.');
-  process.exit(1);
-}
-
-// previous version used salt as a key value pair. The hash was sha256.
-// The new version uses bcrypt where salt in incorporated into the hash.
-// Running this on a version 1 config will automatically update the format by removing salt.
-//
-if (credentials.configVersion === 1) {
-  delete credentials.loginUsers[0].salt;
-  credentials.configVersion = 2;
-  console.log('\n\n* * * Updating credentials.json from configVersion 1 to 2 to support bcrypt\n');
-}
+import readline from 'readline';
+import bcrypt from 'bcryptjs';
 
 const getPass = readline.createInterface({
   input: process.stdin,
@@ -73,13 +50,8 @@ const _sanatizeString = function (inString) {
 };
 
 console.log();
-console.log('Caution, you are editing the password file');
+console.log('You are running a script to generate user login environment variables.');
 console.log();
-console.log('This will set a new login user/password for userid=1 at array index=0');
-console.log('This is a static password not editable online');
-console.log('It is intended there is only one user for the program');
-console.log('This must be run from the tools folder to find credentials.json');
-
 console.log('\nUser up to 16 characters a-z,A-Z,0-9');
 getPass.question('Enter new user:', function (user) {
   user = _sanatizeString(_removeCRLF(user));
@@ -104,19 +76,13 @@ getPass.question('Enter new user:', function (user) {
       }
       password = _removeCRLF(password);
       const hash = bcrypt.hashSync(password, 10);
-      credentials.loginUsers[0].user = user;
-      credentials.loginUsers[0].name = name;
-      credentials.loginUsers[0].hash = hash;
-      const filename = '../credentials.json';
-      fs.writeFileSync(filename, JSON.stringify(credentials, null, 2) + '\n', {
-        encoding: 'utf8',
-        mode: 0o600,
-        flag: 'w'
-      });
-      // If file pre-exists, change permissions
-      fs.chmodSync(filename, 0o600);
+      console.log('\nYou may copy/paste these enviornment variables\n');
+      console.log('LOGIN_USER_USERID=1');
+      console.log('LOGIN_USER_USER=' + user);
+      console.log('LOGIN_USER_NAME=' + name);
+      console.log('LOGIN_USER_HASH=' + hash);
+      console.log();
       getPass.close();
-      console.log(JSON.stringify(credentials, null, 2));
     });
   });
 });

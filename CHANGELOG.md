@@ -23,16 +23,22 @@ web server is deployed in a container.
 The introduction of two concurrent configuration schemes may introduce 
 some security questions. Configuration of security related properties
 could contain ambiguous conflicting values between the two configuration methods.
-At this time, the primary source of configuration will continue to use the 
-existing method using the local file credentials.json as the primary configuration source.
-For configuration properties that have not been defined in credentials.json, 
-the server will parse environment variables to obtain a fallback values.
-If configuration properties are not found in either, then
-a new module server/config/index.mjs will contain default values.
-In the long term, the credentials.json config file may be deprecated 
+To minimize risk of ambiguous configuration, only one method is used at one time.
+In the case where the file "credentials.json" exists then configuration 
+will be parsed from the credentials.json file in the pase repository folder.
+This is the established configuration method up until this release.
+In case case where the file "credentials.json" does not exist then
+the configuration will be parsed from UNIX environment variables.
+For configuration properties that have not been defined, then the
+server/config.index.mjs module will define fallback default values.
+In the long term, the credentials.json config file may be deprecated (breaking change)
 to standardize all of the server configuration with environment variables.
 
+At this time no configuration changes should be needed for this update
+
 ### Changes
+
+After commit ee0a0c2 ( previous version v0.2.43)
 
 Several existing backend modules are wrapped in functions.
 In order to upgrade to ES Modules, the function wrappers will be removed.
@@ -40,8 +46,35 @@ This is a large text edit with no code changes.
 This is being done before code changes so the actual changes to 
 convert CommonJS to ES modules can be more easily seen in the diffs.
 
+After commit eab9e51
 
+- Rename .eslintrc.js to .eslintrc.cjs (CommonJS format) and set lint configuration for ES Modules
+- Edit package.json, set `"type":"module"`, change some script filenames from .js to .mjs
+- Add ".env" to .gitignore file
+- Install NPM package: dotenv to allow use of .env file
+- Create new ES module server/config/index.mjs. Function: 1 - Parse credentials.json, or 2 = Parse environment variables, then 3 - Export config.
+- Rename bin/www to bin/www.mjs, convert to ES Module, temporarily disable websocket
+- Rename server/irc/irc-client-log.js to irc-client-log.mjs, convert to ES Module.
+- Rename server/middlewares/user-authenticate.js to user-authenticate.mjs, convert to ES module.
+- Main server/web-server.js, renamed to web-serve.mjs, and ...
+  - Convert module import statements to ES format
+  - Import configuration from server/config/index.mjs instead of credentails.js
+  - Temporarily comment out IRC client modules and routes
+  - Temporarily comment out IRC server list editor routes
+  - Temporarily comment out /doc help page routes
+  - TEmporarily comment out web socket authorization routes and modules
+  - Refactor express-session, memorystore and redis for alternate configuration
+  - ES modules load asynchronously and can not be loaded conditionally, so both internal and remote authorization modules needed to be loaded concurrently, then select the proper auth module later after the configuration loads.
+  - Reconfigure morgan logger to use imported log file configuration from irc-client-log.mjs
+  - Created example .env file "example-.env"
+  - Updated example-credentials.json
 
+Initial test: Successfully started web server using internal local user authentication 
+and morgan logger with all custom routes disabled.
+
+- Debug/Fixed: server/irc/irc-client-log.mjs, in new clone of repository, NODE_ENV=development, write to log file before "logs" folder created.
+- Rename tools/updateAuthForUser_1.js to updateAuthForUser_1.mjs and convert to ES Module
+- Create new tool script tools/genEnvVarAuthForUser_1.mjs to generate environment variables for copy/paste when using local authentication.
 
 ## [v0.2.43](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.43) 2023-05-28
 

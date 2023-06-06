@@ -27,33 +27,34 @@
 //
 // -----------------------------------------------------------------------------
 'use strict';
-
-const timestamp = new Date();
-console.log('Server timestamp: ' + timestamp.toISOString());
-
 // ------------------------------------------------------------------------
 // Two servers available on same port (express web server, websocket server)
 
-const app = require('../server/web-server');
-const wss = require('../server/ws-server');
+import { app } from '../server/web-server.mjs';
+/* ESM upgrade
+import { wss } from '../server/ws-server';
+*/
 // ------------------------------------------------------------------------
 
 // node server modules
-const http = require('http');
-const https = require('https');
-const fs = require('fs');
+import http from 'http';
+import https from 'https';
+import fs from 'fs';
 
-const credentials = JSON.parse(fs.readFileSync('./credentials.json', 'utf8'));
+import config from '../server/config/index.mjs';
+
+const timestamp = new Date();
+console.log('Server timestamp: ' + timestamp.toISOString());
 
 const nodeEnv = process.env.NODE_ENV || 'development';
 
 let server = null;
 
-if (credentials.tls) {
+if (config.server.tls) {
   console.log('NODE_ENV ' + nodeEnv + ' starting https  (TLS encrypted)');
   const options = {
-    key: fs.readFileSync(credentials.serverTlsKey),
-    cert: fs.readFileSync(credentials.serverTlsCert),
+    key: fs.readFileSync(config.server.serverTlsKey),
+    cert: fs.readFileSync(config.server.serverTlsCert),
     minVersion: 'TLSv1.2',
     handshakeTimeout: 5000
   };
@@ -63,11 +64,7 @@ if (credentials.tls) {
   server = http.createServer(app);
 }
 
-let port = 3003;
-
-if (('port' in credentials) && (parseInt(credentials.port) !== 0)) {
-  port = parseInt(credentials.port);
-}
+const port = config.server.port;
 
 // See TLS/SSL handshakeTimeout above
 //
@@ -88,7 +85,7 @@ server.on('listening', function () {
     ' ' + address.family);
   // intended for use in logrotate, or in restart bash script
   try {
-    const pidFilename = credentials.pidFilename;
+    const pidFilename = config.server.pidFilename;
     if ((pidFilename) && (pidFilename.length > 0)) {
       fs.writeFileSync(pidFilename, '' + process.pid + '\n');
     }
@@ -98,8 +95,10 @@ server.on('listening', function () {
   }
 });
 
+/* ESM upgrade
 // web socket upgrade handler
 server.on('upgrade', wss.wsOnUpgrade);
+*/
 
 server.on('error', function (error) {
   if (error.syscall !== 'listen') {

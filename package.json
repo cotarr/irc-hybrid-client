@@ -2,14 +2,15 @@
   "name": "irc-hybrid-client",
   "version": "0.2.44-dev",
   "description": "Single user hybrid IRC client using JavaScript front end and Node/Express backend",
-  "main": "bin/www",
+  "type": "module",
+  "main": "bin/www.mjs",
   "engines": {
     "node": ">=16"
   },
   "scripts": {
-    "lint": "npx eslint secure/js/*.js server/*/*.js server/*.js bin/www tools/*.js",
+    "lint": "npx eslint secure/js/*.js server/*/*.mjs server/*.mjs bin/www.mjs tools/*.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "bin/www"
+    "start": "node bin/www.mjs"
   },
   "repository": {
     "type": "git",
@@ -29,6 +30,7 @@
     "cookie": "^0.5.0",
     "cookie-parser": "^1.4.6",
     "cookie-signature": "^1.2.1",
+    "dotenv": "^16.1.4",
     "express": "^4.18.2",
     "express-rate-limit": "^6.7.0",
     "express-session": "^1.17.3",
@@ -44,10 +46,10 @@
     "ws": "^8.13.0"
   },
   "devDependencies": {
-    "eslint": "^8.41.0",
-    "eslint-config-standard": "^17.0.0",
+    "eslint": "^8.42.0",
+    "eslint-config-standard": "^17.1.0",
     "eslint-plugin-import": "^2.27.5",
-    "eslint-plugin-n": "^15.7.0",
+    "eslint-plugin-n": "^16.0.0",
     "eslint-plugin-promise": "^6.1.1"
   }
 }

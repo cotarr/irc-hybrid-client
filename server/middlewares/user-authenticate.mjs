@@ -24,19 +24,22 @@
 // User authentication and route authroization functions
 //
 // -----------------------------------------------------------------------------
-
-// wrap in function to limit namespace scope
 'use strict';
-// node native modules
-const fs = require('fs');
-const path = require('path');
-const crypto = require('crypto');
-const bcrypt = require('bcryptjs');
 
-const credentials = JSON.parse(fs.readFileSync('./credentials.json', 'utf8'));
+// node native modules
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import crypto from 'crypto';
+import bcrypt from 'bcryptjs';
+import config, { nodeEnv, loginUsers as userArray } from '../config/index.mjs';
+
+// Custom case for use with ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // other imports
-const sessionExpireAfterSec = credentials.sessionExpireAfterSec || 86400;
+const sessionExpireAfterSec = config.session.ttl;
 
 // HTML fragments for login page
 const loginHtmlTop = fs.readFileSync('./server/fragments/login-top.html', 'utf8');
@@ -45,16 +48,7 @@ const blockedCookieFragment = fs.readFileSync('./server/fragments/blocked-cookie
 const logoutHtmlTop = fs.readFileSync('./server/fragments/logout-top.html', 'utf8');
 const logoutHtmlBottom = fs.readFileSync('./server/fragments/logout-bottom.html', 'utf8');
 
-const nodeEnv = process.env.NODE_ENV || 'development';
 const nodeDebugLog = process.env.NODE_DEBUG_LOG || 0;
-
-//
-// Load credentials, user database from file, check users exist
-//
-const userArray = credentials.loginUsers;
-if ((!Array.isArray(userArray)) || (userArray.length < 1)) {
-  throw new Error('No users found in password file');
-}
 
 //
 // Custom log file (Option: setup to fail2ban to block IP addresses)
@@ -97,12 +91,13 @@ const customLog = function (req, errString) {
 };
 
 // print at server start
-if ((nodeEnv === 'development') || (nodeDebugLog)) {
-  console.log('Auth users: ' + userArray.length + ' Auth log: (console)');
-} else {
-  console.log('Auth users: ' + userArray.length + ' Auth log: ' + authLogFilename);
+if (!config.oauth2.enableRemoteLogin) {
+  if ((nodeEnv === 'development') || (nodeDebugLog)) {
+    console.log('Auth users: ' + userArray.length + ' Auth log: (console)');
+  } else {
+    console.log('Auth users: ' + userArray.length + ' Auth log: ' + authLogFilename);
+  }
 }
-
 //
 // Setup authentication variables inside session
 //
@@ -138,7 +133,7 @@ const _checkIfAuthorized = function (req) {
       if (req.session.sessionAuth.sessionExpireTimeSec) {
         if (timeNowSeconds < req.session.sessionAuth.sessionExpireTimeSec) {
           authorized = true;
-          if (credentials.sessionRollingCookie) {
+          if (config.session.rollingCookie) {
             req.session.sessionAuth.sessionExpireTimeSec = timeNowSeconds + sessionExpireAfterSec;
           }
         }
@@ -181,7 +176,7 @@ const _removeLoginNonceFromSession = function (req) {
 // ----------------------------------------
 // If not authorized, redirect to login
 // ----------------------------------------
-const authorizeOrLogin = function (req, res, next) {
+export const authorizeOrLogin = function (req, res, next) {
   if (_checkIfAuthorized(req)) {
     next();
   } else {
@@ -191,14 +186,14 @@ const authorizeOrLogin = function (req, res, next) {
 // ----------------------
 // Route: GET /blocked
 // ----------------------
-const blockedCookies = function (req, res, next) {
+export const blockedCookies = function (req, res, next) {
   res.send(blockedCookieFragment);
 };
 
 // ---------------------------------------------
 // If not authorized, return 401 Unauthorized
 // ---------------------------------------------
-const authorizeOrFail = function (req, res, next) {
+export const authorizeOrFail = function (req, res, next) {
   if (_checkIfAuthorized(req)) {
     next();
   } else {
@@ -251,7 +246,7 @@ const safeCompare = function (userInput, secret) {
 // -------------------------------------
 // Route: POST /login-authorize
 // -------------------------------------
-const loginAuthorize = function (req, res, next) {
+export const loginAuthorize = function (req, res, next) {
   // console.log('sessionAuth ' + JSON.stringify(req.session.sessionAuth, null, 2));
   // console.log('body ' + JSON.stringify(req.body, null, 2));
   // console.log('query ' + JSON.stringify(req.query));
@@ -276,7 +271,7 @@ const loginAuthorize = function (req, res, next) {
       req.session.sessionAuth = sessionAuth;
       // wrap in try to catch errors
       try {
-        // Check if browser cookies enabled and a session has been establised.
+        // Check if browser cookies enabled and a session has been established.
         if ((Object.hasOwn(req, 'signedCookies')) &&
           (Object.hasOwn(req, 'session')) &&
           (Object.hasOwn(req.session, 'sessionAuth'))) {
@@ -432,7 +427,7 @@ const loginWarningFragment =
 // -------------------------
 // Route: GET /login
 // -------------------------
-const loginPage = function (req, res, next) {
+export const loginPage = function (req, res, next) {
   _initSession(req);
   if (_checkIfAuthorized(req)) {
     return res.redirect('/irc/webclient.html');
@@ -461,7 +456,7 @@ const loginPage = function (req, res, next) {
 // ---------------------------
 // Route: GET /logout
 // ---------------------------
-const logout = function (req, res, next) {
+export const logout = function (req, res, next) {
   // if logged in then add to logfile
   let user;
   if ((Object.hasOwn(req, 'session')) &&
@@ -473,10 +468,10 @@ const logout = function (req, res, next) {
   }
   if (Object.hasOwn(req, 'session')) {
     let cookieName = 'irc-hybrid-client';
-    if ((Object.hasOwn(credentials, 'instanceNumber')) &&
-      (Number.isInteger(credentials.instanceNumber)) &&
-      (credentials.instanceNumber >= 0) && (credentials.instanceNumber < 65536)) {
-      cookieName = 'irc-hybrid-client-' + credentials.instanceNumber.toString();
+    if ((Object.hasOwn(config.server, 'instanceNumber')) &&
+      (Number.isInteger(config.server.instanceNumber)) &&
+      (config.server.instanceNumber >= 0) && (config.server.instanceNumber < 65536)) {
+      cookieName = 'irc-hybrid-client-' + config.server.instanceNumber.toString();
     }
     let cookieOptions = null;
     if (Object.hasOwn(req.session, 'cookie')) {
@@ -509,7 +504,7 @@ const logout = function (req, res, next) {
 // -----------------------------
 // Route: GET /userinfo
 // -----------------------------
-const getUserInfo = function (req, res, next) {
+export const getUserInfo = function (req, res, next) {
   if ((Object.hasOwn(req, 'session')) &&
     (Object.hasOwn(req.session, 'sessionAuth')) &&
     (Object.hasOwn(req.session.sessionAuth, 'user')) &&
@@ -529,7 +524,7 @@ const getUserInfo = function (req, res, next) {
 // -----------------------
 // Route: GET /login.css
 // -----------------------
-const loginStyleSheet = function (req, res, next) {
+export const loginStyleSheet = function (req, res, next) {
   fs.readFile('./server/fragments/login.css', 'utf8', function (err, privacyStr) {
     if (err) {
       next(); // fall through to 404
@@ -539,13 +534,13 @@ const loginStyleSheet = function (req, res, next) {
   });
 };
 
-module.exports = {
-  loginStyleSheet: loginStyleSheet,
-  loginPage: loginPage,
-  loginAuthorize: loginAuthorize,
-  logout: logout,
-  authorizeOrLogin: authorizeOrLogin,
-  authorizeOrFail: authorizeOrFail,
-  getUserInfo: getUserInfo,
-  blockedCookies: blockedCookies
+export default {
+  authorizeOrLogin,
+  blockedCookies,
+  authorizeOrFail,
+  loginAuthorize,
+  loginPage,
+  logout,
+  getUserInfo,
+  loginStyleSheet
 };

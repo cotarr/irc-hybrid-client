@@ -1,7 +1,6 @@
 module.exports = {
   env: {
     browser: true,
-    commonjs: true,
     es2021: true,
     node: true
   },
@@ -9,7 +8,8 @@ module.exports = {
     'standard'
   ],
   parserOptions: {
-    ecmaVersion: 'latest'
+    ecmaVersion: 'latest',
+    sourceType: 'module'
   },
   rules: {
     // Require parenthesis around arrow function argument
@@ -26,7 +26,7 @@ module.exports = {
       rules: {
         // For the web browser code, there are
         // 10 JavaScript source files that are
-        // cancatenated into a single file file.
+        // concatenated into a single file file.
         // When the separate files are opened in the editor,
         // then undefined and unused lint errors are generated
         // by items in other files (before concatenate)

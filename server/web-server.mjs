@@ -24,84 +24,93 @@
 //           ExpressJs Web Server
 //
 // -----------------------------------------------------------------------------
-
 'use strict';
 
 // native node packages
-const http = require('http');
-const path = require('path');
-const fs = require('fs');
+import http from 'http';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import fs from 'fs';
 
 // express packages
-const express = require('express');
-const rateLimit = require('express-rate-limit');
-const cookieParser = require('cookie-parser');
-const session = require('express-session');
-const logger = require('morgan');
-const helmet = require('helmet');
-const compression = require('compression');
-const csrf = require('@dr.pogodin/csurf');
+import express from 'express';
+import rateLimit from 'express-rate-limit';
+import cookieParser from 'cookie-parser';
+import session from 'express-session';
+import logger from 'morgan';
+import helmet from 'helmet';
+import compression from 'compression';
+import { createClient } from 'redis';
+import RedisStore from 'connect-redis';
+import memorystore from 'memorystore';
+import csrf from '@dr.pogodin/csurf';
+
+// Web server configuration
+import config, { nodeEnv } from './config/index.mjs';
+
+import userAuthenticate, {
+  authorizeOrFail as localAuthorizeOrFail,
+  authorizeOrLogin as localAuthorizeOrLogin
+} from './middlewares/user-authenticate.mjs';
+
+/* ESM upgrade
+import remoteAuthenticate, {
+  authorizeOrFail as remoteAuthorizeOrFail,
+  authorizeOrLogin as remoteAuthorizeOrLogin
+} from './middlewares/remote-authenticate.mjs';
+*/
+
+import {
+  accessLogFormat,
+  accessLogOptions
+} from './irc/irc-client-log.mjs';
+
+/* ESM upgrade
+// Irc Client Module
+import ircClient from './irc/irc-client';
+import ircServerListValidations from './irc/irc-serverlist-validations';
+import ircServerListEditor'./irc/irc-serverlist-editor';
+*/
+
+// Custom case for use with ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const csrfProtection = csrf({ cookie: false });
 const app = express();
 
-// Irc Client Module
-const ircClient = require('./irc/irc-client');
-const ircServerListValidations = require('./irc/irc-serverlist-validations');
-const ircServerListEditor = require('./irc/irc-serverlist-editor');
-const ircLog = require('./irc/irc-client-log');
-
-// TLS certificate filenames
-// Web username, password credentials
-const credentials = JSON.parse(fs.readFileSync('./credentials.json', 'utf8'));
-if (credentials.configVersion === 1) {
-  console.log('\nPassword hash requires regeneration due to upgrade of hash function to bcrypt.\n');
-  process.exit(1);
-}
-if ((!('configVersion' in credentials)) || (credentials.configVersion !== 2)) {
-  console.log('Error, credentials.js wrong configVersion');
-  process.exit(1);
-}
-
-//
-// Load optional DRAFT middle for remote authorization
-// See middlewares/remote-authentication.js
-//
 let userAuth = null;
-if (credentials.enableRemoteLogin) {
-  // Session and User login routes
-  userAuth = require('./middlewares/remote-authenticate');
+let authorizeOrFail = null;
+let authorizeOrLogin = null;
+if (config.oauth2.enableRemoteLogin) {
+  // Remote authorization modules
+  /* ESM upgrade
+  userAuth = remoteAuthenticate;
+  authorizeOrFail = remoteAuthorizeOrFail;
+  authorizeOrLogin = remoteAuthorizeOrLogin;
+  */
 } else {
-  // Session and User login routes
-  userAuth = require('./middlewares/user-authenticate');
+  // Local authorization modules
+  userAuth = userAuthenticate;
+  authorizeOrFail = localAuthorizeOrFail;
+  authorizeOrLogin = localAuthorizeOrLogin;
 }
 
 // Also set cookieName in ws-authorize.js, user-authenticate and remote-authenticate.js
 let cookieName = 'irc-hybrid-client';
-if (('instanceNumber' in credentials) && (Number.isInteger(credentials.instanceNumber)) &&
-  (credentials.instanceNumber >= 0) && (credentials.instanceNumber < 65536)) {
-  cookieName = 'irc-hybrid-client-' + credentials.instanceNumber.toString();
+if ((Object.hasOwn(config.server, 'instanceNumber')) &&
+  (Number.isInteger(config.server.instanceNumber)) &&
+  (config.server.instanceNumber >= 0) && (config.server.instanceNumber < 65536)) {
+  cookieName = 'irc-hybrid-client-' + config.server.instanceNumber.toString();
 }
-
-// For session cookie
-const cookieSecret = credentials.cookieSecret;
-if (cookieSecret.length < 8) {
-  throw new Error('Error, cookie secret required');
-}
-// console.log('cookieSecret ' + cookieSecret);
-
-// default 24 hour = 86400 sec 86400000 milliseconds
-const sessionExpireAfterSec = credentials.sessionExpireAfterSec || 86400;
-const sessionExpireAfterMs = 1000 * sessionExpireAfterSec;
-// console.log('sessionExpireAfterMs ' + sessionExpireAfterMs);
-
-const nodeEnv = process.env.NODE_ENV || 'development';
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
 // cookieParser is not required for express-session
 // cookieParser used for user-authenticate.js cookie enabled in browser
 // cookieParser used for ws-server /irc/wsauth route cookie match
-app.use(cookieParser(cookieSecret));
+app.use(cookieParser(config.session.secret));
 
 // Generic console log to debug various nodejs req object properties
 // const logStuff = function (req, res, next) {
@@ -121,7 +130,7 @@ if (nodeEnv === 'production') {
 // ------------------
 // HTTP access log
 // ------------------
-app.use(logger(ircLog.logConfig.format, ircLog.logConfig.options));
+app.use(logger(accessLogFormat, accessLogOptions));
 
 // ------------------------------
 // Content Security Policy (CSP)
@@ -157,7 +166,7 @@ const contentSecurityPolicy = {
   reportOnly: false
 };
 // When using internal user login a <form> submission is required for password entry
-if (credentials.enableRemoteLogin) {
+if (config.oauth2.enableRemoteLogin) {
   contentSecurityPolicy.directives.formAction = ["'none'"];
 } else {
   contentSecurityPolicy.directives.formAction = ["'self'"];
@@ -165,7 +174,7 @@ if (credentials.enableRemoteLogin) {
 // API calls require "connect-src 'self'"
 // IOS Safari also needs "wss:" in connect-src to connect websocket
 // Chrome and Firefox seem to require only: "connect-source 'self'"
-if (credentials.tls) {
+if (config.server.tls) {
   contentSecurityPolicy.directives.connectSrc = ["'self'", 'wss:'];
 } else {
   contentSecurityPolicy.directives.connectSrc = ["'self'", 'ws:'];
@@ -216,8 +225,9 @@ app.get('/status', (req, res) => res.json({ status: 'ok' }));
 // Required Format (see https://securitytxt.org/)
 // Contact: mailto:security@example.com
 // Expires: Fri, 1 Apr 2022 08:30 -0500
-const securityContact = credentials.securityContact;
-const securityExpires = credentials.securityExpires;
+// Generate in bash: date --date='1 year' --rfc-email
+const securityContact = config.site.securityContact;
+const securityExpires = config.site.securityExpires;
 if (securityContact.length > 0) {
   app.get('/.well-known/security.txt', function (req, res) {
     res.set('Content-Type', 'text/plain');
@@ -250,55 +260,53 @@ app.get('/favicon.ico', function (req, res, next) {
 const sessionOptions = {
   name: cookieName, // name also in ws-authorize.js
   proxy: false,
-  rolling: credentials.sessionRollingCookie || false,
+  rolling: config.session.rollingCookie,
   resave: false,
   saveUninitialized: false,
-  secret: cookieSecret,
+  secret: config.session.secret,
   cookie: {
     path: '/',
-    maxAge: sessionExpireAfterMs,
-    secure: (credentials.tls), // When TLS enabled, require secure cookies
+    maxAge: config.session.maxAge,
+    secure: (config.server.tls), // When TLS enabled, require secure cookies
     httpOnly: true,
     sameSite: 'Lax'
   }
 };
 
-const sessionStore = {};
-if (credentials.sessionEnableRedis) {
+if (config.session.enableRedis) {
   // redis database queries
   // list:       KEYS *
   // view:       GET <key>
   // Clear all:  FLUSHALL
   console.log('Using redis for session storage');
-  sessionStore.redis = require('redis');
-  sessionStore.RedisStore = require('connect-redis').default;
   const redisClientOptions = {};
   // must match /etc/redis/redis.conf "requirepass <password>"
-  if ((credentials.sessionRedisPassword) && (credentials.sessionRedisPassword.length > 0)) {
-    redisClientOptions.password = credentials.sessionRedisPassword;
+  if ((config.session.redisPassword) && (config.session.redisPassword.length > 0)) {
+    redisClientOptions.password = config.session.redisPassword;
   }
-  sessionStore.redisClient = sessionStore.redis.createClient(redisClientOptions);
-  sessionStore.redisClient.connect()
+  const redisClient = createClient(redisClientOptions);
+  redisClient.connect()
     .catch((err) => {
       console.log('redis-server error: ', err.toString());
       // fatal error
       process.exit(1);
     });
   const redisStoreOptions = {
-    client: sessionStore.redisClient,
-    prefix: credentials.sessionRedisPrefix || 'irc:'
+    client: redisClient,
+    prefix: config.session.redisPrefix || 'irc:'
     // redis uses Cookie ttl from session cookie
   };
-  sessionOptions.store = new sessionStore.RedisStore(redisStoreOptions);
+  sessionOptions.store = new RedisStore(redisStoreOptions);
 } else {
   console.log('Using memorystore for session storage');
-  sessionStore.MemoryStore = require('memorystore')(session);
-  sessionOptions.store = new sessionStore.MemoryStore({
-    // memorystore in milliseconds
-    ttl: sessionExpireAfterMs, // milliseconds
+  const memoryStoreOptions = {
+    // store ttl in milliseconds
+    ttl: config.session.maxAge, // milliseconds
     stale: true, // return expired value before deleting otherwise undefined if false
     checkPeriod: 86400000 // prune every 24 hours
-  });
+  };
+  const MemoryStore = memorystore(session);
+  sessionOptions.store = new MemoryStore(memoryStoreOptions);
 }
 
 // -----------------------------------------------------------------
@@ -331,7 +339,7 @@ if (nodeEnv === 'production') {
 // User Login Routes
 // ------------------
 
-if (credentials.enableRemoteLogin) {
+if (config.oauth2.enableRemoteLogin) {
   //
   // First part is optional remote user password login.
   // DRAFT, in debug, see: middlewares/remote-authenticate.js
@@ -365,7 +373,8 @@ if (credentials.enableRemoteLogin) {
 //    "terminate": "YES"
 //  }
 //
-app.post('/terminate', userAuth.authorizeOrFail, csrfProtection, function (req, res, next) {
+/* esm upgrade
+app.post('/terminate', authorizeOrFail, csrfProtection, function (req, res, next) {
   let inputVerifyString = '';
   if (('terminate' in req.body) && (typeof req.body.terminate === 'string')) {
     inputVerifyString = req.body.terminate;
@@ -396,9 +405,10 @@ app.post('/terminate', userAuth.authorizeOrFail, csrfProtection, function (req, 
     next(error);
   }
 });
+*/
 
 // Route used to verify cookie not expired before reconnecting
-app.get('/secure', userAuth.authorizeOrFail, (req, res) => res.json({ secure: 'ok' }));
+app.get('/secure', authorizeOrFail, (req, res) => res.json({ secure: 'ok' }));
 
 // -----------------------------------------
 //          Websocket Auth
@@ -425,14 +435,15 @@ app.get('/secure', userAuth.authorizeOrFail, (req, res) => res.json({ secure: 'o
 // the backend web server. It is not a multi-user web server.
 //
 // This route and function exchanges cookie value
-// and expiration timestamp with the webscket module
+// and expiration timestamp with the websocket module
 // for independent (manual) cookie validation
 // for the websocket upgrade request.
 //
 // Data stored globally, time expiration 10 seconds.
 //
 // -----------------------------------------
-app.post('/irc/wsauth', userAuth.authorizeOrFail, csrfProtection, function (req, res, next) {
+/* ESM upgrade
+app.post('/irc/wsauth', authorizeOrFail, csrfProtection, function (req, res, next) {
   delete global.webSocketAuth;
   // requires cookie-parser
   if ('signedCookies' in req) {
@@ -451,6 +462,7 @@ app.post('/irc/wsauth', userAuth.authorizeOrFail, csrfProtection, function (req,
   error.status = 400;
   return next(error);
 });
+*/
 
 // -------------------------------------------------------
 // Web socket security test
@@ -474,64 +486,68 @@ app.post('/irc/wsauth', userAuth.authorizeOrFail, csrfProtection, function (req,
 // Route:  /userinfo
 //
 // ----------------
-app.get('/userinfo', userAuth.authorizeOrFail, userAuth.getUserInfo);
+app.get('/userinfo', authorizeOrFail, userAuth.getUserInfo);
 
+/* ESM Upgrade
 // ---------------------------------------
 // IRC client API routes served to browser
 // ---------------------------------------
-app.post('/irc/server', userAuth.authorizeOrFail, csrfProtection, ircClient.serverHandler);
-app.post('/irc/connect', userAuth.authorizeOrFail, csrfProtection, ircClient.connectHandler);
-app.post('/irc/disconnect', userAuth.authorizeOrFail, csrfProtection, ircClient.disconnectHandler);
-app.post('/irc/message', userAuth.authorizeOrFail, csrfProtection, ircClient.messageHandler);
-app.get('/irc/getircstate', userAuth.authorizeOrFail, ircClient.getIrcState);
-app.get('/irc/cache', userAuth.authorizeOrFail, ircClient.getCache);
-app.post('/irc/prune', userAuth.authorizeOrFail, csrfProtection, ircClient.pruneChannel);
-app.post('/irc/erase', userAuth.authorizeOrFail, csrfProtection, ircClient.eraseCache);
-app.get('/irc/test1', userAuth.authorizeOrFail, ircClient.test1Handler);
-app.get('/irc/test2', userAuth.authorizeOrFail, ircClient.test2Handler);
+app.post('/irc/server', authorizeOrFail, csrfProtection, ircClient.serverHandler);
+app.post('/irc/connect', authorizeOrFail, csrfProtection, ircClient.connectHandler);
+app.post('/irc/disconnect', authorizeOrFail, csrfProtection, ircClient.disconnectHandler);
+app.post('/irc/message', authorizeOrFail, csrfProtection, ircClient.messageHandler);
+app.get('/irc/getircstate', authorizeOrFail, ircClient.getIrcState);
+app.get('/irc/cache', authorizeOrFail, ircClient.getCache);
+app.post('/irc/prune', authorizeOrFail, csrfProtection, ircClient.pruneChannel);
+app.post('/irc/erase', authorizeOrFail, csrfProtection, ircClient.eraseCache);
+app.get('/irc/test1', authorizeOrFail, ircClient.test1Handler);
+app.get('/irc/test2', authorizeOrFail, ircClient.test2Handler);
+*/
 
-//
-// API for Server List Editor
-//
+// //
+// // API for Server List Editor
+// //
+/* ESM upgrade
 if (credentials.disableServerListEditor) {
-  app.get('/irc/serverlist', userAuth.authorizeOrFail,
+  app.get('/irc/serverlist', authorizeOrFail,
     (req, res) => res.status(405).json({ Error: 'Server List Editor Disabled' }));
-  app.post('/irc/serverlist', userAuth.authorizeOrFail, csrfProtection,
+  app.post('/irc/serverlist', authorizeOrFail, csrfProtection,
     (req, res) => res.status(405).json({ Error: 'Server List Editor Disabled' }));
-  app.patch('/irc/serverlist', userAuth.authorizeOrFail, csrfProtection,
+  app.patch('/irc/serverlist', authorizeOrFail, csrfProtection,
     (req, res) => res.status(405).json({ Error: 'Server List Editor Disabled' }));
-  app.copy('/irc/serverlist', userAuth.authorizeOrFail, csrfProtection,
+  app.copy('/irc/serverlist', authorizeOrFail, csrfProtection,
     (req, res) => res.status(405).json({ Error: 'Server List Editor Disabled' }));
-  app.delete('/irc/serverlist', userAuth.authorizeOrFail, csrfProtection,
+  app.delete('/irc/serverlist', authorizeOrFail, csrfProtection,
     (req, res) => res.status(405).json({ Error: 'Server List Editor Disabled' }));
-  app.post('/irc/serverlist/tools', userAuth.authorizeOrFail, csrfProtection,
+  app.post('/irc/serverlist/tools', authorizeOrFail, csrfProtection,
     (req, res) => res.status(405).json({ Error: 'Server List Editor Disabled' }));
 } else {
   app.get('/irc/serverlist',
-    userAuth.authorizeOrFail,
+    authorizeOrFail,
     ircServerListValidations.list,
     ircServerListEditor.list);
   app.post('/irc/serverlist',
-    userAuth.authorizeOrFail, csrfProtection,
+    authorizeOrFail, csrfProtection,
     ircServerListValidations.create,
     ircServerListEditor.create);
   app.patch('/irc/serverlist',
-    userAuth.authorizeOrFail, csrfProtection,
+    authorizeOrFail, csrfProtection,
     ircServerListValidations.update,
     ircServerListEditor.update);
   app.copy('/irc/serverlist',
-    userAuth.authorizeOrFail, csrfProtection,
+    authorizeOrFail, csrfProtection,
     ircServerListValidations.copy,
     ircServerListEditor.copy);
   app.delete('/irc/serverlist',
-    userAuth.authorizeOrFail, csrfProtection,
+    authorizeOrFail, csrfProtection,
     ircServerListValidations.destroy,
     ircServerListEditor.destroy);
   app.post('/irc/serverlist/tools',
-    userAuth.authorizeOrFail, csrfProtection,
+    authorizeOrFail, csrfProtection,
     ircServerListValidations.tools,
     ircServerListEditor.tools);
 }
+*/
 
 // -------------------------------
 // If unauthorized, redirect to /login for main html file /irc/webclient.html.
@@ -541,7 +557,7 @@ if (credentials.disableServerListEditor) {
 // substitute CSRF token into meta tag for csurf middleware
 // -------------------------------
 app.get('/irc/webclient.html',
-  userAuth.authorizeOrLogin,
+  authorizeOrLogin,
   csrfProtection,
   function (req, res, next) {
     let filename = './secure-minify/webclient.html';
@@ -555,8 +571,9 @@ app.get('/irc/webclient.html',
     });
   }
 );
+/* ESM upgrade
 app.get('/irc/serverlist.html',
-  userAuth.authorizeOrLogin,
+  authorizeOrLogin,
   csrfProtection,
   function (req, res, next) {
     let filename = './secure-minify/serverlist.html';
@@ -570,6 +587,7 @@ app.get('/irc/serverlist.html',
     });
   }
 );
+*/
 
 // -------------------------------
 // Web server for static files
@@ -582,15 +600,17 @@ let secureDir = path.join(__dirname, '../secure');
 if (nodeEnv === 'production') secureDir = path.join(__dirname, '../secure-minify');
 
 console.log('Serving files from: ' + secureDir);
-app.use('/irc', userAuth.authorizeOrFail, express.static(secureDir));
+app.use('/irc', authorizeOrFail, express.static(secureDir));
 
 //
 // Optionally server /docs folder to /irc/docs
 //
+/* ESM upgrade
 if (credentials.serveHtmlHelpDocs) {
   const docsDir = path.join(__dirname, '../docs');
-  app.use('/irc/docs', userAuth.authorizeOrFail, express.static(docsDir));
+  app.use('/irc/docs', authorizeOrFail, express.static(docsDir));
 }
+*/
 
 // ---------------------------------
 //    E R R O R   H A N D L E R S
@@ -670,4 +690,4 @@ app.use(function (err, req, res, next) {
   // next(err);
 });
 
-module.exports = app;
+export { app };
