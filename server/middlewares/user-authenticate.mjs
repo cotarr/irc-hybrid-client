@@ -21,7 +21,30 @@
 // SOFTWARE.
 // -----------------------------------------------------------------------------
 //
-// User authentication and route authroization functions
+// User authentication and route authorization functions
+//
+// -----------------------------------------------------------------------------
+//
+// Option 1 of 2 - configuration using credentials.json
+//
+// "enableRemoteLogin": false,
+// "loginUsers": [
+//   {
+//     "userid": 1,
+//     "user": "user1",
+//     "name": "My Name",
+//     "hash": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+//   }
+// ],
+//
+// ------------------------------------------------
+// Option 2 of 2 - Configuration with UNIX environment variables
+
+// OAUTH2_ENABLE_REMOTE_LOGIN=false
+// LOGIN_USER_USERID=1
+// LOGIN_USER_USER=user1
+// LOGIN_USER_NAME="My Name"
+// LOGIN_USER_HASH="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 //
 // -----------------------------------------------------------------------------
 'use strict';
@@ -37,9 +60,6 @@ import config, { nodeEnv, loginUsers as userArray } from '../config/index.mjs';
 // Custom case for use with ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-// other imports
-const sessionExpireAfterSec = config.session.ttl;
 
 // HTML fragments for login page
 const loginHtmlTop = fs.readFileSync('./server/fragments/login-top.html', 'utf8');
@@ -134,7 +154,7 @@ const _checkIfAuthorized = function (req) {
         if (timeNowSeconds < req.session.sessionAuth.sessionExpireTimeSec) {
           authorized = true;
           if (config.session.rollingCookie) {
-            req.session.sessionAuth.sessionExpireTimeSec = timeNowSeconds + sessionExpireAfterSec;
+            req.session.sessionAuth.sessionExpireTimeSec = timeNowSeconds + config.session.ttl;
           }
         }
       }
@@ -358,7 +378,7 @@ export const loginAuthorize = function (req, res, next) {
               req.session.sessionAuth.userid = userArray[userIndex].userid;
               // req.session.sessionAuth.scopes = userArray[userIndex].scopes;
               req.session.sessionAuth.sessionExpireTimeSec =
-                timeNowSeconds + sessionExpireAfterSec;
+                timeNowSeconds + config.session.ttl;
               _removeLoginNonceFromSession(req);
               //
               // add to log file

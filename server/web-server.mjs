@@ -53,12 +53,10 @@ import userAuthenticate, {
   authorizeOrLogin as localAuthorizeOrLogin
 } from './middlewares/user-authenticate.mjs';
 
-/* ESM upgrade
 import remoteAuthenticate, {
   authorizeOrFail as remoteAuthorizeOrFail,
   authorizeOrLogin as remoteAuthorizeOrLogin
 } from './middlewares/remote-authenticate.mjs';
-*/
 
 import {
   accessLogFormat,
@@ -84,11 +82,9 @@ let authorizeOrFail = null;
 let authorizeOrLogin = null;
 if (config.oauth2.enableRemoteLogin) {
   // Remote authorization modules
-  /* ESM upgrade
   userAuth = remoteAuthenticate;
   authorizeOrFail = remoteAuthorizeOrFail;
   authorizeOrLogin = remoteAuthorizeOrLogin;
-  */
 } else {
   // Local authorization modules
   userAuth = userAuthenticate;
@@ -249,7 +245,9 @@ app.get('/robots.txt', function (req, res) {
     'Disallow: /\n');
 });
 
+//
 // Return status 204 Empty Response for icon
+//
 app.get('/favicon.ico', function (req, res, next) {
   res.status(204).send(null);
 });

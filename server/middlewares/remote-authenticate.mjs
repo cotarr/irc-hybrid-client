@@ -23,10 +23,11 @@
 //
 // Optional remote login using custom Oauth 2.0 Server
 //
-// This properties are not required when irc-hybrid-client is used with
+// These properties are not required when irc-hybrid-client is used with
 // the default configuration of internal user password login.
 //
-// The file credentials.json should something similar to the following
+// Option 1 of 2 - configuration using credentials.json
+//
 //   {
 //     "enableRemoteLogin": true,
 //     "remoteAuthHost": "http://127.0.0.1:3500",
@@ -44,70 +45,86 @@
 //    ]
 //  }
 //
-//
 // In credentials.json file, user array is not required. --> "loginUsers": []
+//
+// ----------------------------------------
+//
+// Option 2 of 2 - Configuration with UNIX environment variables
+//
+// In the case of configuration with environment variables,
+// the configuration would be something like the following:
+//
+// OAUTH2_ENABLE_REMOTE_LOGIN=false
+// OAUTH2_REMOTE_AUTH_HOST=http://127.0.0.1:3500
+// OAUTH2_REMOTE_CALLBACK_HOST=http://localhost:3003
+// OAUTH2_REMOTE_CLIENT_ID=irc_client_id
+// OAUTH2_REMOTE_CLIENT_SECRET="irc_client_secret_TO_BE_CHANGED"
+// OAUTH2_REMOTE_SCOPE=irc.one,irc.two
 //
 // -----------------------------------------------------------------------------
 'use strict';
 // node native modules
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import nodeFetch from 'node-fetch';
 
-const credentials = JSON.parse(fs.readFileSync('./credentials.json', 'utf8'));
+import config, { nodeEnv, oauth2 } from '../config/index.mjs';
 
-// other imports
-const sessionExpireAfterSec = credentials.sessionExpireAfterSec || 86400;
+// Custom case for use with ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // HTML fragments for login page
 const blockedCookieFragment = fs.readFileSync('./server/fragments/blocked-cookies.html', 'utf8');
 const logoutHtmlTop = fs.readFileSync('./server/fragments/logout-top.html', 'utf8');
 const logoutHtmlBottom = fs.readFileSync('./server/fragments/logout-bottom.html', 'utf8');
 
-const nodeEnv = process.env.NODE_ENV || 'development';
 const nodeDebugLog = process.env.NODE_DEBUG_LOG || 0;
 
 //
-// At program startup, validate the credentials.json file for required properties.
+// At program startup, validate that the credentials object
+// has required properties to use oauth2 authentication
 //
-if ((!Object.hasOwn(credentials, 'remoteAuthHost')) ||
-  (credentials.remoteAuthHost.length < 1)) {
+if ((!Object.hasOwn(oauth2, 'remoteAuthHost')) ||
+  (oauth2.remoteAuthHost.length < 1)) {
   console.log(
-    'Error: Remote login, "remoteAuthHost" is a required property, credentials.json');
+    'Error: Remote login, "remoteAuthHost" is a required property');
   process.exit(1);
-} else if ((!Object.hasOwn(credentials, 'remoteCallbackHost')) ||
-  (credentials.remoteCallbackHost.length < 1)) {
+} else if ((!Object.hasOwn(oauth2, 'remoteCallbackHost')) ||
+  (oauth2.remoteCallbackHost.length < 1)) {
   console.log(
-    'Error: Remote login, "remoteCallbackHost" is a required property, credentials.json');
+    'Error: Remote login, "remoteCallbackHost" is a required property');
   process.exit(1);
-} else if ((!Object.hasOwn(credentials, 'remoteClientId')) ||
-  (credentials.remoteClientId.length < 1)) {
+} else if ((!Object.hasOwn(oauth2, 'remoteClientId')) ||
+  (oauth2.remoteClientId.length < 1)) {
   console.log(
-    'Error: Remote login, "remoteClientId" is a required property, credentials.json');
+    'Error: Remote login, "remoteClientId" is a required property');
   process.exit(1);
-} else if ((!Object.hasOwn(credentials, 'remoteClientSecret')) ||
-  (credentials.remoteClientSecret.length < 1)) {
+} else if ((!Object.hasOwn(oauth2, 'remoteClientSecret')) ||
+  (oauth2.remoteClientSecret.length < 1)) {
   console.log(
-    'Error: Remote login, "remoteClientSecret" is a required property, credentials.json');
+    'Error: Remote login, "remoteClientSecret" is a required property');
   process.exit(1);
-} else if (!Object.hasOwn(credentials, 'remoteScope')) {
+} else if (!Object.hasOwn(oauth2, 'remoteScope')) {
   console.log(
-    'Error: Remote login, "remoteScope" is a required property, credentials.json');
+    'Error: Remote login, "remoteScope" is a required property');
   process.exit(1);
 } else {
   let scopeExist = false;
-  if (Array.isArray(credentials.remoteScope)) {
-    if ((credentials.remoteScope.length > 0) &&
-      (credentials.remoteScope[0].length > 0)) {
+  if (Array.isArray(oauth2.remoteScope)) {
+    if ((oauth2.remoteScope.length > 0) &&
+      (oauth2.remoteScope[0].length > 0)) {
       scopeExist = true;
     }
   } else {
-    if ((typeof credentials.remoteScope === 'string') &&
-      (credentials.remoteScope.length > 0)) {
+    if ((typeof oauth2.remoteScope === 'string') &&
+      (oauth2.remoteScope.length > 0)) {
       scopeExist = true;
     }
   }
   if (!scopeExist) {
-    console.log('Error: Remote login, "remoteScope" is a required property, credentials.json');
+    console.log('Error: Remote login, "remoteScope" is a required property');
     process.exit(1);
   }
 }
@@ -128,7 +145,7 @@ if ((typeof fetch).toString() !== 'function') {
   '| using the optional remote login. (CHANGELOG v0.2.41)\n' +
   '+-----------------------------------------------------------';
   console.log(nodeUpgradeMessage);
-  global.fetch = require('node-fetch');
+  global.fetch = nodeFetch;
 }
 
 //
@@ -213,8 +230,8 @@ const _checkIfAuthorized = function (req) {
       if (req.session.sessionAuth.sessionExpireTimeSec) {
         if (timeNowSeconds < req.session.sessionAuth.sessionExpireTimeSec) {
           authorized = true;
-          if (credentials.sessionRollingCookie) {
-            req.session.sessionAuth.sessionExpireTimeSec = timeNowSeconds + sessionExpireAfterSec;
+          if (config.session.rollingCookie) {
+            req.session.sessionAuth.sessionExpireTimeSec = timeNowSeconds + config.session.ttl;
           }
         }
       }
@@ -245,14 +262,14 @@ const _removeAuthorizationFromSession = function (req) {
 // Route: GET /blocked
 // ----------------------
 // TODO blocked cookies not detected in this branch.
-const blockedCookies = function (req, res, next) {
+export const blockedCookies = function (req, res, next) {
   res.send(blockedCookieFragment);
 };
 
 // ----------------------------------------
 // If not authorized, redirect to login
 // ----------------------------------------
-const authorizeOrLogin = function (req, res, next) {
+export const authorizeOrLogin = function (req, res, next) {
   if (_checkIfAuthorized(req)) {
     next();
   } else {
@@ -263,7 +280,7 @@ const authorizeOrLogin = function (req, res, next) {
 // ---------------------------------------------
 // If not authorized, return 401 Unauthorized
 // ---------------------------------------------
-const authorizeOrFail = function (req, res, next) {
+export const authorizeOrFail = function (req, res, next) {
   if (_checkIfAuthorized(req)) {
     next();
   } else {
@@ -281,29 +298,29 @@ const authorizeOrFail = function (req, res, next) {
 // /dialog/authorize?redirect_uri=http://localhost:3003/login/callback&
 //     response_type=code&client_id=irc_client&scope=irc.scope1%20irc.scope2
 // ---------------------------
-const loginRedirect = function (req, res, next) {
+export const loginRedirect = function (req, res, next) {
   let scopeString = '';
   // Case 1, remoteScope is single string
-  if (typeof credentials.remoteScope === 'string') {
-    scopeString = credentials.remoteScope;
+  if (typeof oauth2.remoteScope === 'string') {
+    scopeString = oauth2.remoteScope;
   }
   // Case 2, remoteScope is array of strings
-  if ((Array.isArray(credentials.remoteScope)) && (credentials.remoteScope.length > 0)) {
-    for (let i = 0; i < credentials.remoteScope.length; i++) {
+  if ((Array.isArray(oauth2.remoteScope)) && (oauth2.remoteScope.length > 0)) {
+    for (let i = 0; i < oauth2.remoteScope.length; i++) {
       if (i > 0) {
         // Delimit with escaped space characters
-        scopeString += ' ' + credentials.remoteScope[i];
+        scopeString += ' ' + oauth2.remoteScope[i];
       } else {
-        scopeString += credentials.remoteScope[i];
+        scopeString += oauth2.remoteScope[i];
       }
     }
   }
   res.redirect(encodeURI(
-    credentials.remoteAuthHost +
+    oauth2.remoteAuthHost +
     '/dialog/authorize?' +
-    'redirect_uri=' + credentials.remoteCallbackHost + '/login/callback' + '&' +
+    'redirect_uri=' + oauth2.remoteCallbackHost + '/login/callback' + '&' +
     'response_type=code&' +
-    'client_id=' + credentials.remoteClientId + '&' +
+    'client_id=' + oauth2.remoteClientId + '&' +
     'scope=' + scopeString));
 };
 
@@ -406,7 +423,7 @@ const _validateTokenResponse = function (chain) {
 // ------------------------------------------------------
 const _authorizeTokenScope = function (chain) {
   // console.log('chain.tokenMetaData.scope ', chain.tokenMetaData.scope);
-  // console.log('credentials.remoteScope ', credentials.remoteScope);
+  // console.log('oauth2.remoteScope ', oauth2.remoteScope);
   return new Promise(function (resolve, reject) {
     if ((Object.hasOwn(chain, 'tokenMetaData')) &&
       (!(chain.tokenMetaData == null)) &&
@@ -416,13 +433,13 @@ const _authorizeTokenScope = function (chain) {
       (Array.isArray(chain.tokenMetaData.scope))) {
       let scopeFound = false;
       // Case 1 remoteScope is type String
-      if (typeof credentials.remoteScope === 'string') {
-        if (chain.tokenMetaData.scope.indexOf(credentials.remoteScope) >= 0) {
+      if (typeof oauth2.remoteScope === 'string') {
+        if (chain.tokenMetaData.scope.indexOf(oauth2.remoteScope) >= 0) {
           scopeFound = true;
         }
         // Case 2, remoteScope is Array of Strings
-      } else if (Array.isArray(credentials.remoteScope)) {
-        credentials.remoteScope.forEach(function (scopeString) {
+      } else if (Array.isArray(oauth2.remoteScope)) {
+        oauth2.remoteScope.forEach(function (scopeString) {
           if (chain.tokenMetaData.scope.indexOf(scopeString) >= 0) {
             scopeFound = true;
           }
@@ -455,7 +472,7 @@ const _setSessionAuthorized = function (req, chain) {
     req.session.sessionAuth.user = chain.tokenMetaData.user.username;
     req.session.sessionAuth.name = chain.tokenMetaData.user.name;
     req.session.sessionAuth.userid = chain.tokenMetaData.user.id;
-    req.session.sessionAuth.sessionExpireTimeSec = timeNowSeconds + sessionExpireAfterSec;
+    req.session.sessionAuth.sessionExpireTimeSec = timeNowSeconds + config.session.ttl;
     //
     // add to log file
     //
@@ -478,14 +495,14 @@ const _setSessionAuthorized = function (req, chain) {
 // -----------------------------------------------------------------------
 const _introspectAccessToken = function (chain) {
   // OAuth2 authorization server
-  const fetchUrl = credentials.remoteAuthHost + '/oauth/introspect';
+  const fetchUrl = oauth2.remoteAuthHost + '/oauth/introspect';
 
   const fetchController = new AbortController();
 
   const body = {
     access_token: chain.tokenResponse.access_token,
-    client_id: credentials.remoteClientId,
-    client_secret: credentials.remoteClientSecret
+    client_id: oauth2.remoteClientId,
+    client_secret: oauth2.remoteClientSecret
   };
 
   const fetchOptions = {
@@ -527,15 +544,15 @@ const _introspectAccessToken = function (chain) {
 // ---------------------------------------------------------------
 const _fetchNewAccessToken = function (chain) {
   // OAuth2 authorization server
-  const fetchUrl = credentials.remoteAuthHost + '/oauth/token';
+  const fetchUrl = oauth2.remoteAuthHost + '/oauth/token';
 
   const fetchController = new AbortController();
 
   const body = {
     code: chain.code,
-    redirect_uri: credentials.remoteCallbackHost + '/login/callback',
-    client_id: credentials.remoteClientId,
-    client_secret: credentials.remoteClientSecret,
+    redirect_uri: oauth2.remoteCallbackHost + '/login/callback',
+    client_id: oauth2.remoteClientId,
+    client_secret: oauth2.remoteClientSecret,
     grant_type: 'authorization_code'
   };
 
@@ -563,7 +580,7 @@ const _fetchNewAccessToken = function (chain) {
       }
     })
     .then((tokenResponse) => {
-      // console.log(tokenResponse);
+      // console.log('tokenResponse', tokenResponse);
       if (chain.tokenFetchTimerId) clearTimeout(chain.tokenFetchTimerId);
       chain.tokenResponse = tokenResponse;
       return chain;
@@ -584,7 +601,7 @@ const _fetchNewAccessToken = function (chain) {
 // 6) Validate that user's token scope is sufficient to use irc-hybrid-client
 // 7) Redirect to single page application at /irc/webclient.html
 // -------------------------------------------------------------------------------
-const exchangeAuthCode = function (req, res, next) {
+export const exchangeAuthCode = function (req, res, next) {
   const chainObj = Object.create(null);
   // Calling _regenerateSessionCookie returns promise
   _regenerateSessionCookie(req, chainObj)
@@ -609,7 +626,7 @@ const exchangeAuthCode = function (req, res, next) {
 // ---------------------------
 // Route: GET /logout
 // ---------------------------
-const logout = function (req, res, next) {
+export const logout = function (req, res, next) {
   // if logged in then add to logfile
   let user;
   if ((Object.hasOwn(req, 'session')) &&
@@ -620,10 +637,10 @@ const logout = function (req, res, next) {
   }
   if (Object.hasOwn(req, 'session')) {
     let cookieName = 'irc-hybrid-client';
-    if ((Object.hasOwn(credentials, 'instanceNumber')) &&
-      (Number.isInteger(credentials.instanceNumber)) &&
-      (credentials.instanceNumber >= 0) && (credentials.instanceNumber < 65536)) {
-      cookieName = 'irc-hybrid-client-' + credentials.instanceNumber.toString();
+    if ((Object.hasOwn(config.server, 'instanceNumber')) &&
+      (Number.isInteger(config.server.instanceNumber)) &&
+      (config.server.instanceNumber >= 0) && (config.server.instanceNumber < 65536)) {
+      cookieName = 'irc-hybrid-client-' + config.server.instanceNumber.toString();
     }
     let cookieOptions = null;
     if (Object.hasOwn(req.session, 'cookie')) {
@@ -651,14 +668,14 @@ const logout = function (req, res, next) {
     tempHtml =
       'Logout successful for user ' + user +
       ' on the web server at ' +
-      credentials.remoteCallbackHost + '.' +
+      oauth2.remoteCallbackHost + '.' +
       '<br><br>' +
       'You may still be logged in to the authorization server at ' +
-      credentials.remoteAuthHost + '. ' +
+      oauth2.remoteAuthHost + '. ' +
       'You may remove your authoriztion server login by visiting the link at: ' +
-      '<a href="' + credentials.remoteAuthHost + '/logout">' +
-      credentials.remoteAuthHost + '/logout</a>. ' +
-      '<a href="' + credentials.remoteAuthHost + '/logout"><button>Auth Logout</button></a>';
+      '<a href="' + oauth2.remoteAuthHost + '/logout">' +
+      oauth2.remoteAuthHost + '/logout</a>. ' +
+      '<a href="' + oauth2.remoteAuthHost + '/logout"><button>Auth Logout</button></a>';
   }
   res.send(logoutHtmlTop + tempHtml + logoutHtmlBottom);
 };
@@ -666,7 +683,7 @@ const logout = function (req, res, next) {
 // -----------------------------
 // Route: GET /userinfo
 // -----------------------------
-const getUserInfo = function (req, res, next) {
+export const getUserInfo = function (req, res, next) {
   if ((Object.hasOwn(req, 'session')) &&
     (Object.hasOwn(req.session, 'sessionAuth')) &&
     (Object.hasOwn(req.session.sessionAuth, 'user')) &&
@@ -685,7 +702,7 @@ const getUserInfo = function (req, res, next) {
 // -----------------------
 // Route: GET /login.css
 // -----------------------
-const loginStyleSheet = function (req, res, next) {
+export const loginStyleSheet = function (req, res, next) {
   fs.readFile('./server/fragments/login.css', 'utf8', function (err, styleSheetStr) {
     if (err) {
       next(); // fall through to 404
@@ -695,13 +712,13 @@ const loginStyleSheet = function (req, res, next) {
   });
 };
 
-module.exports = {
-  loginRedirect: loginRedirect,
-  exchangeAuthCode: exchangeAuthCode,
-  logout: logout,
-  authorizeOrLogin: authorizeOrLogin,
-  authorizeOrFail: authorizeOrFail,
-  getUserInfo: getUserInfo,
-  blockedCookies: blockedCookies,
-  loginStyleSheet: loginStyleSheet
+export default {
+  blockedCookies,
+  authorizeOrLogin,
+  authorizeOrFail,
+  loginRedirect,
+  exchangeAuthCode,
+  logout,
+  getUserInfo,
+  loginStyleSheet
 };

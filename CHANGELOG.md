@@ -76,6 +76,10 @@ and morgan logger with all custom routes disabled.
 - Rename tools/updateAuthForUser_1.js to updateAuthForUser_1.mjs and convert to ES Module
 - Create new tool script tools/genEnvVarAuthForUser_1.mjs to generate environment variables for copy/paste when using local authentication.
 
+After commit f9de974
+
+- Rename server/middlewares/remote-authenticate.js remote-authenticate.mjs, convert to ES modules, alternate configuration index.mjs
+
 ## [v0.2.43](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.43) 2023-05-28
 
 ### Updated
