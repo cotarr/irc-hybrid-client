@@ -70,6 +70,15 @@ if ((credentials) && (typeof credentials === 'object') && ('configVersion' in cr
   }
 }
 
+if (!fcf) {
+  if (!Object.hasOwn(process.env, 'ENV_VAR_CONFIG_VERSION') ||
+    (process.env.ENV_VAR_CONFIG_VERSION == null) ||
+    (process.env.ENV_VAR_CONFIG_VERSION !== '2')) {
+    console.error('Environment variable configuration error: ENV_VAR_CONFIG_VERSION does not match expected value "2"');
+    process.exit(1);
+  }
+}
+
 // --------------------------------------------------
 // Internal function to handle 'OR' multiple input
 // with mixed types number and string in
