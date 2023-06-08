@@ -115,6 +115,8 @@ After commit 543db92
 - Setup config and successfully ran postman tests, no issues
 - Added version identifier to configuration when using environment variables, set to 2 to match credentials.json
 - Add node version check requiring node 16 or greater, else exit with error.
+- Update filenames in restart.sh. The restart.sh script will only work using credentials.json as configuration source.
+- Created alternate restart2.sh script for use in a server configured with environment variables.
 
 ## [v0.2.43](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.43) 2023-05-28
 

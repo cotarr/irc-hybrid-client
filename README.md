@@ -10,17 +10,17 @@ Screen capture images are available in the [documentation](https://cotarr.github
 
 ### Project Status (Work in Progress)
 
-This project is still under development and new features may be added in the future.
-At this time, no formal release has been issued.
+This IRC client is functional and mostly stable, but still evolving. 
+New features are still being added from time to time.
 
 ### Repository Contents
 
 HTML content is available in both the minified-bundled version and
-the commented development files. HTML content is located in folders `secure-minify/` and `secure/`.
-Selection is determined by the NODE_ENV environment variable.
-The browser download is about 37 kB for minify-bundled version
-with server compression, compared to about 338 kB serving
-from development folders without compression.
+the commented development version. HTML content is located in 
+folders `secure-minify/` and `secure/`. Selection is determined by 
+the NODE_ENV environment variable. The browser download is about 
+37 kB for minify-bundled version with server compression, 
+compared to about 338 kB serving from development folders without compression.
 
 The server files are located in the `server/` folder. The server is launched
 from the socket server in the `bin/` folder.
@@ -67,7 +67,7 @@ chmod 600 credentials.json
 cd tools
 
 # fill in user and password when prompted.
-node updateAuthForUser_1.js
+node updateAuthForUser_1.mjs
 
 # A revised copy of credentials.json will be displayed after password assignment
 

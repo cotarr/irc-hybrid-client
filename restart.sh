@@ -7,6 +7,11 @@
 # This script is intended to restart the NodeJs web server after
 # changes to the configuration files: credentials.json
 #
+# The restart.sh script assumed you are using "credentials.json" file
+# to configure the irc-hybrid-client. If you are using 
+# the alternate environment variable configuration method,
+# you should use the "restart2.sh" script instead.
+
 # If the irc-hybrid-client is not currently running, the irc-hybrid-client
 # will be started. Any error message from the kill command may be ignored.
 #
@@ -16,9 +21,13 @@
 #   - Credentials.json contains full PID file path name, example: "pidFilename": "/home/user1/tmp/ircHybridClient.PID",
 #   - This is a user run untility and not intended for use with cron
 #
+# Optional:
+#   - The property "instanceNumber" contains an integer 0 to 65535 to 
+#     identify the server. Adding the number to the  command line will 
+#     identify a specific server in the ps process list.
 
 # Check this is run from the proper folder
-if ! [ -f bin/www ] ; then
+if ! [ -f bin/www.mjs ] ; then
   echo "The irc-hybrid-client executable not found. This script should be run from the base folder of the repository"
   exit 1
 fi
@@ -60,7 +69,7 @@ fi
 
 # All prerequisites met, go ahead and kill the previous process
 if [ -n "$KILLPID" ] ; then
-  echo "Killing process $KILLPID node bin/www $INSTANCENO"
+  echo "Killing process $KILLPID node bin/www.mjs $INSTANCENO"
   kill -SIGTERM  $KILLPID
 fi
 
@@ -81,7 +90,7 @@ sleep 2
 #        In normal use, only the program start notices should be present
 #
 export NODE_ENV="production"
-/usr/bin/node --expose-gc bin/www $INSTANCENO &>> logs/node.log &
+/usr/bin/node --expose-gc bin/www.mjs $INSTANCENO &>> logs/node.log &
 
 sleep 2
 
