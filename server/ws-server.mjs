@@ -27,22 +27,20 @@
 
 'use strict';
 
-const ws = require('ws');
-const isValidUTF8 = require('utf-8-validate');
-const fs = require('node:fs');
+import { WebSocketServer } from 'ws';
 
-const authorizeWebSocket = require('./middlewares/ws-authorize').authorizeWebSocket;
-const customLog = require('./middlewares/ws-authorize').customLog;
+import isValidUTF8 from 'utf-8-validate';
 
-const nodeEnv = process.env.NODE_ENV || 'development';
+import { authorizeWebSocket, wsCustomLog } from './middlewares/ws-authorize.mjs';
+
+// Web server configuration
+import config, { nodeEnv } from './config/index.mjs';
 const nodeDebugLog = process.env.NODE_DEBUG_LOG || 0;
-
-const credentials = JSON.parse(fs.readFileSync('./credentials.json', 'utf8'));
 
 // ----------------------------------------
 // Set up a headless websocket server
 // ----------------------------------------
-const wsServer = new ws.Server({ noServer: true });
+const wsServer = new WebSocketServer({ noServer: true });
 
 // -------------------------------------------------
 // Message handler (browser --> web server)
@@ -120,7 +118,7 @@ setInterval(function () {
 // 2) Validate cookie on upgrade request
 // 3) Connect the webscket
 // ----------------------------------------
-const wsOnUpgrade = function (request, socket, head) {
+export const wsOnUpgrade = function (request, socket, head) {
   let upgradePath = '';
   if (('url' in request) && (typeof request.url === 'string')) {
     upgradePath = request.url;
@@ -129,25 +127,20 @@ const wsOnUpgrade = function (request, socket, head) {
     if (authorizeWebSocket(request)) {
       // logged into access.log with IP address:
       //      2022-09-18T12:12:58.585Z 1.2.3.4 websocket-connection /irc/ws
-      if ((nodeEnv === 'development') || (nodeDebugLog) || (!credentials.accessLogOnlyErrors)) {
-        customLog(request, 'websocket-connection');
+      if ((nodeEnv === 'development') || (nodeDebugLog) || (!config.server.accessLogOnlyErrors)) {
+        wsCustomLog(request, 'websocket-connection');
       }
       wsServer.handleUpgrade(request, socket, head, function (socket) {
         wsServer.emit('connection', socket, request);
       });
     } else {
-      customLog(request, 'websocket-auth-fail');
+      wsCustomLog(request, 'websocket-auth-fail');
       socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
       socket.destroy();
     }
   } else {
-    customLog(request, 'websocket-path-not-found');
+    wsCustomLog(request, 'websocket-path-not-found');
     socket.write('HTTP/1.1 404 Not Found\r\n\r\n');
     socket.destroy();
   }
-};
-
-module.exports = {
-  wsServer: wsServer,
-  wsOnUpgrade: wsOnUpgrade
 };

@@ -51,31 +51,30 @@
 // ---------------------------------------------------------------------------------------------
 'use strict';
 
-const fs = require('fs');
-const crypto = require('crypto');
-const signature = require('cookie-signature');
-const cookie = require('cookie');
+import crypto from 'crypto';
+import signature from 'cookie-signature';
+import cookie from 'cookie';
 
-const credentials = JSON.parse(fs.readFileSync('./credentials.json', 'utf8'));
-const cookieSecret = credentials.cookieSecret;
+import ircLog from '../irc/irc-client-log.mjs';
+
+// Web server configuration
+import config from '../config/index.mjs';
+
+const cookieSecret = config.session.secret;
 // console.log('cookieSecret ' + cookieSecret);
-
-const ircLog = require('../irc/irc-client-log');
-
-// const nodeEnv = process.env.NODE_ENV || 'development';
 
 // Also set cookieName in web-server.js
 let cookieName = 'irc-hybrid-client';
-if ((Object.hasOwn(credentials, 'instanceNumber')) &&
-  (Number.isInteger(credentials.instanceNumber)) &&
-  (credentials.instanceNumber >= 0) && (credentials.instanceNumber < 65536)) {
-  cookieName = 'irc-hybrid-client-' + credentials.instanceNumber.toString();
+if ((Object.hasOwn(config.server, 'instanceNumber')) &&
+  (Number.isInteger(config.server.instanceNumber)) &&
+  (config.server.instanceNumber >= 0) && (config.server.instanceNumber < 65536)) {
+  cookieName = 'irc-hybrid-client-' + config.server.instanceNumber.toString();
 }
 
 //
 // Custom log file (Option: setup to fail2ban to block IP addresses)
 //
-const customLog = function (request, logString) {
+export const wsCustomLog = function (request, logString) {
   //
   // build log text string
   //
@@ -114,7 +113,7 @@ const safeCompare = function (userInput, secret) {
 //
 // Return true if authorized, otherwise return false
 // ------------------------------------------------------
-const authorizeWebSocket = function (request) {
+export const authorizeWebSocket = function (request) {
   // Check if header contains cookies
   // Odd, "headers" appears to be a prototype method, not an object property
   if ((request.headers) &&
@@ -172,9 +171,4 @@ const authorizeWebSocket = function (request) {
   // In case of code error return false (unreachable return)
   // eslint-disable-next-line no-unreachable
   return false;
-};
-
-module.exports = {
-  authorizeWebSocket: authorizeWebSocket,
-  customLog: customLog
 };

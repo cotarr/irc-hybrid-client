@@ -58,10 +58,15 @@
 // -----------------------------------------------------------------------------
 'use strict';
 
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-const vars = require('./irc-client-vars');
+import vars from './irc-client-vars.mjs';
+
+// Custom case for use with ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // const nodeEnv = process.env.NODE_ENV || 'development';
 
@@ -794,7 +799,7 @@ const toggleServerDisabled = function (req, chainObject) {
 /**
  * List - NodeJs Middleware function: GET /irc/serverlist route handler
  */
-const listServerlist = function (req, res, next) {
+const list = function (req, res, next) {
   const chainObject = {};
   requireListWithoutLock(req, chainObject)
     .then((chainObject) => setDatabaseLock(req, chainObject))
@@ -808,7 +813,7 @@ const listServerlist = function (req, res, next) {
 /**
  * Create - NodeJs Middleware function: POST /irc/serverlist route handler
  */
-const createServerlist = function (req, res, next) {
+const create = function (req, res, next) {
   const chainObject = {};
   requireIrcNotConnected(chainObject)
     .then((chainObject) => requireNotLock(chainObject))
@@ -824,7 +829,7 @@ const createServerlist = function (req, res, next) {
 /**
  * Update - NodeJs Middleware function:  PATCH /irc/serverlist?index=0 route handler
  */
-const updateServerlist = function (req, res, next) {
+const update = function (req, res, next) {
   const chainObject = {};
   requireIrcNotConnected(chainObject)
     .then((chainObject) => requireLock(chainObject))
@@ -841,7 +846,7 @@ const updateServerlist = function (req, res, next) {
 /**
  * Copy - NodeJs Middleware function: COPY /irc/serverlist?index=0 route handler
  */
-const copyServerlist = function (req, res, next) {
+const copy = function (req, res, next) {
   // Copy specified record to the end of the list as a duplicate
   const chainObject = {};
   requireIrcNotConnected(chainObject)
@@ -858,7 +863,7 @@ const copyServerlist = function (req, res, next) {
 /**
  * Destroy - NodeJs Middleware function:  DELETE /irc/serverlist?index=0 route handler
  */
-const destroyServerlist = function (req, res, next) {
+const destroy = function (req, res, next) {
   const chainObject = {};
   requireIrcNotConnected(chainObject)
     .then((chainObject) => requireNotLock(chainObject))
@@ -873,7 +878,7 @@ const destroyServerlist = function (req, res, next) {
 /**
  * Tools - NodeJs Middleware function: POST /irc/serverlist/tools?index=0 route handler
 */
-const serverlistTools = function (req, res, next) {
+const tools = function (req, res, next) {
   if (('action' in req.body) && (req.body.action === 'move-up')) {
     // Case 1: reorder the list moving record at index up 1 position
     // body {
@@ -911,11 +916,11 @@ const serverlistTools = function (req, res, next) {
   }
 };
 
-module.exports = {
-  list: listServerlist,
-  create: createServerlist,
-  update: updateServerlist,
-  copy: copyServerlist,
-  destroy: destroyServerlist,
-  tools: serverlistTools
+export default {
+  list,
+  create,
+  update,
+  copy,
+  destroy,
+  tools
 };

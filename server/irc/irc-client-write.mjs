@@ -41,11 +41,11 @@
 // Send utf8 string to browser
 // Send Buffer encoded utf8 to IRC server socket
 // ----------------------------------------------------
-const isValidUTF8 = require('utf-8-validate');
-const vars = require('./irc-client-vars');
-const ircLog = require('./irc-client-log');
+import isValidUTF8 from 'utf-8-validate';
+import vars from './irc-client-vars.mjs';
+import ircLog from './irc-client-log.mjs';
 
-const writeSocket = function (socket, message) {
+export const writeSocket = function (socket, message) {
   if (message.length === 0) return;
   if ((socket) && (socket.writable)) {
     //
@@ -103,18 +103,18 @@ const writeSocket = function (socket, message) {
     }
     if (!isValidUTF8(out)) {
       out = null;
-      console.log('_writeSocket() failed UTF-8 validation');
+      console.log('writeSocket() failed UTF-8 validation');
     }
     // RFC 2812 does not allow zero character
     if (out.includes(0)) {
       out = null;
-      console.log('_writeSocket() failed zero byte validation');
+      console.log('writeSocket() failed zero byte validation');
     }
     // 512 btye maximum size from RFC 2812 Section 2.3 Messages
     // It is assumed here this means 8 bit types not multi-byte characters
     if (out.length > 512) {
       out = null;
-      console.log('_writeSocket() send buffer exceeds 512 character limit.');
+      console.log('writeSocket() send buffer exceeds 512 character limit.');
     }
     //
     // Third, send into socket to IRC server
@@ -124,10 +124,6 @@ const writeSocket = function (socket, message) {
     }
   } else {
     // TODO should this disconnect?
-    console.log('_writeSocket() server socket not writable');
+    console.log('writeSocket() server socket not writable');
   }
-}; // _writeSocket
-
-module.exports = {
-  writeSocket: writeSocket
-};
+}; // writeSocket

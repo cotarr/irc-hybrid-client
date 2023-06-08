@@ -29,11 +29,9 @@
 // -----------------------------------------------------------------------------
 'use strict';
 
-const ircWrite = require('./irc-client-write');
-// const ircLog = require('./irc-client-log');
-
-const ircMessageCache = require('./irc-client-cache');
-const vars = require('./irc-client-vars');
+import { writeSocket } from './irc-client-write.mjs';
+import ircMessageCache from './irc-client-cache.mjs';
+import vars from './irc-client-vars.mjs';
 
 // const tellBrowserToRequestState = function() {
 //   global.sendToBrowser('UPDATE\r\n');
@@ -64,7 +62,7 @@ const ctcpTimerTick = function () {
 // ----------------------------
 // Handle CTCP requests
 // ----------------------------
-const _parseCtcpMessage = function (socket, parsedMessage) {
+export const parseCtcpMessage = function (socket, parsedMessage) {
   // Internal function
   function _sendCtcpMessage (socket, ircMessage, ctcpReply, ctcpTo) {
     // It is necessary to fake out a message back to self to show the reply
@@ -75,7 +73,7 @@ const _parseCtcpMessage = function (socket, parsedMessage) {
     if (checkCtcpNotFlood()) {
       global.sendToBrowser(outgoingBackToSelf + '\r\n');
       ircMessageCache.addMessage(Buffer.from(outgoingBackToSelf));
-      ircWrite.writeSocket(socket, ircMessage);
+      writeSocket(socket, ircMessage);
     }
   }
   const ctcpDelim = 1;
@@ -199,7 +197,3 @@ const _parseCtcpMessage = function (socket, parsedMessage) {
 setInterval(function () {
   ctcpTimerTick();
 }, 1000);
-
-module.exports = {
-  _parseCtcpMessage: _parseCtcpMessage
-};

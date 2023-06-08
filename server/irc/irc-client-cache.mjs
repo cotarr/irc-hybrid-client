@@ -34,11 +34,17 @@
 // -----------------------------------------------------------------------------
 'use strict';
 
-const path = require('path');
-const fs = require('fs');
-const vars = require('./irc-client-vars');
+import path from 'path';
+import { fileURLToPath } from 'url';
+import fs from 'fs';
+import vars from './irc-client-vars.mjs';
 
-const credentials = JSON.parse(fs.readFileSync('./credentials.json', 'utf8'));
+// Web server configuration
+import config from '../config/index.mjs';
+
+// Custom case for use with ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // ------------------------------------------------
 // Example of data structure for message cache
@@ -755,7 +761,7 @@ const cacheInfo = function () {
 // ---------------------------------------------------------
 // Optional Code Section
 //
-// Enabled by credentials.persistIrcMessageCache === true
+// Enabled by config.irc.persistIrcMessageCache === true
 //
 // In this section of the code, functionality has been added
 // to automatically save and restore the IRC message cache
@@ -853,7 +859,7 @@ const terminateSignalHandler = function (signal) {
 // The program will exit with status 0 if the file is successfully saved.
 //
 let acceptSignalsFlag = true;
-if (credentials.persistIrcMessageCache) {
+if (config.irc.persistIrcMessageCache) {
   process.on('SIGINT', function (signal) {
     if (acceptSignalsFlag) {
       acceptSignalsFlag = false;
@@ -980,7 +986,7 @@ if (credentials.persistIrcMessageCache) {
       } // callback function
     ); // fs.readfile
   })(); // immediate function
-} // if (credentials.persistIrcMessageCache)
+} // if (config.irc.persistIrcMessageCache)
 
 // const nodeEnv = process.env.NODE_ENV || 'development';
 // if (nodeEnv === 'development') {
@@ -998,13 +1004,13 @@ if (credentials.persistIrcMessageCache) {
 //   }, 15000);
 // }
 
-module.exports = {
-  eraseCache: eraseCache,
-  eraseCacheWallops: eraseCacheWallops,
-  eraseCacheNotices: eraseCacheNotices,
-  eraseCacheUserPM: eraseCacheUserPM,
-  addMessage: addMessage,
-  pruneChannelCache: pruneChannelCache,
-  allMessages: allMessages,
-  cacheInfo: cacheInfo
+export default {
+  eraseCache,
+  eraseCacheWallops,
+  eraseCacheNotices,
+  eraseCacheUserPM,
+  addMessage,
+  pruneChannelCache,
+  allMessages,
+  cacheInfo
 };

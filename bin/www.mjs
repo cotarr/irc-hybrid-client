@@ -31,9 +31,7 @@
 // Two servers available on same port (express web server, websocket server)
 
 import { app } from '../server/web-server.mjs';
-/* ESM upgrade
-import { wss } from '../server/ws-server';
-*/
+import { wsOnUpgrade } from '../server/ws-server.mjs';
 // ------------------------------------------------------------------------
 
 // node server modules
@@ -41,12 +39,10 @@ import http from 'http';
 import https from 'https';
 import fs from 'fs';
 
-import config from '../server/config/index.mjs';
+import config, { nodeEnv } from '../server/config/index.mjs';
 
 const timestamp = new Date();
 console.log('Server timestamp: ' + timestamp.toISOString());
-
-const nodeEnv = process.env.NODE_ENV || 'development';
 
 let server = null;
 
@@ -95,10 +91,8 @@ server.on('listening', function () {
   }
 });
 
-/* ESM upgrade
 // web socket upgrade handler
-server.on('upgrade', wss.wsOnUpgrade);
-*/
+server.on('upgrade', wsOnUpgrade);
 
 server.on('error', function (error) {
   if (error.syscall !== 'listen') {

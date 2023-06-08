@@ -33,14 +33,13 @@
 // -----------------------------------------------------------------------------
 'use strict';
 
-const ircCtcp = require('./irc-client-ctcp');
-const ircCap = require('./irc-client-cap');
-const ircWrite = require('./irc-client-write');
-const ircLog = require('./irc-client-log');
-ircLog.test = 'test';
+import { parseCtcpMessage } from './irc-client-ctcp.mjs';
+import ircCap from './irc-client-cap.mjs';
+import { writeSocket } from './irc-client-write.mjs';
+import ircLog from './irc-client-log.mjs';
 
-const ircMessageCache = require('./irc-client-cache');
-const vars = require('./irc-client-vars');
+import ircMessageCache from './irc-client-cache.mjs';
+import vars from './irc-client-vars.mjs';
 
 const tellBrowserToRequestState = function () {
   global.sendToBrowser('UPDATE\r\n');
@@ -55,7 +54,7 @@ let nickservIdentifyActiveFlag = false;
 //
 // Returns: jason object with prefix, command and params array
 // ----------------------------------------------------------------
-const _parseIrcMessage = function (messageBuffer) {
+const parseIrcMessage = function (messageBuffer) {
   // ----------------------------
   //  Internal functions
   // ----------------------------
@@ -221,7 +220,7 @@ const _parseIrcMessage = function (messageBuffer) {
     command: command,
     params: params
   };
-}; // _parseIrcMessage
+}; // parseIrcMessage
 
 // -----------------------------------------
 // #Channel MODE changes to Op/Voice status
@@ -420,11 +419,11 @@ function _removeName (oldNick, channel) {
 //
 // Input: Node.js UTF-8 encoded Buffer object
 // -----------------------------------------------------------------
-const _processIrcMessage = function (socket, socks5Socket, messageBuffer) {
+export const processIrcMessage = function (socket, socks5Socket, messageBuffer) {
   //
   // parse message into: prefix, command, and param array
   //
-  const parsedMessage = _parseIrcMessage(messageBuffer);
+  const parsedMessage = parseIrcMessage(messageBuffer);
   // console.log('(IRC-->) messageBuffer ' + messageBuffer.toString('utf8'));
   // console.log('(IRC-->) parsedMessage ' + JSON.stringify(parsedMessage, null, 2));
 
@@ -559,7 +558,7 @@ const _processIrcMessage = function (socket, socks5Socket, messageBuffer) {
           //
           if (vars.ircState.userMode.length > 0) {
             setTimeout(function () {
-              ircWrite.writeSocket(socket, 'MODE ' + vars.ircState.nickName +
+              writeSocket(socket, 'MODE ' + vars.ircState.nickName +
                 ' ' + vars.ircState.userMode);
             }, 500);
           }
@@ -574,7 +573,7 @@ const _processIrcMessage = function (socket, socks5Socket, messageBuffer) {
                 (vars.ircState.nickName === vars.nsIdentifyNick)) {
                 // This is a raw server message
                 // Example: "PRIVMSG NickServ :IDENTIFY xxxxxxxx"
-                ircWrite.writeSocket(socket, vars.nsIdentifyCommand);
+                writeSocket(socket, vars.nsIdentifyCommand);
               }
             }, 1500);
           }
@@ -589,7 +588,7 @@ const _processIrcMessage = function (socket, socks5Socket, messageBuffer) {
                 (vars.ircState.ircConnectOn) &&
                 (vars.ircState.count.ircConnect > 0)) {
                 if (vars.ircServerReconnectChannelString.length > 0) {
-                  ircWrite.writeSocket(socket, 'JOIN ' + vars.ircServerReconnectChannelString);
+                  writeSocket(socket, 'JOIN ' + vars.ircServerReconnectChannelString);
                   vars.ircServerReconnectChannelString = '';
                 }
               }
@@ -743,7 +742,7 @@ const _processIrcMessage = function (socket, socks5Socket, messageBuffer) {
             // and the server will not send a NICK message response to
             // this NICK message.
             vars.ircState.nickName = alternateNick;
-            ircWrite.writeSocket(socket, 'NICK ' + alternateNick);
+            writeSocket(socket, 'NICK ' + alternateNick);
             // Only change nickname,
             // Do not request auto recovery after 432
             // because it would require user password manually
@@ -822,7 +821,7 @@ const _processIrcMessage = function (socket, socks5Socket, messageBuffer) {
             // and the server will not send a NICK message response to
             // this NICK message.
             vars.ircState.nickName = alternateNick;
-            ircWrite.writeSocket(socket, 'NICK ' + alternateNick);
+            writeSocket(socket, 'NICK ' + alternateNick);
             _activateNickRecovery();
             tellBrowserToRequestState();
           }, 500);
@@ -1154,7 +1153,7 @@ const _processIrcMessage = function (socket, socks5Socket, messageBuffer) {
                 nickservIdentifyActiveFlag = false;
                 // This is a raw server message
                 // Example: "PRIVMSG NickServ :IDENTIFY xxxxxxxx"
-                ircWrite.writeSocket(socket, vars.nsIdentifyCommand);
+                writeSocket(socket, vars.nsIdentifyCommand);
               }, 500);
               ircLog.writeIrcLog('Sending NickServ identify command after nickname recovery.');
             } // if correct nicknames
@@ -1207,7 +1206,7 @@ const _processIrcMessage = function (socket, socks5Socket, messageBuffer) {
         const ctcpDelim = 1;
         if (parsedMessage.params[1].charCodeAt(0) === ctcpDelim) {
           // case of CTCP message
-          ircCtcp._parseCtcpMessage(socket, parsedMessage);
+          parseCtcpMessage(socket, parsedMessage);
         }
       }
       break;
@@ -1248,7 +1247,7 @@ const _processIrcMessage = function (socket, socks5Socket, messageBuffer) {
           }
           setTimeout(function () {
             // _cancelNickRecovery();
-            ircWrite.writeSocket(socket, 'NICK ' + configNick);
+            writeSocket(socket, 'NICK ' + configNick);
           }, 500);
           ircLog.writeIrcLog('Nickname ' + parsedMessage.nick +
             ' has QUIT, attempting to recover nickname ' + configNick);
@@ -1305,7 +1304,7 @@ function _cancelNickRecovery () {
 }
 
 // this is called from main module irc-client.js to insert TCP socket object
-function recoverNickTimerTick (socket) {
+export const recoverNickTimerTick = function (socket) {
   if (nickRecoveryReqNickTimer > 0) {
     const configNick = vars.servers.serverArray[vars.ircState.ircServerIndex].nick;
     const alternateNick = vars.servers.serverArray[vars.ircState.ircServerIndex].altNick;
@@ -1345,7 +1344,7 @@ function recoverNickTimerTick (socket) {
                 nickservIdentifyActiveFlag = false;
               }, 10000);
             }
-            ircWrite.writeSocket(socket, 'NICK ' + configNick);
+            writeSocket(socket, 'NICK ' + configNick);
           }
         } else {
           _cancelNickRecovery();
@@ -1355,9 +1354,4 @@ function recoverNickTimerTick (socket) {
     }
   }
   return null;
-};
-
-module.exports = {
-  _processIrcMessage: _processIrcMessage,
-  recoverNickTimerTick: recoverNickTimerTick
 };

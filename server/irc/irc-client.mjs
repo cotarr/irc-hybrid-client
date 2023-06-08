@@ -28,26 +28,29 @@
 // -----------------------------------------------------------------------------
 'use strict';
 
-const net = require('net');
-const tls = require('tls');
-const fs = require('fs');
-const isValidUTF8 = require('utf-8-validate');
-const socks5 = require('socks5-client');
-const events = require('events');
+import net from 'net';
+import tls from 'tls';
+import fs from 'fs';
+import isValidUTF8 from 'utf-8-validate';
+import socks5 from 'socks5-client';
+import events from 'events';
+
+// log module loaded first to create /logs folder if needed.
+import ircLog from './irc-client-log.mjs';
+
+import { writeSocket } from './irc-client-write.mjs';
+import { processIrcMessage, recoverNickTimerTick } from './irc-client-parse.mjs';
+import ircCap from './irc-client-cap.mjs';
+import { parseBrowserMessageForCommand } from './irc-client-command.mjs';
+import ircMessageCache from './irc-client-cache.mjs';
+import vars from './irc-client-vars.mjs';
+
+// Web server configuration
+import config, { nodeEnv } from '../config/index.mjs';
+
 // For use by server list editor
 global.externalEvent = new events.EventEmitter();
 
-// log module loaded first to create /logs folder if needed.
-const ircLog = require('./irc-client-log');
-
-const ircWrite = require('./irc-client-write');
-const ircParse = require('./irc-client-parse');
-const ircCap = require('./irc-client-cap');
-const ircCommand = require('./irc-client-command');
-const ircMessageCache = require('./irc-client-cache');
-const vars = require('./irc-client-vars');
-
-const nodeEnv = process.env.NODE_ENV || 'development';
 const nodeDebugLog = process.env.NODE_DEBUG_LOG || 0;
 
 vars.servers = null;
@@ -267,11 +270,14 @@ vars.ircState.channelStates = [];
 // case that socks5 configuration properties are omitted.
 //
 // credentials.json socks5 properties
+// or env variables if credentials.json does not exist
 //
 // Option 1: socks5 client disabled (automatically disabled if property omitted)
 // {
 //   enableSocks5Proxy: false
 // }
+//
+// IRC_ENABLE_SOCKS5_PROXY=false
 //
 // Option 2: socks5 client unauthenticated
 //
@@ -280,6 +286,10 @@ vars.ircState.channelStates = [];
 //   socks5Host: '192.168.0.1',
 //   socks5Port: '1080'
 // }
+//
+// IRC_ENABLE_SOCKS5_PROXY=true
+// IRC_SOCKS5_HOST=192.168.0.1
+// IRC_SOCKS5_PORT=1080
 //
 // Option 3: socks5 client requires password authentication
 // {
@@ -290,21 +300,27 @@ vars.ircState.channelStates = [];
 //   socks5Password: 'xxxxxxxx'
 // }
 //
-const credentials = JSON.parse(fs.readFileSync('./credentials.json', 'utf8'));
-vars.ircState.enableSocks5Proxy = credentials.enableSocks5Proxy || false;
+// IRC_ENABLE_SOCKS5_PROXY=true
+// IRC_SOCKS5_HOST=192.168.0.1
+// IRC_SOCKS5_PORT=1080
+// IRC_SOCKS5_USERNAME=user1
+// IRC_SOCKS5_PASSWORD="xxxxxxxx"
+//
+vars.ircState.enableSocks5Proxy = config.proxy.enableSocks5Proxy || false;
 if (vars.ircState.enableSocks5Proxy) {
-  vars.ircState.socks5Host = credentials.socks5Host || '';
-  vars.ircState.socks5Port = parseInt(credentials.socks5Port || '1080');
-  if ((credentials.socks5Username) && (credentials.socks5Username.length > 0) &&
-    (credentials.socks5Password) && (credentials.socks5Password.length > 0)) {
-    vars.socks5Username = credentials.socks5Username || '';
-    vars.socks5Password = credentials.socks5Password || '';
+  vars.ircState.socks5Host = config.proxy.socks5Host || '';
+  vars.ircState.socks5Port = parseInt(config.proxy.socks5Port || '1080');
+  if ((config.proxy.socks5Username) && (config.proxy.socks5Username.length > 0) &&
+    (config.proxy.socks5Password) && (config.proxy.socks5Password.length > 0)) {
+    vars.socks5Username = config.proxy.socks5Username || '';
+    vars.socks5Password = config.proxy.socks5Password || '';
   };
 };
 
 // get name and version number from npm package.json
-vars.ircState.progVersion = require('../../package.json').version;
-vars.ircState.progName = require('../../package.json').name;
+const packageJson = JSON.parse(fs.readFileSync('./package.json', 'utf8'));
+vars.ircState.progVersion = packageJson.version;
+vars.ircState.progName = packageJson.name;
 
 vars.ircState.times = { programRun: 0, ircConnect: 0 };
 vars.ircState.count = {
@@ -316,13 +332,13 @@ vars.ircState.websocketCount = 0;
 
 // Used to disable or hide buttons in IRC client page
 vars.ircState.disableServerListEditor = false;
-if (credentials.disableServerListEditor) {
+if (config.irc.disableServerListEditor) {
   vars.ircState.disableServerListEditor = true;
 }
 
 // Designate alternate set of sound file filenames for browser download
 vars.ircState.customBeepSounds = false;
-if (credentials.customBeepSounds) {
+if (config.irc.customBeepSounds) {
   vars.ircState.customBeepSounds = true;
 }
 
@@ -554,11 +570,11 @@ const _connectEventHandler = function (socket) {
       ircCap.initCapNegotiation(socket);
       // Traditional IRC Registration
       if ((vars.ircServerPassword) && (vars.ircServerPassword.length > 0)) {
-        ircWrite.writeSocket(socket, 'PASS ' + vars.ircServerPassword);
+        writeSocket(socket, 'PASS ' + vars.ircServerPassword);
       }
-      ircWrite.writeSocket(socket, 'NICK ' + vars.ircState.nickName);
+      writeSocket(socket, 'NICK ' + vars.ircState.nickName);
       // Note: mode 8 = i not working on ngirc ?
-      ircWrite.writeSocket(socket, 'USER ' + vars.ircState.userName +
+      writeSocket(socket, 'USER ' + vars.ircState.userName +
         ' 0 * :' + vars.ircState.realName);
       vars.ircState.ircConnecting = false;
       vars.ircState.ircConnected = true;
@@ -649,7 +665,7 @@ const extractMessagesFromStream = function (socket, inBuffer) {
           // message ignore
         } else {
           // else message processed
-          ircParse._processIrcMessage(socket, socks5Socket, message);
+          processIrcMessage(socket, socks5Socket, message);
         }
       }
       index = i + 1;
@@ -954,10 +970,10 @@ const connectIRC = function () {
     // Options to bind a specific IP address to the IRC connections
     // Warning, this will block IPV4 or IPV6 that does not
     // match the family of the specified address.
-    if (('ircSocketLocalAddress' in credentials) &&
-      (typeof credentials.ircSocketLocalAddress === 'string') &&
-      (credentials.ircSocketLocalAddress.length > 0)) {
-      options.localAddress = credentials.ircSocketLocalAddress;
+    if ((Object.hasOwn(config.irc, 'ircSocketLocalAddress')) &&
+      (typeof config.irc.ircSocketLocalAddress === 'string') &&
+      (config.irc.ircSocketLocalAddress.length > 0)) {
+      options.localAddress = config.irc.ircSocketLocalAddress;
     }
     ircSocket = net.connect(options);
     _createIrcSocketEventListeners(ircSocket);
@@ -978,10 +994,10 @@ const connectIRC = function () {
     // Options to bind a specific IP address to the IRC connections
     // Warning, this will block IPV4 or IPV6 that does not
     // match the family of the specified address.
-    if (('ircSocketLocalAddress' in credentials) &&
-      (typeof credentials.ircSocketLocalAddress === 'string') &&
-      (credentials.ircSocketLocalAddress.length > 0)) {
-      options.localAddress = credentials.ircSocketLocalAddress;
+    if ((Object.hasOwn(config.irc, 'ircSocketLocalAddress')) &&
+      (typeof config.irc.ircSocketLocalAddress === 'string') &&
+      (config.irc.ircSocketLocalAddress.length > 0)) {
+      options.localAddress = config.irc.ircSocketLocalAddress;
     }
     ircSocket = tls.connect(options);
     _createIrcSocketEventListeners(ircSocket);
@@ -1972,12 +1988,12 @@ const messageHandler = function (req, res, next) {
     if ((message.indexOf('\n') >= 0) || (message.indexOf('\r') >= 0)) {
       return res.json({ error: true, message: 'Invalid multiple line message' });
     } else {
-      const parseResult = ircCommand.parseBrowserMessageForCommand(message);
+      const parseResult = parseBrowserMessageForCommand(message);
       if (parseResult.error) {
         return res.json({ error: true, message: parseResult.message });
       } else {
         // Send browser message on to web server
-        ircWrite.writeSocket(ircSocket, message);
+        writeSocket(ircSocket, message);
         res.json({ error: false });
       }
     }
@@ -2264,21 +2280,21 @@ setInterval(function () {
   registrationWatchdogTimerTick();
   activityWatchdogTimerTick();
   clientToServerPingTimerTick();
-  ircParse.recoverNickTimerTick(ircSocket);
+  recoverNickTimerTick(ircSocket);
 }, 1000);
 
 // Program run timestamp
 vars.ircState.times.programRun = vars.unixTimestamp();
 
-module.exports = {
-  serverHandler: serverHandler,
-  connectHandler: connectHandler,
-  messageHandler: messageHandler,
-  disconnectHandler: disconnectHandler,
-  getIrcState: getIrcState,
-  getCache: getCache,
-  pruneChannel: pruneChannel,
-  eraseCache: eraseCache,
-  test1Handler: test1Handler,
-  test2Handler: test2Handler
+export default {
+  serverHandler,
+  connectHandler,
+  messageHandler,
+  disconnectHandler,
+  getIrcState,
+  getCache,
+  pruneChannel,
+  eraseCache,
+  test1Handler,
+  test2Handler
 };

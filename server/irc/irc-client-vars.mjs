@@ -25,6 +25,7 @@
 //
 // -----------------------------------------------------------------------------
 'use strict';
+/* eslint-disable prefer-const */
 
 // Excluded command list.
 // The purpose is to avoid filling the message cache up with PING, PONG
@@ -165,39 +166,40 @@ const unixTimestamp = function () {
   return parseInt(now.valueOf() / 1000).toString();
 };
 
-module.exports = {
-  excludedCommands: excludedCommands,
-  servers: servers,
-  ircState: ircState,
-  ircServerPassword: ircServerPassword,
-  ircSaslUsername: ircSaslUsername,
-  ircSaslPassword: ircSaslPassword,
-  socks5Username: socks5Username,
-  socks5Password: socks5Password,
-  nsIdentifyNick: nsIdentifyNick,
-  nsIdentifyCommand: nsIdentifyCommand,
-  nickNameLength: nickNameLength,
-  userNameLength: userNameLength,
-  realNameLength: realNameLength,
-  channelPrefixChars: channelPrefixChars,
-  channelUserModeChars: channelUserModeChars,
-  nicknamePrefixChars: nicknamePrefixChars,
-  commandMsgPrefix: commandMsgPrefix,
-  ircServerReconnectTimerSeconds: ircServerReconnectTimerSeconds,
-  ircServerReconnectIntervals: ircServerReconnectIntervals,
-  ircServerReconnectChannelString: ircServerReconnectChannelString,
-  ircServerReconnectAwayString: ircServerReconnectAwayString,
-  ircSocketConnectingTimeout: ircSocketConnectingTimeout,
-  ircRegistrationTimeout: ircRegistrationTimeout,
-  serverRotateInhibitTimeout: serverRotateInhibitTimeout,
-  activityWatchdogTimerSeconds: activityWatchdogTimerSeconds,
-  activityWatchdogTimerLimit: activityWatchdogTimerLimit,
-  clientToServerPingSendTimer: clientToServerPingSendTimer,
-  clientToServerPingResponseTimer: clientToServerPingResponseTimer,
-  clientToServerPingTimestampMs: clientToServerPingTimestampMs,
-  clientToServerPingInterval: clientToServerPingInterval,
-  clientToServerPingTimeout: clientToServerPingTimeout,
-  ctcpTimeLocale: ctcpTimeLocale,
-  timestamp: timestamp,
-  unixTimestamp: unixTimestamp
+export default {
+  excludedCommands,
+  servers,
+  ircState,
+  ircServerPassword,
+  ircSaslUsername,
+  ircSaslPassword,
+  socks5Username,
+  socks5Password,
+  nsIdentifyNick,
+  nsIdentifyCommand,
+  nickNameLength,
+  userNameLength,
+  realNameLength,
+  channelPrefixChars,
+  channelUserModeChars,
+  nicknamePrefixChars,
+  commandMsgPrefix,
+  ircServerReconnectTimerSeconds,
+  ircServerReconnectIntervals,
+  ircServerReconnectChannelString,
+  ircServerReconnectAwayString,
+  ircSocketConnectingTimeout,
+  ircRegistrationTimeout,
+  serverRotateInhibitTimeout,
+  activityWatchdogTimerSeconds,
+  activityWatchdogTimerLimit,
+  clientToServerPingSendTimer,
+  clientToServerPingResponseTimer,
+  clientToServerPingTimestampMs,
+  clientToServerPingInterval,
+  clientToServerPingTimeout,
+  ctcpTimeLocale,
+  timestamp,
+  unixTimestamp
 };
+/* eslint-enable prefer-const */

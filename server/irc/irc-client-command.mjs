@@ -29,11 +29,8 @@
 // -----------------------------------------------------------------------------
 'use strict';
 
-// const ircWrite = require('./irc-client-write');
-// const ircLog = require('./irc-client-log');
-
-const ircMessageCache = require('./irc-client-cache');
-const vars = require('./irc-client-vars');
+import ircMessageCache from './irc-client-cache.mjs';
+import vars from './irc-client-vars.mjs';
 
 // const tellBrowserToRequestState = function() {
 //   global.sendToBrowser('UPDATE\r\n');
@@ -53,7 +50,7 @@ const vars = require('./irc-client-vars');
 //
 //  web-broswer --> web server --> [THIS PARSER] --> irc-server
 // -----------------------------------------------------------------
-const parseBrowserMessageForCommand = function (message) {
+export const parseBrowserMessageForCommand = function (message) {
   // console.log('Browser --> backend message: ' + message);
 
   let i = 0;
@@ -211,7 +208,3 @@ const parseBrowserMessageForCommand = function (message) {
   // by default messages are valid
   return { error: false };
 }; // parseBrowserMessageForCommand
-
-module.exports = {
-  parseBrowserMessageForCommand: parseBrowserMessageForCommand
-};

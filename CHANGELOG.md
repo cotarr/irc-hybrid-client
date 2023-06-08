@@ -20,12 +20,14 @@ allow import of NPM modules that no longer publish a CommonJS package format.
 The motivation for use of environment variables is to simplify configuration where the 
 web server is deployed in a container. 
 
+No configuration changes will be needed for this upgrade.
+
 The introduction of two concurrent configuration schemes may introduce 
 some security questions. Configuration of security related properties
 could contain ambiguous conflicting values between the two configuration methods.
 To minimize risk of ambiguous configuration, only one method is used at one time.
 In the case where the file "credentials.json" exists then configuration 
-will be parsed from the credentials.json file in the pase repository folder.
+will be parsed from the credentials.json file in the base repository folder.
 This is the established configuration method up until this release.
 In case case where the file "credentials.json" does not exist then
 the configuration will be parsed from UNIX environment variables.
@@ -33,8 +35,6 @@ For configuration properties that have not been defined, then the
 server/config.index.mjs module will define fallback default values.
 In the long term, the credentials.json config file may be deprecated (breaking change)
 to standardize all of the server configuration with environment variables.
-
-At this time no configuration changes should be needed for this update
 
 ### Changes
 
@@ -58,13 +58,13 @@ After commit eab9e51
 - Rename server/middlewares/user-authenticate.js to user-authenticate.mjs, convert to ES module.
 - Main server/web-server.js, renamed to web-serve.mjs, and ...
   - Convert module import statements to ES format
-  - Import configuration from server/config/index.mjs instead of credentails.js
+  - Import configuration from server/config/index.mjs instead of credentials.js
   - Temporarily comment out IRC client modules and routes
   - Temporarily comment out IRC server list editor routes
   - Temporarily comment out /doc help page routes
-  - TEmporarily comment out web socket authorization routes and modules
+  - Temporarily comment out web socket authorization routes and modules
   - Refactor express-session, memorystore and redis for alternate configuration
-  - ES modules load asynchronously and can not be loaded conditionally, so both internal and remote authorization modules needed to be loaded concurrently, then select the proper auth module later after the configuration loads.
+  - ES modules load asynchronously. They can not be loaded conditionally. Therefore both internal and remote authorization modules needed to be loaded concurrently, then select the proper auth module later after the configuration loads.
   - Reconfigure morgan logger to use imported log file configuration from irc-client-log.mjs
   - Created example .env file "example-.env"
   - Updated example-credentials.json
@@ -81,6 +81,33 @@ After commit f9de974
 - Rename server/middlewares/remote-authenticate.js remote-authenticate.mjs, convert to ES modules, alternate configuration index.mjs
 
 After commit ba9e578
+
+- Removed comments used to disable IRC client in web-server.mjs and bin/www.mjs
+- Converted the following additional IRC client backend server modules to ES Modules, and updated configuration source.
+
+```
+server/ws-server.mjs
+server/irc/irc-client-cache.mjs
+server/irc/irc-client-cap.mjs
+server/irc/irc-client-command.mjs
+server/irc/irc-client-ctcp.mjs
+server/irc/irc-client-parse.mjs
+server/irc/irc-client-vars.mjs
+server/irc/irc-client-write.mjs
+server/irc/irc-client.mjs
+server/irc/irc-serverlist-editor.mjs
+server/irc/irc-serverlist-validations.mjs
+server/middlewares/validation-error.mjs
+server/middlewares/ws-authorize.mjs
+server/testws/testws.mjs
+tools/showIrcLog.mjs
+```
+
+- Debug: NPM package 'ws' for websocket server loads differently in ESM than CommonJS, requiring some minor code change in ws-server.mjs.
+- Debug: Edited server/testws/testws.mjs to dynamically load debugging module for websocket authorization test, if uncommented in web-server.mjs
+- Address various eslint linting errors in backend server
+- Preliminary test: limited trial in dev virtual machine was able to successfully connect to IRC server.
+- This is ready to debug.
 
 ## [v0.2.43](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.43) 2023-05-28
 

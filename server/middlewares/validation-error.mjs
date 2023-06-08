@@ -3,14 +3,14 @@
 // Error handler for express-valiation
 //
 
-const { validationResult } = require('express-validator');
+import { validationResult } from 'express-validator';
 
 // ---------------------------------------------------
 // Updated to handle both express-validator errors
 // and custom errors in single response
 // ---------------------------------------------------
 
-exports.handleError = function (req, res, next) {
+export const handleError = function (req, res, next) {
   const allErrors = [];
 
   // First, errors from express-validator
@@ -62,7 +62,7 @@ exports.handleError = function (req, res, next) {
 //     },
 // -------------------------------------------------
 
-exports.checkExtraneousKeys = function (req, allowKeys, location) {
+export const checkExtraneousKeys = function (req, allowKeys, location) {
   let locationArray = [];
   if (Array.isArray(location)) {
     locationArray = location;

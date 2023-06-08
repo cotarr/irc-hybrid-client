@@ -26,9 +26,11 @@
 // -----------------------------------------------------------------------------
 'use-strict';
 
-const handleValidationError = require('../middlewares/validation-error').handleError;
-const checkExtraneousKeys = require('../middlewares/validation-error').checkExtraneousKeys;
-const { query, body, oneOf } = require('express-validator');
+import { query, body, oneOf } from 'express-validator';
+import {
+  checkExtraneousKeys,
+  handleError as handleValidationError
+} from '../middlewares/validation-error.mjs';
 
 // const whiteListChars = 'abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
 
@@ -783,11 +785,11 @@ const tools = [
   handleValidationError
 ]; // tools
 
-module.exports = {
-  list: list,
-  create: create,
-  update: update,
-  copy: copy,
-  destroy: destroy,
-  tools: tools
+export default {
+  list,
+  create,
+  update,
+  copy,
+  destroy,
+  tools
 };

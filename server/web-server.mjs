@@ -63,12 +63,10 @@ import {
   accessLogOptions
 } from './irc/irc-client-log.mjs';
 
-/* ESM upgrade
 // Irc Client Module
-import ircClient from './irc/irc-client';
-import ircServerListValidations from './irc/irc-serverlist-validations';
-import ircServerListEditor'./irc/irc-serverlist-editor';
-*/
+import ircClient from './irc/irc-client.mjs';
+import ircServerListValidations from './irc/irc-serverlist-validations.mjs';
+import ircServerListEditor from './irc/irc-serverlist-editor.mjs';
 
 // Custom case for use with ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -371,7 +369,6 @@ if (config.oauth2.enableRemoteLogin) {
 //    "terminate": "YES"
 //  }
 //
-/* esm upgrade
 app.post('/terminate', authorizeOrFail, csrfProtection, function (req, res, next) {
   let inputVerifyString = '';
   if (('terminate' in req.body) && (typeof req.body.terminate === 'string')) {
@@ -403,7 +400,6 @@ app.post('/terminate', authorizeOrFail, csrfProtection, function (req, res, next
     next(error);
   }
 });
-*/
 
 // Route used to verify cookie not expired before reconnecting
 app.get('/secure', authorizeOrFail, (req, res) => res.json({ secure: 'ok' }));
@@ -440,7 +436,6 @@ app.get('/secure', authorizeOrFail, (req, res) => res.json({ secure: 'ok' }));
 // Data stored globally, time expiration 10 seconds.
 //
 // -----------------------------------------
-/* ESM upgrade
 app.post('/irc/wsauth', authorizeOrFail, csrfProtection, function (req, res, next) {
   delete global.webSocketAuth;
   // requires cookie-parser
@@ -460,7 +455,6 @@ app.post('/irc/wsauth', authorizeOrFail, csrfProtection, function (req, res, nex
   error.status = 400;
   return next(error);
 });
-*/
 
 // -------------------------------------------------------
 // Web socket security test
@@ -473,8 +467,9 @@ app.post('/irc/wsauth', authorizeOrFail, csrfProtection, function (req, res, nex
 // -------------------------------------------------------
 // console.log('******** (debug) /testws route enabled without authorization **********');
 // if (nodeEnv === 'development') {
-//   const testWs = require('./testws/testws');
-//   app.use('/testws', testWs);
+//   // Dynamic import of ES Module, used only for debugging
+//   const module1 = await import('./testws/testws.mjs');
+//   app.use('/testws', module1.testWsRouter);
 // }
 
 // ----------------
@@ -486,7 +481,6 @@ app.post('/irc/wsauth', authorizeOrFail, csrfProtection, function (req, res, nex
 // ----------------
 app.get('/userinfo', authorizeOrFail, userAuth.getUserInfo);
 
-/* ESM Upgrade
 // ---------------------------------------
 // IRC client API routes served to browser
 // ---------------------------------------
@@ -500,13 +494,11 @@ app.post('/irc/prune', authorizeOrFail, csrfProtection, ircClient.pruneChannel);
 app.post('/irc/erase', authorizeOrFail, csrfProtection, ircClient.eraseCache);
 app.get('/irc/test1', authorizeOrFail, ircClient.test1Handler);
 app.get('/irc/test2', authorizeOrFail, ircClient.test2Handler);
-*/
 
 // //
 // // API for Server List Editor
 // //
-/* ESM upgrade
-if (credentials.disableServerListEditor) {
+if (config.irc.disableServerListEditor) {
   app.get('/irc/serverlist', authorizeOrFail,
     (req, res) => res.status(405).json({ Error: 'Server List Editor Disabled' }));
   app.post('/irc/serverlist', authorizeOrFail, csrfProtection,
@@ -545,7 +537,6 @@ if (credentials.disableServerListEditor) {
     ircServerListValidations.tools,
     ircServerListEditor.tools);
 }
-*/
 
 // -------------------------------
 // If unauthorized, redirect to /login for main html file /irc/webclient.html.
@@ -569,7 +560,6 @@ app.get('/irc/webclient.html',
     });
   }
 );
-/* ESM upgrade
 app.get('/irc/serverlist.html',
   authorizeOrLogin,
   csrfProtection,
@@ -585,7 +575,6 @@ app.get('/irc/serverlist.html',
     });
   }
 );
-*/
 
 // -------------------------------
 // Web server for static files
@@ -603,12 +592,11 @@ app.use('/irc', authorizeOrFail, express.static(secureDir));
 //
 // Optionally server /docs folder to /irc/docs
 //
-/* ESM upgrade
-if (credentials.serveHtmlHelpDocs) {
+
+if (config.irc.serveHtmlHelpDocs) {
   const docsDir = path.join(__dirname, '../docs');
   app.use('/irc/docs', authorizeOrFail, express.static(docsDir));
 }
-*/
 
 // ---------------------------------
 //    E R R O R   H A N D L E R S

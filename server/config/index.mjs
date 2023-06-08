@@ -123,7 +123,7 @@ export const server = {
   tls: ((fcf) ? credentials.tls : (process.env.SERVER_TLS === 'true')) || false,
   port: parseInt(((fcf) ? _parseNum(credentials.port) : process.env.SERVER_PORT) || '3003'),
   pidFilename: ((fcf) ? credentials.pidFilename : process.env.SERVER_PID_FILENAME) || '',
-  instanceNumber: ((fcf) ? credentials.instanceNumber : parseInt(process.env.SERVER_INSTANCE_NUMBER)) || null,
+  instanceNumber: ((fcf) ? credentials.instanceNumber : parseInt(process.env.SERVER_INSTANCE_NUMBER)),
   logRotateInterval: ((fcf) ? credentials.logRotationInterval : process.env.SERVER_LOG_ROTATE_INTERVAL) || null,
   logRotateSize: ((fcf) ? credentials.logRotationSize : process.env.SERVER_LOG_ROTATE_SIZE) || null,
   accessLogOnlyErrors: ((fcf) ? credentials.accessLogOnlyErrors : (process.env.SERVER_LOG_ONLY_ERRORS === 'true')) || false

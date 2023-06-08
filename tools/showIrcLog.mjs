@@ -27,7 +27,7 @@
 //
 // The channel name must be in quotes due to the hash character "#"
 //
-// Command line: node showIrcLog.js "#channelName"
+// Command line: node showIrcLog.mjs "#channelName"
 //
 // The output may be pipelined such as:
 //    node showIrcLog.js "#channelName" | tail -100
@@ -35,10 +35,15 @@
 //
 // --------------------------------------------------------------------------
 
-const readline = require('node:readline');
-const fs = require('node:fs');
-const path = require('node:path');
-const process = require('node:process');
+import readline from 'node:readline';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'url';
+import process from 'node:process';
+
+// Custom case for use with ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 if ((!process.argv) || (process.argv.length !== 3) ||
   (process.argv[2].charAt(0) !== '#')) {

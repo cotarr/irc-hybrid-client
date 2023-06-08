@@ -26,9 +26,9 @@
 // -----------------------------------------------------------------------------
 'use strict';
 
-const ircWrite = require('./irc-client-write');
-const ircLog = require('./irc-client-log');
-const vars = require('./irc-client-vars');
+import { writeSocket } from './irc-client-write.mjs';
+import ircLog from './irc-client-log.mjs';
+import vars from './irc-client-vars.mjs';
 
 // saslState - Workflow step identifier
 //
@@ -59,7 +59,7 @@ let saslPlain = false;
 function _sendCapEndOneTimeOnly (socket) {
   if (!capEndSent) {
     capEndSent = true;
-    ircWrite.writeSocket(socket, 'CAP END');
+    writeSocket(socket, 'CAP END');
   }
 }
 
@@ -138,7 +138,7 @@ const initCapNegotiation = function (socket) {
   if ((vars.ircSaslUsername.length > 0) && (vars.ircSaslPassword.length > 0)) {
     saslState = 10;
     // Request IRC server disclose it's IRCv3 capabilities
-    ircWrite.writeSocket(socket, 'CAP LS 302');
+    writeSocket(socket, 'CAP LS 302');
 
     ircLog.writeIrcLog(
       'SASL credentials found, checking to see if IRC server supports SASL authentication.');
@@ -165,7 +165,7 @@ const parseCapMessage = function (socket, parsedMessage) {
       // console.log('saslPlain:', saslPlain);
       if (saslPlain) {
         saslState = 20;
-        ircWrite.writeSocket(socket, 'CAP REQ sasl');
+        writeSocket(socket, 'CAP REQ sasl');
       } else {
         saslState = 999;
         // Send: CAP END
@@ -185,7 +185,7 @@ const parseCapMessage = function (socket, parsedMessage) {
     const ackList = parsedMessage.params[2].split(' ');
     if (ackList.indexOf('sasl' >= 0)) {
       saslState = 30;
-      ircWrite.writeSocket(socket, 'AUTHENTICATE PLAIN');
+      writeSocket(socket, 'AUTHENTICATE PLAIN');
     } else {
       global.sendToBrowser('webError: SASL authentication does not support mechanism PLAIN\n');
       ircLog.writeIrcLog('SASL authentication does not support mechanism PLAIN');
@@ -213,7 +213,7 @@ const parseAuthMessage = function (socket, parsedMessage) {
       vars.ircSaslUsername + String.fromCharCode(0) +
       vars.ircSaslPassword).toString('base64');
     saslState = 40;
-    ircWrite.writeSocket(socket, 'AUTHENTICATE ' + authString);
+    writeSocket(socket, 'AUTHENTICATE ' + authString);
     ircLog.writeIrcLog(
       'IRC server supports SASL with mechanism PLAIN, sending SASL credentials.');
   } else {
@@ -283,11 +283,11 @@ const closeSaslAuth = function () {
   }
 };
 
-module.exports = {
-  initCapNegotiation: initCapNegotiation,
-  parseCapMessage: parseCapMessage,
-  parseAuthMessage: parseAuthMessage,
-  numericSuccessHandler: numericSuccessHandler,
-  numericErrorHandler: numericErrorHandler,
-  closeSaslAuth: closeSaslAuth
+export default {
+  initCapNegotiation,
+  parseCapMessage,
+  parseAuthMessage,
+  numericSuccessHandler,
+  numericErrorHandler,
+  closeSaslAuth
 };

@@ -2,7 +2,7 @@
 
 // This is a tool to generate bcrypt user hash when using environment variables for configuration.
 // - This will generate string output that can be copy/pasted, containing user hash
-// - This must be run from the tools folder to find credentials.json
+// - This must be run from the tools folder
 //
 //
 // To run:
