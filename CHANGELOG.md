@@ -114,6 +114,7 @@ After commit 543db92
 - Removed nodeEnv and NODE_ENV from server/config.index.mjs as export/import. Put NODE_ENV back in individual files where it was originally.
 - Setup config and successfully ran postman tests, no issues
 - Added version identifier to configuration when using environment variables, set to 2 to match credentials.json
+- Add node version check requiring node 16 or greater, else exit with error.
 
 ## [v0.2.43](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.43) 2023-05-28
 
