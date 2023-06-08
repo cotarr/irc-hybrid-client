@@ -46,7 +46,7 @@ import memorystore from 'memorystore';
 import csrf from '@dr.pogodin/csurf';
 
 // Web server configuration
-import config, { nodeEnv } from './config/index.mjs';
+import config from './config/index.mjs';
 
 import userAuthenticate, {
   authorizeOrFail as localAuthorizeOrFail,
@@ -67,6 +67,8 @@ import {
 import ircClient from './irc/irc-client.mjs';
 import ircServerListValidations from './irc/irc-serverlist-validations.mjs';
 import ircServerListEditor from './irc/irc-serverlist-editor.mjs';
+
+const nodeEnv = process.env.NODE_ENV || 'development';
 
 // Custom case for use with ES modules
 const __filename = fileURLToPath(import.meta.url);

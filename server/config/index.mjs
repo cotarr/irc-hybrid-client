@@ -43,7 +43,7 @@ import dotenv from 'dotenv';
 // Import the .env file
 dotenv.config();
 
-export const nodeEnv = process.env.NODE_ENV || 'development';
+const nodeEnv = process.env.NODE_ENV || 'development';
 
 let credentials = null;
 try {
@@ -239,9 +239,9 @@ if (!oauth2.enableRemoteLogin) {
   }
 }
 
-export default { nodeEnv, site, server, session, oauth2, loginUsers, irc, proxy };
+export default { site, server, session, oauth2, loginUsers, irc, proxy };
 
-// console.log(JSON.stringify({ nodeEnv, site, server, session, oauth2, loginUsers, irc, proxy }, null, 2));
+// console.log(JSON.stringify({ site, server, session, oauth2, loginUsers, irc, proxy }, null, 2));
 // process.exit(0);
 
 /* eslint-enable max-len */

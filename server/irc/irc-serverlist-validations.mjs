@@ -32,6 +32,8 @@ import {
   handleError as handleValidationError
 } from '../middlewares/validation-error.mjs';
 
+// const nodeEnv = process.env.NODE_ENV || 'development';
+
 // const whiteListChars = 'abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
 
 // ----------------------------

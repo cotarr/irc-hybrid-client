@@ -60,6 +60,8 @@ import ircLog from '../irc/irc-client-log.mjs';
 // Web server configuration
 import config from '../config/index.mjs';
 
+// const nodeEnv = process.env.NODE_ENV || 'development';
+
 const cookieSecret = config.session.secret;
 // console.log('cookieSecret ' + cookieSecret);
 

@@ -46,11 +46,12 @@ import ircMessageCache from './irc-client-cache.mjs';
 import vars from './irc-client-vars.mjs';
 
 // Web server configuration
-import config, { nodeEnv } from '../config/index.mjs';
+import config from '../config/index.mjs';
 
 // For use by server list editor
 global.externalEvent = new events.EventEmitter();
 
+const nodeEnv = process.env.NODE_ENV || 'development';
 const nodeDebugLog = process.env.NODE_DEBUG_LOG || 0;
 
 vars.servers = null;

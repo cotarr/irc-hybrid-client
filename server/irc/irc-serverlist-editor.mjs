@@ -64,11 +64,11 @@ import { fileURLToPath } from 'url';
 
 import vars from './irc-client-vars.mjs';
 
+// const nodeEnv = process.env.NODE_ENV || 'development';
+
 // Custom case for use with ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-// const nodeEnv = process.env.NODE_ENV || 'development';
 
 //
 // editLock must be set to true to accept POST, PATCH or DELETE methods.

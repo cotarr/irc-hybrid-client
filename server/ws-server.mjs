@@ -34,7 +34,9 @@ import isValidUTF8 from 'utf-8-validate';
 import { authorizeWebSocket, wsCustomLog } from './middlewares/ws-authorize.mjs';
 
 // Web server configuration
-import config, { nodeEnv } from './config/index.mjs';
+import config from './config/index.mjs';
+
+const nodeEnv = process.env.NODE_ENV || 'development';
 const nodeDebugLog = process.env.NODE_DEBUG_LOG || 0;
 
 // ----------------------------------------

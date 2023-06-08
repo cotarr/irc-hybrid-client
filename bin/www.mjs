@@ -39,7 +39,9 @@ import http from 'http';
 import https from 'https';
 import fs from 'fs';
 
-import config, { nodeEnv } from '../server/config/index.mjs';
+import config from '../server/config/index.mjs';
+
+const nodeEnv = process.env.NODE_ENV || 'development';
 
 const timestamp = new Date();
 console.log('Server timestamp: ' + timestamp.toISOString());

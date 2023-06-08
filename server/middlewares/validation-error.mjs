@@ -5,6 +5,8 @@
 
 import { validationResult } from 'express-validator';
 
+// const nodeEnv = process.env.NODE_ENV || 'development';
+
 // ---------------------------------------------------
 // Updated to handle both express-validator errors
 // and custom errors in single response

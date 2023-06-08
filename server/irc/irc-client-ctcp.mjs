@@ -33,6 +33,8 @@ import { writeSocket } from './irc-client-write.mjs';
 import ircMessageCache from './irc-client-cache.mjs';
 import vars from './irc-client-vars.mjs';
 
+// const nodeEnv = process.env.NODE_ENV || 'development';
+
 // const tellBrowserToRequestState = function() {
 //   global.sendToBrowser('UPDATE\r\n');
 // };

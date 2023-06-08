@@ -45,6 +45,8 @@ import isValidUTF8 from 'utf-8-validate';
 import vars from './irc-client-vars.mjs';
 import ircLog from './irc-client-log.mjs';
 
+// const nodeEnv = process.env.NODE_ENV || 'development';
+
 export const writeSocket = function (socket, message) {
   if (message.length === 0) return;
   if ((socket) && (socket.writable)) {

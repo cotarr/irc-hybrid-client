@@ -7,7 +7,7 @@ of the websocket server connection request. This web page can also
 be used in combination with postman to view API responses as described
 in the API section of the /docs.
 
-Caution, when enabled, this test page is publically visible and does not require
+Caution, when enabled, this test page is publicly visible and does not require
 authentication to load the page. Therefore, the route handler
 is disabled with commenting in web-server.js. It should only
 be temporarily enabled for testing purposes.
@@ -31,7 +31,7 @@ This temporary web page is intended to be used to confirm the websocket server i
 ### Recommend test procedure
 
 * Stop the web server (if running). This removes any active user login status.
-* Remove comment the route `app.use('/testws', testWs);` in file web-server.js to temporarily enable the test page
+* Remove comment the route `app.use('/testws', module1.testWsRouter);` in file web-server.js to temporarily enable the test page
 * Set environment `export NODE_ENV=development`
 * Start web server
 * Set browser to test page: http://localhost:3003/testws/test-websocket.html

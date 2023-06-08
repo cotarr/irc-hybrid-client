@@ -55,7 +55,10 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
-import config, { nodeEnv, loginUsers as userArray } from '../config/index.mjs';
+import config, { loginUsers as userArray } from '../config/index.mjs';
+
+const nodeEnv = process.env.NODE_ENV || 'development';
+const nodeDebugLog = process.env.NODE_DEBUG_LOG || 0;
 
 // Custom case for use with ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -67,8 +70,6 @@ const loginHtmlBottom = fs.readFileSync('./server/fragments/login-bottom.html', 
 const blockedCookieFragment = fs.readFileSync('./server/fragments/blocked-cookies.html', 'utf8');
 const logoutHtmlTop = fs.readFileSync('./server/fragments/logout-top.html', 'utf8');
 const logoutHtmlBottom = fs.readFileSync('./server/fragments/logout-bottom.html', 'utf8');
-
-const nodeDebugLog = process.env.NODE_DEBUG_LOG || 0;
 
 //
 // Custom log file (Option: setup to fail2ban to block IP addresses)

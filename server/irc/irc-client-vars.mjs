@@ -25,6 +25,9 @@
 //
 // -----------------------------------------------------------------------------
 'use strict';
+
+// const nodeEnv = process.env.NODE_ENV || 'development';
+
 /* eslint-disable prefer-const */
 
 // Excluded command list.

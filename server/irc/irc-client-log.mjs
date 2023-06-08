@@ -31,13 +31,14 @@ import { fileURLToPath } from 'url';
 import fs from 'fs';
 import rotatingFileStream from 'rotating-file-stream';
 
-import config, { nodeEnv } from '../config/index.mjs';
+import config from '../config/index.mjs';
+
+const nodeEnv = process.env.NODE_ENV || 'development';
+const nodeDebugLog = process.env.NODE_DEBUG_LOG || 0;
 
 // Custom case for use with ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-const nodeDebugLog = process.env.NODE_DEBUG_LOG || 0;
 
 const logFolder = path.join(__dirname, '../../logs');
 

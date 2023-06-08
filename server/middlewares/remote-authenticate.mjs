@@ -69,7 +69,10 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import nodeFetch from 'node-fetch';
 
-import config, { nodeEnv, oauth2 } from '../config/index.mjs';
+import config, { oauth2 } from '../config/index.mjs';
+
+const nodeEnv = process.env.NODE_ENV || 'development';
+const nodeDebugLog = process.env.NODE_DEBUG_LOG || 0;
 
 // Custom case for use with ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -79,8 +82,6 @@ const __dirname = path.dirname(__filename);
 const blockedCookieFragment = fs.readFileSync('./server/fragments/blocked-cookies.html', 'utf8');
 const logoutHtmlTop = fs.readFileSync('./server/fragments/logout-top.html', 'utf8');
 const logoutHtmlBottom = fs.readFileSync('./server/fragments/logout-bottom.html', 'utf8');
-
-const nodeDebugLog = process.env.NODE_DEBUG_LOG || 0;
 
 //
 // At program startup, validate that the credentials object
