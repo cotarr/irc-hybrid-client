@@ -49,30 +49,68 @@ npm install
 # Option 2 Typical for server installation, use minified files, log output to files.
 export NODE_ENV=production
 npm ci
+```
+There are two possible methods that may be used to define the
+web server configuration settings. The settings may be stored as 
+properties in the "credentials.json" file, or the settings may 
+be defined as environment variables or entries in the .env file.
 
+To use the credentials.json file:
+
+```bash
 # copy example-credentials.json and edit
 cp -v example-credentials.json credentials.json
 # If multi user system optionally change permission
 chmod 600 credentials.json
+```
 
-# 1) Set file path for TLS certs and tls:true ...or.. set tls=false
-# 2) Set a unique cookie secret
-# 3) Set .well-known/security.txt data, or empty string.
-# 4) Set writable file path for PID file, or empty string to disable PDF file.
+To use environment variables:
 
-# It is necessary to assign one web page username and password.
-# This must be done after copying the example-credentials.json into the project folder
-# There is a detailed example in the documentation.
+Copy the "example-.env" file to a ".env" file or else 
+use the "example-.env" file as a template for exporting 
+environment variables to the app.
 
-cd tools
+```bash
+# copy example-credentials.json and edit
+cp -v example-.env .env
+# If multi user system optionally change permission
+chmod 600 .env
+```
 
+- Set file path for TLS certs and tls:true ...or.. set tls=false
+- Set a unique cookie secret as `"cookieSecret": "xxxxxxx"` or `SESSION_SECRET=xxxxx` (Required)
+
+It is necessary to assign one web page username and password.
+There is a detailed example in the documentation.
+
+When using credentials.json file as configuration, this must be done after copying 
+the example-credentials.json into the project folder
+
+The user account used for web page login may be created using one of two 
+javascript files in the tools/ folder. Either the "updateAuthForUser_1.mjs" script maybe
+be used to add a user account to the credentials.json file, or the "genEnvVarAuthForUser_1.mjs"
+script may be used to generate the user account for environment variable configuration.
+
+To add a user account to the credentials.json file.
+
+```bash
+cd tools/
 # fill in user and password when prompted.
 node updateAuthForUser_1.mjs
-
 # A revised copy of credentials.json will be displayed after password assignment
-
 cd ..
+```
+To generate a user account when using environment variable configuration:
+```bash
+cd tools/
+# fill in user and password when prompted.
+node genEnvVarAuthForUser_1.mjs
+# Copy/Paste the environment variable assignments as needed.
+cd ..
+```
+IRC server configuration (TBD requires update)
 
+```
 # Copy example-servers.json file
 cp -v example-servers.json servers.json
 # If multi user system optionally change permissions
@@ -85,26 +123,12 @@ chmod 600 servers.json
 # 3) IRC server password (if needed)
 # 4) IRC nick name, user, real name.
 # 5) Optional: Preferred list of channels for this server.
-
-# Configure firewall ports as required.
-
-# To start the app
-node bin/www
-
-# route on web page: /irc/webclient.html
 ```
 
-### Changes to configuration
+- Configure firewall ports as required.
+- To start the app `node bin/www.mjs` or `npm start`
 
-The program configuration is contained in the JSON file `credentials.json`
-located in the base repository folder. The list of IRC servers and 
-related connection information is stored in the JSON file `servers.json`.
-Changes to program configuration or changes to the IRC server list 
-can be performed by manually editing these 2 JSON files in a linux terminal,
-then restarting the server.
-The list of server definitions can also be edited from the web page.
-Detailed configuration instructions are provided in the 
-[documentation](https://cotarr.github.io/irc-hybrid-client).
+- Route on web page: `/irc/webclient.html`
 
 ### Minify and bundle for deployment
 
@@ -162,12 +186,6 @@ The default irc-hybrid-client configuration uses stand alone internal user authe
 ### eslint
 
 ```
-# Lint browser JavaScript
-npx eslint secure/js/*.js
-
-# Lint server JavaScript
-npx eslint server/*/*.js server/*.js bin/www
-
-# Run both as npm script
+# Run eslint as npm script defined package.json
 npm run lint
 ```

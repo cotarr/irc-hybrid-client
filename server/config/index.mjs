@@ -43,7 +43,7 @@ import dotenv from 'dotenv';
 // Import the .env file
 dotenv.config();
 
-const nodeEnv = process.env.NODE_ENV || 'development';
+// const nodeEnv = process.env.NODE_ENV || 'development';
 
 // Check requirement for minimum node version
 const minNodeVersion = 16;
@@ -151,7 +151,7 @@ export const session = {
   // 604800 = 7 days (7 * 24 * 3600)
   maxAge: parseInt(((fcf) ? _parseNum(credentials.sessionExpireAfterSec) : process.env.SESSION_EXPIRE_SEC) || '604800') * 1000,
   ttl: parseInt(((fcf) ? _parseNum(credentials.sessionExpireAfterSec) : process.env.SESSION_EXPIRE_SEC) || '604800'),
-  secret: ((fcf) ? credentials.cookieSecret : process.env.SESSION_SECRET) || 'Change Me',
+  secret: ((fcf) ? credentials.cookieSecret : process.env.SESSION_SECRET) || null, // 'Change Me'
   enableRedis: ((fcf) ? credentials.sessionEnableRedis : (process.env.SESSION_ENABLE_REDIS === 'true')) || false,
   redisPrefix: ((fcf) ? credentials.sessionRedisPrefix : process.env.SESSION_REDIS_PREFIX) || 'irc:',
   redisPassword: ((fcf) ? credentials.sessionRedisPassword : process.env.SESSION_REDIS_PASSWORD) || ''
@@ -240,18 +240,21 @@ export const proxy = {
 };
 
 // For session cookie
-if (session.secret.length < 8) {
+if ((!(session.secret)) || (session.secret.length < 8)) {
   console.error('Error, cookie secret required');
-  process.exit(1);
-}
-if ((nodeEnv !== 'development') && (session.secret === 'Change Me')) {
-  console.error('Error, you must assign a unique session secret to sign cookies');
+  console.log('This may be set using the "cookieSecret" property in the credentials.json file ' +
+    'or in the "SESSION_SECRET" environment variable, depending on the configuration method. ' +
+    'This is a random string value used to create and validate cookie digital signatures.');
   process.exit(1);
 }
 
 if (!oauth2.enableRemoteLogin) {
   if ((!Array.isArray(loginUsers)) || (loginUsers.length < 1)) {
-    console.error('Configured for local authentication and no users found in password file');
+    console.error('Error, no users or passwords have been configured for web page login.');
+    console.log('The user account used for web page login may be created using one of two ' +
+      'javascript files in the tools/ folder. Either the "updateAuthForUser_1.mjs" script maybe ' +
+      'be used to add a user account to the credentials.json file, or the "genEnvVarAuthForUser_1.mjs" ' +
+      'script may be used to generate the user account for environment variable configuration.');
     process.exit(1);
   }
 }
