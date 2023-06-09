@@ -140,7 +140,7 @@ if ((typeof fetch).toString() !== 'function') {
   const nodeUpgradeMessage =
   '+-----------------------------------------------------------\n' +
   '| During startup, the fetch() API was not detected. For backward\n' +
-  '| compatibility, the legacy NPM module "node-fetch" v2 was loaded.\n' +
+  '| compatibility, the NPM module "node-fetch" was loaded.\n' +
   '| In version v18.0.0 NodeJs introduced a native fetch() API.\n' +
   '| In the future, NodeJs v18 or greater may be required when\n' +
   '| using the optional remote login. (CHANGELOG v0.2.41)\n' +

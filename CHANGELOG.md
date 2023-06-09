@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## v0.2.44-dev 2023-06-05
+## v0.2.44-dev 2023-06-09
 
 This next update has 2 primary goals:
 
@@ -131,7 +131,19 @@ After commit 543db92
 
 After commit 52e5cd3
 
+- Bump redis to redis@4.6.7
+- Bump node-fetch from v2.6.11 to v3.3.1, checked for breaking changes.
 
+The legacy node-fetch v2 package had previously generated 
+an NPM outdated package warning when using CommonJS modules. 
+The upgrade to ES modules has allowed upgrade to the current 
+version of node-fetch v3, which has removed the outdated package warning.
+Considering that node v18 and greater supports fetch API natively, 
+in the future the node-fetch package may be eliminated by 
+setting minimum node version to node > 18.
+This only impacts remote login. Instances that use local login 
+do not perform any backend fetch requests.
+This clears all npm outdated package warnings.
 
 ## [v0.2.43](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.43) 2023-05-28
 
