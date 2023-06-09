@@ -133,6 +133,7 @@ After commit 52e5cd3
 
 - Bump redis to redis@4.6.7
 - Bump node-fetch from v2.6.11 to v3.3.1, checked for breaking changes.
+- Set node-fetch module replacement conditional remote login selected.
 
 The legacy node-fetch v2 package had previously generated 
 an NPM outdated package warning when using CommonJS modules. 

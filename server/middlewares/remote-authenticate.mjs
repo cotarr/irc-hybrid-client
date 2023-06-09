@@ -135,8 +135,7 @@ if ((!Object.hasOwn(oauth2, 'remoteAuthHost')) ||
 // If the fetch() API is not found, load legacy v2
 // of the node-fetch package.
 //
-// eslint-disable-next-line no-use-before-define
-if ((typeof fetch).toString() !== 'function') {
+if (((typeof fetch).toString() !== 'function') && (oauth2.enableRemoteLogin)) {
   const nodeUpgradeMessage =
   '+-----------------------------------------------------------\n' +
   '| During startup, the fetch() API was not detected. For backward\n' +
