@@ -15,6 +15,12 @@ This next update has 2 primary goals:
 The motivation for converting server package format to ES Modules is to 
 allow import of NPM modules that no longer publish a CommonJS package format.
 
+The direct dependencies were checked one by one. The following NPM repositories appear to
+provide specific ES Modules packages: connect-redis, dotenv, express-rate-limit, helmet, 
+node-fetch, rotating-file-stream, and ws. The remainder of the dependencies 
+were CommonJS modules. All modules imported without issue except ws which has 
+different exports for the ESM version. 
+
 - 2. Add new capability to manage web server configuration using UNIX environment variables.
 
 The motivation for use of environment variables is to simplify configuration where the 
@@ -122,6 +128,10 @@ After commit 543db92
 - Log files change permission from 644 to 600 when creating new log files
 - Fixed env variable SITE_SECURITY_CONTACT omitted the "mailto:"
 - Update /docs web page to explain dual configuration options with examples.
+
+After commit 52e5cd3
+
+
 
 ## [v0.2.43](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.43) 2023-05-28
 
