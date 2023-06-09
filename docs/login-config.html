@@ -33,20 +33,68 @@
         <div class="desc-title">
           Login Config
         </div>
+        <div class="install-section-title">Select configuration method</div>
+        <p>
+          There are two possible methods that may be used to define the
+          web server configuration settings. The settings may be stored as 
+          properties in the "credentials.json" file, or the settings may 
+          be defined as environment variables with use of .env file supported.
+          Only one method can be used at a time. If the credentials.json 
+          file exists, it will be parsed for settings, otherwise 
+          the environment variables will be parsed for settings.
+        </p>
+        <p>
+          The introduction of two concurrent configuration schemes may introduce 
+          some security questions. Configuration of security related properties
+          could contain ambiguous conflicting values between the two configuration methods.
+          To minimize risk of ambiguous configuration, only one method is used at one time.
+          In the case where the file "credentials.json" exists then configuration 
+          will be parsed from the credentials.json file and the environment 
+          variable configuration will be ignored.
+          In case case where the file "credentials.json" does not exist then
+          the configuration will be parsed from UNIX environment variables.
+          For configuration properties that have not been defined, the
+          server/config/index.mjs module will define fallback default values.
+          In a future release, the credentials.json config file may be deprecated (breaking change)
+          to standardize all of the server configuration with environment variables
+          or the .env file.
+        </p>
+        <p>
+          The configuration examples on this page will include both
+          configuration methods, credentials.json method first
+          and environment variable method second, each with a slightly 
+          different background color.
+        </p>
+<div class="pre-div"><pre>
+  credentials.json method - Examples with this background color
+</pre></div>
+<div class="pre-div2"><pre>
+  environment variable method - Examples with this background color
+</pre></div>
         <div class="install-section-title">Copy example configuration</div>
         <p>
           The git repository includes an example configuration file
-          named &quot;example-credentials.json&quot;. The first step
-          is to make a copy of this file to &quot;credentials.json&quot;.
+          for each method named &quot;example-credentials.json&quot; and 
+          &quot;example-.env&quot;. The first step is to make a copy of 
+          the example file to &quot;credentials.json&quot; or &quot;.env&quot;.
           If you are on a multi user system you may optionally
           change permissions.
+        </p>
+        <p>
+          If you are managing environment variables external to the program,
+          such as importing environment variables into a container,
+          it is not necessary to use the optional &quot;.env&quot; file. The example 
+          environment variables can still be used as a guide.
         </p>
 
 <div class="pre-div"><pre>
   cp -v example-credentials.json credentials.json
   chmod 600 credentials.json
 </pre></div>
-
+<div class="pre-div2"><pre>
+  cp -v example-.env .env
+  chmod 600 .env
+</pre></div>
         <div class="install-section-title">Configuration File version</div>
         <p>
           This is intended for future use. It provides a method to
@@ -59,9 +107,13 @@
           upgraded to bcrypt in Version 0.1.0 as a breaking change.
         </p>
 <div class="pre-div"><pre>
+{
   "configVersion": 2,
+}
 </pre></div>
-
+<div class="pre-div2"><pre>
+ENV_VAR_CONFIG_VERSION=2
+</pre></div>
         <div class="install-section-title">Certificates</div>
         <p>
           Next, 3 lines are used to specify the path
@@ -82,20 +134,33 @@
           encrypted connections, this section would look something like this:
         </p>
 <div class="pre-div"><pre>
+{
   "serverTlsKey": "/home/user1/tls/privkey.pem",
   "serverTlsCert": "/home/user1/tls/fullchain.pem",
   "tls": true,
+}
+</pre></div>
+<div class="pre-div2"><pre>
+SERVER_TLS_KEY=/home/user/tls/privkey.pem
+SERVER_TLS_CERT=/home/user/tls/fullchain.pem
+SERVER_TLS=true
 </pre></div>
         <p>
           If on the other hand you are using the program in a development
           environment without TLS certificates, set these lines as follows:
         </p>
 <div class="pre-div"><pre>
+{
   "serverTlsKey": "",
   "serverTlsCert": "",
   "tls": false,
+}
 </pre></div>
-
+<div class="pre-div2"><pre>
+# SERVER_TLS_KEY=
+# SERVER_TLS_CERT=
+SERVER_TLS=false
+</pre></div>
         <div class="install-section-title">Listen Port</div>
         <p>
           Set the web server listen port to the desired port number for the web server.
@@ -109,9 +174,13 @@
           port numbers to 443 as packets cross the firewall.
         </p>
 <div class="pre-div"><pre>
+{
   "port": 3003,
+}
 </pre></div>
-
+<div class="pre-div2"><pre>
+SERVER_PORT=3003
+</pre></div>
         <div class="install-section-title">Session Credentials</div>
         <p>
           The cookie secret is used to place digital signatures on session cookies.
@@ -169,11 +238,17 @@
           browser tabs for simultaneous connection to different IRC networks.
         </p>
 <div class="pre-div"><pre>
+{
   "cookieSecret": "Lg9HLgCEmtag4Ff7",
   "sessionExpireAfterSec": 86400,
-  "instanceNumber": 0,
+  "instanceNumber": 3003,
+}
 </pre></div>
-
+<div class="pre-div2"><pre>
+SESSION_SECRET="Lg9HLgCEmtag4Ff7"
+SESSION_EXPIRE_SEC=604800
+SERVER_INSTANCE_NUMBER=3003
+</pre></div>
         <div class="install-section-title">Session Store (Optional)</div>
         <p>
           By default, irc-hybrid-client web server uses Memorystore as a RAM database
@@ -205,12 +280,19 @@
           <li>Install redis from OS package manager, Debian: `apt-get install redis-server`.</li>
           <li>Customize redis server configuration as needed `/etc/redis/redis.conf`</li>
           <li>Set local firewall to protect redis TCP port.</li>
-          <li>Enable redis by editing `credentials.json` as follows:</li>
+          <li>Enable redis by editing `credentials.json` or environment variables as follows:</li>
         </ul>
 <div class="pre-div"><pre>
+{
   "sessionEnableRedis": true,
   "sessionRedisPrefix": "irc001:",
   "sessionRedisPassword": "",
+}
+</pre></div>
+<div class="pre-div2"><pre>
+SESSION_ENABLE_REDIS=true
+SESSION_REDIS_PREFIX="irc:"
+# SESSION_REDIS_PASSWORD=
 </pre></div>
         <p>
           There is a redis client `redis-cli` that can be used to view or clear the
@@ -226,22 +308,41 @@
           Should a security issue be detected on your server by a third
           party, this provides a method to contact the server owner
           and notify them of the security issue.
+          The email address should be prefixed with &quot;mailto:&quot;.
           This URL is publicly readable without requiring login or session cookie.
           To enable this feature, set a valid security email address.
-          The expiration date is typically 1 year out and must be entered using this date format.
+          The expiration date is typically 1 year out and must be entered 
+          using a standard UNIX date format. 
         </p>
+        <p>
+          A date string can be generated using the following bash command:
+        </p>
+<pre>
+        date --date='1 year' --rfc-email
+</pre>
 <div class="pre-div"><pre>
+{
   "securityContact": "mailto:security@example.com",
   "securityExpires": "Fri, 1 Apr 2022 08:00:00 -0600",
+}
+</pre></div>
+<div class="pre-div2"><pre>
+SITE_SECURITY_CONTACT=mailto:security@example.com
+SITE_SECURITY_EXPIRES="Fri, 1 Apr 2022 08:00:00 -0600"
 </pre></div>
         <p>
           To disable the security contact, modify these lines as follows:
         </p>
 <div class="pre-div"><pre>
+{
   "securityContact": "",
   "securityExpires": "",
+}
 </pre></div>
-
+<div class="pre-div2"><pre>
+# SITE_SECURITY_CONTACT=
+# SITE_SECURITY_EXPIRES=
+</pre></div>
 
         <div class="install-section-title">PID file path</div>
         <p>
@@ -257,27 +358,44 @@
         </p>
 
 <div class="pre-div"><pre>
+{
   "pidFilename": "/home/user1/tmp/ircHybridClient.PID",
+}
 </pre></div>
-
+<div class="pre-div2"><pre>
+SERVER_PID_FILENAME=/home/user1/tmp/ircHybridClient.PID
+</pre></div>
         <div class="install-section-title">Restart using PID file (Optional)</div>
         <p>
-          After making changes to the configuration in credentials.json, 
+          After making changes to the configuration in credentials.json or .env, 
           it is necessary to stop and restart the irc-hybrid-client web server
           to load the new configuration.
         </p>
         <p>
           Assuming a PID filename (previous section) has been configured 
-          and contains a full path name, a bash script &quot;restart.sh&quot; 
-          may be executed from the base folder of the repository to retrieve the PID number, 
+          and contains a full path name, a bash script &quot;restart.sh&quot; for 
+          credentials.json configuration or &quot;restart2.sh&quot; for environment 
+          variable configuration may be executed from the base folder of the 
+          repository to retrieve the PID number, 
           kill previous irc-hybrid-client instance, and launch a new
           instance of the irc-hybrid-client web server.
         </p>
         <p>
-          This script requires the Linux &quot;jq&quot; utility for parsing JSON content.
+          The restart.sh script requires the Linux &quot;jq&quot; utility for parsing JSON content.
           The jq linux package may be installed using &quot;apt-get install jq&quot; in Debian or Ubuntu.
-          The restart.sh utility is intended to be run manually to assist with editing 
-          of credentials.json. It is not intended to be run from cron.
+          The restart2.sh script used with enviornment variables 
+          does not require this package to be installed.
+        </p>
+        <p>
+          The restart2.sh script requires that the environment 
+          variable SERVER_PID_FILENAME be assigned and exported before running 
+          the script. The optional SERVER_INSTANCE_NUMBER variable will be
+          used if found.
+        </p>
+        <p>
+          The restart.sh or restart2.sh utility is intended to be run manually to 
+          assist with editing of credentials.json or .env. 
+          It is not intended to be run from cron.
         </p>
 
         <div class="install-section-title">Disable Server List Editor Web Page</div>
@@ -315,9 +433,13 @@
         </p>
 
 <div class="pre-div"><pre>
+{
   "disableServerListEditor": false,
+}
 </pre></div>
-
+<div class="pre-div2"><pre>
+IRC_DISABLE_LIST_EDITOR=false
+</pre></div>
 
         <div class="install-section-title">Restore Message Cache After Web Server Restart</div>
         <p>
@@ -372,7 +494,15 @@ if [ -n "$PID_NUMBER" ] ; then
   kill -SIGTERM $PID_NUMBER
 fi
 </pre></div>
-        <p>
+<div class="pre-div2"><pre>
+IRC_HYBRID_CLIENT_PATH=$HOME/tmp/irc-hybrid-client.PID
+PID_NUMBER=$(cat $IRC_HYBRID_CLIENT_PATH)
+if [ -n "$PID_NUMBER" ] ; then
+  echo "Sending SIGTERM to $PID_NUMBER irc-hybrid-client"
+  kill -SIGTERM $PID_NUMBER
+fi
+</pre></div>
+          <p>
           There is a bash script &quot;restart.sh&quot; that can 
           be used to restart after changes were made to credentials.json. 
           This may be used as a further example.
@@ -385,9 +515,13 @@ fi
           the auto-save will not be enabled, but no errors are thrown for missing property.         
         </p>
 <div class="pre-div"><pre>
+{
   "persistIrcMessageCache": true,
+}
 </pre></div>
-
+<div class="pre-div2"><pre>
+IRC_PERSIST_MESSAGE_CACHE=true
+</pre></div>
         <div class="install-section-title">Log Files and File Rotation</div>
         <p>
           Logging to disk file is enabled when the server is started 
@@ -434,10 +568,15 @@ fi
         </p>
 
 <div class="pre-div"><pre>
+{
   "logRotationInterval": "7d",
   "logRotationSize": "1M",
+}
 </pre></div>
-
+<div class="pre-div2"><pre>
+SERVER_LOG_ROTATE_INTERVAL=7d
+SERVER_LOG_ROTATE_SIZE=1M
+</pre></div>
         <div class="install-section-title">HTTP Access Log Filter</div>
         <p>
           HTTP requests are logged to logs/access.log. If the configuration property 
@@ -451,7 +590,12 @@ fi
         </p>
 
 <div class="pre-div"><pre>
+{
   "accessLogOnlyErrors": false,
+}
+</pre></div>
+<div class="pre-div2"><pre>
+SERVER_LOG_ONLY_ERRORS=false
 </pre></div>
 
         <div class="install-section-title">Assign Login Password</div>
@@ -474,6 +618,9 @@ fi
           it until a new password were set using the ssh terminal.
         </p>
         <p>
+          Case 1 - Configuration using credentials.json
+        </p>
+        <p>
           A brief note about syntax. The credentials.json file represents a JSON structured data object.
           JSON syntax must be exact, with matching curly braces and proper use of commas.
           The credentials.json file includes a loginUsers property.
@@ -491,12 +638,12 @@ fi
           The program can be executed from the command line to
           assign the username and password for the primary user at array index 0, (userid 1).
           To run this program, change directory to the tools folder, and execute the
-          ./updateAuthForUser_1.js program as in the following example.
+          ./updateAuthForUser_1.mjs program as in the following example.
         </p>
 
 <div class="pre-div"><pre>
 cd tools
-node updateAuthForUser_1.js
+node updateAuthForUser_1.mjs
 </pre></div>
         <p>
           This will start an interactive session.
@@ -578,6 +725,71 @@ cd ..
           copy/paste the entire javascript object as an additional javascript object in the array.
           Use care to maintain valid JSON format with commas and braces.
         </p>
+        <p>
+          Case 2 - Configuration using environment variables
+        </p>
+        <p>
+          A small javascript program has been included to create a user password hash
+          and generate environment variables that can be copy/paste into 
+          the .env file or other environment variable configuration.
+          The program can be executed from the command line to
+          assign the username and generate password hash for the primary user (userid 1).
+          To run this program, change directory to the tools folder, and execute the
+          ./genEnvVarAuthForUser_1.mjs program as in the following example.
+
+        </p>
+
+        
+<div class="pre-div2"><pre>
+  cd tools
+  node genEnvVarAuthForUser_1.mjs
+</pre></div>
+        <p>
+          This will start an interactive session.
+          In this example, the &quot;user&quot; was set to <blue-example>user1</blue-example>.
+          The &quot;name&quot; was allowed to default to the
+          same value as the user.
+          In this example, the password was set to
+          <blue-example>zuwa79xoJxLJ</blue-example>.
+          A bcrypt function was used to generate a salted hash.
+          The data was printed to the terminal so the 
+          environment variables can be copied in order to paste the  
+          values into an external environment variable configuration.
+          If the .env file is used, all 4 lines can be copied 
+          to the .env file.
+        </p>
+<div class="pre-div2"><pre>
+You are running a script to generate user login environment variables.
+
+
+User up to 16 characters a-z,A-Z,0-9
+Enter new user:user1
+
+Name up to 32 characters a-z,A-Z,0-9
+Enter new name (user1):
+
+Enter new password:zuwa79xoJxLJ
+
+You may copy/paste these enviornment variables
+
+<yellow-example>LOGIN_USER_USERID=1
+LOGIN_USER_USER=user1
+LOGIN_USER_NAME=user1
+LOGIN_USER_HASH=$2a$10$oWs2sKPpnscvSfUeYjZc2.AapYo6MzS0MvoB/oI8ltUhvmT79JdlG</yellow-example>
+</pre></div>
+        <p>
+          Privacy Caution:
+          The web userid numeric value (userid: 1) and web login timestamp are saved in the web browsers's
+          localStorage API. See:
+          <a href="faq.html#localstorage">FAQ</a>
+        </p>
+        <p>
+          Next, return from the tools folder to the repository folder.
+        </p>
+
+<div class="pre-div2"><pre>
+  cd ..
+</pre></div>
 
         <div class="install-section-title">Serve HTML Help Files</div>
         <p>
@@ -606,7 +818,10 @@ cd ..
   "serveHtmlHelpDocs": true
 }
 </pre></div>
-
+<div class="pre-div2"><pre>
+IRC_SERVE_HTML_HELP_DOCS=true
+</pre></div>
+  
         <div class="install-section-title">Optional Custom Sound Files</div>
 
         <p>
@@ -635,8 +850,9 @@ secure/sounds/custom-beep3.mp3 (Private Message)
 </pre>
 
         <p>
-          To enable the optional custom sounds set the &quot;customBeepSounds&quot; 
-          property to true in the credentials.json file. 
+          To enable the optional custom sounds set the property 
+          &quot;customBeepSounds: true&quot; in the credentials.json file 
+          or set the environment variable &quot;IRC_CUSTOM_BEEP_SOUNDS=true&quot;
           For backward compatibility, if this property does not exist
           in credentials.json due to an upgrade from previous version the default 
           sound filenames will be used and no error will be generated.
@@ -647,7 +863,9 @@ secure/sounds/custom-beep3.mp3 (Private Message)
   "customBeepSounds": true
 }
 </pre></div>
-          
+<div class="pre-div2"><pre>
+IRC_CUSTOM_BEEP_SOUNDS=true
+</pre></div>          
 
         <div class="vh-20"></div>
         <div class="desc-title">
@@ -675,20 +893,28 @@ secure/sounds/custom-beep3.mp3 (Private Message)
         </p>
         <p>
           To globally enable use of a remote socks5 proxy server without authentication,
-          update the credentials.json file as in the following example, changing address and port.
+          update the configuration as shown in following example, changing address and port.
         </p>
 
 <div class="pre-div"><pre>
 {
   "enableSocks5Proxy": true,
   "socks5Host": "192.168.0.1",
-  "socks5Port": 1080
+  "socks5Port": 1080,
+  "socks5Username": null,
+  "socks5Password": null  
 }
 </pre></div>
-
+<div class="pre-div2"><pre>
+IRC_ENABLE_SOCKS5_PROXY=false
+IRC_SOCKS5_HOST=192.168.0.1
+IRC_SOCKS5_PORT=1080
+# IRC_SOCKS5_USERNAME=
+# IRC_SOCKS5_PASSWORD=
+</pre></div>
         <p>
           To globally enable use of a remote socks5 proxy server with password authentication,
-          update the credentials.json file as in the following example.
+          update the configuration as shown in the following example.
           Note:  This can expose socks5 authentication passwords in plain text.
           This issue can be addressed by passing the socks5 connection through a TLS
           encrypted VPN tunnel.
@@ -703,7 +929,13 @@ secure/sounds/custom-beep3.mp3 (Private Message)
   "socks5Password": "xxxxxxxx"
 } 
 </pre></div>
-
+<div class="pre-div2"><pre>
+IRC_ENABLE_SOCKS5_PROXY=false
+IRC_SOCKS5_HOST=192.168.0.1
+IRC_SOCKS5_PORT=1080
+IRC_SOCKS5_USERNAME=user1
+IRC_SOCKS5_PASSWORD="xxxxxxxx"
+</pre></div>
         <p>
           Socks5 support was debugged using the dante-server apt package in Debian 10
           using danted.conf configuration set to &quot;socksmethod: none&quot; (Not authenticated)
@@ -748,11 +980,14 @@ secure/sounds/custom-beep3.mp3 (Private Message)
         </p>
 
 <div class="pre-div"><pre>
-  {
-    "ircSocketLocalAddress": "fc00:10::1000"
-  } 
-  </pre></div>
-
+{
+  "ircSocketLocalAddress": "fc00:10::1000"
+} 
+</pre></div>
+<div class="pre-div2"><pre>
+IRC_SOCKET_LOCAL_ADDRESS=fc00:10::1000
+</pre></div>
+  
         <div class="vh-20"></div>
         <div class="desc-title">
           Optional Remote Login
@@ -870,7 +1105,7 @@ secure/sounds/custom-beep3.mp3 (Private Message)
           This can be thought of as a list of possible scopes that irc-hybrid-clients are allowed to use.
         </p>
         <p>
-          allowedRedirectIRI: The Oauth 2.0 authentication workflow includes a browser redirect to the 
+          allowedRedirectURI: The Oauth 2.0 authentication workflow includes a browser redirect to the 
           URL address of the authorization server. After user authentication, the authentication server
           will redirect the user's browser back to the URL address of the specific irc-hybrid-client server that 
           had initiated the authentication workflow.
@@ -916,67 +1151,93 @@ secure/sounds/custom-beep3.mp3 (Private Message)
         <div class="install-section-title">irc-hybrid-client Configuration</div>
         <p>
           For a specific instance of irc-hybrid-client, the configuration is located 
-          in the &quot;credentials.json&quot; file in the root of the repository.
-          This is a JSON formatted file. Any JSON syntax errors will prevent the 
-          irc-hybrid-client from starting. This file is discussed in detail 
-          in the upper part of this page. Only the properties related to remote login 
+          in the &quot;credentials.json&quot; file or alternately configured using
+          environment variables. Only the properties related to remote login 
           will be discussed in this section.
         </p>
         <p>
-          loginUsers: The loginUsers property is an array of user login definitions that is
-          used by the internal authentication system (local login). When using remote login,
-          the definition of local users is not required and may be an empty array as shown below.
+          When using remote login, the local user account described above is not used 
+          and the local user account entries may be omitted from the configuration.
           If you want to switch back and forth between local login and remote login, 
-          you may leave the loginUser array in the configuration.
-          The user definitions specified here will not be functional when remote login is enabled.
-          If present, the users definitions will not impact remote login.
+          you may leave the local user account in the configuration.
+          The local user definitions specified above will not be functional when remote login is enabled.
+          If present, the local users definitions will not impact remote login.
 
         </p>
         <p>
-          enableRemoteLogin: The enableRemoteLogin is a boolean flag. If the property does not exist 
+          enableRemoteLogin/OAUTH2_ENABLE_REMOTE_LOGIN: This is a boolean flag. If the property does not exist 
           or the enableRemoteLogin property is false, the default internal login will be enabled.
           When set to true, remote login is enabled.
         </p>
         <p>
-          remoteAuthHost: This is the address of the remote authorization server.
+          remoteAuthHost/OAUTH2_REMOTE_AUTH_HOST: This is the address of the remote authorization server.
           Hostnames must specify http or https. When using non-standard port numbers, 
           the port should be specified. With TLS standard port 443 the port may be omitted.
         </p>
         <p>
-          clientId/clientSecret: The clientId and clientSecret must exactly match the 
-          client credentials as defined in the authorization server client account.
+          remoteCallbackHost/OAUTH2_REMOTE_CALLBACK_HOST: This is address of this 
+          irc-hybrid-client web server. After successful entry of 
+          username and password, the authorization server will redirect the 
+          web browser back to this address with an authorization code.
+          the value must match the allowedRedirectURI property defined
+          in the client account on the authorization server.
+        </p>
+        <p>
+          clientId/OAUTH2_REMOTE_CLIENT_ID: 
+          The client id must exactly match the client credentials as 
+          defined in the authorization server client account.
+        </p>
+        <p>
+          clientSecret/OAUTH2_REMOTE_CLIENT_SECRET: 
+          The client secret must exactly match the client credentials as 
+          defined in the authorization server client account.
           Take precautions to protect the client credentials from accidental disclosure
           as this could grant unauthorized access to the authorization server. 
         </p>
         <p>
-          remoteScope: The remoteScope property may be a single string, or it may be an 
-          array of strings. Any authenticated user may access an instance of irc-hybrid-client
-          if one of the remoteScope values here is an exact match to at least one of the 
-          scopes defined in the user's role.
+          remoteScope/OAUTH2_REMOTE_SCOPE: The remoteScope property may be a single string value, or it may be an 
+          array of strings. The OAUTH2_REMOTE_SCOPE environment variable may 
+          be assigned as one string value, or multiple string values separated by commas without spaces.   
+          Any authenticated user may access an instance 
+          of irc-hybrid-client if one of the remoteScope values here is an exact 
+          match to at least one of the scopes defined in the user's role and the 
+          client allowedScope. To clarify, the scope is a 3 way match, the client account's 
+          &quot;allowedScope&quot;, the user account's &quot;role&quot;, 
+          and the irc-hybrid-client server's &quot;remoteScope&quot; or 
+          &quot;OAUTH2_REMOTE_SCOPE&quot; value for the irc-hybrid-client
+          server's scope.
         </p>
 
 <div class="pre-div"><pre>
-  {
-    ...
-    
-    "loginUsers": [ ],
-    "enableRemoteLogin": true,
-    "remoteAuthHost": "http://127.0.0.1:3500",
-    "remoteCallbackHost": "http://localhost:3003",
-    "remoteClientId": <yellow-example>irc_client_1</yellow-example>,
-    "remoteClientSecret": "xxxxxxxxxxxxxxxxxxxxxxxx",
-    "remoteScope": [
-      <yellow-example>"irc.all"</yellow-example>,
-      "irc.demo1"
-    ]
-  }
-  </pre></div>    
+{
+  ...
+  
+  "loginUsers": [ ],
+  "enableRemoteLogin": true,
+  "remoteAuthHost": "http://127.0.0.1:3500",
+  "remoteCallbackHost": "http://localhost:3003",
+  "remoteClientId": <yellow-example>irc_client_1</yellow-example>,
+  "remoteClientSecret": "xxxxxxxxxxxxxxxxxxxxxxxx",
+  "remoteScope": [
+    <yellow-example>"irc.all"</yellow-example>,
+    "irc.demo1"
+  ]
+}
+</pre></div>    
+<div class="pre-div2"><pre>
+OAUTH2_ENABLE_REMOTE_LOGIN=true
+OAUTH2_REMOTE_AUTH_HOST=http://127.0.0.1:3500
+OAUTH2_REMOTE_CALLBACK_HOST=http://localhost:3003
+OAUTH2_REMOTE_CLIENT_ID=<yellow-example>irc_client_1</yellow-example>
+OAUTH2_REMOTE_CLIENT_SECRET="xxxxxxxxxxxxxxxxxxxxxxxx"
+OAUTH2_REMOTE_SCOPE=<yellow-example>irc.all</yellow-example>,irc.two
+</pre></div> 
 
       <div class="install-section-title">Other Oauth Providers</div>
 
       <p>
         It is unlikely that irc-hybrid-client will work with other generic 
-        Oauth 2.0 providers without modification to the middlewares/remote-authentication.js 
+        Oauth 2.0 providers without modification to the middlewares/remote-authentication.mjs 
         javascript file. Both irc-hybrid-client and collab-auth were written concurrently
         by the same author.
       </p>

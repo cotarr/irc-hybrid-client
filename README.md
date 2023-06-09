@@ -54,6 +54,9 @@ There are two possible methods that may be used to define the
 web server configuration settings. The settings may be stored as 
 properties in the "credentials.json" file, or the settings may 
 be defined as environment variables or entries in the .env file.
+Only one method can be used at a time. If the credentials.json 
+file exists, it will be parsed for settings, otherwise 
+the environment variables will be parsed for settings.
 
 To use the credentials.json file:
 

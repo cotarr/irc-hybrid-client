@@ -32,7 +32,7 @@ This is the established configuration method up until this release.
 In case case where the file "credentials.json" does not exist then
 the configuration will be parsed from UNIX environment variables.
 For configuration properties that have not been defined, then the
-server/config.index.mjs module will define fallback default values.
+server/config/index.mjs module will define fallback default values.
 In the long term, the credentials.json config file may be deprecated (breaking change)
 to standardize all of the server configuration with environment variables.
 
@@ -119,6 +119,9 @@ After commit 543db92
 - Created alternate restart2.sh script for use in a server configured with environment variables.
 - Add configuration validation that cookie secret has been defined and user account has been configured.
 - Updated README.md for dual configuration.
+- Log files change permission from 644 to 600 when creating new log files
+- Fixed env variable SITE_SECURITY_CONTACT omitted the "mailto:"
+- Update /docs web page to explain dual configuration options with examples.
 
 ## [v0.2.43](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.43) 2023-05-28
 

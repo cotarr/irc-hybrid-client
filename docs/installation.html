@@ -40,11 +40,10 @@
         </p>
 
 
-        <div class="install-section-title">Project Status (Work in Progress)</div>
+        <div class="install-section-title">Project Status</div>
         <p>
-          This project is still under development and 
-          new features may be added in the future.
-          At this time, no formal release has been issued.
+          This IRC client is functional and mostly stable, but still evolving. 
+          New features are still being added from time to time.
         </p>
 
         <div class="install-section-title">Prerequisite Knowledge</div>
@@ -57,7 +56,7 @@
           <li>Comfortable using ssh and command line interface (CLI)</li>
           <li>Use of git to clone a git repository using CLI</li>
           <li>Use of Node.js package manager npm to install dependencies</li>
-          <li>Use of text editor to modify raw JSON configuration files</li>
+          <li>Use of text editor to modify configuration files or environment variables</li>
           <li>Experience opening firewall ports to expose a server</li>
           <li>Experience generating web server TLS certificates</li>
           <li>Familiar with IRC and with configuration of IRC clients</li>
@@ -74,7 +73,7 @@
           The application was developed in a virtual machine 
           running Debian-11 with the web server running Node v18. 
           The author deploys it for personal use in a cloud VPS 
-          single-core droplets with 500MB RAM running Debian 10 and Debian 11.
+          single-core shared cpu droplets with 500MB RAM running Debian 11.
           It has also run on a RaspberryPi 3 and 4 behind a home network NAT router.
         </p>
         <p>
@@ -119,6 +118,7 @@
           You can check if nodejs is installed by typing
           &quot;node -v&quot;
           in your terminal. If installed, the version will be displayed.
+          This program requires node v16 or greater.
           If node is not installed, there are several options:
         </p>
         <p>
@@ -146,10 +146,10 @@ cd irc-hybrid-client
 
         <div class="install-section-title">3 - Install package dependencies</div>
         <p>
-          This program uses the Express web server framework.
+          This program uses the Express web server.
           The Express web site is located at
           <a href="https://expressjs.com/">https://expressjs.com/</a>.
-          Express framework and various JavaScript dependency libraries
+          Express various JavaScript dependency libraries
           will be installed using the npm package manager.
         </p>
         <p>
@@ -179,6 +179,11 @@ npm ci
           connection and the browser. The certificates will provide
           some verification that you are connecting to the intended
           server, avoiding a man in the middle interception.
+          TLS will also protect passwords used for IRC servers and 
+          NickServ services. This step may be skipped when using 
+          a TLS enabled load balancer or network proxy external 
+          to the irc-hybrid-client, 
+
         </p>
         <p>
           Managing TLS certificates is a complex task, mostly beyond
@@ -224,20 +229,33 @@ sudo certbot certonly --standalone -d abcd.example.com
 
         <div class="install-section-title">5 - Configuration Files</div>
         <p>
-          There are two example configuration files that need to be
-          copied to new filenames. They require editing before use.
-          The web server reads configuration from these files when the server starts.
-          A utility program is included to assign the web page login password.
-          There is also a simple web based IRC server list editor.
-          Two other sections of this web page contain detail instructions describing
-          how to edit the configuration, so it will not be repeated here.
+          The web server settings and IRC server settings
+          are configured separately. The web server settings are defined 
+          before starting the server and can not be changed when the server 
+          is running. IRC network settings may be edited in the web browser
+          when the server is running.
         </p>
         <p>
-          4A Edit: credentials.json (<a href="login-config.html">Login Config Instructions</a>),
-          <br>
-          4B Edit: servers.json (<a href="server-config.html">IRC Config Instructions</a>)
+          Web Server:
         </p>
-
+        <p>
+          There are two possible methods that may be used to define the
+          web server configuration settings. The settings may be stored as 
+          properties in the "credentials.json" file, or the settings may 
+          be defined as environment variables or entries in the .env file.
+          Only one method can be used at a time. If the credentials.json 
+          file exists, it will be parsed for settings, otherwise 
+          the environment variables will be parsed for settings.  
+          See: <a href="login-config.html">Login Config Instructions</a>
+        </p>
+          IRC Network Setup:
+        <p>
+          The settings for the IRC Network server list are defined in 
+          an example server file that may be copied to the 
+          servers.json file and edited manually.
+          There is also a simple web based IRC server list editor.
+          See: <a href="server-config.html">IRC Config Instructions</a>
+        </p>
 
         <div class="install-section-title">6 - Firewall configuration</div>
         <p>
@@ -309,10 +327,6 @@ sudo certbot certonly --standalone -d abcd.example.com
 
         <div class="install-section-title">9 - Log Files</div>
         <p>
-          The current program does not manage, limit or prune log file size.
-          If you use logging, monitor file size as necessary.
-        </p>
-        <p>
           When the program first starts, if not existing, a &quot;/logs/&quot; folder will be created
           automatically. If you have enabled logging,
           the log files will be written to the /logs folder in the base folder of the repository.
@@ -345,7 +359,11 @@ sudo certbot certonly --standalone -d abcd.example.com
           </li>
         </ul>
         </p>
-       
+        <p>
+          Since version v0.2.38, the program uses the npm rotating-file-stream middleware
+          to limit size of the HTTP access log and the IRC raw message log.
+          Configuration is explained in the login-config section.
+        </p>       
         <p>
           If the program is started with environment variable NODE_ENV=development, 
           all logging will be redirected to the console. In a production situation 
@@ -370,7 +388,7 @@ sudo certbot certonly --standalone -d abcd.example.com
           While in the project directory, start the web server by typing:
         </p>
 <div class="pre-div"><pre>
-node bin/www
+node bin/www.mjs
 </pre></div>
         <p>
           To access the IRC client from your web browser, append the path
@@ -385,7 +403,8 @@ node bin/www
           An alternative method is to load the &quot;screen&quot;
           program which allows Linux to run a detached command shell
           that can be reattached at a later time as a console terminal.
-        </p>
+          There are many other methods to manage servers, such as the NPM package 
+          &quot;pm2&quot; that can be installed globally and used to automatically restart the server.        </p>
         <p>
           If you are running bash want to capture any console standard or error output while running in the background,
           you may redirect terminal output to a log file and
@@ -393,9 +412,9 @@ node bin/www
           Attempting this from a script or from cron may require full file pathnames.
           Systems may vary, but it would look something like this:
         </p>
-<div class="pre-div"><pre>
-/usr/bin/node bin/www &amp;>> logs/node.log &
-</pre></div>
+        <div class="pre-div"><pre>
+          /usr/bin/node bin/www.mjs &amp;>> logs/node.log &
+        </pre></div>
         <p>
           Optional:
         </p>
@@ -418,7 +437,7 @@ node bin/www
           optional identifier as a command line argument.
         </p>
 <div class="pre-div"><pre>
-/usr/bin/node bin/www 4301 &amp;>> logs/node.log &
+/usr/bin/node bin/www.mjs 4301 &amp;>> logs/node.log &
 </pre></div> 
         <p>
           Using the bash command &quot;ps x&quot; would identify the matching 
@@ -426,8 +445,8 @@ node bin/www
         </p>
 
 <div class="pre-div"><pre>
-51910 pts/0    Sl     0:07 /usr/bin/node bin/www 4301
-55240 pts/0    Sl     0:04 /usr/bin/node bin/www 4312
+51910 pts/0    Sl     0:07 /usr/bin/node bin/www.mjs 4301
+55240 pts/0    Sl     0:04 /usr/bin/node bin/www.mjs 4312
 </pre></div> 
 
 

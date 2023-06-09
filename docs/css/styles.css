@@ -99,6 +99,16 @@ ul.install-list {
   padding-bottom: 0px;
   padding-left: 15px;
 }
+.pre-div2 {
+  background-color: #e6c4c4;
+  border: 1px solid black;
+  border-radius: 5px;
+  margin-top: 10px;
+  padding-top: 0px;
+  padding-right: 10px;
+  padding-bottom: 0px;
+  padding-left: 15px;
+}
 
 table {
   background-color: #ffffff;

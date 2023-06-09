@@ -65,7 +65,8 @@
         </p>
         <p>
           It is also possible to globally disable the web page server list editor by setting 
-          disableServerListEditor:true in the credentials.json file.
+          &quot;disableServerListEditor:true&quot; in the credentials.json file 
+          or setting the environment variable &quot;IRC_DISABLE_LIST_EDITOR=true&quot;
           This may be useful if the IRC client is to be restricted to one IRC network.
           In the case where the editor has been disabled, the manual edit method must be used.
         </p>
@@ -206,8 +207,9 @@
               The checkbox for socks5 proxy will enable this IRC server definition to use the 
               programs global socks5 configuration for the IRC connection.
               This setting is ignored when socks5 proxy is disabled.
-              Socks5 settings must be configured globally in the credentials.json file as 
-              described in the <a href="login-config.html">login config</a> section.
+              Socks5 settings must be configured globally in the credentials.json file 
+              or with environment variables as described in the 
+              <a href="login-config.html">login config</a> section.
             </p>
             <p>
               If IRC server password field is optional.
@@ -400,7 +402,7 @@
         <p>
           When the &quot;proxy&quot; property is set to true, the IRC client
           will attempt to connect to IRC using the Socks5 proxy configuration
-          that was defined globally in the credentials.json file.
+          that was defined globally in the credentials.json file or environment variables.
           This is described in the <a href="login-config.html">login config</a>
           page of the documentation. If the socks5 proxy is disabled globally,
           the proxy property is ignored.

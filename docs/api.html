@@ -692,8 +692,10 @@ Cached message with 2 IRC channels.
           server in the file &quot;servers.json&quot;
           The file may be edited manually instead of using this interface.
         </p><p>
-          The IRC server list editor can be disabled by setting &quot;disableServerListEditor: true&quot;
-          in the credentials.json file. When disabled, all attempts to access the 
+          The IRC server list editor can be disabled by setting 
+          &quot;disableServerListEditor: true&quot; in the credentials.json file
+          or by setting the environment variable &quot;IRC_DISABLE_LIST_EDITOR=true&quot;
+           When disabled, all attempts to access the 
           /irc/serverlist API will return Status 405 Method not allowed 
           &quot;Server List Editor Disabled&quot;
         </p><p>
@@ -1489,7 +1491,7 @@ HEARTBEAT
           the browser html page and browser javascript. The custom web page is located
           in the &quot;server/testws&quot; folder. It contains 3 files, one each html, js and css.
           To enable this route and serve these files from the main web server, TEMPORARILY remove comment
-          characters from the following code located in the &quot;server/web-server.js" file.
+          characters from the following code located in the &quot;server/web-server.mjs" file.
           Restart the server after the edit.
         </p>
 

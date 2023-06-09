@@ -85,7 +85,7 @@ if ((nodeEnv !== 'development') && (!nodeDebugLog)) {
     ((logRotationSize) && (logRotationSize.length > 1))) {
     const rotateOptions = {
       encoding: 'utf8',
-      mode: 0o644,
+      mode: 0o600,
       rotate: 5
     };
     logStream += ' (Rotate';
@@ -106,7 +106,7 @@ if ((nodeEnv !== 'development') && (!nodeDebugLog)) {
     // Else, log filename rotation disabled, use native fs module
     accessLogStream = fs.createWriteStream(accessLogFilename, {
       encoding: 'utf8',
-      mode: 0o644,
+      mode: 0o600,
       flags: 'a'
     });
     accessLogOptions.stream = accessLogStream;
@@ -160,7 +160,7 @@ if ((nodeEnv !== 'development') && (!nodeDebugLog)) {
     ((logRotationSize) && (logRotationSize.length > 1))) {
     const ircRotateOptions = {
       encoding: 'utf8',
-      mode: 0o644,
+      mode: 0o600,
       rotate: 5
     };
     if ((logRotationInterval) && (logRotationInterval.length > 1)) {
@@ -174,7 +174,7 @@ if ((nodeEnv !== 'development') && (!nodeDebugLog)) {
   } else {
     ircLogStream = fs.createWriteStream(ircLogFilename, {
       encoding: 'utf8',
-      mode: 0o644,
+      mode: 0o600,
       flags: 'a'
     });
   }
