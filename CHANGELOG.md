@@ -151,6 +151,7 @@ After commit d796fd2
 - Fixed: utilities to generate user login would not accept space characters in user's name.
 - Debug and edit: configuration parsing, example configuration files.
 - Update to /docs and README.md
+- Added custom* to .gitignore so custom bash script can be created with git conflict.
 
 ## [v0.2.43](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.43) 2023-05-28
 
