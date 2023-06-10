@@ -8,7 +8,7 @@ Screen capture images are available in the [documentation](https://cotarr.github
 
 [ChangeLog.md](https://github.com/cotarr/irc-hybrid-client/blob/master/CHANGELOG.md)
 
-### Project Status (Work in Progress)
+### Project Status
 
 This IRC client is functional and mostly stable, but still evolving. 
 New features are still being added from time to time.
@@ -25,7 +25,7 @@ compared to about 338 kB serving from development folders without compression.
 The server files are located in the `server/` folder. The server is launched
 from the socket server in the `bin/` folder.
 
-### Installation
+# Installation
 
 There is a complete step by step installation instruction in the
 [docmentation](https://cotarr.github.io/irc-hybrid-client).
@@ -50,6 +50,11 @@ npm install
 export NODE_ENV=production
 npm ci
 ```
+
+# Web Server Configuration
+
+## Choose a configuration method
+
 There are two possible methods that may be used to define the
 web server configuration settings. The settings may be stored as 
 properties in the "credentials.json" file, or the settings may 
@@ -58,7 +63,70 @@ Only one method can be used at a time. If the credentials.json
 file exists, it will be parsed for settings, otherwise 
 the environment variables will be parsed for settings.
 
-To use the credentials.json file:
+In the case where someone may want to try the irc-hybrid-client in a 
+virtual machine on a private network, it is possible to setup 
+a minimal configuration. This should only be used for testing.
+
+Most of the configuration settings can be allowed to fall back to the configuration defaults. 
+At minimum, the configuration needs these items:
+
+* A defined user login account
+* The web server port number
+* A cookie secret. 
+* If using TLS, the full path names to the certificate files.
+
+
+### Option 1 - Bare minimum settings using credentials.json file
+
+To create a minimal configuration that uses the credentials.json,
+copy the following JSON object, then paste it into a "credentials.json" file
+in the base folder of the repository.
+Protect file permissions using `chmod 600 credentials.json`
+
+```json
+{
+  "configVersion": 2,
+  "loginUsers": [
+    {
+      "userid": 1,
+      "user": "user1",
+      "name": "Bob Smith",
+      "hash": "---BCRYPT-HASH-GOES-HERE---"
+    }
+  ],
+  "serverTlsKey": "/home/user1/tls/privkey.pem",
+  "serverTlsCert": "/home/user1/tls/fullchain.pem",
+  "tls": true,
+  "port": 3003,
+  "cookieSecret": "---COOKIE-SECRET-GOES-HERE---"
+}
+```
+
+### Option 2 - Bare minimum settings using environment variables
+
+To make a minimal configuration that uses environment variables,
+copy the following environment variables, then paste them into a .env file
+in the base folder of the repository.
+Protect file permissions using `chmod 600 .env`.
+To use environment variables as the configuration, make sure the 
+credentials.json file does not exist in the base folder of the repository.
+
+```
+ENV_VAR_CONFIG_VERSION=2
+LOGIN_USER_USERID=1
+LOGIN_USER_USER="user1"
+LOGIN_USER_NAME="Bob Smith"
+LOGIN_USER_HASH="---BCRYPT-HASH-GOES-HERE---"
+SERVER_TLS_KEY=/home/user/tls/privkey.pem
+SERVER_TLS_CERT=/home/user/tls/fullchain.pem
+SERVER_TLS=true
+SERVER_PORT=3003
+SESSION_SECRET="---COOKIE-SECRET-GOES-HERE---"
+```
+
+### Option 3 - Create configuration.json using template
+
+To create a new credentials.json file from a full settings template:
 
 ```bash
 # copy example-credentials.json and edit
@@ -67,11 +135,17 @@ cp -v example-credentials.json credentials.json
 chmod 600 credentials.json
 ```
 
-To use environment variables:
+### Option 4 - Create example .env file using template:
 
-Copy the "example-.env" file to a ".env" file or else 
-use the "example-.env" file as a template for exporting 
-environment variables to the app.
+
+If you are using an external method to manage environment variables,
+such as running irc-hybrid-client in a container, then
+use the environment variable template as a guide.
+
+To use environment variables as the configuration, make sure the 
+credentials.json file does not exist in the base folder of the repository.
+
+For configuration using a full settings template:
 
 ```bash
 # copy example-credentials.json and edit
@@ -80,8 +154,13 @@ cp -v example-.env .env
 chmod 600 .env
 ```
 
-- Set file path for TLS certs and tls:true ...or.. set tls=false
-- Set a unique cookie secret as `"cookieSecret": "xxxxxxx"` or `SESSION_SECRET=xxxxx` (Required)
+## Customize web server settings
+
+- Set file path for TLS certs and `tls:true` or `SERVER_TLS=true`. If not using TLS set this to `false` and the file paths may be omitted.
+- Set the port number to a valid integer value. This is the listening port of the web server.
+- Set a unique cookie secret as `"cookieSecret": "xxxxxxxx"` or `SESSION_SECRET=xxxxxxxx` (Required)
+
+## Assign one user login password
 
 It is necessary to assign one web page username and password.
 There is a detailed example in the documentation.
@@ -93,8 +172,9 @@ The user account used for web page login may be created using one of two
 javascript files in the tools/ folder. Either the "updateAuthForUser_1.mjs" script maybe
 be used to add a user account to the credentials.json file, or the "genEnvVarAuthForUser_1.mjs"
 script may be used to generate the user account for environment variable configuration.
+The generated environment variables can be copy / paste into the .env file using a text editor.
 
-To add a user account to the credentials.json file.
+Option 1 of 2: To add a user account to the credentials.json file.
 
 ```bash
 cd tools/
@@ -103,7 +183,7 @@ node updateAuthForUser_1.mjs
 # A revised copy of credentials.json will be displayed after password assignment
 cd ..
 ```
-To generate a user account when using environment variable configuration:
+Option 2 of 2: To generate a user account when using environment variable configuration:
 ```bash
 cd tools/
 # fill in user and password when prompted.
@@ -111,7 +191,12 @@ node genEnvVarAuthForUser_1.mjs
 # Copy/Paste the environment variable assignments as needed.
 cd ..
 ```
-IRC server configuration (TBD requires update)
+# IRC server configuration (TBD requires update)
+
+The configuration of IRC servers is fully independent of the web server configuration.
+At least 1 IRC server must be configured manually for the program to start.
+(In the future this will be improved).
+Once the server is started, the IRC server list may be edited from the web page.
 
 ```
 # Copy example-servers.json file
@@ -128,7 +213,12 @@ chmod 600 servers.json
 # 5) Optional: Preferred list of channels for this server.
 ```
 
+## Related setup
+
 - Configure firewall ports as required.
+
+## Start the app
+
 - To start the app `node bin/www.mjs` or `npm start`
 
 - Route on web page: `/irc/webclient.html`
@@ -141,7 +231,7 @@ The repository can be cloned and deployed as-is,
 requiring only editing of the configurations files.
 
 In the case where the web page files have been edited, you may want
-to regenrate a new folder containing replacement minified files for the web page.
+to regenerate a new folder containing replacement minified files for the web page.
 The there is a separate repository for this called
 [irc-hybrid-client-dev-tools](https://github.com/cotarr/irc-hybrid-client-dev-tools).
 There are complete instructions for use of this utility in the

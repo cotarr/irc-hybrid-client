@@ -44,6 +44,10 @@
           the environment variables will be parsed for settings.
         </p>
         <p>
+          On a multi-user system, you may want to change permissions 
+          on the config file to protect credentials.
+        </p>
+        <p>
           The introduction of two concurrent configuration schemes may introduce 
           some security questions. Configuration of security related properties
           could contain ambiguous conflicting values between the two configuration methods.
@@ -71,30 +75,114 @@
 <div class="pre-div2"><pre>
   environment variable method - Examples with this background color
 </pre></div>
-        <div class="install-section-title">Copy example configuration</div>
+
+
+        <div class="install-section-title">NODE_ENV environment variable</div>
         <p>
-          The git repository includes an example configuration file
-          for each method named &quot;example-credentials.json&quot; and 
-          &quot;example-.env&quot;. The first step is to make a copy of 
-          the example file to &quot;credentials.json&quot; or &quot;.env&quot;.
-          If you are on a multi user system you may optionally
-          change permissions.
+          Do not include the NODE_ENV environment variable in the .env file.
+          It is used by the NPM package manager and used internally by node itself.
+          Defining NODE_ENV in the .env file will generate a configuration validation error.
+          The NODE_ENV variable should be defined external to the program to a value of 
+          "development" or "production" as described in the node documentation.
+        </p>
+
+        <div class="install-section-title">Default Values</div>
+        <p>
+          When configuration settings are omitted from the configuration,
+          each setting will fall back to a default value defined in the 
+          server/config/index.mjs file. In order to reduce the size and 
+          complexity of the configuration, setting that remain at the default 
+          values may be omitted from both credentials.json and environment variables.
+        </p>
+
+        <div class="install-section-title">Bare minimum settings for testing</div>
+        <p>
+          Ok... Let's say that you just want to clone irc-hybrid-client  into a virtual machine and try it
+          on a private network. What is the minimum configuration needed?
         </p>
         <p>
-          If you are managing environment variables external to the program,
-          such as importing environment variables into a container,
-          it is not necessary to use the optional &quot;.env&quot; file. The example 
-          environment variables can still be used as a guide.
+          Most of the configuration settings can be allowed to fall back to the configuration defaults.
+          At minimum, the web server configuration needs:
+        </p>
+        <ul>
+          <li>A defined user login account</li>
+          <li>a web server port number</li>
+          <li>a cookie secret</li>
+          <li>Optional TLS, full path names to TLS certificates</li>
+        </ul>
+
+        <div class="install-section-title">Create configuration settings</div>
+        <p>
+          Option 1 of 4 - To make a minimal configuration that uses the credentials.json configuration method,
+          copy the following JSON object, then paste it into a new credentials.json file in the base folder of the repository.
+          Protect file permissions using "chmod 600 credentials.json".
+        </p>
+<div class="pre-div"><pre>
+{
+  "configVersion": 2,
+  "loginUsers": [
+    {
+      "userid": 1,
+      "user": "user1",
+      "name": "Bob Smith",
+      "hash": "---BCRYPT-HASH-GOES-HERE---"
+    }
+  ],
+  "serverTlsKey": "/home/user1/tls/privkey.pem",
+  "serverTlsCert": "/home/user1/tls/fullchain.pem",
+  "tls": true,
+  "port": 3003,
+  "cookieSecret": "---COOKIE-SECRET-GOES-HERE---"
+}
+</pre></div>
+        <p>
+          Option 2 of 4 - To make a minimal configuration that uses environment variables,
+          copy the following environment variables, then paste them into 
+          a .env file in the base folder of the repository.
+          Protect file permissions using `chmod 600 .env`.
+          To use environment variables as the configuration, make sure the
+          credentials.json file does not exist in the base folder of the repository.
+        </p>
+<div class="pre-div2"><pre>
+ENV_VAR_CONFIG_VERSION=2
+LOGIN_USER_USERID=1
+LOGIN_USER_USER="user1"
+LOGIN_USER_NAME="Bob Smith"
+LOGIN_USER_HASH="---BCRYPT-HASH-GOES-HERE---"
+SERVER_TLS_KEY=/home/user/tls/privkey.pem
+SERVER_TLS_CERT=/home/user/tls/fullchain.pem
+SERVER_TLS=true
+SERVER_PORT=3003
+SESSION_SECRET="---COOKIE-SECRET-GOES-HERE---"
+</pre></div>
+
+        <p>
+          Option 3 of 4 - To create a new credentials.json file using a full configuration template,
+          the git repository includes an example configuration file template 
+          named &quot;example-credentials.json&quot;.
+          Create a new credentials.json file as follows:
         </p>
 
 <div class="pre-div"><pre>
   cp -v example-credentials.json credentials.json
   chmod 600 credentials.json
 </pre></div>
+
+        <p>
+          Option 4 of 4 - To create an environment variable .env file using a full configuration template.
+          the git repository includes an example environment variable template
+          named &quot;example-.env&quot;.
+          To use environment variables as the configuration, make sure the
+          credentials.json file does not exist in the base folder of the repository.
+          Create a new .env file as follows:
+        </p>
+
+
 <div class="pre-div2"><pre>
   cp -v example-.env .env
   chmod 600 .env
 </pre></div>
+
         <div class="install-section-title">Configuration File version</div>
         <p>
           This is intended for future use. It provides a method to
@@ -147,7 +235,9 @@ SERVER_TLS=true
 </pre></div>
         <p>
           If on the other hand you are using the program in a development
-          environment without TLS certificates, set these lines as follows:
+          environment without TLS certificates, or you are using 
+          an external load balancer or proxy that provides TLS capabilities,
+          set these lines as follows to disable TLS:
         </p>
 <div class="pre-div"><pre>
 {
@@ -240,7 +330,7 @@ SERVER_PORT=3003
 <div class="pre-div"><pre>
 {
   "cookieSecret": "Lg9HLgCEmtag4Ff7",
-  "sessionExpireAfterSec": 86400,
+  "sessionExpireAfterSec": 604800,
   "instanceNumber": 3003,
 }
 </pre></div>
@@ -249,6 +339,187 @@ SESSION_SECRET="Lg9HLgCEmtag4Ff7"
 SESSION_EXPIRE_SEC=604800
 SERVER_INSTANCE_NUMBER=3003
 </pre></div>
+
+        <div class="install-section-title">Assign Login Password</div>
+        <p>
+          In the current version of the program, the username and password
+          that you will use to gain access to the web page must be configured using the ssh terminal
+          during the initial configuration of the web server. There is no provision to
+          change the password from within the web page.
+        </p>
+        <p>
+          As written, this program was intended to be a single user,
+          private web server. This will limit to password database to 1 authorized user.
+          This user would be the owner of the private web server.
+          Therefore, there was no reason to unnecessarily increase security risk by adding
+          an API capable of writing password credentials. Should someone
+          gain unauthorized access, such as a forged cookie or cross-site script, it would
+          not be possible to remotely modify the password file, or any of
+          the server configuration. Should the account password become compromised,
+          the web interface allows remote shutdown of the server. This would protect
+          it until a new password were set using the ssh terminal.
+        </p>
+        <p>
+          Case 1 - Configuration using credentials.json
+        </p>
+        <p>
+          A brief note about syntax. The credentials.json file represents a JSON structured data object.
+          JSON syntax must be exact, with matching curly braces and proper use of commas.
+          The credentials.json file includes a loginUsers property.
+          The square brackets [ ] define a javascript array.
+          Each of the curly braces { } within the array is a javascript object
+          used to define an individual user.
+          The user object contains 4 properties listed as key/value pairs.
+          Note the use of double quotes and commas between key/value pairs except the last has no comma.
+          In fact, there is only 1 user. Only the first array object at
+          index 0 (userid 1) is relevant.
+        </p>
+        <p>
+          A small javascript program has been included to create a user password hash
+          and automatically update the credentials.json file.
+          The program can be executed from the command line to
+          assign the username and password for the primary user at array index 0, (userid 1).
+          To run this program, change directory to the tools folder, and execute the
+          updateAuthForUser_1.mjs program as in the following example.
+        </p>
+
+<div class="pre-div"><pre>
+cd tools
+node updateAuthForUser_1.mjs
+</pre></div>
+        <p>
+          This will start an interactive session.
+          In this example, the &quot;user&quot; was set to <blue-example>user1</blue-example>.
+          The &quot;name&quot; was set to <blue-example>Bob Smith</blue-example>.
+          In this example, the password was set to
+          <blue-example>zuwa79xoJxLJ</blue-example>.
+          A bcrypt function was used to generate a salted hash.
+          The data was written to the credentials.json file, and
+          an excerpt from the credentials.json was displayed for your review.
+        </p>
+<div class="pre-div"><pre>
+$ node updateAuthForUser_1.mjs 
+
+Caution, you are editing the password file.
+
+This will set a new login user/password for userid=1 at array index=0.
+This is a static password not editable online.
+It is intended there is only one user for the program.
+This must be run from the tools/ folder to find credentials.json.
+
+User up to 16 characters a-z,A-Z,0-9
+Enter new user:<blue-example>user1</blue-example>
+
+Name up to 32 characters a-z,A-Z,0-9 and spaces
+Enter new name (user1):<blue-example>Bob Smith</blue-example>
+
+Enter new password:<blue-example>zuwa79xoJxLJ</blue-example>
+{
+  "loginUsers": [<yellow-example>
+    {
+      "userid": 1,
+      "user": "user1",
+      "name": "Bob Smith",
+      "hash": "$2a$10$eJDI3vQNIqblM4tBhCdwuumbpzRtsX6.AYApsaUfxa9CS.ztamKSC"
+    }</yellow-example>
+  ]
+}
+</pre></div>
+        <p>
+          Privacy Caution:
+          The web userid numeric value (userid: 1) and web login timestamp are saved in the web browsers's
+          localStorage API. See:
+          <a href="faq.html#localstorage">FAQ</a>
+        </p>
+        <p>
+          Next, return from the tools folder to the repository folder.
+        </p>
+<div class="pre-div"><pre>
+cd ..
+</pre></div>
+        <p>
+          If you really feel you need to create a second username/password entry,
+          such as one for your phone and one for your desktop,
+          you can create one at index 0 using the above script, then
+          copy/paste the entire javascript object as an additional javascript object in the array.
+          Use care to maintain valid JSON format with commas and braces.
+        </p>
+        <p>
+          Case 2 - Configuration using environment variables
+        </p>
+        <p>
+          A small javascript program has been included to create a user password hash
+          and generate environment variables that can be copy/paste into 
+          the .env file or other environment variable configuration.
+          The program can be executed from the command line to
+          assign the username and generate password hash for the primary user (userid 1).
+          To run this program, change directory to the tools folder, and execute the
+          genEnvVarAuthForUser_1.mjs program as in the following example.
+
+        </p>
+
+        
+<div class="pre-div2"><pre>
+  cd tools
+  node genEnvVarAuthForUser_1.mjs
+</pre></div>
+        <p>
+          This will start an interactive session.
+          In this example, the &quot;user&quot; was set to <blue-example>user1</blue-example>.
+          The &quot;name&quot; was set to <blue-example>Bob Smith</blue-example>.
+          In this example, the password was set to
+          <blue-example>zuwa79xoJxLJ</blue-example>.
+          A bcrypt function was used to generate a salted hash.
+          The data was printed to the terminal so the 
+          environment variables can be copied in order to paste the  
+          values into an external environment variable configuration.
+          If the .env file is used, all 4 lines can be copied 
+          to the .env file.
+        </p>
+<div class="pre-div2"><pre>
+$ node genEnvVarAuthForUser_1.mjs 
+
+You are running a script to generate user login environment variables.
+This is a static password not editable online.
+It is intended there is only one user for the program.
+This must be run from the tools/ folder.
+
+
+User up to 16 characters a-z,A-Z,0-9
+Enter new user:<blue-example>user1</blue-example>
+
+Name up to 32 characters a-z,A-Z,0-9 and spaces
+Enter new name (user1):<blue-example>Bob Smith</blue-example>
+
+Enter new password:<blue-example>zuwa79xoJxLJ</blue-example>
+
+You may copy/paste these environment variables
+
+<yellow-example>
+LOGIN_USER_USERID=1
+LOGIN_USER_USER="user1"
+LOGIN_USER_NAME="Bob Smith"
+LOGIN_USER_HASH="$2a$10$0pr9Q21L7CFoSw5.FjbW0.izOzQtBTqQjOGbZJabM2MMNdSxKyfpO"
+</yellow-example>
+</pre></div>
+        <p>
+          Privacy Caution:
+          The web userid numeric value (userid: 1) and web login timestamp are saved in the web browsers's
+          localStorage API. See:
+          <a href="faq.html#localstorage">FAQ</a>
+        </p>
+        <p>
+          Next, return from the tools folder to the repository folder.
+        </p>
+
+<div class="pre-div2"><pre>
+  cd ..
+</pre></div>
+
+
+
+
+
         <div class="install-section-title">Session Store (Optional)</div>
         <p>
           By default, irc-hybrid-client web server uses Memorystore as a RAM database
@@ -598,198 +869,6 @@ SERVER_LOG_ROTATE_SIZE=1M
 SERVER_LOG_ONLY_ERRORS=false
 </pre></div>
 
-        <div class="install-section-title">Assign Login Password</div>
-        <p>
-          In the current version of the program, the username and password
-          that you will use to gain access to the web page must be configured using the ssh terminal
-          during the initial configuration of the web server. There is no provision to
-          change the password from within the web page.
-        </p>
-        <p>
-          As written, this program was intended to be a single user,
-          private web server. This will limit to password database to 1 authorized user.
-          This user would be the owner of the private web server.
-          Therefore, there was no reason to unnecessarily increase security risk by adding
-          an API capable of writing password credentials. Should someone
-          gain unauthorized access, such as a forged cookie or cross-site script, it would
-          not be possible to remotely modify the password file, or any of
-          the server configuration. Should the account password become compromised,
-          the web interface allows remote shutdown of the server. This would protect
-          it until a new password were set using the ssh terminal.
-        </p>
-        <p>
-          Case 1 - Configuration using credentials.json
-        </p>
-        <p>
-          A brief note about syntax. The credentials.json file represents a JSON structured data object.
-          JSON syntax must be exact, with matching curly braces and proper use of commas.
-          The credentials.json file includes a loginUsers property.
-          The square brackets [ ] define a javascript array.
-          Each of the curly braces { } within the array is a javascript object
-          used to define an individual user.
-          The user object contains 4 properties listed as key/value pairs.
-          Note the use of double quotes and commas between key/value pairs except the last has no comma.
-          In fact, there is only 1 user. Only the first array object at
-          index 0 (userid 1) is relevant.
-        </p>
-        <p>
-          A small javascript program has been included to create a user password hash
-          and automatically update the credentials.json file.
-          The program can be executed from the command line to
-          assign the username and password for the primary user at array index 0, (userid 1).
-          To run this program, change directory to the tools folder, and execute the
-          ./updateAuthForUser_1.mjs program as in the following example.
-        </p>
-
-<div class="pre-div"><pre>
-cd tools
-node updateAuthForUser_1.mjs
-</pre></div>
-        <p>
-          This will start an interactive session.
-          In this example, the &quot;user&quot; was set to <blue-example>user1</blue-example>.
-          The &quot;name&quot; was allowed to default to the
-          same value as the user.
-          In this example, the password was set to
-          <blue-example>zuwa79xoJxLJ</blue-example>.
-          A bcrypt function was used to generate a salted hash.
-          The data was written to the credentials.json file, and
-          a copy of the credentials.json was displayed for your review.
-        </p>
-<div class="pre-div"><pre>
-Caution, you are editing the password file
-
-This will set a new login user/password for userid=1 at array index=0
-This is a static password not editable online
-It is intended there is only one user for the program
-This must be run from the tools folder to find credentials.json
-
-User up to 16 characters a-z,A-Z,0-9
-Enter new user:<blue-example>user1</blue-example>
-
-Name up to 32 characters a-z,A-Z,0-9
-Enter new name (user1):
-
-Enter new password:<blue-example>zuwa79xoJxLJ</blue-example>
-{
-  "configVersion": 2,
-  "serverTlsKey": "/home/user1/tls/privkey.pem",
-  "serverTlsCert": "/home/user1/tls/fullchain.pem",
-  "tls": true,
-  "port": 3003,
-  "cookieSecret": "xxxxxxxxxxxxxxxx",
-  "sessionExpireAfterSec": 86400,
-  "sessionRollingCookie": false,
-  "sessionEnableRedis": false,
-  "sessionRedisPrefix": "irc001:",
-  "sessionRedisPassword": "",
-  "instanceNumber": 0,
-  "securityContact": "mailto:security@example.com",
-  "securityExpires": "Fri, 1 Apr 2022 08:00:00 -0600",
-  "pidFilename": "/home/user1/tmp/ircHybridClient.PID",
-  "disableServerListEditor": false,
-  "persistIrcMessageCache": false,
-  "accessLogOnlyErrors": false,
-  "logRotationInterval": "5m",
-  "loginUsers": [<yellow-example>
-    {
-      "userid": 1,
-      "user": "user1",
-      "name": "user1",
-      "hash": "$2a$10$kvW6dwBpWKkZzcMBuKLI4OlEVoI6guWu.yewp8AHK4DGS3OjMWcPq"
-    }</yellow-example>
-  ],
-  "enableRemoteLogin": false,
-  "enableSocks5Proxy": false,
-  "ircSocketLocalAddress": "",
-  "serveHtmlHelpDocs": false,
-  "customBeepSounds": false
-}
-</pre></div>
-        <p>
-          Privacy Caution:
-          The web userid numeric value (userid: 1) and web login timestamp are saved in the web browsers's
-          localStorage API. See:
-          <a href="faq.html#localstorage">FAQ</a>
-        </p>
-        <p>
-          Next, return from the tools folder to the repository folder.
-        </p>
-<div class="pre-div"><pre>
-cd ..
-</pre></div>
-        <p>
-          If you really feel you need to create a second username/password entry,
-          such as one for your phone and one for your desktop,
-          you can create one at index 0 using the above script, then
-          copy/paste the entire javascript object as an additional javascript object in the array.
-          Use care to maintain valid JSON format with commas and braces.
-        </p>
-        <p>
-          Case 2 - Configuration using environment variables
-        </p>
-        <p>
-          A small javascript program has been included to create a user password hash
-          and generate environment variables that can be copy/paste into 
-          the .env file or other environment variable configuration.
-          The program can be executed from the command line to
-          assign the username and generate password hash for the primary user (userid 1).
-          To run this program, change directory to the tools folder, and execute the
-          ./genEnvVarAuthForUser_1.mjs program as in the following example.
-
-        </p>
-
-        
-<div class="pre-div2"><pre>
-  cd tools
-  node genEnvVarAuthForUser_1.mjs
-</pre></div>
-        <p>
-          This will start an interactive session.
-          In this example, the &quot;user&quot; was set to <blue-example>user1</blue-example>.
-          The &quot;name&quot; was allowed to default to the
-          same value as the user.
-          In this example, the password was set to
-          <blue-example>zuwa79xoJxLJ</blue-example>.
-          A bcrypt function was used to generate a salted hash.
-          The data was printed to the terminal so the 
-          environment variables can be copied in order to paste the  
-          values into an external environment variable configuration.
-          If the .env file is used, all 4 lines can be copied 
-          to the .env file.
-        </p>
-<div class="pre-div2"><pre>
-You are running a script to generate user login environment variables.
-
-
-User up to 16 characters a-z,A-Z,0-9
-Enter new user:user1
-
-Name up to 32 characters a-z,A-Z,0-9
-Enter new name (user1):
-
-Enter new password:zuwa79xoJxLJ
-
-You may copy/paste these enviornment variables
-
-<yellow-example>LOGIN_USER_USERID=1
-LOGIN_USER_USER=user1
-LOGIN_USER_NAME=user1
-LOGIN_USER_HASH=$2a$10$oWs2sKPpnscvSfUeYjZc2.AapYo6MzS0MvoB/oI8ltUhvmT79JdlG</yellow-example>
-</pre></div>
-        <p>
-          Privacy Caution:
-          The web userid numeric value (userid: 1) and web login timestamp are saved in the web browsers's
-          localStorage API. See:
-          <a href="faq.html#localstorage">FAQ</a>
-        </p>
-        <p>
-          Next, return from the tools folder to the repository folder.
-        </p>
-
-<div class="pre-div2"><pre>
-  cd ..
-</pre></div>
 
         <div class="install-section-title">Serve HTML Help Files</div>
         <p>

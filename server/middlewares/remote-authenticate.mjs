@@ -87,48 +87,51 @@ const logoutHtmlBottom = fs.readFileSync('./server/fragments/logout-bottom.html'
 // At program startup, validate that the credentials object
 // has required properties to use oauth2 authentication
 //
-if ((!Object.hasOwn(oauth2, 'remoteAuthHost')) ||
-  (oauth2.remoteAuthHost.length < 1)) {
-  console.log(
-    'Error: Remote login, "remoteAuthHost" is a required property');
-  process.exit(1);
-} else if ((!Object.hasOwn(oauth2, 'remoteCallbackHost')) ||
-  (oauth2.remoteCallbackHost.length < 1)) {
-  console.log(
-    'Error: Remote login, "remoteCallbackHost" is a required property');
-  process.exit(1);
-} else if ((!Object.hasOwn(oauth2, 'remoteClientId')) ||
-  (oauth2.remoteClientId.length < 1)) {
-  console.log(
-    'Error: Remote login, "remoteClientId" is a required property');
-  process.exit(1);
-} else if ((!Object.hasOwn(oauth2, 'remoteClientSecret')) ||
-  (oauth2.remoteClientSecret.length < 1)) {
-  console.log(
-    'Error: Remote login, "remoteClientSecret" is a required property');
-  process.exit(1);
-} else if (!Object.hasOwn(oauth2, 'remoteScope')) {
-  console.log(
-    'Error: Remote login, "remoteScope" is a required property');
-  process.exit(1);
-} else {
-  let scopeExist = false;
-  if (Array.isArray(oauth2.remoteScope)) {
-    if ((oauth2.remoteScope.length > 0) &&
-      (oauth2.remoteScope[0].length > 0)) {
-      scopeExist = true;
-    }
-  } else {
-    if ((typeof oauth2.remoteScope === 'string') &&
-      (oauth2.remoteScope.length > 0)) {
-      scopeExist = true;
-    }
-  }
-  if (!scopeExist) {
-    console.log('Error: Remote login, "remoteScope" is a required property');
+// Ignore the checks unless enabled for remote login.
+if (config.oauth2.enableRemoteLogin) {
+  if ((!Object.hasOwn(oauth2, 'remoteAuthHost')) ||
+    (oauth2.remoteAuthHost.length < 1)) {
+    console.log(
+      'Error: Remote login, "remoteAuthHost" is a required property');
     process.exit(1);
+  } else if ((!Object.hasOwn(oauth2, 'remoteCallbackHost')) ||
+    (oauth2.remoteCallbackHost.length < 1)) {
+    console.log(
+      'Error: Remote login, "remoteCallbackHost" is a required property');
+    process.exit(1);
+  } else if ((!Object.hasOwn(oauth2, 'remoteClientId')) ||
+    (oauth2.remoteClientId.length < 1)) {
+    console.log(
+      'Error: Remote login, "remoteClientId" is a required property');
+    process.exit(1);
+  } else if ((!Object.hasOwn(oauth2, 'remoteClientSecret')) ||
+    (oauth2.remoteClientSecret.length < 1)) {
+    console.log(
+      'Error: Remote login, "remoteClientSecret" is a required property');
+    process.exit(1);
+  } else if (!Object.hasOwn(oauth2, 'remoteScope')) {
+    console.log(
+      'Error: Remote login, "remoteScope" is a required property');
+    process.exit(1);
+  } else {
+    let scopeExist = false;
+    if (Array.isArray(oauth2.remoteScope)) {
+      if ((oauth2.remoteScope.length > 0) &&
+        (oauth2.remoteScope[0].length > 0)) {
+        scopeExist = true;
+      }
+    } else {
+      if ((typeof oauth2.remoteScope === 'string') &&
+        (oauth2.remoteScope.length > 0)) {
+        scopeExist = true;
+      }
+    }
+    if (!scopeExist) {
+      console.log('Error: Remote login, "remoteScope" is a required property');
+      process.exit(1);
+    }
   }
-}
+} // remote auth enabled
 
 //
 // At program startup, check if native fetch() exists.

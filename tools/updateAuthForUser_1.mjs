@@ -6,20 +6,31 @@
 //
 // To run:
 //    cd tools
-//    node updateAuthForUser_1.js
+//    node updateAuthForUser_1.mjs
 //
 import readline from 'readline';
 import fs from 'fs';
 import bcrypt from 'bcryptjs';
 
+try {
+  const packageJson = JSON.parse(fs.readFileSync('../package.json', 'utf8'));
+  if (!(packageJson)) {
+    throw new Error('Wrong folder');
+  }
+} catch (e) {
+  console.log('This utility should be run from the "tools/" folder');
+  process.exit(1);
+}
+
 const credentials = JSON.parse(fs.readFileSync('../credentials.json', 'utf8'));
 
-if (credentials.configVersion > 2) {
+if ((!Object.hasOwn(credentials, 'configVersion')) || (credentials.configVersion > 2)) {
   console.log('credentials.json error: configVersion unrecognized value');
   process.exit(1);
 }
 
-if (credentials.enableRemoteLogin === true) {
+if ((Object.hasOwn(credentials, 'enableRemoteLogin')) &&
+  (credentials.enableRemoteLogin === true)) {
   console.log('Error: A new local web server password may not be assigned because the program' +
     ' is configured for remote login in credentials.json, enableRemoteLogin: true.');
   process.exit(1);
@@ -29,7 +40,8 @@ if (credentials.enableRemoteLogin === true) {
 // The new version uses bcrypt where salt in incorporated into the hash.
 // Running this on a version 1 config will automatically update the format by removing salt.
 //
-if (credentials.configVersion === 1) {
+if ((Object.hasOwn(credentials, 'configVersion')) &&
+  (credentials.configVersion === 1)) {
   delete credentials.loginUsers[0].salt;
   credentials.configVersion = 2;
   console.log('\n\n* * * Updating credentials.json from configVersion 1 to 2 to support bcrypt\n');
@@ -57,7 +69,7 @@ function _removeCRLF (inStr) {
   return inStr;
 }
 
-const _sanatizeString = function (inString) {
+const _sanitizeUserString = function (inString) {
   let sanitizedString = '';
   const allowedChars =
     'abcdefghijklmnoqprstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -72,25 +84,40 @@ const _sanatizeString = function (inString) {
   return sanitizedString;
 };
 
+const _sanitizeNameString = function (inString) {
+  let sanitizedString = '';
+  const allowedChars =
+    'abcdefghijklmnoqprstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  if ((typeof inString === 'string') && (inString.length > 0)) {
+    for (let i = 0; i < inString.length; i++) {
+      const allowedCharIndex = allowedChars.indexOf(inString[i]);
+      if (allowedCharIndex > -1) {
+        sanitizedString += allowedChars[allowedCharIndex];
+      }
+    }
+  }
+  return sanitizedString;
+};
+
 console.log();
-console.log('Caution, you are editing the password file');
+console.log('Caution, you are editing the password file.');
 console.log();
-console.log('This will set a new login user/password for userid=1 at array index=0');
-console.log('This is a static password not editable online');
-console.log('It is intended there is only one user for the program');
-console.log('This must be run from the tools folder to find credentials.json');
+console.log('This will set a new login user/password for userid=1 at array index=0.');
+console.log('This is a static password not editable online.');
+console.log('It is intended there is only one user for the program.');
+console.log('This must be run from the tools/ folder to find credentials.json.');
 
 console.log('\nUser up to 16 characters a-z,A-Z,0-9');
 getPass.question('Enter new user:', function (user) {
-  user = _sanatizeString(_removeCRLF(user));
+  user = _sanitizeUserString(_removeCRLF(user));
   if (user.length > 16) {
     console.log('Error: Exceeded maximum username 16 characters');
     process.exit(1);
   }
-  console.log('\nName up to 32 characters a-z,A-Z,0-9');
+  console.log('\nName up to 32 characters a-z,A-Z,0-9 and spaces');
   getPass.question('Enter new name (' + user + '):', function (name) {
     if (name.length === 0) name = user;
-    name = _sanatizeString(_removeCRLF(name));
+    name = _sanitizeNameString(_removeCRLF(name));
     if (name.length > 32) {
       console.log('Error: Exceeded maximum username 32 characters');
       process.exit(1);
@@ -103,6 +130,10 @@ getPass.question('Enter new user:', function (user) {
         process.exit(1);
       }
       password = _removeCRLF(password);
+      if (password.length < 8) {
+        console.log('Error: password to short. Expect >= 8 characters.');
+        process.exit(1);
+      }
       const hash = bcrypt.hashSync(password, 10);
       credentials.loginUsers[0].user = user;
       credentials.loginUsers[0].name = name;
@@ -116,7 +147,7 @@ getPass.question('Enter new user:', function (user) {
       // If file pre-exists, change permissions
       fs.chmodSync(filename, 0o600);
       getPass.close();
-      console.log(JSON.stringify(credentials, null, 2));
+      console.log(JSON.stringify({ loginUsers: credentials.loginUsers }, null, 2));
     });
   });
 });

@@ -43,8 +43,6 @@ import dotenv from 'dotenv';
 // Import the .env file
 dotenv.config();
 
-// const nodeEnv = process.env.NODE_ENV || 'development';
-
 // Check requirement for minimum node version
 const minNodeVersion = 16;
 if (parseInt(process.version.replace('v', '').split('.')[0]) < minNodeVersion) {
@@ -53,6 +51,33 @@ if (parseInt(process.version.replace('v', '').split('.')[0]) < minNodeVersion) {
   process.exit(1);
 }
 
+// The NODE_ENV variable should be assigned external to the .env file
+try {
+  const dotEnvFile = fs.readFileSync('./.env', 'utf8');
+  if (dotEnvFile.indexOf('NODE_ENV') >= 0) {
+    console.log('Error: The environment variable NODE_ENV should be defined ' +
+      'external to the .env file.');
+    process.exit(1);
+  }
+} catch (err) {
+  if (err.code !== 'ENOENT') {
+    console.log(err);
+    process.exit(1);
+  }
+}
+
+// Verify that NODE_ENV has been assigned to a valid value
+if ((!Object.hasOwn(process.env, 'NODE_ENV')) ||
+((process.env.NODE_ENV !== 'development') && (process.env.NODE_ENV !== 'production'))) {
+  console.log('Error: The environment variable "NODE_ENV" must be assigned to either ' +
+    '"NODE_ENV=development" or "NODE_ENV=production". ' +
+    'This must be done external to the .env file, if used.');
+  process.exit(1);
+}
+// const nodeEnv = process.env.NODE_ENV || 'development';
+
+// Attempt to read credentials.json.
+// This file should not exist if configuration is using environment variables.
 let credentials = null;
 try {
   credentials = JSON.parse(fs.readFileSync('./credentials.json', 'utf8'));
@@ -242,6 +267,13 @@ export const proxy = {
 // For session cookie
 if ((!(session.secret)) || (session.secret.length < 8)) {
   console.error('Error, cookie secret required');
+  console.log('This may be set using the "cookieSecret" property in the credentials.json file ' +
+    'or in the "SESSION_SECRET" environment variable, depending on the configuration method. ' +
+    'This is a random string value used to create and validate cookie digital signatures.');
+  process.exit(1);
+}
+if ((session.secret === '---COOKIE-SECRET-GOES-HERE---') || (session.secret === 'xxxxxxxx')) {
+  console.error('Error, Session cookie secret at default value.');
   console.log('This may be set using the "cookieSecret" property in the credentials.json file ' +
     'or in the "SESSION_SECRET" environment variable, depending on the configuration method. ' +
     'This is a random string value used to create and validate cookie digital signatures.');

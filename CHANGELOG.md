@@ -146,6 +146,12 @@ This only impacts remote login. Instances that use local login
 do not perform any backend fetch requests.
 This clears all npm outdated package warnings.
 
+After commit d796fd2
+
+- Fixed: utilities to generate user login would not accept space characters in user's name.
+- Debug and edit: configuration parsing, example configuration files.
+- Update to /docs and README.md
+
 ## [v0.2.43](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.43) 2023-05-28
 
 ### Updated
