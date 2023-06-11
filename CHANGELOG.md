@@ -172,11 +172,11 @@ it is also appended. With this change, when remote login fails, the error in the
 authorization server is sent to web server and in turn forwarded to the browser.
 This has no impact when configured for local login.
 
-Example Error:
+Example remote auth error:
 
-```
 500 Internal Server Error, HTTP status error, 403 Forbidden, POST http://127.0.0.1:3500/oauth/token, {"error":"invalid_grant","error_description":"Invalid authorization code"}
-```
+
+- Fixed unclosed input tag in html fragment file
 
 ## [v0.2.43](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.43) 2023-05-28
 
