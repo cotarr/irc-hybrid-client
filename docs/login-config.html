@@ -95,6 +95,59 @@
           values may be omitted from both credentials.json and environment variables.
         </p>
 
+        <table class="account-table" border="1" cellpadding="5px">
+          <tr><th>Environment variable</th>        <th>credentials.json</th>        <th>Parsed config object</th>        <th>Default Value</th></tr>
+          <tr><td>ENV_VAR_CONFIG_VERSION</td>      <td>configVersion</td>           <td></td>                            <td>(See note-1)</td></tr>
+          <tr><td>LOGIN_USER_USERID</td>           <td>loginUsers[0].userid</td>    <td>loginusers[0].userid</td>        <td>(See note-2)</td></tr>
+          <tr><td>LOGIN_USER_USER</td>             <td>loginUsers[0].user</td>      <td>loginusers[0].user</td>          <td>(See note-2)</td></tr>
+          <tr><td>LOGIN_USER_NAME</td>             <td>loginUsers[0].name</td>      <td>loginusers[0].name</td>          <td>(See note-2)</td></tr>
+          <tr><td>LOGIN_USER_HASH</td>             <td>loginUsers[0].hash</td>      <td>loginusers[0].hash</td>          <td>(See note-2)</td></tr>
+          <tr><td>SITE_SECURITY_CONTACT</td>       <td>securityContact</td>         <td>site.securityContact</td>        <td>&quot;&quot;</td></tr>
+          <tr><td>SITE_SECURITY_EXPIRES</td>       <td>securityExpires</td>         <td>site.securityExpires</td>        <td>&quot;&quot;</td></tr>
+          <tr><td>SERVER_TLS_KEY</td>              <td>serverTlsKey</td>            <td>server.serverTlsKey</td>         <td>&quot;&quot;</td></tr>
+          <tr><td>SERVER_TLS_CERT</td>             <td>serverTlsCert</td>           <td>server.serverTlsCert</td>        <td>&quot;&quot;</td></tr>
+          <tr><td>SERVER_TLS</td>                  <td>tls</td>                     <td>server.tls</td>                  <td>false</td></tr>
+          <tr><td>SERVER_PORT</td>                 <td>port</td>                    <td>server.port</td>                 <td>3003</td></tr>
+          <tr><td>SERVER_PID_FILENAME</td>         <td>pidFilename</td>             <td>server.pidFilename</td>          <td>&quot;&quot;</td></tr>
+          <tr><td>SERVER_INSTANCE_NUMBER</td>      <td>instanceNumber</td>          <td>server.instanceNumber</td>       <td>null</td></tr>
+          <tr><td>SERVER_LOG_ROTATE_INTERVAL</td>  <td>logRotationInterval</td>     <td>server.logRotateInterval</td>    <td>&quot;&quot;</td></tr>
+          <tr><td>SERVER_LOG_ROTATE_SIZE</td>      <td>logRotationSize</td>         <td>server.logRotationSize</td>      <td>null</td></tr>
+          <tr><td>SERVER_LOG_ONLY_ERRORS</td>      <td>accessLogOnlyErrors</td>     <td>server.accessLogOnlyErrors</td>  <td>false</td></tr>
+          <tr><td>SESSION_SET_ROLLING_COOKIE</td>  <td>sessionRollingCookie</td>    <td>session.rollingCookie</td>       <td>false</td></tr>
+          <tr><td>SESSION_EXPIRE_SEC</td>          <td>sessionExpireAfterSec</td>   <td>session.ttl</td>                 <td>604800</td></tr>
+          <tr><td></td>                            <td></td>                        <td>session.maxAge</td>              <td>604800000</td></tr>
+          <tr><td>SESSION_SECRET</td>              <td>cookieSecret</td>            <td>session.secret</td>              <td>null</td></tr>
+          <tr><td>SESSION_ENABLE_REDIS</td>        <td>sessionEnableRedis</td>      <td>session.enableRedis</td>         <td>false</td></tr>
+          <tr><td>SESSION_REDIS_PREFIX</td>        <td>sessionRedisPrefix</td>      <td>session.redisPrefix</td>         <td>&quot;irc:&quot;</td></tr>
+          <tr><td>SESSION_REDIS_PASSWORD</td>      <td>sessionRedisPassword</td>    <td>session.redisPassword</td>       <td>&quot;&quot;</td></tr>
+          <tr><td>OAUTH2_ENABLE_REMOTE_LOGIN</td>  <td>enableRemoteLogin</td>       <td>oauth2.enableRemoteLogin</td>    <td>false</td></tr>
+          <tr><td>OAUTH2_REMOTE_AUTH_HOST</td>     <td>remoteAuthHost</td>          <td>oauth2.remoteAuthHost</td>       <td>null</td></tr>
+          <tr><td>OAUTH2_REMOTE_CALLBACK_HOST</td> <td>remoteCallbackHost</td>      <td>oauth2.remoteCallbackHost</td>   <td>null</td></tr>
+          <tr><td>OAUTH2_REMOTE_CLIENT_ID</td>     <td>remoteClientId</td>          <td>oauth2.remoteClientId</td>       <td>null</td></tr>
+          <tr><td>OAUTH2_REMOTE_CLIENT_SECRET</td> <td>remoteClientSecret</td>      <td>oauth2.remoteClientSecret</td>   <td>null</td></tr>
+          <tr><td>OAUTH2_REMOTE_SCOPE</td>         <td>remoteScope</td>             <td>oauth2.remoteScope</td>          <td>null</td></tr>
+          <tr><td>IRC_DISABLE_LIST_EDITOR</td>     <td>disableServerListEditor</td> <td>irc.disableServerListEditor</td> <td>false</td></tr>
+          <tr><td>IRC_PERSIST_MESSAGE_CACHE</td>   <td>persistIrcMessageCache</td>  <td>irc.persistIrcMessageCache</td>  <td>false</td></tr>
+          <tr><td>IRC_SOCKET_LOCAL_ADDRESS</td>    <td>ircSocketLocalAddress</td>   <td>irc.ircSocketLocalAddress</td>   <td>null</td></tr>
+          <tr><td>IRC_SERVE_HTML_HELP_DOCS</td>    <td>serveHtmlHelpDocs</td>       <td>irc.serveHtmlHelpDocs</td>       <td>false</td></tr>
+          <tr><td>IRC_CUSTOM_BEEP_SOUNDS</td>      <td>customBeepSounds</td>        <td>irc.customBeepSounds</td>        <td>false</td></tr>
+          <tr><td>IRC_ENABLE_SOCKS5_PROXY</td>     <td>enableSocks5Proxy</td>       <td>proxy.enableSocks5Proxy</td>     <td>false</td></tr>
+          <tr><td>IRC_SOCKS5_HOST</td>             <td>socks5Host</td>              <td>proxy.socks5Host</td>            <td>null</td></tr>
+          <tr><td>IRC_SOCKS5_PORT</td>             <td>socks5Port</td>              <td>proxy.socks5Port</td>            <td>null</td></tr>
+          <tr><td>IRC_SOCKS5_USERNAME</td>         <td>socks5Username</td>          <td>proxy.socks5Username</td>        <td>null</td></tr>
+          <tr><td>IRC_SOCKS5_PASSWORD</td>         <td>socks5Password</td>          <td>proxy.socks5Password</td>        <td>null</td></tr>
+          <tr><td></td>        <td></td>  <td></td>      <td></td></tr>
+        </table>
+        <ul>
+          <li>
+            Note-1: The configuration version is checked on program start. Missing or wrong value will generate an error. The current expeccted value is 2. It is not otherwise used by the application.
+          </li>
+          <li>
+            Note-2: In the case where the alternate remote OAuth2 login method is enabled, definition of local users may be omitted from the configuration without error.
+            If web user accounts are not defined there will be no entry in the parsed configuration object.
+          </li>
+        </ul>
+
         <div class="install-section-title">Bare minimum settings for testing</div>
         <p>
           Ok... Let's say that you just want to clone irc-hybrid-client  into a virtual machine and try it
@@ -139,7 +192,7 @@
           Option 2 of 4 - To make a minimal configuration that uses environment variables,
           copy the following environment variables, then paste them into 
           a .env file in the base folder of the repository.
-          Protect file permissions using `chmod 600 .env`.
+          Protect file permissions using "chmod 600 .env".
           To use environment variables as the configuration, make sure the
           credentials.json file does not exist in the base folder of the repository.
         </p>
@@ -237,7 +290,8 @@ SERVER_TLS=true
           If on the other hand you are using the program in a development
           environment without TLS certificates, or you are using 
           an external load balancer or proxy that provides TLS capabilities,
-          set these lines as follows to disable TLS:
+          set these lines as follows to disable TLS. The lines 
+          containing empty filenames may be omitted from the configuration.
         </p>
 <div class="pre-div"><pre>
 {
@@ -388,11 +442,11 @@ cd tools
 node updateAuthForUser_1.mjs
 </pre></div>
         <p>
-          This will start an interactive session.
+          This will start an interactive session in the command line terminal.
           In this example, the &quot;user&quot; was set to <blue-example>user1</blue-example>.
           The &quot;name&quot; was set to <blue-example>Bob Smith</blue-example>.
           In this example, the password was set to
-          <blue-example>zuwa79xoJxLJ</blue-example>.
+          <blue-example>zuwa79xoJxLJ</blue-example>, but you should select your own random password.
           A bcrypt function was used to generate a salted hash.
           The data was written to the credentials.json file, and
           an excerpt from the credentials.json was displayed for your review.
@@ -464,11 +518,11 @@ cd ..
   node genEnvVarAuthForUser_1.mjs
 </pre></div>
         <p>
-          This will start an interactive session.
+          This will start an interactive session in the command line terminal.
           In this example, the &quot;user&quot; was set to <blue-example>user1</blue-example>.
           The &quot;name&quot; was set to <blue-example>Bob Smith</blue-example>.
           In this example, the password was set to
-          <blue-example>zuwa79xoJxLJ</blue-example>.
+          <blue-example>zuwa79xoJxLJ</blue-example>, but you should select your own random password.
           A bcrypt function was used to generate a salted hash.
           The data was printed to the terminal so the 
           environment variables can be copied in order to paste the  
@@ -502,6 +556,11 @@ LOGIN_USER_NAME="Bob Smith"
 LOGIN_USER_HASH="$2a$10$0pr9Q21L7CFoSw5.FjbW0.izOzQtBTqQjOGbZJabM2MMNdSxKyfpO"
 </yellow-example>
 </pre></div>
+        <p>
+          Only 1 user account can be defined when using environment variables for configuration.
+          If you want to add a second login password, you will need to use the credentials.json or
+          configure the program to use the remote login feature.
+        </p>
         <p>
           Privacy Caution:
           The web userid numeric value (userid: 1) and web login timestamp are saved in the web browsers's
@@ -562,7 +621,7 @@ LOGIN_USER_HASH="$2a$10$0pr9Q21L7CFoSw5.FjbW0.izOzQtBTqQjOGbZJabM2MMNdSxKyfpO"
 </pre></div>
 <div class="pre-div2"><pre>
 SESSION_ENABLE_REDIS=true
-SESSION_REDIS_PREFIX="irc:"
+SESSION_REDIS_PREFIX="irc001:"
 # SESSION_REDIS_PASSWORD=
 </pre></div>
         <p>
@@ -664,10 +723,37 @@ SERVER_PID_FILENAME=/home/user1/tmp/ircHybridClient.PID
           used if found.
         </p>
         <p>
-          The restart.sh or restart2.sh utility is intended to be run manually to 
-          assist with editing of credentials.json or .env. 
-          It is not intended to be run from cron.
+          The .gitignore file includes "custom*" to allow creation of 
+          custom shell scripts. Since 2 environment variables are required
+          for the restart2.sh script, it may be possible to create a script
+          similar to the following. This is only a suggestion, please write
+          your own script.
         </p>
+
+<pre>
+
+#!/bin/bash
+#
+# Determine irc-hybrid-client configuration method
+# Call proper restart.sh or restart2.sh
+#
+if [ -f credentials.json ] ; then
+echo "irc-hybrid-client config: credentials.json"
+./restart.sh
+else
+echo "irc-hybrid-client config: .env"
+SERVER_INSTANCE_NUMBER=3
+SERVER_PID_FILENAME=/home/user/tmp/ircHybridClient003.PID
+./restart2.sh
+fi
+
+</pre>
+
+      <p>
+        The restart.sh or restart2.sh utility is intended to be run manually to 
+        assist with editing of credentials.json or .env. 
+        It is not intended to be run from cron.
+      </p>
 
         <div class="install-section-title">Disable Server List Editor Web Page</div>
         <p>
@@ -739,7 +825,7 @@ IRC_DISABLE_LIST_EDITOR=false
         <p>
           Regarding server reboot, if the distribution of Linux does not send a 
           SIGINT or SIGTERM to the irc-hybrid-client process before shutdown, then the cache 
-          will not be written. Debian seem to send a SIGKILL different signal before shutdown.
+          will not be written. Debian seems to send a SIGKILL different signal before shutdown.
           According to the NodeJs documentation
           &quot;SIGKILL cannot have a listener installed, it will unconditionally 
           terminate Node.js on all platforms.&quot;. Therefore to preserve the cache across 
@@ -774,16 +860,8 @@ if [ -n "$PID_NUMBER" ] ; then
 fi
 </pre></div>
           <p>
-          There is a bash script &quot;restart.sh&quot; that can 
+          There are bash scripts &quot;restart.sh&quot; and &quot;restart2.sh&quot; that can 
           be used to restart after changes were made to credentials.json. 
-          This may be used as a further example.
-        </p>
-        <p>
-          In the file example-credentials.json, a new boolean
-          property `persistIrcMessageCache` will enable auto-save
-          and restore of message cache across web server restarts.
-          In the case where the property is missing from the configuration, 
-          the auto-save will not be enabled, but no errors are thrown for missing property.         
         </p>
 <div class="pre-div"><pre>
 {
@@ -880,13 +958,14 @@ SERVER_LOG_ONLY_ERRORS=false
           in web server deployment, nor is it necessary to serve the folder, even if present.
         </p>
         <p>
-          Proper login will be required prior to viewing the help pages.
-          To login, first visit /irc/webclient.html to enter your username and password, 
-          then change the path to /irc/docs/ in the URL.
-          Unauthorized requests will return status 403 Forbidden.
+          User login will be required prior to viewing the help pages.
+          If enabled, a button &quot;View Documentation&quot; will be added
+          to the Info/License panel. Alternately, the path URL /irc/docs/
+          can be bookmarked.
+          When not logged in, the help page will return status 403 Forbidden.
         </p>
         <p>
-          To enable the /docs file folder to be available at web path /irc/docs, set the 
+          To enable the /docs file folder to be available at web path /irc/docs/, set the 
           serveHtmlHelpDocs property to true. If the property does not exist
           due to an earlier version of credentials.json, no error will 
           be issued and the files will not be served.
@@ -1126,13 +1205,6 @@ IRC_SOCKET_LOCAL_ADDRESS=fc00:10::1000
             <li>
               The collab-auth authorization server must be installed, 
               running and tested. (<a href="https://cotarr.github.io/collab-auth/">Documentation</a>)
-            </li>
-            <li>
-              NodeJs version v18.0.0 or greater is preferred for use of the native fetch() API.
-              At program start, if the native fetch() API is not detected, for backward compatibility, 
-              the NPM legacy package "node-fetch" Version 2.0 will be loaded.
-              Note: The default web login (user/password) does not use the backend fetch API so 
-              earlier versions of NodeJs should work.
             </li>
           </ul>
         <p>

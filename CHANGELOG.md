@@ -152,6 +152,8 @@ After commit d796fd2
 - Debug and edit: configuration parsing, example configuration files.
 - Update to /docs and README.md
 - Added custom* to .gitignore so custom bash script can be created with git conflict.
+- Add table of configuration properties and default values to /docs/
+- Parse missing instanceNumber as null.
 
 ## [v0.2.43](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.43) 2023-05-28
 

@@ -170,6 +170,12 @@ export const server = {
   logRotateSize: ((fcf) ? credentials.logRotationSize : process.env.SERVER_LOG_ROTATE_SIZE) || null,
   accessLogOnlyErrors: ((fcf) ? credentials.accessLogOnlyErrors : (process.env.SERVER_LOG_ONLY_ERRORS === 'true')) || false
 };
+// to avoid 0 or '0' interpreted as false
+if ((!Object.hasOwn(server, 'instanceNumber')) ||
+  (isNaN(server.instanceNumber)) ||
+  (server.instanceNumber === undefined)) {
+  server.instanceNumber = null;
+}
 
 export const session = {
   rollingCookie: ((fcf) ? credentials.sessionRollingCookie : (process.env.SESSION_SET_ROLLING_COOKIE === 'true')) || false,
@@ -272,7 +278,9 @@ if ((!(session.secret)) || (session.secret.length < 8)) {
     'This is a random string value used to create and validate cookie digital signatures.');
   process.exit(1);
 }
-if ((session.secret === '---COOKIE-SECRET-GOES-HERE---') || (session.secret === 'xxxxxxxx')) {
+if ((session.secret === '---COOKIE-SECRET-GOES-HERE---') ||
+  (session.secret === 'xxxxxxxx') ||
+  (session.secret === 'Lg9HLgCEmtag4Ff7')) {
   console.error('Error, Session cookie secret at default value.');
   console.log('This may be set using the "cookieSecret" property in the credentials.json file ' +
     'or in the "SESSION_SECRET" environment variable, depending on the configuration method. ' +

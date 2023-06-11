@@ -156,9 +156,9 @@ chmod 600 .env
 
 ## Customize web server settings
 
-- Set file path for TLS certs and `tls:true` or `SERVER_TLS=true`. If not using TLS set this to `false` and the file paths may be omitted.
+- Enter the full file path for TLS certificates. If not using TLS, the file path lines may be omitted and set `tls: false` or `SERVER_TLS=false`. 
 - Set the port number to a valid integer value. This is the listening port of the web server.
-- Set a unique cookie secret as `"cookieSecret": "xxxxxxxx"` or `SESSION_SECRET=xxxxxxxx` (Required)
+- Set a unique cookie secret to a unique random string (Required).
 
 ## Assign one user login password
 
@@ -206,11 +206,11 @@ chmod 600 servers.json
 
 # The following steps are the minimal setup of one IRC server definition.
 # IRC server definitions can also be edited from the web interface.
-# 1) Edit a short name for the server definition
-# 2) IRC server host, port and TLS flags
-# 3) IRC server password (if needed)
-# 4) IRC nick name, user, real name.
-# 5) Optional: Preferred list of channels for this server.
+# 1 Edit a short name for the server definition
+# 2 IRC server host, port and TLS flags
+# 3 IRC server password (if needed)
+# 4 IRC nick name, user, real name.
+# 5 Optional: Preferred list of channels for this server.
 ```
 
 ## Related setup
