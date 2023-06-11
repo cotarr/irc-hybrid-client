@@ -603,79 +603,30 @@ if (config.irc.serveHtmlHelpDocs) {
 // ---------------------------------
 //    E R R O R   H A N D L E R S
 // ---------------------------------
-
 //
-// catch 404 and forward to error handler
+// catch 404 Not Found
 //
 app.use(function (req, res, next) {
-  const responseObject = {};
-  responseObject.error = {
-    status: 404,
-    message: http.STATUS_CODES[404]
-  };
-  if (nodeEnv === 'development') {
-    // console.log(JSON.stringify(req.url));
-    responseObject.error.error = req.method + ' ' + req.url;
-  }
-  if (('accept' in req.headers) && (req.headers.accept.toLowerCase() === 'application/json')) {
-    return res.status(404).json(responseObject);
-  }
-  // simple custom handler
-  let htmlString =
-    '<!DOCTYPE html><html lang="en">' +
-    '<head><meta charset="utf-8"><title>Error</title></head>' +
-    '<body><pre>' + responseObject.error.message + '\n';
-  if (nodeEnv === 'development') {
-    htmlString += responseObject.error.error + '\n';
-  }
-  htmlString += '</pre></body></html>';
-  return res.status(responseObject.error.status).send(htmlString);
-
-  // Else: default node express error handler generate HTML
-  // next();
+  const err = new Error(http.STATUS_CODES[404]);
+  err.status = 404;
+  return res.set('Content-Type', 'text/plain').status(err.status).send(err.message);
 });
-
 //
 // Custom error handler
 //
 app.use(function (err, req, res, next) {
-  if (nodeEnv === 'development') {
-    // console.log(err);
-  }
   // per Node docs, if response in progress, must be returned to default error handler
-  if (res.headersSent) {
-    return next(err);
+  if (res.headersSent) return next(err);
+  const status = err.status || 500;
+  let message = status.toString() + ' ' + (http.STATUS_CODES[status] || 'Error');
+  if (err.message) message += ', ' + (err.message.split('\n')[0]);
+  if (nodeEnv === 'production') {
+    console.log(message);
+    return res.set('Content-Type', 'text/plain').status(status).send(message);
+  } else {
+    console.log(message);
+    // console.log(err);
+    return res.set('Content-Type', 'text/plain').status(status).send(message + '\n' + err.stack);
   }
-
-  if (typeof err === 'string') {
-    err = {
-      message: err.toString()
-    };
-  };
-  const responseObject = {};
-  responseObject.error = {};
-  responseObject.error.status = err.status || 500;
-  responseObject.error.message =
-    http.STATUS_CODES[responseObject.error.status] || 'Internal Server Error';
-  if (nodeEnv === 'development') {
-    responseObject.error.error = err.message.toString() || '';
-    responseObject.error.stack = err.stack || '';
-  }
-  if (('accept' in req.headers) && (req.headers.accept.toLowerCase() === 'application/json')) {
-    return res.status(responseObject.error.status).json(responseObject);
-  }
-  let htmlString =
-    '<!DOCTYPE html><html lang="en">' +
-    '<head><meta charset="utf-8"><title>Error</title></head>' +
-    '<body><pre>' + responseObject.error.message + '\n';
-  if (nodeEnv === 'development') {
-    htmlString += responseObject.error.error + '\n' + responseObject.error.stack;
-  }
-  htmlString += '</pre></body></html>';
-  return res.status(responseObject.error.status).send(htmlString);
-
-  // Else not application/json, let default node express error handler generate HTML
-  // next(err);
 });
-
 export { app };

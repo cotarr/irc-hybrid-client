@@ -6,11 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## v0.2.44-dev 2023-06-09
+## v0.2.44-dev 2023-06-11
 
 This next update has 2 primary goals:
 
-- 1. Convert the Node web server from CommonJS modules to ECMAScript modules.
+- 1 Convert the Node web server from CommonJS modules to ECMAScript modules.
 
 The motivation for converting server package format to ES Modules is to 
 allow import of NPM modules that no longer publish a CommonJS package format.
@@ -21,7 +21,7 @@ node-fetch, rotating-file-stream, and ws. The remainder of the dependencies
 were CommonJS modules. All modules imported without issue except ws which has 
 different exports for the ESM version. 
 
-- 2. Add new capability to manage web server configuration using UNIX environment variables.
+- 2 Add new capability to manage web server configuration using UNIX environment variables.
 
 The motivation for use of environment variables is to simplify configuration where the 
 web server is deployed in a container. 
@@ -42,7 +42,7 @@ server/config/index.mjs module will define fallback default values.
 In the long term, the credentials.json config file may be deprecated (breaking change)
 to standardize all of the server configuration with environment variables.
 
-### Changes
+### Changes (Long list, from here down to previous git tag number)
 
 After commit ee0a0c2 ( previous version v0.2.43)
 
@@ -151,9 +151,32 @@ After commit d796fd2
 - Fixed: utilities to generate user login would not accept space characters in user's name.
 - Debug and edit: configuration parsing, example configuration files.
 - Update to /docs and README.md
-- Added custom* to .gitignore so custom bash script can be created with git conflict.
+- Added "custom*" to .gitignore so custom bash script can be created without git conflict.
 - Add table of configuration properties and default values to /docs/
 - Parse missing instanceNumber as null.
+
+After commit e8c4c73
+
+- In server/web-server.js, re-coded the previous express error handler. New custom error handler smaller and simpler.
+- In case of remote login, file server/middlewares/remote-authenticate.mjs, updated fetch() code used to exchange auth code for access token, and submit access token to get token meta-data.
+
+This is a case where a fetch in the browser causes a second fetch inside the web server.
+Previously, if the authorization server fetch request did not return status 200, 
+the fetch was aborted inside the web server and an error thrown, returning 500 to the browser. 
+This does not provide any information on the cause of the authorization error.
+The fetch code was extended so the web server will request a content response 
+from the authorization server following a status NOT 200 error, the error response 
+text message indicating the reason for the error is added to the error when thrown.
+If the OAuth2 error response included a WWW-Authenticate header with error description, the message 
+it is also appended. With this change, when remote login fails, the error in the
+authorization server is sent to web server and in turn forwarded to the browser.
+This has no impact when configured for local login.
+
+Example Error:
+
+```
+500 Internal Server Error, HTTP status error, 403 Forbidden, POST http://127.0.0.1:3500/oauth/token, {"error":"invalid_grant","error_description":"Invalid authorization code"}
+```
 
 ## [v0.2.43](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.43) 2023-05-28
 

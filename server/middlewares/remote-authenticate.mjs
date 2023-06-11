@@ -497,47 +497,83 @@ const _setSessionAuthorized = function (req, chain) {
 // Returns promise
 // -----------------------------------------------------------------------
 const _introspectAccessToken = function (chain) {
-  // OAuth2 authorization server
-  const fetchUrl = oauth2.remoteAuthHost + '/oauth/introspect';
+  return new Promise((resolve, reject) => {
+    // OAuth2 authorization server
+    const fetchURL = oauth2.remoteAuthHost + '/oauth/introspect';
 
-  const fetchController = new AbortController();
+    const fetchController = new AbortController();
 
-  const body = {
-    access_token: chain.tokenResponse.access_token,
-    client_id: oauth2.remoteClientId,
-    client_secret: oauth2.remoteClientSecret
-  };
+    const body = {
+      access_token: chain.tokenResponse.access_token,
+      client_id: oauth2.remoteClientId,
+      client_secret: oauth2.remoteClientSecret
+    };
 
-  const fetchOptions = {
-    method: 'POST',
-    redirect: 'error',
-    signal: fetchController.signal,
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json'
-    },
-    body: JSON.stringify(body)
-  };
+    const fetchOptions = {
+      method: 'POST',
+      redirect: 'error',
+      signal: fetchController.signal,
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json'
+      },
+      body: JSON.stringify(body)
+    };
 
-  chain.introspectFetchTimerId = setTimeout(() => fetchController.abort(), 5000);
+    const fetchTimerId = setTimeout(() => fetchController.abort(), 5000);
 
-  // Return Promise
-  return fetch(fetchUrl, fetchOptions)
-    .then((response) => {
-      if (response.status === 200) {
-        return response.json();
-      } else {
-        throw new Error('Fetch status ' + response.status + ' ' +
-        fetchOptions.method + ' ' + fetchUrl);
-      }
-    })
-    .then((introspectResponse) => {
-      // console.log('introspectResponse ', introspectResponse);
-      if (chain.introspectFetchTimerId) clearTimeout(chain.introspectFetchTimerId);
-      chain.tokenMetaData = introspectResponse;
-      return chain;
-    });
-};
+    // Return Promise
+    fetch(fetchURL, fetchOptions)
+      .then((response) => {
+        if (response.status === 200) {
+          return response.json();
+        } else {
+          // Retrieve error message from remote web server and pass to error handler
+          return response.text()
+            .then((remoteErrorText) => {
+              const err = new Error('HTTP status error');
+              err.status = response.status;
+              err.statusText = response.statusText;
+              err.remoteErrorText = remoteErrorText;
+              if (response.headers.get('WWW-Authenticate')) {
+                err.oauthHeaderText = response.headers.get('WWW-Authenticate');
+              }
+              throw err;
+            });
+        }
+      })
+      .then((introspect) => {
+        // console.log('introspect ', introspect);
+        if (fetchTimerId) clearTimeout(fetchTimerId);
+        if ((Object.hasOwn(introspect, 'active')) && (introspect.active === true)) {
+          chain.tokenMetaData = introspect;
+          resolve(chain);
+        } else {
+          const error = new Error('Inactive token');
+          reject(error);
+        }
+      })
+      .catch((err) => {
+        if (fetchTimerId) clearTimeout(fetchTimerId);
+        // Build generic error message to catch network errors
+        let message = ('Fetch error, ' + fetchOptions.method + ' ' + fetchURL + ', ' +
+          (err.message || err.toString() || 'Error'));
+        if (err.status) {
+          // Case of HTTP status error, build descriptive error message
+          message = ('HTTP status error, ') + err.status.toString() + ' ' +
+            err.statusText + ', ' + fetchOptions.method + ' ' + fetchURL;
+        }
+        if (err.remoteErrorText) {
+          message += ', ' + err.remoteErrorText;
+        }
+        if (err.oauthHeaderText) {
+          message += ', ' + err.oauthHeaderText;
+        }
+        const error = new Error(message);
+        reject(error);
+      });
+  }); // new Promise()
+}; // _introspectAccessToken()
 
 // ---------------------------------------------------------------
 // Exchange authorization code for a new
@@ -546,49 +582,79 @@ const _introspectAccessToken = function (chain) {
 // Returns promise
 // ---------------------------------------------------------------
 const _fetchNewAccessToken = function (chain) {
-  // OAuth2 authorization server
-  const fetchUrl = oauth2.remoteAuthHost + '/oauth/token';
+  return new Promise((resolve, reject) => {
+    // OAuth2 authorization server
+    const fetchURL = oauth2.remoteAuthHost + '/oauth/token';
 
-  const fetchController = new AbortController();
+    const fetchController = new AbortController();
 
-  const body = {
-    code: chain.code,
-    redirect_uri: oauth2.remoteCallbackHost + '/login/callback',
-    client_id: oauth2.remoteClientId,
-    client_secret: oauth2.remoteClientSecret,
-    grant_type: 'authorization_code'
-  };
+    const body = {
+      code: chain.code,
+      redirect_uri: oauth2.remoteCallbackHost + '/login/callback',
+      client_id: oauth2.remoteClientId,
+      client_secret: oauth2.remoteClientSecret,
+      grant_type: 'authorization_code'
+    };
 
-  const fetchOptions = {
-    method: 'POST',
-    redirect: 'error',
-    signal: fetchController.signal,
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json'
-    },
-    body: JSON.stringify(body)
-  };
+    const fetchOptions = {
+      method: 'POST',
+      redirect: 'error',
+      signal: fetchController.signal,
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json'
+      },
+      body: JSON.stringify(body)
+    };
 
-  chain.tokenFetchTimerId = setTimeout(() => fetchController.abort(), 5000);
+    const fetchTimerId = setTimeout(() => fetchController.abort(), 5000);
 
-  // Return Promise
-  return fetch(fetchUrl, fetchOptions)
-    .then((response) => {
-      if (response.status === 200) {
-        return response.json();
-      } else {
-        throw new Error('Fetch status ' + response.status + ' ' +
-        fetchOptions.method + ' ' + fetchUrl);
-      }
-    })
-    .then((tokenResponse) => {
-      // console.log('tokenResponse', tokenResponse);
-      if (chain.tokenFetchTimerId) clearTimeout(chain.tokenFetchTimerId);
-      chain.tokenResponse = tokenResponse;
-      return chain;
-    });
-};
+    fetch(fetchURL, fetchOptions)
+      .then((response) => {
+        if (response.status === 200) {
+          return response.json();
+        } else {
+          // Retrieve error message from remote web server and pass to error handler
+          return response.text()
+            .then((remoteErrorText) => {
+              const err = new Error('HTTP status error');
+              err.status = response.status;
+              err.statusText = response.statusText;
+              err.remoteErrorText = remoteErrorText;
+              if (response.headers.get('WWW-Authenticate')) {
+                err.oauthHeaderText = response.headers.get('WWW-Authenticate');
+              }
+              throw err;
+            });
+        }
+      })
+      .then((tokenResponse) => {
+        // console.log('tokenResponse', tokenResponse);
+        if (fetchTimerId) clearTimeout(fetchTimerId);
+        chain.tokenResponse = tokenResponse;
+        resolve(chain);
+      })
+      .catch((err) => {
+        if (fetchTimerId) clearTimeout(fetchTimerId);
+        // Build generic error message to catch network errors
+        let message = ('Fetch error, ' + fetchOptions.method + ' ' + fetchURL + ', ' +
+          (err.message || err.toString() || 'Error'));
+        if (err.status) {
+          // Case of HTTP status error, build descriptive error message
+          message = ('HTTP status error, ') + err.status.toString() + ' ' +
+            err.statusText + ', ' + fetchOptions.method + ' ' + fetchURL;
+        }
+        if (err.remoteErrorText) {
+          message += ', ' + err.remoteErrorText;
+        }
+        if (err.oauthHeaderText) {
+          message += ', ' + err.oauthHeaderText;
+        }
+        const error = new Error(message);
+        reject(error);
+      });
+  }); // new Promise()
+}; // _fetchNewAccessToken()
 
 // -------------------------------------------------------------------------------
 // Route handler for GET /login/callback
@@ -620,8 +686,6 @@ export const exchangeAuthCode = function (req, res, next) {
     })
     .catch((err) => {
       // Failure...
-      if (chainObj.introspectFetchTimerId) clearTimeout(chainObj.introspectFetchTimerId);
-      if (chainObj.tokenFetchTimerId) clearTimeout(chainObj.tokenFetchTimerId);
       return next(err);
     });
 };
