@@ -43,13 +43,11 @@ import config from '../server/config/index.mjs';
 
 const nodeEnv = process.env.NODE_ENV || 'development';
 
-const timestamp = new Date();
-console.log('Server timestamp: ' + timestamp.toISOString());
-
 let server = null;
 
+console.log('Environment: NODE_ENV=' + nodeEnv);
 if (config.server.tls) {
-  console.log('NODE_ENV ' + nodeEnv + ' starting https  (TLS encrypted)');
+  console.log('Starting "https" server (TLS encrypted)');
   const options = {
     key: fs.readFileSync(config.server.serverTlsKey),
     cert: fs.readFileSync(config.server.serverTlsCert),
@@ -58,7 +56,7 @@ if (config.server.tls) {
   };
   server = https.createServer(options, app);
 } else {
-  console.log('NODE_ENV ' + nodeEnv + ' starting http (non-encrypted)');
+  console.log('Starting "http" server (non-encrypted)');
   server = http.createServer(app);
 }
 
@@ -79,8 +77,10 @@ server.listen(port);
 
 server.on('listening', function () {
   const address = server.address();
-  console.log('listening: ' + address.address + ':' + address.port +
-    ' ' + address.family);
+  console.log('Web server listening interface: "' + address.address + '" port: ' + address.port +
+    ' family: ' + address.family);
+  const timestamp = new Date();
+  console.log('Timestamp: ' + timestamp.toISOString());
   // intended for use in logrotate, or in restart bash script
   try {
     const pidFilename = config.server.pidFilename;

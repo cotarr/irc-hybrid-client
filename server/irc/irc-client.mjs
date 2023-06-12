@@ -345,10 +345,10 @@ if (config.irc.customBeepSounds) {
 
 // ircLog.setRawMessageLogEnabled(vars.servers.rawMessageLog);
 
-console.log('Starting web server: ' + vars.ircState.progName +
-  ' version-' + vars.ircState.progVersion);
-console.log('Point web browser to <your-http-domain-name> + "/irc/webclient.html"');
+console.log('Application: ' + vars.ircState.progName + ' ' + vars.ircState.progVersion);
+console.log('IRC web-client URL: <your-http-domain-name> + "/irc/webclient.html"');
 
+console.log(ircLog);
 // report log file status
 if ((nodeEnv === 'development') || (nodeDebugLog)) {
   console.log('IRC raw message log: (console)');

@@ -114,9 +114,11 @@ const customLog = function (req, errString) {
 // print at server start
 if (!config.oauth2.enableRemoteLogin) {
   if ((nodeEnv === 'development') || (nodeDebugLog)) {
-    console.log('Auth users: ' + userArray.length + ' Auth log: (console)');
+    console.log('User Login: (local) Auth users: ' +
+      userArray.length + ' Auth log: (console)');
   } else {
-    console.log('Auth users: ' + userArray.length + ' Auth log: ' + authLogFilename);
+    console.log('User Login: (local) Auth users: ' +
+      userArray.length + ' Auth log: ' + authLogFilename);
   }
 }
 //

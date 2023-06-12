@@ -213,6 +213,8 @@ password submission when cookies are disabled, avoiding a loop,
 although the error message is wrong. 
 This will be parked for now and addressed at a future date.
 
+- General edit of program startup console.log() messages. Due to ES modules import prior to code running, start up messages are in different order.
+
 ## [v0.2.43](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.43) 2023-05-28
 
 ### Updated

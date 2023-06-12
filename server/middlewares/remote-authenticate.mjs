@@ -191,11 +191,13 @@ const customLog = function (req, errString) {
   }
 };
 
-// print at server start
-if ((nodeEnv === 'development') || (nodeDebugLog)) {
-  console.log('User Login: (remote) Auth log: (console)');
-} else {
-  console.log('User Login: (remote) Auth log: ' + authLogFilename);
+if (oauth2.enableRemoteLogin) {
+  // print at server start
+  if ((nodeEnv === 'development') || (nodeDebugLog)) {
+    console.log('User Login: (remote) Auth log: (console)');
+  } else {
+    console.log('User Login: (remote) Auth log: ' + authLogFilename);
+  }
 }
 
 //

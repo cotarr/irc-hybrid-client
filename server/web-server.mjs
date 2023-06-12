@@ -276,7 +276,7 @@ if (config.session.enableRedis) {
   // list:       KEYS *
   // view:       GET <key>
   // Clear all:  FLUSHALL
-  console.log('Using redis for session storage');
+  console.log('Session store: redis');
   const redisClientOptions = {};
   // must match /etc/redis/redis.conf "requirepass <password>"
   if ((config.session.redisPassword) && (config.session.redisPassword.length > 0)) {
@@ -296,7 +296,7 @@ if (config.session.enableRedis) {
   };
   sessionOptions.store = new RedisStore(redisStoreOptions);
 } else {
-  console.log('Using memorystore for session storage');
+  console.log('Session storage: memorystore');
   const memoryStoreOptions = {
     // store ttl in milliseconds
     ttl: config.session.maxAge, // milliseconds
@@ -588,7 +588,7 @@ let secureDir = path.join(__dirname, '../secure');
 // Else, if production, server the minified, bundled version
 if (nodeEnv === 'production') secureDir = path.join(__dirname, '../secure-minify');
 
-console.log('Serving files from: ' + secureDir);
+console.log('Web server root folder: ' + secureDir);
 app.use('/irc', authorizeOrFail, express.static(secureDir));
 
 //
