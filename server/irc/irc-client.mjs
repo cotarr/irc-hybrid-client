@@ -348,7 +348,6 @@ if (config.irc.customBeepSounds) {
 console.log('Application: ' + vars.ircState.progName + ' ' + vars.ircState.progVersion);
 console.log('IRC web-client URL: <your-http-domain-name> + "/irc/webclient.html"');
 
-console.log(ircLog);
 // report log file status
 if ((nodeEnv === 'development') || (nodeDebugLog)) {
   console.log('IRC raw message log: (console)');

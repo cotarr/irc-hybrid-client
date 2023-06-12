@@ -301,7 +301,9 @@ if (!oauth2.enableRemoteLogin) {
 
 export default { site, server, session, oauth2, loginUsers, irc, proxy };
 
-// console.log(JSON.stringify({ site, server, session, oauth2, loginUsers, irc, proxy }, null, 2));
-// process.exit(0);
+// if (process.env.SHOW_CONFIG) {
+//   console.log(JSON.stringify({ site, server, session, oauth2, loginUsers, irc, proxy }, null, 2));
+//   process.exit(0);
+// }
 
 /* eslint-enable max-len */

@@ -46,9 +46,9 @@ export const accessLogFilename = path.join(__dirname, '../../logs/access.log');
 export const ircLogFilename = path.join(__dirname, '../../logs/irc.log');
 
 // logRotationInterval type string, example: '5m', '12h', '7d'
-export const logRotationInterval = config.server.logRotationInterval || '';
+export const logRotationInterval = config.server.logRotateInterval || '';
 // logRotationSize type string, example '1K', '10M'
-export const logRotationSize = config.server.logRotationSize || '';
+export const logRotationSize = config.server.logRotateSize || '';
 
 const accessLogOnlyErrors = config.server.accessLogOnlyErrors || false;
 
