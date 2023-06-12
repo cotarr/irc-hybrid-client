@@ -339,8 +339,8 @@ if (nodeEnv === 'production') {
 
 if (config.oauth2.enableRemoteLogin) {
   //
-  // First part is optional remote user password login.
-  // DRAFT, in debug, see: middlewares/remote-authenticate.js
+  // Optional remote login (oauth2)
+  // See server/middlewares/remote-authenticate.mjs
   //
   app.get('/login', userAuth.loginRedirect);
   app.get('/login/callback', userAuth.exchangeAuthCode);
@@ -349,12 +349,12 @@ if (config.oauth2.enableRemoteLogin) {
   app.get('/blocked', userAuth.blockedCookies);
 } else {
   //
-  // This is the normal built in user password login as found
-  // in the master branch (the default)
+  // For local login (this is the default)
+  // See server/middlewares/user-authenticate.mjs
   //
   app.get('/login.css', userAuth.loginStyleSheet);
   app.get('/login', csrfProtection, userAuth.loginPage);
-  app.post('/login-authorize', csrfProtection, userAuth.loginAuthorize);
+  app.post('/login-authorize', userAuth.cookieExists, csrfProtection, userAuth.loginAuthorize);
   app.get('/logout', userAuth.logout);
   app.get('/blocked', userAuth.blockedCookies);
 }

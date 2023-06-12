@@ -211,6 +211,32 @@ export const blockedCookies = function (req, res, next) {
   res.send(blockedCookieFragment);
 };
 
+// --------------------------------------------
+// Middleware to check if request has at
+// leasts 1 signed cookie. If not, user's
+// browser may be blocking cookies
+//
+// This is a work around for cookie check in
+// user-authenticate.mjs which was broken by
+// adding CSRF token middleware in front of cookie check.
+//
+// Since express-session options are  {saveUninitialized: false}
+// no cookie is created until the GET /login page request creates one.
+//
+// --> Create cookie:
+// app.get('/login', csrfProtection, userAuth.loginPage);
+// --> Check cookie exists:
+// app.post('/login-authorize', userAuth.cookieExists, csrfProtection, userAuth.loginAuthorize);
+// --------------------------------------------
+export const cookieExists = (req, res, next) => {
+  if ((Object.hasOwn(req, 'signedCookies')) &&
+    (Object.keys(req.signedCookies).length > 0)) {
+    next();
+  } else {
+    res.redirect('/blocked');
+  }
+};
+
 // ---------------------------------------------
 // If not authorized, return 401 Unauthorized
 // ---------------------------------------------
@@ -287,7 +313,7 @@ export const loginAuthorize = function (req, res, next) {
     if (err) {
       return next(err);
     } else {
-      // restore session porperties from previous session
+      // restore session properties from previous session
       req.session.csrfSecret = csrfSecret;
       req.session.sessionAuth = sessionAuth;
       // wrap in try to catch errors
@@ -449,6 +475,9 @@ const loginWarningFragment =
 // Route: GET /login
 // -------------------------
 export const loginPage = function (req, res, next) {
+  // Since express-session options are  {saveUninitialized: false}
+  // no cookie will be created until a session is modified.
+  // Calling initSession with cause express session to create a cookie.
   _initSession(req);
   if (_checkIfAuthorized(req)) {
     return res.redirect('/irc/webclient.html');
@@ -558,6 +587,7 @@ export const loginStyleSheet = function (req, res, next) {
 export default {
   authorizeOrLogin,
   blockedCookies,
+  cookieExists,
   authorizeOrFail,
   loginAuthorize,
   loginPage,

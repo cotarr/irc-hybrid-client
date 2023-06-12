@@ -176,7 +176,42 @@ Example remote auth error:
 
 500 Internal Server Error, HTTP status error, 403 Forbidden, POST http://127.0.0.1:3500/oauth/token, {"error":"invalid_grant","error_description":"Invalid authorization code"}
 
-- Fixed unclosed input tag in html fragment file
+- Fixed: unclosed input tag in html fragment file
+
+- Fixed: detection of browser disabled cookies when using browser local login.
+
+It appears that the blocked cookie detector was a working feature 
+that was later broken by adding CSRF token middleware.
+If an expected cookie is not present, the CSRF validation fails prior to the cookie check.
+Therefore a missing cookie will generate an incorrect (CSRF) error message 
+rather than the expected cookie disabled message.
+To mitigate this issue, a new cookie check was added to user-authenticate.mjs.
+The new middleware is called in web-server.mjs prior to the the CSRF token check.
+First a request to GET /login creates a cookie returned with the blank HTML login form.
+Second the password submission to POST /login-authorize checks that a valid cookie exists,
+followed by validation of the CSRF token, then compares submitted password.
+The user will be properly informed of disabled cookies in the browser.
+
+Open issue: Disabled cookie detection in the browser 
+may still be an issue when using optional remote login.
+Remote login follows a typical oauth2 authorization code grant workflow.
+For a first time unauthenticated site visit without a cookie, 
+a request to the landing page at GET /irc/webclient.html redirects 
+to the oauth2 server. The oauth2 server authenticates identity 
+with username and password. The oauth2 server redirect 
+will return to GET /login/callback with auth code.
+If the auth code is successfully accepted, irc-hybrid-client will 
+create a new cookie and redirect to the original landing page 
+at /irc/webclient.html. If the browser were to have disabled cookies, 
+this could create a login loop redirecting back to the oauth2 
+authentication server rather than loading the IRC client web page as expected.
+Cookie detection is complicated because no cookies exist until after the redirect 
+back the landing page, the same landing page that triggered the initial 
+unauthenticated login redirect. With collab-auth as the external 
+oauth2 server, this is not an issue because collab-auth fails 
+password submission when cookies are disabled, avoiding a loop, 
+although the error message is wrong. 
+This will be parked for now and addressed at a future date.
 
 ## [v0.2.43](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.43) 2023-05-28
 
