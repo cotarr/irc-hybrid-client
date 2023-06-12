@@ -187,34 +187,37 @@ Therefore a missing cookie will generate an incorrect (CSRF) error message
 rather than the expected cookie disabled message.
 To mitigate this issue, a new cookie check was added to user-authenticate.mjs.
 The new middleware is called in web-server.mjs prior to the the CSRF token check.
-First a request to GET /login creates a cookie returned with the blank HTML login form.
-Second the password submission to POST /login-authorize checks that a valid cookie exists,
-followed by validation of the CSRF token, then compares submitted password.
-The user will be properly informed of disabled cookies in the browser.
-
-Open issue: Disabled cookie detection in the browser 
-may still be an issue when using optional remote login.
-Remote login follows a typical oauth2 authorization code grant workflow.
-For a first time unauthenticated site visit without a cookie, 
-a request to the landing page at GET /irc/webclient.html redirects 
-to the oauth2 server. The oauth2 server authenticates identity 
-with username and password. The oauth2 server redirect 
-will return to GET /login/callback with auth code.
-If the auth code is successfully accepted, irc-hybrid-client will 
-create a new cookie and redirect to the original landing page 
-at /irc/webclient.html. If the browser were to have disabled cookies, 
-this could create a login loop redirecting back to the oauth2 
-authentication server rather than loading the IRC client web page as expected.
-Cookie detection is complicated because no cookies exist until after the redirect 
-back the landing page, the same landing page that triggered the initial 
-unauthenticated login redirect. With collab-auth as the external 
-oauth2 server, this is not an issue because collab-auth fails 
-password submission when cookies are disabled, avoiding a loop, 
-although the error message is wrong. 
-This will be parked for now and addressed at a future date.
+First a request to GET "/login" initializes the session triggering express-session to
+create a new cookie returned to the browser with the blank HTML login form.
+Second the password submission to POST "/login-authorize" checks that a valid cookie exists.
+If no cookie is found, the browser is redirected to the "/blocked" route so
+the user will be properly informed of disabled cookies in the browser.
 
 - General edit of program startup console.log() messages. Due to ES modules import prior to code running, start up messages are in different order.
+
 - Fixed: in server/irc/irc-client-log.mjs, log file rotation parameters size and interval not parsed from config object.
+
+- Fixed: Detection of disabled cookies when using remote login.
+
+For the case of remote login enabled, a new cookie check was 
+added to remote-authenticate.mjs that works as follows:
+Remote login uses the OAuth2 authorization code grant workflow.
+Unauthorized HTTP requests to GET "/irc/webclient.html" 
+will redirect to GET "/login" route that calls loginRedirect 
+in remote-authenticate.mjs. This will initialize the session 
+which will trigger express-session middleware to  
+create a new cookie, returned to the browser with the 302 
+redirect response to the remote OAuth2 server's address.
+After password entry, the OAuth server redirects back to the 
+GET "/login/callback" route with an auth code, at which point 
+existence of the cookie is checked before proceeding 
+to submit the authorization code to the web server.
+If no cookie is found, the browser is redirected to the "/blocked" 
+route to display the proper message.
+However, the external authorization server may fail 
+independently of irc-hybrid-client if cookies are disabled, 
+but that is outside scope of this code.
+
 
 ## [v0.2.43](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.43) 2023-05-28
 

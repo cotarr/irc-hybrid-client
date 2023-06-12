@@ -304,6 +304,12 @@ export const authorizeOrFail = function (req, res, next) {
 //     response_type=code&client_id=irc_client&scope=irc.scope1%20irc.scope2
 // ---------------------------
 export const loginRedirect = function (req, res, next) {
+  // Modification of the session by _initSession() will trigger express-session
+  // to create a new cookie that will be returned withe the 302 redirect response.
+  // Existence of the cookie will be checked in exchangeAuthCode()
+  // to detect disabled cookies in the browser and give a proper message.
+  _initSession(req);
+
   let scopeString = '';
   // Case 1, remoteScope is single string
   if (typeof oauth2.remoteScope === 'string') {
@@ -335,6 +341,20 @@ export const loginRedirect = function (req, res, next) {
 // Internal functions for promise chain
 // ----------------------------------------
 
+// Function to check that the request has at leasts one
+// signed cookie. If not, user's browser may be blocking cookies
+// A new cookie would have previously been created in exchangeAuthCode()
+const _checkCookieExists = (req, res, chain) => {
+  return new Promise((resolve, reject) => {
+    if ((Object.hasOwn(req, 'signedCookies')) &&
+      (Object.keys(req.signedCookies).length > 0)) {
+      resolve(chain);
+    } else {
+      res.redirect('/blocked');
+    }
+  });
+};
+
 // Function will regenerate a new session and cookie
 // Returns Promise resolving to null
 // Throws error if unable to regenerate and rejects promise
@@ -342,18 +362,16 @@ export const loginRedirect = function (req, res, next) {
 // It is a general security practice to update session upon change in permission.
 //
 const _regenerateSessionCookie = function (req, chain) {
-  return new Promise(
-    (resolve, reject) => {
-      req.session.regenerate(function (err) {
-        if (err) {
-          reject(err);
-        } else {
-          // return chain object unmodified
-          resolve(chain);
-        };
-      });
-    }
-  );
+  return new Promise((resolve, reject) => {
+    req.session.regenerate(function (err) {
+      if (err) {
+        reject(err);
+      } else {
+        // return chain object unmodified
+        resolve(chain);
+      };
+    });
+  });
 };
 
 // ---------------------------------------------------------
@@ -664,18 +682,20 @@ const _fetchNewAccessToken = function (chain) {
 // The browser will redirect to here with the Oauth 2.0 authorization code
 // as a query parameter in the url. (Example: /login/callback?code=xxxxxxx)
 //
-// 1) Regenerate a new session and cookie (security)
-// 2) Input validation on GET /login/callback, then extract authorization code
-// 3) Perform fetch request to exchange authorization code for a new access_token
-// 4) Validate the token request response object required parameters
-// 5) Perform fetch request to validate token and obtain user's token meta-data
-// 6) Validate that user's token scope is sufficient to use irc-hybrid-client
-// 7) Redirect to single page application at /irc/webclient.html
+// 1) Check cookie exists (Cookies not disabled in browser)
+// 2) Regenerate a new session and cookie (security)
+// 3) Input validation on GET /login/callback, then extract authorization code
+// 4) Perform fetch request to exchange authorization code for a new access_token
+// 5) Validate the token request response object required parameters
+// 6) Perform fetch request to validate token and obtain user's token meta-data
+// 7) Validate that user's token scope is sufficient to use irc-hybrid-client
+// 8) Redirect to single page application at /irc/webclient.html
 // -------------------------------------------------------------------------------
 export const exchangeAuthCode = function (req, res, next) {
   const chainObj = Object.create(null);
   // Calling _regenerateSessionCookie returns promise
-  _regenerateSessionCookie(req, chainObj)
+  _checkCookieExists(req, res, chainObj)
+    .then((chain) => _regenerateSessionCookie(req, chain))
     .then((chain) => _extractCallbackAuthCode(req, chain))
     .then((chain) => _fetchNewAccessToken(chain))
     .then((chain) => _validateTokenResponse(chain))
