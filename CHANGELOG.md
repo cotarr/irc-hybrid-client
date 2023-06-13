@@ -6,9 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## v0.2.44-dev 2023-06-11
+## [v0.2.44](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.44) 2023-06-13
 
-This next update has 2 primary goals:
+Version v0.2.44 changed only the backend server. 
+No browser code was changed. In v0.2.44 there were 2 primary goals:
 
 - 1 Convert the Node web server from CommonJS modules to ECMAScript modules.
 
@@ -41,6 +42,10 @@ For configuration properties that have not been defined, then the
 server/config/index.mjs module will define fallback default values.
 In the long term, the credentials.json config file may be deprecated (breaking change)
 to standardize all of the server configuration with environment variables.
+
+This also helps debugging. Since environment variables can be specified in the command line, 
+using the terminal, it makes it easy to rapidly switch between server configuration 
+options using the up arrow with different command lines.
 
 ### Changes (Long list, from here down to previous git tag number)
 
@@ -133,7 +138,7 @@ After commit 52e5cd3
 
 - Bump redis to redis@4.6.7
 - Bump node-fetch from v2.6.11 to v3.3.1, checked for breaking changes.
-- Set node-fetch module replacement conditional remote login selected.
+- Set node-fetch module replacement conditional when remote login selected.
 
 The legacy node-fetch v2 package had previously generated 
 an NPM outdated package warning when using CommonJS modules. 
@@ -141,7 +146,7 @@ The upgrade to ES modules has allowed upgrade to the current
 version of node-fetch v3, which has removed the outdated package warning.
 Considering that node v18 and greater supports fetch API natively, 
 in the future the node-fetch package may be eliminated by 
-setting minimum node version to node > 18.
+setting minimum node version to node >= 18.
 This only impacts remote login. Instances that use local login 
 do not perform any backend fetch requests.
 This clears all npm outdated package warnings.
