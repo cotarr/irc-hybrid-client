@@ -493,17 +493,110 @@ document.getElementById('noticeUnreadExistIcon').addEventListener('click', funct
 });
 
 // -----------------------------
-// Show help for server groups
+// Popup Help for Server Panel
 // -----------------------------
-document.getElementById('groupInfoButton').addEventListener('click', function () {
-  if (document.getElementById('groupInfoHiddenDiv').hasAttribute('hidden')) {
-    document.getElementById('groupInfoHiddenDiv').removeAttribute('hidden');
+document.getElementById('ircServerIndexInputInfoBtn').addEventListener('click', function () {
+  if (document.getElementById('ircServerIndexInputInfo').hasAttribute('hidden')) {
+    document.getElementById('ircServerIndexInputInfo').removeAttribute('hidden');
   } else {
-    document.getElementById('groupInfoHiddenDiv').setAttribute('hidden', '');
+    document.getElementById('ircServerIndexInputInfo').setAttribute('hidden', '');
   }
 });
 
-// Some initialization of div visibility at laod time
+document.getElementById('ircServerGroupInputInfoBtn').addEventListener('click', function () {
+  if (document.getElementById('ircServerGroupInputInfo').hasAttribute('hidden')) {
+    document.getElementById('ircServerGroupInputInfo').removeAttribute('hidden');
+  } else {
+    document.getElementById('ircServerGroupInputInfo').setAttribute('hidden', '');
+  }
+});
+
+document.getElementById('ircServerNameInputInfoBtn').addEventListener('click', function () {
+  if (document.getElementById('ircServerNameInputInfo').hasAttribute('hidden')) {
+    document.getElementById('ircServerNameInputInfo').removeAttribute('hidden');
+  } else {
+    document.getElementById('ircServerNameInputInfo').setAttribute('hidden', '');
+  }
+});
+
+document.getElementById('ircServerReconnectEnableInfoBtn').addEventListener('click', function () {
+  if (document.getElementById('ircServerReconnectEnableInfo').hasAttribute('hidden')) {
+    document.getElementById('ircServerReconnectEnableInfo').removeAttribute('hidden');
+  } else {
+    document.getElementById('ircServerReconnectEnableInfo').setAttribute('hidden', '');
+  }
+});
+
+document.getElementById('ircServerRotateEnableInfoBtn').addEventListener('click', function () {
+  if (document.getElementById('ircServerRotateEnableInfo').hasAttribute('hidden')) {
+    document.getElementById('ircServerRotateEnableInfo').removeAttribute('hidden');
+  } else {
+    document.getElementById('ircServerRotateEnableInfo').setAttribute('hidden', '');
+  }
+});
+
+document.getElementById('socks5EnabledCheckboxInfoBtn').addEventListener('click', function () {
+  if (document.getElementById('socks5EnabledCheckboxInfo').hasAttribute('hidden')) {
+    document.getElementById('socks5EnabledCheckboxInfo').removeAttribute('hidden');
+  } else {
+    document.getElementById('socks5EnabledCheckboxInfo').setAttribute('hidden', '');
+  }
+});
+
+document.getElementById('ircProxyInfoBtn').addEventListener('click', function () {
+  if (document.getElementById('ircProxyInfo').hasAttribute('hidden')) {
+    document.getElementById('ircProxyInfo').removeAttribute('hidden');
+  } else {
+    document.getElementById('ircProxyInfo').setAttribute('hidden', '');
+  }
+});
+
+document.getElementById('nickNameInputInfoBtn').addEventListener('click', function () {
+  if (document.getElementById('nickNameInputInfo').hasAttribute('hidden')) {
+    document.getElementById('nickNameInputInfo').removeAttribute('hidden');
+  } else {
+    document.getElementById('nickNameInputInfo').setAttribute('hidden', '');
+  }
+});
+
+document.getElementById('userRealModeInfoBtn').addEventListener('click', function () {
+  if (document.getElementById('userRealModeInfo').hasAttribute('hidden')) {
+    document.getElementById('userRealModeInfo').removeAttribute('hidden');
+  } else {
+    document.getElementById('userRealModeInfo').setAttribute('hidden', '');
+  }
+});
+
+document.getElementById('setAwayInfoBtn').addEventListener('click', function () {
+  if (document.getElementById('setAwayInfo').hasAttribute('hidden')) {
+    document.getElementById('setAwayInfo').removeAttribute('hidden');
+  } else {
+    document.getElementById('setAwayInfo').setAttribute('hidden', '');
+  }
+});
+
+// -----------------------------
+// Print warning if clicking read only buttons
+// -----------------------------
+function _shoDis () {
+  document.getElementById('readOnlyPropertyWarningDiv').removeAttribute('hidden');
+  setTimeout(function () {
+    document.getElementById('readOnlyPropertyWarningDiv').setAttribute('hidden', '');
+  }, 3000);
+}
+document.getElementById('ircServerTlsEnable').addEventListener('click', _shoDis);
+document.getElementById('ircServerTlsVerify').addEventListener('click', _shoDis);
+document.getElementById('ircServerReconnectEnable').addEventListener('click', _shoDis);
+document.getElementById('socks5EnabledCheckbox').addEventListener('click', _shoDis);
+// Special case
+document.getElementById('ircServerRotateEnable').addEventListener('click', function () {
+  document.getElementById('ircServerRotateEnableWarn').removeAttribute('hidden');
+  setTimeout(function () {
+    document.getElementById('ircServerRotateEnableWarn').setAttribute('hidden', '');
+  }, 3000);
+});
+
+// Some initialization of div visibility at load time
 // Hidden divs to allow <noscrpit> when not javascript
 // In case of javascript, show them
 document.getElementById('annunciatorBackgroundDivId').removeAttribute('hidden');
@@ -633,7 +726,16 @@ function updateDivVisibility () {
     } else {
       document.getElementById('editServerListButton').removeAttribute('disabled');
     }
-    document.getElementById('groupInfoHiddenDiv').setAttribute('hidden', '');
+    document.getElementById('ircServerIndexInputInfo').setAttribute('hidden', '');
+    document.getElementById('ircServerGroupInputInfo').setAttribute('hidden', '');
+    document.getElementById('ircServerNameInputInfo').setAttribute('hidden', '');
+    document.getElementById('ircServerReconnectEnableInfo').setAttribute('hidden', '');
+    document.getElementById('ircServerRotateEnableInfo').setAttribute('hidden', '');
+    document.getElementById('socks5EnabledCheckboxInfo').setAttribute('hidden', '');
+    document.getElementById('ircProxyInfo').setAttribute('hidden', '');
+    document.getElementById('nickNameInputInfo').setAttribute('hidden', '');
+    document.getElementById('userRealModeInfo').setAttribute('hidden', '');
+    document.getElementById('setAwayInfo').setAttribute('hidden', '');
   } else {
     // Else, Web server disconnected
     document.getElementById('hiddenInfoDiv').setAttribute('hidden', '');
@@ -665,7 +767,16 @@ function updateDivVisibility () {
     document.getElementById('userAwayMessageId').setAttribute('disabled', '');
     document.getElementById('setAwayButton').setAttribute('disabled', '');
     document.getElementById('setBackButton').setAttribute('disabled', '');
-    document.getElementById('groupInfoHiddenDiv').setAttribute('hidden', '');
+    document.getElementById('ircServerIndexInputInfo').setAttribute('hidden', '');
+    document.getElementById('ircServerGroupInputInfo').setAttribute('hidden', '');
+    document.getElementById('ircServerNameInputInfo').setAttribute('hidden', '');
+    document.getElementById('ircServerReconnectEnableInfo').setAttribute('hidden', '');
+    document.getElementById('ircServerRotateEnableInfo').setAttribute('hidden', '');
+    document.getElementById('socks5EnabledCheckboxInfo').setAttribute('hidden', '');
+    document.getElementById('ircProxyInfo').setAttribute('hidden', '');
+    document.getElementById('nickNameInputInfo').setAttribute('hidden', '');
+    document.getElementById('userRealModeInfo').setAttribute('hidden', '');
+    document.getElementById('setAwayInfo').setAttribute('hidden', '');
   }
 }
 
@@ -916,12 +1027,10 @@ function getIrcState (callback) {
         updateTrueFalseIcons('ircServerRotateEnable', ircState.ircServerRotation);
         // If socks5 proxy enabled globally and enabled for selected server
         if (ircState.enableSocks5Proxy && ircState.ircProxy) {
-          document.getElementById('socks5HidableDiv').removeAttribute('hidden');
           updateTrueFalseIcons('socks5EnabledCheckbox', true);
           document.getElementById('socks5AddrInputId').value = ircState.socks5Host;
           document.getElementById('socks5PortInputId').value = ircState.socks5Port;
         } else {
-          // document.getElementById('socks5HidableDiv').setAttribute('hidden', '');
           updateTrueFalseIcons('socks5EnabledCheckbox', false);
           document.getElementById('socks5AddrInputId').value = '';
           document.getElementById('socks5PortInputId').value = '';
@@ -947,12 +1056,10 @@ function getIrcState (callback) {
         updateTrueFalseIcons('ircServerRotateEnable', ircState.ircServerRotation);
         // If socks5 proxy enabled globally and enabled for selected server
         if (ircState.enableSocks5Proxy && ircState.ircProxy) {
-          document.getElementById('socks5HidableDiv').removeAttribute('hidden');
           updateTrueFalseIcons('socks5EnabledCheckbox', true);
           document.getElementById('socks5AddrInputId').value = ircState.socks5Host;
           document.getElementById('socks5PortInputId').value = ircState.socks5Port;
         } else {
-          // document.getElementById('socks5HidableDiv').setAttribute('hidden', '');
           updateTrueFalseIcons('socks5EnabledCheckbox', false);
           document.getElementById('socks5AddrInputId').value = '';
           document.getElementById('socks5PortInputId').value = '';
@@ -971,9 +1078,21 @@ function getIrcState (callback) {
         document.getElementById('nickNameInputId').value = ircState.nickName;
         // If no server list, show message and link button to add new servers
         if (ircState.ircServerIndex === -1) {
-          document.getElementById('emptyServerListDiv').removeAttribute('hidden');
+          if (ircState.disableServerListEditor) {
+            // Custom error message, no servers and server editor is disabled
+            document.getElementById('emptyServerListNoEdit').removeAttribute('hidden');
+            document.getElementById('emptyServerListDiv').setAttribute('hidden', '');
+          } else {
+            // Show button to link to server list editor
+            document.getElementById('emptyServerListDiv').removeAttribute('hidden');
+            document.getElementById('emptyServerListNoEdit').setAttribute('hidden', '');
+            // Force redirect to server list editor
+            window.location = '/irc/serverlist.html';
+          }
         } else {
           document.getElementById('emptyServerListDiv').setAttribute('hidden', '');
+          document.getElementById('emptyServerListDiv').setAttribute('hidden', '');
+          document.getElementById('emptyServerListNoEdit').setAttribute('hidden', '');
         }
         // Since disconnected from IRC remove all channel plugin div
         setVariablesShowingIRCDisconnected();

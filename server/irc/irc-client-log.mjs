@@ -58,7 +58,7 @@ const accessLogOnlyErrors = config.server.accessLogOnlyErrors || false;
 if ((nodeEnv === 'production') && (!nodeDebugLog)) {
   try {
     if (!fs.existsSync(logFolder)) {
-      console.log('Log folder not found, creating folder...');
+      console.log('Log folder not found, creating folder: ' + logFolder);
       fs.mkdirSync(logFolder);
       fs.chmodSync(logFolder, 0o700);
     }

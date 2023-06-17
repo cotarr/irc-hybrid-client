@@ -4,7 +4,7 @@
 		<meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
 
-		<title>IRC Config</title>
+		<title>/docs/ IRC Config</title>
     <link rel="stylesheet" href="css/styles.css">
 	</head>
 	<body>
@@ -109,18 +109,21 @@
           In the far right column, [move-up] buttons may be used to re-order the list.
         </p>
         <p>
-          The disable checkbox is used to prevent an individual server from 
+          The disable checkbox is used to prevent an individual IRC server definition from 
           being selected using the [Next], [Prev] buttons in the web client.
+          Disabled IRC server definitions are excluded from automatic server rotation when connections fail.
           The disabled checkbox is the only property that may be modified 
           from within in the server list table.
         </p>
         <p>
           The &quot;group&quot; column shows an integer group number. 
           Groups are used to configure and define a common group of IRC server definitions.
-          Different IRC servers can be rotated after disconnect from the IRC network.
+          In the event of an IRC server network connection failures, 
+          different IRC servers within a common group number can be 
+          automatically rotated to other servers in the group.
           Group 0 is reserved for stand alone servers.
-          In the case where the group number is 1 or greater, a rotation group is defined. 
-          If more than 2 server in a group are not disabled and both have the 
+          A rotation group is defined when the group number is 1 or greater . 
+          If more than two server in a group are not disabled and both have the 
           reconnect property enabled, then upon disconnect, the client will 
           automatically rotate IRC server definitions within a server group.
         </p>
@@ -160,17 +163,19 @@
           being selected using the [Next], [Prev] buttons in the web client.
         </p>
         <p>
-          The &quot;group&quot; field shows an integer group number. 
+          The &quot;Server Rotation Group Number&quot; field shows an integer group number. 
           Groups are used to configure and define a common group of IRC server definitions.
-          Different IRC servers can be rotated after disconnect from the IRC network.
+          In the event of IRC server network connection failures, 
+          different IRC servers within a common group number can be 
+          automatically rotated to other servers in the group.
           Group 0 is reserved for stand alone servers.
-          In the case where the group number is 1 or greater, a rotation group is defined. 
-          If more than 2 server in a group are not disabled and both have the reconnect
-          property enabled, then up on disconnect the client will automatically 
-          rotate IRC server definitions within a server group.
+          A rotation group is defined when the group number is 1 or greater . 
+          If more than two server in a group are not disabled and both have the 
+          Auto Reconnect property enabled, then upon disconnect, the client will 
+          automatically rotate IRC server definitions within a server group.
         </p>        
         <p>
-          The Label is used to provide a descriptive name for an IRC server definition.
+          The &quot;Label&quot; is used to provide a descriptive name for an IRC server definition.
           The Label is not otherwise used, and it may contain any arbitrary string values.
           If you are using a small screen smartphone, it is best to keep the Label short.
         </p>
@@ -196,9 +201,10 @@
               When the log checkbox is checked, the raw IRC messages from the IRC server
               are written the file &quot;irc.log&quot; located in the logs folder.
               Caution should be used as logging of passwords or other bot credentials
-              may occur.
-              This is really intended for debugging. It is recommended to leave
-              this set to false.
+              may occur. Some filters are included to redact common password syntax
+              before writing to the log, but the list may not include all possibilities.
+              This is really intended for debugging. There are obvious privacy concerns here.
+               It is recommended to leave this set to false.
             </p>
             <p>
               The IRC server address, port, and TLS settings are similar to other IRC clients.
@@ -206,7 +212,8 @@
             <p>
               The checkbox for socks5 proxy will enable this IRC server definition to use the 
               programs global socks5 configuration for the IRC connection.
-              This setting is ignored when socks5 proxy is disabled.
+              This setting is ignored when socks5 proxy is disabled or has 
+              not been configured in the web server settings.
               Socks5 settings must be configured globally in the credentials.json file 
               or with environment variables as described in the 
               <a href="login-config.html">login config</a> section.
@@ -244,16 +251,16 @@
               The manual configuration section shown below provides a detailed 
               explanation of nickname recovery.
             </p>
-            <p>
-              The IRC channel list is a comma separated list of channel names. 
-              In the client interface, a button will be created for each channel to /JOIN the channel 
-              when pressed.
-            </p>
           </div>
           <div class="image-photo">
             <img src=images/server-form.png width="576" height="1110"alt="Server definition form">
           </div>
         </div>  
+        <p>
+          The IRC channel list is a comma separated list of channel names. 
+          In the client interface, a button will be created for each channel to /JOIN the channel 
+          when pressed.
+        </p>
         <p>
           The IRC services section is optional. 
           Leave these field empty to disable this feature.

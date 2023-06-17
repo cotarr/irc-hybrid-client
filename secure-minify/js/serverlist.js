@@ -25,9 +25,9 @@ SOFTWARE.
 'use strict';
 
 let full=false;let editable=false;const _clearError=()=>{const errorDivEl=document.getElementById('errorDiv');errorDivEl.setAttribute('hidden','')
-;while(errorDivEl.firstChild)errorDivEl.removeChild(errorDivEl.firstChild);document.getElementById('showRefreshButtonDiv').setAttribute('hidden','')};const _showError=errorString=>{
+;while(errorDivEl.firstChild)errorDivEl.removeChild(errorDivEl.firstChild);document.getElementById('showForceButtonDiv').setAttribute('hidden','')};const _showError=errorString=>{
 const errorDivEl=document.getElementById('errorDiv');errorDivEl.removeAttribute('hidden');const errorMessageEl=document.createElement('div')
-;errorMessageEl.textContent=errorString||'Error: unknown error (4712)';errorDivEl.appendChild(errorMessageEl);document.getElementById('showRefreshButtonDiv').removeAttribute('hidden')
+;errorMessageEl.textContent=errorString||'Error: unknown error (4712)';errorDivEl.appendChild(errorMessageEl);document.getElementById('showForceButtonDiv').removeAttribute('hidden')
 ;window.scrollTo(0,document.querySelector('body').scrollHeight)};const fetchIrcState=()=>{const fetchURL=encodeURI('/irc/getircstate');const fetchOptions={method:'GET',headers:{
 Accept:'application/json'}};return fetch(fetchURL,fetchOptions).then(response=>{
 if(response.ok)return response.json();else throw new Error('Fetch status '+response.status+' '+response.statusText+' '+fetchURL)})};const fetchServerList=(index,lock)=>{let urlStr='/irc/serverlist'
@@ -110,9 +110,10 @@ _showError(err.toString()||err);console.log(err)})};const parseFormInputValues=(
 ;if(full)columnTitles.push('Real Name');if(full)columnTitles.push('Modes');if(full)columnTitles.push('Channels');if(full)columnTitles.push('identifyNick');if(full)columnTitles.push('command')
 ;if(full)columnTitles.push('reconnect');if(full)columnTitles.push('logging');if(editable)columnTitles.push('');if(editable)columnTitles.push('');if(editable)columnTitles.push('')
 ;if(editable)columnTitles.push('');const titleRowEl=document.createElement('tr');columnTitles.forEach(titleName=>{const tdEl=document.createElement('td');tdEl.textContent=titleName
-;titleRowEl.appendChild(tdEl)});tableNode.appendChild(titleRowEl);if(Array.isArray(data)&&data.length>0)for(let i=0;i<data.length;i++){const rowEl=document.createElement('tr')
-;rowEl.setAttribute('index',i.toString());if(data[i].disabled)rowEl.classList.add('disabled-tr');const td01El=document.createElement('td');td01El.textContent=i.toString();rowEl.appendChild(td01El)
-;const td10El=document.createElement('td');const disabledCheckboxEl=document.createElement('input');disabledCheckboxEl.setAttribute('type','checkbox')
+;titleRowEl.appendChild(tdEl)});tableNode.appendChild(titleRowEl);if(Array.isArray(data)&&data.length>0){document.getElementById('tableVisibilityDiv').removeAttribute('hidden')
+;document.getElementById('emptyTableDiv').setAttribute('hidden','');let allServersDisabled=true;for(let i=0;i<data.length;i++){const rowEl=document.createElement('tr')
+;rowEl.setAttribute('index',i.toString());if(data[i].disabled)rowEl.classList.add('disabled-tr');else allServersDisabled=false;const td01El=document.createElement('td');td01El.textContent=i.toString()
+;rowEl.appendChild(td01El);const td10El=document.createElement('td');const disabledCheckboxEl=document.createElement('input');disabledCheckboxEl.setAttribute('type','checkbox')
 ;if(editable)disabledCheckboxEl.removeAttribute('disabled');else disabledCheckboxEl.setAttribute('disabled','');disabledCheckboxEl.checked=data[i].disabled;td10El.appendChild(disabledCheckboxEl)
 ;rowEl.appendChild(td10El);const td11El=document.createElement('td');if('group'in data[i])td11El.textContent=data[i].group;else td11El.textContent=0
 ;if('group'in data[i]&&data[i].group>0&&data[i].group<6)td11El.classList.add('group-color-'+data[i].group.toString());rowEl.appendChild(td11El);const td12El=document.createElement('td')
@@ -149,12 +150,18 @@ reconnectIconEl.classList.add('icon-false');reconnectIconInnerEl.classList.add('
 ;disabledCheckboxEl.addEventListener('click',()=>{toggleDisabled(parseInt(rowEl.getAttribute('index')))});editButtonEl.addEventListener('click',()=>{
 openIrcServerEdit(parseInt(rowEl.getAttribute('index')))});copyButtonEl.addEventListener('click',()=>{copyIrcServerToNew(parseInt(rowEl.getAttribute('index')))})
 ;deleteButtonEl.addEventListener('click',()=>{deleteIrcServer(parseInt(rowEl.getAttribute('index')))});if(i>0)moveUpButtonEl.addEventListener('click',()=>{
-moveUpInList(parseInt(rowEl.getAttribute('index')))})}tableNode.appendChild(rowEl)}resolve(null)});const checkForApiError=data=>new Promise((resolve,reject)=>{
-if('success'===data.status)resolve(null);else reject(new Error('PATCH API did not return success status flag'))});const setDivVisibility=data=>{
-document.getElementById('listVisibilityDiv').removeAttribute('hidden','');document.getElementById('formVisibilityDiv').setAttribute('hidden','')
-;document.getElementById('serverPasswordWarningDiv').setAttribute('hidden','');document.getElementById('nickservCommandWarningDiv').setAttribute('hidden','');if(data.ircConnected||data.ircConnecting){
-document.getElementById('createNewButton').setAttribute('hidden','');document.getElementById('warningVisibilityDiv').removeAttribute('hidden');editable=false}else{
-document.getElementById('createNewButton').removeAttribute('hidden');document.getElementById('warningVisibilityDiv').setAttribute('hidden','');editable=true}
+moveUpInList(parseInt(rowEl.getAttribute('index')))})}tableNode.appendChild(rowEl)}if(allServersDisabled){document.getElementById('allDisabledWarningDiv').removeAttribute('hidden')
+;document.getElementById('returnIrcButton').setAttribute('disabled','');document.getElementById('fullButton').removeAttribute('disabled')}else{
+document.getElementById('allDisabledWarningDiv').setAttribute('hidden','');document.getElementById('returnIrcButton').removeAttribute('disabled')
+;document.getElementById('fullButton').removeAttribute('disabled')}}else{document.getElementById('tableVisibilityDiv').setAttribute('hidden','')
+;document.getElementById('emptyTableDiv').removeAttribute('hidden');document.getElementById('allDisabledWarningDiv').setAttribute('hidden','')
+;document.getElementById('returnIrcButton').setAttribute('disabled','');document.getElementById('fullButton').setAttribute('disabled','')}resolve(null)})
+;const checkForApiError=data=>new Promise((resolve,reject)=>{if('success'===data.status)resolve(null);else reject(new Error('PATCH API did not return success status flag'))})
+;const setDivVisibility=data=>{console.log('setDivVisibility data: ',JSON.stringify(data,null,2));document.getElementById('listVisibilityDiv').removeAttribute('hidden','')
+;document.getElementById('formVisibilityDiv').setAttribute('hidden','');document.getElementById('serverPasswordWarningDiv').setAttribute('hidden','')
+;document.getElementById('nickservCommandWarningDiv').setAttribute('hidden','');if(data.ircConnected||data.ircConnecting){document.getElementById('createNewButton').setAttribute('disabled','')
+;document.getElementById('warningVisibilityDiv').removeAttribute('hidden');editable=false}else{document.getElementById('createNewButton').removeAttribute('disabled')
+;document.getElementById('warningVisibilityDiv').setAttribute('hidden','');editable=true}
 if(data.enableSocks5Proxy)document.getElementById('ircProxyDiv').textContent='Socks5 Proxy: Enabled Globally\nSocks5 Proxy: '+data.socks5Host+':'+data.socks5Port;else document.getElementById('ircProxyDiv').textContent='Socks5 Proxy: Disabled Globally'
 ;return Promise.resolve(null)};document.getElementById('groupInfoButton').addEventListener('click',()=>{
 if(document.getElementById('groupInfoHiddenDiv').hasAttribute('hidden'))document.getElementById('groupInfoHiddenDiv').removeAttribute('hidden');else document.getElementById('groupInfoHiddenDiv').setAttribute('hidden','')
@@ -185,4 +192,7 @@ fetchIrcState().then(data=>setDivVisibility(data)).then(()=>fetchServerList(-1,-
 document.getElementById('serverListDisabledDiv').removeAttribute('hidden');document.getElementById('warningVisibilityDiv').setAttribute('hidden','')
 ;document.getElementById('listVisibilityDiv').setAttribute('hidden','');document.getElementById('formVisibilityDiv').setAttribute('hidden','')
 ;document.getElementById('serverPasswordWarningDiv').setAttribute('hidden','');document.getElementById('nickservCommandWarningDiv').setAttribute('hidden','')}else{_showError(err.toString()||err)
-;console.log(err)}});
+;console.log(err)}});document.getElementById('showHelpDocsButton').setAttribute('hidden','');const docsTestUrl='/irc/docs/index.html';const fetchOptions={method:'HEAD',headers:{Accept:'text/html'}}
+;fetch(docsTestUrl,fetchOptions).then(response=>{
+if(response.ok)document.getElementById('showHelpDocsButton').removeAttribute('hidden');else document.getElementById('showHelpDocsButton').setAttribute('hidden','')});setTimeout((function(){
+document.getElementById('hidableStartupNotes').setAttribute('hidden','')}),5e3);

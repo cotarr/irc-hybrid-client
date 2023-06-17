@@ -34,6 +34,8 @@ import fs from 'fs';
 import isValidUTF8 from 'utf-8-validate';
 import socks5 from 'socks5-client';
 import events from 'events';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 // log module loaded first to create /logs folder if needed.
 import ircLog from './irc-client-log.mjs';
@@ -48,29 +50,66 @@ import vars from './irc-client-vars.mjs';
 // Web server configuration
 import config from '../config/index.mjs';
 
+// Custom case for use with ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 // For use by server list editor
 global.externalEvent = new events.EventEmitter();
 
 const nodeEnv = process.env.NODE_ENV || 'development';
 const nodeDebugLog = process.env.NODE_DEBUG_LOG || 0;
 
+const defaultServerListObj = {
+  configVersion: 2,
+  ctcpTimeLocale: ['en-US', 'UTC'],
+  serverArray: []
+};
+
 vars.servers = null;
+const serverListJsonFile = path.join(__dirname, '../../servers.json');
+
 const loadServerList = function () {
-  vars.servers = JSON.parse(fs.readFileSync('./servers.json', 'utf8'));
-  if ((!('configVersion' in vars.servers)) || (vars.servers.configVersion !== 2)) {
-    if (vars.servers.configVersion === 1) {
-      console.log('\nObsolete configuration format in: servers.json');
-      console.log(' - See: example-servers.json');
-      console.log(' - Edit: servers.json requires version 2 flag: "configVersion": 2,');
-      console.log(' - Removed (Ignored): Legacy properties ircAutoReconnect and rawMessageLog.');
-      console.log(' - Added: Individual servers properties: disabled, proxy, reconnect, logging');
-      console.log(' - Recommend open/save each IRC server definition using IRC server editor.\n');
-      process.exit(1);
+  try {
+    vars.servers = JSON.parse(fs.readFileSync(serverListJsonFile, 'utf8'));
+    if ((!('configVersion' in vars.servers)) || (vars.servers.configVersion !== 2)) {
+      if (vars.servers.configVersion === 1) {
+        console.log('\nObsolete configuration format in: servers.json');
+        console.log(' - See: example-servers.json');
+        console.log(' - Edit: servers.json requires version 2 flag: "configVersion": 2,');
+        console.log(' - Removed (Ignored): Legacy properties ircAutoReconnect and rawMessageLog.');
+        console.log(' - Added: Individual servers properties: disabled, proxy, reconnect, logging');
+        console.log(' - Recommend open/save each IRC server definition using IRC server editor.\n');
+        process.exit(1);
+      } else {
+        console.error('Error, servers.json wrong configVersion');
+        process.exit(1);
+      }
+    }
+  } catch (err) {
+    // Check if server list file does not exists,
+    // If not exist, then create it using default empty list template.
+    if ((err.code) && (err.code === 'ENOENT')) {
+      try {
+        console.log('Server list file not found. Creating: ' + serverListJsonFile);
+        fs.writeFileSync(serverListJsonFile, JSON.stringify(defaultServerListObj, null, 2) + '\n', {
+          encoding: 'utf8',
+          mode: 0o600,
+          flag: 'w'
+        });
+      } catch (err2) {
+        console.error('Error. Write error while trying to create empty server list file: ' +
+          serverListJsonFile);
+        process.exit(1);
+      }
+      // assume success for the file write, else try catch would have caught it
+      vars.servers = defaultServerListObj;
     } else {
-      console.error('Error, servers.json wrong configVersion');
+      console.log(err.toString());
       process.exit(1);
     }
   }
+
   // Upgrade from servers.json version 1 to 2, missing properties set to default
   if ((vars.servers.configVersion === 2) && (vars.servers.serverArray.length > 0)) {
     for (let i = 0; i < vars.servers.serverArray.length; i++) {

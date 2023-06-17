@@ -563,7 +563,7 @@ app.get('/irc/webclient.html',
   }
 );
 app.get('/irc/serverlist.html',
-  authorizeOrLogin,
+  authorizeOrFail,
   csrfProtection,
   function (req, res, next) {
     let filename = './secure-minify/serverlist.html';

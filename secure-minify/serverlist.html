@@ -2,16 +2,22 @@
 <link rel="stylesheet" href="css/serverlist.css"><script src="./js/serverlist.js" defer="defer"></script><title>IRC Server List</title></head><body><noscript><br><h1>
 JavaScript is required to load this page.</h1></noscript><h1>IRC Server List Editor</h1><div class="yellow-warning-div" id="serverListDisabledDiv" hidden><p>
 The Server List Editor has been disabled in the web server configuration file.</p><a href="/irc/webclient.html"><button>Return to IRC Client...</button></a></div><div class="connected-warning-div" 
-id="warningVisibilityDiv" hiddenxxx><p>READ ONLY - Disconnect from IRC network to enable editing.</p></div><div id="listVisibilityDiv"><div class="list-style-div"><div><a href="/irc/webclient.html">
-<button>Return to IRC Client...</button> </a><button id="createNewButton">Create New IRC Server...</button> <button id="fullButton">Show all columns</button> <button id="refreshButton">Refresh...
-</button></div><div class="vh10"></div><table border="1" cellpadding="3px"><tbody id="tbodyId"></tbody></table><div><pre id="ircProxyDiv"></pre></div><div class="vh20"></div><div 
-id="showRefreshButtonDiv" hidden><button id="forceUnlockAll">Force Unlock</button></div></div></div><div id="formVisibilityDiv" hidden><div class="form-style-div>"><div><button id="saveNewButton">Save
-</button> <button id="saveModifiedButton">Save</button> <button id="cancelEditButton">Cancel</button></div><div class="vh20"></div><div class="input-group2"><div class="vh10"></div><div 
-class="button-div" hidden><input type="number" id="indexInputId" value="" readonly="readonly"><div class="input-label-right">index</div></div><div class="button-div"><input type="checkbox" 
-id="disabledCheckboxId"><div class="input-label-right">Disable/Hide this IRC server definition</div></div><div class="button-div"><input type="number" id="groupInputId" class="group-input" value="">
-<div class="input-label-right">Group</div><button id="groupInfoButton">?</button></div><div class="button-div"><input type="text" id="nameInputId" value=""><div class="input-label-right">Label</div>
-</div><div class="button-div"><input type="checkbox" id="autoReconnectCheckboxId"><div class="input-label-right">Automatic Reconnect</div></div><div class="button-div"><input type="checkbox" 
-id="loggingCheckboxId"><div class="input-label-right">Log IRC raw server messages</div></div><div class="white-info-div" id="groupInfoHiddenDiv" hidden><p>
+id="warningVisibilityDiv" hidden><p>READ ONLY - Disconnect from IRC network to enable editing.</p></div><div id="listVisibilityDiv"><div class="list-style-div"><div><a href="/irc/webclient.html">
+<button id="returnIrcButton">Return to IRC Client...</button> </a><button id="createNewButton">Create New IRC Server...</button> <button id="fullButton">Show all columns</button> <button 
+id="refreshButton">Refresh...</button></div><div class="vh10"></div><div id="tableVisibilityDiv" hidden><table border="1" cellpadding="3px"><tbody id="tbodyId"></tbody></table></div><div 
+class="all-disabled-warning-div" id="allDisabledWarningDiv" hidden><h2>All IRC servers are disabled</h2><p>At least one server must be enabled before opening the IRC client page.</p></div><div 
+class="empty-table-div" id="emptyTableDiv" hidden><h2>No IRC servers have been defined</h2><p>At least 1 IRC server must be defined here in the Server List Editor before opening the IRC client page.
+</p><ul><li>Click the [Create new IRC server] button.</li><li>After data entry, click the [Save] button to close server edit form.</li><li>Click the [Return to IRC client...] button.</li></ul></div>
+<div><pre id="ircProxyDiv"></pre></div><div id="showForceButtonDiv" hidden><button id="forceUnlockAll">Force Unlock</button></div><div class="hidable-startup-notes" id="hidableStartupNotes"><p>
+The &quot;Disabled&quot; checkbox may be clicked on this screen<br>to enable/disable each server. Other settings must use the [Edit] buttons.</p><p>
+Optionally, the servers.json file in the base repository folder can be edited manually.</p></div></div></div><div id="formVisibilityDiv" hidden><div class="form-style-div>"><div><button 
+id="saveNewButton">Save</button> <button id="saveModifiedButton">Save</button> <button id="cancelEditButton">Cancel</button> <a href="/irc/docs/server-config.html"><button id="showHelpDocsButton" 
+hidden>Help</button></a></div><div class="vh20"></div><div class="input-group2"><div class="vh10"></div><div class="button-div" hidden><input type="number" id="indexInputId" value="" 
+readonly="readonly"><div class="input-label-right">index</div></div><div class="button-div"><input type="checkbox" id="disabledCheckboxId"><div class="input-label-right">
+Disable/Hide this IRC server definition</div></div><div class="button-div"><input type="number" id="groupInputId" class="group-input" value=""><div class="input-label-right">Group</div><button 
+id="groupInfoButton">?</button></div><div class="button-div"><input type="text" id="nameInputId" value=""><div class="input-label-right">Label</div></div><div class="button-div"><input 
+type="checkbox" id="autoReconnectCheckboxId"><div class="input-label-right">Automatic Reconnect</div></div><div class="button-div"><input type="checkbox" id="loggingCheckboxId"><div 
+class="input-label-right">Log IRC raw server messages</div></div><div class="white-info-div" id="groupInfoHiddenDiv" hidden><p>
 A server group defines a set of IRC server definitions where different IRC servers can be rotated in sequence after disconnect from IRC.</p><ul><li>
 The Group input field accepts integer values 0 to 9999</li><li>Group 0 is used to define individual IRC server addresses that do not rotate.</li><li>
 Group 1 or greater defines a set of server where servers of the same group number will automatically rotate different server addresses after disconnect.</li><li>
@@ -44,4 +50,4 @@ To abort changing the previous value, press [Cancel] button above</li><li>It is 
 class="white-example-div">PRIVMSG NickServ :IDENTIFY xxxxxxxx</div></li><li>Example command:<div class="white-example-div">PRIVMSG NickServ@services.dal.net :IDENTIFY xxxxxxxx</div></li><li>
 Example command:<div class="white-example-div">NICKSERV IDENTIFY xxxxxxxx</div></li></ul><div class="yellow-warning-div">
 Note: NickServ command including any passwords will be stored unencrypted in clear text in &quot;servers.json&quot; located in the base folder of the web server.</div></div></div></div></div></div>
-<div class="vh20"></div><div class="error-div" id="errorDiv" hidden></div><div class="vh20"></div></body></html>
+<div class="error-div" id="errorDiv" hidden></div><div><a href="/logout"><button class="web-logout-button">Web logout</button></a></div><div class="vh20"></div><div class="vh20"></div></body></html>

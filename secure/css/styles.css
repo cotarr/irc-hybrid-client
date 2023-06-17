@@ -341,6 +341,7 @@ display: none;
   background-color: yellow;
   padding: 10px;
   margin-right: 10px;
+  margin-bottom: 20px;
 }
 
 .message-icon {
@@ -515,8 +516,17 @@ display: none;
   background-color: white;
   border: 1px solid black;
   margin-top: 3px;
+  margin-bottom: 10px;
   padding-left: 5px;
   padding-right: 5px;
+}
+
+.yellow-info-div {
+  background-color: yellow;
+  border: 1px solid black;
+  margin-top: 3px;
+  margin-bottom: 10px;
+  padding: 10px;
 }
 
 #enableAudioButton {

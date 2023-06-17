@@ -154,7 +154,7 @@ a raw command to the IRC server directly.
           your nickname is still present on IRC, or the
           status of your IRC connection is unknown.
           Your nickname may remain present on IRC.
-          Web page login is independant of IRC login.
+          Web page login is independent of IRC login.
         </div>
       </div>
 
@@ -176,90 +176,243 @@ a raw command to the IRC server directly.
           </div>
           <div class="vh10"></div>
           <div id="hideLoginSection">
-            <div class="empty-server-list-div" id="emptyServerListDiv" hidden>
-              <h2>Empty Server List</h2>
+            <div class="empty-server-list-div" id="emptyServerListNoEdit" hidden>
+              <h2>No IRC servers.</h2>
               <p>
-                The list of IRC servers is empty or all IRC servers are disabled. 
+                The list of IRC servers is empty or all IRC servers are disabled.
+              </p>
+              <p>
+                The IRC server list editor appears to be disabled in the 
+                web server configuration. There are 2 options:
+              </p>
+              <ul>
+                <li>
+                  Enable the IRC server list editor in the server 
+                  configuration, restart the server, then create a new 
+                  IRC server.
+                </li>
+                <li>
+                  Manually edit the servers.json file using the 
+                  example-server.json as a template. Then restart the server.
+                </li>
+              </ul>
+            </div>
+
+            <div class="empty-server-list-div" id="emptyServerListDiv" hidden>
+              <h2>No IRC servers.</h2>
+              <p>
+                The list of IRC servers is empty or all IRC servers are disabled.
+              </p>
+              <p>
                 Please add at least one non-disabled IRC server definition
-                by selecting the &quot;Edit IRC Server List&quot; button, then selecting the button &quot;Create New IRC Server&quot;
+                by selecting the &quot;Edit IRC Server List&quot; button.
               </p>
               <a href="/irc/serverlist.html">
                 <button>Edit IRC Server List</button>
               </a>        
             </div>
-            </dev>
-            <!-- <div>
-              To modify, edit file: &quotservers.json&quot
-            </div> -->
+
             <div class="button-div">
               <input type="text" id="ircServerIndexInputId" size="2" value="" disabled>
               <span>Index</span>
+              <button id="ircServerIndexInputInfoBtn">?</button>
               <button id="cyclePrevServerButton">Prev</button>
               <button id="cycleNextServerButton">Next</button>
               <a href="/irc/serverlist.html">
                 <button id="editServerListButton">Edit Server List</button>
-              </a>            </div>
+              </a>
+            </div>
+            <div class="white-info-div" id="ircServerIndexInputInfo" hidden>
+              <p>
+                This is the index number the currently selected IRC server.
+              </p>
+              <p>
+                Index numbers start at zero and are assigned to each server in 
+                the IRC server list in the order in which the IRC servers appear in the list.
+                Adding, deleting, or re-ordering servers will change the index numbers.
+              </p>
+              <ul>
+                <li>Click [Prev] or [Next] to step through the list of non-disabled IRC servers</li>
+                <li>If Server Rotation is enabled, the server index will advance automatically as alternate servers are tried.</li>
+              </ul>
+              <p>
+                Click the [?] again to close this message.
+              </p>
+            </div>
             <div class="button-div">
               <input type="text" id="ircServerGroupInputId" size="2" value="" disabled>
               <span>Server Rotation Group Number</span>
-              <button id="groupInfoButton">?</button>
+              <button id="ircServerGroupInputInfoBtn">?</button>
             </div>
-            <div class="button-div">
-                <input type="text" id="ircServerNameInputId" size="10" value="" disabled>
-                <span>Server Definition Label</span>
-            </div>
-            <div class="white-info-div" id="groupInfoHiddenDiv" hidden>
+            <div class="white-info-div" id="ircServerGroupInputInfo" hidden>
               <p>
-                A server group defines a set of IRC server definitions where different 
-                IRC servers can be rotated in sequence after disconnect from IRC.
+                The &quot;Server Rotation Group Number&quot; column defines an integer group number. 
+                Groups are used to configure and define a common group of IRC server definitions.
+                In the event of IRC server network connection failures, 
+                different IRC servers within a common group number can be 
+                automatically rotated to other servers in the group.
+                Group 0 is reserved for stand alone servers.
+                A rotation group is defined when the group number is 1 or greater . 
+                If more than two server in a group are not disabled and both have the 
+                Auto Reconnect property enabled, then upon disconnect, the client will 
+                automatically rotate IRC server definitions within a server group.
+                In typical use, a server group would allow different IRC networks 
+                such as DALnet or Undernet to have different group numbers.
               </p>
               <ul>
                 <li>The Group input field accepts integer values 0 to 9999</li>
                 <li>Group 0 is used to define individual IRC server addresses that do not rotate.</li>
                 <li>
                   Group 1 or greater defines a set of server where servers of the same group number 
-                  will automatically rotate different server addresses after disconnect.
+                  will automatically rotate after disconnect.
                 </li>
                 <li>
-                  In typical use, a server group would allow different IRC networks 
-                  such as DALnet or Undernet to have different group numbers.
+                  Each server in the group must have &quot;Auto Reconnect&quot; enabled.
                 </li>
               </ul>
+              <p>
+                Click the [?] again to close this message.
+              </p>
             </div>
-            <div class="vh10"></div>
+            <div class="button-div">
+              <input type="text" id="ircServerNameInputId" size="10" value="" disabled>
+              <span>Server Definition Label</span>
+              <button id="ircServerNameInputInfoBtn">?</button>
+            </div>
+            <div class="white-info-div" id="ircServerNameInputInfo" hidden>
+              <p>
+                The &quot;Label&quot; is used to provide a descriptive name for an IRC server definition.
+                The Label is not otherwise used, and it may contain any arbitrary string values.
+                If you are using a small screen smartphone, it is best to keep the Label short.
+              </p>
+              <p>
+                Click the [?] again to close this message.
+              </p>
+            </div>
             <div class="button-div">
               <input type="text" id="ircServerAddrInputId" size="26" value="" disabled>
               <span>:</span>
               <input type="text" id="ircServerPortInputId" size="4" value="" disabled>
             </div>
+            <div class="vh10"></div>
             <div class="button-div">
               <div id="ircServerTlsEnable"><div id="ircServerTlsEnableDot"></div></div>
               <span class="rm20">TLS</span>
               <div id="ircServerTlsVerify"><div id="ircServerTlsVerifyDot"></div></div>
-              <span>Verify Hostname</span>
+              <span>Verify TLS Certificate Hostname</span>
             </div>
             <div class="button-div">
               <div id="ircServerReconnectEnable"><div id="ircServerReconnectEnableDot"></div></div>
-              <span class="rm20">Auto Reconnect</span>
+              <span>Auto Reconnect</span>
+              <span class="rm20"><button id="ircServerReconnectEnableInfoBtn">?</button></span>
               <div id="ircServerRotateEnable"><div id="ircServerRotateEnableDot"></div></div>
               <span>Server Rotation</span>
+              <button id="ircServerRotateEnableInfoBtn">?</button>
             </div>
-            <div id="socks5HidableDiv">
-              <div class="button-div">
-                <div id="socks5EnabledCheckbox"><div id="socks5EnabledCheckboxDot"></div></div>
-                <span>Connect using socks5 proxy</span>
-              </div>
-              <div class="button-div">
-                <input type="text" id="socks5AddrInputId" size="26" value="" disabled>
-                <span>:</span>
-                <input type="text" id="socks5PortInputId" size="4" value="" disabled>
-              </div>
+            <div class="white-info-div" id="ircServerReconnectEnableInfo" hidden>
+              <p>
+                When the reconnect checkbox is checked, after disconnect, the IRC
+                client will attempt to reconnect to IRC. For the first try, it will use 
+                the existing server definition and existing nickname. 
+                In the case where first reconnect 
+                attempt using the same IRC server and nickname fails, if additional 
+                IRC servers have been defined within a Group, other IRC server 
+                definitions will be tried. Upon reconnect, it will attempt to 
+                re-join up to 5 channels that were open at the time of disconnection. 
+                This feature does not support channel passwords.
+              </p>
+              <p>
+                At this time there are no provisions to configure a server to auto-connect 
+                to IRC on startup. There is no provision to auto-join channels on startup.
+              </p>
+              <p>
+                Click the [?] again to close this message.
+              </p>
+            </div>
+            <div class="yellow-info-div" id="ircServerRotateEnableWarn" hidden>
+              Calculated value, not editable.
+            </div>
+            <div class="white-info-div" id="ircServerRotateEnableInfo" hidden>
+              <p>
+                This is a Read-Only indicator to show if IRC server rotation is enabled.
+              </p>
+              <p>
+                In the case where the Server Rotation Group Number is greater than zero
+                AND more than one non-disabled server has been configured in that group number,
+                then when the IRC server connection fails for the IRC server at the current 
+                select index number, the IRC server index will be advanced to the next 
+                available IRC server definition of the same group number. This is a 
+                calculated value and may not be modified.
+              </p>
+              <p>
+                Click the [?] again to close this message.
+              </p>
+            </div>
+            <div class="button-div">
+              <div id="socks5EnabledCheckbox"><div id="socks5EnabledCheckboxDot"></div></div>
+              <span>Connect using socks5 proxy</span>
+              <button id="socks5EnabledCheckboxInfoBtn">?</button>
+            </div>
+            <div class="white-info-div" id="socks5EnabledCheckboxInfo" hidden>
+              <p>
+                The irc-hybrid-client has limited capability to connect 
+                to an IRC server using a socks5 network proxy. The configuration 
+                settings for the socks5 proxy are defined in the web server 
+                configuration as explained in the Login Config section of /docs.
+                If a socks5 proxy has been defined in the web server configuration,
+                the each IRC server definition will have the option to 
+                use the Socks5 Proxy to connect to the IRC server.
+              </p>
+              <p>
+                The current socks5 proxy address will be displayed below the 
+                radio button here, if configured.
+              </p> 
+              <ul>
+                <li>Use the [Edit Server List] button to change this value.</li>
+              </ul>
+              <p>
+                Click the [?] again to close this message.
+              </p>
+            </div>            
+            <div class="yellow-info-div" id="readOnlyPropertyWarningDiv" hidden>
+              Read Only: Click the [Edit Server List] button to modify these values.
+            </div>
+            <div class="button-div">
+              <input type="text" id="socks5AddrInputId" size="26" value="" disabled>
+              <span>:</span>
+              <input type="text" id="socks5PortInputId" size="4" value="" disabled>
+              <button id="ircProxyInfoBtn">?</button>
+            </div>
+            <div class="white-info-div" id="ircProxyInfo" hidden>
+              <p>
+                The proxy info displayed here shows the current socks5 network proxy 
+                settings that have been configured in the web server. See the Login Config section of the /docs.
+              </p>
+              <p>
+                Click the [?] again to close this message.
+              </p>
             </div>
             <div class="vh10"></div>
             <div class="nickname-input-div">
               <div class="button-div">
                 <input type="text" id="nickNameInputId" value="">
                 <div class="input-label-right">Nickname</div>
+                <button id="nickNameInputInfoBtn">?</button>
+              </div>
+              <div class="white-info-div" id="nickNameInputInfo" hidden>
+                <p>
+                  The Nickname entry is the name you will known as when you sign into IRC.
+                  The default value may be changed by clicking the [Edit Server List] button.
+                  A different nickname may be specified here each time you connect, 
+                  but it would revert to the default for subsequent connections.
+                </p>
+                <p>
+                  Some characters are restricted like @ and + are restricted because they designate channel operator or voice. Allowed are 
+                  uppercase or lowercase characters, numbers, hyphens, underscores, square brackets, curly braces, backslash, backticks, or pipes. 
+                </p>
+                <p>
+                  Click the [?] again to close this message.
+                </p>
               </div>
               <div class="button-div">
                 <span>User: </span>
@@ -267,14 +420,45 @@ a raw command to the IRC server directly.
                 <span>Real:</span>
                 <span id="realNameInputId"></span>
                 <span>Mode:</span>
-                <span id = "userModeInputId">
+                <span id = "userModeInputId"></span>
+                <button id="userRealModeInfoBtn">?</button>
               </div>
+            </div>
+            <div class="white-info-div" id="userRealModeInfo" hidden>
+              <p>
+                These are the username, real name, and initial modes used to connect to the IRC network.
+                To modify these values, click the [Edit Server List] button.
+              </p>
+              <ul>
+                <li>
+                  User: This is the backup user name to be used if the identd service is not running, such as &quot;mynick!~user@example.com&quot;
+                </li>
+                <li>
+                  Real: This is the content of the name field displayed in the /WHOIS response from the IRC server. It may be any made up value.
+                </li>
+                <li>
+                  Mode: This is a string used to set the initial user mode during connect to the IRC network. Suggest invisible as +i.
+                </li>
+              </ul>
+              <p>
+                Click the [?] again to close this message.
+              </p>
             </div>
             <div class="vh10"></div>
             <div class="button-div">
               <input type="text" id = "userAwayMessageId" size="20" value="AFK">
               <button id=setAwayButton>Away</button>
               <button id=setBackButton>Back</button>
+              <button id="setAwayInfoBtn">?</button>
+            </div>
+            <div class="white-info-div" id="setAwayInfo" hidden>
+              <p>
+                This will execute the IRC command /AWAY command providing a custom 
+                message if provided.
+              </p>
+              <p>
+                Click the [?] again to close this message.
+              </p>
             </div>
             <div class="vh10"></div>
             <div class="button-div">

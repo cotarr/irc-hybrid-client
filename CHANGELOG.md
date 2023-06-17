@@ -6,6 +6,35 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v0.2.45-dev 2023-06-17
+
+### Browser Changes (webclient.html)
+
+- Detect empty IRC server list or detect all servers disabled then browser auto-redirects to server list editor "irc/serverlist.html"
+- Detect empty IRC server list when server list editor is disabled and show pop-up panel with instructions.
+- Added additional info buttons (?) to the server panel showing field descriptions and data entry instructions.
+- Detect clicks on read only radio buttons in IRC Controls panel and show pop-up panel with waning message.
+- Add event listener to show popup panel warning when clicking on read radio buttons
+
+### Brewser changes (serverlist.html)
+
+- If /docs folder is enabled in the web server, show [Help] button with link in the server list edit form page.
+- Detect empty IRC server list, show pop-up panel with instruction, hide IRC return button.
+- Detect condition were all IRC servers are disabled, open pop-up panel with instructions, hide IRC return button.
+- Added additional info buttons (?) to the server edit form showing field descriptions and data entry instructions.
+- Added [Web logout] button to server list editor page.
+
+### Server changes
+
+- In server/irc/irc-client.mjs, on program start, if the "servers.json" (server list) file does not exist, create a new empty server list automatically.
+- In server/irc/irc-client-log.mjs, edit startup message for auto-created logs/ folder to match auto-create server list message.
+- In server/web-server.mjs, change /irc/serverlist.html authorization failure action from redirect to 403 forbidden.
+
+### /docs/ changes
+
+- In server-config.html, update some individual server field instructions to match pop-up help in server list editor.
+
+
 ## [v0.2.44](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.44) 2023-06-13
 
 Version v0.2.44 changed only the backend server. 

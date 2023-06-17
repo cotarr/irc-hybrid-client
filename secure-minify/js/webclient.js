@@ -73,9 +73,10 @@ document.getElementById('rawHiddenElements').setAttribute('hidden','');document.
 document.getElementById('noticeUnreadExistIcon').removeAttribute('hidden')}function resetNotActivityIcon(index){document.getElementById('noticeUnreadExistIcon').setAttribute('hidden','')}
 document.getElementById('noticeUnreadExistIcon').addEventListener('click',(function(){resetNotActivityIcon()}));document.getElementById('groupInfoButton').addEventListener('click',(function(){
 if(document.getElementById('groupInfoHiddenDiv').hasAttribute('hidden'))document.getElementById('groupInfoHiddenDiv').removeAttribute('hidden');else document.getElementById('groupInfoHiddenDiv').setAttribute('hidden','')
-}));document.getElementById('annunciatorBackgroundDivId').removeAttribute('hidden');document.getElementById('annunciatiorDivId').removeAttribute('hidden')
-;document.getElementById('scrollableDivId').removeAttribute('hidden');hideRawMessageWindow();function updateDivVisibility(){if(webState.webConnected){
-document.getElementById('webDisconnectedVisibleDiv').setAttribute('hidden','');document.getElementById('webDisconnectedHiddenDiv1').removeAttribute('hidden')
+}));document.getElementById('readOnlyClickDetector').addEventListener('click',(function(){document.getElementById('readOnlyPropertyWarningDiv').removeAttribute('hidden');setTimeout((function(){
+document.getElementById('readOnlyPropertyWarningDiv').setAttribute('hidden','')}),3e3)}));document.getElementById('annunciatorBackgroundDivId').removeAttribute('hidden')
+;document.getElementById('annunciatiorDivId').removeAttribute('hidden');document.getElementById('scrollableDivId').removeAttribute('hidden');hideRawMessageWindow();function updateDivVisibility(){
+if(webState.webConnected){document.getElementById('webDisconnectedVisibleDiv').setAttribute('hidden','');document.getElementById('webDisconnectedHiddenDiv1').removeAttribute('hidden')
 ;document.getElementById('webDisconnectedHiddenDiv2').removeAttribute('hidden');document.getElementById('reconnectStatusDiv').textContent=''
 ;document.getElementById('webConnectIconId').setAttribute('connected','');document.getElementById('webConnectIconId').removeAttribute('connecting')
 ;document.getElementById('rawMessageInputId').removeAttribute('disabled');document.getElementById('sendRawMessageButton').removeAttribute('disabled')
@@ -176,9 +177,12 @@ document.getElementById('socks5HidableDiv').removeAttribute('hidden');updateTrue
 ;document.getElementById('headerUser').textContent=' ('+ircState.nickName+')';document.getElementById('nickNameInputId').value=ircState.nickName
 ;document.getElementById('userNameInputId').textContent='"'+ircState.userName+'"';document.getElementById('realNameInputId').textContent='"'+ircState.realName+'"'
 ;document.getElementById('userModeInputId').textContent='"'+ircState.userMode+'"';webState.ircConnecting=false}if(!ircState.ircConnected){
-document.getElementById('nickNameInputId').value=ircState.nickName
-;if(-1===ircState.ircServerIndex)document.getElementById('emptyServerListDiv').removeAttribute('hidden');else document.getElementById('emptyServerListDiv').setAttribute('hidden','')
-;setVariablesShowingIRCDisconnected();document.title='irc-hybrid-client'}if(lastConnectErrorCount!==ircState.count.ircConnectError){lastConnectErrorCount=ircState.count.ircConnectError
+document.getElementById('nickNameInputId').value=ircState.nickName;if(-1===ircState.ircServerIndex)if(ircState.disableServerListEditor){
+document.getElementById('emptyServerListNoEdit').removeAttribute('hidden');document.getElementById('emptyServerListDiv').setAttribute('hidden','')}else{
+document.getElementById('emptyServerListDiv').removeAttribute('hidden');document.getElementById('emptyServerListNoEdit').setAttribute('hidden','');window.location='/irc/serverlist.html'}else{
+document.getElementById('emptyServerListDiv').setAttribute('hidden','');document.getElementById('emptyServerListDiv').setAttribute('hidden','')
+;document.getElementById('emptyServerListNoEdit').setAttribute('hidden','')}setVariablesShowingIRCDisconnected();document.title='irc-hybrid-client'}
+if(lastConnectErrorCount!==ircState.count.ircConnectError){lastConnectErrorCount=ircState.count.ircConnectError
 ;if(ircState.count.ircConnectError>0)if(webState.count.webStateCalls>1)showError('An IRC Server connection error occurred');webState.ircConnecting=false}
 document.dispatchEvent(new CustomEvent('irc-state-changed',{bubbles:true,detail:{}}));updateDivVisibility()
 ;if(!document.getElementById('variablesDivId').hasAttribute('hidden'))document.getElementById('variablesPreId').textContent='ircState = '+JSON.stringify(ircState,null,2)+'\n\n'+'webState = '+JSON.stringify(webState,null,2)
@@ -970,7 +974,8 @@ if('default'===event.detail.parsedMessage.params[0])displayRawMessage(cleanForma
 if(ircState.nickName.toLowerCase()===event.detail.parsedMessage.nick.toLowerCase())displayRawMessage(cleanFormatting(cleanCtcpDelimiter(event.detail.parsedMessage.timestamp+' '+event.detail.parsedMessage.nick+' is now known as '+event.detail.parsedMessage.params[0])))
 ;break;case'NOTICE':
 displayRawMessage(cleanFormatting(cleanCtcpDelimiter(event.detail.parsedMessage.timestamp+' '+'NOTICE '+event.detail.parsedMessage.params[0]+' '+event.detail.parsedMessage.params[1])));break;default:
-displayRawMessage(cleanFormatting(cleanCtcpDelimiter(substituteHmsTime(event.detail.message))))}if(!webState.cacheReloadInProgress){const inhibitCommandList=['NICK','PRIVMSG']
+console.log('default',event.detail.parsedMessage.command);displayRawMessage(cleanFormatting(cleanCtcpDelimiter(substituteHmsTime(event.detail.message))))}if(!webState.cacheReloadInProgress){
+const inhibitCommandList=['NICK','PRIVMSG']
 ;if('detail'in event&&'parsedMessage'in event.detail&&'command'in event.detail.parsedMessage&&'string'===typeof event.detail.parsedMessage.command&&event.detail.parsedMessage.command.length>0){
 if(inhibitCommandList.indexOf(event.detail.parsedMessage.command.toUpperCase())<0)showRawMessageWindow()}else showRawMessageWindow()}}))
 ;document.addEventListener('erase-before-reload',(function(event){document.getElementById('rawMessageDisplay').value='';document.getElementById('rawMessageInputId').value=''
