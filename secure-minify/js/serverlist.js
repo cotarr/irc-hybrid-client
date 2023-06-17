@@ -157,14 +157,57 @@ document.getElementById('allDisabledWarningDiv').setAttribute('hidden','');docum
 ;document.getElementById('emptyTableDiv').removeAttribute('hidden');document.getElementById('allDisabledWarningDiv').setAttribute('hidden','')
 ;document.getElementById('returnIrcButton').setAttribute('disabled','');document.getElementById('fullButton').setAttribute('disabled','')}resolve(null)})
 ;const checkForApiError=data=>new Promise((resolve,reject)=>{if('success'===data.status)resolve(null);else reject(new Error('PATCH API did not return success status flag'))})
-;const setDivVisibility=data=>{console.log('setDivVisibility data: ',JSON.stringify(data,null,2));document.getElementById('listVisibilityDiv').removeAttribute('hidden','')
-;document.getElementById('formVisibilityDiv').setAttribute('hidden','');document.getElementById('serverPasswordWarningDiv').setAttribute('hidden','')
-;document.getElementById('nickservCommandWarningDiv').setAttribute('hidden','');if(data.ircConnected||data.ircConnecting){document.getElementById('createNewButton').setAttribute('disabled','')
-;document.getElementById('warningVisibilityDiv').removeAttribute('hidden');editable=false}else{document.getElementById('createNewButton').removeAttribute('disabled')
-;document.getElementById('warningVisibilityDiv').setAttribute('hidden','');editable=true}
-if(data.enableSocks5Proxy)document.getElementById('ircProxyDiv').textContent='Socks5 Proxy: Enabled Globally\nSocks5 Proxy: '+data.socks5Host+':'+data.socks5Port;else document.getElementById('ircProxyDiv').textContent='Socks5 Proxy: Disabled Globally'
-;return Promise.resolve(null)};document.getElementById('groupInfoButton').addEventListener('click',()=>{
-if(document.getElementById('groupInfoHiddenDiv').hasAttribute('hidden'))document.getElementById('groupInfoHiddenDiv').removeAttribute('hidden');else document.getElementById('groupInfoHiddenDiv').setAttribute('hidden','')
+;const setDivVisibility=data=>{document.getElementById('listVisibilityDiv').removeAttribute('hidden','');document.getElementById('formVisibilityDiv').setAttribute('hidden','')
+;document.getElementById('serverPasswordWarningDiv').setAttribute('hidden','');document.getElementById('nickservCommandWarningDiv').setAttribute('hidden','');if(data.ircConnected||data.ircConnecting){
+document.getElementById('createNewButton').setAttribute('disabled','');document.getElementById('warningVisibilityDiv').removeAttribute('hidden');editable=false}else{
+document.getElementById('createNewButton').removeAttribute('disabled');document.getElementById('warningVisibilityDiv').setAttribute('hidden','');editable=true}
+if(data.enableSocks5Proxy)document.getElementById('ircProxyDiv').textContent='Socks5 Proxy: Enabled Globally  Socks5 Proxy: '+data.socks5Host+':'+data.socks5Port;else document.getElementById('ircProxyDiv').textContent='Socks5 Proxy: Disabled Globally'
+;return Promise.resolve(null)};document.getElementById('disabledCheckboxInfoBtn').addEventListener('click',()=>{
+if(document.getElementById('disabledCheckboxInfo').hasAttribute('hidden'))document.getElementById('disabledCheckboxInfo').removeAttribute('hidden');else document.getElementById('disabledCheckboxInfo').setAttribute('hidden','')
+});document.getElementById('groupInputInfoBtn').addEventListener('click',()=>{
+if(document.getElementById('groupInputInfo').hasAttribute('hidden'))document.getElementById('groupInputInfo').removeAttribute('hidden');else document.getElementById('groupInputInfo').setAttribute('hidden','')
+});document.getElementById('nameInputInfoBtn').addEventListener('click',()=>{
+if(document.getElementById('nameInputInfo').hasAttribute('hidden'))document.getElementById('nameInputInfo').removeAttribute('hidden');else document.getElementById('nameInputInfo').setAttribute('hidden','')
+});document.getElementById('autoReconnectCheckboxInfoBtn').addEventListener('click',()=>{
+if(document.getElementById('autoReconnectCheckboxInfo').hasAttribute('hidden'))document.getElementById('autoReconnectCheckboxInfo').removeAttribute('hidden');else document.getElementById('autoReconnectCheckboxInfo').setAttribute('hidden','')
+});document.getElementById('loggingCheckboxInfoBtn').addEventListener('click',()=>{
+if(document.getElementById('loggingCheckboxInfo').hasAttribute('hidden'))document.getElementById('loggingCheckboxInfo').removeAttribute('hidden');else document.getElementById('loggingCheckboxInfo').setAttribute('hidden','')
+});document.getElementById('hostInputInfoBtn').addEventListener('click',()=>{
+if(document.getElementById('hostInputInfo').hasAttribute('hidden'))document.getElementById('hostInputInfo').removeAttribute('hidden');else document.getElementById('hostInputInfo').setAttribute('hidden','')
+});document.getElementById('proxyCheckboxInfoBtn').addEventListener('click',()=>{
+if(document.getElementById('proxyCheckboxInfo').hasAttribute('hidden'))document.getElementById('proxyCheckboxInfo').removeAttribute('hidden');else document.getElementById('proxyCheckboxInfo').setAttribute('hidden','')
+});document.getElementById('ircProxyInfoBtn').addEventListener('click',()=>{
+if(document.getElementById('ircProxyInfo').hasAttribute('hidden'))document.getElementById('ircProxyInfo').removeAttribute('hidden');else document.getElementById('ircProxyInfo').setAttribute('hidden','')
+});document.getElementById('passwordInputInfoBtn').addEventListener('click',()=>{
+if(document.getElementById('passwordInputInfo').hasAttribute('hidden'))document.getElementById('passwordInputInfo').removeAttribute('hidden');else document.getElementById('passwordInputInfo').setAttribute('hidden','')
+});document.getElementById('saslUsernameInputInfoBtn').addEventListener('click',()=>{
+if(document.getElementById('saslUsernameInputInfo').hasAttribute('hidden'))document.getElementById('saslUsernameInputInfo').removeAttribute('hidden');else document.getElementById('saslUsernameInputInfo').setAttribute('hidden','')
+});document.getElementById('saslPasswordInputInfoBtn').addEventListener('click',()=>{
+if(document.getElementById('saslPasswordInputInfo').hasAttribute('hidden'))document.getElementById('saslPasswordInputInfo').removeAttribute('hidden');else document.getElementById('saslPasswordInputInfo').setAttribute('hidden','')
+});document.getElementById('nickInputInfoBtn').addEventListener('click',()=>{
+if(document.getElementById('nickInputInfo').hasAttribute('hidden'))document.getElementById('nickInputInfo').removeAttribute('hidden');else document.getElementById('nickInputInfo').setAttribute('hidden','')
+});document.getElementById('altNickInputInfoBtn').addEventListener('click',()=>{
+if(document.getElementById('altNickInputInfo').hasAttribute('hidden'))document.getElementById('altNickInputInfo').removeAttribute('hidden');else document.getElementById('altNickInputInfo').setAttribute('hidden','')
+});document.getElementById('recoverNickCheckboxInfoBtn').addEventListener('click',()=>{
+if(document.getElementById('recoverNickCheckboxInfo').hasAttribute('hidden'))document.getElementById('recoverNickCheckboxInfo').removeAttribute('hidden');else document.getElementById('recoverNickCheckboxInfo').setAttribute('hidden','')
+});document.getElementById('realInputInfoBtn').addEventListener('click',()=>{
+if(document.getElementById('realInputInfo').hasAttribute('hidden'))document.getElementById('realInputInfo').removeAttribute('hidden');else document.getElementById('realInputInfo').setAttribute('hidden','')
+});document.getElementById('userInputInfoBtn').addEventListener('click',()=>{
+if(document.getElementById('userInputInfo').hasAttribute('hidden'))document.getElementById('userInputInfo').removeAttribute('hidden');else document.getElementById('userInputInfo').setAttribute('hidden','')
+});document.getElementById('identifyNickInputInfoBtn').addEventListener('click',()=>{
+if(document.getElementById('identifyNickInputInfo').hasAttribute('hidden'))document.getElementById('identifyNickInputInfo').removeAttribute('hidden');else document.getElementById('identifyNickInputInfo').setAttribute('hidden','')
+});document.getElementById('modesInputInfoBtn').addEventListener('click',()=>{
+if(document.getElementById('modesInputInfo').hasAttribute('hidden'))document.getElementById('modesInputInfo').removeAttribute('hidden');else document.getElementById('modesInputInfo').setAttribute('hidden','')
+});document.getElementById('channelListInputInfoBtn').addEventListener('click',()=>{
+if(document.getElementById('channelListInputInfo').hasAttribute('hidden'))document.getElementById('channelListInputInfo').removeAttribute('hidden');else document.getElementById('channelListInputInfo').setAttribute('hidden','')
+});document.getElementById('identifyCommandInputInfoBtn').addEventListener('click',()=>{
+if(document.getElementById('identifyCommandInputInfo').hasAttribute('hidden'))document.getElementById('identifyCommandInputInfo').removeAttribute('hidden');else document.getElementById('identifyCommandInputInfo').setAttribute('hidden','')
+});document.getElementById('forceUnlockAllInfoBtn').addEventListener('click',()=>{
+if(document.getElementById('forceUnlockAllInfo').hasAttribute('hidden'))document.getElementById('forceUnlockAllInfo').removeAttribute('hidden');else document.getElementById('forceUnlockAllInfo').setAttribute('hidden','')
+});document.getElementById('logoutLinkInfoBtn').addEventListener('click',()=>{
+if(document.getElementById('logoutLinkInfo').hasAttribute('hidden'))document.getElementById('logoutLinkInfo').removeAttribute('hidden');else document.getElementById('logoutLinkInfo').setAttribute('hidden','')
+});document.getElementById('logoutLinkInfoBtn2').addEventListener('click',()=>{
+if(document.getElementById('logoutLinkInfo2').hasAttribute('hidden'))document.getElementById('logoutLinkInfo2').removeAttribute('hidden');else document.getElementById('logoutLinkInfo2').setAttribute('hidden','')
 });document.getElementById('replacePasswordButton').addEventListener('click',()=>{document.getElementById('passwordInputId').removeAttribute('disabled')
 ;document.getElementById('passwordInputId').value='';document.getElementById('replacePasswordButton').setAttribute('hidden','')
 ;document.getElementById('serverPasswordWarningDiv').removeAttribute('hidden')});document.getElementById('replaceSaslPasswordButton').addEventListener('click',()=>{
