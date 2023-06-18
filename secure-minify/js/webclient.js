@@ -1045,32 +1045,30 @@ if(document.getElementById('showRawInHexCheckbox').checked)webState.showRawInHex
 ;document.getElementById('showCommsCheckbox').addEventListener('click',(function(){
 if(document.getElementById('showCommsCheckbox').checked)webState.showCommsMessages=true;else webState.showCommsMessages=false;document.dispatchEvent(new CustomEvent('update-from-cache',{bubbles:true
 }))}));document.getElementById('infoOpenCloseButton').addEventListener('click',(function(){if(document.getElementById('hiddenInfoDiv').hasAttribute('hidden')){
-document.getElementById('hiddenInfoDiv').removeAttribute('hidden');document.getElementById('infoOpenCloseButton').textContent='-'
-;if(!document.getElementById('infoSectionDiv').hasAttribute('docs-enabled')){document.getElementById('infoSectionDiv').setAttribute('docs-enabled','0');const docsTestUrl='/irc/docs/index.html'
-;const fetchOptions={method:'HEAD',headers:{Accept:'text/html'}};fetch(docsTestUrl,fetchOptions).then(response=>{if(response.ok){
-document.getElementById('infoSectionDiv').setAttribute('docs-enabled','1');document.getElementById('viewDocsButtonDiv').removeAttribute('hidden')}})}}else{
-document.getElementById('hiddenInfoDiv').setAttribute('hidden','');document.getElementById('infoOpenCloseButton').textContent='+'}}));function updateFromCache(){if(webState.cacheReloadInProgress){
-console.log('Attempt cache reload, while previous in progress');return}webState.cacheReloadInProgress=true;resetNotActivityIcon();document.dispatchEvent(new CustomEvent('erase-before-reload',{
-bubbles:true,detail:{}}));const fetchURL=webServerUrl+'/irc/cache';const fetchOptions={method:'GET',headers:{Accept:'application/json'}};fetch(fetchURL,fetchOptions).then(response=>{
-if(response.ok)return response.json();else throw new Error('Fetch status '+response.status+' '+response.statusText)}).then(responseArray=>{if(Array.isArray(responseArray)){webState.lastPMNick=''
-;webState.activePrivateMessageNicks=[];if(responseArray.length>0)for(let i=0;i<responseArray.length;i++)if(responseArray[i].length>0)_parseBufferMessage(responseArray[i])}
-const timestamp=unixTimestamp();document.dispatchEvent(new CustomEvent('cache-reload-done',{bubbles:true,detail:{timestamp:timestamp}}))}).catch(error=>{const timestamp=unixTimestamp()
-;console.log(error);document.dispatchEvent(new CustomEvent('cache-reload-error',{bubbles:true,detail:{timestamp:timestamp}}))})}window.addEventListener('update-from-cache',(function(event){
-updateFromCache()}));let updateCacheDebounceActive=false;window.addEventListener('debounced-update-from-cache',(function(event){if(!updateCacheDebounceActive){updateCacheDebounceActive=true
-;setTimeout((function(){updateCacheDebounceActive=false;if(!webState.cacheReloadInProgress)updateFromCache()}),1e3)}}));window.addEventListener('cache-reload-done',(function(event){
-webState.cacheReloadInProgress=false}));window.addEventListener('cache-reload-error',(function(event){webState.cacheReloadInProgress=false}))
-;document.getElementById('serverTerminateButton').addEventListener('click',(function(){console.log('Requesting backend server to terminate');const fetchURL=webServerUrl+'/terminate'
-;const fetchOptions={method:'POST',headers:{'CSRF-Token':csrfToken,'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify({terminate:'YES'})}
-;fetch(fetchURL,fetchOptions).then(response=>{if(response.ok)return response.json();else throw new Error('Fetch status '+response.status+' '+response.statusText)}).then(responseJson=>{
-console.log(JSON.stringify(responseJson))}).catch(error=>{showError('Terminate: Unable to connect');console.log(error)})}))
-;document.getElementById('eraseCacheButton').addEventListener('click',(function(){document.dispatchEvent(new CustomEvent('erase-before-reload',{bubbles:true,detail:{}}))
-;const fetchURL=webServerUrl+'/irc/erase';const fetchOptions={method:'POST',headers:{'CSRF-Token':csrfToken,'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify({
-erase:'CACHE'})};fetch(fetchURL,fetchOptions).then(response=>{if(response.ok)return response.json();else throw new Error('Fetch status '+response.status+' '+response.statusText)}).then(responseJson=>{
-if(responseJson.error)showError(responseJson.message)}).catch(error=>{showError(error.toString())})}));function detectWebUseridChanged(){let lastLoginUser=null
-;lastLoginUser=JSON.parse(window.localStorage.getItem('lastLoginUser'));if(lastLoginUser&&lastLoginUser.userid&&lastLoginUser.userid!==webState.loginUser.userid){
-console.log('User id changed, clearing local storage');window.localStorage.clear()}const newLoginTimestamp=unixTimestamp();const newLoginUser={timestamp:newLoginTimestamp,
-userid:webState.loginUser.userid};window.localStorage.setItem('lastLoginUser',JSON.stringify(newLoginUser))}function updateUsername(){const fetchURL=webServerUrl+'/userinfo';const fetchOptions={
-method:'GET',headers:{Accept:'application/json'}};fetch(fetchURL,fetchOptions).then(response=>{
+document.getElementById('hiddenInfoDiv').removeAttribute('hidden');document.getElementById('infoOpenCloseButton').textContent='-'}else{
+document.getElementById('hiddenInfoDiv').setAttribute('hidden','');document.getElementById('infoOpenCloseButton').textContent='+'}}));const docsTestUrl='/irc/docs/index.html';const fetchOptions={
+method:'HEAD',headers:{Accept:'text/html'}};fetch(docsTestUrl,fetchOptions).then(response=>{if(response.ok)document.getElementById('viewDocsButtonDiv').removeAttribute('hidden')}).catch(()=>{})
+;function updateFromCache(){if(webState.cacheReloadInProgress){console.log('Attempt cache reload, while previous in progress');return}webState.cacheReloadInProgress=true;resetNotActivityIcon()
+;document.dispatchEvent(new CustomEvent('erase-before-reload',{bubbles:true,detail:{}}));const fetchURL=webServerUrl+'/irc/cache';const fetchOptions={method:'GET',headers:{Accept:'application/json'}}
+;fetch(fetchURL,fetchOptions).then(response=>{if(response.ok)return response.json();else throw new Error('Fetch status '+response.status+' '+response.statusText)}).then(responseArray=>{
+if(Array.isArray(responseArray)){webState.lastPMNick='';webState.activePrivateMessageNicks=[]
+;if(responseArray.length>0)for(let i=0;i<responseArray.length;i++)if(responseArray[i].length>0)_parseBufferMessage(responseArray[i])}const timestamp=unixTimestamp()
+;document.dispatchEvent(new CustomEvent('cache-reload-done',{bubbles:true,detail:{timestamp:timestamp}}))}).catch(error=>{const timestamp=unixTimestamp();console.log(error)
+;document.dispatchEvent(new CustomEvent('cache-reload-error',{bubbles:true,detail:{timestamp:timestamp}}))})}window.addEventListener('update-from-cache',(function(event){updateFromCache()}))
+;let updateCacheDebounceActive=false;window.addEventListener('debounced-update-from-cache',(function(event){if(!updateCacheDebounceActive){updateCacheDebounceActive=true;setTimeout((function(){
+updateCacheDebounceActive=false;if(!webState.cacheReloadInProgress)updateFromCache()}),1e3)}}));window.addEventListener('cache-reload-done',(function(event){webState.cacheReloadInProgress=false}))
+;window.addEventListener('cache-reload-error',(function(event){webState.cacheReloadInProgress=false}));document.getElementById('serverTerminateButton').addEventListener('click',(function(){
+console.log('Requesting backend server to terminate');const fetchURL=webServerUrl+'/terminate';const fetchOptions={method:'POST',headers:{'CSRF-Token':csrfToken,'Content-type':'application/json',
+Accept:'application/json'},body:JSON.stringify({terminate:'YES'})};fetch(fetchURL,fetchOptions).then(response=>{
+if(response.ok)return response.json();else throw new Error('Fetch status '+response.status+' '+response.statusText)}).then(responseJson=>{console.log(JSON.stringify(responseJson))}).catch(error=>{
+showError('Terminate: Unable to connect');console.log(error)})}));document.getElementById('eraseCacheButton').addEventListener('click',(function(){
+document.dispatchEvent(new CustomEvent('erase-before-reload',{bubbles:true,detail:{}}));const fetchURL=webServerUrl+'/irc/erase';const fetchOptions={method:'POST',headers:{'CSRF-Token':csrfToken,
+'Content-type':'application/json',Accept:'application/json'},body:JSON.stringify({erase:'CACHE'})};fetch(fetchURL,fetchOptions).then(response=>{
+if(response.ok)return response.json();else throw new Error('Fetch status '+response.status+' '+response.statusText)}).then(responseJson=>{if(responseJson.error)showError(responseJson.message)
+}).catch(error=>{showError(error.toString())})}));function detectWebUseridChanged(){let lastLoginUser=null;lastLoginUser=JSON.parse(window.localStorage.getItem('lastLoginUser'))
+;if(lastLoginUser&&lastLoginUser.userid&&lastLoginUser.userid!==webState.loginUser.userid){console.log('User id changed, clearing local storage');window.localStorage.clear()}
+const newLoginTimestamp=unixTimestamp();const newLoginUser={timestamp:newLoginTimestamp,userid:webState.loginUser.userid};window.localStorage.setItem('lastLoginUser',JSON.stringify(newLoginUser))}
+function updateUsername(){const fetchURL=webServerUrl+'/userinfo';const fetchOptions={method:'GET',headers:{Accept:'application/json'}};fetch(fetchURL,fetchOptions).then(response=>{
 if(response.ok)return response.json();else throw new Error('Fetch status '+response.status+' '+response.statusText)}).then(responseJson=>{webState.loginUser=responseJson;detectWebUseridChanged()
 }).catch(error=>{console.log(error)})}updateUsername();document.getElementById('test1Button').addEventListener('click',(function(){console.log('Test1 button pressed.')
 ;const fetchURL=webServerUrl+'/irc/test1';const fetchOptions={method:'GET',headers:{Accept:'application/json'}};fetch(fetchURL,fetchOptions).then(response=>{

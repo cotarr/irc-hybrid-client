@@ -7,8 +7,9 @@ class="annunciator-connect-icon" id="webConnectIconId">Web</div><div class="annu
 Wait...</div><div class="annunciator-away-icon" id="ircIsAwayIconId" hidden>Away</div><div class="message-icon color-channel" id="channelUnreadExistIcon" hidden>C</div><div 
 class="message-icon color-pm" id="privMsgUnreadExistIcon" hidden>P</div><div class="message-icon color-notice" id="noticeUnreadExistIcon" hidden>N</div><div class="message-icon color-recovery" 
 id="nickRecovIconId" hidden>R</div></div><div class="aa-start-scrollable" id="scrollableDivId" hidden><div class="aa-section-div info-section-div" id="infoSectionDiv"><div class="head-flex"><div 
-class="head-left"><button class="notice-button" id="infoOpenCloseButton">+</button> <span>Info / License</span></div><div class="head-center"></div><div class="head-right"></div></div><div 
-id="hiddenInfoDiv" hidden><div class="info-license-div"><p>MIT License</p><p>Copyright (c) 2021 Dave Bolenbaugh</p><p></p>
+class="head-left"><button class="notice-button" id="infoOpenCloseButton">+</button> <span>Info / License</span></div><div class="head-center"></div><div class="head-right"><div id="viewDocsButtonDiv" 
+hidden><a href="/irc/docs/index.html"><button>View /docs/</button></a></div></div></div><div id="hiddenInfoDiv" hidden><div class="info-license-div"><p>MIT License</p><p>
+Copyright (c) 2021 Dave Bolenbaugh</p><p></p>
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 <p></p><p></p>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.<p></p><p></p>
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
@@ -44,9 +45,8 @@ Available IRC Text Commands
 If the command you are looking for is not
 available, please use the /QUOTE to send
 a raw command to the IRC server directly.
-</pre></div><div id="viewDocsButtonDiv" hidden><a href="/irc/docs/index.html"><button>View Documentation</button></a></div></div></div><div class="logout-confirm-div" id="logoutConfirmDiv" hidden><div
- class="head-flex"><div class="head-left"><div>Check IRC status!</div></div><div class="head-right"><div><button id="cancelLogoutConfirmButton">Cancel</button> <button id="confirmedWebLogoutButton">
-Web Logout</button></div></div></div><div class="vh10"></div><div>
+</pre></div></div></div><div class="logout-confirm-div" id="logoutConfirmDiv" hidden><div class="head-flex"><div class="head-left"><div>Check IRC status!</div></div><div class="head-right"><div>
+<button id="cancelLogoutConfirmButton">Cancel</button> <button id="confirmedWebLogoutButton">Web Logout</button></div></div></div><div class="vh10"></div><div>
 You are receiving this message because your nickname is still present on IRC, or the status of your IRC connection is unknown. Your nickname may remain present on IRC. Web page login is independent of IRC login.
 </div></div><div id="webDisconnectedHiddenDiv1" hidden><div class="aa-section-div color-connect"><div class="head-flex"><div class="head-left"><button id="hideLoginSectionButton">-</button> <span>
 IRC Controls</span></div><div class="head-right"><button id="webLogoutButton">Web logout</button></div></div><div class="vh10"></div><div class="button-div"><span class="user-span" id="headerServer">
@@ -85,16 +85,17 @@ In the case where the Server Rotation Group Number is greater than zero AND more
 </p><p>Click the [?] again to close this message.</p></div><div class="button-div"><div id="socks5EnabledCheckbox"><div id="socks5EnabledCheckboxDot"></div></div><span>Connect using socks5 proxy
 </span> <button id="socks5EnabledCheckboxInfoBtn">?</button></div><div class="white-info-div" id="socks5EnabledCheckboxInfo" hidden><p>
 The irc-hybrid-client has limited capability to connect to an IRC server using a socks5 network proxy. The configuration settings for the socks5 proxy are defined in the web server configuration as explained in the Login Config section of /docs. If a socks5 proxy has been defined in the web server configuration, the each IRC server definition will have the option to use the Socks5 Proxy to connect to the IRC server.
-</p><p>The current socks5 proxy address will be displayed below the radio button here, if configured.</p><ul><li>Use the [Edit Server List] button to change this value.</li></ul><p>
-Click the [?] again to close this message.</p></div><div class="yellow-info-div" id="readOnlyPropertyWarningDiv" hidden>Read Only: Click the [Edit Server List] button to modify these values.</div><div
- class="button-div"><input type="text" id="socks5AddrInputId" size="26" value="" disabled="disabled"> <span>:</span> <input type="text" id="socks5PortInputId" size="4" value="" disabled="disabled"> 
-<button id="ircProxyInfoBtn">?</button></div><div class="white-info-div" id="ircProxyInfo" hidden><p>
-The proxy info displayed here shows the current socks5 network proxy settings that have been configured in the web server. See the Login Config section of the /docs.</p><p>
-Click the [?] again to close this message.</p></div><div class="vh10"></div><div class="nickname-input-div"><div class="button-div"><input type="text" id="nickNameInputId" value=""><div 
+</p><p>The current socks5 proxy address will be displayed below the radio button here, if configured.</p><ul><li>
+Use the [Edit Server List] button to enable or disable the proxy for this specific IRC server.</li><li>It is necessary to edit the web server configuration to change the proxy address and port.</li>
+</ul><p>Click the [?] again to close this message.</p></div><div class="yellow-info-div" id="readOnlyPropertyWarningDiv" hidden>Read Only: Click the [Edit Server List] button to modify these values.
+</div><div class="button-div"><input type="text" id="socks5AddrInputId" size="26" value="" disabled="disabled"> <span>:</span> <input type="text" id="socks5PortInputId" size="4" value="" 
+disabled="disabled"> <button id="ircProxyInfoBtn">?</button></div><div class="white-info-div" id="ircProxyInfo" hidden><p>
+The proxy info displayed here shows the current socks5 network proxy settings that have been configured in the web server. The address and port must be changed in the web server configuration. See the Login Config section of the /docs.
+</p><p>Click the [?] again to close this message.</p></div><div class="vh10"></div><div class="nickname-input-div"><div class="button-div"><input type="text" id="nickNameInputId" value=""><div 
 class="input-label-right">Nickname</div><button id="nickNameInputInfoBtn">?</button></div><div class="white-info-div" id="nickNameInputInfo" hidden><p>
 The Nickname entry is the name you will known as when you sign into IRC. The default value may be changed by clicking the [Edit Server List] button. A different nickname may be specified here each time you connect, but it would revert to the default for subsequent connections.
 </p><p>
-Some characters are restricted like @ and + are restricted because they designate channel operator or voice. Allowed are uppercase or lowercase characters, numbers, hyphens, underscores, square brackets, curly braces, backslash, backticks, or pipes.
+Some characters are restricted like @ and + because these characters designate channel operator or voice. Allowed are uppercase or lowercase characters, numbers, hyphens, underscores, square brackets, curly braces, backslash, backticks, or pipes.
 </p><p>Click the [?] again to close this message.</p></div><div class="button-div"><span>User: </span><span id="userNameInputId"></span> <span>Real:</span> <span id="realNameInputId"></span> <span>
 Mode:</span> <span id="userModeInputId"></span> <button id="userRealModeInfoBtn">?</button></div></div><div class="white-info-div" id="userRealModeInfo" hidden><p>
 These are the username, real name, and initial modes used to connect to the IRC network. To modify these values, click the [Edit Server List] button.</p><ul><li>
