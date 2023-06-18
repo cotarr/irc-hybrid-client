@@ -248,6 +248,7 @@ td:first-of-type {
   display: inline-block;
   width: 11px;
   height: 11px;
+  margin-right: 3px;
 }
 .optional-input {
   background-color: rgba(0,0,0,0);
@@ -255,4 +256,5 @@ td:first-of-type {
   display: inline-block;
   width: 11px;
   height: 11px;
+  margin-right: 3px;
 }
