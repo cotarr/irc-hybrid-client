@@ -50,8 +50,9 @@
         <p>
           There are two ways to edit the list of IRC server definitions, using 
           the browser web page or use of a text editor to modify the configuration file directly.
-          This section will focus on the use of the web page editor. 
-          The bottom of this page includes instructions related to the manual edit method.
+          This first section will focus on the use of the web page editor. 
+          The secpmd sectopm at the bottom of this page includes instructions 
+          related to the manual edit method.
         </p>
         <p>
           It is also possible to globally disable the web page server list editor by setting 
@@ -77,11 +78,13 @@
             </p>
             <p>
               Alternately, the page can be loaded by entering &quot;/irc/serverlist.html&quot;
-              into the browser address bar. The editor and web client may be open concurrently, 
-              but the client must be disconnected from the IRC network to edit the list.
+              into the browser address bar. 
+              If you receive a 403 Forbidden error, visit &quot;/irc/webclient.html&quot; first
+              to enter username and password.
             </p>
             <p>
-              Both the IRC client and the server list may be open concurrently.
+              Both the IRC client and the server list may be open concurrently, 
+              but the client must be disconnected from the IRC network to edit the list.
             </p>
           </div>
           <div class="image-photo">
@@ -241,16 +244,16 @@
               The manual configuration section shown below provides a detailed 
               explanation of nickname recovery.
             </p>
+            <p>
+              The IRC channel list is a comma separated list of channel names. 
+              In the client interface, a button will be created for each channel to /JOIN the channel 
+              when pressed.
+            </p>
           </div>
           <div class="image-photo">
-            <img src=images/server-form.png width="576" height="1110"alt="Server definition form">
+            <img src=images/server-form.png width="610" height="1220"alt="Server definition form">
           </div>
         </div>  
-        <p>
-          The IRC channel list is a comma separated list of channel names. 
-          In the client interface, a button will be created for each channel to /JOIN the channel 
-          when pressed.
-        </p>
         <p>
           The IRC services section is optional. 
           Leave these field empty to disable this feature.

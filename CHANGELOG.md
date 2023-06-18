@@ -16,18 +16,19 @@ The goal of v0.2.45 is to simplify the setup of IRC server settings during a new
 
 ### Browser Changes (webclient.html)
 
-- Detect empty IRC server list or detect all servers disabled then browser auto-redirects to server list editor "irc/serverlist.html"
+- Detect empty IRC server list or detect all servers disabled, then browser auto-redirects to server list editor "irc/serverlist.html"
 - Detect empty IRC server list when server list editor is disabled and show pop-up panel with instructions.
 - Added additional info buttons (?) to the server panel showing field descriptions and data entry instructions.
-- Detect clicks on read only radio buttons in IRC Controls panel and show pop-up panel with waning message.
 - Add event listener to show popup panel warning when clicking on read radio buttons
+- If /docs/ folder is enabled in the web server, [view /docs/] button moved to top bar of License/Info tab.
 
 ### Brewser changes (serverlist.html)
 
-- If /docs folder is enabled in the web server, show [Help] button with link in the server list edit form page.
+- If /docs/ folder is enabled in the web server, show [Help] button with link in the server list edit form page.
 - Detect empty IRC server list, show pop-up panel with instruction, hide IRC return button.
 - Detect condition were all IRC servers are disabled, open pop-up panel with instructions, hide IRC return button.
 - Added additional info buttons (?) to the server edit form showing field descriptions and data entry instructions.
+- Added icon showing required fields on IRC server form.
 - Added [Web logout] button to server list editor page.
 
 ### Server changes
@@ -38,8 +39,9 @@ The goal of v0.2.45 is to simplify the setup of IRC server settings during a new
 
 ### /docs/ changes
 
+- Update general instructions for IRC server configuration.
 - In server-config.html, update some individual server field instructions to match pop-up help in server list editor.
-
+- Update screen shots showing IRC Controls and server list form editor.
 
 ## [v0.2.44](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.44) 2023-06-13
 

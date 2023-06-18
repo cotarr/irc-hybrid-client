@@ -78,7 +78,9 @@
         <div class="white-info-div" id="ircProxyInfo" hidden>
           <p>
             The proxy info displayed here shows the current socks5 network proxy 
-            settings that have been configured in the web server. See the Login Config section of the /docs.
+            settings that have been configured in the web server. 
+            The address and port may only be changed in the web server configuration.
+            See the Login Config section of the /docs.
           </p>
           <p>
             If a socks5 proxy has been defined in the web server configuration,
@@ -151,7 +153,12 @@
           <a href="/irc/docs/server-config.html">
           <button id="showHelpDocsButton" hidden>Help</button></a>
         </div>
-        <div class="vh20"></div>
+        <div class="vh10"></div>
+        <div>
+          <div class="required-input"></div>
+          <span> - Required Field</span>
+        </div>
+        <div class="vh10"></div>
         <div class="input-group2">
           <div class="vh10"></div>
           <div class="button-div" hidden>
@@ -159,6 +166,7 @@
             <div class="input-label-right">index</div>
           </div>
           <div class="button-div">
+            <div class="optional-input"></div>
             <input type="checkbox" id="disabledCheckboxId">
             <div class="input-label-right">Disable/Hide this IRC server definition</div>
             <button id="disabledCheckboxInfoBtn">?</button>
@@ -177,6 +185,7 @@
             </p>
           </div>
           <div class="button-div">
+            <div class="required-input"></div>
             <input type="number" id="groupInputId" class="group-input" value="">
             <div class="input-label-right">Server Rotation Group Number</div>
             <button id="groupInputInfoBtn">?</button>
@@ -212,6 +221,7 @@
             </p>
           </div>
           <div class="button-div">
+            <div class="required-input"></div>
             <input type="text" id="nameInputId" value="">
             <div class="input-label-right">Label</div>
             <button id="nameInputInfoBtn">?</button>
@@ -227,13 +237,14 @@
             </p>
           </div>
           <div class="button-div">
+            <div class="optional-input"></div>
             <input type="checkbox" id="autoReconnectCheckboxId">
             <div class="input-label-right">Automatic Reconnect</div>
             <button id="autoReconnectCheckboxInfoBtn">?</button>
           </div>
           <div class="white-info-div" id="autoReconnectCheckboxInfo" hidden>
             <p>
-              When the reconnect checkbox is checked, after disconnect, the IRC
+              When the Automatic Reconnect checkbox is checked, after disconnect, the IRC
               client will attempt to reconnect to IRC. For the first try, it will use 
               the existing server definition and existing nickname. 
               In the case where first reconnect 
@@ -252,6 +263,7 @@
             </p>
           </div>
           <div class="button-div">
+            <div class="optional-input"></div>
             <input type="checkbox" id="loggingCheckboxId">
             <div class="input-label-right">Log IRC raw server messages</div>
             <button id="loggingCheckboxInfoBtn">?</button>
@@ -277,6 +289,7 @@
         <div class="input-group">
           <h3>IRC Server Connection</h3>
           <div class="button-div">
+            <div class="required-input"></div>
             <input type="text" id="hostInputId" value="">
             <div class="input-label-right">IRC Server: Host or IP</div>
             <button id="hostInputInfoBtn">?</button>
@@ -290,7 +303,7 @@
             </p>
             <p>
               Caution: In the web server settings, if the outbound IRC network 
-              has been specified by use of an IP address, then the IRC server 
+              socket address has been specified by use of an IP address, then the IRC server 
               address defined here must be the same IPV4/IPV6 family as the 
               bound interface. This could be an issue where IRC server domain names
               lookup both IPV4 and IPV6 addresses. Many IRC networks provide
@@ -306,16 +319,19 @@
             </p>
           </div>
           <div class="button-div">
+            <div class="required-input"></div>
             <input type="number" id="portInputId" class="port-input" value="">
             <div class="input-label-right">IRC Server: Port</div>
           </div>
           <div class="button-div">
+            <div class="required-input"></div>
             <input type="checkbox" id="tlsCheckboxId">
             <div class="input-label-right">Use TLS</div>
             <input type="checkbox" id="verifyCheckboxId">
             <div class="input-label-right">TLS certificate verify</div>
           </div>
           <div class="button-div">
+            <div class="optional-input"></div>
             <input type="checkbox" id="proxyCheckboxId">
             <div class="input-label-right">Use Socks5 Proxy if available.</div>
             <button id="proxyCheckboxInfoBtn">?</button>
@@ -348,6 +364,7 @@
           </div>
           <div class="button-div">
             <div>
+              <div class="optional-input"></div>
               <input type="text" id="passwordInputId" value="">
               <div class="input-label-right">IRC server password (Optional) </div>
               <button id="replacePasswordButton">Replace</button>
@@ -367,8 +384,8 @@
             </div>
             <div class="white-info-div" id="passwordInputInfo" hidden>
               <p>
-                If IRC server password field is optional.
-                It may used for IRC servers that require a password in order to connect to the IRC network.
+                <Thead></Thead> IRC server password field is optional.
+                It may be used for IRC servers that require a password in order to connect to the IRC network.
                 The password is a write-only field and the current value may not be viewed from 
                 the web page for security reasons.
               </p>
@@ -382,6 +399,7 @@
             </div>
           </div>
           <div class="button-div">
+            <div class="optional-input"></div>
             <input type="text" id="saslUsernameInputId" value="">
             <div class="input-label-right">IRC server SASL username (Optional)</div>
             <button id="saslUsernameInputInfoBtn">?</button>
@@ -413,6 +431,7 @@
           </div>
           <div class="button-div">
             <div>
+              <div class="optional-input"></div>
               <input type="text" id="saslPasswordInputId" value="">
               <div class="input-label-right">IRC server SASL password (Optional) </div>
               <button id="replaceSaslPasswordButton">Replace</button>
@@ -467,6 +486,7 @@
         <div class="input-group">
           <h3>User Settings</h3>
           <div class="button-div">
+            <div class="required-input"></div>
             <input type="text" id="nickInputId" value="">
             <div class="input-label-right">User IRC nickname</div>
             <button id="nickInputInfoBtn">?</button>
@@ -479,9 +499,9 @@
               for subsequent connections.
             </p>
             <p>
-              Some characters are restricted like @ and + are restricted because they designate channel operator or voice. Allowed are 
+              Some characters are restricted like @ and + because they designate channel operator or voice. Allowed are 
               uppercase or lowercase characters, numbers, hyphens, underscores, square brackets, curly braces, backslash, backticks, or pipes. 
-              Please note that different types of IRC servers have different requirements for the number of characters allowed in a Nickname, 
+              Please note that different types of IRC servers have different requirements for the number of characters allowed in a nickname, 
               user or real name. These are often displayed in a server message when you first connect to IRC. At the present time, the maximum 
               length of these values is not checked by this program, so exceeding the limit set by the server would generate an IRC server error.
             </p>
@@ -490,6 +510,7 @@
             </p>
           </div>
           <div class="button-div">
+            <div class="optional-input"></div>
             <input type="text" id="altNickInputId" value="">
             <div class="input-label-right">Alternate nickname (Disabled when blank)</div>
             <button id="altNickInputInfoBtn">?</button>
@@ -507,6 +528,7 @@
             </p>
           </div>
           <div class="button-div">
+            <div class="optional-input"></div>
             <input type="checkbox" id="recoverNickCheckboxId">
             <div class="input-label-right">Attempt to auto-recover nickname from alternate.</div>
             <button id="recoverNickCheckboxInfoBtn">?</button>
@@ -546,6 +568,7 @@
             </p>
           </div>
           <div class="button-div">
+            <div class="required-input"></div>
             <input type="text" id="realInputId" value="">
             <div class="input-label-right">User real name</div>
             <button id="realInputInfoBtn">?</button>
@@ -562,6 +585,7 @@
             </p>
           </div>
           <div class="button-div">
+            <div class="required-input"></div>
             <input type="text" id="userInputId" value="">
             <div class="input-label-right">Unix ident user (for address mask)</div>
             <button id="userInputInfoBtn">?</button>
@@ -589,8 +613,8 @@
             <p>
               On IRC, a user's /WHOIS response would prepend a tilde (~)
               character to the username as shown here, first UNIX username
-              &quot;unixuser&quot; and backup client username &quot;myuser&quot; 
-              without the tilde.
+              &quot;unixuser&quot; and backup client username &quot;myuser&quot;.
+              Do not add the tilde, it is added automatically by the IRC server.
             </p>
 <pre>
 mynickname!unixuser@example.com
@@ -602,6 +626,7 @@ mynickname!~myuser@exmaple.com
             </p>
           </div>
           <div class="button-div">
+            <div class="optional-input"></div>
             <input type="text" id="modesInputId" value="">
             <div class="input-label-right">Initial user modes Example: &quot;+i&quot; (Optional)</div>
             <button id="modesInputInfoBtn">?</button>
@@ -629,6 +654,7 @@ mynickname!~myuser@exmaple.com
         <div class="input-group">
           <h3>Channel Preset Buttons</h3>
           <div class="button-div">
+            <div class="optional-input"></div>
             <input type="text" id="channelListInputId" value="">
             <div class="input-label-right">IRC Channels, Comma separated list (Optional)</div>
             <button id="channelListInputInfoBtn">?</button>
@@ -657,6 +683,7 @@ mynickname!~myuser@exmaple.com
         <div class="input-group">
           <h3>IRC Services</h3>
           <div class="button-div">
+            <div class="optional-input"></div>
             <input type="text" id="identifyNickInputId" value="">
             <div class="input-label-right">Nickserv identify nick (Optional) </div>
             <button id="identifyNickInputInfoBtn">?</button>
@@ -679,6 +706,7 @@ mynickname!~myuser@exmaple.com
 
           <div class="button-div">
             <div>
+              <div class="optional-input"></div>
               <input type="text" id="identifyCommandInputId" value="">
               <div class="input-label-right">Nickserv identify command (Optional) </div>
               <button id="replaceIdentifyCommandButton">Replace</button>

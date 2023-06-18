@@ -64,6 +64,9 @@
           <div class="head-center">
           </div>
           <div class="head-right">
+            <div id="viewDocsButtonDiv" hidden>
+              <a href="/irc/docs/index.html"><button>View /docs/</button></a>
+            </div>
           </div>
         </div>
         <div id='hiddenInfoDiv' hidden>
@@ -128,10 +131,7 @@ available, please use the /QUOTE to send
 a raw command to the IRC server directly.
 </pre>
           </div>
-          <div id="viewDocsButtonDiv" hidden>
-            <a href="/irc/docs/index.html"><button>View Documentation</button></a>
           </div>
-        </div>
       </div>
 
       <div class="logout-confirm-div" id="logoutConfirmDiv" hidden>
@@ -368,7 +368,8 @@ a raw command to the IRC server directly.
                 radio button here, if configured.
               </p> 
               <ul>
-                <li>Use the [Edit Server List] button to change this value.</li>
+                <li>Use the [Edit Server List] button to enable or disable the proxy for this specific IRC server.</li>
+                <li>It is necessary to edit the web server configuration to change the proxy address and port.</li>
               </ul>
               <p>
                 Click the [?] again to close this message.
@@ -386,7 +387,9 @@ a raw command to the IRC server directly.
             <div class="white-info-div" id="ircProxyInfo" hidden>
               <p>
                 The proxy info displayed here shows the current socks5 network proxy 
-                settings that have been configured in the web server. See the Login Config section of the /docs.
+                settings that have been configured in the web server. 
+                The address and port must be changed in the web server configuration. 
+                See the Login Config section of the /docs.
               </p>
               <p>
                 Click the [?] again to close this message.
@@ -407,7 +410,7 @@ a raw command to the IRC server directly.
                   but it would revert to the default for subsequent connections.
                 </p>
                 <p>
-                  Some characters are restricted like @ and + are restricted because they designate channel operator or voice. Allowed are 
+                  Some characters are restricted like @ and + because these characters designate channel operator or voice. Allowed are 
                   uppercase or lowercase characters, numbers, hyphens, underscores, square brackets, curly braces, backslash, backticks, or pipes. 
                 </p>
                 <p>

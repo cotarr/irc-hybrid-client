@@ -242,3 +242,17 @@ td:first-of-type {
   margin-top: 20px;
 }
 
+.required-input {
+  background-color: black;
+  border-radius: 5px;
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+}
+.optional-input {
+  background-color: rgba(0,0,0,0);
+  border-radius: 5px;
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+}

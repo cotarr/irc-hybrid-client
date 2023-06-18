@@ -711,34 +711,28 @@ document.getElementById('infoOpenCloseButton').addEventListener('click', functio
   if (document.getElementById('hiddenInfoDiv').hasAttribute('hidden')) {
     document.getElementById('hiddenInfoDiv').removeAttribute('hidden');
     document.getElementById('infoOpenCloseButton').textContent = '-';
-    //
-    // The /docs folder is optional, enabled in the configuration
-    // When the Info/License folder is opened for the first time,
-    // perform a test fetch to see if the /irc/docs folder is available on the server.
-    // If /docs is available, then un-hide a button providing a link to the documentation pages.
-    //
-    if (!document.getElementById('infoSectionDiv').hasAttribute('docs-enabled')) {
-      // only perform the fetch one time, remember the result
-      document.getElementById('infoSectionDiv').setAttribute('docs-enabled', '0');
-      const docsTestUrl = '/irc/docs/index.html';
-      const fetchOptions = {
-        method: 'HEAD',
-        headers: {
-          Accept: 'text/html'
-        }
-      };
-      fetch(docsTestUrl, fetchOptions)
-        .then((response) => {
-          // console.log(response.status);
-          if (response.ok) {
-            document.getElementById('infoSectionDiv').setAttribute('docs-enabled', '1');
-            // Make the irc-hybrid-client documentation link button visible
-            document.getElementById('viewDocsButtonDiv').removeAttribute('hidden');
-          }
-        });
-    }
   } else {
     document.getElementById('hiddenInfoDiv').setAttribute('hidden', '');
     document.getElementById('infoOpenCloseButton').textContent = '+';
   }
 });
+
+//
+// The /docs folder is optional, enabled in the configuration
+// If /docs is available, then un-hide a button providing a link to the documentation pages.
+//
+const docsTestUrl = '/irc/docs/index.html';
+const fetchOptions = {
+  method: 'HEAD',
+  headers: {
+    Accept: 'text/html'
+  }
+};
+fetch(docsTestUrl, fetchOptions)
+  .then((response) => {
+    if (response.ok) {
+      // Make the irc-hybrid-client documentation link button visible
+      document.getElementById('viewDocsButtonDiv').removeAttribute('hidden');
+    }
+  })
+  .catch(() => {});
