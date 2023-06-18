@@ -8,6 +8,12 @@ and this project adheres to
 
 ## v0.2.45-dev 2023-06-17
 
+The goal of v0.2.45 is to simplify the setup of IRC server settings during a new installation.
+
+* On launch, the web server will automatically create a new empty server list.
+* On opening the IRC client page, the page automatically redirects to the server list editor page.
+* The server list editor form has help buttons to explain and provide instructions for each IRC server setting.
+
 ### Browser Changes (webclient.html)
 
 - Detect empty IRC server list or detect all servers disabled then browser auto-redirects to server list editor "irc/serverlist.html"
