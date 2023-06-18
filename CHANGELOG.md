@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## v0.2.45-dev 2023-06-17
+## [v0.2.45](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.45) 2023-06-18
 
 The goal of v0.2.45 is to simplify the setup of IRC server settings during a new installation.
 
