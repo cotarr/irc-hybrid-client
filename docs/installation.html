@@ -236,7 +236,7 @@ sudo certbot certonly --standalone -d abcd.example.com
           when the server is running.
         </p>
         <p>
-          Web Server:
+          Web Server Configuration:
         </p>
         <p>
           There are two possible methods that may be used to define the
@@ -248,13 +248,16 @@ sudo certbot certonly --standalone -d abcd.example.com
           the environment variables will be parsed for settings.  
           See: <a href="login-config.html">Login Config Instructions</a>
         </p>
-          IRC Network Setup:
+          IRC Server Configuration:
         <p>
-          The settings for the IRC Network server list are defined in 
-          an example server file that may be copied to the 
-          servers.json file and edited manually.
-          There is also a simple web based IRC server list editor.
-          See: <a href="server-config.html">IRC Config Instructions</a>
+          The first time the web server is started, an empty IRC server list will be created 
+          automatically as "servers.json" in the base folder of the repository.
+          Upon the first login to the web page at `/irc/webclient.html`, the 
+          browser will be automatically redirected to the server list editor page.
+          The IRC server edit form includes instructions showing how to add 
+          new IRC servers.
+          Optionally, the IRC server list may be edited manually, 
+          see: <a href="server-config.html">IRC Config Instructions</a>
         </p>
 
         <div class="install-section-title">6 - Firewall configuration</div>

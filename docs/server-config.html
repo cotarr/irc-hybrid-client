@@ -34,28 +34,18 @@
           IRC Configuration
         </div>
 
-        <div class="install-section-title">Copy example configuration</div>
+        <div class="install-section-title">Initial IRC Server Configuration</div>
         <p>
-          The git repository includes an example configuration file
-          named &quotexample-servers.json&quot. The first step
-          is to make a copy of this file to &quotservers.json&quot.
-          If you are on a multi user system you may optionally
-          change permissions.
+          The first time the web server is started, an empty IRC server list will be created 
+          automatically as "servers.json" in the base folder of the repository.
+        </p>
+        <p>
+          Upon the first login to the web page at `/irc/webclient.html`, the 
+          browser will be automatically redirected to the server list editor page.
+          The IRC server edit form includes instructions showing how to add 
+          new IRC servers.
         </p>
 
-<div class="pre-div"><pre>
-  cp -v example-servers.json servers.json
-  chmod 600 servers.json
-</pre></div>
-
-        <div class="install-section-title">Previous IRC Experience</div>
-        <p>
-          For purposes of this help file, it is assumed the person installing this
-          IRC client is familiar with standard IRC server connection parameters, including
-          hostname or IP address, port number, TLS flag, IRC nickname, IRC user, and real name.
-          If you are not familiar with these concepts, it is recommended to consult
-          some general IRC help web pages.
-        </p>
         <div class="install-section-title">Optional Manual Configuration</div>
         <p>
           There are two ways to edit the list of IRC server definitions, using 
@@ -280,6 +270,16 @@
         <div class="desc-title">
           Manual Edit of servers.json file
         </div>
+
+        <div class="install-section-title">Previous IRC Experience</div>
+        <p>
+          For purposes of this help file, it is assumed the person manually configuring 
+          the IRC server list is familiar with standard IRC server connection parameters, including
+          hostname or IP address, port number, TLS flag, IRC nickname, IRC user, and real name.
+          If you are not familiar with these concepts, it is recommended to consult
+          some general IRC help web pages.
+        </p>        
+
         <div class="install-section-title">JSON Format</div>
         <p>
           A brief note about syntax. The servers.json file represents a JSON structured data object.

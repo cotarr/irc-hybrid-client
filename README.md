@@ -191,7 +191,7 @@ node genEnvVarAuthForUser_1.mjs
 # Copy/Paste the environment variable assignments as needed.
 cd ..
 ```
-# IRC server configuration (TBD requires update)
+# IRC server configuration
 
 The first time the web server is started, an empty IRC server list will be created 
 automatically as "servers.json" in the base folder of the repository.
