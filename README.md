@@ -27,7 +27,7 @@ from the socket server in the `bin/` folder.
 
 # Installation
 
-There is a complete step by step installation instruction in the
+There are complete step by step installation instructions in the
 [docmentation](https://cotarr.github.io/irc-hybrid-client).
 The steps listed here are a minimal installation guide for
 people very familiar with deploying Node.js/Express servers.
@@ -193,25 +193,19 @@ cd ..
 ```
 # IRC server configuration (TBD requires update)
 
-The configuration of IRC servers is fully independent of the web server configuration.
-At least 1 IRC server must be configured manually for the program to start.
-(In the future this will be improved).
-Once the server is started, the IRC server list may be edited from the web page.
+The first time the web server is started, an empty IRC server list will be created 
+automatically as "servers.json" in the base folder of the repository.
 
-```
-# Copy example-servers.json file
-cp -v example-servers.json servers.json
-# If multi user system optionally change permissions
-chmod 600 servers.json
+Upon the first login to the web page at `/irc/webclient.html`, the 
+browser will be automatically redirected to the server list editor page.
+The IRC server edit form includes instructions showing how to add 
+new IRC servers.
 
-# The following steps are the minimal setup of one IRC server definition.
-# IRC server definitions can also be edited from the web interface.
-# 1 Edit a short name for the server definition
-# 2 IRC server host, port and TLS flags
-# 3 IRC server password (if needed)
-# 4 IRC nick name, user, real name.
-# 5 Optional: Preferred list of channels for this server.
-```
+After creating at least 1 IRC server definition, the user may return to the IRC client page.
+
+Optionally, you may edit the IRC server list manually. A file "example-servers.json" 
+can act as a template. The IRC Config section of the documentation (/docs/) includes 
+detail explanation related to manual edit of the server list.
 
 ## Related setup
 
