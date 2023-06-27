@@ -356,6 +356,23 @@ if (areBeepsConfigured()) {
   document.getElementById('enableAudioButton').removeAttribute('hidden');
 }
 
+// ----------------------------------------
+// Manually play sound for setting volume
+// ----------------------------------------
+// Note: after playing a sound it is inhibited for a short delay timer.
+document.getElementById('manualEmitBeep1Button').addEventListener('click', function () {
+  beep1InhibitTimer = 0;
+  playBeep1Sound();
+});
+document.getElementById('manualEmitBeep2Button').addEventListener('click', function () {
+  beep2InhibitTimer = 0;
+  playBeep2Sound();
+});
+document.getElementById('manualEmitBeep3Button').addEventListener('click', function () {
+  beep3InhibitTimer = 0;
+  playBeep3Sound();
+});
+
 // --------------------------
 // Error display functions
 // --------------------------

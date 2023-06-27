@@ -6,6 +6,27 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v0.2.46-dev 2023-06-27
+
+This issue involves playing audio beep sounds in response to IRC channel messages using 
+the default mp3 audio files included in the repository. 
+
+Issue: Following a long period of silence. with some audio devices the 
+first beep is not heard on the speakers. Subsequent beeps immediately after play correctly.
+This has been observed when using HDMI audio as the Linux audio output device.
+This does not occur with internal laptop speakers.
+
+The default channel message "short-beep1.mp3" was previously 1300 Hz at 0.20 Amplitude and duration 0.250 seconds.
+If the audio device takes more than 0.25 seconds to connect/initialize, then the initial beep is missed.
+As a work around, the default sound files have been regenerated to include 
+0.75 seconds of silence prior to the start of the tone. The slight audio delay seems to fix the problem.
+
+### Changed
+
+- Regenerate audio files short-beep1.mp3, short-beep2.mp3, and short-beep3.mp3.
+- Add 3 buttons to the hidden section ("More..." button) of the Server panel to manually play the beep sounds (useful to set speaker volume)
+- Bump eslint to current version.
+
 ## [v0.2.45](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.45) 2023-06-18
 
 The goal of v0.2.45 is to simplify the setup of IRC server settings during a new installation.

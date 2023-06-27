@@ -55,9 +55,12 @@ if('NotAllowedError'===error.name)console.info('playBeep3Sound() '+audioPromiseE
 ;if(beepEnableObj&&'object'===typeof beepEnableObj)if(beepEnableObj.beep)isAnyBeepEnabled=true;return isAnyBeepEnabled}function userInitiatedAudioPlay(){
 document.getElementById('enableAudioButton').setAttribute('hidden','');if(areBeepsConfigured()){setTimeout(playBeep2Sound,100);setTimeout(playBeep3Sound,600);setTimeout(playBeep1Sound,950)}}
 document.getElementById('enableAudioButton').addEventListener('click',userInitiatedAudioPlay);if(areBeepsConfigured())document.getElementById('enableAudioButton').removeAttribute('hidden')
-;const errorExpireSeconds=5;let errorRemainSeconds=0;function clearError(){const errorDivEl=document.getElementById('errorDiv');errorDivEl.setAttribute('hidden','')
-;const errorContentDivEl=document.getElementById('errorContentDiv');while(errorContentDivEl.firstChild)errorContentDivEl.removeChild(errorContentDivEl.firstChild);errorRemainSeconds=0}
-function showError(errorString){const errorDivEl=document.getElementById('errorDiv');errorDivEl.removeAttribute('hidden');const errorContentDivEl=document.getElementById('errorContentDiv')
+;document.getElementById('manualEmitBeep1Button').addEventListener('click',(function(){beep1InhibitTimer=0;playBeep1Sound()}))
+;document.getElementById('manualEmitBeep2Button').addEventListener('click',(function(){beep2InhibitTimer=0;playBeep2Sound()}))
+;document.getElementById('manualEmitBeep3Button').addEventListener('click',(function(){beep3InhibitTimer=0;playBeep3Sound()}));const errorExpireSeconds=5;let errorRemainSeconds=0
+;function clearError(){const errorDivEl=document.getElementById('errorDiv');errorDivEl.setAttribute('hidden','');const errorContentDivEl=document.getElementById('errorContentDiv')
+;while(errorContentDivEl.firstChild)errorContentDivEl.removeChild(errorContentDivEl.firstChild);errorRemainSeconds=0}function showError(errorString){
+const errorDivEl=document.getElementById('errorDiv');errorDivEl.removeAttribute('hidden');const errorContentDivEl=document.getElementById('errorContentDiv')
 ;const errorMessageEl=document.createElement('div');errorMessageEl.textContent=errorString||'Error: unknown error (2993)';errorContentDivEl.appendChild(errorMessageEl)
 ;errorRemainSeconds=errorExpireSeconds}document.addEventListener('show-error-message',(function(event){showError(event.detail.message)}))
 ;document.getElementById('errorDiv').addEventListener('click',(function(){clearError()}));function errorTimerTickHandler(){if(errorRemainSeconds>0){errorRemainSeconds--
