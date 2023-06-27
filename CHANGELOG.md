@@ -26,6 +26,7 @@ As a work around, the default sound files have been regenerated to include
 - Regenerate audio files short-beep1.mp3, short-beep2.mp3, and short-beep3.mp3.
 - Add 3 buttons to the hidden section ("More..." button) of the Server panel to manually play the beep sounds (useful to set speaker volume)
 - Bump eslint to current version.
+- Manual edit package-lock.json set semver to semver@7.5.3 to clear npm audit notification for eslint-plugin-import.
 
 ## [v0.2.45](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.45) 2023-06-18
 
