@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.2.47](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.47) 2023-06-29
+
+Run npm audit fix to clear audit violation on regular expression DOS for package word-wrap.
+
 ## [v0.2.46](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.46) 2023-06-27
 
 This issue involves playing audio beep sounds in response to IRC channel messages using 
