@@ -188,7 +188,7 @@ function createPrivateMessageEl (name, parsedMessage) {
   // section-div
   const privMsgSectionEl = document.createElement('div');
   privMsgSectionEl.classList.add('aa-section-div');
-  privMsgSectionEl.classList.add('color-pm');
+  privMsgSectionEl.classList.add('pm-panel-theme-light');
   privMsgSectionEl.setAttribute('lastDate', '0000-00-00');
 
   // Top Element (non-hidden element)
@@ -246,6 +246,7 @@ function createPrivateMessageEl (name, parsedMessage) {
   const privMsgTextAreaEl = document.createElement('textarea');
   const privMsgTextAreaId = 'privMsg' + privMsgIndex.toString() + 'TextAreaId';
   privMsgTextAreaEl.id = privMsgTextAreaId;
+  privMsgTextAreaEl.classList.add('text-theme-light');
   privMsgTextAreaEl.setAttribute('cols', '120');
   privMsgTextAreaEl.setAttribute('rows', '6');
   privMsgTextAreaEl.setAttribute('spellCheck', 'false');
@@ -259,6 +260,7 @@ function createPrivateMessageEl (name, parsedMessage) {
   const privMsgInputAreaEl = document.createElement('textarea');
   const privMsgInputAreaId = 'privMsg' + privMsgIndex.toString() + 'InputAreaId';
   privMsgInputAreaEl.id = privMsgInputAreaId;
+  privMsgInputAreaEl.classList.add('text-theme-light');
   privMsgInputAreaEl.classList.add('va-middle');
   privMsgInputAreaEl.classList.add('rm5');
   privMsgInputAreaEl.setAttribute('cols', '120');
@@ -517,6 +519,15 @@ function createPrivateMessageEl (name, parsedMessage) {
   };
   document.addEventListener('hide-or-zoom', handleHideOrZoom);
 
+  // ---------------------------------------------
+  // Detect change in color theme
+  // Call updateVisibility to changes CSS classes
+  // ---------------------------------------------
+  function handleColorThemePM (event) {
+    updateVisibility();
+  };
+  document.addEventListener('color-theme-changed', handleColorThemePM);
+
   // -----------------------
   // Detect paste event,
   // Check clipboard, if multi-line, make multi-line send button visible
@@ -672,6 +683,27 @@ function createPrivateMessageEl (name, parsedMessage) {
       privMsgBeep1CBInputEl.checked = true;
     } else {
       privMsgBeep1CBInputEl.checked = false;
+    }
+    // -------------------------------------
+    // Color Theme selector
+    // Exchange light theme and dark theme CSS classes
+    // -------------------------------------
+    if (document.querySelector('body').getAttribute('theme') === 'dark') {
+      privMsgSectionEl.classList.add('pm-panel-theme-dark');
+      privMsgTextAreaEl.classList.add('text-theme-dark');
+      privMsgInputAreaEl.classList.add('text-theme-dark');
+
+      privMsgSectionEl.classList.remove('pm-panel-theme-light');
+      privMsgTextAreaEl.classList.remove('text-theme-light');
+      privMsgInputAreaEl.classList.remove('text-theme-light');
+    } else {
+      privMsgSectionEl.classList.add('pm-panel-theme-light');
+      privMsgTextAreaEl.classList.add('text-theme-light');
+      privMsgInputAreaEl.classList.add('text-theme-light');
+
+      privMsgSectionEl.classList.remove('pm-panel-theme-dark');
+      privMsgTextAreaEl.classList.remove('text-theme-dark');
+      privMsgInputAreaEl.classList.remove('text-theme-dark');
     }
   }
 
@@ -945,6 +977,7 @@ function createPrivateMessageEl (name, parsedMessage) {
     privMsgNormalButtonEl.removeEventListener('click', handlePrivMsgNormalButtonElClick);
     document.removeEventListener('show-all-divs', handleShowAllDivs);
     document.removeEventListener('hide-or-zoom', handleHideOrZoom);
+    document.removeEventListener('color-theme-changed', handleColorThemePM);
     privMsgSendButtonEl.removeEventListener('click', handlePrivMsgSendButtonElClick);
     privMsgMultiLineSendButtonEl.removeEventListener('click', handleMultiLineSendButtonClick);
     privMsgInputAreaEl.removeEventListener('input', handlePrivMsgInputAreaElInput);

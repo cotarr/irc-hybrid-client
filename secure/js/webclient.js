@@ -616,7 +616,7 @@ document.getElementById('ircServerRotateEnable').addEventListener('click', funct
 // Some initialization of div visibility at load time
 // Hidden divs to allow <noscrpit> when not javascript
 // In case of javascript, show them
-document.getElementById('annunciatorBackgroundDivId').removeAttribute('hidden');
+document.getElementById('annunciatorTopId').removeAttribute('hidden');
 document.getElementById('annunciatiorDivId').removeAttribute('hidden');
 document.getElementById('scrollableDivId').removeAttribute('hidden');
 hideRawMessageWindow();
@@ -813,8 +813,8 @@ document.addEventListener('show-all-divs', function (event) {
   webState.wallopsOpen = true;
   document.getElementById('noticeSectionDiv').removeAttribute('hidden');
   document.getElementById('wallopsSectionDiv').removeAttribute('hidden');
-  // document.getElementById('hiddenInfoDiv').removeAttribute('hidden');
-  // document.getElementById('infoOpenCloseButton').textContent = '-';
+  document.getElementById('hiddenInfoDiv').removeAttribute('hidden');
+  document.getElementById('infoOpenCloseButton').textContent = '-';
 });
 
 // ---------------------------------------------------------

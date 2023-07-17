@@ -1,19 +1,19 @@
 <!DOCTYPE html><html lang="en" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"><meta name="csrf-token" content="{{csrfToken}}">
 <link rel="stylesheet" href="css/styles.css"><script src="./js/webclient.js" defer="defer"></script><title>irc-hybrid-client</title></head><body><noscript><br><h1>
 JavaScript is required to load this page.</h1></noscript><div class="error-div" id="errorDiv" hidden><div id="errorContentDiv"></div><div class="error-title" id="errorTitle">Tap to Close</div></div>
-<div class="annunciator-background" id="annunciatorBackgroundDivId" hidden><div class="head-flex"><div class="head-left"></div><div class="head-right"><button id="enableAudioButton" hidden>+Audio
-</button> <button id="showAllDivsButton">+ all</button> <button id="hideAllDivsButton">- all</button></div></div></div><div class="annunciator-div" id="annunciatiorDivId" hidden><div 
-class="annunciator-connect-icon" id="webConnectIconId">Web</div><div class="annunciator-connect-icon" id="ircConnectIconId">IRC</div><div class="annunciator-wait-icon" id="waitConnectIconId" hidden>
-Wait...</div><div class="annunciator-away-icon" id="ircIsAwayIconId" hidden>Away</div><div class="message-icon color-channel" id="channelUnreadExistIcon" hidden>C</div><div 
-class="message-icon color-pm" id="privMsgUnreadExistIcon" hidden>P</div><div class="message-icon color-notice" id="noticeUnreadExistIcon" hidden>N</div><div class="message-icon color-recovery" 
-id="nickRecovIconId" hidden>R</div></div><div class="aa-start-scrollable" id="scrollableDivId" hidden><div class="aa-section-div info-section-div" id="infoSectionDiv"><div class="head-flex"><div 
-class="head-left"><button class="notice-button" id="infoOpenCloseButton">+</button> <span>Info / License</span></div><div class="head-center"></div><div class="head-right"><div id="viewDocsButtonDiv" 
-hidden><a href="/irc/docs/index.html"><button>View /docs/</button></a></div></div></div><div id="hiddenInfoDiv" hidden><div class="info-license-div"><p>MIT License</p><p>
-Copyright (c) 2021 Dave Bolenbaugh</p><p></p>
+<div class="annunciator-panel-div annunciator-panel-theme-light" id="annunciatorTopId" hidden><div class="head-flex"><div class="head-left"></div><div class="head-right"><button 
+id="enableAudioButton" hidden>+Audio</button> <button id="showAllDivsButton">+ all</button> <button id="hideAllDivsButton">- all</button></div></div></div><div class="annunciator-div" 
+id="annunciatiorDivId" hidden><div class="annunciator-connect-icon" id="webConnectIconId">Web</div><div class="annunciator-connect-icon" id="ircConnectIconId">IRC</div><div 
+class="annunciator-wait-icon" id="waitConnectIconId" hidden>Wait...</div><div class="annunciator-away-icon" id="ircIsAwayIconId" hidden>Away</div><div class="message-icon channel-panel-theme-light" 
+id="channelUnreadExistIcon" hidden>C</div><div class="message-icon pm-panel-theme-light" id="privMsgUnreadExistIcon" hidden>P</div><div class="message-icon notice-panel-theme-light" 
+id="noticeUnreadExistIcon" hidden>N</div><div class="annunciator-recovery-icon" id="nickRecovIconId" hidden>R</div></div><div class="aa-start-scrollable" id="scrollableDivId" hidden><div 
+class="aa-section-div info-panel-theme-light" id="infoSectionDiv"><div class="head-flex"><div class="head-left"><button class="notice-button" id="infoOpenCloseButton">+</button> <span>Info / License
+</span></div><div class="head-center"></div><div class="head-right"><div id="viewDocsButtonDiv" hidden><a href="/irc/docs/index.html"><button>View /docs/</button></a></div></div></div><div 
+id="hiddenInfoDiv" hidden><div class="info-license-div text-theme-light" id="infoLicenseDiv"><p>MIT License</p><p>Copyright (c) 2021 Dave Bolenbaugh</p><p></p>
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 <p></p><p></p>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.<p></p><p></p>
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-<p></p></div><div class="info-license-div"><pre .class="info-pre-help">
+<p></p></div><div class="info-license-div text-theme-light" id="infoHelpDiv"><pre .class="info-pre-help">
 Available IRC Text Commands
 
 /ADMIN [server]
@@ -48,32 +48,48 @@ a raw command to the IRC server directly.
 </pre></div></div></div><div class="logout-confirm-div" id="logoutConfirmDiv" hidden><div class="head-flex"><div class="head-left"><div>Check IRC status!</div></div><div class="head-right"><div>
 <button id="cancelLogoutConfirmButton">Cancel</button> <button id="confirmedWebLogoutButton">Web Logout</button></div></div></div><div class="vh10"></div><div>
 You are receiving this message because your nickname is still present on IRC, or the status of your IRC connection is unknown. Your nickname may remain present on IRC. Web page login is independent of IRC login.
-</div></div><div id="webDisconnectedHiddenDiv1" hidden><div class="aa-section-div color-connect"><div class="head-flex"><div class="head-left"><button id="hideLoginSectionButton">-</button> <span>
-IRC Controls</span></div><div class="head-right"><button id="webLogoutButton">Web logout</button></div></div><div class="vh10"></div><div class="button-div"><span class="user-span" id="headerServer">
-server</span> <span class="user-span" id="headerUser"></span></div><div class="vh10"></div><div id="hideLoginSection"><div class="empty-server-list-div" id="emptyServerListNoEdit" hidden><h2>
-No IRC servers.</h2><p>The list of IRC servers is empty or all IRC servers are disabled.</p><p>The IRC server list editor appears to be disabled in the web server configuration. There are 2 options:
-</p><ul><li>Enable the IRC server list editor in the server configuration, restart the server, then create a new IRC server.</li><li>
+</div></div><div id="webDisconnectedHiddenDiv1" hidden><div id="connectPanel" class="aa-section-div connect-panel-theme-light"><div class="head-flex"><div class="head-left"><button 
+id="hideLoginSectionButton">-</button> <span>IRC Controls</span></div><div class="head-right"><button id="webLogoutButton">Web logout</button></div></div><div class="vh10"></div><div 
+class="button-div"><span class="user-span" id="headerServer">server</span> <span class="user-span" id="headerUser"></span></div><div class="vh10"></div><div id="hideLoginSection"><div 
+class="empty-server-list-div" id="emptyServerListNoEdit" hidden><h2>No IRC servers.</h2><p>The list of IRC servers is empty or all IRC servers are disabled.</p><p>
+The IRC server list editor appears to be disabled in the web server configuration. There are 2 options:</p><ul><li>
+Enable the IRC server list editor in the server configuration, restart the server, then create a new IRC server.</li><li>
 Manually edit the servers.json file using the example-server.json as a template. Then restart the server.</li></ul></div><div class="empty-server-list-div" id="emptyServerListDiv" hidden><h2>
 No IRC servers.</h2><p>The list of IRC servers is empty or all IRC servers are disabled.</p><p>
 Please add at least one non-disabled IRC server definition by selecting the &quot;Edit IRC Server List&quot; button.</p><a href="/irc/serverlist.html"><button>Edit IRC Server List</button></a></div>
-<div class="button-div"><input type="text" id="ircServerIndexInputId" size="2" value="" disabled="disabled"> <span>Index</span> <button id="ircServerIndexInputInfoBtn">?</button> <button 
-id="cyclePrevServerButton">Prev</button> <button id="cycleNextServerButton">Next</button> <a href="/irc/serverlist.html"><button id="editServerListButton">Edit Server List</button></a></div><div 
-class="white-info-div" id="ircServerIndexInputInfo" hidden><p>This is the index number the currently selected IRC server.</p><p>
+<div class="button-div"><span>IRC Server:</span> <input type="text" id="ircServerNameInputId" size="10" value="" disabled="disabled"> <button id="ircServerNameInputInfoBtn">?</button></div><div 
+class="white-info-div" id="ircServerNameInputInfo" hidden><p>
+The &quot;Label&quot; is used to provide a descriptive name for an IRC server definition. The Label is not otherwise used, and it may contain any arbitrary string values. If you are using a small screen smartphone, it is best to keep the Label short.
+</p><p>To edit this value select the [Edit Server list] button.</p><p>Click the [?] again to close this message.</p></div><div class="button-div"><button id="cyclePrevServerButton">Prev</button> 
+<button id="cycleNextServerButton">Next</button> <span>Index:</span> <input type="text" id="ircServerIndexInputId" size="2" value="" disabled="disabled"> <button id="ircServerIndexInputInfoBtn">?
+</button> <span>Group:</span> <input type="text" id="ircServerGroupInputId" size="2" value="" disabled="disabled"> <button id="ircServerGroupInputInfoBtn">?</button></div><div class="white-info-div" 
+id="ircServerIndexInputInfo" hidden><p>This is the index number the currently selected IRC server.</p><p>
 Index numbers start at zero and are assigned to each server in the IRC server list in the order in which the IRC servers appear in the list. Adding, deleting, or re-ordering servers will change the index numbers.
 </p><ul><li>Click [Prev] or [Next] to step through the list of non-disabled IRC servers</li><li>
-If Server Rotation is enabled, the server index will advance automatically as alternate servers are tried.</li></ul><p>Click the [?] again to close this message.</p></div><div class="button-div">
-<input type="text" id="ircServerGroupInputId" size="2" value="" disabled="disabled"> <span>Server Rotation Group Number</span> <button id="ircServerGroupInputInfoBtn">?</button></div><div 
-class="white-info-div" id="ircServerGroupInputInfo" hidden><p>
+If Server Rotation is enabled, the server index will advance automatically as alternate servers are tried.</li></ul><p>To edit this value select the [Edit Server list] button.</p><p>
+Click the [?] again to close this message.</p></div><div class="vh5"></div><div class="white-info-div" id="ircServerGroupInputInfo" hidden><p>
 The &quot;Server Rotation Group Number&quot; column defines an integer group number. Groups are used to configure and define a common group of IRC server definitions. In the event of IRC server network connection failures, different IRC servers within a common group number can be automatically rotated to other servers in the group. Group 0 is reserved for stand alone servers. A rotation group is defined when the group number is 1 or greater . If more than two server in a group are not disabled and both have the Auto Reconnect property enabled, then upon disconnect, the client will automatically rotate IRC server definitions within a server group. In typical use, a server group would allow different IRC networks such as DALnet or Undernet to have different group numbers.
 </p><ul><li>The Group input field accepts integer values 0 to 9999</li><li>Group 0 is used to define individual IRC server addresses that do not rotate.</li><li>
 Group 1 or greater defines a set of server where servers of the same group number will automatically rotate after disconnect.</li><li>
-Each server in the group must have &quot;Auto Reconnect&quot; enabled.</li></ul><p>Click the [?] again to close this message.</p></div><div class="button-div"><input type="text" 
-id="ircServerNameInputId" size="10" value="" disabled="disabled"> <span>Server Definition Label</span> <button id="ircServerNameInputInfoBtn">?</button></div><div class="white-info-div" 
-id="ircServerNameInputInfo" hidden><p>
-The &quot;Label&quot; is used to provide a descriptive name for an IRC server definition. The Label is not otherwise used, and it may contain any arbitrary string values. If you are using a small screen smartphone, it is best to keep the Label short.
-</p><p>Click the [?] again to close this message.</p></div><div class="button-div"><input type="text" id="ircServerAddrInputId" size="26" value="" disabled="disabled"> <span>:</span> <input 
-type="text" id="ircServerPortInputId" size="4" value="" disabled="disabled"></div><div class="vh10"></div><div class="button-div"><div id="ircServerTlsEnable"><div id="ircServerTlsEnableDot"></div>
-</div><span class="rm20">TLS</span><div id="ircServerTlsVerify"><div id="ircServerTlsVerifyDot"></div></div><span>Verify TLS Certificate Hostname</span></div><div class="button-div"><div 
+Each server in the group must have &quot;Auto Reconnect&quot; enabled.</li></ul><p>To edit this value select the [Edit Server list] button.</p><p>Click the [?] again to close this message.</p></div>
+<div class="button-div"><input type="text" id="nickNameInputId" value=""><div class="input-label-right">Nickname</div><button id="nickNameInputInfoBtn">?</button></div><div class="white-info-div" 
+id="nickNameInputInfo" hidden><p>
+The Nickname entry is the name you will known as when you sign into IRC. The default value may be changed by clicking the [Edit Server List] button. A different nickname may be specified here each time you connect, but it would revert to the default for subsequent connections.
+</p><p>
+Some characters are restricted like @ and + because these characters designate channel operator or voice. Allowed are uppercase or lowercase characters, numbers, hyphens, underscores, square brackets, curly braces, backslash, backticks, or pipes.
+</p><p>Click the [?] again to close this message.</p></div><div class="vh10"></div><div id="connectShowMoreDiv"><div id="connectShowMoreButtonDiv"><button id="connectShowMoreButton">Show More...
+</button> <a href="/irc/serverlist.html"><button id="editServerListButton">Edit Server List</button></a></div></div><div class="connect-read-only-div border-theme-light" id="connectReadOnlyDiv" 
+hidden><div><button id="connectShowLessButton">Show Less...</button> <a href="/irc/serverlist.html"><button id="editServerListButton">Edit Server List</button></a></div><div class="vh10"></div><div>
+<span class="font120">User Info (Read only)</span> <button id="userRealModeInfoBtn">?</button></div><div class="white-info-div" id="userRealModeInfo" hidden><p>
+These are the username, real name, and initial modes used to connect to the IRC network. To modify these values, click the [Edit Server List] button.</p><ul><li>
+User: This is the backup user name to be used if the identd service is not running, such as &quot;mynick!~user@example.com&quot;</li><li>
+Real: This is the content of the name field displayed in the /WHOIS response from the IRC server. It may be any made up value.</li><li>
+Mode: This is a string used to set the initial user mode during connect to the IRC network. Suggest invisible as +i.</li></ul><p>Click the [?] again to close this message.</p></div><div class="vh5">
+</div><div class="indent20"><div class="vh10"></div><div class="button-div"><span>User: </span><span id="userNameInputId"></span></div><div class="button-div"><span>Real:</span> <span 
+id="realNameInputId"></span></div><div class="button-div"><span>Mode:</span> <span id="userModeInputId"></span></div></div><div class="vh10"></div><div class="font120">Server Info (Read Only)</div>
+<div class="vh5"></div><div class="indent20"><div class="button-div"><input type="text" id="ircServerAddrInputId" size="26" value="" disabled="disabled"> <span>:</span> <input type="text" 
+id="ircServerPortInputId" size="4" value="" disabled="disabled"></div><div class="vh10"></div><div class="button-div"><div id="ircServerTlsEnable"><div id="ircServerTlsEnableDot"></div></div><span 
+class="rm20">TLS</span><div id="ircServerTlsVerify"><div id="ircServerTlsVerifyDot"></div></div><span>Verify TLS Certificate Hostname</span></div><div class="button-div"><div 
 id="ircServerReconnectEnable"><div id="ircServerReconnectEnableDot"></div></div><span>Auto Reconnect</span> <span class="rm20"><button id="ircServerReconnectEnableInfoBtn">?</button></span><div 
 id="ircServerRotateEnable"><div id="ircServerRotateEnableDot"></div></div><span>Server Rotation</span> <button id="ircServerRotateEnableInfoBtn">?</button></div><div class="white-info-div" 
 id="ircServerReconnectEnableInfo" hidden><p>
@@ -91,28 +107,19 @@ Use the [Edit Server List] button to enable or disable the proxy for this specif
 </div><div class="button-div"><input type="text" id="socks5AddrInputId" size="26" value="" disabled="disabled"> <span>:</span> <input type="text" id="socks5PortInputId" size="4" value="" 
 disabled="disabled"> <button id="ircProxyInfoBtn">?</button></div><div class="white-info-div" id="ircProxyInfo" hidden><p>
 The proxy info displayed here shows the current socks5 network proxy settings that have been configured in the web server. The address and port must be changed in the web server configuration. See the Login Config section of the /docs.
-</p><p>Click the [?] again to close this message.</p></div><div class="vh10"></div><div class="nickname-input-div"><div class="button-div"><input type="text" id="nickNameInputId" value=""><div 
-class="input-label-right">Nickname</div><button id="nickNameInputInfoBtn">?</button></div><div class="white-info-div" id="nickNameInputInfo" hidden><p>
-The Nickname entry is the name you will known as when you sign into IRC. The default value may be changed by clicking the [Edit Server List] button. A different nickname may be specified here each time you connect, but it would revert to the default for subsequent connections.
-</p><p>
-Some characters are restricted like @ and + because these characters designate channel operator or voice. Allowed are uppercase or lowercase characters, numbers, hyphens, underscores, square brackets, curly braces, backslash, backticks, or pipes.
-</p><p>Click the [?] again to close this message.</p></div><div class="button-div"><span>User: </span><span id="userNameInputId"></span> <span>Real:</span> <span id="realNameInputId"></span> <span>
-Mode:</span> <span id="userModeInputId"></span> <button id="userRealModeInfoBtn">?</button></div></div><div class="white-info-div" id="userRealModeInfo" hidden><p>
-These are the username, real name, and initial modes used to connect to the IRC network. To modify these values, click the [Edit Server List] button.</p><ul><li>
-User: This is the backup user name to be used if the identd service is not running, such as &quot;mynick!~user@example.com&quot;</li><li>
-Real: This is the content of the name field displayed in the /WHOIS response from the IRC server. It may be any made up value.</li><li>
-Mode: This is a string used to set the initial user mode during connect to the IRC network. Suggest invisible as +i.</li></ul><p>Click the [?] again to close this message.</p></div><div class="vh10">
-</div><div class="button-div"><input type="text" id="userAwayMessageId" size="20" value="AFK"> <button id="setAwayButton">Away</button> <button id="setBackButton">Back</button> <button 
-id="setAwayInfoBtn">?</button></div><div class="white-info-div" id="setAwayInfo" hidden><p>This will execute the IRC command /AWAY command providing a custom message if provided.</p><p>
-Click the [?] again to close this message.</p></div><div class="vh10"></div><div class="button-div"><button id="connectButton">Connect IRC</button> <button id="quitButton">Disconnect IRC</button>
-</div></div></div></div><div><div class="aa-section-div color-raw" id="rawSectionDiv" lastdate="0000-00-00"><div class="head-flex"><div class="head-left"><button class="notice-button" 
-id="rawHiddenElementsButton">-</button> <span>Server</span></div><div class="head-center"></div><div class="head-right"><div id="rawHeadRightButtons"><button id="rawTallerButton">Taller</button> 
-<button id="rawNormalButton">Normal</button> <button id="rawClearButton">Clear</button></div></div></div><div id="rawHiddenElements"><div><textarea id="rawMessageDisplay" cols="120" rows="10" 
-spellcheck="false" readonly="readonly"></textarea></div><div id="hideRawButtons"><div class="button-div"><textarea class="va-middle" spellcheck="false" id="rawMessageInputId" cols="83" rows="1">
-</textarea> <button class="va-middle" id="sendRawMessageButton">Send</button></div><div class="button-div"><button id="loadFromCacheButton">Refresh</button> <button id="eraseCacheButton">Erase Cache
-</button> <button id="showDebugButton">More...</button></div><div id="hiddenDebugDiv" hidden><div class="button-div"><input class="raw-cb-cb" type="checkbox" id="viewRawMessagesCheckbox"> <span 
-class="raw-cb-span">View-Raw</span> <input class="raw-cb-cb" type="checkbox" id="showCommsCheckbox" disabled="disabled"> <span class="raw-cb-span">Add-Comms</span> <input class="raw-cb-cb" 
-type="checkbox" id="showRawInHexCheckbox" disabled="disabled"> <span class="raw-cb-span">Add-Hex</span></div><div class="debug-div-time"><div><pre id="elapsedTimeDiv"></pre></div></div><div 
+</p><p>Click the [?] again to close this message.</p></div></div></div><div class="vh10"></div><div class="button-div"><input type="text" id="userAwayMessageId" size="20" value="AFK"> <button 
+id="setAwayButton">Away</button> <button id="setBackButton">Back<button id="setAwayInfoBtn">?</button></button></div><div class="white-info-div" id="setAwayInfo" hidden><p>
+This will execute the IRC command /AWAY command providing a custom message if provided.</p><p>Click the [?] again to close this message.</p></div><div class="vh5"></div><div class="button-div"><span>
+Color Theme:</span> <button id="colorThemeButtonLight">Light</button> <button id="colorThemeButtonDark">Dark</button></div><div class="vh5"></div><div class="button-div"><button id="connectButton">
+Connect IRC</button> <button id="quitButton">Disconnect IRC</button></div></div></div></div><div><div class="aa-section-div server-panel-theme-light" id="rawSectionDiv" lastdate="0000-00-00"><div 
+class="head-flex"><div class="head-left"><button class="notice-button" id="rawHiddenElementsButton">-</button> <span>Server</span></div><div class="head-center"></div><div class="head-right"><div 
+id="rawHeadRightButtons"><button id="rawTallerButton">Taller</button> <button id="rawNormalButton">Normal</button> <button id="rawClearButton">Clear</button></div></div></div><div 
+id="rawHiddenElements"><div><textarea id="rawMessageDisplay" class="text-theme-light" cols="120" rows="10" spellcheck="false" readonly="readonly"></textarea></div><div id="hideRawButtons"><div 
+class="button-div"><textarea class="va-middle text-theme-light" spellcheck="false" id="rawMessageInputId" cols="83" rows="1"></textarea> <button class="va-middle" id="sendRawMessageButton">Send
+</button></div><div class="button-div"><button id="loadFromCacheButton">Refresh</button> <button id="eraseCacheButton">Erase Cache</button> <button id="showDebugButton">More...</button></div><div 
+id="hiddenDebugDiv" hidden><div class="button-div"><input class="raw-cb-cb" type="checkbox" id="viewRawMessagesCheckbox"> <span class="raw-cb-span">View-Raw</span> <input class="raw-cb-cb" 
+type="checkbox" id="showCommsCheckbox" disabled="disabled"> <span class="raw-cb-span">Add-Comms</span> <input class="raw-cb-cb" type="checkbox" id="showRawInHexCheckbox" disabled="disabled"> <span 
+class="raw-cb-span">Add-Hex</span></div><div id="elapsedTimeOuterDiv" class="debug-div-time text-theme-light"><div><pre id="elapsedTimeDiv" class="debug-pre-time"></pre></div></div><div 
 class="button-div"><button id="test1Button">Test-1</button> <span>Server: </span><span id="test1ButtonDesc"></span></div><div class="button-div"><button id="test2Button">Test-2</button> <span>Server: 
 </span><span id="test2ButtonDesc"></span></div><div class="button-div"><button id="test3Button">Test-3</button> <span>Local: </span><span id="test3ButtonDesc"></span></div><div class="button-div">
 <button id="test4Button">Test-4</button> <span>Local: </span><span id="test4ButtonDesc"></span></div><div class="button-div"><button id="manualEmitBeep1Button">Beep-1</button> <button 
@@ -120,21 +127,22 @@ id="manualEmitBeep2Button">Beep-2</button> <button id="manualEmitBeep3Button">Be
 </button> <button id="serverTerminateButton">Die Web Server</button></div><div class="button-div"><button id="recalcPageWidthButtonId">Recalc Page Width</button> <button id="variablesButtonId">
 Show Variables</button></div><div class="variables-div" id="variablesDivId" hidden><pre id="variablesPreId"></pre></div></div></div><div class="program-version-div"><span><a 
 href="https://cotarr.github.io/irc-hybrid-client">irc-hybrid-client</a></span> <span id="programVersionDiv"></span></div></div></div></div><div id="webDisconnectedHiddenDiv2" hidden><div 
-id="ircDisconnectedHiddenDiv" hidden><div class="aa-section-div color-wallops" id="wallopsSectionDiv" lastdate="0000-00-00" hidden><div class="head-flex"><div class="head-left"><button 
+id="ircDisconnectedHiddenDiv" hidden><div class="aa-section-div wallops-panel-theme-light" id="wallopsSectionDiv" lastdate="0000-00-00" hidden><div class="head-flex"><div class="head-left"><button 
 class="notice-button" id="wallopsCloseButton">-</button> <span>Wallops</span></div><div class="head-center"></div><div class="head-right"><button id="wallopsTallerButton">Taller</button> <button 
-id="wallopsNormalButton">Normal</button> <button id="wallopsEraseButton">Erase</button></div></div><textarea id="wallopsMessageDisplay" cols="120" rows="5" spellcheck="false" readonly="readonly">
-</textarea></div><div class="aa-section-div color-notice" id="noticeSectionDiv" lastdate="0000-00-00" hidden><div class="head-flex"><div class="head-left"><button class="notice-button" 
-id="closeNoticeButton">-</button> <span>Notice</span></div><div class="head-center"></div><div class="head-right"><button id="noticeTallerButton">Taller</button> <button id="noticeNormalButton">Normal
-</button> <button id="noticeEraseButton">Erase</button></div></div><textarea id="noticeMessageDisplay" cols="120" rows="5" spellcheck="false" readonly="readonly"></textarea></div><div 
-class="aa-section-div color-pm" id="privMsgSectionDiv"><div class="head-flex"><div class="head-left"><div><button id="privMsgMainHiddenButton">+</button> <span>Private Messages</span><div 
-class="pm-window-count" id="privMsgWindowCountDiv" hidden>0</div><div class="message-count" id="privMsgCountDiv" hidden>0</div></div></div><div class="head-right"><div id="privMsgHeaderEraseAllDiv" 
-hidden><button>Erase All PM</button></div></div></div><div id="privMsgMainHiddenDiv" hidden><div class="vh10"></div><div class="button-div"><div class="input-label-left">Private Msg to</div><input 
-type="text" id="pmNickNameInputId" size="12" value=""> <button id="whoisButton">Whois</button></div><div class="vh10"></div><div class="button-div"><textarea class="va-middle" id="userPrivMsgInputId" 
-cols="83" rows="1"></textarea> <button class="va-middle" id="UserPrivMsgSendButton">Send</button></div><div class="button-div"><input class="pm-cb-cb" type="checkbox" id="openPmWithBeepCheckbox"> 
-<span class="pm-cb-span">Open/Refresh with line-beep enabled</span></div></div></div><div id="privateMessageContainerDiv"></div><div class="aa-section-div color-channel" id="channelMenuDiv"><div>
-<button id="ircChannelsMainHiddenButton">+</button> <span>Join IRC Channels</span><div class="channel-window-count" id="activeChannelCount">0</div><div class="message-count" 
-id="channelUnreadCountDiv" hidden>0</div></div><div id="ircChannelsMainHiddenDiv"><div class="vh10"></div><div class="button-div"><textarea class="va-middle" id="newChannelNameInputId" cols="20" 
-rows="1"></textarea> <button class="va-middle" id="newChannelButton" class="rm20">Join Channel</button></div><div class="vh10"></div><div>Presets:</div><div class="button-div" 
-id="channelJoinButtonContainer"></div></div></div><div id="channelContainerDiv"></div></div></div><div id="webDisconnectedVisibleDiv" hidden><div class="reconnect-div" id="reconnectDivId"><h2>
-Disconnected from Web Server</h2><div class="button-div"><button id="manualWebSocketReconnectButton">Reconnect to Web Site</button> <button id="stopWebSocketReconnectButton">Stop</button></div><pre 
-class="reconnect-status-div" id="reconnectStatusDiv"></pre></div></div></div><div id="rulerDiv"></div></body></html>
+id="wallopsNormalButton">Normal</button> <button id="wallopsEraseButton">Erase</button></div></div><textarea class="text-theme-light" id="wallopsMessageDisplay" cols="120" rows="5" spellcheck="false" 
+readonly="readonly"></textarea></div><div class="aa-section-div notice-panel-theme-light" id="noticeSectionDiv" lastdate="0000-00-00" hidden><div class="head-flex"><div class="head-left"><button 
+class="notice-button" id="closeNoticeButton">-</button> <span>Notice</span></div><div class="head-center"></div><div class="head-right"><button id="noticeTallerButton">Taller</button> <button 
+id="noticeNormalButton">Normal</button> <button id="noticeEraseButton">Erase</button></div></div><textarea class="text-theme-light" id="noticeMessageDisplay" cols="120" rows="5" spellcheck="false" 
+readonly="readonly"></textarea></div><div class="aa-section-div pm-panel-theme-light" id="privMsgSectionDiv"><div class="head-flex"><div class="head-left"><div><button id="privMsgMainHiddenButton">+
+</button> <span>Private Messages</span><div class="pm-window-count border-theme-light" id="privMsgWindowCountDiv" hidden>0</div><div class="message-count" id="privMsgCountDiv" hidden>0</div></div>
+</div><div class="head-right"><div id="privMsgHeaderEraseAllDiv" hidden><button>Erase All PM</button></div></div></div><div id="privMsgMainHiddenDiv" hidden><div class="vh10"></div><div 
+class="button-div"><div class="input-label-left">Private Msg to</div><input class="text-theme-light" type="text" id="pmNickNameInputId" size="12" value=""> <button id="whoisButton">Whois</button>
+</div><div class="vh10"></div><div class="button-div"><textarea class="va-middle text-theme-light" id="userPrivMsgInputId" cols="83" rows="1"></textarea> <button class="va-middle" 
+id="UserPrivMsgSendButton">Send</button></div><div class="button-div"><input class="pm-cb-cb" type="checkbox" id="openPmWithBeepCheckbox"> <span class="pm-cb-span">Open/Refresh with line-beep enabled
+</span></div></div></div><div id="privateMessageContainerDiv"></div><div class="aa-section-div channel-panel-theme-light" id="channelMenuDiv"><div><button id="ircChannelsMainHiddenButton">+</button> 
+<span>Join IRC Channels</span><div class="channel-window-count border-theme-light" id="activeChannelCount">0</div><div class="message-count" id="channelUnreadCountDiv" hidden>0</div></div><div 
+id="ircChannelsMainHiddenDiv"><div class="vh10"></div><div class="button-div"><textarea class="va-middle text-theme-light" id="newChannelNameInputId" cols="20" rows="1"></textarea> <button 
+class="va-middle" id="newChannelButton" class="rm20">Join Channel</button></div><div class="vh10"></div><div>Presets:</div><div class="button-div" id="channelJoinButtonContainer"></div></div></div>
+<div id="channelContainerDiv"></div></div></div><div id="webDisconnectedVisibleDiv" hidden><div class="reconnect-div" id="reconnectDivId"><h2>Disconnected from Web Server</h2><div class="button-div">
+<button id="manualWebSocketReconnectButton">Reconnect to Web Site</button> <button id="stopWebSocketReconnectButton">Stop</button></div><pre class="reconnect-status-div" id="reconnectStatusDiv"></pre>
+</div></div></div><div id="rulerDiv"></div></body></html>

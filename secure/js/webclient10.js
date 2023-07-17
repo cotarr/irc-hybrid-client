@@ -370,6 +370,145 @@ document.getElementById('test4Button').addEventListener('click', function () {
 });
 document.getElementById('test4ButtonDesc').textContent = 'Call getIrcState()';
 
+// ----------------------------------------------------
+// Checkbox click handler for light theme, dark theme
+// ----------------------------------------------------
+document.getElementById('colorThemeButtonDark').addEventListener('click', function () {
+  document.querySelector('body').setAttribute('theme', 'dark');
+  window.localStorage.setItem('colorTheme', JSON.stringify({ theme: 'dark' }));
+  document.dispatchEvent(new CustomEvent('color-theme-changed', { bubbles: true }));
+});
+document.getElementById('colorThemeButtonLight').addEventListener('click', function () {
+  document.querySelector('body').setAttribute('theme', 'light');
+  window.localStorage.setItem('colorTheme', JSON.stringify({ theme: 'light' }));
+  document.dispatchEvent(new CustomEvent('color-theme-changed', { bubbles: true }));
+});
+
+// -------------------------------------
+// Color Theme selector
+// Exchange light theme and dark theme CSS classes
+// -------------------------------------
+document.addEventListener('color-theme-changed', function (event) {
+  if (document.querySelector('body').getAttribute('theme') === 'light') {
+    document.querySelector('body').classList.add('body-theme-light');
+    document.getElementById('annunciatorTopId').classList.add('annunciator-panel-theme-light');
+    document.getElementById('infoSectionDiv').classList.add('info-panel-theme-light');
+    document.getElementById('infoLicenseDiv').classList.add('text-theme-light');
+    document.getElementById('infoHelpDiv').classList.add('text-theme-light');
+    document.getElementById('connectPanel').classList.add('connect-panel-theme-light');
+    document.getElementById('connectReadOnlyDiv').classList.add('border-theme-light');
+    document.getElementById('rawSectionDiv').classList.add('server-panel-theme-light');
+    document.getElementById('rawMessageDisplay').classList.add('text-theme-light');
+    document.getElementById('rawMessageInputId').classList.add('text-theme-light');
+    document.getElementById('elapsedTimeOuterDiv').classList.add('text-theme-light');
+    document.getElementById('wallopsSectionDiv').classList.add('wallops-panel-theme-light');
+    document.getElementById('wallopsMessageDisplay').classList.add('text-theme-light');
+    document.getElementById('noticeUnreadExistIcon').classList.add('notice-panel-theme-light');
+    document.getElementById('noticeSectionDiv').classList.add('notice-panel-theme-light');
+    document.getElementById('noticeMessageDisplay').classList.add('text-theme-light');
+    document.getElementById('privMsgUnreadExistIcon').classList.add('pm-panel-theme-light');
+    document.getElementById('privMsgWindowCountDiv').classList.add('border-theme-light');
+    document.getElementById('privMsgSectionDiv').classList.add('pm-panel-theme-light');
+    document.getElementById('pmNickNameInputId').classList.add('text-theme-light');
+    document.getElementById('userPrivMsgInputId').classList.add('text-theme-light');
+    document.getElementById('channelUnreadExistIcon').classList.add('channel-panel-theme-light');
+    document.getElementById('channelMenuDiv').classList.add('channel-panel-theme-light');
+    document.getElementById('newChannelNameInputId').classList.add('text-theme-light');
+    document.getElementById('activeChannelCount').classList.add('border-theme-light');
+
+    document.querySelector('body').classList.remove('body-theme-dark');
+    document.getElementById('annunciatorTopId').classList.remove('annunciator-panel-theme-dark');
+    document.getElementById('infoSectionDiv').classList.remove('info-panel-theme-dark');
+    document.getElementById('infoLicenseDiv').classList.remove('text-theme-dark');
+    document.getElementById('infoHelpDiv').classList.remove('text-theme-dark');
+    document.getElementById('connectPanel').classList.remove('connect-panel-theme-dark');
+    document.getElementById('connectReadOnlyDiv').classList.remove('border-theme-dark');
+    document.getElementById('rawSectionDiv').classList.remove('server-panel-theme-dark');
+    document.getElementById('rawMessageDisplay').classList.remove('text-theme-dark');
+    document.getElementById('rawMessageInputId').classList.remove('text-theme-dark');
+    document.getElementById('elapsedTimeOuterDiv').classList.remove('text-theme-dark');
+    document.getElementById('wallopsSectionDiv').classList.remove('wallops-panel-theme-dark');
+    document.getElementById('wallopsMessageDisplay').classList.remove('text-theme-dark');
+    document.getElementById('noticeUnreadExistIcon').classList.remove('notice-panel-theme-dark');
+    document.getElementById('noticeSectionDiv').classList.remove('notice-panel-theme-dark');
+    document.getElementById('noticeMessageDisplay').classList.remove('text-theme-dark');
+    document.getElementById('privMsgUnreadExistIcon').classList.remove('pm-panel-theme-dark');
+    document.getElementById('privMsgWindowCountDiv').classList.remove('border-theme-dark');
+    document.getElementById('privMsgSectionDiv').classList.remove('pm-panel-theme-dark');
+    document.getElementById('pmNickNameInputId').classList.remove('text-theme-dark');
+    document.getElementById('userPrivMsgInputId').classList.remove('text-theme-dark');
+    document.getElementById('channelUnreadExistIcon').classList.remove('channel-panel-theme-dark');
+    document.getElementById('channelMenuDiv').classList.remove('channel-panel-theme-dark');
+    document.getElementById('newChannelNameInputId').classList.remove('text-theme-dark');
+    document.getElementById('activeChannelCount').classList.remove('border-theme-dark');
+  } else {
+    document.querySelector('body').classList.add('body-theme-dark');
+    document.getElementById('annunciatorTopId').classList.add('annunciator-panel-theme-dark');
+    document.getElementById('infoSectionDiv').classList.add('info-panel-theme-dark');
+    document.getElementById('infoLicenseDiv').classList.add('text-theme-dark');
+    document.getElementById('infoHelpDiv').classList.add('text-theme-dark');
+    document.getElementById('connectPanel').classList.add('connect-panel-theme-dark');
+    document.getElementById('connectReadOnlyDiv').classList.add('border-theme-dark');
+    document.getElementById('rawSectionDiv').classList.add('server-panel-theme-dark');
+    document.getElementById('rawMessageDisplay').classList.add('text-theme-dark');
+    document.getElementById('rawMessageInputId').classList.add('text-theme-dark');
+    document.getElementById('elapsedTimeOuterDiv').classList.add('text-theme-dark');
+    document.getElementById('wallopsSectionDiv').classList.add('wallops-panel-theme-dark');
+    document.getElementById('wallopsMessageDisplay').classList.add('text-theme-dark');
+    document.getElementById('noticeUnreadExistIcon').classList.add('notice-panel-theme-dark');
+    document.getElementById('noticeSectionDiv').classList.add('notice-panel-theme-dark');
+    document.getElementById('noticeMessageDisplay').classList.add('text-theme-dark');
+    document.getElementById('privMsgUnreadExistIcon').classList.add('pm-panel-theme-dark');
+    document.getElementById('privMsgWindowCountDiv').classList.add('border-theme-dark');
+    document.getElementById('privMsgSectionDiv').classList.add('pm-panel-theme-dark');
+    document.getElementById('pmNickNameInputId').classList.add('text-theme-dark');
+    document.getElementById('userPrivMsgInputId').classList.add('text-theme-dark');
+    document.getElementById('channelUnreadExistIcon').classList.add('channel-panel-theme-dark');
+    document.getElementById('channelMenuDiv').classList.add('channel-panel-theme-dark');
+    document.getElementById('newChannelNameInputId').classList.add('text-theme-dark');
+    document.getElementById('activeChannelCount').classList.add('border-theme-dark');
+
+    document.querySelector('body').classList.remove('body-theme-light');
+    document.getElementById('annunciatorTopId').classList.remove('annunciator-panel-theme-light');
+    document.getElementById('infoSectionDiv').classList.remove('info-panel-theme-light');
+    document.getElementById('infoLicenseDiv').classList.remove('text-theme-light');
+    document.getElementById('infoHelpDiv').classList.remove('text-theme-light');
+    document.getElementById('connectPanel').classList.remove('connect-panel-theme-light');
+    document.getElementById('connectReadOnlyDiv').classList.remove('border-theme-light');
+    document.getElementById('rawSectionDiv').classList.remove('server-panel-theme-light');
+    document.getElementById('rawMessageDisplay').classList.remove('text-theme-light');
+    document.getElementById('rawMessageInputId').classList.remove('text-theme-light');
+    document.getElementById('elapsedTimeOuterDiv').classList.remove('text-theme-light');
+    document.getElementById('wallopsSectionDiv').classList.remove('wallops-panel-theme-light');
+    document.getElementById('wallopsMessageDisplay').classList.remove('text-theme-light');
+    document.getElementById('noticeUnreadExistIcon').classList.remove('notice-panel-theme-light');
+    document.getElementById('noticeSectionDiv').classList.remove('notice-panel-theme-light');
+    document.getElementById('noticeMessageDisplay').classList.remove('text-theme-light');
+    document.getElementById('privMsgUnreadExistIcon').classList.remove('pm-panel-theme-light');
+    document.getElementById('privMsgWindowCountDiv').classList.remove('border-theme-light');
+    document.getElementById('privMsgSectionDiv').classList.remove('pm-panel-theme-light');
+    document.getElementById('pmNickNameInputId').classList.remove('text-theme-light');
+    document.getElementById('userPrivMsgInputId').classList.remove('text-theme-light');
+    document.getElementById('channelUnreadExistIcon').classList.remove('channel-panel-theme-light');
+    document.getElementById('channelMenuDiv').classList.remove('channel-panel-theme-light');
+    document.getElementById('newChannelNameInputId').classList.remove('text-theme-light');
+    document.getElementById('activeChannelCount').classList.remove('border-theme-light');
+  }
+});
+
+// -----------------------------------------------------
+// On page load, restore color theme from local storage
+// -----------------------------------------------------
+let localStorageColorTheme = null;
+localStorageColorTheme = JSON.parse(window.localStorage.getItem('colorTheme'));
+if ((localStorageColorTheme) && (localStorageColorTheme.theme === 'dark')) {
+  document.querySelector('body').setAttribute('theme', 'dark');
+  document.dispatchEvent(new CustomEvent('color-theme-changed', { bubbles: true }));
+} else {
+  document.querySelector('body').setAttribute('theme', 'light');
+  document.dispatchEvent(new CustomEvent('color-theme-changed', { bubbles: true }));
+}
+
 // ---------------------------------------------------------------------------
 // This is some code to dynamically resize the width of the textarea elements
 // ---------------------------------------------------------------------------

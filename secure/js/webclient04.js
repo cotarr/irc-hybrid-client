@@ -124,6 +124,17 @@ document.getElementById('cycleNextServerButton').addEventListener('click', funct
     });
 }); // cycleNextServerButton()
 
+// Set visibility of connect panel additional information
+document.getElementById('connectShowMoreButton').addEventListener('click', function () {
+  document.getElementById('connectReadOnlyDiv').removeAttribute('hidden');
+  document.getElementById('connectShowMoreDiv').setAttribute('hidden', '');
+});
+
+document.getElementById('connectShowLessButton').addEventListener('click', function () {
+  document.getElementById('connectReadOnlyDiv').setAttribute('hidden', '');
+  document.getElementById('connectShowMoreDiv').removeAttribute('hidden');
+});
+
 // -------------------------
 // Connect Button Handler
 // -------------------------

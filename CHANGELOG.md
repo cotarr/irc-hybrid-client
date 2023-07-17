@@ -6,6 +6,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Next 0.2.48-dev 2023-07-17 (Draft)
+
+The goal of this change is to add color themes, light and dark.
+
+Approach: In order to minimize the risk of breaking existing HTML/CSS,
+for each colored panel, the "color" and "background-color" styles were removed 
+from the existing CSS class definitions, leaving previous margin, padding, etc.
+New CSS class definitions were created for each colored panel 
+using "xxx-theme-light" and "xxx-theme-dark" containing only "color" 
+and "background-color" styles. Javascript could then use .classList.add() 
+or .classList.remove() to switch between light and dark.
+
+### Added
+
+- Added 2 buttons to the "IRC Controls" panel that when checked will select dark theme or light theme.
+- At the top level, added attribute "theme" to the body element with possible values "light" and "dark". Any elements can get this value.
+- Added web browser localStorage property "colorTheme" with values "light" and "dark" to persist color theme when the page is reloaded.
+- Added global event "color-theme-changed" so that channel panel elements and private message elements can listen for color theme changes.
+- Created multiple new CSS class styles for light theme color and dark theme colors.
+- Added javascript to exchange CSS class names for light theme and dark theme.
+- Reorganized the layout of the "IRC Controls" panel. It was cluttered, confusing, and show too many read only values by default.
+
 ## [v0.2.47](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.47) 2023-06-29
 
 Run npm audit fix to clear audit violation on regular expression DOS for package word-wrap.

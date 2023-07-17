@@ -250,8 +250,8 @@ function createChannelEl (name) {
 
   // section-div (main element for each channel)
   const channelMainSectionEl = document.createElement('div');
-  channelMainSectionEl.classList.add('color-channel');
   channelMainSectionEl.classList.add('aa-section-div');
+  channelMainSectionEl.classList.add('channel-panel-theme-light');
   channelMainSectionEl.setAttribute('lastDate', '0000-00-00');
 
   // Top Element (non-hidden element)
@@ -298,6 +298,7 @@ function createChannelEl (name) {
   const channelNickCounterEl = document.createElement('div');
   channelNickCounterEl.textContent = '0';
   channelNickCounterEl.classList.add('nick-count');
+  channelNickCounterEl.classList.add('border-theme-light');
 
   // Channel message activity counter
   const channelMessageCounterEl = document.createElement('div');
@@ -335,6 +336,7 @@ function createChannelEl (name) {
   const channelNamesCharWidth = 20;
   const channelNamesDisplayEl = document.createElement('textarea');
   channelNamesDisplayEl.classList.add('channel-names-display');
+  channelNamesDisplayEl.classList.add('text-theme-light');
   channelNamesDisplayEl.setAttribute('cols', channelNamesCharWidth.toString());
   channelNamesDisplayEl.setAttribute('rows', defaultHeightInRows);
   channelNamesDisplayEl.setAttribute('spellCheck', 'false');
@@ -343,6 +345,7 @@ function createChannelEl (name) {
   // resizable text area
   const channelTextAreaEl = document.createElement('textarea');
   const channelTextAreaId = 'chan' + channelIndex.toString() + 'TextAreaId';
+  channelTextAreaEl.classList.add('text-theme-light');
   channelTextAreaEl.id = channelTextAreaId;
   // this is temporary, the width (cols attribute) will be resized dynamically
   channelTextAreaEl.setAttribute('cols', '30');
@@ -357,6 +360,7 @@ function createChannelEl (name) {
   // single line user input
   const channelInputAreaEl = document.createElement('textarea');
   const channelInputAreaId = 'chan' + channelIndex.toString() + 'InputInputId';
+  channelInputAreaEl.classList.add('text-theme-light');
   channelInputAreaEl.id = channelInputAreaId;
   channelInputAreaEl.setAttribute('cols', '120');
   channelInputAreaEl.setAttribute('rows', '1');
@@ -978,6 +982,35 @@ function createChannelEl (name) {
       channelBottomDiv2El.setAttribute('hidden', '');
       channelHideButtonEl.textContent = '+';
     }
+    // -------------------------------------
+    // Color Theme selector
+    // Exchange light theme and dark theme CSS classes
+    // -------------------------------------
+    if (document.querySelector('body').getAttribute('theme') === 'dark') {
+      channelMainSectionEl.classList.add('channel-panel-theme-dark');
+      channelNickCounterEl.classList.add('border-theme-dark');
+      channelTextAreaEl.classList.add('text-theme-dark');
+      channelNamesDisplayEl.classList.add('text-theme-dark');
+      channelInputAreaEl.classList.add('text-theme-dark');
+
+      channelMainSectionEl.classList.remove('channel-panel-theme-light');
+      channelNickCounterEl.classList.remove('border-theme-light');
+      channelTextAreaEl.classList.remove('text-theme-light');
+      channelNamesDisplayEl.classList.remove('text-theme-light');
+      channelInputAreaEl.classList.remove('text-theme-light');
+    } else {
+      channelMainSectionEl.classList.add('channel-panel-theme-light');
+      channelNickCounterEl.classList.add('border-theme-light');
+      channelTextAreaEl.classList.add('text-theme-light');
+      channelNamesDisplayEl.classList.add('text-theme-light');
+      channelInputAreaEl.classList.add('text-theme-light');
+
+      channelMainSectionEl.classList.remove('channel-panel-theme-dark');
+      channelNickCounterEl.classList.remove('border-theme-dark');
+      channelTextAreaEl.classList.remove('text-theme-dark');
+      channelNamesDisplayEl.classList.remove('text-theme-dark');
+      channelInputAreaEl.classList.remove('text-theme-dark');
+    }
   } // updateVisibility()
 
   // -------------------------
@@ -1059,6 +1092,15 @@ function createChannelEl (name) {
     updateVisibility();
   };
   document.addEventListener('hide-or-zoom', handleHideOrZoom);
+
+  // ---------------------------------------------
+  // Detect change in color theme
+  // Call updateVisibility to changes CSS classes
+  // ---------------------------------------------
+  function handleColorThemeChannel (event) {
+    updateVisibility();
+  };
+  document.addEventListener('color-theme-changed', handleColorThemeChannel);
 
   // --------------------------------------------------
   // Function to update window.localStorage with IRC
@@ -1582,6 +1624,7 @@ function createChannelEl (name) {
       channelZoomButtonEl.removeEventListener('click', handleChannelZoomButtonElClick);
       document.removeEventListener('show-all-divs', handleShowAllDivs);
       document.removeEventListener('hide-or-zoom', handleHideOrZoom);
+      document.removeEventListener('color-theme-changed', handleColorThemeChannel);
       channelBeep1CBInputEl.removeEventListener('click', handleChannelBeep1CBInputElClick);
       channelBeep2CBInputEl.removeEventListener('click', handleChannelBeep2CBInputElClick);
       channelBeep3CBInputEl.removeEventListener('click', handleChannelBeep3CBInputElClick);
