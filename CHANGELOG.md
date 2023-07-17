@@ -27,6 +27,7 @@ or .classList.remove() to switch between light and dark.
 - Created multiple new CSS class styles for light theme color and dark theme colors.
 - Added javascript to exchange CSS class names for light theme and dark theme.
 - Reorganized the layout of the "IRC Controls" panel. It was cluttered, confusing, and show too many read only values by default.
+- Updated /docs/ folder with new screen captures of the IRC Controls panel.
 
 ## [v0.2.47](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.47) 2023-06-29
 
