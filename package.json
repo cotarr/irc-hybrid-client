@@ -23,16 +23,16 @@
   },
   "homepage": "https://github.com/cotarr/irc-hybrid-client#readme",
   "dependencies": {
-    "@dr.pogodin/csurf": "^1.12.4",
+    "@dr.pogodin/csurf": "^1.13.0",
     "bcryptjs": "^2.4.3",
     "compression": "^1.7.4",
     "connect-redis": "^7.1.0",
     "cookie": "^0.5.0",
     "cookie-parser": "^1.4.6",
     "cookie-signature": "^1.2.1",
-    "dotenv": "^16.1.4",
+    "dotenv": "^16.3.1",
     "express": "^4.18.2",
-    "express-rate-limit": "^6.7.0",
+    "express-rate-limit": "^6.7.1",
     "express-session": "^1.17.3",
     "express-validator": "^7.0.1",
     "helmet": "^7.0.0",
@@ -46,7 +46,7 @@
     "ws": "^8.13.0"
   },
   "devDependencies": {
-    "eslint": "^8.43.0",
+    "eslint": "^8.45.0",
     "eslint-config-standard": "^17.1.0",
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-n": "^16.0.1",
