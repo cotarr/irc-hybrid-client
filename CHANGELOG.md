@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Next 0.2.48-dev 2023-07-17 (Draft)
+## [v0.2.48](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.48) 2023-07-17
 
 The goal of this change is to add color themes, light and dark.
 
