@@ -6,7 +6,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Next v0.2.49 2023-07-18
+## [v0.2.49](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.49) 2023-07-20
+
+### Added
+
+This is a minor log update. Changes to the IRC server list that are entered 
+using the web server API at "/irc/serverlist" will be logged to the file logs/auth.log.
+Log data includes IP address, web login username, IRC server address, and port as shown below
+
+```
+2023-07-20T14:03:05.663Z 192.168.0.100 user1 EDITSERVERLIST POST irc.dal.net 6697
+2023-07-20T14:03:09.801Z 192.168.0.100 user1 EDITSERVERLIST PATCH irc.dal.net 6697
+2023-07-20T14:03:12.442Z 192.168.0.100 user1 EDITSERVERLIST COPY irc.dal.net 6697
+2023-07-20T14:03:13.688Z 192.168.0.100 user1 EDITSERVERLIST DELETE irc.dal.net 6697
+```
+
+- Added server list events logger in server/irc/serverlist-editor.mjs
+- Updated /docs/ to explain logging of IRC server list changes
+
+### Added (for previous edit)
 
 - Update FAQ include colorTheme as localStorage property in privacy description.
 
