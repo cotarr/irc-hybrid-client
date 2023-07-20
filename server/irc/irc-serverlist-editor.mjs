@@ -70,6 +70,10 @@ import vars from './irc-client-vars.mjs';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const nodeEnv = process.env.NODE_ENV || 'development';
+const nodeDebugLog = process.env.NODE_DEBUG_LOG || 0;
+
+const authLogFilename = path.join(__dirname, '../../logs/auth.log');
 //
 // editLock must be set to true to accept POST, PATCH or DELETE methods.
 // lock record index must match
@@ -797,6 +801,85 @@ const toggleServerDisabled = function (req, chainObject) {
 };
 
 /**
+ * Server List Edit API logger - Changes to the server list are written to "auth.log"
+ * @param {Object} req - NodeJs HTTP request object, req.query.index contain index
+ * @param {Object} chainObject - Wrapper object used to pass common date through promise chain
+ * @returns {Promise} Resolve to Object (chainObject) or reject error
+ */
+const logger = (req, chainObject) => {
+  return new Promise((resolve, reject) => {
+    let method = null;
+    let server = {};
+    if (req.method.toUpperCase() === 'POST') {
+      method = 'POST';
+      server = chainObject.newServer;
+    } else if (req.method.toUpperCase() === 'PATCH') {
+      method = 'PATCH';
+      server = chainObject.newServer;
+    } else if (req.method.toUpperCase() === 'COPY') {
+      method = 'COPY';
+      server = chainObject.newServer;
+    } else if (req.method.toUpperCase() === 'DELETE') {
+      method = 'DELETE';
+      const index = parseInt(req.query.index);
+      if ((!isNaN(index)) && (index >= 0) &&
+        (index < chainObject.serversFile.serverArray.length)) {
+        server = chainObject.serversFile.serverArray[index];
+      } else {
+        reject(new Error('Server list API method DELETE received bad index.'));
+      }
+    }
+
+    if ((method == null) || (server == null)) {
+      reject(new Error('Server list API logger parsing error.'));
+    } else {
+      //
+      // build log text string
+      //
+      const now = new Date();
+      let logEntry = now.toISOString();
+      if ('_remoteAddress' in req) {
+        logEntry += ' ' + req._remoteAddress;
+      } else {
+        logEntry += ' NOADDRESS';
+      }
+      if ((req.session) && (req.session.sessionAuth) && (req.session.sessionAuth.user) &&
+      (req.session.sessionAuth.user.length > 0)) {
+        logEntry += ' ' + req.session.sessionAuth.user;
+      } else {
+        logEntry += ' NOUSER';
+      }
+      logEntry += ' EDITSERVERLIST';
+      logEntry += ' ' + method + ' ' + server.host + ' ' + server.port.toString();
+      //
+      // Append string to file
+      //
+      if ((nodeEnv === 'development') || (nodeDebugLog)) {
+        console.log(logEntry);
+      } else {
+        fs.writeFile(
+          authLogFilename,
+          logEntry + '\n',
+          {
+            encoding: 'utf8',
+            mode: 0o600,
+            flag: 'a'
+          },
+          function (err) {
+            if (err) {
+              const error = new Error(err.message || err.toString() || 'Server List Log I/O Error');
+              reject(error);
+            } else {
+              resolve(chainObject);
+            }
+          }
+        );
+      }
+    }
+  });
+}; // logger()
+
+/**
  * List - NodeJs Middleware function: GET /irc/serverlist route handler
  */
 const list = function (req, res, next) {
@@ -822,6 +905,7 @@ const create = function (req, res, next) {
     .then((chainObject) => deserializeElements(req, chainObject))
     .then((chainObject) => appendArrayElement(chainObject))
     .then((chainObject) => writeServersFile(chainObject))
+    .then((chainObject) => logger(req, chainObject))
     .then((chainObject) => returnStatus(req, res, chainObject))
     .catch((err) => next(err));
 };
@@ -839,6 +923,7 @@ const update = function (req, res, next) {
     .then((chainObject) => deserializeElements(req, chainObject))
     .then((chainObject) => replaceArrayElement(req, chainObject))
     .then((chainObject) => writeServersFile(chainObject))
+    .then((chainObject) => logger(req, chainObject))
     .then((chainObject) => returnStatus(req, res, chainObject))
     .catch((err) => handlePromiseErrors(next, err));
 };
@@ -856,6 +941,7 @@ const copy = function (req, res, next) {
     .then((chainObject) => copyExistingServer(req, chainObject))
     .then((chainObject) => appendArrayElement(chainObject))
     .then((chainObject) => writeServersFile(chainObject))
+    .then((chainObject) => logger(req, chainObject))
     .then((chainObject) => returnStatus(req, res, chainObject))
     .catch((err) => next(err));
 };
@@ -869,6 +955,7 @@ const destroy = function (req, res, next) {
     .then((chainObject) => requireNotLock(chainObject))
     .then((chainObject) => readServersFile(chainObject))
     .then((chainObject) => addMissingProperties(chainObject))
+    .then((chainObject) => logger(req, chainObject))
     .then((chainObject) => deleteArrayElement(req, chainObject))
     .then((chainObject) => writeServersFile(chainObject))
     .then((chainObject) => returnStatus(req, res, chainObject))

@@ -336,9 +336,10 @@ sudo certbot certonly --standalone -d abcd.example.com
           Configuration of a custom directory location is not supported in this version.
         </p>
         <ul>
-          <li>auth.log - Web page user authentication. This file contains 
-            user login to the web server, which is infrequent, so this
-            file tends to remain small.
+          <li>auth.log - This file records user login events when signing into the web server. 
+            Additions, modifications, or deletions from the IRC server list will 
+            be added to the auth.log file. These are infrequent events to the log file 
+            tends to remain small. There is no log file rotation on auth.log.
           </li>
 
           <li>access.log - HTTP access requests.
