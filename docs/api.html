@@ -1328,91 +1328,236 @@ HEARTBEAT
           A second tool is required to observe the asynchronous RFC 2812 IRC messages which
           originate in the IRC server and are passed through the web server and
           onward to the web browser using the websocket stream connection.
-          The following documentation will explain using Postman to issue API requests.
-          Postman is used in combination with a custom websocket monitoring tool included in the repository.
         </p>
         <p>
-          Warning: API requests can cause the web server to initiate new IRC connections or
-          issue IRC commands WITHOUT visibility of the IRC server responses.
-          Therefore, it is recommended to use a dedicated IRC test server.
-          The irc-hybrid-client was developed using a ngircd IRC server
-          available in the Debian 10 apt packages, running in an isolated development environment.
-        </p>
-        <h3>1 - Postman API calls</h3>
-        <p>
-          One way to send http requests to the backend is to use
-          <a href="https://www.postman.com/downloads/">Postman</a>.
-          The irc-hybrid-client github repository includes a Postman collection
+          One way to send http requests to the backend is to use the VSCode extension Thunder Client.
+          This is an API test application similar to Postman.
+          The irc-hybrid-client github repository includes a Thunder Client collection
           containing example API calls described above.
-          This program's API debug collection can be imported into Postman from the cloned repository
-          located at
-          &quot;/postman/irc-hybrid-client message debug.postman_collection.json&quot;.
-        </p>  
-        <p>
-          Several additional Postman collections are included that allow testing of
-          access restrictions of the API routes and testing of websocket authorization.
-          Documentation on authorization testing is available in the README.md which is
-          located in the directory with the exported collections, as well as comments within the
-          Postman collections.
+          This program's API debug collection can be imported from the cloned repository.
+          The following documentation will explain using Thunder Client to issue API requests.
+          Thunder Client should be used in combination with an independent method to monitor IRC messages.
         </p>
-        <h4>1A - Configuration of irc-hybrid-client for testing</h4>
+        <p>
+          Warning: Running the tests individually can cause the web server to initiate IRC 
+          connections and issue IRC commands WITHOUT display of the IRC server responses.
+          This is because IRC server responses are returned asynchronously 
+          in the websocket stream which is not visible in Thunder Client.
+          In most cases, the API response is limited to a true/false error flag 
+          showing initialization of an asynchronous request, not subsequent completion or data.
+          
+          The collections include tests defined in a specific order such that interaction between the
+          web server and IRC server are blocked as authorization failures. Should you choose to run
+          the API requests individually, it is recommended to use a dedicated IRC server.
+        </p>
+
+        <h3>IRC server setup for testing</h3>
+        <p>
+          It is recommended to install a temporary IRC server to perform these tests.
+          The irc-hybrid-client was developed using the Debian apt package "ngircd".
+          Performing these tests can submit multiple IRC messages in rapid succession.
+          Running this on a public IRC server may get the IP addressed banned.
+        </p>
+        <p>
+          It is recommended to run the entire test on an isolated network or 
+          inside a virtual machine. In an isolated environment TLS and TLS certificates are not required.
+          Development testing was performed using a ngirc IRC server on a raspberry pi
+          on segregated network behind a NAT router.          
+        </p>
+        <p>
+          The temporary IRC server that we just created must be added to the irc-hybrid-client server list.
+          If you prefer to use the internal server list editor web page, you can skip the next part 
+          and use the server list editor web page after the app is running.
+        </p>
+        <p>
+          In the base folder of the repository, copy the example IRC server file to servers.json
+
+        </p>
+<pre>
+   cp -v example-servers.json servers.json
+</pre>
+        <p>
+          The File will look like this. Setup the servers.json to match the test IRC server you just installed.
+          The file is in JSON format. Use caution to use quotes and commas in the proper syntax.
+          The important values are marked with arrows.
+        </p>
+<div class="pre-div"><pre>
+{
+  "configVersion": 2,
+  "ctcpTimeLocale": ["en-US", "UTC"],
+  "serverArray": [
+    {
+      "disabled": false,
+      "name": "Test IRC Server",    &lt;------
+      "host": "127.0.0.1",          &lt;------
+      "port": 6667,                 &lt;------
+      "tls": false,
+      "verify": false,
+      "proxy": false,
+      "reconnect": false,
+      "logging": false,
+      "password": "",
+      "saslUsername": "",
+      "saslPassword": "",
+      "identifyNick": "",
+      "identifyCommand": "",
+      "nick": "Bob",                &lt;------
+      "altNick": "",
+      "recoverNick": false,
+      "user": "user",               &lt;------
+      "real": "Bob Smith",          &lt;------
+      "modes": "+i",
+      "channelList": ["#test"]
+    }
+  ]
+}  
+</pre></div>
+
+        <h4>Configuration of irc-hybrid-client for testing</h4>
+        <p>
+          Previous sections of this documentation contained detail
+          instructions for installation and setup of the irc-hybrid-client 
+          web server. The following are limited instructions for creating 
+          a test instance of the web server in an isolated environment 
+          that is protected from the internet.
+        </p>
+        <p>
+          The irc-hybrid-client is configured using a .env file.
+          The following minimum configuration may be used for testing.
+        </p>
         <ul>
-          <li>Suggest delete any postman cookies before running tests.</li>
-          <li>Assign a temporary user/password in the web server for testing.</li>
-          <li>In Postman, create a environment with the variables listed below. Set values to the temporary user/password and server URL.</li>
-          <li>Start the irc-hybrid-client web server</li>
+          <li>Make sure credentials.json does not exist, this demo will use a .env file for configuration.</li>
+          <li>In the base repository folder, create a .env file. The following minimum configuration copied from the repository main README.md</li>
+          <li>The SERVER_INSTANCE must be set to 0 (zero) to setup a unique cookie name.</li>
+          <li>Use a password random generator like pwgen to generate an insert SESSION_SECRET.</li>
+          <li>Use the &quot;tools/genEnvVarAuthForUser_1.mjs&quot; utility to generate a user hash.</li>
         </ul>
-        <h4>1B - Postman configuration</h4>
         <p>
-          Postman settings: General: Automatically follow redirects: OFF
+          Example .env file
         </p>
-        <h4>1C Postman Environment</h4>
+
+<div class="pre-div"><pre>
+ENV_VAR_CONFIG_VERSION=2
+LOGIN_USER_USERID=1
+LOGIN_USER_USER="user1"
+LOGIN_USER_NAME="Bob Smith"
+LOGIN_USER_HASH="---BCRYPT-HASH-GOES-HERE---"
+SERVER_TLS=false
+SERVER_PORT=3003
+SERVER_INSTANCE_NUMBER=0
+SESSION_SECRET="---COOKIE-SECRET-GOES-HERE---"  
+</pre></div>
+
+
+        <h4>Thunder Client configuration</h4>
         <p>
-          Create a postman environment and create the following variables. 
-          A postman environment suitable for testing is included in the repository.
+          This must be done **BEFORE** importing the collection. Otherwise, tests 
+          using the COPY method will be imported as GET requests.
+        </p>
+        <p>
+          In Thunder Client: Disable the functionality to follow redirects (302)
+        </p>
+<pre>
+  Settings > User > Extensions > Thunder Client > Follow Redirects (Uncheck)
+</pre>        
+        <p>
+          In Thunder Client: Add "COPY" as a custom HTTP method.
+        </p>          
+<pre>
+  Settings > User > Extensions > Thunder Client > Custom Methods: COPY
+</pre>          
+
+        <h4>Thunder Client Environment Variables</h4>
+        <p>
+          A local environment is required to save authorization codes and access_tokens. 
+          In the Thunder Client &quot;Env&quot; tab, if &quot;(Local Env)&quot; does not show in the 
+          list of environments. it must be created by selecting &quot;Local Environment&quot; in dropdown.          
+        </p>
+        <p>
+          The following environment variables may be imported into Thunder Client 
+          from: &quot;thunderclient/thunder-environment_irc-hybrid-client.json&quot;. 
+          The first 6 environment variables listed below are used for the main IRC test collection.
+          The remaining 7 environment variables that begin with &quot;auth_&quot; are only 
+          required if remote authentication is used. 
+          The variables beginning with auth_ may be omitted for this part of the test.
         </p>
         <ul>
-          <li>server_URL</li>
-          <li>server_user1</li>
-          <li>server_password1</li>
-          <li>irc_nickname</li>
-          <li>irc_channel</li>
-          <li>sever_die ("YES" or "NO")</li>
+          <li>The server_URL is the web server, not the IRC server</li>
+          <li>The server_user1 and server_password1 values are for the web page login, not IRC.</li>
+          <li>The irc_nickname and irc_channel will be used for the tests.</li>
         </ul>
-        <h4>1D - Obtaining a postman cookie</h4>
+
+        <div class="pre-div"><pre>
+server_URL:          "http://localhost:3003"
+server_user1:        "user1"
+server_password1:    "mysecret"
+irc_nickname:        "myNick"
+irc_channel":        "#test"
+server_die:          "NO"
+
+auth_host:           "http://127.0.0.1:3500"
+auth_redirect_uri:   "http://localhost:3003/login/callback"
+auth_username:       "bob"
+auth_password:       "bobssecret"
+auth_client_id:      "irc_client_1"
+auth_client_secret:  "ssh-secret"
+auth_scopes:         "irc.all"
+</pre></div>
+
+        <h4>Thunder Client Collection</h4>
         <p>
-          To get a valid cookie, run selections 7.1, 7.2, and 7.3 from the postman collection.
+          In the Thunder Client extension in VSCode, 
+          import the <b>irc-hybrid-client</b> collection from 
+          &quot;thunderclient/thunder-collection_irc-hybrid-client.json&quot;. 
+          This collection is divided into 5 folders that can be run as 
+          individual sequences or collectively the entire collection can 
+          be run as a single sequence.
+        </p>
+        <p>
+          The test described below are in the collection folder &quot;Message Debug&quot;
+        </p>
+
+        <h4>Obtaining a Thunder Client cookie</h4>
+        <p>
+          To get a valid cookie, run selections 7.1, 7.2, and 7.3 from the Thunder Client collection.
           7.1 Will clear previous cookie.
-          7.2 Will request the login form, then extract a login random nonce from the form.
-          7.3 Will issue a login authorization POST request containing username and password
-          from the local environment and the random nonce from 7.2.
+          7.2 Will request the login form, then extract a login random nonce and CSRF token from the form.
+          7.3 Will issue a POST request containing username and password to authenticate the user.
           Steps 7.2 and 7.3 are time critical and must be executed together to avoid
           time expiration of the random nonce.
         </p>
 
-        <h4>1E - List of tests</h4>
+        <h4>List of tests</h4>
         <p>
           Collection: &quot;irc-hybrid-client message debug &quot;
         </p>
         <ul>
           <li>7.1-7.3 Login to web server</li>
-          <li>8.1 Selects server index</li>
-          <li>8.3 Connect backend to IRC</li>
+          <li>8.1 Selects server index 0 in the IRC server list.</li>
+          <li>8.2 Download IRC client state object, confirm server index=0</li>
+          <li>8.3 Connect backend to IRC server (be careful here)</li>
+          <li>Timer 5 seconds. If your IRC server needs more time for domain lookup and identd lookup, you can extend this longer.</li>
+          <li>8.4 Download IRC client state object, confirm connected to IRC.</li>
           <li>8.5 JOIN an IRC channel</li>
+          <li>Timer 1 second (for IRC server latency)</li>
+          <li>8.6 Download IRC client state, confirm join in channel</li>
           <li>8.7 Send a channel message (PRIVMSG)</li>
           <li>8.8 PART or leave the channel.</li>
+          <li>Timer 1 second (for IRC server latency)</li>
+          <li>8.9 Download IRC client state, confirm part</li>
           <li>8.10 Remove (prune) the channel data from backend.</li>
+          <li>8.11 Download IRC client state, confirm channel pruned</li>
           <li>8.12 Retrieve message cache</li>
           <li>8.13 Disconnect backend from IRC</li>
           <li>8.14 Clear the message cache.</li>
-          <li>8.16 Terminate (Die) the backend web server.</li>
+          <li>8.15 Confirm empty cache.</li>
+          <li>8.16 Terminate (Die) the backend web server (This will show a message, but not die unless environment variable server_die is set to "YES").</li>
         </ul>
 
         <h4>1F Additional documentation</h4>
         <p>
           Additional documentation is available in a README.md file located in the
-          github directory where the postman collections are located. The Postman
-          collection and individual tests may also include test specific documentation.
+          github directory where the Thunder Client collections are located.
         </p>
 
         <h4>1G - IRC command issuance</h4>
@@ -1426,19 +1571,19 @@ HEARTBEAT
           in an end-of-line character.
         </p>
         <p>
-          The postman response shown below has the response body tab selected.
+          The Thunder Client response shown below has the response body tab selected.
           The contents of the response is limited to a boolean error flag.
           The error condition refers to acceptance
           of the API request by the web server. As the IRC command is passed to the
           IRC server, should an IRC server error occur, the IRC server error
           will appear in the websocket stream, not on the API response.
         </p>
-        <img src=images/postman-trace.png width="749" height="438"alt="Postman Example">
+        <img src=images/thunder-client.png width="894" height="571"alt="API test Example">
         <p>
-          Postman is not capable to view the websocket response.
+          Thunder Client is not capable to view the websocket response.
           The expected response should be returned to the web browser as stream data containing
           IRC messages received over the websocket.
-          The example below shows the sample websocket message expected from the above Postman request.
+          The example below shows the sample websocket message expected from the above Thunder Client request.
           The first line is a RFC 2812 formatted IRC message intended to be parsed by the browser
           in order to add content to the displayed web page.
           The second line starting with &quot;--&gt;&quot; is a verbatim copy of the outgoing
@@ -1468,7 +1613,7 @@ HEARTBEAT
         </p>
         <p>
           To view websocket messages in the IRC client, first open the irc-hybrid-client web page.
-          Enter the username and password that were setup for postman tests as described above.
+          Enter the username and password that were setup for Thunder Client tests as described above.
           Next, open the Server window, then select the [More...] button.
         </p>
         <p>
@@ -1481,7 +1626,7 @@ HEARTBEAT
           as described above. View-Comms requires that View-Raw also be selected.
         </p>
 
-        <img src=images/raw-server-messages.png width="757" height="282"alt="Postman Example">
+        <img src=images/raw-server-messages.png width="757" height="282"alt="API response Example">
 
         <h3>3 - Browser Websocket Messages (custom debug tool)</h3>
         <p>
@@ -1508,7 +1653,7 @@ HEARTBEAT
           visible. Remember to disable the route by replacing the comment characters after testing.
         </p>
         <p>
-          It is necessary to obtain a session cookie. Both postman and the web browser each
+          It is necessary to obtain a session cookie. Both Thunder Client and the web browser each
           requires it's own cookie. The easiest way to do this is to
           open the normal login form at the &quot;/login&quot; route. The login route can be appended to the
           testing web URL, such as &quot;http://localhost:3000/login". The following window should
@@ -1557,7 +1702,7 @@ http://localhost:3000/testws/test-websocket.html
           &quot; server/testws&quot; folder.
         </p>
 
-        <img src=images/websocket-trace.png width="874" height="464"alt="Postman Example">
+        <img src=images/websocket-trace.png width="874" height="464"alt="Websocket Example">
 
       </div> <!-- /text-div -->
 

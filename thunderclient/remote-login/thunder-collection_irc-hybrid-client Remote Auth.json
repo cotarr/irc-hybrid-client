@@ -1,0 +1,591 @@
+{
+    "client": "Thunder Client",
+    "collectionName": "irc-hybrid-client Remote Auth",
+    "dateExported": "2023-07-28T12:43:02.170Z",
+    "version": "1.1",
+    "folders": [],
+    "requests": [
+        {
+            "_id": "edc5af8c-ac9f-4692-8405-0ae59c10958a",
+            "colId": "fd6e7e9e-5514-456a-98fd-3d2e27ebef33",
+            "containerId": "",
+            "name": "Auth (/logout)  Clear variables",
+            "url": "{{auth_host}}/logout",
+            "method": "GET",
+            "sortNum": 10000,
+            "created": "2023-07-26T12:06:07.248Z",
+            "modified": "2023-07-26T12:06:07.248Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "You have been logged out of the authorization server."
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{login_nonce, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{irc_server_index, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{transaction_id, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{auth_code, local}}"
+                }
+            ],
+            "preReq": {
+                "options": {
+                    "clearCookies": true
+                }
+            }
+        },
+        {
+            "_id": "d0290d2b-0afa-41c9-85e7-5e248765f0f3",
+            "colId": "fd6e7e9e-5514-456a-98fd-3d2e27ebef33",
+            "containerId": "",
+            "name": "Web (/logout)",
+            "url": "{{server_URL}}/logout",
+            "method": "GET",
+            "sortNum": 20000,
+            "created": "2023-07-26T12:06:10.311Z",
+            "modified": "2023-07-26T12:06:10.311Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "<button>Return to Login</button>"
+                }
+            ]
+        },
+        {
+            "_id": "82ef5748-42a4-4025-9255-f92ba9d67bdc",
+            "colId": "fd6e7e9e-5514-456a-98fd-3d2e27ebef33",
+            "containerId": "",
+            "name": "10.1 Web-1 /irc/webclient.html (irc server redirect /login)",
+            "url": "{{server_URL}}/irc/webclient.html",
+            "method": "GET",
+            "sortNum": 30000,
+            "created": "2023-07-26T12:06:13.409Z",
+            "modified": "2023-07-26T12:06:13.409Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "Location",
+                    "action": "equal",
+                    "value": "/login"
+                }
+            ]
+        },
+        {
+            "_id": "cef3e5ab-2051-4f4a-89ca-c560b02ec6da",
+            "colId": "fd6e7e9e-5514-456a-98fd-3d2e27ebef33",
+            "containerId": "",
+            "name": "10.2 Web-2 /login (irc server redirect to auth server)",
+            "url": "{{server_URL}}/login",
+            "method": "GET",
+            "sortNum": 35000,
+            "created": "2023-07-26T12:06:24.636Z",
+            "modified": "2023-07-26T12:06:24.636Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "Location",
+                    "action": "contains",
+                    "value": "{{auth_host}}"
+                }
+            ]
+        },
+        {
+            "_id": "c688a718-6c39-45aa-b6ce-2a40d4c834fb",
+            "colId": "fd6e7e9e-5514-456a-98fd-3d2e27ebef33",
+            "containerId": "",
+            "name": "10.3 Auth-1 (/dialog/authorize) 1 Auth Check (remember URL)",
+            "url": "{{auth_host}}/dialog/authorize?redirect_uri={{auth_redirect_uri}}&response_type=code&client_id={{auth_client_id}}&scope={{auth_scopes}}",
+            "method": "GET",
+            "sortNum": 40000,
+            "created": "2023-07-26T12:06:16.797Z",
+            "modified": "2023-07-26T12:06:16.797Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [
+                {
+                    "name": "redirect_uri",
+                    "value": "{{auth_redirect_uri}}",
+                    "isPath": false
+                },
+                {
+                    "name": "response_type",
+                    "value": "code",
+                    "isPath": false
+                },
+                {
+                    "name": "client_id",
+                    "value": "{{auth_client_id}}",
+                    "isPath": false
+                },
+                {
+                    "name": "scope",
+                    "value": "{{auth_scopes}}",
+                    "isPath": false
+                }
+            ],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "equal",
+                    "value": "/login"
+                }
+            ]
+        },
+        {
+            "_id": "a6be5443-2ff6-41c6-a51c-489c020559e3",
+            "colId": "fd6e7e9e-5514-456a-98fd-3d2e27ebef33",
+            "containerId": "",
+            "name": "10.4 Auth-2 (/login) Get login form (CSRF hash)",
+            "url": "{{auth_host}}/login",
+            "method": "GET",
+            "sortNum": 50000,
+            "created": "2023-07-26T12:06:19.480Z",
+            "modified": "2023-07-26T12:06:19.480Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "User Login"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "_csrf"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"name=_csrf\" | at(1) | split(\"value=\" | at(1) | split(\">\") | first ",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "8c9d26ac-fd69-44d3-aaf2-fca7c658c33d",
+            "colId": "fd6e7e9e-5514-456a-98fd-3d2e27ebef33",
+            "containerId": "",
+            "name": "10.5 Auth-3 (/login) Submit username and password",
+            "url": "{{auth_host}}/login",
+            "method": "POST",
+            "sortNum": 70000,
+            "created": "2023-07-26T12:06:28.615Z",
+            "modified": "2023-07-26T12:06:28.615Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "username",
+                        "value": "{{auth_username}}"
+                    },
+                    {
+                        "name": "password",
+                        "value": "{{auth_password}}"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    }
+                ]
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location | split(\"?\") | first",
+                    "action": "equal",
+                    "value": "/dialog/authorize"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "contains",
+                    "value": "response_type=code"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "contains",
+                    "value": "client_id={{auth_client_id}}"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "contains",
+                    "value": "scope="
+                }
+            ]
+        },
+        {
+            "_id": "8aeb1386-03b8-4a93-9ba1-1f911eb5eb6d",
+            "colId": "fd6e7e9e-5514-456a-98fd-3d2e27ebef33",
+            "containerId": "",
+            "name": "10.6 Auth-4 (/dialog/authorize) 2 decision form with accept button",
+            "url": "{{auth_host}}/dialog/authorize?redirect_uri={{auth_redirect_uri}}&response_type=code&client_id={{auth_client_id}}&scope={{auth_scopes}}",
+            "method": "GET",
+            "sortNum": 80000,
+            "created": "2023-07-26T12:06:31.061Z",
+            "modified": "2023-07-26T12:06:31.061Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [
+                {
+                    "name": "redirect_uri",
+                    "value": "{{auth_redirect_uri}}",
+                    "isPath": false
+                },
+                {
+                    "name": "response_type",
+                    "value": "code",
+                    "isPath": false
+                },
+                {
+                    "name": "client_id",
+                    "value": "{{auth_client_id}}",
+                    "isPath": false
+                },
+                {
+                    "name": "scope",
+                    "value": "{{auth_scopes}}",
+                    "isPath": false
+                }
+            ],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "Resource Decision"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"name=_csrf\" | at(1) | split(\"value=\" | at(1) | split(\">\") | first ",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"name=transaction_id\" | at(1) | split(\"value=\") | at(1) | split(\">\") | first",
+                    "action": "setto",
+                    "value": "{{transaction_id, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "header.location | split(\"code=\") | last",
+                    "action": "setto",
+                    "value": "{{auth_code, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "89725e4d-ba10-4b0a-9d19-4e42df2843d3",
+            "colId": "fd6e7e9e-5514-456a-98fd-3d2e27ebef33",
+            "containerId": "",
+            "name": "10.7 Auth-5 (/dialog/authorize/decision) 302 (see location header)",
+            "url": "{{auth_host}}/dialog/authorize/decision",
+            "method": "POST",
+            "sortNum": 90000,
+            "created": "2023-07-26T12:06:33.576Z",
+            "modified": "2023-07-26T12:06:33.576Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "transaction_id",
+                        "value": "{{transaction_id}}"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    },
+                    {
+                        "name": "cancel",
+                        "value": "Deny",
+                        "isDisabled": true
+                    }
+                ]
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location | split(\"?\") | first",
+                    "action": "equal",
+                    "value": "{{auth_redirect_uri}}"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "contains",
+                    "value": "code="
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "header.location | split(\"code=\") | last",
+                    "action": "setto",
+                    "value": "{{auth_code, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "38e1f0fe-0db8-4088-9ece-212da2907695",
+            "colId": "fd6e7e9e-5514-456a-98fd-3d2e27ebef33",
+            "containerId": "",
+            "name": "10.8 Web-3 /login/callback (validate auth code, return cookie)",
+            "url": "{{server_URL}}/login/callback?code={{auth_code}}",
+            "method": "GET",
+            "sortNum": 100000,
+            "created": "2023-07-26T12:06:35.953Z",
+            "modified": "2023-07-26T12:06:35.954Z",
+            "headers": [],
+            "params": [
+                {
+                    "name": "code",
+                    "value": "{{auth_code}}",
+                    "isPath": false
+                }
+            ],
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "Location",
+                    "action": "equal",
+                    "value": "/irc/webclient.html"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "Set-Cookie",
+                    "action": "contains",
+                    "value": "irc-hybrid-client-0"
+                }
+            ]
+        },
+        {
+            "_id": "254a02d5-15ab-4332-a5f6-58ff1674e410",
+            "colId": "fd6e7e9e-5514-456a-98fd-3d2e27ebef33",
+            "containerId": "",
+            "name": "10.9 Web-4 /irc/webclient.html (confirm access)",
+            "url": "{{server_URL}}/irc/webclient.html",
+            "method": "GET",
+            "sortNum": 110000,
+            "created": "2023-07-26T12:06:38.047Z",
+            "modified": "2023-07-26T12:06:38.047Z",
+            "headers": [],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                }
+            ]
+        },
+        {
+            "_id": "a72d7213-54fd-4dbd-94f9-00cd739e8ea6",
+            "colId": "fd6e7e9e-5514-456a-98fd-3d2e27ebef33",
+            "containerId": "",
+            "name": "10.10 Web-5 /logout",
+            "url": "{{server_URL}}/logout",
+            "method": "GET",
+            "sortNum": 120000,
+            "created": "2023-07-26T12:06:41.291Z",
+            "modified": "2023-07-26T12:06:41.292Z",
+            "headers": [],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "<button>Return to Login</button>"
+                }
+            ]
+        },
+        {
+            "_id": "8cb4a2db-3caf-40c2-bf9d-e9e6c68cb360",
+            "colId": "fd6e7e9e-5514-456a-98fd-3d2e27ebef33",
+            "containerId": "",
+            "name": "10.11 Web-6 /irc/webclient.html (fail)",
+            "url": "{{server_URL}}/irc/webclient.html",
+            "method": "GET",
+            "sortNum": 130000,
+            "created": "2023-07-26T12:06:43.954Z",
+            "modified": "2023-07-26T12:06:43.954Z",
+            "headers": [],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "Location",
+                    "action": "equal",
+                    "value": "/login"
+                }
+            ]
+        }
+    ],
+    "settings": {
+        "envId": "3e6eb4f9-a6b2-4830-9d40-d4609c2b292d"
+    }
+}

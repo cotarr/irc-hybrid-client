@@ -1,0 +1,5046 @@
+{
+    "client": "Thunder Client",
+    "collectionName": "irc-hybrid-client",
+    "dateExported": "2023-07-28T12:42:24.743Z",
+    "version": "1.1",
+    "folders": [
+        {
+            "_id": "b28c465a-5ebb-40f6-9458-fde7e78b8ab8",
+            "name": "Auth Tests",
+            "containerId": "",
+            "created": "2023-07-25T11:55:24.185Z",
+            "sortNum": 10000
+        },
+        {
+            "_id": "bc567fc6-7c5c-4e01-b1c6-f2cb839d2fd8",
+            "name": "Websocket Auth Test",
+            "containerId": "",
+            "created": "2023-07-26T12:29:18.348Z",
+            "sortNum": 15000
+        },
+        {
+            "_id": "5128ab34-d198-4a67-ac6c-ed4fd12be78d",
+            "name": "Message Debug",
+            "containerId": "",
+            "created": "2023-07-25T17:10:00.496Z",
+            "sortNum": 20000
+        },
+        {
+            "_id": "ecc75ad7-4e04-4bb3-9d20-b61bdb63aa6b",
+            "name": "Server Config",
+            "containerId": "",
+            "created": "2023-07-26T14:26:10.804Z",
+            "sortNum": 30000
+        },
+        {
+            "_id": "ecfa4866-ad79-488d-af21-ee69689bd407",
+            "name": "Response Headers",
+            "containerId": "",
+            "created": "2023-07-26T18:56:33.772Z",
+            "sortNum": 40000
+        }
+    ],
+    "requests": [
+        {
+            "_id": "4c80901e-130f-42db-b61f-6f34e7e5b7f0",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "b28c465a-5ebb-40f6-9458-fde7e78b8ab8",
+            "name": "1.1 /logout Clear Cookie and Variables",
+            "url": "{{server_URL}}/logout",
+            "method": "GET",
+            "sortNum": 10000,
+            "created": "2023-07-25T11:56:02.698Z",
+            "modified": "2023-07-25T16:35:53.356Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{login_nonce, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{irc_server_index, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{transaction_id, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{auth_code, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "8f9b5c03-f13f-43ff-aa2e-c2d7e9a4dc15",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "5128ab34-d198-4a67-ac6c-ed4fd12be78d",
+            "name": "7.1 /logout Clear Cookie and Variables",
+            "url": "{{server_URL}}/logout",
+            "method": "GET",
+            "sortNum": 10000,
+            "created": "2023-07-25T17:11:13.703Z",
+            "modified": "2023-07-25T17:11:13.703Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{login_nonce, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{irc_server_index, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{transaction_id, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{auth_code, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "168d400c-5d64-45d9-957f-dbbffba6e28c",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "bc567fc6-7c5c-4e01-b1c6-f2cb839d2fd8",
+            "name": "5.1 /logout Clear Cookie and Variable",
+            "url": "{{server_URL}}/logout",
+            "method": "GET",
+            "sortNum": 10000,
+            "created": "2023-07-26T12:29:58.493Z",
+            "modified": "2023-07-26T12:29:58.493Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{login_nonce, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{irc_server_index, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{transaction_id, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{auth_code, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "8ad46379-1cda-4fea-bf1f-4357522c89f7",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "ecfa4866-ad79-488d-af21-ee69689bd407",
+            "name": "Helmet Headers",
+            "url": "{{server_URL}}/status",
+            "method": "GET",
+            "sortNum": 10000,
+            "created": "2023-07-26T18:56:43.508Z",
+            "modified": "2023-07-26T18:58:21.105Z",
+            "headers": [],
+            "params": [],
+            "tests": [
+                {
+                    "type": "custom-header",
+                    "custom": "cross-origin-opener-policy",
+                    "action": "equal",
+                    "value": "same-origin"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "cross-origin-resource-policy",
+                    "action": "equal",
+                    "value": "same-origin"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "origin-agent-cluster",
+                    "action": "equal",
+                    "value": "?1"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "referrer-policy",
+                    "action": "equal",
+                    "value": "no-referrer"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "strict-transport-security",
+                    "action": "equal",
+                    "value": "max-age=15552000; includeSubDomains"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "x-content-type-options",
+                    "action": "equal",
+                    "value": "nosniff"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "x-dns-prefetch-control",
+                    "action": "equal",
+                    "value": "off"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "x-download-options",
+                    "action": "equal",
+                    "value": "noopen"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "x-frame-options",
+                    "action": "equal",
+                    "value": "DENY"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "x-permitted-cross-domain-policies",
+                    "action": "equal",
+                    "value": "none"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "x-xss-protection",
+                    "action": "equal",
+                    "value": "0"
+                }
+            ]
+        },
+        {
+            "_id": "65a6f9ed-fab7-48fc-b980-0c795aa6918e",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "ecc75ad7-4e04-4bb3-9d20-b61bdb63aa6b",
+            "name": "9.1 /logout Clear Cookie and Variables",
+            "url": "{{server_URL}}/logout",
+            "method": "GET",
+            "sortNum": 12500,
+            "created": "2023-07-26T14:30:23.250Z",
+            "modified": "2023-07-26T18:55:10.692Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "<button>Return to Login</button>"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{login_nonce, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{irc_server_index, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{transaction_id, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{auth_code, local}}"
+                }
+            ],
+            "preReq": {
+                "options": {
+                    "clearCookies": true
+                }
+            }
+        },
+        {
+            "_id": "1fa8bb84-9465-48c3-a920-09404e829226",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "ecc75ad7-4e04-4bb3-9d20-b61bdb63aa6b",
+            "name": "9.2 /login (get nonce, csrfToken)",
+            "url": "{{server_URL}}/login",
+            "method": "GET",
+            "sortNum": 18125,
+            "created": "2023-07-26T14:33:47.787Z",
+            "modified": "2023-07-26T14:33:47.787Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "_csrf"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "nonce="
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"nonce=\") | last | split(\" \") | first",
+                    "action": "setto",
+                    "value": "{{login_nonce, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"_csrf\") | at(1) | split(\"value=\") | at(1) | split(\" \") | first",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "6259f5e4-bf5c-4433-9231-07a1e79c13c5",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "ecc75ad7-4e04-4bb3-9d20-b61bdb63aa6b",
+            "name": "9.3 /login-authorize success, receive cookie",
+            "url": "{{server_URL}}/login-authorize?nonce={{login_nonce}}",
+            "method": "POST",
+            "sortNum": 19062.5,
+            "created": "2023-07-26T14:34:21.295Z",
+            "modified": "2023-07-26T14:34:21.295Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [
+                {
+                    "name": "nonce",
+                    "value": "{{login_nonce}}",
+                    "isPath": false
+                }
+            ],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "user",
+                        "value": "{{server_user1}}"
+                    },
+                    {
+                        "name": "password",
+                        "value": "{{server_password1}}"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    }
+                ]
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "Location",
+                    "action": "equal",
+                    "value": "/irc/webclient.html"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "Set-Cookie",
+                    "action": "contains",
+                    "value": "irc-hybrid-client-0"
+                }
+            ]
+        },
+        {
+            "_id": "83329401-efb6-47ed-9c11-50a1635efba0",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "b28c465a-5ebb-40f6-9458-fde7e78b8ab8",
+            "name": "1.2 /status confirm server running",
+            "url": "{{server_URL}}/status",
+            "method": "GET",
+            "sortNum": 20000,
+            "created": "2023-07-25T11:58:36.701Z",
+            "modified": "2023-07-25T11:59:51.649Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.status",
+                    "action": "equal",
+                    "value": "ok"
+                }
+            ]
+        },
+        {
+            "_id": "43241951-ea48-4ea0-92ec-8a425a47af27",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "5128ab34-d198-4a67-ac6c-ed4fd12be78d",
+            "name": "7.2 /login (get nonce, csrfToken)",
+            "url": "{{server_URL}}/login",
+            "method": "GET",
+            "sortNum": 20000,
+            "created": "2023-07-25T17:12:50.883Z",
+            "modified": "2023-07-25T17:12:50.883Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "_csrf"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "nonce="
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"nonce=\") | last | split(\" \") | first",
+                    "action": "setto",
+                    "value": "{{login_nonce, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"_csrf\") | at(1) | split(\"value=\") | at(1) | split(\" \") | first",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "8ceaea00-94f9-444d-b98c-6105a8dd680a",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "bc567fc6-7c5c-4e01-b1c6-f2cb839d2fd8",
+            "name": "5.2 /login (get nonce, csrfToken)",
+            "url": "{{server_URL}}/login",
+            "method": "GET",
+            "sortNum": 20000,
+            "created": "2023-07-26T12:30:30.107Z",
+            "modified": "2023-07-26T12:30:30.107Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "_csrf"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "nonce="
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"nonce=\") | last | split(\" \") | first",
+                    "action": "setto",
+                    "value": "{{login_nonce, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"_csrf\") | at(1) | split(\"value=\") | at(1) | split(\" \") | first",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "b347b9e5-9f1f-4d6b-91c7-6fe388592f27",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "ecfa4866-ad79-488d-af21-ee69689bd407",
+            "name": "Content Security Policy",
+            "url": "{{server_URL}}/status",
+            "method": "GET",
+            "sortNum": 20000,
+            "created": "2023-07-26T18:56:49.930Z",
+            "modified": "2023-07-26T19:05:48.085Z",
+            "headers": [],
+            "params": [],
+            "tests": [
+                {
+                    "type": "custom-header",
+                    "custom": "content-security-policy",
+                    "action": "contains",
+                    "value": "default-src 'none'"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "content-security-policy",
+                    "action": "contains",
+                    "value": "base-uri 'self'"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "content-security-policy",
+                    "action": "contains",
+                    "value": "script-src 'self'"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "content-security-policy",
+                    "action": "contains",
+                    "value": "style-src 'self'"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "content-security-policy",
+                    "action": "contains",
+                    "value": "media-src 'self'"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "content-security-policy",
+                    "action": "contains",
+                    "value": "frame-ancestors 'none'"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "content-security-policy",
+                    "action": "contains",
+                    "value": "img-src 'self'"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "content-security-policy",
+                    "action": "contains",
+                    "value": "form-action 'self'"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "content-security-policy",
+                    "action": "contains",
+                    "value": "connect-src 'self'"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "content-security-policy",
+                    "action": "contains",
+                    "value": "ws:"
+                }
+            ]
+        },
+        {
+            "_id": "73de3d92-e93e-4e6e-9616-13ae99818bfc",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "ecc75ad7-4e04-4bb3-9d20-b61bdb63aa6b",
+            "name": "9.4 /irc/webclient.html parse CSRF token",
+            "url": "{{server_URL}}/irc/webclient.html",
+            "method": "GET",
+            "sortNum": 29531.3,
+            "created": "2023-07-26T14:35:07.793Z",
+            "modified": "2023-07-26T14:35:07.793Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"csrf-token\") | at(1) | split(\"content=\") | at(1) | split(\">\") | first",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "dbbcd9ce-0c38-433f-af1a-0aa9cf3f67e4",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "b28c465a-5ebb-40f6-9458-fde7e78b8ab8",
+            "name": "1.3 /secure confirm one secure route will fail",
+            "url": "{{server_URL}}/secure",
+            "method": "GET",
+            "sortNum": 30000,
+            "created": "2023-07-25T12:00:04.208Z",
+            "modified": "2023-07-25T12:01:22.366Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "403"
+                }
+            ]
+        },
+        {
+            "_id": "eb1729b1-3169-402c-9d67-b21d46fc48f9",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "5128ab34-d198-4a67-ac6c-ed4fd12be78d",
+            "name": "7.3 /login-authorize success, receive cookie",
+            "url": "{{server_URL}}/login-authorize?nonce={{login_nonce}}",
+            "method": "POST",
+            "sortNum": 30000,
+            "created": "2023-07-25T17:13:26.138Z",
+            "modified": "2023-07-25T17:13:26.138Z",
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/x-www-form-urlencoded"
+                },
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [
+                {
+                    "name": "nonce",
+                    "value": "{{login_nonce}}",
+                    "isPath": false
+                }
+            ],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "user",
+                        "value": "{{server_user1}}"
+                    },
+                    {
+                        "name": "password",
+                        "value": "{{server_password1}}"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    }
+                ]
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "Location",
+                    "action": "equal",
+                    "value": "/irc/webclient.html"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "Set-Cookie",
+                    "action": "contains",
+                    "value": "irc-hybrid-client-0"
+                }
+            ]
+        },
+        {
+            "_id": "cdec7857-e2d3-4606-8613-0ecf05e8f22b",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "bc567fc6-7c5c-4e01-b1c6-f2cb839d2fd8",
+            "name": "5.3 /login-authorize success, receive cookie",
+            "url": "{{server_URL}}/login-authorize?nonce={{login_nonce}}",
+            "method": "POST",
+            "sortNum": 30000,
+            "created": "2023-07-26T12:30:40.612Z",
+            "modified": "2023-07-26T12:36:06.425Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [
+                {
+                    "name": "nonce",
+                    "value": "{{login_nonce}}",
+                    "isPath": false
+                }
+            ],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "user",
+                        "value": "{{server_user1}}"
+                    },
+                    {
+                        "name": "password",
+                        "value": "{{server_password1}}"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    }
+                ]
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "Location",
+                    "action": "equal",
+                    "value": "/irc/webclient.html"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "Set-Cookie",
+                    "action": "contains",
+                    "value": "irc-hybrid-client-0"
+                }
+            ]
+        },
+        {
+            "_id": "f59517af-551f-45bc-b1b0-114905eaafca",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "b28c465a-5ebb-40f6-9458-fde7e78b8ab8",
+            "name": "2.1 /login-authorize disabled cookies",
+            "url": "{{server_URL}}/login-authorize?nonce={{login_nonce}}",
+            "method": "POST",
+            "sortNum": 32500,
+            "created": "2023-07-25T12:43:06.606Z",
+            "modified": "2023-07-25T12:45:35.997Z",
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/x-www-form-urlencoded"
+                },
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [
+                {
+                    "name": "nonce",
+                    "value": "{{login_nonce}}",
+                    "isPath": false
+                }
+            ],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "user",
+                        "value": "{{server_user1}}"
+                    },
+                    {
+                        "name": "password",
+                        "value": "{{server_password1}}"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    }
+                ]
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "Location",
+                    "action": "equal",
+                    "value": "/blocked"
+                }
+            ],
+            "preReq": {
+                "options": {
+                    "clearCookies": true
+                }
+            }
+        },
+        {
+            "_id": "dcc3d58f-a8a5-4521-a1f7-0d375fc1cd31",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "b28c465a-5ebb-40f6-9458-fde7e78b8ab8",
+            "name": "2.2 /login (get nonce, csrfToken)",
+            "url": "{{server_URL}}/login",
+            "method": "GET",
+            "sortNum": 40000,
+            "created": "2023-07-25T12:01:39.131Z",
+            "modified": "2023-07-25T12:14:15.975Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "_csrf"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "nonce="
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"nonce=\") | last | split(\" \") | first",
+                    "action": "setto",
+                    "value": "{{login_nonce, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"_csrf\") | at(1) | split(\"value=\") | at(1) | split(\" \") | first",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "71617d52-4717-4f4a-9669-e06a8ece9b1d",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "5128ab34-d198-4a67-ac6c-ed4fd12be78d",
+            "name": "8.1 Debug  /irc/server",
+            "url": "{{server_URL}}/irc/server",
+            "method": "POST",
+            "sortNum": 40000,
+            "created": "2023-07-25T17:14:52.933Z",
+            "modified": "2023-07-25T17:15:46.780Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"index\": 0\n}\n",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.index",
+                    "action": "equal",
+                    "value": "0"
+                }
+            ]
+        },
+        {
+            "_id": "8892af2d-c67b-47de-8c3b-ebe5fb568cc3",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "b28c465a-5ebb-40f6-9458-fde7e78b8ab8",
+            "name": "2.3 /login-authorize empty body",
+            "url": "{{server_URL}}/login-authorize?nonce={{login_nonce}}",
+            "method": "POST",
+            "sortNum": 50000,
+            "created": "2023-07-25T12:17:34.514Z",
+            "modified": "2023-07-25T12:39:29.209Z",
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/x-www-form-urlencoded"
+                },
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                },
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}"
+                }
+            ],
+            "params": [
+                {
+                    "name": "nonce",
+                    "value": "{{login_nonce}}",
+                    "isPath": false
+                }
+            ],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "400"
+                }
+            ]
+        },
+        {
+            "_id": "07017112-067a-4d27-8c4c-75c3b92927bc",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "5128ab34-d198-4a67-ac6c-ed4fd12be78d",
+            "name": "8.2 Debug  /irc/getircstate 1",
+            "url": "{{server_URL}}/irc/getircstate",
+            "method": "GET",
+            "sortNum": 50000,
+            "created": "2023-07-25T17:16:16.344Z",
+            "modified": "2023-07-25T17:19:04.098Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.ircConnected",
+                    "action": "equal",
+                    "value": "false"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.ircServerIndex",
+                    "action": "equal",
+                    "value": "0"
+                }
+            ]
+        },
+        {
+            "_id": "303764ad-f0ab-405c-9fad-07fd2d8bbb1c",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "ecc75ad7-4e04-4bb3-9d20-b61bdb63aa6b",
+            "name": "9.5 /irc/getircstate",
+            "url": "{{server_URL}}/irc/getircstate",
+            "method": "GET",
+            "sortNum": 50000,
+            "created": "2023-07-26T14:26:28.393Z",
+            "modified": "2023-07-26T15:09:18.537Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                }
+            ]
+        },
+        {
+            "_id": "b11c59ec-2c0a-4049-8979-e2155fec6ec0",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "b28c465a-5ebb-40f6-9458-fde7e78b8ab8",
+            "name": "2.4 /login-authorize no nonce",
+            "url": "{{server_URL}}/login-authorize",
+            "method": "POST",
+            "sortNum": 60000,
+            "created": "2023-07-25T12:21:44.460Z",
+            "modified": "2023-07-25T12:23:57.023Z",
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/x-www-form-urlencoded"
+                },
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [
+                {
+                    "name": "nonce",
+                    "value": "{{server_nonce}}",
+                    "isDisabled": true,
+                    "isPath": false
+                }
+            ],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "user",
+                        "value": "{{server_user1}}"
+                    },
+                    {
+                        "name": "password",
+                        "value": "{{server_password1}}"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    }
+                ]
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "400"
+                }
+            ]
+        },
+        {
+            "_id": "5e639d04-62f5-4711-bfd3-49278204c5cb",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "5128ab34-d198-4a67-ac6c-ed4fd12be78d",
+            "name": "8.3 Debug  /irc/connect",
+            "url": "{{server_URL}}/irc/connect",
+            "method": "POST",
+            "sortNum": 60000,
+            "created": "2023-07-25T17:19:20.766Z",
+            "modified": "2023-07-25T17:20:06.505Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"nickName\": \"{{irc_nickname}}\",\n  \"realName\": \"{{irc_nickname}}\",\n  \"userMode\": \"\"\n}",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.error",
+                    "action": "equal",
+                    "value": "false"
+                }
+            ]
+        },
+        {
+            "_id": "2aeccedd-5ce0-40a2-af90-99caaae357ca",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "ecc75ad7-4e04-4bb3-9d20-b61bdb63aa6b",
+            "name": "9.6 /irc/server",
+            "url": "{{server_URL}}/irc/server",
+            "method": "POST",
+            "sortNum": 60000,
+            "created": "2023-07-26T14:26:34.604Z",
+            "modified": "2023-07-26T15:15:43.718Z",
+            "headers": [
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n    \"index\": 0\n}\n",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.error",
+                    "action": "equal",
+                    "value": "false"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.index",
+                    "action": "equal",
+                    "value": "0"
+                }
+            ]
+        },
+        {
+            "_id": "f524d558-0b8f-4800-a0e7-fb7e0d35b7d0",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "5128ab34-d198-4a67-ac6c-ed4fd12be78d",
+            "name": "Delay Timer --> exec(\"sleep 5\")",
+            "url": "{{server_URL}}/status",
+            "method": "GET",
+            "sortNum": 65000,
+            "created": "2023-07-26T11:29:52.923Z",
+            "modified": "2023-07-26T19:15:05.115Z",
+            "headers": [],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "notequal",
+                    "value": "{{@ | exec(\"sleep 5\")}}"
+                }
+            ]
+        },
+        {
+            "_id": "701509c3-df11-4197-86ed-955eaf5ec6d8",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "b28c465a-5ebb-40f6-9458-fde7e78b8ab8",
+            "name": "2.5 /login-authorize no csrfToken",
+            "url": "{{server_URL}}/login-authorize?nonce={{login_nonce}}",
+            "method": "POST",
+            "sortNum": 70000,
+            "created": "2023-07-25T12:24:09.721Z",
+            "modified": "2023-07-25T12:40:23.655Z",
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/x-www-form-urlencoded"
+                },
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [
+                {
+                    "name": "nonce",
+                    "value": "{{login_nonce}}",
+                    "isPath": false
+                }
+            ],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "user",
+                        "value": "{{server_user1}}"
+                    },
+                    {
+                        "name": "password",
+                        "value": "{{server_password1}}"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}",
+                        "isDisabled": true
+                    }
+                ]
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "403"
+                }
+            ]
+        },
+        {
+            "_id": "5587ce82-e569-4a96-b0f7-698d2a2f6795",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "5128ab34-d198-4a67-ac6c-ed4fd12be78d",
+            "name": "8.4 Debug  /irc/getircstate 2",
+            "url": "{{server_URL}}/irc/getircstate",
+            "method": "GET",
+            "sortNum": 70000,
+            "created": "2023-07-25T17:20:30.036Z",
+            "modified": "2023-07-25T17:22:23.260Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.ircConnecting",
+                    "action": "equal",
+                    "value": "false"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.ircConnected",
+                    "action": "equal",
+                    "value": "true"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.ircRegistered",
+                    "action": "equal",
+                    "value": "true"
+                }
+            ]
+        },
+        {
+            "_id": "062b4f3f-0d57-4333-a546-2231c9cbadff",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "ecc75ad7-4e04-4bb3-9d20-b61bdb63aa6b",
+            "name": "9.7 /irc/serverlist Retrieve full IRC server list",
+            "url": "{{server_URL}}/irc/serverlist",
+            "method": "GET",
+            "sortNum": 70000,
+            "created": "2023-07-26T14:26:36.672Z",
+            "modified": "2023-07-26T15:20:26.429Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/vnd.api+json"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json | length ",
+                    "action": ">",
+                    "value": "0"
+                }
+            ]
+        },
+        {
+            "_id": "6e87360a-97a0-46f5-85c7-54050f5efecc",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "b28c465a-5ebb-40f6-9458-fde7e78b8ab8",
+            "name": "2.6 /login (get nonce, csrfToken)",
+            "url": "{{server_URL}}/login",
+            "method": "GET",
+            "sortNum": 80000,
+            "created": "2023-07-25T12:25:33.863Z",
+            "modified": "2023-07-25T12:25:33.863Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "_csrf"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "nonce="
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"nonce=\") | last | split(\" \") | first",
+                    "action": "setto",
+                    "value": "{{login_nonce, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"_csrf\") | at(1) | split(\"value=\") | at(1) | split(\" \") | first",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "8bc42226-44a4-46fb-bf8e-18c27d723f27",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "5128ab34-d198-4a67-ac6c-ed4fd12be78d",
+            "name": "8.5 Debug  /irc/message JOIN",
+            "url": "{{server_URL}}/irc/message",
+            "method": "POST",
+            "sortNum": 80000,
+            "created": "2023-07-25T17:22:32.286Z",
+            "modified": "2023-07-25T17:23:10.404Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"message\": \"JOIN {{irc_channel}}\"\n}\n",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.error",
+                    "action": "equal",
+                    "value": "false"
+                }
+            ]
+        },
+        {
+            "_id": "d52fed35-436c-4084-9a27-2e4ebe7ac9ee",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "ecc75ad7-4e04-4bb3-9d20-b61bdb63aa6b",
+            "name": "9.8 /irc/serverlist Retrieve index 0, clear edit lock",
+            "url": "{{server_URL}}/irc/serverlist?index=0&lock=0",
+            "method": "GET",
+            "sortNum": 80000,
+            "created": "2023-07-26T14:26:38.698Z",
+            "modified": "2023-07-26T15:51:09.147Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                }
+            ],
+            "params": [
+                {
+                    "name": "index",
+                    "value": "0",
+                    "isPath": false
+                },
+                {
+                    "name": "lock",
+                    "value": "0",
+                    "isPath": false
+                }
+            ],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.index",
+                    "action": "equal",
+                    "value": "0"
+                }
+            ]
+        },
+        {
+            "_id": "4cc85710-139e-479d-ac87-43c1d07141a6",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "5128ab34-d198-4a67-ac6c-ed4fd12be78d",
+            "name": "Delay Timer --> exec(\"sleep 1\")",
+            "url": "{{server_URL}}/status",
+            "method": "GET",
+            "sortNum": 85000,
+            "created": "2023-07-26T12:02:35.368Z",
+            "modified": "2023-07-26T19:13:44.961Z",
+            "headers": [],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "notequal",
+                    "value": "{{@ | exec(\"sleep 1\")}}"
+                }
+            ]
+        },
+        {
+            "_id": "4136a267-81de-4a06-90be-860cf85bf691",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "b28c465a-5ebb-40f6-9458-fde7e78b8ab8",
+            "name": "2.7 /login-authorize missing pw",
+            "url": "{{server_URL}}/login-authorize?nonce={{login_nonce}}",
+            "method": "POST",
+            "sortNum": 90000,
+            "created": "2023-07-25T12:26:03.357Z",
+            "modified": "2023-07-25T12:40:38.965Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [
+                {
+                    "name": "nonce",
+                    "value": "{{login_nonce}}",
+                    "isPath": false
+                }
+            ],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "user",
+                        "value": "{{server_user1}}"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    },
+                    {
+                        "name": "password",
+                        "value": "{{server_password1}}",
+                        "isDisabled": true
+                    }
+                ]
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "400"
+                }
+            ]
+        },
+        {
+            "_id": "26827735-c5a4-4cbb-b3e6-27d2ec7ca823",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "5128ab34-d198-4a67-ac6c-ed4fd12be78d",
+            "name": "8.6 Debug /irc/getircstate 3",
+            "url": "{{server_URL}}/irc/getircstate",
+            "method": "GET",
+            "sortNum": 90000,
+            "created": "2023-07-25T17:23:30.265Z",
+            "modified": "2023-07-25T17:26:17.024Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.channels | length",
+                    "action": ">",
+                    "value": "0"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.channels | first",
+                    "action": "equal",
+                    "value": "{{irc_channel}}"
+                }
+            ]
+        },
+        {
+            "_id": "ecced173-727e-4fe8-be71-a0485a1bb1ce",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "ecc75ad7-4e04-4bb3-9d20-b61bdb63aa6b",
+            "name": "9.9 /irc/serverlist Retrieve index 0, set edit lock",
+            "url": "{{server_URL}}/irc/serverlist?index=0&lock=1",
+            "method": "GET",
+            "sortNum": 90000,
+            "created": "2023-07-26T14:27:00.282Z",
+            "modified": "2023-07-26T15:50:38.275Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/vnd.api+json"
+                }
+            ],
+            "params": [
+                {
+                    "name": "index",
+                    "value": "0",
+                    "isPath": false
+                },
+                {
+                    "name": "lock",
+                    "value": "1",
+                    "isPath": false
+                }
+            ],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.index",
+                    "action": "equal",
+                    "value": "0"
+                }
+            ]
+        },
+        {
+            "_id": "487abecd-c515-402a-92b9-d0ba65dffe68",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "b28c465a-5ebb-40f6-9458-fde7e78b8ab8",
+            "name": "2.8 /login set incorrect nonce",
+            "url": "{{server_URL}}/login",
+            "method": "GET",
+            "sortNum": 100000,
+            "created": "2023-07-25T12:28:21.211Z",
+            "modified": "2023-07-25T12:28:56.673Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "_csrf"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "nonce="
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "xxxxxxxx",
+                    "action": "setto",
+                    "value": "{{login_nonce, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"_csrf\") | at(1) | split(\"value=\") | at(1) | split(\" \") | first",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "8cf11ffa-ae26-4e51-a7ea-94cf670689ab",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "5128ab34-d198-4a67-ac6c-ed4fd12be78d",
+            "name": "8.7. Debug  /irc/message PRIVMSG",
+            "url": "{{server_URL}}/irc/message",
+            "method": "POST",
+            "sortNum": 100000,
+            "created": "2023-07-25T17:27:08.005Z",
+            "modified": "2023-07-25T17:27:54.166Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"message\": \"PRIVMSG {{irc_channel}} :This is a test message (irc-hybrid-client)\"\n}\n",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.error",
+                    "action": "equal",
+                    "value": "false"
+                }
+            ]
+        },
+        {
+            "_id": "4e9a09f0-54ff-4318-8690-c275da974ae7",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "ecc75ad7-4e04-4bb3-9d20-b61bdb63aa6b",
+            "name": "9.10 /irc/serverlist Create New, requires unlocked, expect 409",
+            "url": "{{server_URL}}/irc/serverlist",
+            "method": "POST",
+            "sortNum": 100000,
+            "created": "2023-07-26T14:27:01.998Z",
+            "modified": "2023-07-26T15:24:01.649Z",
+            "headers": [
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}"
+                },
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n    \"disabled\": false,\n    \"group\": 0,\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 6667,\n    \"tls\": false,\n    \"verify\": false,\n    \"proxy\": false,\n    \"reconnect\": false,\n    \"logging\": false,\n    \"password\": \"\",\n    \"saslUsername\": \"\",\n    \"saslPassword\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"altNick\": \"myNick2\",\n    \"recoverNick\": false,\n    \"user\": \"myUser\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "409"
+                }
+            ]
+        },
+        {
+            "_id": "b690fbb2-41f3-4c29-b0cb-fc9db7fe3aee",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "b28c465a-5ebb-40f6-9458-fde7e78b8ab8",
+            "name": "2.9 /login-authorize incorrect nonce",
+            "url": "{{server_URL}}/login-authorize?nonce={{login_nonce}}",
+            "method": "POST",
+            "sortNum": 110000,
+            "created": "2023-07-25T12:29:26.320Z",
+            "modified": "2023-07-25T12:40:48.371Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [
+                {
+                    "name": "nonce",
+                    "value": "{{login_nonce}}",
+                    "isPath": false
+                }
+            ],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "user",
+                        "value": "{{server_user1}}"
+                    },
+                    {
+                        "name": "password",
+                        "value": "{{server_password1}}"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    }
+                ]
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "Location",
+                    "action": "equal",
+                    "value": "/login"
+                }
+            ]
+        },
+        {
+            "_id": "a6fa6dc5-5a9c-4204-b1ac-80462d584a05",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "5128ab34-d198-4a67-ac6c-ed4fd12be78d",
+            "name": "8.8 Debug  /irc/message PART",
+            "url": "{{server_URL}}/irc/message",
+            "method": "POST",
+            "sortNum": 110000,
+            "created": "2023-07-25T17:29:12.093Z",
+            "modified": "2023-07-25T17:29:47.561Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"message\": \"PART {{irc_channel}}\"\n}\n",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.error",
+                    "action": "equal",
+                    "value": "false"
+                }
+            ]
+        },
+        {
+            "_id": "ece3f3f3-c290-469c-b2b0-54f414fb5759",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "ecc75ad7-4e04-4bb3-9d20-b61bdb63aa6b",
+            "name": "9.11 /irc/serverlist Already locked, expect fail 409",
+            "url": "{{server_URL}}/irc/serverlist?index=0&lock=1",
+            "method": "GET",
+            "sortNum": 110000,
+            "created": "2023-07-26T14:27:03.750Z",
+            "modified": "2023-07-26T18:04:34.540Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/vnd.api+json"
+                }
+            ],
+            "params": [
+                {
+                    "name": "index",
+                    "value": "0",
+                    "isPath": false
+                },
+                {
+                    "name": "lock",
+                    "value": "1",
+                    "isPath": false
+                }
+            ],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "409"
+                }
+            ]
+        },
+        {
+            "_id": "86edaf2a-6b88-4e84-8b86-de155a5ea954",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "5128ab34-d198-4a67-ac6c-ed4fd12be78d",
+            "name": "Delay Timer --> exec(\"sleep 1\")",
+            "url": "{{server_URL}}/status",
+            "method": "GET",
+            "sortNum": 115000,
+            "created": "2023-07-26T12:03:14.041Z",
+            "modified": "2023-07-26T12:03:14.041Z",
+            "headers": [],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "notequal",
+                    "value": "{{@ | exec(\"sleep 1\")}}"
+                }
+            ]
+        },
+        {
+            "_id": "ca6acd15-bad6-4cce-bf70-55d526d3e04d",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "b28c465a-5ebb-40f6-9458-fde7e78b8ab8",
+            "name": "2.10 /login (get nonce, csrfToken)",
+            "url": "{{server_URL}}/login",
+            "method": "GET",
+            "sortNum": 120000,
+            "created": "2023-07-25T12:30:50.673Z",
+            "modified": "2023-07-25T12:30:50.673Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "_csrf"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "nonce="
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"nonce=\") | last | split(\" \") | first",
+                    "action": "setto",
+                    "value": "{{login_nonce, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"_csrf\") | at(1) | split(\"value=\") | at(1) | split(\" \") | first",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "7043a599-b5d1-45fe-a641-bdbae9edd001",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "ecc75ad7-4e04-4bb3-9d20-b61bdb63aa6b",
+            "name": "9.12 /irc/serverlist Retrieve index 0, clear edit lock",
+            "url": "{{server_URL}}/irc/serverlist?index=0&lock=0",
+            "method": "GET",
+            "sortNum": 120000,
+            "created": "2023-07-26T14:27:07.557Z",
+            "modified": "2023-07-26T15:51:59.426Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/vnd.api+json"
+                }
+            ],
+            "params": [
+                {
+                    "name": "index",
+                    "value": "0",
+                    "isPath": false
+                },
+                {
+                    "name": "lock",
+                    "value": "0",
+                    "isPath": false
+                }
+            ],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.index",
+                    "action": "equal",
+                    "value": "0"
+                }
+            ]
+        },
+        {
+            "_id": "aeadb912-9a52-4d75-908a-c7a85e7c8c38",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "b28c465a-5ebb-40f6-9458-fde7e78b8ab8",
+            "name": "2.11 /login-authorize bad user",
+            "url": "{{server_URL}}/login-authorize?nonce={{login_nonce}}",
+            "method": "POST",
+            "sortNum": 130000,
+            "created": "2023-07-25T12:31:15.132Z",
+            "modified": "2023-07-25T12:41:00.460Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [
+                {
+                    "name": "nonce",
+                    "value": "{{login_nonce}}",
+                    "isPath": false
+                }
+            ],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "user",
+                        "value": "xxxxxxxx"
+                    },
+                    {
+                        "name": "password",
+                        "value": "{{server_password1}}"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    }
+                ]
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "Location",
+                    "action": "equal",
+                    "value": "/login"
+                }
+            ]
+        },
+        {
+            "_id": "95548a70-7ed4-4cee-8803-a845c2e946e3",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "5128ab34-d198-4a67-ac6c-ed4fd12be78d",
+            "name": "8.9 Debug  /irc/getircstate 4",
+            "url": "{{server_URL}}/irc/getircstate",
+            "method": "GET",
+            "sortNum": 130000,
+            "created": "2023-07-25T17:29:57.691Z",
+            "modified": "2023-07-25T17:31:52.888Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.channelStates[0].joined",
+                    "action": "equal",
+                    "value": "false"
+                }
+            ]
+        },
+        {
+            "_id": "36f0ed61-9567-45bc-93bd-8c07a51a8a5c",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "ecc75ad7-4e04-4bb3-9d20-b61bdb63aa6b",
+            "name": "9.13 /irc/serverlist Modify requires lock, fail 409",
+            "url": "{{server_URL}}/irc/serverlist?index=0",
+            "method": "PATCH",
+            "sortNum": 130000,
+            "created": "2023-07-26T14:27:09.482Z",
+            "modified": "2023-07-26T15:25:49.932Z",
+            "headers": [
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}"
+                },
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                }
+            ],
+            "params": [
+                {
+                    "name": "index",
+                    "value": "0",
+                    "isPath": false
+                }
+            ],
+            "body": {
+                "type": "json",
+                "raw": "{\n    \"index\": 0,\n    \"disabled\": false,\n    \"group\": 0,\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 6667,\n    \"tls\": false,\n    \"verify\": false,\n    \"proxy\": false,\n    \"reconnect\": false,\n    \"logging\": false,\n    \"password\": \"\",\n    \"saslUsername\": \"\",\n    \"saslPassword\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"altNick\": \"myNick2\",\n    \"recoverNick\": false,\n    \"user\": \"myUser\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "409"
+                }
+            ]
+        },
+        {
+            "_id": "85806ec6-9411-483f-badd-d3269669960a",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "ecc75ad7-4e04-4bb3-9d20-b61bdb63aa6b",
+            "name": "9.14 /irc/serverlist Create New, Success",
+            "url": "{{server_URL}}/irc/serverlist",
+            "method": "POST",
+            "sortNum": 137500,
+            "created": "2023-07-26T18:23:45.291Z",
+            "modified": "2023-07-26T18:27:07.762Z",
+            "headers": [
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}"
+                },
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n    \"disabled\": false,\n    \"group\": 0,\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 6667,\n    \"tls\": false,\n    \"verify\": false,\n    \"proxy\": false,\n    \"reconnect\": false,\n    \"logging\": false,\n    \"password\": \"\",\n    \"saslUsername\": \"\",\n    \"saslPassword\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"altNick\": \"myNick2\",\n    \"recoverNick\": false,\n    \"user\": \"myUser\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.status",
+                    "action": "equal",
+                    "value": "success"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.method",
+                    "action": "equal",
+                    "value": "POST"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "json.index",
+                    "action": "setto",
+                    "value": "{{irc_server_index, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "59e2d902-ee00-485f-a6db-420d0e612ff5",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "b28c465a-5ebb-40f6-9458-fde7e78b8ab8",
+            "name": "2.12 /login (get nonce, csrfToken)",
+            "url": "{{server_URL}}/login",
+            "method": "GET",
+            "sortNum": 140000,
+            "created": "2023-07-25T12:32:45.306Z",
+            "modified": "2023-07-25T12:32:45.306Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "_csrf"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "nonce="
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"nonce=\") | last | split(\" \") | first",
+                    "action": "setto",
+                    "value": "{{login_nonce, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"_csrf\") | at(1) | split(\"value=\") | at(1) | split(\" \") | first",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "c5baea86-7eec-4869-9786-edde08e12eb5",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "5128ab34-d198-4a67-ac6c-ed4fd12be78d",
+            "name": "8.10 Debug  /irc/prune",
+            "url": "{{server_URL}}/irc/prune",
+            "method": "POST",
+            "sortNum": 140000,
+            "created": "2023-07-25T17:32:19.260Z",
+            "modified": "2023-07-25T17:32:51.001Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"channel\": \"{{irc_channel}}\"\n}\n",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.error",
+                    "action": "equal",
+                    "value": "false"
+                }
+            ]
+        },
+        {
+            "_id": "c9fe350b-ec47-408e-b37a-8fbb37779063",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "ecc75ad7-4e04-4bb3-9d20-b61bdb63aa6b",
+            "name": "9.15 /irc/serverlist Lock, view created server, value checks",
+            "url": "{{server_URL}}/irc/serverlist?index={{irc_server_index}}&lock=1",
+            "method": "GET",
+            "sortNum": 145000,
+            "created": "2023-07-26T15:38:38.298Z",
+            "modified": "2023-07-26T18:21:39.941Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/vnd.api+json"
+                }
+            ],
+            "params": [
+                {
+                    "name": "index",
+                    "value": "{{irc_server_index}}",
+                    "isPath": false
+                },
+                {
+                    "name": "lock",
+                    "value": "1",
+                    "isPath": false
+                }
+            ],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.index",
+                    "action": "equal",
+                    "value": "{{irc_server_index}}"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.name",
+                    "action": "equal",
+                    "value": "local-server"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.host",
+                    "action": "equal",
+                    "value": "127.0.0.1"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.port",
+                    "action": "equal",
+                    "value": "6667"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.nick",
+                    "action": "equal",
+                    "value": "myNick"
+                }
+            ]
+        },
+        {
+            "_id": "f1845241-2384-44dd-a03e-ca1826fff49c",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "b28c465a-5ebb-40f6-9458-fde7e78b8ab8",
+            "name": "2.13 /login-authorizr bad password",
+            "url": "{{server_URL}}/login-authorize?nonce={{login_nonce}}",
+            "method": "POST",
+            "sortNum": 150000,
+            "created": "2023-07-25T12:33:51.058Z",
+            "modified": "2023-07-25T18:16:08.452Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [
+                {
+                    "name": "nonce",
+                    "value": "{{login_nonce}}",
+                    "isPath": false
+                }
+            ],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "user",
+                        "value": "{{server_user1}}"
+                    },
+                    {
+                        "name": "password",
+                        "value": "xxxxxxxx"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    }
+                ]
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "Location",
+                    "action": "equal",
+                    "value": "/login"
+                }
+            ]
+        },
+        {
+            "_id": "b549c124-5892-43d7-99e7-fb1972992c05",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "5128ab34-d198-4a67-ac6c-ed4fd12be78d",
+            "name": "8.11 Debug  /irc/getircstate 5",
+            "url": "{{server_URL}}/irc/getircstate",
+            "method": "GET",
+            "sortNum": 150000,
+            "created": "2023-07-25T17:32:59.471Z",
+            "modified": "2023-07-25T17:33:54.635Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.channels | length",
+                    "action": "equal",
+                    "value": "0"
+                }
+            ]
+        },
+        {
+            "_id": "b8f183c7-1a25-4a6d-9f6c-beefc8a6d1d6",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "b28c465a-5ebb-40f6-9458-fde7e78b8ab8",
+            "name": "2.14/irc/webclient.html confirm fail",
+            "url": "{{server_URL}}/irc/webclient.html",
+            "method": "GET",
+            "sortNum": 160000,
+            "created": "2023-07-25T12:34:45.993Z",
+            "modified": "2023-07-25T12:35:29.541Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "Location",
+                    "action": "equal",
+                    "value": "/login"
+                }
+            ]
+        },
+        {
+            "_id": "5360615d-5d0f-412b-be80-f371eab42de9",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "5128ab34-d198-4a67-ac6c-ed4fd12be78d",
+            "name": "8.12 Debug  /irc/cache 1",
+            "url": "{{server_URL}}/irc/cache",
+            "method": "GET",
+            "sortNum": 160000,
+            "created": "2023-07-25T17:34:46.630Z",
+            "modified": "2023-07-25T17:36:04.475Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                }
+            ]
+        },
+        {
+            "_id": "a5630a79-028b-4909-b54b-c42f4836d5be",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "ecc75ad7-4e04-4bb3-9d20-b61bdb63aa6b",
+            "name": "9.16 /irc/serverlist Modify with wrong lock code, expect 409",
+            "url": "{{server_URL}}/irc/serverlist?index=9999",
+            "method": "PATCH",
+            "sortNum": 160000,
+            "created": "2023-07-26T14:27:15.584Z",
+            "modified": "2023-07-26T15:29:07.944Z",
+            "headers": [
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}"
+                },
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                }
+            ],
+            "params": [
+                {
+                    "name": "index",
+                    "value": "9999",
+                    "isPath": false
+                }
+            ],
+            "body": {
+                "type": "json",
+                "raw": "{\n    \"index\": 9999,\n    \"disabled\": false,\n    \"group\": 0,\n    \"name\": \"local-serverxxxx\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 6667,\n    \"tls\": false,\n    \"verify\": false,\n    \"proxy\": false,\n    \"reconnect\": false,\n    \"logging\": false,\n    \"password\": \"\",\n    \"saslUsername\": \"\",\n    \"saslPassword\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"altNick\": \"myNick2\",\n    \"recoverNick\": false,\n    \"user\": \"myUser\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "409"
+                }
+            ]
+        },
+        {
+            "_id": "e8b2ebdd-aff2-4091-89fe-8f46c806e7b0",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "b28c465a-5ebb-40f6-9458-fde7e78b8ab8",
+            "name": "3.1 /login (get nonce, csrfToken)",
+            "url": "{{server_URL}}/login",
+            "method": "GET",
+            "sortNum": 170000,
+            "created": "2023-07-25T12:35:36.229Z",
+            "modified": "2023-07-25T12:35:36.229Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "_csrf"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "nonce="
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"nonce=\") | last | split(\" \") | first",
+                    "action": "setto",
+                    "value": "{{login_nonce, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"_csrf\") | at(1) | split(\"value=\") | at(1) | split(\" \") | first",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "9de0b58b-b9e0-4671-a455-3b116ede8f16",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "5128ab34-d198-4a67-ac6c-ed4fd12be78d",
+            "name": "8.13 Debug  /irc/disconnect",
+            "url": "{{server_URL}}/irc/disconnect",
+            "method": "POST",
+            "sortNum": 170000,
+            "created": "2023-07-25T17:37:26.773Z",
+            "modified": "2023-07-25T17:38:10.542Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{}\n",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.error",
+                    "action": "equal",
+                    "value": "false"
+                }
+            ]
+        },
+        {
+            "_id": "4b28b29e-1c63-4a41-bb91-c152e5e2e1c4",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "ecc75ad7-4e04-4bb3-9d20-b61bdb63aa6b",
+            "name": "9.17 /irc/serverlist Already locked, expect 409",
+            "url": "{{server_URL}}/irc/serverlist?index={{irc_server_index}}&lock=1",
+            "method": "GET",
+            "sortNum": 170000,
+            "created": "2023-07-26T14:27:17.652Z",
+            "modified": "2023-07-26T15:30:14.886Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/vnd.api+json"
+                }
+            ],
+            "params": [
+                {
+                    "name": "index",
+                    "value": "{{irc_server_index}}",
+                    "isPath": false
+                },
+                {
+                    "name": "lock",
+                    "value": "1",
+                    "isPath": false
+                }
+            ],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "409"
+                }
+            ]
+        },
+        {
+            "_id": "fca40044-c22c-4bba-b7f1-4e0ec403780e",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "b28c465a-5ebb-40f6-9458-fde7e78b8ab8",
+            "name": "3.2 /login-authorize success, receive cookie",
+            "url": "{{server_URL}}/login-authorize?nonce={{login_nonce}}",
+            "method": "POST",
+            "sortNum": 180000,
+            "created": "2023-07-25T12:36:16.343Z",
+            "modified": "2023-07-25T18:17:01.850Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [
+                {
+                    "name": "nonce",
+                    "value": "{{login_nonce}}",
+                    "isPath": false
+                }
+            ],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "user",
+                        "value": "{{server_user1}}"
+                    },
+                    {
+                        "name": "password",
+                        "value": "{{server_password1}}"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    }
+                ]
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "Location",
+                    "action": "equal",
+                    "value": "/irc/webclient.html"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "Set-Cookie",
+                    "action": "contains",
+                    "value": "irc-hybrid-client-0"
+                }
+            ]
+        },
+        {
+            "_id": "cb348734-080b-442c-a567-95ff7f2c1147",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "5128ab34-d198-4a67-ac6c-ed4fd12be78d",
+            "name": "8.14 Debug  /irc/erase",
+            "url": "{{server_URL}}/irc/erase",
+            "method": "POST",
+            "sortNum": 180000,
+            "created": "2023-07-25T17:38:20.553Z",
+            "modified": "2023-07-25T17:39:12.901Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"erase\": \"CACHE\"\n}\n",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.error",
+                    "action": "equal",
+                    "value": "false"
+                }
+            ]
+        },
+        {
+            "_id": "7c078a37-9ba9-4a07-a48f-575aa5fa2741",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "ecc75ad7-4e04-4bb3-9d20-b61bdb63aa6b",
+            "name": "9.18 /irc/serverlist Modify server, success, expect 200",
+            "url": "{{server_URL}}/irc/serverlist?index={{irc_server_index}}",
+            "method": "PATCH",
+            "sortNum": 180000,
+            "created": "2023-07-26T14:27:19.526Z",
+            "modified": "2023-07-26T18:09:38.664Z",
+            "headers": [
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}"
+                },
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                }
+            ],
+            "params": [
+                {
+                    "name": "index",
+                    "value": "{{irc_server_index}}",
+                    "isPath": false
+                }
+            ],
+            "body": {
+                "type": "json",
+                "raw": "{\n    \"index\": {{irc_server_index}},\n    \"disabled\": true,\n    \"group\": 2,\n    \"name\": \"local-server2\",\n    \"host\": \"127.0.0.2\",\n    \"port\": 6668,\n    \"tls\": true,\n    \"verify\": true,\n    \"proxy\": true,\n    \"reconnect\": true,\n    \"logging\": true,\n    \"password\": \"test1\",\n    \"saslUsername\": \"testsp1\",\n    \"saslPassword\": \"testsp2\",\n    \"identifyNick\": \"test2\",\n    \"identifyCommand\": \"test3\",\n    \"nick\": \"myNick2\",\n    \"altNick\": \"myNick3\",\n    \"recoverNick\": true,\n    \"user\": \"myUser2\",\n    \"real\": \"myRealName2\",\n    \"modes\": \"+iwww\",\n    \"channelList\": \"#test, #test2, #test3, #test4\"\n}\n",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.status",
+                    "action": "equal",
+                    "value": "success"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.method",
+                    "action": "equal",
+                    "value": "PATCH"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.index",
+                    "action": "equal",
+                    "value": "{{irc_server_index}}"
+                }
+            ]
+        },
+        {
+            "_id": "083ab88b-2bd9-44cd-b58b-d1eef5ee35d2",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "b28c465a-5ebb-40f6-9458-fde7e78b8ab8",
+            "name": "3.3 /irc/webclient.html verify access",
+            "url": "{{server_URL}}/irc/webclient.html",
+            "method": "GET",
+            "sortNum": 190000,
+            "created": "2023-07-25T12:59:15.112Z",
+            "modified": "2023-07-25T15:40:25.301Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"csrf-token\") | at(1) | split(\"content=\") | at(1) | split(\">\") | first",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "a3cbedf7-ce1a-4575-96d8-f694126b2a60",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "5128ab34-d198-4a67-ac6c-ed4fd12be78d",
+            "name": "8.15 Debug  /irc/cache 2",
+            "url": "{{server_URL}}/irc/cache",
+            "method": "GET",
+            "sortNum": 190000,
+            "created": "2023-07-25T17:39:22.010Z",
+            "modified": "2023-07-25T17:40:04.607Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "[]"
+                }
+            ]
+        },
+        {
+            "_id": "ce3364f6-d00b-45e8-be21-c228257602c4",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "ecc75ad7-4e04-4bb3-9d20-b61bdb63aa6b",
+            "name": "9.19 /irc/serverlist Lock, view modified record, value checks",
+            "url": "{{server_URL}}/irc/serverlist?index={{irc_server_index}}&lock=1",
+            "method": "GET",
+            "sortNum": 190000,
+            "created": "2023-07-26T14:27:23.354Z",
+            "modified": "2023-07-26T15:54:24.122Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/vnd.api+json"
+                }
+            ],
+            "params": [
+                {
+                    "name": "index",
+                    "value": "{{irc_server_index}}",
+                    "isPath": false
+                },
+                {
+                    "name": "lock",
+                    "value": "1",
+                    "isPath": false
+                }
+            ],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.name",
+                    "action": "equal",
+                    "value": "local-server2"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.host",
+                    "action": "equal",
+                    "value": "127.0.0.2"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.port",
+                    "action": "equal",
+                    "value": "6668"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.nick",
+                    "action": "equal",
+                    "value": "myNick2"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.index",
+                    "action": "equal",
+                    "value": "{{irc_server_index}}"
+                }
+            ]
+        },
+        {
+            "_id": "81b943d7-ac90-49e9-a813-7262a1fdcc2f",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "b28c465a-5ebb-40f6-9458-fde7e78b8ab8",
+            "name": "3.4 /irc/getircstate verify access",
+            "url": "{{server_URL}}/irc/getircstate",
+            "method": "GET",
+            "sortNum": 200000,
+            "created": "2023-07-25T13:01:41.739Z",
+            "modified": "2023-07-25T13:05:19.349Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/javascript"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.progName",
+                    "action": "equal",
+                    "value": "irc-hybrid-client"
+                }
+            ]
+        },
+        {
+            "_id": "22b11b48-6a30-4b78-9594-2180bcd10a41",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "5128ab34-d198-4a67-ac6c-ed4fd12be78d",
+            "name": "8.16Debug  /terminate (die)",
+            "url": "{{server_URL}}/terminate",
+            "method": "POST",
+            "sortNum": 200000,
+            "created": "2023-07-25T17:40:11.963Z",
+            "modified": "2023-07-25T17:42:00.033Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"terminate\": \"{{server_die}}\"\n}\n",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                }
+            ]
+        },
+        {
+            "_id": "f41fd8a8-8fad-47b6-b93a-1290091a3f03",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "ecc75ad7-4e04-4bb3-9d20-b61bdb63aa6b",
+            "name": "9.20 /irc/serverlist Delete requires unlocked, fail 409",
+            "url": "{{server_URL}}/irc/serverlist?index={{irc_server_index}}",
+            "method": "DELETE",
+            "sortNum": 200000,
+            "created": "2023-07-26T14:27:25.589Z",
+            "modified": "2023-07-26T15:45:58.752Z",
+            "headers": [
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}"
+                },
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                }
+            ],
+            "params": [
+                {
+                    "name": "index",
+                    "value": "{{irc_server_index}}",
+                    "isPath": false
+                }
+            ],
+            "body": {
+                "type": "json",
+                "raw": "{\n    \"disabled\": false,\n    \"index\": \"{{irc_server_index}}\",\n    \"group\": 0,\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 3000,\n    \"tls\": false,\n    \"verify\": false,\n    \"proxy\": false,\n    \"reconnect\": false,\n    \"logging\": false,\n    \"password\": \"\",\n    \"saslUsername\": \"\",\n    \"saslPassword\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"altNick\": \"myNick2\",\n    \"recoverNick\": false,\n    \"user\": \"myUsername\",\n    \"real\": \"Irc Hybrid Client\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "409"
+                }
+            ]
+        },
+        {
+            "_id": "27daf69f-c271-4e4a-8b4d-bb4a81b9afb1",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "b28c465a-5ebb-40f6-9458-fde7e78b8ab8",
+            "name": "4.1 /logout",
+            "url": "{{server_URL}}/logout",
+            "method": "GET",
+            "sortNum": 210000,
+            "created": "2023-07-25T13:06:06.200Z",
+            "modified": "2023-07-25T13:15:37.522Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "<button>Return to Login</button>"
+                }
+            ]
+        },
+        {
+            "_id": "cf3ca22a-e283-41c2-a9db-f40a5c631706",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "ecc75ad7-4e04-4bb3-9d20-b61bdb63aa6b",
+            "name": "9.21 /irc/serverlist Remove lock",
+            "url": "{{server_URL}}/irc/serverlist?index={{irc_server_index}}&lock=0",
+            "method": "GET",
+            "sortNum": 210000,
+            "created": "2023-07-26T14:27:27.927Z",
+            "modified": "2023-07-26T18:12:06.821Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/vnd.api+json"
+                }
+            ],
+            "params": [
+                {
+                    "name": "index",
+                    "value": "{{irc_server_index}}",
+                    "isPath": false
+                },
+                {
+                    "name": "lock",
+                    "value": "0",
+                    "isPath": false
+                }
+            ],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.index",
+                    "action": "equal",
+                    "value": "{{irc_server_index}}"
+                }
+            ]
+        },
+        {
+            "_id": "fdaf2588-4b2f-41aa-9706-02cfe2adfdde",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "b28c465a-5ebb-40f6-9458-fde7e78b8ab8",
+            "name": "4.2 /irc/webclient.html confirm fail",
+            "url": "{{server_URL}}/irc/webclient.html",
+            "method": "GET",
+            "sortNum": 220000,
+            "created": "2023-07-25T13:15:56.175Z",
+            "modified": "2023-07-25T13:16:40.634Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "Location",
+                    "action": "equal",
+                    "value": "/login"
+                }
+            ]
+        },
+        {
+            "_id": "518ed8bc-b1d2-4600-ad91-d41e97a7116f",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "ecc75ad7-4e04-4bb3-9d20-b61bdb63aa6b",
+            "name": "9.22 /irc/serverlist Delete created IRC server, expect",
+            "url": "{{server_URL}}/irc/serverlist?index={{irc_server_index}}",
+            "method": "DELETE",
+            "sortNum": 220000,
+            "created": "2023-07-26T14:27:29.859Z",
+            "modified": "2023-07-26T18:14:43.207Z",
+            "headers": [
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}"
+                },
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                }
+            ],
+            "params": [
+                {
+                    "name": "index",
+                    "value": "{{irc_server_index}}",
+                    "isPath": false
+                }
+            ],
+            "body": {
+                "type": "json",
+                "raw": "{\n    \"index\": {{irc_server_index}},\n    \"disabled\": false,\n    \"group\": 0,\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 3000,\n    \"tls\": false,\n    \"verify\": false,\n    \"proxy\": false,\n    \"reconnect\": false,\n    \"logging\": false,\n    \"password\": \"\",\n    \"saslUsername\": \"\",\n    \"saslPassword\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"altNick\": \"myNick\",\n    \"recoverNick\": false,\n    \"user\": \"myUsername\",\n    \"real\": \"Irc Hybrid Client\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.status",
+                    "action": "equal",
+                    "value": "success"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.method",
+                    "action": "equal",
+                    "value": "DELETE"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.index",
+                    "action": "equal",
+                    "value": "{{irc_server_index | subtract(1)}}"
+                }
+            ]
+        },
+        {
+            "_id": "993e8ece-346f-4465-a090-4a9ca7ca840b",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "b28c465a-5ebb-40f6-9458-fde7e78b8ab8",
+            "name": "4.3 /irc/js/webclient.js confirm fail",
+            "url": "{{server_URL}}/irc/js/webclient.js",
+            "method": "GET",
+            "sortNum": 230000,
+            "created": "2023-07-25T13:16:59.137Z",
+            "modified": "2023-07-25T13:17:42.052Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/javascript"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "403"
+                }
+            ]
+        },
+        {
+            "_id": "5dad07e5-a097-4f45-9031-fc44b46fa8cd",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "ecc75ad7-4e04-4bb3-9d20-b61bdb63aa6b",
+            "name": "9.23 /irc/serverlist (lock #0)",
+            "url": "{{server_URL}}/irc/serverlist?index=0&lock=1",
+            "method": "GET",
+            "sortNum": 230000,
+            "created": "2023-07-26T14:27:31.945Z",
+            "modified": "2023-07-26T15:49:42.416Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/vnd.api+json"
+                }
+            ],
+            "params": [
+                {
+                    "name": "index",
+                    "value": "0",
+                    "isPath": false
+                },
+                {
+                    "name": "lock",
+                    "value": "1",
+                    "isPath": false
+                }
+            ],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.index",
+                    "action": "equal",
+                    "value": "0"
+                }
+            ]
+        },
+        {
+            "_id": "feef0e04-6163-4ff9-8dff-4b3f8471add2",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "b28c465a-5ebb-40f6-9458-fde7e78b8ab8",
+            "name": "4.4 /irc/server confirm fail",
+            "url": "{{server_URL}}/irc/server",
+            "method": "POST",
+            "sortNum": 240000,
+            "created": "2023-07-25T13:17:49.599Z",
+            "modified": "2023-07-25T13:18:24.421Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"index\": -1\n}\n",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "403"
+                }
+            ]
+        },
+        {
+            "_id": "7208768c-0487-4aae-9124-d219a575128d",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "ecc75ad7-4e04-4bb3-9d20-b61bdb63aa6b",
+            "name": "9.24 /irc/serverlist Copy requires not locked, fail 409",
+            "url": "{{server_URL}}/irc/serverlist?index=0",
+            "method": "COPY",
+            "sortNum": 240000,
+            "created": "2023-07-26T14:27:35.463Z",
+            "modified": "2023-07-26T16:01:04.951Z",
+            "headers": [
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}"
+                },
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                }
+            ],
+            "params": [
+                {
+                    "name": "index",
+                    "value": "0",
+                    "isPath": false
+                }
+            ],
+            "body": {
+                "type": "json",
+                "raw": "{\n    \"index\": 0\n}\n",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "409"
+                }
+            ]
+        },
+        {
+            "_id": "09421fe1-c6c7-4cb4-9ef8-c4becb170001",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "b28c465a-5ebb-40f6-9458-fde7e78b8ab8",
+            "name": "4.5 /irc/connect confirm fail",
+            "url": "{{server_URL}}/irc/connect",
+            "method": "POST",
+            "sortNum": 250000,
+            "created": "2023-07-25T13:18:33.945Z",
+            "modified": "2023-07-25T15:09:53.710Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"nickName\": \"{{irc_nickname}}\",\n  \"realName\": \"{{irc_nickname}}\",\n  \"userMode\": \"\"\n}",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "403"
+                }
+            ]
+        },
+        {
+            "_id": "efbfe262-e09f-4bfb-8ef1-e1bbd1adc486",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "ecc75ad7-4e04-4bb3-9d20-b61bdb63aa6b",
+            "name": "9.25 /irc/serverlist (remove lock)",
+            "url": "{{server_URL}}/irc/serverlist?index=0&lock=0",
+            "method": "GET",
+            "sortNum": 250000,
+            "created": "2023-07-26T14:27:37.761Z",
+            "modified": "2023-07-26T15:57:48.822Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/vnd.api+json"
+                }
+            ],
+            "params": [
+                {
+                    "name": "index",
+                    "value": "0",
+                    "isPath": false
+                },
+                {
+                    "name": "lock",
+                    "value": "0",
+                    "isPath": false
+                }
+            ],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.index",
+                    "action": "equal",
+                    "value": "0"
+                }
+            ]
+        },
+        {
+            "_id": "1e60933e-4c4d-4abb-9219-820a2f3679ce",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "b28c465a-5ebb-40f6-9458-fde7e78b8ab8",
+            "name": "4.6 /irc/message confirm fail",
+            "url": "{{server_URL}}/irc/message",
+            "method": "POST",
+            "sortNum": 255000,
+            "created": "2023-07-25T13:18:51.599Z",
+            "modified": "2023-07-25T15:09:35.152Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"message\": \"TIME\"\n}\n",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "403"
+                }
+            ]
+        },
+        {
+            "_id": "2efc39d5-b7c5-4c04-b772-972274eceee1",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "b28c465a-5ebb-40f6-9458-fde7e78b8ab8",
+            "name": "4.7 /irc/disconnect confirm fail",
+            "url": "{{server_URL}}/irc/disconnect",
+            "method": "POST",
+            "sortNum": 260000,
+            "created": "2023-07-25T13:18:45.735Z",
+            "modified": "2023-07-25T15:09:44.246Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{}\n",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "403"
+                }
+            ]
+        },
+        {
+            "_id": "d8b15b32-46b8-4d86-9fd5-258283f60394",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "ecc75ad7-4e04-4bb3-9d20-b61bdb63aa6b",
+            "name": "9.26 /irc/serverlist (copy idx 0)",
+            "url": "{{server_URL}}/irc/serverlist?index=0",
+            "method": "COPY",
+            "sortNum": 260000,
+            "created": "2023-07-26T14:27:43.187Z",
+            "modified": "2023-07-26T16:03:00.200Z",
+            "headers": [
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}"
+                },
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                }
+            ],
+            "params": [
+                {
+                    "name": "index",
+                    "value": "0",
+                    "isPath": false
+                }
+            ],
+            "body": {
+                "type": "json",
+                "raw": "{\n    \"index\": 0\n}\n",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.status",
+                    "action": "equal",
+                    "value": "success"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.method",
+                    "action": "equal",
+                    "value": "COPY"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "json.index",
+                    "action": "setto",
+                    "value": "{{irc_server_index, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "12249226-c104-4586-bc2c-f66d0a021701",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "ecc75ad7-4e04-4bb3-9d20-b61bdb63aa6b",
+            "name": "9.27 /irc/serverlist/tools move-up",
+            "url": "{{server_URL}}/irc/serverlist/tools?index={{irc_server_index}}",
+            "method": "POST",
+            "sortNum": 270000,
+            "created": "2023-07-26T14:27:46.331Z",
+            "modified": "2023-07-26T18:42:03.121Z",
+            "headers": [
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}"
+                },
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                }
+            ],
+            "params": [
+                {
+                    "name": "index",
+                    "value": "{{irc_server_index}}",
+                    "isPath": false
+                }
+            ],
+            "body": {
+                "type": "json",
+                "raw": "{\n    \"index\": {{irc_server_index}},\n    \"action\": \"move-up\"\n}\n",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.status",
+                    "action": "equal",
+                    "value": "success"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.index",
+                    "action": "equal",
+                    "value": "{{irc_server_index | subtract(1)}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "json.index",
+                    "action": "setto",
+                    "value": "{{irc_server_index, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "51f49c8d-2c0d-4d70-a3ce-b407bca60315",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "b28c465a-5ebb-40f6-9458-fde7e78b8ab8",
+            "name": "4.8 /irc/getircstate confirm fail",
+            "url": "{{server_URL}}/irc/getircstate",
+            "method": "GET",
+            "sortNum": 280000,
+            "created": "2023-07-25T15:06:21.760Z",
+            "modified": "2023-07-25T15:06:37.245Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "403"
+                }
+            ]
+        },
+        {
+            "_id": "1fc19829-9655-4bac-b258-59d466c7430f",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "ecc75ad7-4e04-4bb3-9d20-b61bdb63aa6b",
+            "name": "9.28 /irc/serverlist/tools toggle-disabled",
+            "url": "{{server_URL}}/irc/serverlist/tools?index={{irc_server_index}}",
+            "method": "POST",
+            "sortNum": 280000,
+            "created": "2023-07-26T14:27:48.891Z",
+            "modified": "2023-07-26T18:15:32.573Z",
+            "headers": [
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}"
+                },
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                }
+            ],
+            "params": [
+                {
+                    "name": "index",
+                    "value": "{{irc_server_index}}",
+                    "isPath": false
+                }
+            ],
+            "body": {
+                "type": "json",
+                "raw": "{\n    \"index\": {{irc_server_index}},\n    \"action\": \"toggle-disabled\"\n}\n",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.status",
+                    "action": "equal",
+                    "value": "success"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.index",
+                    "action": "equal",
+                    "value": "{{irc_server_index}}"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.value",
+                    "action": "equal",
+                    "value": "true"
+                }
+            ]
+        },
+        {
+            "_id": "9402f0ca-39e6-4af7-b30a-5babac293a7b",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "ecc75ad7-4e04-4bb3-9d20-b61bdb63aa6b",
+            "name": "9.29 /irc/serverlist.html confirm lock toggle",
+            "url": "{{server_URL}}/irc/serverlist?index={{irc_server_index}}",
+            "method": "GET",
+            "sortNum": 285000,
+            "created": "2023-07-26T16:08:57.398Z",
+            "modified": "2023-07-26T16:10:17.576Z",
+            "headers": [],
+            "params": [
+                {
+                    "name": "index",
+                    "value": "{{irc_server_index}}",
+                    "isPath": false
+                }
+            ],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.disabled",
+                    "action": "equal",
+                    "value": "true"
+                }
+            ]
+        },
+        {
+            "_id": "d4265172-5c9f-457d-b673-fd9c31737ebd",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "b28c465a-5ebb-40f6-9458-fde7e78b8ab8",
+            "name": "4.9 /irc/cache confirm fail",
+            "url": "{{server_URL}}/irc/cache",
+            "method": "GET",
+            "sortNum": 290000,
+            "created": "2023-07-25T15:07:12.944Z",
+            "modified": "2023-07-25T15:07:52.537Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "403"
+                }
+            ]
+        },
+        {
+            "_id": "912e3b15-2ad9-413a-9a68-7ad56586f6f8",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "ecc75ad7-4e04-4bb3-9d20-b61bdb63aa6b",
+            "name": "9.30 /irc/serverlist (success)",
+            "url": "{{server_URL}}/irc/serverlist?index={{irc_server_index}}",
+            "method": "DELETE",
+            "sortNum": 290000,
+            "created": "2023-07-26T14:27:56.233Z",
+            "modified": "2023-07-26T16:12:11.282Z",
+            "headers": [
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}"
+                },
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                }
+            ],
+            "params": [
+                {
+                    "name": "index",
+                    "value": "{{irc_server_index}}",
+                    "isPath": false
+                }
+            ],
+            "body": {
+                "type": "json",
+                "raw": "{\n    \"index\": {{irc_server_index}},\n    \"disabled\": false,\n    \"group\": 0,\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 3000,\n    \"tls\": false,\n    \"verify\": false,\n    \"proxy\": false,\n    \"reconnect\": false,\n    \"logging\": false,\n    \"password\": \"\",\n    \"saslUsername\": \"\",\n    \"saslPassword\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"altNick\": \"myNick2\",\n    \"recoverNick\": false,\n    \"user\": \"myUsername\",\n    \"real\": \"Irc Hybrid Client\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.status",
+                    "action": "equal",
+                    "value": "success"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.method",
+                    "action": "equal",
+                    "value": "DELETE"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.index",
+                    "action": "equal",
+                    "value": "{{irc_server_index}}"
+                }
+            ]
+        },
+        {
+            "_id": "53d86249-de9e-40ed-ac1a-55566c0bfbf6",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "b28c465a-5ebb-40f6-9458-fde7e78b8ab8",
+            "name": "4.10 /irc/prune confirm fail",
+            "url": "{{server_URL}}/irc/prune",
+            "method": "POST",
+            "sortNum": 300000,
+            "created": "2023-07-25T15:08:36.641Z",
+            "modified": "2023-07-25T15:09:21.864Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"channel\": \"{{irc_channel}}\"\n}\n",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "403"
+                }
+            ]
+        },
+        {
+            "_id": "c60720a8-cd55-41c0-870a-99ccdfeb170f",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "ecc75ad7-4e04-4bb3-9d20-b61bdb63aa6b",
+            "name": "9.31 /irc/serverlist (fail host syntax)",
+            "url": "{{server_URL}}/irc/serverlist",
+            "method": "POST",
+            "sortNum": 300000,
+            "created": "2023-07-26T14:28:00.832Z",
+            "modified": "2023-07-26T16:15:35.901Z",
+            "headers": [
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}"
+                },
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n    \"disabled\": false,\n    \"group\": 0,\n    \"name\": \"local-server\",\n    \"host\": \"invalid\",\n    \"port\": 6667,\n    \"tls\": false,\n    \"verify\": false,\n    \"proxy\": false,\n    \"reconnect\": false,\n    \"logging\": false,\n    \"password\": \"\",\n    \"saslUsername\": \"\",\n    \"saslPassword\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"altNick\": \"myNick2\",\n    \"recoverNick\": false,\n    \"user\": \"myUser\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "422"
+                }
+            ]
+        },
+        {
+            "_id": "4fc22468-3e80-4090-80eb-331acdb22058",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "b28c465a-5ebb-40f6-9458-fde7e78b8ab8",
+            "name": "4.11/irc/erase confirm fail",
+            "url": "{{server_URL}}/irc/erase",
+            "method": "POST",
+            "sortNum": 310000,
+            "created": "2023-07-25T15:16:31.373Z",
+            "modified": "2023-07-25T15:17:02.609Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"erase\": \"CACHE\"\n}\n",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "403"
+                }
+            ]
+        },
+        {
+            "_id": "b7f8c104-053a-4a7d-adfc-b8b31e1a78f4",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "ecc75ad7-4e04-4bb3-9d20-b61bdb63aa6b",
+            "name": "9.32 /irc/serverlist (fail port syntax)",
+            "url": "{{server_URL}}/irc/serverlist",
+            "method": "POST",
+            "sortNum": 310000,
+            "created": "2023-07-26T14:28:02.765Z",
+            "modified": "2023-07-26T16:17:58.914Z",
+            "headers": [
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}"
+                },
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n    \"disabled\": false,\n    \"group\": 0,\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": \"invalid\",\n    \"tls\": false,\n    \"verify\": false,\n    \"proxy\": false,\n    \"reconnect\": false,\n    \"logging\": false,\n    \"password\": \"\",\n    \"saslUsername\": \"\",\n    \"saslPassword\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"altNick\": \"myNick2\",\n    \"recoverNick\": false,\n    \"user\": \"myUser\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n\n",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "422"
+                }
+            ]
+        },
+        {
+            "_id": "0924072a-6342-42f9-9de8-fe53887a2011",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "b28c465a-5ebb-40f6-9458-fde7e78b8ab8",
+            "name": "4.12 /irc/serverlist fail",
+            "url": "{{server_URL}}/irc/serverlist",
+            "method": "GET",
+            "sortNum": 320000,
+            "created": "2023-07-25T15:17:15.189Z",
+            "modified": "2023-07-25T15:24:09.609Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "403"
+                }
+            ]
+        },
+        {
+            "_id": "1678356e-6054-4707-8ddb-b0633e6ce322",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "ecc75ad7-4e04-4bb3-9d20-b61bdb63aa6b",
+            "name": "9.33 /irc/serverlist (fail missing name)",
+            "url": "{{server_URL}}/irc/serverlist",
+            "method": "POST",
+            "sortNum": 320000,
+            "created": "2023-07-26T14:28:04.970Z",
+            "modified": "2023-07-26T18:36:06.211Z",
+            "headers": [
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}"
+                },
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n    \"disabled\": false,\n    \"group\": 0,\n    \"name\": \"\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 6667,\n    \"tls\": false,\n    \"verify\": false,\n    \"proxy\": false,\n    \"reconnect\": false,\n    \"logging\": false,\n    \"password\": \"\",\n    \"saslUsername\": \"\",\n    \"saslPassword\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"altNick\": \"myNick2\",\n    \"recoverNick\": false,\n    \"user\": \"myUser\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "422"
+                }
+            ]
+        },
+        {
+            "_id": "dbeaf6bd-e2fe-4f0a-9be6-56ecfdcbfa97",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "b28c465a-5ebb-40f6-9458-fde7e78b8ab8",
+            "name": "4.13 /irc/serverlist fail",
+            "url": "{{server_URL}}/irc/serverlist",
+            "method": "POST",
+            "sortNum": 330000,
+            "created": "2023-07-25T15:17:20.505Z",
+            "modified": "2023-07-25T15:46:00.521Z",
+            "headers": [
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}"
+                },
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n    \"disabled\": false,\n    \"group\": 0,\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 6667,\n    \"tls\": false,\n    \"verify\": false,\n    \"proxy\": false,\n    \"reconnect\": false,\n    \"logging\": false,\n    \"password\": \"\",\n    \"saslUsername\": \"\",\n    \"saslPassword\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"altNick\": \"myNick2\",\n    \"recoverNick\": false,\n    \"user\": \"myUser\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "403"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "0",
+                    "action": "setto",
+                    "value": "{{irc_server_index, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "5f1802ef-0c0f-43be-8855-94bb956c0c1c",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "ecc75ad7-4e04-4bb3-9d20-b61bdb63aa6b",
+            "name": "9.34 /irc/serverlist (fail missing nick)",
+            "url": "{{server_URL}}/irc/serverlist",
+            "method": "POST",
+            "sortNum": 330000,
+            "created": "2023-07-26T14:28:06.450Z",
+            "modified": "2023-07-26T16:19:47.525Z",
+            "headers": [
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}"
+                },
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n    \"disabled\": false,\n    \"group\": 0,\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 6667,\n    \"tls\": false,\n    \"verify\": false,\n    \"proxy\": false,\n    \"reconnect\": false,\n    \"logging\": false,\n    \"password\": \"\",\n    \"saslUsername\": \"\",\n    \"saslPassword\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"\",\n    \"altNick\": \"myNick2\",\n    \"recoverNick\": false,\n    \"user\": \"myUser\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "422"
+                }
+            ]
+        },
+        {
+            "_id": "f4d41b50-3ff8-49c4-9eac-6b6b66fb6efa",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "b28c465a-5ebb-40f6-9458-fde7e78b8ab8",
+            "name": "4.14 /irc/serverlist (set edit lock) fail",
+            "url": "{{server_URL}}/irc/serverlist?index={{irc_server_index}}&lock=1",
+            "method": "GET",
+            "sortNum": 340000,
+            "created": "2023-07-25T15:17:25.272Z",
+            "modified": "2023-07-25T15:23:26.770Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                }
+            ],
+            "params": [
+                {
+                    "name": "index",
+                    "value": "{{irc_server_index}}",
+                    "isPath": false
+                },
+                {
+                    "name": "lock",
+                    "value": "1",
+                    "isPath": false
+                }
+            ],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "403"
+                }
+            ]
+        },
+        {
+            "_id": "cb2d6434-d571-4387-adc9-24e6d6b74da6",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "ecc75ad7-4e04-4bb3-9d20-b61bdb63aa6b",
+            "name": "9.35 /irc/serverlist (fail missing user)",
+            "url": "{{server_URL}}/irc/serverlist",
+            "method": "POST",
+            "sortNum": 340000,
+            "created": "2023-07-26T14:28:07.992Z",
+            "modified": "2023-07-26T16:20:00.889Z",
+            "headers": [
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}"
+                },
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n    \"disabled\": false,\n    \"group\": 0,\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 6667,\n    \"tls\": false,\n    \"verify\": false,\n    \"proxy\": false,\n    \"reconnect\": false,\n    \"logging\": false,\n    \"password\": \"\",\n    \"saslUsername\": \"\",\n    \"saslPassword\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"altNick\": \"myNick2\",\n    \"recoverNick\": false,\n    \"user\": \"\",\n    \"real\": \"myRealName\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}\n",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "422"
+                }
+            ]
+        },
+        {
+            "_id": "6fcd9e93-a3bb-4192-ac8b-1368dca34ff6",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "b28c465a-5ebb-40f6-9458-fde7e78b8ab8",
+            "name": "4.15 /irc/serverlist fail",
+            "url": "{{server_URL}}/irc/serverlist?index={{irc_server_index}}",
+            "method": "PATCH",
+            "sortNum": 350000,
+            "created": "2023-07-25T15:17:32.821Z",
+            "modified": "2023-07-25T15:23:03.159Z",
+            "headers": [
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}"
+                },
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                }
+            ],
+            "params": [
+                {
+                    "name": "index",
+                    "value": "{{irc_server_index}}",
+                    "isPath": false
+                }
+            ],
+            "body": {
+                "type": "json",
+                "raw": "{\n    \"index\": {{irc_server_index}},\n    \"disabled\": true,\n    \"group\": 2,\n    \"name\": \"local-server2\",\n    \"host\": \"127.0.0.2\",\n    \"port\": 6668,\n    \"tls\": true,\n    \"verify\": true,\n    \"proxy\": true,\n    \"reconnect\": true,\n    \"logging\": true,\n    \"password\": \"test1\",\n    \"saslUsername\": \"testsp1\",\n    \"saslPassword\": \"testsp2\",\n    \"identifyNick\": \"test2\",\n    \"identifyCommand\": \"test3\",\n    \"nick\": \"myNick2\",\n    \"altNick\": \"myNick3\",\n    \"recoverNick\": true,\n    \"user\": \"myUser2\",\n    \"real\": \"myRealName2\",\n    \"modes\": \"+iwww\",\n    \"channelList\": \"#test, #test2, #test3, #test4\"\n}\n",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "403"
+                }
+            ]
+        },
+        {
+            "_id": "8ed6ae87-dbf6-4752-954d-cd34b7d0b58f",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "b28c465a-5ebb-40f6-9458-fde7e78b8ab8",
+            "name": "4.16 /irc/serverlist fail",
+            "url": "{{server_URL}}/irc/serverlist?index={{irc_server_index}}",
+            "method": "DELETE",
+            "sortNum": 360000,
+            "created": "2023-07-25T15:17:36.470Z",
+            "modified": "2023-07-25T15:22:46.949Z",
+            "headers": [
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}"
+                },
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                }
+            ],
+            "params": [
+                {
+                    "name": "index",
+                    "value": "{{irc_server_index}}",
+                    "isPath": false
+                }
+            ],
+            "body": {
+                "type": "json",
+                "raw": "{\n    \"index\": {{irc_server_index}},\n    \"disabled\": false,\n    \"group\": 0,\n    \"name\": \"local-server\",\n    \"host\": \"127.0.0.1\",\n    \"port\": 3000,\n    \"tls\": false,\n    \"verify\": false,\n    \"proxy\": false,\n    \"reconnect\": false,\n    \"logging\": false,\n    \"password\": \"\",\n    \"saslUsername\": \"\",\n    \"saslPassword\": \"\",\n    \"identifyNick\": \"\",\n    \"identifyCommand\": \"\",\n    \"nick\": \"myNick\",\n    \"altNick\": \"myNick\",\n    \"recoverNick\": false,\n    \"user\": \"myUsername\",\n    \"real\": \"Irc Hybrid Client\",\n    \"modes\": \"+iw\",\n    \"channelList\": \"#test, #test2, #test3\"\n}",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "403"
+                }
+            ]
+        },
+        {
+            "_id": "71750e61-1708-4a9e-811b-bcc76fc4ee89",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "b28c465a-5ebb-40f6-9458-fde7e78b8ab8",
+            "name": "4.17 /irc/serverlist fail",
+            "url": "{{server_URL}}/irc/serverlist?index=0",
+            "method": "GET",
+            "sortNum": 370000,
+            "created": "2023-07-25T15:17:40.191Z",
+            "modified": "2023-07-25T15:22:27.700Z",
+            "headers": [
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}"
+                },
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                }
+            ],
+            "params": [
+                {
+                    "name": "index",
+                    "value": "0",
+                    "isPath": false
+                }
+            ],
+            "body": {
+                "type": "json",
+                "raw": "{\n    \"index\": 0\n}\n",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "403"
+                }
+            ]
+        },
+        {
+            "_id": "b11048ef-87dd-4f18-91f3-29246cbe1da8",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "b28c465a-5ebb-40f6-9458-fde7e78b8ab8",
+            "name": "4.18 /irc/serverlist/tools fail",
+            "url": "{{server_URL}}/irc/serverlist/tools?index={{irc_server_index}}",
+            "method": "POST",
+            "sortNum": 390000,
+            "created": "2023-07-25T15:17:50.615Z",
+            "modified": "2023-07-25T15:21:04.881Z",
+            "headers": [
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}"
+                },
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                }
+            ],
+            "params": [
+                {
+                    "name": "index",
+                    "value": "{{irc_server_index}}",
+                    "isPath": false
+                }
+            ],
+            "body": {
+                "type": "json",
+                "raw": "{\n    \"index\": {{irc_server_index}},\n    \"action\": \"move-up\"\n}\n",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "403"
+                }
+            ]
+        },
+        {
+            "_id": "c4bc5639-9b14-4bda-a4b5-349a20b9a0f3",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "b28c465a-5ebb-40f6-9458-fde7e78b8ab8",
+            "name": "4.20 /terminate confirm fail",
+            "url": "{{server_URL}}/terminate",
+            "method": "POST",
+            "sortNum": 400000,
+            "created": "2023-07-25T15:17:54.382Z",
+            "modified": "2023-07-25T15:42:56.822Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "_csrf",
+                    "value": "{{csrf_token}}"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"terminate\": \"YES\"\n}\n",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "403"
+                }
+            ]
+        },
+        {
+            "_id": "ee34f60b-a9f2-4a36-83ee-4c13aa86b2ad",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "bc567fc6-7c5c-4e01-b1c6-f2cb839d2fd8",
+            "name": "5.4 /irc/wsauth enable websocket requests for 10 seconds",
+            "url": "{{server_URL}}/irc/wsauth",
+            "method": "POST",
+            "sortNum": 420000,
+            "created": "2023-07-26T12:37:22.850Z",
+            "modified": "2023-07-26T13:35:23.955Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"purpose\": \"websocket-auth\"\n}",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.error",
+                    "action": "equal",
+                    "value": "false"
+                }
+            ]
+        },
+        {
+            "_id": "fd625991-961f-4707-a8b2-0d59c6f72e44",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "bc567fc6-7c5c-4e01-b1c6-f2cb839d2fd8",
+            "name": "5.5 Delay Timer --> exec(\"sleep 12\")",
+            "url": "{{server_URL}}/status",
+            "method": "GET",
+            "sortNum": 422500,
+            "created": "2023-07-26T12:53:08.837Z",
+            "modified": "2023-07-26T13:37:38.725Z",
+            "headers": [],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "notequal",
+                    "value": "{{@ | exec(\"sleep 12\")}}"
+                },
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                }
+            ]
+        },
+        {
+            "_id": "f6180cfa-dec3-4b62-bf83-3914ef8326e2",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "bc567fc6-7c5c-4e01-b1c6-f2cb839d2fd8",
+            "name": "5.6 /irc/ws websocket request (Fail 401) Copy",
+            "url": "{{server_URL}}/irc/ws",
+            "method": "GET",
+            "sortNum": 423789.1,
+            "created": "2023-07-27T13:19:20.570Z",
+            "modified": "2023-07-27T13:19:20.570Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Connection",
+                    "value": "upgrade"
+                },
+                {
+                    "name": "upgrade",
+                    "value": "websocket"
+                },
+                {
+                    "name": "Sec-WebSocket-Key",
+                    "value": "expect-to-fail"
+                },
+                {
+                    "name": "Sec-WebSocket-Version",
+                    "value": "13"
+                },
+                {
+                    "name": "Sec-WebSocket-Extensions",
+                    "value": "permessage-deflate; client_max_window_bits"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "401"
+                }
+            ]
+        },
+        {
+            "_id": "ff367e74-6805-444a-b0eb-ec01031d6ec0",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "bc567fc6-7c5c-4e01-b1c6-f2cb839d2fd8",
+            "name": "5.7 /irc/wsauth enable websocket requests for 10 seconds",
+            "url": "{{server_URL}}/irc/wsauth",
+            "method": "POST",
+            "sortNum": 423906.3,
+            "created": "2023-07-26T13:36:10.615Z",
+            "modified": "2023-07-26T13:36:10.615Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"purpose\": \"websocket-auth\"\n}",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.error",
+                    "action": "equal",
+                    "value": "false"
+                }
+            ]
+        },
+        {
+            "_id": "04e96e56-d659-4aed-b561-6e2af2bf2e89",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "bc567fc6-7c5c-4e01-b1c6-f2cb839d2fd8",
+            "name": "5.8 /irc/not-found websocket request to wrong path (Fail 404)",
+            "url": "{{server_URL}}/irc/not-found",
+            "method": "GET",
+            "sortNum": 426953.2,
+            "created": "2023-07-27T13:16:59.573Z",
+            "modified": "2023-07-27T13:21:07.119Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Connection",
+                    "value": "upgrade"
+                },
+                {
+                    "name": "upgrade",
+                    "value": "websocket"
+                },
+                {
+                    "name": "Sec-WebSocket-Key",
+                    "value": "expect-to-fail"
+                },
+                {
+                    "name": "Sec-WebSocket-Version",
+                    "value": "13"
+                },
+                {
+                    "name": "Sec-WebSocket-Extensions",
+                    "value": "permessage-deflate; client_max_window_bits"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "404"
+                }
+            ]
+        },
+        {
+            "_id": "a2504f58-c277-4207-8bd7-7ba3384cd714",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "bc567fc6-7c5c-4e01-b1c6-f2cb839d2fd8",
+            "name": "5.9 /irc/ws websocket request (SUCCESS)",
+            "url": "{{server_URL}}/irc/ws",
+            "method": "GET",
+            "sortNum": 435000,
+            "created": "2023-07-26T13:19:27.394Z",
+            "modified": "2023-07-27T13:14:33.704Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Connection",
+                    "value": "upgrade"
+                },
+                {
+                    "name": "upgrade",
+                    "value": "websocket"
+                },
+                {
+                    "name": "Sec-WebSocket-Key",
+                    "value": "expect-to-fail"
+                },
+                {
+                    "name": "Sec-WebSocket-Version",
+                    "value": "13"
+                },
+                {
+                    "name": "Sec-WebSocket-Extensions",
+                    "value": "permessage-deflate; client_max_window_bits"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "400"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "Missing or invalid Sec-WebSocket-Key header"
+                }
+            ]
+        },
+        {
+            "_id": "a8571014-3bca-44fa-98e6-83750d8ac480",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "bc567fc6-7c5c-4e01-b1c6-f2cb839d2fd8",
+            "name": "5.10 /irc/ws Repeat, request valid only one time (Fail 401)",
+            "url": "{{server_URL}}/irc/ws",
+            "method": "GET",
+            "sortNum": 439687.5,
+            "created": "2023-07-27T13:18:23.097Z",
+            "modified": "2023-07-27T13:18:23.097Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Connection",
+                    "value": "upgrade"
+                },
+                {
+                    "name": "upgrade",
+                    "value": "websocket"
+                },
+                {
+                    "name": "Sec-WebSocket-Key",
+                    "value": "expect-to-fail"
+                },
+                {
+                    "name": "Sec-WebSocket-Version",
+                    "value": "13"
+                },
+                {
+                    "name": "Sec-WebSocket-Extensions",
+                    "value": "permessage-deflate; client_max_window_bits"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "401"
+                }
+            ]
+        },
+        {
+            "_id": "0b917255-a11c-4884-85e0-9a52b479c623",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "bc567fc6-7c5c-4e01-b1c6-f2cb839d2fd8",
+            "name": "5.11 /irc/wsauth enable websocket requests for 10 seconds",
+            "url": "{{server_URL}}/irc/wsauth",
+            "method": "POST",
+            "sortNum": 440625,
+            "created": "2023-07-26T13:36:32.269Z",
+            "modified": "2023-07-26T13:36:32.269Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"purpose\": \"websocket-auth\"\n}",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.error",
+                    "action": "equal",
+                    "value": "false"
+                }
+            ]
+        },
+        {
+            "_id": "e7cd6736-bccd-4b69-acda-ba8f1fce81fc",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "bc567fc6-7c5c-4e01-b1c6-f2cb839d2fd8",
+            "name": "5.12 /login (delete cookie, get new CSRF nonce)",
+            "url": "{{server_URL}}/login",
+            "method": "GET",
+            "sortNum": 452500,
+            "created": "2023-07-26T13:26:35.970Z",
+            "modified": "2023-07-26T13:31:15.050Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "_csrf"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "nonce="
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"nonce=\") | last | split(\" \") | first",
+                    "action": "setto",
+                    "value": "{{login_nonce, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"_csrf\") | at(1) | split(\"value=\") | at(1) | split(\" \") | first",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                }
+            ],
+            "preReq": {
+                "options": {
+                    "clearCookies": true
+                }
+            }
+        },
+        {
+            "_id": "262222ad-40b9-49ed-8b6b-93d977438104",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "bc567fc6-7c5c-4e01-b1c6-f2cb839d2fd8",
+            "name": "5.13 /login-authorize success, receive cookie",
+            "url": "{{server_URL}}/login-authorize?nonce={{login_nonce}}",
+            "method": "POST",
+            "sortNum": 462500,
+            "created": "2023-07-26T13:27:12.440Z",
+            "modified": "2023-07-26T13:27:12.440Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [
+                {
+                    "name": "nonce",
+                    "value": "{{login_nonce}}",
+                    "isPath": false
+                }
+            ],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "user",
+                        "value": "{{server_user1}}"
+                    },
+                    {
+                        "name": "password",
+                        "value": "{{server_password1}}"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    }
+                ]
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "Location",
+                    "action": "equal",
+                    "value": "/irc/webclient.html"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "Set-Cookie",
+                    "action": "contains",
+                    "value": "irc-hybrid-client-0"
+                }
+            ]
+        },
+        {
+            "_id": "e5c1e97c-aaf5-4e74-bb71-5109893e502b",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "bc567fc6-7c5c-4e01-b1c6-f2cb839d2fd8",
+            "name": "5.14 /irc/ws Different cookie (Fail 401)",
+            "url": "{{server_URL}}/irc/ws",
+            "method": "GET",
+            "sortNum": 467500,
+            "created": "2023-07-27T13:16:02.237Z",
+            "modified": "2023-07-27T13:16:44.917Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Connection",
+                    "value": "upgrade"
+                },
+                {
+                    "name": "upgrade",
+                    "value": "websocket"
+                },
+                {
+                    "name": "Sec-WebSocket-Key",
+                    "value": "expect-to-fail"
+                },
+                {
+                    "name": "Sec-WebSocket-Version",
+                    "value": "13"
+                },
+                {
+                    "name": "Sec-WebSocket-Extensions",
+                    "value": "permessage-deflate; client_max_window_bits"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "401"
+                }
+            ]
+        }
+    ],
+    "settings": {
+        "envId": "3e6eb4f9-a6b2-4830-9d40-d4609c2b292d"
+    }
+}

@@ -4,7 +4,7 @@ This is a temporary testing web page.
 
 The purpose of this page is to challenge the authorization
 of the websocket server connection request. This web page can also
-be used in combination with postman to view API responses as described
+be used in combination with Thunder Client to view API responses as described
 in the API section of the /docs.
 
 Caution, when enabled, this test page is publicly visible and does not require
@@ -56,5 +56,5 @@ message will be displayed at 10 second intervals. The "HEARTBEAT" messages indic
 Alternately, the [login] and [logout] buttons can be used to add or remove valid cookie from session.
 
 During general debugging, this test page may be useful. Multiple browsers are allowed to connect concurrently.
-This is one way to observe the raw websocket stream, such as when using postman for API testing.
+This is one way to observe the raw websocket stream, such as when using Thunder Client for API testing.
 Equivalent content is echoed to all connected websockets.

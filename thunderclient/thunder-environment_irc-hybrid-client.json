@@ -1,0 +1,60 @@
+{
+    "client": "Thunder Client",
+    "environmentName": "irc-hybrid-client",
+    "dateExported": "2023-07-28T12:41:57.121Z",
+    "version": "1.0",
+    "variables": [
+        {
+            "name": "server_URL",
+            "value": "http://localhost:3003"
+        },
+        {
+            "name": "server_user1",
+            "value": "user1"
+        },
+        {
+            "name": "server_password1",
+            "value": "mysecret"
+        },
+        {
+            "name": "irc_nickname",
+            "value": "myNick"
+        },
+        {
+            "name": "irc_channel",
+            "value": "#test"
+        },
+        {
+            "name": "server_die",
+            "value": "NO"
+        },
+        {
+            "name": "auth_host",
+            "value": "http://127.0.0.1:3500"
+        },
+        {
+            "name": "auth_redirect_uri",
+            "value": "http://localhost:3003/login/callback"
+        },
+        {
+            "name": "auth_username",
+            "value": "bob"
+        },
+        {
+            "name": "auth_password",
+            "value": "bobssecret"
+        },
+        {
+            "name": "auth_client_id",
+            "value": "irc_client_1"
+        },
+        {
+            "name": "auth_client_secret",
+            "value": "ssh-secret"
+        },
+        {
+            "name": "auth_scopes",
+            "value": "irc.all"
+        }
+    ]
+}
