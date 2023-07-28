@@ -17,6 +17,10 @@ The logger was added in v0.2.49, disabled in v0.2.50.
 Fixed: Fixed unresolved promise in server list edit logger by adding resolve() statement.
 Re-enabled the server list edit logging feature.
 
+### Upgrade NPM dependencies 
+
+express-rate-limit@6.8.1, node-fetch@3.3.2, rotating-file-stream@3.1.1, eslint@8.46.0, eslint-plugin-import@2.28.0
+
 ## [v0.2.51](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.51) 2023-07-28
 
 There are no code changes in this commit.
