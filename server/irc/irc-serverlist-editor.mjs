@@ -806,7 +806,6 @@ const toggleServerDisabled = function (req, chainObject) {
  * @param {Object} chainObject - Wrapper object used to pass common date through promise chain
  * @returns {Promise} Resolve to Object (chainObject) or reject error
  */
-// eslint-disable-next-line no-unused-vars
 const logger = (req, chainObject) => {
   return new Promise((resolve, reject) => {
     let method = null;
@@ -857,6 +856,7 @@ const logger = (req, chainObject) => {
       //
       if ((nodeEnv === 'development') || (nodeDebugLog)) {
         console.log(logEntry);
+        resolve(chainObject);
       } else {
         fs.writeFile(
           authLogFilename,
@@ -906,7 +906,7 @@ const create = function (req, res, next) {
     .then((chainObject) => deserializeElements(req, chainObject))
     .then((chainObject) => appendArrayElement(chainObject))
     .then((chainObject) => writeServersFile(chainObject))
-    // .then((chainObject) => logger(req, chainObject))
+    .then((chainObject) => logger(req, chainObject))
     .then((chainObject) => returnStatus(req, res, chainObject))
     .catch((err) => next(err));
 };
@@ -924,7 +924,7 @@ const update = function (req, res, next) {
     .then((chainObject) => deserializeElements(req, chainObject))
     .then((chainObject) => replaceArrayElement(req, chainObject))
     .then((chainObject) => writeServersFile(chainObject))
-    // .then((chainObject) => logger(req, chainObject))
+    .then((chainObject) => logger(req, chainObject))
     .then((chainObject) => returnStatus(req, res, chainObject))
     .catch((err) => handlePromiseErrors(next, err));
 };
@@ -942,7 +942,7 @@ const copy = function (req, res, next) {
     .then((chainObject) => copyExistingServer(req, chainObject))
     .then((chainObject) => appendArrayElement(chainObject))
     .then((chainObject) => writeServersFile(chainObject))
-    // .then((chainObject) => logger(req, chainObject))
+    .then((chainObject) => logger(req, chainObject))
     .then((chainObject) => returnStatus(req, res, chainObject))
     .catch((err) => next(err));
 };
@@ -956,7 +956,7 @@ const destroy = function (req, res, next) {
     .then((chainObject) => requireNotLock(chainObject))
     .then((chainObject) => readServersFile(chainObject))
     .then((chainObject) => addMissingProperties(chainObject))
-    // .then((chainObject) => logger(req, chainObject))
+    .then((chainObject) => logger(req, chainObject))
     .then((chainObject) => deleteArrayElement(req, chainObject))
     .then((chainObject) => writeServersFile(chainObject))
     .then((chainObject) => returnStatus(req, res, chainObject))
