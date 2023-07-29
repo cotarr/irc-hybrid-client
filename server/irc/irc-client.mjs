@@ -1052,7 +1052,7 @@ const connectIRC = function () {
     ircLog.writeIrcLog(proxyConnectMessage);
     const options = {
       port: vars.ircState.ircServerPort,
-      host: vars.ircState.ircServerHost,
+      hostname: vars.ircState.ircServerHost,
       socksPort: vars.ircState.socks5Port,
       socksHost: vars.ircState.socks5Host
     };
@@ -1080,7 +1080,7 @@ const connectIRC = function () {
 
     const socks5Options = {
       port: vars.ircState.ircServerPort,
-      host: vars.ircState.ircServerHost,
+      hostname: vars.ircState.ircServerHost,
       socksPort: vars.ircState.socks5Port,
       socksHost: vars.ircState.socks5Host
     };

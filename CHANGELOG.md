@@ -10,12 +10,25 @@ and this project adheres to
 
 ### Fixed
 
+Issue: When using Socks5 proxy, an IPV6 numeric IRC server address was
+attempting domain name lookup causing IRC server connection failure via proxy.
+IRC servers using domain names that resolve to IPV6 addresses did not have this problem.
+It was specific to IRC server numeric address in the form "a123:45bc::6def" 
+passing through the socks5 proxy.
+
+Fixed: The NPM package socks5-client accepts 3 options: host, hostname, and port.
+For socks5 proxy connections the options were changed from host, port to hostname, port.
+Combinations of IRC server address: IPV4, IPV6, FQDN, TLS, non-TLS, and 
+username/password were tested with socks5 proxy server addresses: IPV4 and IPV6.
+
+### Fixed
+
 Issue: The IRC server list editor could become responsive when irc-hybrid-client is 
 configured to redirect log file output to stdout using console.log() statements.
-The logger was added in v0.2.49, disabled in v0.2.50.
+The faulty server list edit logger was added in v0.2.49, disabled in v0.2.50.
 
 Fixed: Fixed unresolved promise in server list edit logger by adding resolve() statement.
-Re-enabled the server list edit logging feature.
+Re-enabled the server list edit logging feature for v0.2.52.
 
 ### Upgrade NPM dependencies 
 
