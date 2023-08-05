@@ -525,18 +525,91 @@ const deserializeElements = function (req, chainObject) {
 /**
  * Function to copy existing IRC server to a new entry at the end of the list.
  * Index of source server is provided in URL query parameter 'index'
+ * Name of duplicated server appended with sequential integers '-0' to '-9'
+ * @param {Object} req - NodeJs HTTP request object
+ * @param {Object} req.query.index - URL query parameter for from index for copy operation
  * @param {Object} chainObject - Wrapper object used to pass common date through promise chain
- * @returns {Promise} Resolve to Object (chainObject) or reject error
+ * @param {Object} chainObject.serversFile.serverArray - IRC server list (from file).
+* @returns {Promise} Resolve to chainObject with chainObject.newServer or reject error
  */
 const copyExistingServer = function (req, chainObject) {
   return new Promise(function (resolve, reject) {
     const index = parseInt(req.query.index);
     const listLength = chainObject.serversFile.serverArray.length;
     if (index < listLength) {
+      chainObject.fromIndex = index;
       // this is a deep copy
       chainObject.newServer =
         JSON.parse(JSON.stringify(chainObject.serversFile.serverArray[index]));
-      chainObject.newServer.name = chainObject.newServer.name + '-2';
+      // Name (label) of new IRC server formed from copied server name.
+      let newName = chainObject.newServer.name;
+      // Append ('-0', '-1', '-2',  ... '-8', '-9', '-dup' to the end of the server name
+      // If server name ends in '-dup', leave it without modification.
+      if ((newName.length < 4) || (newName.indexOf('-dup') !== newName.length - 4)) {
+        if ((newName.length > 2) && (newName.charAt(newName.length - 2) === '-') &&
+          (newName.charCodeAt(newName.length - 1) >= '0'.charCodeAt(0)) &&
+          (newName.charCodeAt(newName.length - 1) <= '9'.charCodeAt(0))) {
+          // Server name already ends in '-?', so strip 2 characters.
+          newName = newName.slice(0, newName.length - 2);
+        }
+        let available = false;
+        let suffix = '';
+        // loop ascii digits '0' to '9'
+        for (let i = 0; i <= 9; i++) {
+          available = true;
+          suffix = '-' + String.fromCharCode('0'.charCodeAt(0) + i);
+          // loop through each server in the list checking for duplicate names.
+          for (let j = 0; j < chainObject.serversFile.serverArray.length; j++) {
+            if (newName + suffix === chainObject.serversFile.serverArray[j].name) {
+              available = false;
+              break;
+            }
+          } // next j
+          if (available) break;
+        } // next i
+        if (available) {
+          newName += suffix;
+        } else {
+          newName += '-dup';
+        }
+      }
+      chainObject.newServer.name = newName;
+      resolve(chainObject);
+    } else {
+      const err = new Error('Copy index out of range');
+      err.status = 400; // Bad Request
+      reject(err);
+    }
+  });
+};
+
+/**
+ * Function to insert a copy of existing IRC server into array IRC server definitions
+ * at location immediately after the source IRC server index position.
+ * Both new IRC server object and IRC server array are present within chainObject
+ * @param {Object} chainObject - Wrapper object used to pass common date through promise chain
+ * @param {Object} chainObject.fromIndex - Array index of source IRC server for copy
+ * @param {Object} chainObject.serversFile.serverArray - IRC server list (from file).
+ * @param {Object} chainObject.newServer - Javascript object defining the copied IRC server.
+ * @returns {Promise} Resolve to chainObject, chainObject.serversFile.serverArray or reject error
+ */
+const insertArrayElement = function (chainObject) {
+  return new Promise((resolve, reject) => {
+    const index = chainObject.fromIndex;
+    const listLength = chainObject.serversFile.serverArray.length;
+    if ((typeof index === 'number') && (index >= 0) && (index < listLength)) {
+      const newArray = [];
+      for (let i = 0; i <= index; i++) {
+        newArray.push(chainObject.serversFile.serverArray[i]);
+      }
+      newArray.push(chainObject.newServer);
+      if (listLength > index + 1) {
+        for (let i = index + 1; i < chainObject.serversFile.serverArray.length; i++) {
+          newArray.push(chainObject.serversFile.serverArray[i]);
+        }
+      }
+      chainObject.serversFile.serverArray = newArray;
+      chainObject.returnIndex = index + 1;
       resolve(chainObject);
     } else {
       const err = new Error('Copy index out of range');
@@ -940,7 +1013,7 @@ const copy = function (req, res, next) {
     .then((chainObject) => readServersFile(chainObject))
     .then((chainObject) => addMissingProperties(chainObject))
     .then((chainObject) => copyExistingServer(req, chainObject))
-    .then((chainObject) => appendArrayElement(chainObject))
+    .then((chainObject) => insertArrayElement(chainObject))
     .then((chainObject) => writeServersFile(chainObject))
     .then((chainObject) => logger(req, chainObject))
     .then((chainObject) => returnStatus(req, res, chainObject))

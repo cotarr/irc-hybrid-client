@@ -1,7 +1,7 @@
 {
     "client": "Thunder Client",
     "collectionName": "irc-hybrid-client",
-    "dateExported": "2023-08-05T13:48:08.099Z",
+    "dateExported": "2023-08-05T22:39:18.124Z",
     "version": "1.1",
     "folders": [
         {
@@ -3503,7 +3503,7 @@
             "method": "DELETE",
             "sortNum": 220000,
             "created": "2023-07-26T14:27:29.859Z",
-            "modified": "2023-07-26T18:14:43.207Z",
+            "modified": "2023-08-05T22:16:33.687Z",
             "headers": [
                 {
                     "name": "CSRF-Token",
@@ -3670,7 +3670,7 @@
             "method": "COPY",
             "sortNum": 240000,
             "created": "2023-07-26T14:27:35.463Z",
-            "modified": "2023-07-26T16:01:04.951Z",
+            "modified": "2023-08-05T22:21:26.061Z",
             "headers": [
                 {
                     "name": "CSRF-Token",
@@ -4137,7 +4137,7 @@
             "method": "DELETE",
             "sortNum": 290000,
             "created": "2023-07-26T14:27:56.233Z",
-            "modified": "2023-07-26T16:12:11.282Z",
+            "modified": "2023-08-05T22:26:31.610Z",
             "headers": [
                 {
                     "name": "CSRF-Token",
@@ -4182,12 +4182,6 @@
                     "custom": "json.method",
                     "action": "equal",
                     "value": "DELETE"
-                },
-                {
-                    "type": "json-query",
-                    "custom": "json.index",
-                    "action": "equal",
-                    "value": "{{irc_server_index}}"
                 }
             ]
         },

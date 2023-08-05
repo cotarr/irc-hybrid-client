@@ -8,8 +8,11 @@ and this project adheres to
 
 ## Next v0.2.53-dev 2023-08-05
 
-There are no code changes in this commit.
-
+- IRC server list editor, renamed button "Copy" to "Duplicate"
+- When duplicating an existing IRC server definition, the copy is inserted immediately following the source IRC server, rather than append to the end of the list as before.
+- When duplicating an IRC server definition, the name (label) of the copy is appended with "-0", "-1", "-2", "-3" ... "-9", "-dup".
+- Updated Thunder Client tests for changes to IRC server list editor.
+- Updated /docs/ for changes to IRC server list editor.
 - Additional Thunder Client API tests to include tests with expired CSRF tokens.
 - Improve explanation of CSRF token use in the API Examples section of the /docs/.
 

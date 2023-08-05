@@ -793,7 +793,7 @@ const buildServerListTable = (data) => {
 
           const td71El = document.createElement('td');
           const copyButtonEl = document.createElement('button');
-          copyButtonEl.textContent = 'Copy';
+          copyButtonEl.textContent = 'Duplicate';
           td71El.appendChild(copyButtonEl);
           rowEl.appendChild(td71El);
 
