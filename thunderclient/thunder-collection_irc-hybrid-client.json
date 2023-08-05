@@ -1,7 +1,7 @@
 {
     "client": "Thunder Client",
     "collectionName": "irc-hybrid-client",
-    "dateExported": "2023-07-28T12:42:24.743Z",
+    "dateExported": "2023-08-05T13:48:08.099Z",
     "version": "1.1",
     "folders": [
         {
@@ -50,7 +50,7 @@
             "method": "GET",
             "sortNum": 10000,
             "created": "2023-07-25T11:56:02.698Z",
-            "modified": "2023-07-25T16:35:53.356Z",
+            "modified": "2023-08-05T13:45:06.518Z",
             "headers": [
                 {
                     "name": "Accept",
@@ -60,10 +60,22 @@
             "params": [],
             "tests": [
                 {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
                     "type": "set-env-var",
                     "custom": "delete",
                     "action": "setto",
                     "value": "{{login_nonce, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{first_csrf_token, local}}"
                 },
                 {
                     "type": "set-env-var",
@@ -100,7 +112,7 @@
             "method": "GET",
             "sortNum": 10000,
             "created": "2023-07-25T17:11:13.703Z",
-            "modified": "2023-07-25T17:11:13.703Z",
+            "modified": "2023-08-05T13:46:02.161Z",
             "headers": [
                 {
                     "name": "Accept",
@@ -110,10 +122,22 @@
             "params": [],
             "tests": [
                 {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
                     "type": "set-env-var",
                     "custom": "delete",
                     "action": "setto",
                     "value": "{{login_nonce, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{first_csrf_token, local}}"
                 },
                 {
                     "type": "set-env-var",
@@ -150,7 +174,7 @@
             "method": "GET",
             "sortNum": 10000,
             "created": "2023-07-26T12:29:58.493Z",
-            "modified": "2023-07-26T12:29:58.493Z",
+            "modified": "2023-08-05T13:45:40.671Z",
             "headers": [
                 {
                     "name": "Accept",
@@ -160,10 +184,22 @@
             "params": [],
             "tests": [
                 {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
                     "type": "set-env-var",
                     "custom": "delete",
                     "action": "setto",
                     "value": "{{login_nonce, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{first_csrf_token, local}}"
                 },
                 {
                     "type": "set-env-var",
@@ -281,7 +317,7 @@
             "method": "GET",
             "sortNum": 12500,
             "created": "2023-07-26T14:30:23.250Z",
-            "modified": "2023-07-26T18:55:10.692Z",
+            "modified": "2023-08-05T13:25:03.675Z",
             "headers": [
                 {
                     "name": "Accept",
@@ -307,6 +343,12 @@
                     "custom": "delete",
                     "action": "setto",
                     "value": "{{login_nonce, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{first_csrf_token, local}}"
                 },
                 {
                     "type": "set-env-var",
@@ -537,12 +579,12 @@
             "_id": "8ceaea00-94f9-444d-b98c-6105a8dd680a",
             "colId": "40f52759-c344-48ea-8561-1e96946e0321",
             "containerId": "bc567fc6-7c5c-4e01-b1c6-f2cb839d2fd8",
-            "name": "5.2 /login (get nonce, csrfToken)",
+            "name": "5.2 /login (get nonce, csrf_token, first_csrf_token)",
             "url": "{{server_URL}}/login",
             "method": "GET",
             "sortNum": 20000,
             "created": "2023-07-26T12:30:30.107Z",
-            "modified": "2023-07-26T12:30:30.107Z",
+            "modified": "2023-08-05T13:30:08.894Z",
             "headers": [
                 {
                     "name": "Accept",
@@ -580,6 +622,12 @@
                     "custom": "text | removeQuotes | split(\"_csrf\") | at(1) | split(\"value=\") | at(1) | split(\" \") | first",
                     "action": "setto",
                     "value": "{{csrf_token, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"_csrf\") | at(1) | split(\"value=\") | at(1) | split(\" \") | first",
+                    "action": "setto",
+                    "value": "{{first_csrf_token, local}}"
                 }
             ]
         },
@@ -913,12 +961,12 @@
             "_id": "dcc3d58f-a8a5-4521-a1f7-0d375fc1cd31",
             "colId": "40f52759-c344-48ea-8561-1e96946e0321",
             "containerId": "b28c465a-5ebb-40f6-9458-fde7e78b8ab8",
-            "name": "2.2 /login (get nonce, csrfToken)",
+            "name": "2.2 /login (get nonce, csrf_token,  first_csrf_token)",
             "url": "{{server_URL}}/login",
             "method": "GET",
             "sortNum": 40000,
             "created": "2023-07-25T12:01:39.131Z",
-            "modified": "2023-07-25T12:14:15.975Z",
+            "modified": "2023-08-05T12:53:49.794Z",
             "headers": [
                 {
                     "name": "Accept",
@@ -956,6 +1004,12 @@
                     "custom": "text | removeQuotes | split(\"_csrf\") | at(1) | split(\"value=\") | at(1) | split(\" \") | first",
                     "action": "setto",
                     "value": "{{csrf_token, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"_csrf\") | at(1) | split(\"value=\") | at(1) | split(\" \") | first",
+                    "action": "setto",
+                    "value": "{{first_csrf_token, local}}"
                 }
             ]
         },
@@ -2620,6 +2674,175 @@
             ]
         },
         {
+            "_id": "e9c8779a-4954-47a4-8e6e-269531927151",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "b28c465a-5ebb-40f6-9458-fde7e78b8ab8",
+            "name": "2.15 /logout - Remove HTTP session, expires CSRF secret",
+            "url": "{{server_URL}}/logout",
+            "method": "GET",
+            "sortNum": 162500,
+            "created": "2023-08-05T13:15:21.222Z",
+            "modified": "2023-08-05T13:15:21.222Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "<button>Return to Login</button>"
+                }
+            ]
+        },
+        {
+            "_id": "cdfe0991-81b1-4daa-a81a-f38c18cd4647",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "b28c465a-5ebb-40f6-9458-fde7e78b8ab8",
+            "name": "2.16 /login (new HTTP session, get nonce, new csrfToken)",
+            "url": "{{server_URL}}/login",
+            "method": "GET",
+            "sortNum": 165000,
+            "created": "2023-08-05T12:56:11.458Z",
+            "modified": "2023-08-05T12:56:11.458Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "_csrf"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "nonce="
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"nonce=\") | last | split(\" \") | first",
+                    "action": "setto",
+                    "value": "{{login_nonce, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"_csrf\") | at(1) | split(\"value=\") | at(1) | split(\" \") | first",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "46927108-d35d-4bbf-b953-d396c887f04d",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "b28c465a-5ebb-40f6-9458-fde7e78b8ab8",
+            "name": "2.17 /login-authorize (confirm fail, expired initial CSRF token)",
+            "url": "{{server_URL}}/login-authorize?nonce={{login_nonce}}",
+            "method": "POST",
+            "sortNum": 167500,
+            "created": "2023-08-05T12:56:46.422Z",
+            "modified": "2023-08-05T13:14:17.586Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [
+                {
+                    "name": "nonce",
+                    "value": "{{login_nonce}}",
+                    "isPath": false
+                }
+            ],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "user",
+                        "value": "{{server_user1}}"
+                    },
+                    {
+                        "name": "password",
+                        "value": "{{server_password1}}"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{first_csrf_token}}"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}",
+                        "isDisabled": true
+                    }
+                ]
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "403"
+                }
+            ]
+        },
+        {
+            "_id": "9e127653-72ac-4c61-85c1-882f2a693229",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "b28c465a-5ebb-40f6-9458-fde7e78b8ab8",
+            "name": "2.18 /irc/webclient.html confirm fail",
+            "url": "{{server_URL}}/irc/webclient.html",
+            "method": "GET",
+            "sortNum": 168750,
+            "created": "2023-08-05T13:19:56.335Z",
+            "modified": "2023-08-05T13:19:56.335Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "Location",
+                    "action": "equal",
+                    "value": "/login"
+                }
+            ]
+        },
+        {
             "_id": "e8b2ebdd-aff2-4091-89fe-8f46c806e7b0",
             "colId": "40f52759-c344-48ea-8561-1e96946e0321",
             "containerId": "b28c465a-5ebb-40f6-9458-fde7e78b8ab8",
@@ -2760,7 +2983,7 @@
             "method": "POST",
             "sortNum": 180000,
             "created": "2023-07-25T12:36:16.343Z",
-            "modified": "2023-07-25T18:17:01.850Z",
+            "modified": "2023-08-05T12:51:47.589Z",
             "headers": [
                 {
                     "name": "Accept",
@@ -4880,7 +5103,7 @@
             "_id": "e7cd6736-bccd-4b69-acda-ba8f1fce81fc",
             "colId": "40f52759-c344-48ea-8561-1e96946e0321",
             "containerId": "bc567fc6-7c5c-4e01-b1c6-f2cb839d2fd8",
-            "name": "5.12 /login (delete cookie, get new CSRF nonce)",
+            "name": "5.12 /login (pre-run delete cookie, get new CSRF nonce)",
             "url": "{{server_URL}}/login",
             "method": "GET",
             "sortNum": 452500,
@@ -5003,6 +5226,92 @@
             "sortNum": 467500,
             "created": "2023-07-27T13:16:02.237Z",
             "modified": "2023-07-27T13:16:44.917Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Connection",
+                    "value": "upgrade"
+                },
+                {
+                    "name": "upgrade",
+                    "value": "websocket"
+                },
+                {
+                    "name": "Sec-WebSocket-Key",
+                    "value": "expect-to-fail"
+                },
+                {
+                    "name": "Sec-WebSocket-Version",
+                    "value": "13"
+                },
+                {
+                    "name": "Sec-WebSocket-Extensions",
+                    "value": "permessage-deflate; client_max_window_bits"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "401"
+                }
+            ]
+        },
+        {
+            "_id": "613ad3d7-d9bf-4a8b-a74b-7f768933cd9f",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "bc567fc6-7c5c-4e01-b1c6-f2cb839d2fd8",
+            "name": "5.15 /irc/wsauth expired first_csrf_token from 5.2 (Fail 403)",
+            "url": "{{server_URL}}/irc/wsauth",
+            "method": "POST",
+            "sortNum": 477500,
+            "created": "2023-08-05T12:28:44.076Z",
+            "modified": "2023-08-05T13:39:48.651Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}",
+                    "isDisabled": true
+                },
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{first_csrf_token}}"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"purpose\": \"websocket-auth\"\n}",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "403"
+                }
+            ]
+        },
+        {
+            "_id": "c6fa062f-78de-4492-a7b9-45ee00963864",
+            "colId": "40f52759-c344-48ea-8561-1e96946e0321",
+            "containerId": "bc567fc6-7c5c-4e01-b1c6-f2cb839d2fd8",
+            "name": "5.16 /irc/ws Not scheduled, no CSRF token (Fail 401)",
+            "url": "{{server_URL}}/irc/ws",
+            "method": "GET",
+            "sortNum": 487500,
+            "created": "2023-08-05T12:30:37.591Z",
+            "modified": "2023-08-05T12:30:37.591Z",
             "headers": [
                 {
                     "name": "Accept",

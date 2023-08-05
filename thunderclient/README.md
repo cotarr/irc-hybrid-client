@@ -238,7 +238,7 @@ List of tests
 * 1.1 Call /logout, delete cookie, clear variables
 * 1.2 Confirm server is running
 * 1.3 Confirm one secure route is blocked
-* 2.1-2.12 User login requests that are expected to fail.
+* 2.1-2.18 User login requests that are expected to fail.
 * 3.1 Request the login HTML form. Extract the login nonce and CSRF token.
 * 3.2 Use POST request to submit username and password. The login nonce will timeout after a short delay.
 * 4.1-4.20 Logout, then confirm authorization blocks access to each API route.
@@ -251,8 +251,11 @@ A second server is used to listen for websocket connection upgrade requests.
 The websocket is used to receive a UNIX stream containing IRC messages.
 
 In order to initiate a websocket connection, the browser must obtain a valid cookie 
-using the normal user password login process. Using the same cookie as the 
-web server, the browser performs a POST request to the /irc/wsauth route.
+using the normal user password login process.
+The browser must extract a valid CSRF token from the HTML on the main page.
+Using the same cookie as the seb server and a valid CSRF token,
+the browser performs a POST request to the /irc/wsauth route.
+The cookie is validated. The CSRF token is validated.
 The cookie will be remembered. A 10 second timer is started.
 Within the 10 second time window, the browser submits a connection 
 upgrade request to the /irc/ws route including the same cookie. 
@@ -285,8 +288,10 @@ List of tests
 * 5.9 /irc/ws Success, expected result status 400 Bad request "Missing or invalid Sec-WebSocket-Key header"
 * 5.10 /irc/ws Socket listener only valid one time. Repeat request, expect fail 401.
 * 5.11 /irc/wsauth Enable websocket, start timer, remember cookie
-* 5.12-5.13 Logout, login, request will now have a different cookie.
+* 5.12-5.13 Logout, login, request will now have a different cookie, different CSRF secret in session
 * 5.14 Attempt to open websocket upgrade request in case of cookie hash does not match previously saved value, expect fail 401.
+* 5.15 Attempt to enable websocket using initial CSRF token (first_csrf_token) from step 5.2, now invalid, expect fail 403
+* 5.16 Attempt to open websocket upgrade request, no auth scheduled due to 5.15, expect fail 401.
 
 ## Message Debug
 

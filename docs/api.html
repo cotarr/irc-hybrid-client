@@ -1171,8 +1171,31 @@ Cached message with 2 IRC channels.
           Each message is delimited by CR,LF end of line characters (&quot;\r\n&quot;).
         </p>
         <p>
+          The TCP socket for the websocket connection between web browser and the irc-hybrid-client web
+          server is managed on the server end by the NPM package &quot;ws&quot; using 
+          RFC 6455 Websocket Protocol. Chrome supports this type of websocket connection and 
+          no special library is required for the web browser.
+          The general connection process involves making a HTTP request with special headers
+          to designate the request as an 'upgrade' request. The ws library then opens the 
+          websocket connection and manages messages, errors, and closure of the connection.
+        </p>
+        <p>
+          In order to initiate a websocket connection, the browser must obtain 
+          a valid cookie using the normal user password login process.
+          The browser must extract a valid CSRF token from the HTML on the main page.
+          Using the website's cookie and the valid CSRF token,
+          the browser performs a POST request to the /irc/wsauth route.
+          The cookie is validated. The CSRF token is validated.
+          The cookie will be remembered. A 10 second timer is started.
+          Within the 10 second time window, the browser submits a connection 
+          upgrade request to the /irc/ws route using ws:// or wss:// protocol including 
+          the same cookie in the request headers. Upon successful validation of the cookie 
+          the server passes the request to the ws library to manage the websocket. 
+          Unauthorized connection upgrade requests will return a status 401 Unauthorized error.
+        </p>
+        <p>
           All RFC 2812 messages from the web server are passed through the backend.
-          A copy of each message is echoed to the web browser in utf-8 format over the websocket.
+          A copy of each message is echoed to all connected web browsers in utf-8 format over the websocket.
           JavaScript in the web browser parses the messages to identify text messages from
           other IRC users. User text messages are then displayed as text content in the appropriate windows.
         </p>

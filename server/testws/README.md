@@ -22,6 +22,7 @@ This temporary web page is intended to be used to confirm the websocket server i
 
 * Browser attempts POST request to /irc/wsauth
 * Session cookie validated by express-session.
+* The CSRF token is validated by csruf middleware.
 * Cookie value and +10 second expiry setup for subsequent websocket connection.
 * Browser attempts wss:// websocket request containing valid cookie.
 * Cookie from wss:// websocket upgrade request is validated.

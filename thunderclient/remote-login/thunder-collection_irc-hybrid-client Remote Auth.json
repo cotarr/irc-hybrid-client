@@ -1,7 +1,7 @@
 {
     "client": "Thunder Client",
     "collectionName": "irc-hybrid-client Remote Auth",
-    "dateExported": "2023-07-28T12:43:02.170Z",
+    "dateExported": "2023-08-05T13:48:32.908Z",
     "version": "1.1",
     "folders": [],
     "requests": [
@@ -14,7 +14,7 @@
             "method": "GET",
             "sortNum": 10000,
             "created": "2023-07-26T12:06:07.248Z",
-            "modified": "2023-07-26T12:06:07.248Z",
+            "modified": "2023-08-05T13:26:08.247Z",
             "headers": [
                 {
                     "name": "Accept",
@@ -40,6 +40,12 @@
                     "custom": "delete",
                     "action": "setto",
                     "value": "{{login_nonce, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{first_csrf_token, local}}"
                 },
                 {
                     "type": "set-env-var",
