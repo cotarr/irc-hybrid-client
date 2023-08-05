@@ -144,7 +144,7 @@ reconnectIconEl.classList.add('icon-false');reconnectIconInnerEl.classList.add('
 ;if(data[i].logging){loggingIconEl.classList.add('icon-true');loggingIconInnerEl.classList.add('icon-inner-true')}else{loggingIconEl.classList.add('icon-false')
 ;loggingIconInnerEl.classList.add('icon-inner-false')}td61El.appendChild(loggingIconEl);rowEl.appendChild(td61El)}if(editable){const td70El=document.createElement('td')
 ;const editButtonEl=document.createElement('button');editButtonEl.textContent='Edit';td70El.appendChild(editButtonEl);rowEl.appendChild(td70El);const td71El=document.createElement('td')
-;const copyButtonEl=document.createElement('button');copyButtonEl.textContent='Copy';td71El.appendChild(copyButtonEl);rowEl.appendChild(td71El);const td72El=document.createElement('td')
+;const copyButtonEl=document.createElement('button');copyButtonEl.textContent='Duplicate';td71El.appendChild(copyButtonEl);rowEl.appendChild(td71El);const td72El=document.createElement('td')
 ;const deleteButtonEl=document.createElement('button');deleteButtonEl.textContent='Delete';td72El.appendChild(deleteButtonEl);rowEl.appendChild(td72El);const td73El=document.createElement('td')
 ;const moveUpButtonEl=document.createElement('button');moveUpButtonEl.textContent='move-up';if(i>0)td73El.appendChild(moveUpButtonEl);rowEl.appendChild(td73El)
 ;disabledCheckboxEl.addEventListener('click',()=>{toggleDisabled(parseInt(rowEl.getAttribute('index')))});editButtonEl.addEventListener('click',()=>{
