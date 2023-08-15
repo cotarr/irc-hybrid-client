@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.0.0](https://github.com/cotarr/irc-hybrid-client/releases/tag/v1.0.0) 2023-08-21
+
+Starting with this commit, a major upgrade to the web browser code has been started.
+The version number has been bumped from v0.2.53 to v1.0.0 to mark the end of active development 
+on the current v0 web browser code. A new version v2.0.0 will be created to begin development
+of upgraded web browser code.
+
+The goal of the upgrade will be to modularize the web browser code by dividing the existing 
+HTML and JavaScript into individual custom web components. A new branch "web-components"
+will be used to develop the web component version.
+
 ## [v0.2.53](https://github.com/cotarr/irc-hybrid-client/releases/tag/v0.2.53) 2023-08-07
 
 - IRC server list editor, renamed button "Copy" to "Duplicate"
