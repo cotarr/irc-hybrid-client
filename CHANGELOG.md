@@ -10,6 +10,13 @@ and this project adheres to
 
 Work in progress, see top of README.md
 
+
+
+- Deleted source files `secure/*`
+- Deleted build folder `secure-minify/*`
+
+Commit d55fd57
+
 - Created branch "web-components" to write and debug web component version of new browser code.
 - Added branch description notes to top of README.md
 - Bumped version to v2.0.0-dev to mark start of development for new web browser version.
