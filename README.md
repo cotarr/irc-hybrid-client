@@ -1,4 +1,82 @@
-# irc-hybrid-client
+# Branch Notes (Development v2.0.0-dev)
+
+Git branch: web-components
+
+### Work In Progress
+
+Due to major code changes, ***THIS BRANCH IS NOT OPERATIONAL*** as an IRC client
+until additional coding has been completed.
+
+Description: This is a reorganization of the frontend web browser HTML and JavaScript into multiple web components.
+
+Motivation: The previous web browser code consisted of a web page based on
+a single block of HTML code and a single block of JavaScript.
+As the program evolved and increased in size, it has become difficult to maintain. 
+The HTML code was within a single scope with all HTML element id, class, 
+and css style declarations inside one single web page DOM. 
+Although the web browser JavaScript was split to 11 files, this was simply 
+an editing convenience. All the JavaScript files were concatenated together 
+for execution as a single script with one namespace. Splitting the web 
+browser into web components will allow each separate panel in the user interface to 
+have it's own shadowDOM where the scope of element tags, classes, styles and JavaScript 
+are isolated inside the web component.
+
+### Coding notes
+
+- No web component framework will be used. Chrome supports v1 web components using native code.
+- A dedicated git branch `web-components` has been created for development and debug. It will not be merged to master until it is operational.
+- The build process will continue to use gulp to bundle and minify, similar to the previous version.
+- The gulp build tools are located in a separate repository "irc-hybrid-client-dev-tools" also using development branch `web-components`.
+- Web component HTML template files will be concatenated into a single HTML file in both dev and prod builds.
+- CSS style names inside each web component will be prefixed with a unique string identifier. All CSS will be concatenated into a single css style file.
+- In the dev build, all JavaScript files will remain separate to allow js error message line numbers to match in both editor and web browser.
+- In the prod build, all JavaScript will be bundled into a single file and minified.
+- The gulp script will modify HTML source files in both dev and prod to match the bundling configuration.
+- The previous frontend web browser code and folders will be deleted at the start of the edit. This is to avoid text editor global text search hits on the old version.
+
+### Approach
+
+As much as possible, existing IRC client code will be used as-is. Some variable name substitutions 
+will be necessary to accommodate namespace constraints within web components.
+
+The primary changes will be in the user interface panels. For example, in the case where all panels
+have a "close" button, the previous version required a unique element ID name assignment 
+for each button in each panel. Inside the shadowDOM of individual web components, each close 
+button can use a standardized ID name within each panel's shadow DOM. 
+
+To simplify things, no changes to the backend NodeJs server are anticipated.
+
+### Project File Structure
+
+Before (V0.2.53)
+
+```
+Source Files                -->          Minified files (3 files)
+
+secure/webclient.html  (single file)     secure-minify/webclient.html
+secure/css/styles.css  (single file)     secure-minify/css/styles.css
+secure/js/*.js    (multiple --> single)  secure-minify/js/webclient.js
+```
+
+After (V2.0.0-dev)
+
+```
+Source Files                      -->         Development Build (multiple js) --> Bundled, Minified (3 files)
+
+source-files/html/*.html                      build-dev/webclient.html            build-prod/webclient.html
+source-files/css/*.css (shared css)           build-dev/css/styles.css            build-prod/css/styles.css
+source-files/js/*.js (loads page)             build-dev/js/(*multiple files*).js  build-prod/js/webclient.js
+source-files/web-components/*.html,*.css,*.js
+```
+---
+
+End of branch notes
+
+---
+
+# irc-hybrid-client (v0.2.53)
+
+***TBD - Not updated for Version 2***
 
 Single user hybrid IRC client using JavaScript frontend and Node.js/Express backend.
 
