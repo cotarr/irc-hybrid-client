@@ -199,7 +199,6 @@ window.customElements.define('channel-panel', class extends HTMLElement {
   };
 
   _handleColorThemeChanged = (event) => {
-    console.log('_handleColor');
     if (event.detail.theme === 'light') {
       this.shadowRoot.getElementById('panelDivId')
         .classList.remove('channel-panel-theme-dark');
@@ -278,13 +277,9 @@ window.customElements.define('channel-panel', class extends HTMLElement {
         window.globals.webState.channels.splice(webStateChannelIndex, 1);
         window.globals.webState.channelStates.splice(webStateChannelIndex, 1);
       }
-      //
-      // 2 - Remove timers
-      //
-      clearInterval(this.channelIntervalTimer);
 
       //
-      // 3 - Remove eventListeners
+      // 2 - Remove eventListeners
       //
       /* eslint-disable max-len */
       this.shadowRoot.getElementById('clearButton').removeEventListener('click', this._handleClearButton);
@@ -303,7 +298,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       /* eslint-enable max-len */
 
       //
-      // 4 - Channel panel removes itself from the DOM
+      // 3 - Channel panel removes itself from the DOM
       //
       const parentEl = document.getElementById('channelsContainer');
       const childEl = document.getElementById('channel' + this.channelName.toLowerCase());
@@ -411,6 +406,13 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     }
   };
 
+  /**
+   * Called once per second as task scheduler, called from js/_afterLoad.js
+   */
+  timerTickHandler = () => {
+    if (this.activityIconInhibitTimer > 0) this.activityIconInhibitTimer--;
+  };
+
   // ------------------
   // Main entry point
   // ------------------
@@ -455,10 +457,6 @@ window.customElements.define('channel-panel', class extends HTMLElement {
 
     // inhibit timer to prevent display of activity icon
     this.activityIconInhibitTimer = 0;
-    // this timer is removed before pruning a channel
-    this.channelIntervalTimer = setInterval(() => {
-      if (this.activityIconInhibitTimer > 0) this.activityIconInhibitTimer--;
-    }, 1000);
 
     // The following cache reload request is to bring the
     // IRC channel textarea in sync with server.

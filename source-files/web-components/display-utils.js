@@ -265,9 +265,7 @@ window.customElements.define('display-utils', class extends HTMLElement {
   // An external listener will call this function
   // --------------------------------------------------------
   // TODO remove
-  test123 = 'Sees this context';
   handleExternalWindowResizeEvent (event) {
-    console.log('this.handleExternalWindowResizeEvent', this.test123);
     this._updatePageMeasurements();
     // ignore resize events before dynamic size variables exist
     if (window.globals.webState.dynamic.inputAreaCharWidthPx) {
@@ -348,6 +346,13 @@ window.customElements.define('display-utils', class extends HTMLElement {
     ));
   };
 
+  /**
+   * Called once per second as task scheduler, called from js/_afterLoad.js
+   */
+  timerTickHandler = () => {
+    this._checkVerticalSliderPageWidth();
+  };
+
   // ------------------
   // Main entry point
   // ------------------
@@ -400,13 +405,6 @@ window.customElements.define('display-utils', class extends HTMLElement {
         }
       ));
     }, 900);
-
-    //
-    // 1 second utility timer
-    //
-    setInterval(() => {
-      this._checkVerticalSliderPageWidth();
-    }, 1000);
   }
 
   connectedCallback () {

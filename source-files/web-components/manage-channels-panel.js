@@ -75,7 +75,7 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
       // TODO const message = 'JOIN ' + newChannel;
       // TODO _sendIrcServerMessage(message);
     } else {
-      // TODO showError('Invalid Channel Name');
+      document.getElementById('errorPanel').showError('Invalid Channel Name');
     }
   }; // _joinNewChannel()
 
@@ -104,7 +104,6 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
   // Event handler for button click to open new IRC channel
   // windows and /JOIN the channel named on the button.
   _handleChannelButtonClick = (event) => {
-    console.log('event.target.id', event.target.id);
     const channelName = this.shadowRoot.getElementById(event.target.id).textContent;
     if (channelName.length > 0) {
       console.log('channelName ' + channelName);
@@ -112,13 +111,22 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
     }
   };
 
+  /**
+   * Called once per second as task scheduler, called from js/_afterLoad.js
+   */
+  timerTickHandler = () => {
+    const channelsElements = document.getElementById('channelsContainer');
+    const channelEls = Array.from(channelsElements.children);
+    channelEls.forEach((chanEl) => {
+      chanEl.timerTickHandler();
+    });
+  };
+
   // ------------------
   // Main entry point
   // ------------------
-  initializePlugin = () => {
-    // console.log('notice-panel initializePlugin');
-
-  }; // initializePlugin()
+  // initializePlugin = () => {
+  // }; // initializePlugin()
 
   // add event listeners to connected callback
   // -------------------------------------------

@@ -116,7 +116,9 @@ window.customElements.define('user-info', class extends HTMLElement {
             message += ', ' + err.remoteErrorText;
           }
           const error = new Error(message);
-          console.log('Error: ', error.message);
+          // limit to 1 line
+          message = message.split('\n')[0];
+          document.getElementById('errorPanel').showError(message);
           reject(error);
         }); // fetch
     }); // promise

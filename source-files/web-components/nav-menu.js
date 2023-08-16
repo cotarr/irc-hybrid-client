@@ -71,6 +71,7 @@ customElements.define('nav-menu', class extends HTMLElement {
       const parentEl = this.shadowRoot.getElementById('dropdownMenuChannelContainer');
       while (parentEl.firstChild) {
         // 1 - Remove event listener
+        console.log('removing event listener', parentEl.firstChild.id);
         parentEl.firstChild.removeEventListener('click', this.handleChannelClick);
         // 2 - Then delete the element from the menu
         parentEl.removeChild(parentEl.firstChild);
@@ -182,7 +183,6 @@ customElements.define('nav-menu', class extends HTMLElement {
 
     // if click the superior button, open/close the dropdown, if expandable
     const _toggleDropdownOnMenuClick = (groupName) => {
-      // console.log('pageStr ' + pageStr);
       if (this.arrayOfMenuElements.length > 0) {
         for (let i = 0; i < this.arrayOfMenuElements.length; i++) {
           if (this.arrayOfMenuElements[i].classList.contains(groupName)) {
@@ -258,7 +258,6 @@ customElements.define('nav-menu', class extends HTMLElement {
     this.shadowRoot.getElementById('item4_5').addEventListener('click', (event) => {
       // AdHoc function
       event.stopPropagation();
-      console.log('removing event listeners');
       const parentEl = this.shadowRoot.getElementById('dropdownMenuChannelContainer');
       if (parentEl.firstChild) {
         parentEl.firstChild.removeEventListener('click', this.handleChannelClick);

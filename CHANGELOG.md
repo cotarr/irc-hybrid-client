@@ -16,6 +16,12 @@ Work in progress, see top of README.md
 
 Commit
 
+- Added error panel, updated existing showError() calls.
+- Added scheduler to js/_afterLoad.js to call list of functions at 1 second interval.
+- Fixed activitySpinner for /userinfo
+
+Commit 24253fa
+
 This is a preliminary POC (proof of concept) experiment. The purpose of 
 this commit is to setup several UI panels using web components.
 It is used to dynamically insert UI panels, manage eventListener functions, and

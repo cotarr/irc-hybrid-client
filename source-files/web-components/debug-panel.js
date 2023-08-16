@@ -84,9 +84,8 @@ window.customElements.define('debug-panel', class extends HTMLElement {
   // ------------------
   // Main entry point
   // ------------------
-  initializePlugin = () => {
-    // console.log('web-comp1 initializePlugin');
-  };
+  // initializePlugin = () => {
+  // };
 
   // -------------------------------------------
   // add event listeners to connected callback
@@ -187,7 +186,7 @@ window.customElements.define('debug-panel', class extends HTMLElement {
     });
 
     // -------------------------------------
-    // 2 of 3 Debug Button Listeners
+    // 3 of 3 Debug Button Listeners
     // -------------------------------------
 
     // Show debug function buttons
@@ -196,7 +195,7 @@ window.customElements.define('debug-panel', class extends HTMLElement {
       this.shadowRoot.getElementById('debugFunctionsDiv').removeAttribute('hidden');
     });
 
-    this.shadowRoot.getElementById('button1').addEventListener('click', () => {
+    this.shadowRoot.getElementById('button01').addEventListener('click', () => {
       window.globals.ircState.ircConnectOn = true;
       window.globals.ircState.ircConnecting = false;
       window.globals.ircState.ircConnected = true;
@@ -210,7 +209,7 @@ window.customElements.define('debug-panel', class extends HTMLElement {
     });
 
     const newChannelName = '#myNewChannel';
-    this.shadowRoot.getElementById('button2').addEventListener('click', () => {
+    this.shadowRoot.getElementById('button02').addEventListener('click', () => {
       const newName = newChannelName + window.globals.ircState.channels.length.toString();
       if (window.globals.ircState.ircRegistered === true) {
         window.globals.ircState.channels.push(newName.toLowerCase());
@@ -231,20 +230,21 @@ window.customElements.define('debug-panel', class extends HTMLElement {
       }
     });
 
-    this.shadowRoot.getElementById('button3').addEventListener('click', () => {
+    this.shadowRoot.getElementById('button03').addEventListener('click', () => {
       window.globals.ircState.channels = [];
       window.globals.ircState.channelStates = [];
       document.dispatchEvent(new CustomEvent('irc-state-changed'));
     });
 
-    this.shadowRoot.getElementById('button4').addEventListener('click', () => {
+    this.shadowRoot.getElementById('button04').addEventListener('click', () => {
+      document.getElementById('errorPanel').showError('This is a generic error message');
     });
 
-    this.shadowRoot.getElementById('button5').addEventListener('click', () => {
+    this.shadowRoot.getElementById('button05').addEventListener('click', () => {
       console.log('window.globals', JSON.stringify(window.globals, null, 2));
     });
 
-    this.shadowRoot.getElementById('button6').addEventListener('click', () => {
+    this.shadowRoot.getElementById('button06').addEventListener('click', () => {
       document.getElementById('activitySpinner').requestActivitySpinner();
       document.getElementById('headerBar')._icons({
         webConnect: 'connected',
@@ -260,17 +260,17 @@ window.customElements.define('debug-panel', class extends HTMLElement {
       document.getElementById('headerBar')._updateDynamicElementTitles();
     });
 
-    this.shadowRoot.getElementById('button7').addEventListener('click', () => {
+    this.shadowRoot.getElementById('button07').addEventListener('click', () => {
       document.getElementById('displayUtils').manualRecalcPageWidth();
     });
 
-    this.shadowRoot.getElementById('button8').addEventListener('click', () => {
+    this.shadowRoot.getElementById('button08').addEventListener('click', () => {
       window.globals.ircState.channelList.push('#chan' +
         window.globals.ircState.channelList.length.toString());
       document.dispatchEvent(new CustomEvent('irc-state-changed'));
     });
 
-    this.shadowRoot.getElementById('button9').addEventListener('click', () => {
+    this.shadowRoot.getElementById('button09').addEventListener('click', () => {
       this._consoleLogGlobalEvents();
     });
     this.shadowRoot.getElementById('button10').addEventListener('click', () => {

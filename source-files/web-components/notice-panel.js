@@ -69,7 +69,6 @@ window.customElements.define('notice-panel', class extends HTMLElement {
     // Panel Close Button
     // -------------------------------------
     this.shadowRoot.getElementById('closePanelButton').addEventListener('click', () => {
-      console.log('click');
       this.shadowRoot.getElementById('panelVisibilityDiv').removeAttribute('visible');
     });
 

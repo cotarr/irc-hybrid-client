@@ -44,11 +44,13 @@ customElements.define('activity-spinner', class extends HTMLElement {
   // Public methods to enable spinner
   // ----------------------------------
   requestActivitySpinner = () => {
+    // console.log('request activity spinner', this.id);
     this.activitySpinnerCounter += 1;
     this.shadowRoot.getElementById('activitySpinner').removeAttribute('hidden');
   };
 
   cancelActivitySpinner = () => {
+    // console.log('cancel activity spinner');
     this.activitySpinnerCounter -= 1;
     if (this.activitySpinnerCounter < 0) {
       this.activitySpinnerCounter = 0;
@@ -65,10 +67,10 @@ customElements.define('activity-spinner', class extends HTMLElement {
     this.shadowRoot.getElementById('activitySpinner').setAttribute('hidden', '');
   };
 
-  initializePlugin () {
+  // initializePlugin () {
+  // }
+
+  connectedCallback () {
     this.resetActivitySpinner();
   }
-
-  // connectedCallback() {
-  // }
 });

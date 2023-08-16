@@ -31,6 +31,9 @@
 //       are not available within web component shawDOM scope.
 // ------------------------------------------------------------------------------
 'use strict';
+//
+// Confirm web browser supports V1 Web components
+//
 if (!(window.customElements && document.body.attachShadow)) {
   const bodyElement = document.querySelector('body');
   bodyElement.id = 'broken';
@@ -38,28 +41,43 @@ if (!(window.customElements && document.body.attachShadow)) {
     '<b>Your browser does not support Shadow DOM and Custom Elements v1.</b>';
   // do not load page
 } else {
+  //
+  // Yes web components are supported.
+  //
+  // -------------------------------------------
+  // Initialize each web component functionality
+  // -------------------------------------------
+  //
+  // Do not change the order
+  //
   document.getElementById('globVars').initializePlugin();
   document.getElementById('displayUtils').initializePlugin();
   document.getElementById('navMenu').initializePlugin();
-  document.getElementById('activitySpinner').initializePlugin();
   document.getElementById('headerBar').initializePlugin();
   document.getElementById('noticePanel').initializePlugin();
-  document.getElementById('manageChannelsPanel').initializePlugin();
-  document.getElementById('debugPanel').initializePlugin();
 
-  // When requested, scroll page to top
+  /**
+   * When requested, scroll page to top
+   */
   document.addEventListener('global-scroll-to-top', function (e) {
     window.scrollTo(0, 0);
   });
 
-  // The resize event is not available inside the shadowDOM of the custom element
-  // Detect event and call the display-utils web component method.
+  /**
+   * The resize event is not available inside the shadowDOM of the custom element
+   * Detect event and call the display-utils web component method.
+   */
   window.addEventListener('resize', (event) => {
     document.getElementById('displayUtils').handleExternalWindowResizeEvent(event);
     document.dispatchEvent(new CustomEvent('resize-custom-elements', { bubbles: true }));
   });
 
-  document.addEventListener('click', () => {
-    console.log('_afterLoad "click" event');
-  });
+  /**
+   * Common task scheduler, 1 second interval timer.
+   */
+  setInterval(() => {
+    document.getElementById('errorPanel').timerTickHandler();
+    document.getElementById('displayUtils').timerTickHandler();
+    document.getElementById('manageChannelsPanel').timerTickHandler();
+  }, 1000);
 }
