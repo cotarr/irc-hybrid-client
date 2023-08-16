@@ -1,0 +1,115 @@
+
+/* header-bar */
+
+.header-bar-theme-light {
+  background-color: #707070;
+  border: 1px solid black;
+  color: black;
+}
+.header-bar-theme-dark {
+  background-color: #3f3f3f;
+  border: 1px solid #7c7c7c;
+  color: white;
+}
+.hbar-recovery-theme-light {
+  background-color: white;
+  border: 1px solid black;
+  color: black;
+}
+.hbar-recovery-theme-dark {
+  background-color: black;
+  border: 1px solid white;
+  color: white;
+}
+.hbar-annunciator-div {
+  position: fixed;
+  top: 8px;
+  left: 46px;
+  margin-right: 40px;
+  width: auto;
+  z-index: 5;
+}
+.hbar-away-icon {
+  background-color: blue;
+  border: 1px solid black;
+  border-radius: 12px;
+  color: white;
+  font-weight: bold;
+  display: inline-block;
+  margin-right: 2px;
+  padding: 3px 10px 2px 10px;
+  cursor: pointer;
+}
+.hbar-away-icon[hidden] {
+  display: none;
+}
+.hbar-connect-icon {
+  background-color: #e00000;
+  border: 1px solid black;
+  border-radius: 12px;
+  color: white;
+  font-weight: bold;
+  display: inline-block;
+  margin-right: 2px;
+  padding: 3px 10px 2px 10px;
+  cursor: pointer;
+}
+.hbar-connect-icon[unavailable] {
+  background-color: #000000;
+  color: #bbbbbb;
+}
+.hbar-connect-icon[connecting] {
+  background-color: #ffff00;
+  color: #000000;
+}
+.hbar-connect-icon[connected] {
+  color: #ffffff;
+  background-color: #00b800;
+}
+
+.hbar-enable-audio {
+  background-color: #bbe3fc;
+  color: #000000;
+}
+.hbar-panel-div {
+  border-radius: 6px;
+  padding-top: 7px;
+  padding-bottom: 4px;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  z-index: 4;
+}
+.hbar-recovery-icon {
+  background-color: #f2f1e1;
+  color: black;
+  border: 1px solid black;
+  border-radius: 15px;
+  color: #000000;
+  font-weight: bold;
+  display: inline-block;
+  margin-right: 2px;
+  padding: 3px 5px 2px 5px;
+  cursor: pointer;
+}
+.hbar-recovery-icon[hidden] {
+  display: none;
+}
+.hbar-title-div {
+  font-weight: bold;
+  font-size: 120%;
+}
+.hbar-wait-icon {
+  background-color: #ae45b0;
+  border: 1px solid black;
+  border-radius: 12px;
+  color: white;
+  font-weight: bold;
+  display: inline-block;
+  margin-right: 2px;
+  padding: 3px 10px 2px 10px;
+}
+.hbar-wait-icon[hidden] {
+  display: none;
+}

@@ -1,0 +1,56 @@
+<!-- channel-panel -->
+<template id='channelPanelTemplate'>
+  <link rel="stylesheet" href="css/styles.css">
+  <div id="panelVisibilityDiv" class="global-visibility-div" visible>
+    <div id="panelDivId" class="global-panel-style-div channel-panel-theme-dark">
+      <div class='global-head-flex'>
+        <div class="global-head-left">
+          <button id="closePanelButton" title="Hide Panel"class="global-show-hide-button">x</button>
+          <button id="collapsePanelButton" title="Collapse Panel to Bar"class="global-show-hide-button mr5" >&#8645;</button>
+          <div id="channelNameDiv" class="channel-panel-name-div"></div>
+          <div class="been-kicked-icon" hidden>Kicked</div>
+          <div id="nickCount" title="Count of Channel Nicknames" class="global-count global-border-theme-dark">0</div>
+          <div id="messageCount" title="Channel Unread Message Count" class="global-message-count global-text-theme-inv-dark global-border-theme-dark">0</div>
+        </div>
+        <div class="global-head-center">
+        </div>
+        <div class="global-head-right">
+          <div id="hideWithCollapse">
+            <button class="mr7" hiddenXXX>Join</button>
+            <button class="mr7" hiddenXXX>Prune</button>
+            <button class="mr7">Leave</button>
+            <button class="mr7">Zoom</button>
+          </div>
+        </div>
+      </div>
+      <div id="panelCollapsedDiv" class="global-visibility-div" visible>
+      <div id="channelTopicDiv" class="channel-panel-topic-div"></div>
+      <textarea id="panelNickListId" class="channel-names-display global-text-theme-dark" cols="20" rows="5" spellcheck="false" readonly></textarea>
+      <textarea id="panelMessageDisplayId" class="global-text-theme-dark" id="chan0TextAreaId" cols="61" rows="5" spellcheck="false" readonly></textarea>
+      
+      <div class="mb5">
+        <textarea id="panelMessageInputId" class="global-valign-middle rm5 global-text-theme-dark" cols="77" rows="1"></textarea>
+        <button class="global-valign-middle">Send</button>
+      </div>
+      <div hiddenXXX class="mb5">
+        <span class="channel-button">Clipboard (0 lines)</span>
+        <button class="channel-button">Send as multi-line</button>
+      </div>
+      <div class="mb5">
+        <button id="refreshButton" title="Refresh from IRC message cache" class="mr7">Refresh</button>
+        <button id="clearButton" title="Clear Text Area (Does not clear cache)" class="rm7">Clear</button>
+        <button id="tallerButton" title="Enlarge Channel Text Area Vertically" class="rm7">Taller</button>
+        <button id="normalButton" title="Restore Channel Area to default size" class="rm7">Normal</button>
+      </div>
+      <div class="mb5">
+        <input class="channel-cb-cb" type="checkbox"><span class="channel-cb-span">Brief</span>
+        <input class="channel-cb-cb" type="checkbox"><span class="channel-cb-span">Auto-complete (tab)</span>
+      </div>
+      <div class="mb5">
+        <input class="channel-cb-cb" type="checkbox"><span class="channel-cb-span">Line-beep</span>
+        <input class="channel-cb-cb" type="checkbox"><span class="channel-cb-span">Join-beep</span>
+        <input class="channel-cb-cb" type="checkbox"><span class="channel-cb-span">Name-beep</span>
+      </div>
+    </div>
+  </div>
+</template>

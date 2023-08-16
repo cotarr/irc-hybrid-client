@@ -8,7 +8,7 @@
     "node": ">=16"
   },
   "scripts": {
-    "lint": "npx eslint secure/js/*.js server/testws/html/*.js server/*/*.mjs server/*.mjs bin/www.mjs tools/*.mjs",
+    "lint": "npx eslint source-files/js/*.js source-files/web-components/*.js server/testws/html/*.js server/*/*.mjs server/*.mjs bin/www.mjs tools/*.mjs",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node bin/www.mjs"
   },

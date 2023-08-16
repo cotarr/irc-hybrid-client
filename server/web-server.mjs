@@ -551,8 +551,8 @@ app.get('/irc/webclient.html',
   authorizeOrLogin,
   csrfProtection,
   function (req, res, next) {
-    let filename = './secure-minify/webclient.html';
-    if (nodeEnv === 'development') filename = './secure/webclient.html';
+    let filename = './build-dist/webclient.html';
+    if (nodeEnv === 'development') filename = './build-dev/webclient.html';
     fs.readFile(filename, 'utf8', function (err, data) {
       if (err) {
         next(err);
@@ -562,31 +562,31 @@ app.get('/irc/webclient.html',
     });
   }
 );
-app.get('/irc/serverlist.html',
-  authorizeOrFail,
-  csrfProtection,
-  function (req, res, next) {
-    let filename = './secure-minify/serverlist.html';
-    if (nodeEnv === 'development') filename = './secure/serverlist.html';
-    fs.readFile(filename, 'utf8', function (err, data) {
-      if (err) {
-        next(err);
-      } else {
-        res.send(data.replace('{{csrfToken}}', req.csrfToken()));
-      }
-    });
-  }
-);
+// app.get('/irc/serverlist.html',
+//   authorizeOrFail,
+//   csrfProtection,
+//   function (req, res, next) {
+//     let filename = './build-dist/serverlist.html';
+//     if (nodeEnv === 'development') filename = './build-dev/serverlist.html';
+//     fs.readFile(filename, 'utf8', function (err, data) {
+//       if (err) {
+//         next(err);
+//       } else {
+//         res.send(data.replace('{{csrfToken}}', req.csrfToken()));
+//       }
+//     });
+//   }
+// );
 
 // -------------------------------
 // Web server for static files
 // -------------------------------
 
 // If not production, serve HTML file from development folders
-let secureDir = path.join(__dirname, '../secure');
+let secureDir = path.join(__dirname, '../build-dev');
 
 // Else, if production, server the minified, bundled version
-if (nodeEnv === 'production') secureDir = path.join(__dirname, '../secure-minify');
+if (nodeEnv === 'production') secureDir = path.join(__dirname, '../build-prod');
 
 console.log('Web server root folder: ' + secureDir);
 app.use('/irc', authorizeOrFail, express.static(secureDir));

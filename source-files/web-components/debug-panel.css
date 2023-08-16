@@ -1,0 +1,14 @@
+
+/* debug-panel */
+
+.debug-panel-theme-light {
+  background-color: #ffa1a1;
+  border: 1px solid #8f0000;
+  color: black;
+}
+.debug-panel-theme-dark {
+  background-color: #af0000;
+  border: 1px solid #ff8d8d;
+  color: white;
+}
+

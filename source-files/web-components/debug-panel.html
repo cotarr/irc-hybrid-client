@@ -1,0 +1,97 @@
+<!-- debug-panel -->
+<template id="debugPanelTemplate">
+  <link rel="stylesheet" href="css/styles.css">
+  <div id="panelVisibilityDiv" class="global-visibility-div" visible>
+    <div id="panelDivId" class="global-panel-style-div debug-panel-theme-dark">
+      <div class='global-head-flex'>
+        <div class="global-head-left">
+          <button id="closePanelButton" title="Hide Panel" class="global-show-hide-button">x</button>
+          <span>Debug Panel</span>
+        </div>
+        <div class="global-head-center">
+        </div>
+        <div class="global-head-right">
+        </div>
+      </div>
+      <div id="showDebugFunctionsDiv">
+        <div class="mt10">
+          <button id="showDebugFunctionsButton" class="mr10">Show Debug Functions</button>
+          <span>Toolbox functions used during coding.</span>
+        </div>
+      </div>
+      <div id="debugFunctionsDiv" hidden>
+        <div class="global-inline-block">
+          <div class="mt10">
+            <button id="button1" class="mr10">Button 1</button>
+            <span>Set states for connected</span>
+          </div>
+          <div class="mt10">
+            <button id="button2" class="mr10">Button 2</button>
+            <span>Create new channel panel</span>
+          </div>
+          <div class="mt10">
+            <button id="button3" class="mr10">Button 3</button>
+            <span>Remove channel panel</span>
+          </div>
+
+          <div class="mt10">
+            <button id="button4" class="mr10">Button 4</button>
+            <span></span>
+          </div>
+          <div class="mt10">
+            <button id="button5" class="mr10">Button 5</button>
+            <span>Console log window.globals object</span>
+          </div>
+          <div class="mt10">
+            <button id="button6" class="mr10">Button 6</button>
+            <span>Show all header bar icons</span>
+          </div>
+          <div class="mt10">
+            <button id="button7" class="mr10">Button 7</button>
+            <span>Recalc page width</span>
+            <span></span>
+          </div>
+          <div class="mt10">
+            <button id="button8" class="mr10">Button 8</button>
+            <span>Add channel to default list</span>
+          </div>
+        </div>
+        <div class="global-inline-block">
+          <div class="mt10">
+            <button id="button9" class="mr10">Button 9</button>
+            <span>Start logging of global events</span>
+          </div>
+          <div class="mt10">
+            <button id="button10" class="mr10">Button 10</button>
+            <span>Emit: irc-state-changed</span>
+          </div>
+          <div class="mt10">
+            <button id="button11" class="mr10">Button 11</button>
+            <span>Emit: hide-all-panels</span>
+          </div>
+          <div class="mt10">
+            <button id="button12" class="mr10">Button 12</button>
+            <span>Emit: collapse-all-panels</span>
+          </div>
+          <div class="mt10">
+            <button id="button13" class="mr10">Button 13</button>
+            <span>Emit: show-all-panels</span>
+          </div>
+          <div class="mt10">
+            <button id="button14" class="mr10">Button 14</button>
+            <span></span>
+          </div>
+          <div class="mt10">
+            <button id="button15" class="mr10">Button 15</button>
+            <span></span>
+          </div>
+          <div class="mt10">
+            <button id="button16" class="mr10">Button 16</button>
+            <span></span>
+          </div>
+        </div>
+      </div>
+      <div class="vh10"></div>
+    </div>
+  </div>
+</template>

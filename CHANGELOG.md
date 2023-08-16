@@ -6,11 +6,30 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Next v2.0.0-dev 2023-08-15
+## Next v2.0.0-dev 2023-08-15 (Draft)
 
 Work in progress, see top of README.md
 
+- Update server/web-server.mjs to serve HTML files from build-dev/ and build-prod/ folders.
+- Update .gitignore to include sound files
+- Update package.lock, "lint" script, for eslint to scan new folders
 
+Commit
+
+This is a preliminary POC (proof of concept) experiment. The purpose of 
+this commit is to setup several UI panels using web components.
+It is used to dynamically insert UI panels, manage eventListener functions, and
+access data variables globally and inside the shadowDOM elements.
+There is no IRC code at this stage.
+
+- Header bar panel with status icons
+- Drop down navigation menu
+- Prototype IRC notice UI panel
+- Prototype IRC channel UI panels
+- User web page login and user login status
+- Debug toolbox panel
+
+Commit be2e610
 
 - Deleted source files `secure/*`
 - Deleted build folder `secure-minify/*`

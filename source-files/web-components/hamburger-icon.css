@@ -1,0 +1,37 @@
+/* hamburger-icon */
+.hamburger-icon-theme-light {
+  background-color: white;
+  border: 1px solid black;
+  color: black;
+}
+.hamburger-icon-theme-dark {
+  background-color: black;
+  border: 1px solid white;
+  color: white;
+}
+.hamburger-line-theme-light {
+  border-bottom: 2px solid black;
+}
+.hamburger-line-theme-dark {
+  border-bottom: 2px solid white;
+}
+.hamburger-line {
+  width: 16px;
+  margin-top: 5px;
+  margin-left: 5px;
+  cursor: pointer;
+}
+.hamburger-line:last-of-type {
+  margin-bottom: 5px;
+}
+.hamburger-icon {
+  border-radius: 4px;
+  display: inline-block;
+  margin: 0px;
+  margin-left: 10px;
+  padding: px;
+  width: 26px;
+}
+.hamburger-icon:hover {
+  background-color: #808080;
+}

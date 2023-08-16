@@ -1,0 +1,20 @@
+/* activity-spinner */
+.activity-spinner-div {
+  position: fixed;
+  border-top: 6px solid #ffffff;
+  border-right: 6px solid #000000;
+  border-bottom: 6px solid #ffffff;
+  border-left: 6px solid #000000;
+  border-radius: 50%;
+  top: 53px;
+  right: 48%;
+  width: 24px;
+  height: 25px;
+  z-index: 4;
+  animation: spin 2s linear infinite;
+}
+/* for previous .activity8-spinner */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1.0">
+<meta name="csrf-token" content="{{csrfToken}}">
+<link rel="stylesheet" href="css/styles.css">
+<script src="./js/webclient.js" defer></script>
+<title>irc-hybrid-client</title>
+</head>
+<body class="global-body-theme-dark" theme="dark">
+<noscript>
+<br>
+<h1>JavaScript is required to load this page.</h1>
+</noscript>
+
+<!-- HTML TEMPLATES -->
+
+<glob-vars id="globVars"></glob-vars>
+<display-utils id="displayUtils"></display-utils>
+<user-info id="userInfo"></user-info>
+<activity-spinner id="activitySpinner"></activity-spinner>
+<header-bar id="headerBar"></header-bar>
+<nav-menu id="navMenu"></nav-menu>
+
+<div class="global-scrollable-div-offset" id="scrollableDivId" hiddenXXX>
+  <notice-panel id="noticePanel"></notice-panel>
+  <manage-channels-panel id="manageChannelsPanel"></manage-channels-panel>
+  <div id="channelsContainer">
+    <!-- Dynamic IRC channel elements go ere -->
+  </div>
+  <debug-panel id="debugPanel"></debug-panel>
+</div><!-- End scrollable div -->
+
+</body>
+</html>

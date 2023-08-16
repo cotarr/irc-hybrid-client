@@ -1,0 +1,23 @@
+
+/* notice-panel */
+
+.channel-panel-theme-light {
+  background-color: #bef7bf;
+  border: 1px solid black;
+  color: black;
+}
+.channel-panel-theme-dark {
+  background-color: #005e03;
+  border: 1px solid #99dd9b;
+  color: white;
+}
+
+.channel-panel-name-div {
+  display: inline-block;
+  font-size: 120%;
+  margin-bottom: 5px;
+}
+
+.channel-panel-topic-div {
+  margin-bottom: 5px;
+}

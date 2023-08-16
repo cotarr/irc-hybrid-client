@@ -1,0 +1,13 @@
+
+/* notice-panel */
+
+.notice-panel-theme-light {
+  background-color: #fada9d;
+  border: 1px solid black;
+  color: black;
+}
+.notice-panel-theme-dark {
+  background-color: #946000;
+  border: 1px solid #ddb976;
+  color: white;
+}
