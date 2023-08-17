@@ -6,15 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Next v2.0.0-dev 2023-08-15 (Draft)
+## Next v2.0.0-dev 2023-08-17 (Draft)
 
 Work in progress, see top of README.md
 
-- Update server/web-server.mjs to serve HTML files from build-dev/ and build-prod/ folders.
-- Update .gitignore to include sound files
-- Update package.lock, "lint" script, for eslint to scan new folders
-
 Commit
+
+- Added websocket panel, websocket connection active, initial debug successful.
+
+Commit 10efde0
 
 - Added error panel, updated existing showError() calls.
 - Added scheduler to js/_afterLoad.js to call list of functions at 1 second interval.
@@ -34,6 +34,12 @@ There is no IRC code at this stage.
 - Prototype IRC channel UI panels
 - User web page login and user login status
 - Debug toolbox panel
+
+Changes to file from previous version v0.2.53
+
+- Added error panel, updated existing showError() calls.
+- Added scheduler to js/_afterLoad.js to call list of functions at 1 second interval.
+- Fixed activitySpinner for /userinfo
 
 Commit be2e610
 

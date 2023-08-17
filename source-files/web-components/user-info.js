@@ -50,9 +50,8 @@ window.customElements.define('user-info', class extends HTMLElement {
       const fetchURL = '/userinfo';
 
       document.getElementById('activitySpinner').requestActivitySpinner();
-      const fetchTimerId =
-        setTimeout(() => fetchController.abort(),
-          document.getElementById('globVars').constants('fetchTimeout'));
+      const fetchTimerId = setTimeout(() => fetchController.abort(),
+        document.getElementById('globVars').constants('fetchTimeout'));
 
       fetch(fetchURL, fetchOptions)
         .then((response) => {
@@ -118,7 +117,7 @@ window.customElements.define('user-info', class extends HTMLElement {
           const error = new Error(message);
           // limit to 1 line
           message = message.split('\n')[0];
-          document.getElementById('errorPanel').showError(message);
+          document.getElementById('errorPanel').showError('Error retrieving user info: ' + message);
           reject(error);
         }); // fetch
     }); // promise

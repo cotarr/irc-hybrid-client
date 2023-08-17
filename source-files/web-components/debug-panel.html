@@ -1,7 +1,7 @@
 <!-- debug-panel -->
 <template id="debugPanelTemplate">
   <link rel="stylesheet" href="css/styles.css">
-  <div id="panelVisibilityDiv" class="global-visibility-div" visible>
+  <div id="panelVisibilityDiv" class="global-visibility-div">
     <div id="panelDivId" class="global-panel-style-div debug-panel-theme-dark">
       <div class='global-head-flex'>
         <div class="global-head-left">
@@ -23,7 +23,7 @@
         <div class="global-inline-block">
           <div class="mt10">
             <button id="button01" class="mr10">Button 01</button>
-            <span>Set states for connected</span>
+            <span></span>
           </div>
           <div class="mt10">
             <button id="button02" class="mr10">Button 02</button>
@@ -31,7 +31,7 @@
           </div>
           <div class="mt10">
             <button id="button03" class="mr10">Button 03</button>
-            <span>Remove channel panel</span>
+            <span>Remove all channel panels</span>
           </div>
 
           <div class="mt10">
@@ -75,11 +75,11 @@
           </div>
           <div class="mt10">
             <button id="button13" class="mr10">Button 13</button>
-            <span>Emit: show-all-panels</span>
+            <span>Emit: show-all-panels {debug: true}</span>
           </div>
           <div class="mt10">
             <button id="button14" class="mr10">Button 14</button>
-            <span></span>
+            <span>Emit: web-connect-changed</span>
           </div>
           <div class="mt10">
             <button id="button15" class="mr10">Button 15</button>

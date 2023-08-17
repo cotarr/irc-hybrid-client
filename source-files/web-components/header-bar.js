@@ -44,8 +44,14 @@ customElements.define('header-bar', class extends HTMLElement {
     * Set colors and visibility of status icons in the top header bar
     * @param {Object} options - Key/value pairs for each status icon
     */
-  _icons = (options) => {
+  setHeaderBarIcons = (options) => {
     let noIcons = true;
+    if ((Object.hasOwn(options, 'hideNavMenu')) && (options.hideNavMenu)) {
+      this.shadowRoot.getElementById('navDropdownButton').setAttribute('hidden', '');
+    } else {
+      this.shadowRoot.getElementById('navDropdownButton').removeAttribute('hidden');
+    };
+
     if (Object.hasOwn(options, 'webConnect')) {
       const webConnectEl = this.shadowRoot.getElementById('webConnectIconId');
       // Use 'disconnected' to clear attributes
@@ -140,7 +146,7 @@ customElements.define('header-bar', class extends HTMLElement {
    * Add "title" attribute for mouse hover tool-tip to each status icon.
    * Values are based on global ircState object.
    */
-  _setFixedElementTutles = () => {
+  _setFixedElementTitles = () => {
     this.shadowRoot.getElementById('hamburgerIcon').title =
       'Navigation Dropdown Menu';
     this.shadowRoot.getElementById('waitConnectIconId').title =
@@ -157,7 +163,7 @@ customElements.define('header-bar', class extends HTMLElement {
       'Waiting to recover main nickname';
     this.shadowRoot.getElementById('enableAudioButton').title =
       'Browser had disabled media playback. Click to enable beep sounds';
-  }; // _setFixedElementTutles()
+  }; // _setFixedElementTitles()
 
   /**
    * Add "title" attribute for mouse hover tool-tip to each status icon.
@@ -178,11 +184,9 @@ customElements.define('header-bar', class extends HTMLElement {
     }
   }; //  _updateDynamicElementTitles()
 
-  /**
-   * Initialize header-bar functionality, called by "js/_afterLoad.js"
-   */
-  initializePlugin = () => {
-    this._icons({
+  updateStatusIcons = () => {
+    const state = {
+      hideNavMenu: false,
       webConnect: 'disconnected',
       ircConnect: 'unavailable',
       wait: false,
@@ -192,8 +196,48 @@ customElements.define('header-bar', class extends HTMLElement {
       noticeUnread: false,
       nickRecovery: false,
       enableAudio: false
-    });
-    this._setFixedElementTutles();
+    };
+    if (window.globals.webState.webConnected) {
+      state.webConnect = 'connected';
+      if (window.globals.ircState.ircConnected) {
+        if (window.globals.ircState.ircRegistered) {
+          state.ircConnect = 'connected';
+          if (window.globals.ircState.ircIsAway) {
+            state.away = true;
+          }
+        } else {
+          state.ircConnect = 'connecting';
+        }
+      } else {
+        // IRC server disconnected
+        if ((window.globals.webState.ircConnecting) || (window.globals.ircState.ircConnecting)) {
+          state.ircConnect = 'connecting';
+        }
+        if ((window.globals.ircState.ircAutoReconnect) &&
+          (window.globals.ircState.ircConnectOn) &&
+          (!window.globals.ircState.ircConnected) &&
+          (!window.globals.ircState.ircConnecting)) {
+          state.wait = true;
+        }
+      }
+    } else {
+      // Web not connected
+      state.hideNavMenu = true;
+      if (window.globals.webState.webConnecting) {
+        state.webConnect = 'connecting';
+      }
+      state.ircConnect = 'unavailable';
+    }
+    this.setHeaderBarIcons(state);
+    this._updateDynamicElementTitles();
+  };
+
+  /**
+   * Initialize header-bar functionality, called by "js/_afterLoad.js"
+   */
+  initializePlugin = () => {
+    this.updateStatusIcons();
+    this._setFixedElementTitles();
     this._updateDynamicElementTitles();
   };
 
@@ -228,7 +272,7 @@ customElements.define('header-bar', class extends HTMLElement {
       console.log('clicked privMsgUnreadExistIcon');
     });
     this.shadowRoot.getElementById('webConnectIconId').addEventListener('click', () => {
-      console.log('clicked webConnectIconId');
+      document.getElementById('websocketPanel').webConnectHeaderBarIconHandler();
     });
 
     // -------------------------------------
@@ -237,6 +281,7 @@ customElements.define('header-bar', class extends HTMLElement {
 
     /**
      * Global event listener on document object to implement changes to color theme
+     * @listens document:color-theme-changed
      * @param {object} event.detail.theme - Color theme values 'light' or 'dark'
      */
     document.addEventListener('color-theme-changed', (event) => {
@@ -292,58 +337,18 @@ customElements.define('header-bar', class extends HTMLElement {
     /**
      * Global event listener on document object to detect state change of remote IRC server
      * Status icon visibility and color are updated depending on IRC state.
-     * Data source: ircState object
+     * Data source: window.globals.ircState object
+     * @listens document:irc-state-changed
      */
     document.addEventListener('irc-state-changed', () => {
-      const state = {
-        webConnect: 'disconnected',
-        ircConnect: 'disconnected',
-        wait: false,
-        away: false,
-        channelUnread: false,
-        privMsgUnread: false,
-        noticeUnread: false,
-        nickRecovery: false,
-        enableAudio: false
-      };
-      if (window.globals.webState.webConnected) {
-        state.webConnect = 'connected';
-        if (window.globals.ircState.ircConnected) {
-          if (window.globals.ircState.ircRegistered) {
-            state.ircConnect = 'connected';
-            if (window.globals.ircState.ircIsAway) {
-              state.away = true;
-            }
-          } else {
-            state.ircConnect = 'connecting';
-          }
-        } else {
-          // IRC server disconnected
-          if ((window.globals.webState.ircConnecting) || (window.globals.ircState.ircConnecting)) {
-            state.ircConnect = 'connecting';
-          }
-          if ((window.globals.ircState.ircAutoReconnect) &&
-            (window.globals.ircState.ircConnectOn) &&
-            (!window.globals.ircState.ircConnected) &&
-            (!window.globals.ircState.ircConnecting)) {
-            state.wait = true;
-          }
-        }
-      } else {
-        // Web not connected
-        if (window.globals.webState.webConnecting) {
-          state.webConnect = 'connecting';
-        }
-        state.ircConnect = 'unavailable';
-      }
-      this._icons(state);
-      this._updateDynamicElementTitles();
+      this.updateStatusIcons();
     }); // 'irc-state-changed
 
     /**
      * Global event listener on document object to customize page layout when browser size changes.
      * Header bar title is visible/hidden depending on page width
-     * Data source: webState object
+     * Data source: window.globals.webState object
+     * @listens resize-custom-elements
      */
     document.addEventListener('resize-custom-elements', () => {
       // Pixel with occurs 2 places on this page.
@@ -354,5 +359,15 @@ customElements.define('header-bar', class extends HTMLElement {
         this.shadowRoot.getElementById('titleDiv').setAttribute('hidden', '');
       }
     });
+
+    /**
+     * Global event listener on document object to detect state change websocket connection.
+     * Status icon visibility and color are updated depending on IRC state.
+     * Data source: window.globals.webState object
+     * @listens web-connect-change
+     */
+    document.addEventListener('web-connect-changed', () => {
+      this.updateStatusIcons();
+    }); // web-connect-changed
   }; // connectedCallback()
 });

@@ -52,6 +52,7 @@ if (!(window.customElements && document.body.attachShadow)) {
   //
   document.getElementById('globVars').initializePlugin();
   document.getElementById('displayUtils').initializePlugin();
+  document.getElementById('websocketPanel').initializePlugin();
   document.getElementById('navMenu').initializePlugin();
   document.getElementById('headerBar').initializePlugin();
   document.getElementById('noticePanel').initializePlugin();
@@ -78,6 +79,12 @@ if (!(window.customElements && document.body.attachShadow)) {
   setInterval(() => {
     document.getElementById('errorPanel').timerTickHandler();
     document.getElementById('displayUtils').timerTickHandler();
+    document.getElementById('websocketPanel').timerTickHandler();
     document.getElementById('manageChannelsPanel').timerTickHandler();
   }, 1000);
+
+  // -----------------------------
+  //   D O   T H I S   L A S T
+  // -----------------------------
+  document.getElementById('websocketPanel').firstWebSocketConnectOnPageLoad();
 }

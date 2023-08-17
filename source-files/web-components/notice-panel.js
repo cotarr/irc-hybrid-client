@@ -53,9 +53,7 @@ window.customElements.define('notice-panel', class extends HTMLElement {
   initializePlugin = () => {
     // console.log('notice-panel initializePlugin');
     this.shadowRoot.getElementById('panelMessageDisplayId').value =
-      '12:01:26 NickServ | This nick is owned by someone else. Please choose another.\n' +
-      '12:01:26 NickServ | If this is your nick, type: /msg NickSere IDENTIFY <password>\n' +
-      '12:01:26 NickServ | Your nick will be changed in 60 seconds if you do not comply.\n';
+      '12:01:26 MyNickname | This is an example NOTICE message\n';
   };
 
   // add event listeners to connected callback

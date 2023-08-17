@@ -551,7 +551,7 @@ app.get('/irc/webclient.html',
   authorizeOrLogin,
   csrfProtection,
   function (req, res, next) {
-    let filename = './build-dist/webclient.html';
+    let filename = './build-prod/webclient.html';
     if (nodeEnv === 'development') filename = './build-dev/webclient.html';
     fs.readFile(filename, 'utf8', function (err, data) {
       if (err) {
@@ -566,7 +566,7 @@ app.get('/irc/webclient.html',
 //   authorizeOrFail,
 //   csrfProtection,
 //   function (req, res, next) {
-//     let filename = './build-dist/serverlist.html';
+//     let filename = './build-prod/serverlist.html';
 //     if (nodeEnv === 'development') filename = './build-dev/serverlist.html';
 //     fs.readFile(filename, 'utf8', function (err, data) {
 //       if (err) {
