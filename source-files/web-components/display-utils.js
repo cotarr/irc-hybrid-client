@@ -48,9 +48,147 @@ window.customElements.define('display-utils', class extends HTMLElement {
     }
   };
 
+  // --------------------------------------------------------
+  // Convert string with IRCv3 timestamp to HH:MM:SS string
+  // --------------------------------------------------------
+  timestampToHMS = (timeString) => {
+    // console.log('timeString ' + timeString);
+    // Reference: https://ircv3.net/specs/extensions/server-time
+    // @time=2011-10-19T16:40:51.620Z :Angel!angel@example.org PRIVMSG Wiz :Hello
+    let outString = '';
+    if (timeString.length === 0) {
+      outString = null;
+    } else {
+      if (timeString.indexOf('@time=') === 0) {
+        const timeObj = new Date(timeString.slice(6, timeString.length));
+        outString += timeObj.getHours().toString().padStart(2, '0') + ':';
+        outString += timeObj.getMinutes().toString().padStart(2, '0') + ':';
+        outString += timeObj.getSeconds().toString().padStart(2, '0');
+      } else {
+        outString = null;
+      }
+    }
+    return outString;
+  };
+
+  // --------------------------------------------------------
+  // Convert string with IRCv3 timestamp to HH:MM:SS string
+  // --------------------------------------------------------
+  timestampToYMD = (timeString) => {
+    let outString = '';
+    if (timeString.length === 0) {
+      outString = null;
+    } else {
+      if (timeString.indexOf('@time=') === 0) {
+        const timeObj = new Date(timeString.slice(6, timeString.length));
+        outString += timeObj.getFullYear().toString().padStart(4, '0') + '-';
+        // Month start at 0
+        outString += (timeObj.getMonth() + 1).toString().padStart(2, '0') + '-';
+        outString += timeObj.getDate().toString().padStart(2, '0');
+      } else {
+        outString = null;
+      }
+    }
+    return outString;
+  };
+
+  // ----------------------------------------------------------------
+  // Convert unix timestamp in seconds to HH:MM:SS string local time
+  // ----------------------------------------------------------------
+  unixTimestampToHMS = (seconds) => {
+    // console.log('timeString ' + timeString);
+    let outString = '';
+    if ((typeof seconds === 'number') &&
+      (Number.isInteger(seconds)) &&
+      (seconds > 1000000000) &&
+      (seconds < 1000000000000)) {
+      const timeObj = new Date(seconds * 1000);
+      let language;
+      if (window.navigator.languages) {
+        language = window.navigator.languages[0];
+      } else {
+        language = window.navigator.userLanguage || window.navigator.language || 'en-US';
+      }
+      outString = timeObj.toLocaleTimeString(language, { hour12: false }); // hh:mm:ss browser time
+    } else {
+      outString = null;
+    }
+    // console.log(seconds, outString);
+    return outString;
+  };
+
+  // --------------------------------------------------------
+  // Convert string with IRCv3 timestamp to Unix Seconds
+  // --------------------------------------------------------
+  timestampToUnixSeconds = (timeString) => {
+    // Reference: https://ircv3.net/specs/extensions/server-time
+    // @time=2011-10-19T16:40:51.620Z :Angel!angel@example.org PRIVMSG Wiz :Hello
+    let outSeconds = null;
+    if (timeString.length === 0) {
+      outSeconds = null;
+    } else {
+      if (timeString.indexOf('@time=') === 0) {
+        const timeObj = new Date(timeString.slice(6, timeString.length));
+        outSeconds = parseInt(timeObj.valueOf() / 1000);
+      } else {
+        outSeconds = null;
+      }
+    }
+    return outSeconds;
+  };
+
+  /**
+   * Remove trailing CR-LF
+   * @param {string} - Remove trailing CR-LF
+   * @returns {string }
+   */
+  stripTrailingCrLf = (inString) => {
+    let inLength = inString.length;
+    if ((inLength > 0) && (inString.charCodeAt(inLength - 1) === 10)) inLength--;
+    if ((inLength > 0) && (inString.charCodeAt(inLength - 1) === 13)) inLength--;
+    // remove trailing ascii space (left from auto-complete)
+    if ((inLength > 0) && (inString.charCodeAt(inLength - 1) === 32)) inLength--;
+    if ((inLength > 0) && (inString.charCodeAt(inLength - 1) === 32)) inLength--;
+    if (inLength === 0) {
+      return '';
+    } else {
+      return inString.slice(0, inLength);
+    }
+  };
+
+  /**
+   * Function to test string for multi-line content
+   * This is to avoid multi-line errors from copy paste or mobile voice dictation
+   * @param {string} inString - string to check
+   * @returns {boolean} true if text is multi-line
+   */
+  detectMultiLineString = (inString) => {
+    let inLength = inString.length;
+    // if last character is newline 0x0A, then reduce by 1
+    if ((inLength > 0) && (inString.charCodeAt(inLength - 1) === 10)) inLength--;
+    if (inLength > 0) {
+      let countCR = 0;
+      for (let i = 0; i < inLength; i++) {
+        if (inString.charCodeAt(i) === 10) countCR++;
+      }
+      if (countCR === 0) {
+        return false;
+      } else {
+        return true;
+      }
+    } else {
+      return false;
+    }
+  };
+
   // ------------------------------------------
   // Function to strip colors from a string
   // ------------------------------------------
+  /**
+   * Clean IRC color format codes from string
+   * @param {string} inString - IRC text with possible color codes
+   * @returns {string} Returns same string with codes removed
+   */
   cleanFormatting = (inString) => {
     // Filterable formatting codes
     const formattingChars = [
@@ -129,6 +267,49 @@ window.customElements.define('display-utils', class extends HTMLElement {
     }
     return outString;
   };
+
+  // -------------------------------------------------
+  // Remove one CR-LF anywhere from inputArea element
+  //
+  // Modifies HTML element value (contents)
+  // ------------------------------------------------
+  stripOneCrLfFromElement = (textAreaElement) => {
+    if (!textAreaElement.value) return;
+    const inString = textAreaElement.value.toString();
+    //
+    // detect \n or \r\n, and remove one time
+    //
+    let crCount = 0;
+    let lfCount = 0;
+    if (inString.length > 0) {
+      for (let i = 0; i < inString.length; i++) {
+        if (inString.charCodeAt(i) === 0x0D) crCount++;
+        if (inString.charCodeAt(i) === 0x0A) lfCount++;
+      }
+    }
+    // Case of Unix end of line
+    if ((crCount === 0) && (lfCount === 1)) {
+      let newString = '';
+      for (let i = 0; i < inString.length; i++) {
+        if (inString.charCodeAt(i) !== 0x0A) {
+          newString += inString.charAt(i);
+        }
+      }
+      // Exchange value (contents) with new string in html element
+      textAreaElement.value = newString;
+    }
+    // Case of Windows end of line
+    if ((crCount === 1) && (lfCount === 1)) {
+      let newString = '';
+      for (let i = 0; i < inString.length; i++) {
+        if ((inString.charCodeAt(i) !== 0x0A) && (inString.charCodeAt(i) !== 0x0D)) {
+          newString += inString.charAt(i);
+        }
+      }
+      // Exchange value (contents) with new string in html element
+      textAreaElement.value = newString;
+    }
+  }; // stripOneCrLfFromElement()
 
   // ---------------------------------------------------------------------------
   // This runs as part of page load

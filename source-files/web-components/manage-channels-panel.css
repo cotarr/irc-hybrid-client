@@ -21,3 +21,19 @@
 .channel-panel-topic-div {
   margin-bottom: 5px;
 }
+
+.channel-panel-been-kicked-icon {
+  background-color: #ff0000;
+  border: 0px solid black;
+  border-radius: 12px;
+  color: #ffffff;
+  display: inline-block;
+  font-weight: bold;
+  margin-left: 2px;
+  margin-right: 0px;
+  padding: 0px 3px 0px 3px;
+  text-align: center;
+}
+.channel-panel-been-kicked-icon[hidden] {
+display: none;
+}

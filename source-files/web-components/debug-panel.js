@@ -55,6 +55,10 @@ window.customElements.define('debug-panel', class extends HTMLElement {
       this.loggingGlobalEvents = true;
       console.log('Logging global events to console.log');
       const eventList = [
+        'cache-reload-done',
+        'cache-reload-error',
+        'cancel-beep-sounds',
+        'channel-message',
         'collapse-all-panels',
         'color-theme-changed',
         'debounced-update-from-cache',
@@ -197,14 +201,12 @@ window.customElements.define('debug-panel', class extends HTMLElement {
     });
 
     this.shadowRoot.getElementById('button01').addEventListener('click', () => {
-    });
-
-    const newChannelName = '#myNewChannel';
-    this.shadowRoot.getElementById('button02').addEventListener('click', () => {
+      const newChannelName = '#myNewChannel';
       window.globals.ircState.ircConnectOn = true;
       window.globals.ircState.ircConnecting = false;
       window.globals.ircState.ircConnected = true;
       window.globals.ircState.ircRegistered = true;
+      window.globals.ircState.nickName = 'myNick';
 
       window.globals.webState.webConnectOn = true;
       window.globals.webState.webConnected = true;
@@ -229,6 +231,28 @@ window.customElements.define('debug-panel', class extends HTMLElement {
       document.dispatchEvent(new CustomEvent('irc-state-changed'));
     });
 
+    this.shadowRoot.getElementById('button02').addEventListener('click', () => {
+      setTimeout(() => {
+        document.dispatchEvent(new CustomEvent('channel-message',
+          {
+            bubbles: true,
+            detail: {
+              parsedMessage: {
+                timestamp: '10:23:34',
+                datestamp: '2023-08-18',
+                prefix: 'myNick!~myUser@192.168.1.100',
+                nick: 'myNick',
+                host: '~myUser@~myUser@192.168.1.100',
+                command: 'PRIVMSG',
+                params: [
+                  '#myNewChannel0',
+                  'This is a channel message to channel #myNewChannel1'
+                ]
+              }
+            }
+          }));
+      }, 10);
+    });
     this.shadowRoot.getElementById('button03').addEventListener('click', () => {
       window.globals.ircState.channels = [];
       window.globals.ircState.channelStates = [];

@@ -360,6 +360,20 @@ customElements.define('header-bar', class extends HTMLElement {
       }
     });
 
+    document.addEventListener('update-channel-count', (event) => {
+      let totalCount = 0;
+      const channelsElements = document.getElementById('channelsContainerId');
+      const channelEls = Array.from(channelsElements.children);
+      channelEls.forEach((chanEl) => {
+        totalCount += chanEl.unreadMessageCount;
+      });
+      if (totalCount > 0) {
+        this.shadowRoot.getElementById('channelUnreadExistIcon').removeAttribute('hidden');
+      } else {
+        this.shadowRoot.getElementById('channelUnreadExistIcon').setAttribute('hidden', '');
+      }
+    });
+
     /**
      * Global event listener on document object to detect state change websocket connection.
      * Status icon visibility and color are updated depending on IRC state.

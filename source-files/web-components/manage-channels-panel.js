@@ -50,17 +50,17 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
 
   showPanel = () => {
     this.shadowRoot.getElementById('panelVisibilityDiv').setAttribute('visible', '');
-    this.shadowRoot.getElementById('panelCollapsedDiv').setAttribute('visible', '');
+    this.shadowRoot.getElementById('panelCollapsedDivId').setAttribute('visible', '');
   };
 
   collapsePanel = () => {
     this.shadowRoot.getElementById('panelVisibilityDiv').setAttribute('visible', '');
-    this.shadowRoot.getElementById('panelCollapsedDiv').removeAttribute('visible');
+    this.shadowRoot.getElementById('panelCollapsedDivId').removeAttribute('visible');
   };
 
   hidePanel = () => {
     this.shadowRoot.getElementById('panelVisibilityDiv').removeAttribute('visible');
-    this.shadowRoot.getElementById('panelCollapsedDiv').removeAttribute('visible');
+    this.shadowRoot.getElementById('panelCollapsedDivId').removeAttribute('visible');
   };
 
   /**
@@ -72,8 +72,8 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
     if ((newChannel.length > 1) &&
       (document.getElementById('globVars').constants('channelPrefixChars')
         .indexOf(newChannel.charAt(0)) >= 0)) {
-      // TODO const message = 'JOIN ' + newChannel;
-      // TODO _sendIrcServerMessage(message);
+      const message = 'JOIN ' + newChannel;
+      document.getElementById('tempPlaceholder').sendIrcServerMessage(message);
     } else {
       document.getElementById('errorPanel').showError('Invalid Channel Name');
     }
@@ -85,7 +85,7 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
    */
   _createChannelElement = (newChannelName) => {
     if (window.globals.webState.channels.indexOf(newChannelName) < 0) {
-      const channelsContainerEl = document.getElementById('channelsContainer');
+      const channelsContainerEl = document.getElementById('channelsContainerId');
       const newChannelEl = document.createElement('channel-panel');
       newChannelEl.id = 'channel' + newChannelName.toLowerCase();
       newChannelEl.setAttribute('channelName', newChannelName.toLowerCase());
@@ -106,8 +106,7 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
   _handleChannelButtonClick = (event) => {
     const channelName = this.shadowRoot.getElementById(event.target.id).textContent;
     if (channelName.length > 0) {
-      console.log('channelName ' + channelName);
-      // TODO _sendIrcServerMessage('JOIN ' + channelName);
+      document.getElementById('tempPlaceholder').sendIrcServerMessage('JOIN ' + channelName);
     }
   };
 
@@ -115,7 +114,7 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
    * Called once per second as task scheduler, called from js/_afterLoad.js
    */
   timerTickHandler = () => {
-    const channelsElements = document.getElementById('channelsContainer');
+    const channelsElements = document.getElementById('channelsContainerId');
     const channelEls = Array.from(channelsElements.children);
     channelEls.forEach((chanEl) => {
       chanEl.timerTickHandler();
@@ -135,19 +134,19 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
     // 1 of 2 Listeners on internal elements
     // -------------------------------------
 
-    this.shadowRoot.getElementById('closePanelButton').addEventListener('click', () => {
+    this.shadowRoot.getElementById('closePanelButtonId').addEventListener('click', () => {
       this.hidePanel();
     });
 
-    this.shadowRoot.getElementById('collapsePanelButton').addEventListener('click', () => {
-      if (this.shadowRoot.getElementById('panelCollapsedDiv').hasAttribute('visible')) {
+    this.shadowRoot.getElementById('collapsePanelButtonId').addEventListener('click', () => {
+      if (this.shadowRoot.getElementById('panelCollapsedDivId').hasAttribute('visible')) {
         this.collapsePanel();
       } else {
         this.showPanel();
       }
     });
 
-    this.shadowRoot.getElementById('newChannelButton').addEventListener('click', () => {
+    this.shadowRoot.getElementById('newChannelButtonId').addEventListener('click', () => {
       this._joinNewChannel();
     });
 
@@ -191,40 +190,28 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
      * @param {object} event.detail.theme - Color theme values 'light' or 'dark'
      */
     document.addEventListener('color-theme-changed', (event) => {
+      const panelDivEl = this.shadowRoot.getElementById('panelDivId');
+      const activeChannelCountIconEl = this.shadowRoot.getElementById('activeChannelCountIconId');
+      const channelUnreadCountIconEl = this.shadowRoot.getElementById('channelUnreadCountIconId');
+      const newChannelNameInputEl = this.shadowRoot.getElementById('newChannelNameInputId');
       if (event.detail.theme === 'light') {
-        this.shadowRoot.getElementById('panelDivId')
-          .classList.remove('channel-panel-theme-dark');
-        this.shadowRoot.getElementById('panelDivId')
-          .classList.add('channel-panel-theme-light');
-        this.shadowRoot.getElementById('activeChannelCountDiv')
-          .classList.remove('global-border-theme-dark');
-        this.shadowRoot.getElementById('activeChannelCountDiv')
-          .classList.add('global-border-theme-light');
-        this.shadowRoot.getElementById('channelUnreadCountDiv')
-          .classList.remove('global-border-theme-dark');
-        this.shadowRoot.getElementById('channelUnreadCountDiv')
-          .classList.add('global-border-theme-light');
-        this.shadowRoot.getElementById('newChannelNameInputId')
-          .classList.remove('global-text-theme-dark');
-        this.shadowRoot.getElementById('newChannelNameInputId')
-          .classList.add('global-text-theme-light');
+        panelDivEl.classList.remove('channel-panel-theme-dark');
+        panelDivEl.classList.add('channel-panel-theme-light');
+        activeChannelCountIconEl.classList.remove('global-border-theme-dark');
+        activeChannelCountIconEl.classList.add('global-border-theme-light');
+        channelUnreadCountIconEl.classList.remove('global-border-theme-dark');
+        channelUnreadCountIconEl.classList.add('global-border-theme-light');
+        newChannelNameInputEl.classList.remove('global-text-theme-dark');
+        newChannelNameInputEl.classList.add('global-text-theme-light');
       } else {
-        this.shadowRoot.getElementById('panelDivId')
-          .classList.remove('channel-panel-theme-light');
-        this.shadowRoot.getElementById('panelDivId')
-          .classList.add('channel-panel-theme-dark');
-        this.shadowRoot.getElementById('activeChannelCountDiv')
-          .classList.remove('global-border-theme-light');
-        this.shadowRoot.getElementById('activeChannelCountDiv')
-          .classList.add('global-border-theme-dark');
-        this.shadowRoot.getElementById('channelUnreadCountDiv')
-          .classList.remove('global-border-theme-light');
-        this.shadowRoot.getElementById('channelUnreadCountDiv')
-          .classList.add('global-border-theme-dark');
-        this.shadowRoot.getElementById('newChannelNameInputId')
-          .classList.remove('global-text-theme-light');
-        this.shadowRoot.getElementById('newChannelNameInputId')
-          .classList.add('global-text-theme-dark');
+        panelDivEl.classList.remove('channel-panel-theme-light');
+        panelDivEl.classList.add('channel-panel-theme-dark');
+        activeChannelCountIconEl.classList.remove('global-border-theme-light');
+        activeChannelCountIconEl.classList.add('global-border-theme-dark');
+        channelUnreadCountIconEl.classList.remove('global-border-theme-light');
+        channelUnreadCountIconEl.classList.add('global-border-theme-dark');
+        newChannelNameInputEl.classList.remove('global-text-theme-light');
+        newChannelNameInputEl.classList.add('global-text-theme-dark');
       }
     });
 
@@ -235,8 +222,8 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
     document.addEventListener('erase-before-reload', () => {
       this.shadowRoot.getElementById('newChannelNameInputId').value = '';
 
-      this.shadowRoot.getElementById('channelUnreadCountDiv').textContent = '0';
-      this.shadowRoot.getElementById('channelUnreadCountDiv').setAttribute('hidden', '');
+      this.shadowRoot.getElementById('channelUnreadCountIconId').textContent = '0';
+      this.shadowRoot.getElementById('channelUnreadCountIconId').setAttribute('hidden', '');
     });
 
     /**
@@ -309,7 +296,7 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
       }
 
       // Update count of channels in channel menu window
-      this.shadowRoot.getElementById('activeChannelCountDiv').textContent =
+      this.shadowRoot.getElementById('activeChannelCountIconId').textContent =
         joinedChannelCount.toString();
 
       // In the case of the number of joined channels has changed,
@@ -319,7 +306,7 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
         console.log('Updating favorite channel buttons');
         // remove old button elements and associated event listeners
         const channelJoinButtonContainerEl =
-          this.shadowRoot.getElementById('channelJoinButtonContainer');
+          this.shadowRoot.getElementById('channelJoinButtonContainerId');
         while (channelJoinButtonContainerEl.firstChild) {
           channelJoinButtonContainerEl.firstChild
             .removeEventListener('click', this._handleChannelButtonClick);
@@ -376,30 +363,29 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
       }
     });
 
-    // // ---------------------------------------------------------
-    // // Update unread message count in channel menu window
-    // //
-    // // This function will loop through all channel window elements
-    // // For each element, build a sum of total un-read messages
-    // // Then update the count displayed in the channel menu widow
-    // // ---------------------------------------------------------
-    // document.addEventListener('update-channel-count', (event) => {
-    //   let totalCount = 0;
-    //   document.querySelectorAll('.channel-count-class').forEach( (el) => {
-    //     totalCount += parseInt(el.textContent);
-    //   });
-    //   document.getElementById('channelUnreadCountDiv').textContent = totalCount.toString();
-    //   if (totalCount > 0) {
-    //     // This is local icon at parent window to PM section
-    //     document.getElementById('channelUnreadCountDiv').removeAttribute('hidden');
-    //     // This is global icon at top of main page
-    //     document.getElementById('channelUnreadExistIcon').removeAttribute('hidden');
-    //   } else {
-    //     // This is local icon at parent window to PM section
-    //     document.getElementById('channelUnreadCountDiv').setAttribute('hidden', '');
-    //     // This is global icon at top of main page
-    //     document.getElementById('channelUnreadExistIcon').setAttribute('hidden', '');
-    //   }
-    // });
+    // ---------------------------------------------------------
+    // Update unread message count in channel menu window
+    //
+    // This function will loop through all channel window elements
+    // For each element, build a sum of total un-read messages
+    // Then update the count displayed in the channel menu widow
+    // ---------------------------------------------------------
+    document.addEventListener('update-channel-count', (event) => {
+      let totalCount = 0;
+      const channelsElements = document.getElementById('channelsContainerId');
+      const channelEls = Array.from(channelsElements.children);
+      channelEls.forEach((chanEl) => {
+        totalCount += chanEl.unreadMessageCount;
+      });
+      this.shadowRoot.getElementById('channelUnreadCountIconId')
+        .textContent = totalCount.toString();
+      if (totalCount > 0) {
+        // This is local icon at parent window to PM section
+        this.shadowRoot.getElementById('channelUnreadCountIconId').removeAttribute('hidden');
+      } else {
+        // This is local icon at parent window to PM section
+        this.shadowRoot.getElementById('channelUnreadCountIconId').setAttribute('hidden', '');
+      }
+    });
   } // connectedCallback()
 });

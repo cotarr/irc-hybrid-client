@@ -77,13 +77,11 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
    * This is the final action of websocket handshake
    */
   _websocketConnectedActions = () => {
-    setTimeout(() => {
-      // Erase previous messages.
-      this.shadowRoot.getElementById('reconnectStatusDiv').textContent =
-        'Websocket opened successfully\n';
-      this.hidePanel();
-      document.getElementById('debugPanel').showPanel();
-    }, 1500);
+    // Erase previous messages.
+    this.shadowRoot.getElementById('reconnectStatusDiv').textContent =
+      'Websocket opened successfully\n';
+    this.hidePanel();
+    document.getElementById('debugPanel').showPanel();
   };
 
   /**
@@ -547,6 +545,7 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
           }, 100);
         })
         .catch((err) => {
+          this.showPanel();
           let errMessage = err.message || err.toString() || 'Unknown error';
           console.log(errMessage);
           // limit to 1 line for display

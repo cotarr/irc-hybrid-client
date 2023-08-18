@@ -68,7 +68,7 @@ customElements.define('nav-menu', class extends HTMLElement {
     if (changed) {
       console.log('navMenu channel list changed, updating menu');
       // remove previous elements
-      const parentEl = this.shadowRoot.getElementById('dropdownMenuChannelContainer');
+      const parentEl = this.shadowRoot.getElementById('dropdownMenuChannelContainerId');
       while (parentEl.firstChild) {
         // 1 - Remove event listener
         console.log('removing event listener', parentEl.firstChild.id);
@@ -109,12 +109,13 @@ customElements.define('nav-menu', class extends HTMLElement {
             channelMessageCount.classList.add('global-border-theme-dark');
           }
           channelMessageCount.textContent = '0';
+          channelMessageCount.setAttribute('hidden', '');
           channelMessageCount.setAttribute('channel', channels[i]);
           channelMenuItem.appendChild(channelMessageCount);
 
           this.previousChannels.push(channels[i]);
           console.log('adding event listener');
-          this.shadowRoot.getElementById('dropdownMenuChannelContainer')
+          this.shadowRoot.getElementById('dropdownMenuChannelContainerId')
             .appendChild(channelMenuItem);
           channelMenuItem.addEventListener('click', this.handleChannelClick);
         }
@@ -175,6 +176,24 @@ customElements.define('nav-menu', class extends HTMLElement {
     });
 
     document.addEventListener('irc-state-changed', this._handleIrcStateChanged.bind(this));
+
+    document.addEventListener('update-channel-count', (event) => {
+      const channelMenuItemElements =
+        this.shadowRoot.getElementById('dropdownMenuChannelContainerId');
+      const menuItemEls = Array.from(channelMenuItemElements.children);
+      menuItemEls.forEach((itemEl) => {
+        const channelStr = itemEl.id.replace('channelMenu1', '');
+        const channelEl = document.getElementById('channel' + channelStr);
+        const count = channelEl.unreadMessageCount;
+        if (count > 0) {
+          itemEl.lastChild.textContent = channelEl.unreadMessageCount.toString();
+          itemEl.lastChild.removeAttribute('hidden');
+        } else {
+          itemEl.lastChild.textContent = '0';
+          itemEl.lastChild.setAttribute('hidden', '');
+        }
+      });
+    }); // addEventListener('update-channel-count
 
     //
     // Build arrays of page elements
@@ -258,12 +277,8 @@ customElements.define('nav-menu', class extends HTMLElement {
     this.shadowRoot.getElementById('item4_5').addEventListener('click', (event) => {
       // AdHoc function
       event.stopPropagation();
-      const parentEl = this.shadowRoot.getElementById('dropdownMenuChannelContainer');
-      if (parentEl.firstChild) {
-        parentEl.firstChild.removeEventListener('click', this.handleChannelClick);
-      }
-
-      // this.closeDropdownMenu();
+      console.log('Put Ad-hoc funciton here');
+      this.closeDropdownMenu();
     });
     this.shadowRoot.getElementById('item5_0').addEventListener('click', (event) => {
       event.stopPropagation();

@@ -12,6 +12,11 @@ Work in progress, see top of README.md
 
 Commit
 
+- Copied previous code from webclient06.js into channel-panel.js and manage-channels-panel.js. Refactored variables name and element ID. Emulated creation of a new IRC channel and IRC channel messages using debug-panel functions.
+- Added temporary web component temp-placeholder.js. This has temporary functions used to avoid reference errors when debugging channel panel stand alone.
+
+Commit 2b393fd
+
 - Added websocket panel, websocket connection active, initial debug successful.
 
 Commit 10efde0
