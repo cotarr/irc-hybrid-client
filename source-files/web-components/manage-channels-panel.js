@@ -49,17 +49,17 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
   }
 
   showPanel = () => {
-    this.shadowRoot.getElementById('panelVisibilityDiv').setAttribute('visible', '');
+    this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
     this.shadowRoot.getElementById('panelCollapsedDivId').setAttribute('visible', '');
   };
 
   collapsePanel = () => {
-    this.shadowRoot.getElementById('panelVisibilityDiv').setAttribute('visible', '');
+    this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
     this.shadowRoot.getElementById('panelCollapsedDivId').removeAttribute('visible');
   };
 
   hidePanel = () => {
-    this.shadowRoot.getElementById('panelVisibilityDiv').removeAttribute('visible');
+    this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible');
     this.shadowRoot.getElementById('panelCollapsedDivId').removeAttribute('visible');
   };
 

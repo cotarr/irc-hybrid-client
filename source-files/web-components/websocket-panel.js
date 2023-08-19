@@ -55,21 +55,21 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
    * Make panel visible
    */
   showPanel = () => {
-    this.shadowRoot.getElementById('panelVisibilityDiv').setAttribute('visible', '');
+    this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
   };
 
   /**
    * This panel does not collapse, instead close it.
    */
   collapsePanel = () => {
-    this.shadowRoot.getElementById('panelVisibilityDiv').removeAttribute('visible');
+    this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible');
   };
 
   /**
    * Hide panel
    */
   hidePanel = () => {
-    this.shadowRoot.getElementById('panelVisibilityDiv').removeAttribute('visible');
+    this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible');
   };
 
   /**
@@ -78,7 +78,7 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
    */
   _websocketConnectedActions = () => {
     // Erase previous messages.
-    this.shadowRoot.getElementById('reconnectStatusDiv').textContent =
+    this.shadowRoot.getElementById('reconnectStatusDivId').textContent =
       'Websocket opened successfully\n';
     this.hidePanel();
     document.getElementById('debugPanel').showPanel();
@@ -128,6 +128,8 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
   _initWebSocketAuth = () => {
     return new Promise((resolve, reject) => {
       const fetchController = new AbortController();
+      const fetchTimeout = document.getElementById('globVars').constants('fetchTimeout');
+      const activitySpinnerEl = document.getElementById('activitySpinner');
       const fetchOptions = {
         method: 'POST',
         redirect: 'error',
@@ -140,9 +142,8 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
         body: JSON.stringify({ purpose: 'websocket-auth' })
       };
       const fetchURL = document.getElementById('globVars').webServerUrl + '/irc/wsauth';
-      document.getElementById('activitySpinner').requestActivitySpinner();
-      const fetchTimerId = setTimeout(() => fetchController.abort(),
-        document.getElementById('globVars').constants('fetchTimeout'));
+      activitySpinnerEl.requestActivitySpinner();
+      const fetchTimerId = setTimeout(() => fetchController.abort(), fetchTimeout);
 
       fetch(fetchURL, fetchOptions)
         .then((response) => {
@@ -163,12 +164,12 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
         .then((responseJson) => {
           // console.log(JSON.stringify(responseJson, null, 2));
           if (fetchTimerId) clearTimeout(fetchTimerId);
-          document.getElementById('activitySpinner').cancelActivitySpinner();
+          activitySpinnerEl.cancelActivitySpinner();
           resolve(window.globals.ircState);
         })
         .catch((err) => {
           if (fetchTimerId) clearTimeout(fetchTimerId);
-          document.getElementById('activitySpinner').cancelActivitySpinner();
+          activitySpinnerEl.cancelActivitySpinner();
           window.globals.webState.webConnected = false;
           window.globals.webState.webConnecting = false;
           // Build generic error message to catch network errors
@@ -210,7 +211,7 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
       window.globals.webState.webConnecting = false;
       window.globals.webState.times.webConnect = Math.floor(Date.now() / 1000);
       window.globals.webState.count.webConnect++;
-      this.shadowRoot.getElementById('reconnectStatusDiv').textContent +=
+      this.shadowRoot.getElementById('reconnectStatusDivId').textContent +=
         'Websocket opened successfully\n';
       this.updateWebsocketStatus();
       // what to do, open panels, etc
@@ -245,15 +246,15 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
         if (window.globals.webState.websocketCount === 0) {
           if (window.globals.webState.webConnected) {
             if (('code' in event) && (event.code === 3001)) {
-              this.shadowRoot.getElementById('reconnectStatusDiv').textContent +=
+              this.shadowRoot.getElementById('reconnectStatusDivId').textContent +=
                 'Web page disconnected at user request\n';
             } else {
-              this.shadowRoot.getElementById('reconnectStatusDiv').textContent +=
+              this.shadowRoot.getElementById('reconnectStatusDivId').textContent +=
               'Web socket connection closed, count: ' +
               window.globals.webState.websocketCount + '\n' +
               'Code: ' + event.code + ' ' + event.reason + '\n';
               if (!window.globals.webState.webConnectOn) {
-                window.shadowRoot.getElementById('reconnectStatusDiv').textContent +=
+                window.shadowRoot.getElementById('reconnectStatusDivId').textContent +=
                 'Automatic web reconnect is disabled. \nPlease reconnect manually.\n';
               }
             }
@@ -276,7 +277,7 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
         console.log(errMessage);
         // take only first line
         errMessage = errMessage.split('\n')[0];
-        this.shadowRoot.getElementById('reconnectStatusDiv').textContent +=
+        this.shadowRoot.getElementById('reconnectStatusDivId').textContent +=
           'Websocket Error \n';
       }
       // showError('WebSocket error occurred.');
@@ -357,6 +358,8 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
   _testWebServerRunning = () => {
     return new Promise((resolve, reject) => {
       const fetchController = new AbortController();
+      const fetchTimeout = document.getElementById('globVars').constants('fetchTimeout');
+      const activitySpinnerEl = document.getElementById('activitySpinner');
       const fetchOptions = {
         method: 'GET',
         redirect: 'error',
@@ -366,9 +369,8 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
         }
       };
       const fetchURL = document.getElementById('globVars').webServerUrl + '/status';
-      document.getElementById('activitySpinner').requestActivitySpinner();
-      const fetchTimerId = setTimeout(() => fetchController.abort(),
-        document.getElementById('globVars').constants('fetchTimeout'));
+      activitySpinnerEl.requestActivitySpinner();
+      const fetchTimerId = setTimeout(() => fetchController.abort(), fetchTimeout);
       fetch(fetchURL, fetchOptions)
         .then((response) => {
           if (response.status === 200) {
@@ -388,7 +390,7 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
         .then((responseJson) => {
           // console.log(JSON.stringify(responseJson, null, 2));
           if (fetchTimerId) clearTimeout(fetchTimerId);
-          document.getElementById('activitySpinner').cancelActivitySpinner();
+          activitySpinnerEl.cancelActivitySpinner();
           if ((Object.hasOwn(responseJson, 'status')) && (responseJson.status === 'ok')) {
             resolve({});
           } else {
@@ -398,7 +400,7 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
         })
         .catch((err) => {
           if (fetchTimerId) clearTimeout(fetchTimerId);
-          document.getElementById('activitySpinner').cancelActivitySpinner();
+          activitySpinnerEl.cancelActivitySpinner();
           // Build generic error message to catch network errors
           let message = ('Fetch error, ' + fetchOptions.method + ' ' + fetchURL + ', ' +
             (err.message || err.toString() || 'Error'));
@@ -411,7 +413,7 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
             message += ', ' + err.remoteErrorText;
           }
           const error = new Error(message);
-          this.shadowRoot.getElementById('reconnectStatusDiv').textContent +=
+          this.shadowRoot.getElementById('reconnectStatusDivId').textContent +=
             'Error: No internet or server down\n';
           reject(error);
         });
@@ -425,6 +427,8 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
   _testWebServerLoginCookie = () => {
     return new Promise((resolve, reject) => {
       const fetchController = new AbortController();
+      const fetchTimeout = document.getElementById('globVars').constants('fetchTimeout');
+      const activitySpinnerEl = document.getElementById('activitySpinner');
       const fetchOptions = {
         method: 'GET',
         redirect: 'error',
@@ -434,9 +438,8 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
         }
       };
       const fetchURL = document.getElementById('globVars').webServerUrl + '/secure';
-      document.getElementById('activitySpinner').requestActivitySpinner();
-      const fetchTimerId = setTimeout(() => fetchController.abort(),
-        document.getElementById('globVars').constants('fetchTimeout'));
+      activitySpinnerEl.requestActivitySpinner();
+      const fetchTimerId = setTimeout(() => fetchController.abort(), fetchTimeout);
       fetch(fetchURL, fetchOptions)
         .then((response) => {
           if (response.status === 200) {
@@ -462,7 +465,7 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
         .then((responseJson) => {
           // console.log(JSON.stringify(responseJson, null, 2));
           if (fetchTimerId) clearTimeout(fetchTimerId);
-          document.getElementById('activitySpinner').cancelActivitySpinner();
+          activitySpinnerEl.cancelActivitySpinner();
           if ((Object.hasOwn(responseJson, 'secure')) && (responseJson.secure === 'ok')) {
             resolve({});
           } else {
@@ -472,7 +475,7 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
         })
         .catch((err) => {
           if (fetchTimerId) clearTimeout(fetchTimerId);
-          document.getElementById('activitySpinner').cancelActivitySpinner();
+          activitySpinnerEl.cancelActivitySpinner();
           // Build generic error message to catch network errors
           let message = ('Fetch error, ' + fetchOptions.method + ' ' + fetchURL + ', ' +
             (err.message || err.toString() || 'Error'));
@@ -497,19 +500,19 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
   re_connectWebSocketAfterDisconnect = () => {
     this._testWebServerRunning()
       .then(() => {
-        this.shadowRoot.getElementById('reconnectStatusDiv').textContent +=
+        this.shadowRoot.getElementById('reconnectStatusDivId').textContent +=
           'Server found, Checking authorization.\n';
         return Promise.resolve({});
       })
       .then(this._testWebServerLoginCookie)
       .then(() => {
-        this.shadowRoot.getElementById('reconnectStatusDiv').textContent +=
+        this.shadowRoot.getElementById('reconnectStatusDivId').textContent +=
           'Login authorization confirmed, opening web socket.\n';
         return Promise.resolve({});
       })
       .then(this._initWebSocketAuth)
       .then(() => {
-        this.shadowRoot.getElementById('reconnectStatusDiv').textContent +=
+        this.shadowRoot.getElementById('reconnectStatusDivId').textContent +=
           'Authorizing websocket....\n';
         setTimeout(() => {
           this._connectWebSocket();
@@ -522,7 +525,7 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
         errMessage = errMessage.split('\n')[0];
         document.getElementById('errorPanel')
           .showError('Error connecting web socket: ' + errMessage);
-        this.shadowRoot.getElementById('reconnectStatusDiv').textContent +=
+        this.shadowRoot.getElementById('reconnectStatusDivId').textContent +=
           'Error: authorizing websocket.\n';
         window.globals.webState.webConnected = false;
         window.globals.webState.webConnecting = false;
@@ -538,7 +541,7 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
       window.globals.webState.webConnecting = true;
       this._initWebSocketAuth()
         .then(() => {
-          this.shadowRoot.getElementById('reconnectStatusDiv').textContent +=
+          this.shadowRoot.getElementById('reconnectStatusDivId').textContent +=
             'Authorizing websocket....\n';
           setTimeout(() => {
             this._connectWebSocket();
@@ -575,7 +578,7 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
       window.globals.webState.webConnectOn = true;
       window.globals.webState.webConnecting = true;
       this.updateWebsocketStatus();
-      this.shadowRoot.getElementById('reconnectStatusDiv').textContent +=
+      this.shadowRoot.getElementById('reconnectStatusDivId').textContent +=
         'Reconnect to web server initiated (Manual)\n';
       this.re_connectWebSocketAfterDisconnect();
       return;
@@ -619,7 +622,7 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
         this.updateWebsocketStatus();
         this.wsReconnectTimer = 0;
         this.wsReconnectCounter++;
-        this.shadowRoot.getElementById('reconnectStatusDiv').textContent +=
+        this.shadowRoot.getElementById('reconnectStatusDivId').textContent +=
           'Reconnect to web server initiated (Timer-1)\n';
         this.re_connectWebSocketAfterDisconnect();
       }
@@ -630,7 +633,7 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
         this.updateWebsocketStatus();
         this.wsReconnectTimer = 0;
         this.wsReconnectCounter++;
-        this.shadowRoot.getElementById('reconnectStatusDiv').textContent +=
+        this.shadowRoot.getElementById('reconnectStatusDivId').textContent +=
           'Reconnect to web server initiated (Timer-2)\n';
         this.re_connectWebSocketAfterDisconnect();
       }
@@ -640,7 +643,7 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
       // TODO updateDivVisibility();
       if (this.wsReconnectCounter === 11) {
         // only do the message one time
-        this.shadowRoot.getElementById('reconnectStatusDiv').textContent +=
+        this.shadowRoot.getElementById('reconnectStatusDivId').textContent +=
           'Reconnect disabled\n';
       }
     } else {
@@ -649,7 +652,7 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
         this.updateWebsocketStatus();
         this.wsReconnectTimer = 0;
         this.wsReconnectCounter++;
-        this.shadowRoot.getElementById('reconnectStatusDiv').textContent +=
+        this.shadowRoot.getElementById('reconnectStatusDivId').textContent +=
           'Reconnect to web server initiated (Timer-3)\n';
         this.re_connectWebSocketAfterDisconnect();
       }
@@ -696,7 +699,7 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
     if (window.globals.webState.webConnected) {
       if (this.heartbeatUpCounter > this.heartbeatExpirationTimeSeconds + 1) {
         console.log('HEARTBEAT timeout + 2 seconds, socket unresponsive, forcing disconnect');
-        this.shadowRoot.getElementById('reconnectStatusDiv').textContent +=
+        this.shadowRoot.getElementById('reconnectStatusDivId').textContent +=
           'Web socket connection timeout, socket unresponsive, force disconnect\n';
         window.globals.webState.webConnected = false;
         window.globals.webState.webConnecting = false;
@@ -704,7 +707,7 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
         // TODO (removed channels) setVariablesShowingIRCDisconnected();
       } else if (this.heartbeatUpCounter === this.heartbeatExpirationTimeSeconds) {
         console.log('HEARTBEAT timeout + 0 seconds , attempting to closing socket');
-        this.shadowRoot.getElementById('reconnectStatusDiv').textContent +=
+        this.shadowRoot.getElementById('reconnectStatusDivId').textContent +=
           'Web socket connection timeout, attempting to close\n';
         if (window.globals.wsocket) {
           // Closing the web socket will generate a 'close' event.
@@ -733,13 +736,13 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
     /**
      * Button to initiate manual web socket reconnect
      */
-    this.shadowRoot.getElementById('manualWebSocketReconnectButton')
+    this.shadowRoot.getElementById('manualWebSocketReconnectButtonId')
       .addEventListener('click', () => {
         if ((!window.globals.webState.webConnected) && (!window.globals.webState.webConnecting)) {
           window.globals.webState.webConnectOn = true;
           window.globals.webState.webConnecting = true;
           this.updateWebsocketStatus();
-          this.shadowRoot.getElementById('reconnectStatusDiv').textContent +=
+          this.shadowRoot.getElementById('reconnectStatusDivId').textContent +=
             'Reconnect to web server initiated (Manual)\n';
           this.re_connectWebSocketAfterDisconnect();
         }
@@ -748,13 +751,13 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
     /**
      * Button to stop manual web socket reconnect
      */
-    this.shadowRoot.getElementById('stopWebSocketReconnectButton')
+    this.shadowRoot.getElementById('stopWebSocketReconnectButtonId')
       .addEventListener('click', () => {
         if (!window.globals.webState.webConnected) {
           window.globals.webState.webConnectOn = false;
           window.globals.webState.webConnecting = false;
           this.updateWebsocketStatus();
-          this.shadowRoot.getElementById('reconnectStatusDiv').textContent =
+          this.shadowRoot.getElementById('reconnectStatusDivId').textContent =
             'Reconnect disabled\n';
         }
       });

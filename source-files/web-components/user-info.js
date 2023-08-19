@@ -38,6 +38,8 @@ window.customElements.define('user-info', class extends HTMLElement {
   getLoginInfo = () => {
     return new Promise((resolve, reject) => {
       const fetchController = new AbortController();
+      const fetchTimeout = document.getElementById('globVars').constants('fetchTimeout');
+      const activitySpinnerEl = document.getElementById('activitySpinner');
       const fetchOptions = {
         method: 'GET',
         cache: 'no-store',
@@ -48,11 +50,8 @@ window.customElements.define('user-info', class extends HTMLElement {
         }
       };
       const fetchURL = '/userinfo';
-
-      document.getElementById('activitySpinner').requestActivitySpinner();
-      const fetchTimerId = setTimeout(() => fetchController.abort(),
-        document.getElementById('globVars').constants('fetchTimeout'));
-
+      activitySpinnerEl.requestActivitySpinner();
+      const fetchTimerId = setTimeout(() => fetchController.abort(), fetchTimeout);
       fetch(fetchURL, fetchOptions)
         .then((response) => {
           if (response.status === 200) {
@@ -72,7 +71,7 @@ window.customElements.define('user-info', class extends HTMLElement {
         .then((responseJson) => {
           // console.log(JSON.stringify(responseJson, null, 2));
           if (fetchTimerId) clearTimeout(fetchTimerId);
-          document.getElementById('activitySpinner').cancelActivitySpinner();
+          activitySpinnerEl.cancelActivitySpinner();
           if (!('user' in responseJson)) {
             throw new Error('Token validation failed.');
           }
@@ -102,7 +101,7 @@ window.customElements.define('user-info', class extends HTMLElement {
         })
         .catch((err) => {
           if (fetchTimerId) clearTimeout(fetchTimerId);
-          document.getElementById('activitySpinner').cancelActivitySpinner();
+          activitySpinnerEl.cancelActivitySpinner();
           // Build generic error message to catch network errors
           let message = ('Fetch error, ' + fetchOptions.method + ' ' + fetchURL + ', ' +
             (err.message || err.toString() || 'Error'));

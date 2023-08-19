@@ -88,7 +88,7 @@ customElements.define('nav-menu', class extends HTMLElement {
           channelMenuItem.classList.add('nav-level1');
           channelMenuItem.setAttribute('channel', channels[i]);
           // insert into the menu with same collapsed attribute as other menu members in same grop
-          if (this.shadowRoot.getElementById('item1_1').hasAttribute('collapsed')) {
+          if (this.shadowRoot.getElementById('item1_1_Id').hasAttribute('collapsed')) {
             channelMenuItem.setAttribute('collapsed', '');
           }
           const channelNameSpan = document.createElement('span');
@@ -126,16 +126,16 @@ customElements.define('nav-menu', class extends HTMLElement {
   };
 
   toggleDropdownMenu = () => {
-    this.shadowRoot.getElementById('navDropdownDiv').classList.toggle('nav-dropdown-div-show');
+    this.shadowRoot.getElementById('navDropdownDivId').classList.toggle('nav-dropdown-div-show');
     // Make sure dropdown menu is visible by scrolling to the top when opening menu
-    // if (this.shadowRoot.getElementById('navDropdownDiv').classList.contains(
+    // if (this.shadowRoot.getElementById('navDropdownDivId').classList.contains(
     //   'nav-dropdown-div-show')) {
     //   document.dispatchEvent(new CustomEvent('global-scroll-to-top', { bubbles: true }));
     // }
   };
 
   closeDropdownMenu = () => {
-    this.shadowRoot.getElementById('navDropdownDiv').classList.remove('nav-dropdown-div-show');
+    this.shadowRoot.getElementById('navDropdownDivId').classList.remove('nav-dropdown-div-show');
   };
 
   // ------------------
@@ -167,11 +167,11 @@ customElements.define('nav-menu', class extends HTMLElement {
     });
     document.addEventListener('color-theme-changed', (event) => {
       if (event.detail.theme === 'light') {
-        this.shadowRoot.getElementById('navDropdownDiv').classList.remove('nav-menu-theme-dark');
-        this.shadowRoot.getElementById('navDropdownDiv').classList.add('nav-menu-theme-light');
+        this.shadowRoot.getElementById('navDropdownDivId').classList.remove('nav-menu-theme-dark');
+        this.shadowRoot.getElementById('navDropdownDivId').classList.add('nav-menu-theme-light');
       } else {
-        this.shadowRoot.getElementById('navDropdownDiv').classList.remove('nav-menu-theme-light');
-        this.shadowRoot.getElementById('navDropdownDiv').classList.add('nav-menu-theme-dark');
+        this.shadowRoot.getElementById('navDropdownDivId').classList.remove('nav-menu-theme-light');
+        this.shadowRoot.getElementById('navDropdownDivId').classList.add('nav-menu-theme-dark');
       }
     });
 
@@ -214,19 +214,19 @@ customElements.define('nav-menu', class extends HTMLElement {
         } // next i
       }
     };
-    this.shadowRoot.getElementById('group01Button').addEventListener('click', (event) => {
+    this.shadowRoot.getElementById('group01ButtonId').addEventListener('click', (event) => {
       event.stopPropagation();
       _toggleDropdownOnMenuClick('nav-group01');
     });
-    this.shadowRoot.getElementById('group02Button').addEventListener('click', (event) => {
+    this.shadowRoot.getElementById('group02ButtonId').addEventListener('click', (event) => {
       event.stopPropagation();
       _toggleDropdownOnMenuClick('nav-group02');
     });
-    this.shadowRoot.getElementById('group03Button').addEventListener('click', (event) => {
+    this.shadowRoot.getElementById('group03ButtonId').addEventListener('click', (event) => {
       event.stopPropagation();
       _toggleDropdownOnMenuClick('nav-group03');
     });
-    this.shadowRoot.getElementById('group04Button').addEventListener('click', (event) => {
+    this.shadowRoot.getElementById('group04ButtonId').addEventListener('click', (event) => {
       event.stopPropagation();
       _toggleDropdownOnMenuClick('nav-group04');
     });
@@ -234,23 +234,23 @@ customElements.define('nav-menu', class extends HTMLElement {
     // --------------------------------
     // Menu functional Assignments
     // --------------------------------
-    this.shadowRoot.getElementById('item1_1').addEventListener('click', (event) => {
+    this.shadowRoot.getElementById('item1_1_Id').addEventListener('click', (event) => {
       event.stopPropagation();
       document.getElementById('manageChannelsPanel').showPanel();
       this.closeDropdownMenu();
     });
 
-    this.shadowRoot.getElementById('item3_1').addEventListener('click', (event) => {
+    this.shadowRoot.getElementById('item3_1_Id').addEventListener('click', (event) => {
       event.stopPropagation();
       document.getElementById('noticePanel').showPanel();
       this.closeDropdownMenu();
     });
-    this.shadowRoot.getElementById('item4_1').addEventListener('click', (event) => {
+    this.shadowRoot.getElementById('item4_1_Id').addEventListener('click', (event) => {
       event.stopPropagation();
       document.getElementById('displayUtils').toggleColorTheme();
       this.closeDropdownMenu();
     });
-    this.shadowRoot.getElementById('item4_2').addEventListener('click', (event) => {
+    this.shadowRoot.getElementById('item4_2_Id').addEventListener('click', (event) => {
       event.stopPropagation();
       document.dispatchEvent(new CustomEvent('show-all-panels', {
         detail: {
@@ -260,7 +260,7 @@ customElements.define('nav-menu', class extends HTMLElement {
       }));
       this.closeDropdownMenu();
     });
-    this.shadowRoot.getElementById('item4_3').addEventListener('click', (event) => {
+    this.shadowRoot.getElementById('item4_3_Id').addEventListener('click', (event) => {
       event.stopPropagation();
       document.dispatchEvent(new CustomEvent('collapse-all-panels', {
         detail: {
@@ -269,18 +269,18 @@ customElements.define('nav-menu', class extends HTMLElement {
       }));
       this.closeDropdownMenu();
     });
-    this.shadowRoot.getElementById('item4_4').addEventListener('click', (event) => {
+    this.shadowRoot.getElementById('item4_4_Id').addEventListener('click', (event) => {
       event.stopPropagation();
       document.getElementById('debugPanel').showPanel();
       this.closeDropdownMenu();
     });
-    this.shadowRoot.getElementById('item4_5').addEventListener('click', (event) => {
+    this.shadowRoot.getElementById('item4_5_Id').addEventListener('click', (event) => {
       // AdHoc function
       event.stopPropagation();
-      console.log('Put Ad-hoc funciton here');
+      console.log('Put Ad-hoc function here');
       this.closeDropdownMenu();
     });
-    this.shadowRoot.getElementById('item5_0').addEventListener('click', (event) => {
+    this.shadowRoot.getElementById('item5_0_Id').addEventListener('click', (event) => {
       event.stopPropagation();
       window.localStorage.clear();
       window.location = '/logout';

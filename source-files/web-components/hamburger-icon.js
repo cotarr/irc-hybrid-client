@@ -37,42 +37,30 @@ customElements.define('hamburger-icon', class extends HTMLElement {
   }
 
   setColorTheme = (theme) => {
+    const hamburgerIconEl = this.shadowRoot.getElementById('hamburgerBorderId');
+    const hamburgerLine1El = this.shadowRoot.getElementById('hamburgerLine1Id');
+    const hamburgerLine2El = this.shadowRoot.getElementById('hamburgerLine2Id');
+    const hamburgerLine3El = this.shadowRoot.getElementById('hamburgerLine3Id');
     if (theme === 'light') {
-      this.shadowRoot.getElementById('hamburgerIcon')
-        .classList.remove('hamburger-icon-theme-dark');
-      this.shadowRoot.getElementById('hamburgerLine1')
-        .classList.remove('hamburger-line-theme-dark');
-      this.shadowRoot.getElementById('hamburgerLine2')
-        .classList.remove('hamburger-line-theme-dark');
-      this.shadowRoot.getElementById('hamburgerLine3')
-        .classList.remove('hamburger-line-theme-dark');
+      hamburgerIconEl.classList.remove('hamburger-icon-theme-dark');
+      hamburgerLine1El.classList.remove('hamburger-line-theme-dark');
+      hamburgerLine2El.classList.remove('hamburger-line-theme-dark');
+      hamburgerLine3El.classList.remove('hamburger-line-theme-dark');
 
-      this.shadowRoot.getElementById('hamburgerIcon')
-        .classList.add('hamburger-icon-theme-light');
-      this.shadowRoot.getElementById('hamburgerLine1')
-        .classList.add('hamburger-line-theme-light');
-      this.shadowRoot.getElementById('hamburgerLine2')
-        .classList.add('hamburger-line-theme-light');
-      this.shadowRoot.getElementById('hamburgerLine3')
-        .classList.add('hamburger-line-theme-light');
+      hamburgerIconEl.classList.add('hamburger-icon-theme-light');
+      hamburgerLine1El.classList.add('hamburger-line-theme-light');
+      hamburgerLine2El.classList.add('hamburger-line-theme-light');
+      hamburgerLine3El.classList.add('hamburger-line-theme-light');
     } else if (theme === 'dark') {
-      this.shadowRoot.getElementById('hamburgerIcon')
-        .classList.remove('hamburger-icon-theme-light');
-      this.shadowRoot.getElementById('hamburgerLine1')
-        .classList.remove('hamburger-line-theme-light');
-      this.shadowRoot.getElementById('hamburgerLine2')
-        .classList.remove('hamburger-line-theme-light');
-      this.shadowRoot.getElementById('hamburgerLine3')
-        .classList.remove('hamburger-line-theme-light');
+      hamburgerIconEl.classList.remove('hamburger-icon-theme-light');
+      hamburgerLine1El.classList.remove('hamburger-line-theme-light');
+      hamburgerLine2El.classList.remove('hamburger-line-theme-light');
+      hamburgerLine3El.classList.remove('hamburger-line-theme-light');
 
-      this.shadowRoot.getElementById('hamburgerIcon')
-        .classList.add('hamburger-icon-theme-dark');
-      this.shadowRoot.getElementById('hamburgerLine1')
-        .classList.add('hamburger-line-theme-dark');
-      this.shadowRoot.getElementById('hamburgerLine2')
-        .classList.add('hamburger-line-theme-dark');
-      this.shadowRoot.getElementById('hamburgerLine3')
-        .classList.add('hamburger-line-theme-dark');
+      hamburgerIconEl.classList.add('hamburger-icon-theme-dark');
+      hamburgerLine1El.classList.add('hamburger-line-theme-dark');
+      hamburgerLine2El.classList.add('hamburger-line-theme-dark');
+      hamburgerLine3El.classList.add('hamburger-line-theme-dark');
     } else {
       throw new Error('Invalid color theme, allowed: light, dark');
     }

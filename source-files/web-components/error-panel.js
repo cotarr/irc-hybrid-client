@@ -41,8 +41,8 @@ window.customElements.define('error-panel', class extends HTMLElement {
   // --------------------------
 
   clearError = () => {
-    this.shadowRoot.getElementById('panelVisibilityDiv').removeAttribute('visible');
-    const errorContentDivEl = this.shadowRoot.getElementById('errorContentDiv');
+    this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible');
+    const errorContentDivEl = this.shadowRoot.getElementById('errorContentDivId');
     while (errorContentDivEl.firstChild) {
       errorContentDivEl.removeChild(errorContentDivEl.firstChild);
     }
@@ -50,8 +50,8 @@ window.customElements.define('error-panel', class extends HTMLElement {
   };
 
   showError = (errorString) => {
-    this.shadowRoot.getElementById('panelVisibilityDiv').setAttribute('visible', '');
-    const errorContentDivEl = this.shadowRoot.getElementById('errorContentDiv');
+    this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
+    const errorContentDivEl = this.shadowRoot.getElementById('errorContentDivId');
     const errorMessageEl = document.createElement('div');
     errorMessageEl.textContent = errorString || 'Error: unknown error (2993)';
     errorContentDivEl.appendChild(errorMessageEl);
@@ -64,7 +64,7 @@ window.customElements.define('error-panel', class extends HTMLElement {
       if (this.errorRemainSeconds === 0) {
         this.clearError();
       } else {
-        this.shadowRoot.getElementById('errorTitle').textContent =
+        this.shadowRoot.getElementById('errorTitleId').textContent =
           'Tap to Close (' + this.errorRemainSeconds.toString() + ')';
       }
     }

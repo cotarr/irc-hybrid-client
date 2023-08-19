@@ -35,16 +35,16 @@ window.customElements.define('debug-panel', class extends HTMLElement {
   }
 
   showPanel = () => {
-    this.shadowRoot.getElementById('panelVisibilityDiv').setAttribute('visible', '');
+    this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
   };
 
   // this panel does not collapse, so close it.
   collapsePanel = () => {
-    this.shadowRoot.getElementById('panelVisibilityDiv').removeAttribute('visible');
+    this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible');
   };
 
   hidePanel = () => {
-    this.shadowRoot.getElementById('panelVisibilityDiv').removeAttribute('visible');
+    this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible');
   };
 
   //
@@ -102,8 +102,8 @@ window.customElements.define('debug-panel', class extends HTMLElement {
     // -------------------------------------
     // Panel Close Button
     // -------------------------------------
-    this.shadowRoot.getElementById('closePanelButton').addEventListener('click', () => {
-      this.shadowRoot.getElementById('panelVisibilityDiv').removeAttribute('visible');
+    this.shadowRoot.getElementById('closePanelButtonId').addEventListener('click', () => {
+      this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible');
     });
 
     // -------------------------------------
@@ -133,16 +133,13 @@ window.customElements.define('debug-panel', class extends HTMLElement {
     });
 
     document.addEventListener('color-theme-changed', (event) => {
+      const panelDivEl = this.shadowRoot.getElementById('panelDivId');
       if (event.detail.theme === 'light') {
-        this.shadowRoot.getElementById('panelDivId')
-          .classList.remove('debug-panel-theme-dark');
-        this.shadowRoot.getElementById('panelDivId')
-          .classList.add('debug-panel-theme-light');
+        panelDivEl.classList.remove('debug-panel-theme-dark');
+        panelDivEl.classList.add('debug-panel-theme-light');
       } else {
-        this.shadowRoot.getElementById('panelDivId')
-          .classList.remove('debug-panel-theme-light');
-        this.shadowRoot.getElementById('panelDivId')
-          .classList.add('debug-panel-theme-dark');
+        panelDivEl.classList.remove('debug-panel-theme-light');
+        panelDivEl.classList.add('debug-panel-theme-dark');
       }
     });
 
@@ -195,12 +192,12 @@ window.customElements.define('debug-panel', class extends HTMLElement {
     // -------------------------------------
 
     // Show debug function buttons
-    this.shadowRoot.getElementById('showDebugFunctionsButton').addEventListener('click', () => {
-      this.shadowRoot.getElementById('showDebugFunctionsDiv').setAttribute('hidden', '');
-      this.shadowRoot.getElementById('debugFunctionsDiv').removeAttribute('hidden');
+    this.shadowRoot.getElementById('showDebugFunctionsButtonId').addEventListener('click', () => {
+      this.shadowRoot.getElementById('showdebugFunctionsDivId').setAttribute('hidden', '');
+      this.shadowRoot.getElementById('debugFunctionsDivId').removeAttribute('hidden');
     });
 
-    this.shadowRoot.getElementById('button01').addEventListener('click', () => {
+    this.shadowRoot.getElementById('button01Id').addEventListener('click', () => {
       const newChannelName = '#myNewChannel';
       window.globals.ircState.ircConnectOn = true;
       window.globals.ircState.ircConnecting = false;
@@ -231,7 +228,7 @@ window.customElements.define('debug-panel', class extends HTMLElement {
       document.dispatchEvent(new CustomEvent('irc-state-changed'));
     });
 
-    this.shadowRoot.getElementById('button02').addEventListener('click', () => {
+    this.shadowRoot.getElementById('button02Id').addEventListener('click', () => {
       setTimeout(() => {
         document.dispatchEvent(new CustomEvent('channel-message',
           {
@@ -253,21 +250,21 @@ window.customElements.define('debug-panel', class extends HTMLElement {
           }));
       }, 10);
     });
-    this.shadowRoot.getElementById('button03').addEventListener('click', () => {
+    this.shadowRoot.getElementById('button03Id').addEventListener('click', () => {
       window.globals.ircState.channels = [];
       window.globals.ircState.channelStates = [];
       document.dispatchEvent(new CustomEvent('irc-state-changed'));
     });
 
-    this.shadowRoot.getElementById('button04').addEventListener('click', () => {
+    this.shadowRoot.getElementById('button04Id').addEventListener('click', () => {
       document.getElementById('errorPanel').showError('This is a generic error message');
     });
 
-    this.shadowRoot.getElementById('button05').addEventListener('click', () => {
+    this.shadowRoot.getElementById('button05Id').addEventListener('click', () => {
       console.log('window.globals', JSON.stringify(window.globals, null, 2));
     });
 
-    this.shadowRoot.getElementById('button06').addEventListener('click', () => {
+    this.shadowRoot.getElementById('button06Id').addEventListener('click', () => {
       document.getElementById('activitySpinner').requestActivitySpinner();
       document.getElementById('headerBar').setHeaderBarIcons({
         hideNavMenu: false,
@@ -284,37 +281,37 @@ window.customElements.define('debug-panel', class extends HTMLElement {
       document.getElementById('headerBar')._updateDynamicElementTitles();
     });
 
-    this.shadowRoot.getElementById('button07').addEventListener('click', () => {
+    this.shadowRoot.getElementById('button07Id').addEventListener('click', () => {
       document.getElementById('displayUtils').manualRecalcPageWidth();
     });
 
-    this.shadowRoot.getElementById('button08').addEventListener('click', () => {
+    this.shadowRoot.getElementById('button08Id').addEventListener('click', () => {
       window.globals.ircState.channelList.push('#chan' +
         window.globals.ircState.channelList.length.toString());
       document.dispatchEvent(new CustomEvent('irc-state-changed'));
     });
 
-    this.shadowRoot.getElementById('button09').addEventListener('click', () => {
+    this.shadowRoot.getElementById('button09Id').addEventListener('click', () => {
       this._consoleLogGlobalEvents();
     });
-    this.shadowRoot.getElementById('button10').addEventListener('click', () => {
+    this.shadowRoot.getElementById('button10Id').addEventListener('click', () => {
       document.dispatchEvent(new CustomEvent('irc-state-changed'));
     });
-    this.shadowRoot.getElementById('button11').addEventListener('click', () => {
+    this.shadowRoot.getElementById('button11Id').addEventListener('click', () => {
       document.dispatchEvent(new CustomEvent('hide-all-panels', {
         detail: {
           except: ['debugPanel']
         }
       }));
     });
-    this.shadowRoot.getElementById('button12').addEventListener('click', () => {
+    this.shadowRoot.getElementById('button12Id').addEventListener('click', () => {
       document.dispatchEvent(new CustomEvent('collapse-all-panels', {
         detail: {
           except: ['debugPanel']
         }
       }));
     });
-    this.shadowRoot.getElementById('button13').addEventListener('click', () => {
+    this.shadowRoot.getElementById('button13Id').addEventListener('click', () => {
       document.dispatchEvent(new CustomEvent('show-all-panels', {
         detail: {
           except: [],
@@ -322,10 +319,10 @@ window.customElements.define('debug-panel', class extends HTMLElement {
         }
       }));
     });
-    this.shadowRoot.getElementById('button13').addEventListener('click', () => {
+    this.shadowRoot.getElementById('button14Id').addEventListener('click', () => {
       document.dispatchEvent(new CustomEvent('web-connect-changed'));
     });
-    this.shadowRoot.getElementById('button16').addEventListener('click', () => {
+    this.shadowRoot.getElementById('button16Id').addEventListener('click', () => {
     });
   }; // connectedCallback()
 }); // customElements.define

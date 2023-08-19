@@ -215,21 +215,21 @@ window.customElements.define('channel-panel', class extends HTMLElement {
   };
 
   showPanel = () => {
-    this.shadowRoot.getElementById('panelVisibilityDiv').setAttribute('visible', '');
+    this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
     this.shadowRoot.getElementById('panelCollapsedDivId').setAttribute('visible', '');
-    this.shadowRoot.getElementById('hideWithCollapse').removeAttribute('hidden');
+    this.shadowRoot.getElementById('hideWithCollapseId').removeAttribute('hidden');
   };
 
   collapsePanel = () => {
-    this.shadowRoot.getElementById('panelVisibilityDiv').setAttribute('visible', '');
+    this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
     this.shadowRoot.getElementById('panelCollapsedDivId').removeAttribute('visible');
-    this.shadowRoot.getElementById('hideWithCollapse').setAttribute('hidden', '');
+    this.shadowRoot.getElementById('hideWithCollapseId').setAttribute('hidden', '');
   };
 
   hidePanel = () => {
-    this.shadowRoot.getElementById('panelVisibilityDiv').removeAttribute('visible');
+    this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible');
     this.shadowRoot.getElementById('panelCollapsedDivId').removeAttribute('visible');
-    this.shadowRoot.getElementById('hideWithCollapse').removeAttribute('hidden');
+    this.shadowRoot.getElementById('hideWithCollapseId').removeAttribute('hidden');
   };
 
   _handleCloseButton = () => {
@@ -296,6 +296,8 @@ window.customElements.define('channel-panel', class extends HTMLElement {
   handleChannelPruneButtonElClick = (event) => {
     // Fetch API to remove channel from backend server
     const index = window.globals.ircState.channels.indexOf(this.channelName.toLowerCase());
+    const fetchTimeout = document.getElementById('globVars').constants('fetchTimeout');
+    const activitySpinnerEl = document.getElementById('activitySpinner');
     if (index >= 0) {
       // if not joined, this is quietly ignored without error
       if (!window.globals.ircState.channelStates[index].joined) {
@@ -312,9 +314,8 @@ window.customElements.define('channel-panel', class extends HTMLElement {
           body: JSON.stringify({ channel: this.channelName })
         };
         const fetchURL = document.getElementById('globVars').webServerUrl + '/irc/prune';
-        document.getElementById('activitySpinner').requestActivitySpinner();
-        const fetchTimerId = setTimeout(() => fetchController.abort(),
-          document.getElementById('globVars').constants('fetchTimeout'));
+        activitySpinnerEl.requestActivitySpinner();
+        const fetchTimerId = setTimeout(() => fetchController.abort(), fetchTimeout);
 
         fetch(fetchURL, fetchOptions)
           .then((response) => {
@@ -335,7 +336,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
           .then((responseJson) => {
             // console.log(JSON.stringify(responseJson, null, 2));
             if (fetchTimerId) clearTimeout(fetchTimerId);
-            document.getElementById('activitySpinner').cancelActivitySpinner();
+            activitySpinnerEl.cancelActivitySpinner();
             if (responseJson.error) {
               document.getElementById('errorPanel').showError(responseJson.message);
             } else {
@@ -348,7 +349,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
           })
           .catch((err) => {
             if (fetchTimerId) clearTimeout(fetchTimerId);
-            document.getElementById('activitySpinner').cancelActivitySpinner();
+            activitySpinnerEl.cancelActivitySpinner();
             window.globals.webState.webConnected = false;
             window.globals.webState.webConnecting = false;
             // Build generic error message to catch network errors

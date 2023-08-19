@@ -45,32 +45,32 @@ customElements.define('header-bar', class extends HTMLElement {
     * @param {Object} options - Key/value pairs for each status icon
     */
   setHeaderBarIcons = (options) => {
+    const webConnectIconEl = this.shadowRoot.getElementById('webConnectIconId');
+    const ircConnectIconEl = this.shadowRoot.getElementById('ircConnectIconId');
     let noIcons = true;
     if ((Object.hasOwn(options, 'hideNavMenu')) && (options.hideNavMenu)) {
-      this.shadowRoot.getElementById('navDropdownButton').setAttribute('hidden', '');
+      this.shadowRoot.getElementById('navDropdownButtonId').setAttribute('hidden', '');
     } else {
-      this.shadowRoot.getElementById('navDropdownButton').removeAttribute('hidden');
+      this.shadowRoot.getElementById('navDropdownButtonId').removeAttribute('hidden');
     };
 
     if (Object.hasOwn(options, 'webConnect')) {
-      const webConnectEl = this.shadowRoot.getElementById('webConnectIconId');
       // Use 'disconnected' to clear attributes
-      webConnectEl.removeAttribute('connected');
-      webConnectEl.removeAttribute('connecting');
-      webConnectEl.removeAttribute('unavailable');
-      if (options.webConnect === 'connected') webConnectEl.setAttribute('connected', '');
-      if (options.webConnect === 'connecting') webConnectEl.setAttribute('connecting', '');
-      if (options.webConnect === 'unavailable') webConnectEl.setAttribute('unavailable', '');
+      webConnectIconEl.removeAttribute('connected');
+      webConnectIconEl.removeAttribute('connecting');
+      webConnectIconEl.removeAttribute('unavailable');
+      if (options.webConnect === 'connected') webConnectIconEl.setAttribute('connected', '');
+      if (options.webConnect === 'connecting') webConnectIconEl.setAttribute('connecting', '');
+      if (options.webConnect === 'unavailable') webConnectIconEl.setAttribute('unavailable', '');
     }
     if (Object.hasOwn(options, 'ircConnect')) {
-      const ircConnectEl = this.shadowRoot.getElementById('ircConnectIconId');
       // Use 'disconnected' to clear attributes
-      ircConnectEl.removeAttribute('connected');
-      ircConnectEl.removeAttribute('connecting');
-      ircConnectEl.removeAttribute('unavailable');
-      if (options.ircConnect === 'connected') ircConnectEl.setAttribute('connected', '');
-      if (options.ircConnect === 'connecting') ircConnectEl.setAttribute('connecting', '');
-      if (options.ircConnect === 'unavailable') ircConnectEl.setAttribute('unavailable', '');
+      ircConnectIconEl.removeAttribute('connected');
+      ircConnectIconEl.removeAttribute('connecting');
+      ircConnectIconEl.removeAttribute('unavailable');
+      if (options.ircConnect === 'connected') ircConnectIconEl.setAttribute('connected', '');
+      if (options.ircConnect === 'connecting') ircConnectIconEl.setAttribute('connecting', '');
+      if (options.ircConnect === 'unavailable') ircConnectIconEl.setAttribute('unavailable', '');
     }
     if (Object.hasOwn(options, 'wait')) {
       if (options.wait) {
@@ -91,25 +91,25 @@ customElements.define('header-bar', class extends HTMLElement {
     if (Object.hasOwn(options, 'channelUnread')) {
       if (options.channelUnread) {
         noIcons = false;
-        this.shadowRoot.getElementById('channelUnreadExistIcon').removeAttribute('hidden');
+        this.shadowRoot.getElementById('channelUnreadExistIconId').removeAttribute('hidden');
       } else {
-        this.shadowRoot.getElementById('channelUnreadExistIcon').setAttribute('hidden', '');
+        this.shadowRoot.getElementById('channelUnreadExistIconId').setAttribute('hidden', '');
       }
     }
     if (Object.hasOwn(options, 'privMsgUnread')) {
       if (options.privMsgUnread) {
         noIcons = false;
-        this.shadowRoot.getElementById('privMsgUnreadExistIcon').removeAttribute('hidden');
+        this.shadowRoot.getElementById('privMsgUnreadExistIconId').removeAttribute('hidden');
       } else {
-        this.shadowRoot.getElementById('privMsgUnreadExistIcon').setAttribute('hidden', '');
+        this.shadowRoot.getElementById('privMsgUnreadExistIconId').setAttribute('hidden', '');
       }
     }
     if (Object.hasOwn(options, 'noticeUnread')) {
       if (options.noticeUnread) {
         noIcons = false;
-        this.shadowRoot.getElementById('noticeUnreadExistIcon').removeAttribute('hidden');
+        this.shadowRoot.getElementById('noticeUnreadExistIconId').removeAttribute('hidden');
       } else {
-        this.shadowRoot.getElementById('noticeUnreadExistIcon').setAttribute('hidden', '');
+        this.shadowRoot.getElementById('noticeUnreadExistIconId').setAttribute('hidden', '');
       }
     }
     if (Object.hasOwn(options, 'nickRecovery')) {
@@ -123,22 +123,22 @@ customElements.define('header-bar', class extends HTMLElement {
     if (Object.hasOwn(options, 'enableAudio')) {
       if (options.enableAudio) {
         noIcons = false;
-        this.shadowRoot.getElementById('enableAudioButton').removeAttribute('hidden');
+        this.shadowRoot.getElementById('enableAudioButtonId').removeAttribute('hidden');
       } else {
-        this.shadowRoot.getElementById('enableAudioButton').setAttribute('hidden', '');
+        this.shadowRoot.getElementById('enableAudioButtonId').setAttribute('hidden', '');
       }
     }
     if (noIcons) {
-      this.shadowRoot.getElementById('titleDiv').setAttribute('noIcons', '');
+      this.shadowRoot.getElementById('titleDivId').setAttribute('noIcons', '');
       // Pixel with occurs 2 places on this page.
       if (window.globals.webState.dynamic.bodyClientWidth > 500) {
-        this.shadowRoot.getElementById('titleDiv').removeAttribute('hidden');
+        this.shadowRoot.getElementById('titleDivId').removeAttribute('hidden');
       } else {
-        this.shadowRoot.getElementById('titleDiv').setAttribute('hidden', '');
+        this.shadowRoot.getElementById('titleDivId').setAttribute('hidden', '');
       }
     } else {
-      this.shadowRoot.getElementById('titleDiv').removeAttribute('noIcons', '');
-      this.shadowRoot.getElementById('titleDiv').setAttribute('hidden', '');
+      this.shadowRoot.getElementById('titleDivId').removeAttribute('noIcons', '');
+      this.shadowRoot.getElementById('titleDivId').setAttribute('hidden', '');
     }
   };
 
@@ -147,21 +147,21 @@ customElements.define('header-bar', class extends HTMLElement {
    * Values are based on global ircState object.
    */
   _setFixedElementTitles = () => {
-    this.shadowRoot.getElementById('hamburgerIcon').title =
+    this.shadowRoot.getElementById('hamburgerIconId').title =
       'Navigation Dropdown Menu';
     this.shadowRoot.getElementById('waitConnectIconId').title =
       'Waiting to auto-reconnect to IRC server';
     this.shadowRoot.getElementById('ircIsAwayIconId').title =
       'Cancel IRC away (/AWAY)';
-    this.shadowRoot.getElementById('channelUnreadExistIcon').title =
+    this.shadowRoot.getElementById('channelUnreadExistIconId').title =
       'Unread IRC channel message';
-    this.shadowRoot.getElementById('privMsgUnreadExistIcon').title =
+    this.shadowRoot.getElementById('privMsgUnreadExistIconId').title =
       'Unread Private Message (PM)';
-    this.shadowRoot.getElementById('noticeUnreadExistIcon').title =
+    this.shadowRoot.getElementById('noticeUnreadExistIconId').title =
       'Unread IRC Notice (Click to view)';
     this.shadowRoot.getElementById('nickRecovIconId').title =
       'Waiting to recover main nickname';
-    this.shadowRoot.getElementById('enableAudioButton').title =
+    this.shadowRoot.getElementById('enableAudioButtonId').title =
       'Browser had disabled media playback. Click to enable beep sounds';
   }; // _setFixedElementTitles()
 
@@ -170,17 +170,17 @@ customElements.define('header-bar', class extends HTMLElement {
    * Values are based on global ircState object
    */
   _updateDynamicElementTitles = () => {
-    const webConnectEl = this.shadowRoot.getElementById('webConnectIconId');
-    if (webConnectEl.hasAttribute('connected')) {
-      webConnectEl.title = 'Disconnect web browser from remote IRC client';
+    const webConnectIconEl = this.shadowRoot.getElementById('webConnectIconId');
+    if (webConnectIconEl.hasAttribute('connected')) {
+      webConnectIconEl.title = 'Disconnect web browser from remote IRC client';
     } else {
-      webConnectEl.title = 'Re-connect web browser to remote IRC client';
+      webConnectIconEl.title = 'Re-connect web browser to remote IRC client';
     }
-    const ircConnectEl = this.shadowRoot.getElementById('ircConnectIconId');
-    if (ircConnectEl.hasAttribute('connected')) {
-      ircConnectEl.title = 'Disconnect IRC server from remote IRC client (/QUIT)';
+    const ircConnectIconEl = this.shadowRoot.getElementById('ircConnectIconId');
+    if (ircConnectIconEl.hasAttribute('connected')) {
+      ircConnectIconEl.title = 'Disconnect IRC server from remote IRC client (/QUIT)';
     } else {
-      ircConnectEl.title = 'Connect to the currently selected IRC server';
+      ircConnectIconEl.title = 'Connect to the currently selected IRC server';
     }
   }; //  _updateDynamicElementTitles()
 
@@ -249,11 +249,15 @@ customElements.define('header-bar', class extends HTMLElement {
     // 1 of 2 Listeners on internal elements
     // -------------------------------------
 
-    this.shadowRoot.getElementById('channelUnreadExistIcon').addEventListener('click', () => {
-      console.log('clicked channelUnreadExistIcon');
+    this.shadowRoot.getElementById('navDropdownButtonId').addEventListener('click', (event) => {
+      event.stopPropagation();
+      document.getElementById('navMenu').toggleDropdownMenu();
     });
-    this.shadowRoot.getElementById('enableAudioButton').addEventListener('click', () => {
+    this.shadowRoot.getElementById('enableAudioButtonId').addEventListener('click', () => {
       console.log('clicked enableAudioButton');
+    });
+    this.shadowRoot.getElementById('webConnectIconId').addEventListener('click', () => {
+      document.getElementById('websocketPanel').webConnectHeaderBarIconHandler();
     });
     this.shadowRoot.getElementById('ircConnectIconId').addEventListener('click', () => {
       console.log('clicked ircConnectIconId');
@@ -261,18 +265,14 @@ customElements.define('header-bar', class extends HTMLElement {
     this.shadowRoot.getElementById('ircIsAwayIconId').addEventListener('click', () => {
       console.log('clicked ircIsAwayIconId');
     });
-    this.shadowRoot.getElementById('navDropdownButton').addEventListener('click', (event) => {
-      event.stopPropagation();
-      document.getElementById('navMenu').toggleDropdownMenu();
+    this.shadowRoot.getElementById('channelUnreadExistIconId').addEventListener('click', () => {
+      console.log('clicked channelUnreadExistIcon');
     });
-    this.shadowRoot.getElementById('noticeUnreadExistIcon').addEventListener('click', () => {
-      console.log('clicked noticeUnreadExistIcon');
-    });
-    this.shadowRoot.getElementById('privMsgUnreadExistIcon').addEventListener('click', () => {
+    this.shadowRoot.getElementById('privMsgUnreadExistIconId').addEventListener('click', () => {
       console.log('clicked privMsgUnreadExistIcon');
     });
-    this.shadowRoot.getElementById('webConnectIconId').addEventListener('click', () => {
-      document.getElementById('websocketPanel').webConnectHeaderBarIconHandler();
+    this.shadowRoot.getElementById('noticeUnreadExistIconId').addEventListener('click', () => {
+      console.log('clicked noticeUnreadExistIcon');
     });
 
     // -------------------------------------
@@ -285,52 +285,36 @@ customElements.define('header-bar', class extends HTMLElement {
      * @param {object} event.detail.theme - Color theme values 'light' or 'dark'
      */
     document.addEventListener('color-theme-changed', (event) => {
+      const hamburgerIconEl = this.shadowRoot.getElementById('hamburgerIconId');
+      const headerBarDivEl = this.shadowRoot.getElementById('headerBarDivId');
+      const channelUnreadExistIconEl = this.shadowRoot.getElementById('channelUnreadExistIconId');
+      const privMsgUnreadExistIconEl = this.shadowRoot.getElementById('privMsgUnreadExistIconId');
+      const noticeUnreadExistIconEl = this.shadowRoot.getElementById('noticeUnreadExistIconId');
+      const nickRecovIconEl = this.shadowRoot.getElementById('nickRecovIconId');
       if (event.detail.theme === 'light') {
-        this.shadowRoot.getElementById('hamburgerIcon').setColorTheme('light');
-        this.shadowRoot.getElementById('headerBarDivId')
-          .classList.remove('header-bar-theme-dark');
-        this.shadowRoot.getElementById('channelUnreadExistIcon')
-          .classList.remove('channel-panel-theme-dark');
-        this.shadowRoot.getElementById('privMsgUnreadExistIcon')
-          .classList.remove('pm-panel-theme-dark');
-        this.shadowRoot.getElementById('noticeUnreadExistIcon')
-          .classList.remove('notice-panel-theme-dark');
-        this.shadowRoot.getElementById('nickRecovIconId')
-          .classList.remove('hbar-recovery-theme-dark');
-
-        this.shadowRoot.getElementById('headerBarDivId')
-          .classList.add('header-bar-theme-light');
-        this.shadowRoot.getElementById('channelUnreadExistIcon')
-          .classList.add('channel-panel-theme-light');
-        this.shadowRoot.getElementById('privMsgUnreadExistIcon')
-          .classList.add('pm-panel-theme-light');
-        this.shadowRoot.getElementById('noticeUnreadExistIcon')
-          .classList.add('notice-panel-theme-light');
-        this.shadowRoot.getElementById('nickRecovIconId')
-          .classList.add('hbar-recovery-theme-light');
+        hamburgerIconEl.setColorTheme('light');
+        headerBarDivEl.classList.remove('header-bar-theme-dark');
+        headerBarDivEl.classList.add('header-bar-theme-light');
+        channelUnreadExistIconEl.classList.remove('channel-panel-theme-dark');
+        channelUnreadExistIconEl.classList.add('channel-panel-theme-light');
+        privMsgUnreadExistIconEl.classList.remove('pm-panel-theme-dark');
+        privMsgUnreadExistIconEl.classList.add('pm-panel-theme-light');
+        noticeUnreadExistIconEl.classList.remove('notice-panel-theme-dark');
+        noticeUnreadExistIconEl.classList.add('notice-panel-theme-light');
+        nickRecovIconEl.classList.remove('hbar-recovery-theme-dark');
+        nickRecovIconEl.classList.add('hbar-recovery-theme-light');
       } else {
-        this.shadowRoot.getElementById('hamburgerIcon').setColorTheme('dark');
-        this.shadowRoot.getElementById('headerBarDivId')
-          .classList.remove('header-bar-theme-light');
-        this.shadowRoot.getElementById('channelUnreadExistIcon')
-          .classList.remove('channel-panel-theme-light');
-        this.shadowRoot.getElementById('privMsgUnreadExistIcon')
-          .classList.remove('pm-panel-theme-light');
-        this.shadowRoot.getElementById('noticeUnreadExistIcon')
-          .classList.remove('notice-panel-theme-light');
-        this.shadowRoot.getElementById('nickRecovIconId')
-          .classList.remove('hbar-recovery-theme-light');
-
-        this.shadowRoot.getElementById('headerBarDivId')
-          .classList.add('header-bar-theme-dark');
-        this.shadowRoot.getElementById('channelUnreadExistIcon')
-          .classList.add('channel-panel-theme-dark');
-        this.shadowRoot.getElementById('privMsgUnreadExistIcon')
-          .classList.add('pm-panel-theme-dark');
-        this.shadowRoot.getElementById('noticeUnreadExistIcon')
-          .classList.add('notice-panel-theme-dark');
-        this.shadowRoot.getElementById('nickRecovIconId')
-          .classList.add('hbar-recovery-theme-dark');
+        hamburgerIconEl.setColorTheme('dark');
+        headerBarDivEl.classList.remove('header-bar-theme-light');
+        headerBarDivEl.classList.add('header-bar-theme-dark');
+        channelUnreadExistIconEl.classList.remove('channel-panel-theme-light');
+        channelUnreadExistIconEl.classList.add('channel-panel-theme-dark');
+        privMsgUnreadExistIconEl.classList.remove('pm-panel-theme-light');
+        privMsgUnreadExistIconEl.classList.add('pm-panel-theme-dark');
+        noticeUnreadExistIconEl.classList.remove('notice-panel-theme-light');
+        noticeUnreadExistIconEl.classList.add('notice-panel-theme-dark');
+        nickRecovIconEl.classList.remove('hbar-recovery-theme-light');
+        nickRecovIconEl.classList.add('hbar-recovery-theme-dark');
       }
     });
 
@@ -351,12 +335,13 @@ customElements.define('header-bar', class extends HTMLElement {
      * @listens resize-custom-elements
      */
     document.addEventListener('resize-custom-elements', () => {
+      const titleDivEl = this.shadowRoot.getElementById('titleDivId');
       // Pixel with occurs 2 places on this page.
       if ((window.globals.webState.dynamic.bodyClientWidth > 500) &&
-      (this.shadowRoot.getElementById('titleDiv').hasAttribute('noIcons'))) {
-        this.shadowRoot.getElementById('titleDiv').removeAttribute('hidden');
+      (titleDivEl.hasAttribute('noIcons'))) {
+        titleDivEl.removeAttribute('hidden');
       } else {
-        this.shadowRoot.getElementById('titleDiv').setAttribute('hidden', '');
+        titleDivEl.setAttribute('hidden', '');
       }
     });
 
@@ -368,9 +353,9 @@ customElements.define('header-bar', class extends HTMLElement {
         totalCount += chanEl.unreadMessageCount;
       });
       if (totalCount > 0) {
-        this.shadowRoot.getElementById('channelUnreadExistIcon').removeAttribute('hidden');
+        this.shadowRoot.getElementById('channelUnreadExistIconId').removeAttribute('hidden');
       } else {
-        this.shadowRoot.getElementById('channelUnreadExistIcon').setAttribute('hidden', '');
+        this.shadowRoot.getElementById('channelUnreadExistIconId').setAttribute('hidden', '');
       }
     });
 

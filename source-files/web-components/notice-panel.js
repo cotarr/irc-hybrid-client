@@ -35,16 +35,16 @@ window.customElements.define('notice-panel', class extends HTMLElement {
   }
 
   showPanel = () => {
-    this.shadowRoot.getElementById('panelVisibilityDiv').setAttribute('visible', '');
+    this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
   };
 
   // this panel does not collapse, so close it.
   collapsePanel = () => {
-    this.shadowRoot.getElementById('panelVisibilityDiv').removeAttribute('visible');
+    this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible');
   };
 
   hidePanel = () => {
-    this.shadowRoot.getElementById('panelVisibilityDiv').removeAttribute('visible');
+    this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible');
   };
 
   // ------------------
@@ -66,14 +66,14 @@ window.customElements.define('notice-panel', class extends HTMLElement {
     // -------------------------------------
     // Panel Close Button
     // -------------------------------------
-    this.shadowRoot.getElementById('closePanelButton').addEventListener('click', () => {
-      this.shadowRoot.getElementById('panelVisibilityDiv').removeAttribute('visible');
+    this.shadowRoot.getElementById('closePanelButtonId').addEventListener('click', () => {
+      this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible');
     });
 
     // -------------------------
     // Erase button handler
     // -------------------------
-    this.shadowRoot.getElementById('eraseButton').addEventListener('click', () => {
+    this.shadowRoot.getElementById('eraseButtonId').addEventListener('click', () => {
       this.shadowRoot.getElementById('panelMessageDisplayId').value =
         '\nTODO: fetch request to server for cache erase';
     }); // panel erase button
@@ -81,7 +81,7 @@ window.customElements.define('notice-panel', class extends HTMLElement {
     // -------------------------
     // Taller button handler
     // -------------------------
-    this.shadowRoot.getElementById('tallerButton').addEventListener('click', () => {
+    this.shadowRoot.getElementById('tallerButtonId').addEventListener('click', () => {
       const newRows =
         parseInt(this.shadowRoot.getElementById('panelMessageDisplayId').getAttribute('rows')) + 5;
       this.shadowRoot.getElementById('panelMessageDisplayId')
@@ -91,7 +91,7 @@ window.customElements.define('notice-panel', class extends HTMLElement {
     // -------------------------
     // Normal button handler
     // -------------------------
-    this.shadowRoot.getElementById('normalButton').addEventListener('click', () => {
+    this.shadowRoot.getElementById('normalButtonId').addEventListener('click', () => {
       this.shadowRoot.getElementById('panelMessageDisplayId').setAttribute('rows', '5');
     });
 
@@ -129,24 +129,18 @@ window.customElements.define('notice-panel', class extends HTMLElement {
     });
 
     document.addEventListener('color-theme-changed', (event) => {
+      const panelDivEl = this.shadowRoot.getElementById('panelDivId');
+      const panelMessageDisplayEl = this.shadowRoot.getElementById('panelMessageDisplayId');
       if (event.detail.theme === 'light') {
-        this.shadowRoot.getElementById('panelDivId')
-          .classList.remove('notice-panel-theme-dark');
-        this.shadowRoot.getElementById('panelDivId')
-          .classList.add('notice-panel-theme-light');
-        this.shadowRoot.getElementById('panelMessageDisplayId')
-          .classList.remove('global-text-theme-dark');
-        this.shadowRoot.getElementById('panelMessageDisplayId')
-          .classList.add('global-text-theme-light');
+        panelDivEl.classList.remove('notice-panel-theme-dark');
+        panelDivEl.classList.add('notice-panel-theme-light');
+        panelMessageDisplayEl.classList.remove('global-text-theme-dark');
+        panelMessageDisplayEl.classList.add('global-text-theme-light');
       } else {
-        this.shadowRoot.getElementById('panelDivId')
-          .classList.remove('notice-panel-theme-light');
-        this.shadowRoot.getElementById('panelDivId')
-          .classList.add('notice-panel-theme-dark');
-        this.shadowRoot.getElementById('panelMessageDisplayId')
-          .classList.remove('global-text-theme-light');
-        this.shadowRoot.getElementById('panelMessageDisplayId')
-          .classList.add('global-text-theme-dark');
+        panelDivEl.classList.remove('notice-panel-theme-light');
+        panelDivEl.classList.add('notice-panel-theme-dark');
+        panelMessageDisplayEl.classList.remove('global-text-theme-light');
+        panelMessageDisplayEl.classList.add('global-text-theme-dark');
       }
     });
 
