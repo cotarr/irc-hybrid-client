@@ -79,6 +79,7 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('reconnectStatusDivId').textContent =
       'Websocket opened successfully\n';
     this.hidePanel();
+    document.getElementById('ircControlsPanel').showPanel();
     document.getElementById('debugPanel').showPanel();
   };
 
@@ -782,7 +783,7 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
           }
         }
       } else {
-        this.hidePanel();
+        this.collapsePanel();
       }
     });
 
@@ -827,7 +828,7 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
           }
         }
       } else {
-        if (event.detail.debug) this.showPanel();
+        if ((event.detail) && (event.detail.debug)) this.showPanel();
       }
     });
   } // connectedCallback()

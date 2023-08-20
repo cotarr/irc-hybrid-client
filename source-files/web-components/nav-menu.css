@@ -36,6 +36,9 @@
 .nav-group:hover {
   color: #808080;
 }
+.nav-group[unavailable] {
+  display: none;
+}
 .nav-level0 {
   border: unset;
   cursor: pointer;
@@ -65,6 +68,9 @@
 .nav-level1:hover {
   color: #808080;
 }
- .nav-level1[collapsed] {
+.nav-level1[collapsed] {
+  display: none;
+}
+.nav-level1[unavailable] {
   display: none;
 }

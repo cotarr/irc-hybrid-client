@@ -40,12 +40,10 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
     const templateContent = template.content;
     this.attachShadow({ mode: 'open' })
       .appendChild(templateContent.cloneNode(true));
-    /* @type {number} previous value used to detect changes */
     this.lastJoinedChannelCount = -1;
-    /* @type {number} previous value used to detect changes */
     this.lastChannelListCount = -1;
-    /* @type {number} previous value used to detect changes */
     this.lastIrcServerIndex = -1;
+    this.ircConnectedLast = null;
   }
 
   showPanel = () => {
@@ -180,7 +178,7 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
           }
         }
       } else {
-        this.hidePanel();
+        this.collapsePanel();
       }
     });
 
@@ -259,6 +257,11 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
       // console.log('connected ', window.globals.ircState.ircConnected);
       // console.log(JSON.stringify(window.globals.ircState.channels));
       // console.log(JSON.stringify(window.globals.webState.channels));
+
+      if (window.globals.ircState.ircConnected !== this.ircConnectedLast) {
+        this.ircConnectedLast = window.globals.ircState.ircConnected;
+        if (!window.globals.ircState.ircConnected) this.hidePanel();
+      }
 
       // Check list of server's channels and create new if missing.
       if (window.globals.ircState.channels.length > 0) {

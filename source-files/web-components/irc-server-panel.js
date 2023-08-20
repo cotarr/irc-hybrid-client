@@ -93,7 +93,7 @@ window.customElements.define('irc-server-panel', class extends HTMLElement {
           }
         }
       } else {
-        this.hidePanel();
+        this.collapsePanel();
       }
     });
 
@@ -119,17 +119,15 @@ window.customElements.define('irc-server-panel', class extends HTMLElement {
     });
 
     /**
-     * Change size of textArea elements to fit page
-     * @listens document:resize-custom-elements
+     * Global event listener on document object to detect state change of remote IRC server
+     * Detect addition of new IRC channels and create channel panel.
+     * Data source: ircState object
+     * @listens document:irc-state-changed
      */
-    document.addEventListener('resize-custom-elements', () => {
-      if (window.globals.webState.dynamic.inputAreaCharWidthPx) {
-        const calcInputAreaColSize = document.getElementById('displayUtils').calcInputAreaColSize;
-        // pixel width mar1 is reserved space on edges of input area at full screen width
-        const mar1 = window.globals.webState.dynamic.commonMargin;
-        // set width of input area elements
-        this.shadowRoot.getElementById('panelMessageDisplayId')
-          .setAttribute('cols', calcInputAreaColSize(mar1));
+    document.addEventListener('irc-state-changed', () => {
+      if (window.globals.ircState.ircConnected !== this.ircConnectedLast) {
+        this.ircConnectedLast = window.globals.ircState.ircConnected;
+        if (!window.globals.ircState.ircConnected) this.hidePanel();
       }
     });
 
@@ -152,6 +150,21 @@ window.customElements.define('irc-server-panel', class extends HTMLElement {
         }
       } else {
         this.hidePanel();
+      }
+    });
+
+    /**
+     * Change size of textArea elements to fit page
+     * @listens document:resize-custom-elements
+     */
+    document.addEventListener('resize-custom-elements', () => {
+      if (window.globals.webState.dynamic.inputAreaCharWidthPx) {
+        const calcInputAreaColSize = document.getElementById('displayUtils').calcInputAreaColSize;
+        // pixel width mar1 is reserved space on edges of input area at full screen width
+        const mar1 = window.globals.webState.dynamic.commonMargin;
+        // set width of input area elements
+        this.shadowRoot.getElementById('panelMessageDisplayId')
+          .setAttribute('cols', calcInputAreaColSize(mar1));
       }
     });
 

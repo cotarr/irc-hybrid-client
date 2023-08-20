@@ -39,18 +39,49 @@ customElements.define('nav-menu', class extends HTMLElement {
       .appendChild(templateContent.cloneNode(true));
     this.previousChannels = [];
     this.arrayOfMenuElements = [];
+    this.ircConnectedLast = null;
   }
 
-  handleChannelClick = (event) => {
-    event.stopPropagation();
-    const channelName = event.target.id
-      .replace('channelMenu1', '').replace('channelMenu2', '').replace('channelMenu3', '');
-    document.getElementById('channel' + channelName).showPanel();
-    this.closeDropdownMenu();
+  toggleDropdownMenu = () => {
+    this.shadowRoot.getElementById('navDropdownDivId').classList.toggle('nav-dropdown-div-show');
+    // Make sure dropdown menu is visible by scrolling to the top when opening menu
+    // if (this.shadowRoot.getElementById('navDropdownDivId').classList.contains(
+    //   'nav-dropdown-div-show')) {
+    //   document.dispatchEvent(new CustomEvent('global-scroll-to-top', { bubbles: true }));
+    // }
+  };
+
+  closeDropdownMenu = () => {
+    this.shadowRoot.getElementById('navDropdownDivId').classList.remove('nav-dropdown-div-show');
   };
 
   _handleIrcStateChanged = () => {
     console.log('navMenu irc-state-changed event');
+    // Detect state change for IRC server connection. if changed, close the dropdown
+    if (window.globals.ircState.ircConnected !== this.ircConnectedLast) {
+      this.ircConnectedLast = window.globals.ircState.ircConnected;
+      // visible menu items will change so close the menu
+      this.closeDropdownMenu();
+      // List of menu items to be hidden when not connected to IRC
+      const menuIdList = [
+        'group01ButtonId',
+        'group02ButtonId',
+        'group04ButtonId',
+        'item3_2_Id',
+        'item3_3_Id',
+        'item3_4_Id'
+      ];
+      if (window.globals.ircState.ircConnected) {
+        menuIdList.forEach((menuId) => {
+          this.shadowRoot.getElementById(menuId).removeAttribute('unavailable');
+        });
+      } else {
+        menuIdList.forEach((menuId) => {
+          this.shadowRoot.getElementById(menuId).setAttribute('unavailable', '');
+        });
+      }
+    }
+
     // Channel list
     const channels = Array.from(window.globals.ircState.channels);
 
@@ -125,23 +156,21 @@ customElements.define('nav-menu', class extends HTMLElement {
     } // changed
   };
 
-  toggleDropdownMenu = () => {
-    this.shadowRoot.getElementById('navDropdownDivId').classList.toggle('nav-dropdown-div-show');
-    // Make sure dropdown menu is visible by scrolling to the top when opening menu
-    // if (this.shadowRoot.getElementById('navDropdownDivId').classList.contains(
-    //   'nav-dropdown-div-show')) {
-    //   document.dispatchEvent(new CustomEvent('global-scroll-to-top', { bubbles: true }));
-    // }
-  };
-
-  closeDropdownMenu = () => {
-    this.shadowRoot.getElementById('navDropdownDivId').classList.remove('nav-dropdown-div-show');
+  handleChannelClick = (event) => {
+    event.stopPropagation();
+    const channelName = event.target.id
+      .replace('channelMenu1', '').replace('channelMenu2', '').replace('channelMenu3', '');
+    document.getElementById('channel' + channelName).showPanel();
+    this.closeDropdownMenu();
   };
 
   // ------------------
   // Main entry point
   // ------------------
   initializePlugin = () => {
+    // Set initial menu visibility
+    this._handleIrcStateChanged();
+    // Update user login ID into the dropdown menu text for logout selection
     document.getElementById('userInfo').getLoginInfo()
       .then((userinfo) => {
         // console.log('userinfo', JSON.stringify(userinfo, null, 2));
@@ -265,6 +294,11 @@ customElements.define('nav-menu', class extends HTMLElement {
       document.dispatchEvent(new CustomEvent('global-scroll-to-top'));
       this.closeDropdownMenu();
     });
+    this.shadowRoot.getElementById('item3_6_Id').addEventListener('click', (event) => {
+      event.stopPropagation();
+      document.getElementById('debugPanel').showPanel();
+      this.closeDropdownMenu();
+    });
     this.shadowRoot.getElementById('item4_1_Id').addEventListener('click', (event) => {
       event.stopPropagation();
       document.getElementById('displayUtils').toggleColorTheme();
@@ -272,34 +306,25 @@ customElements.define('nav-menu', class extends HTMLElement {
     });
     this.shadowRoot.getElementById('item4_2_Id').addEventListener('click', (event) => {
       event.stopPropagation();
-      document.dispatchEvent(new CustomEvent('show-all-panels', {
-        detail: {
-          except: [],
-          debug: false
-        }
-      }));
+      document.dispatchEvent(new CustomEvent('show-all-panels'));
       this.closeDropdownMenu();
     });
     this.shadowRoot.getElementById('item4_3_Id').addEventListener('click', (event) => {
       event.stopPropagation();
-      document.dispatchEvent(new CustomEvent('collapse-all-panels', {
-        detail: {
-          except: []
-        }
-      }));
+      document.dispatchEvent(new CustomEvent('collapse-all-panels'));
       this.closeDropdownMenu();
     });
     this.shadowRoot.getElementById('item4_4_Id').addEventListener('click', (event) => {
       event.stopPropagation();
-      document.getElementById('debugPanel').showPanel();
+      document.dispatchEvent(new CustomEvent('hide-all-panels'));
       this.closeDropdownMenu();
     });
-    this.shadowRoot.getElementById('item4_5_Id').addEventListener('click', (event) => {
-      // AdHoc function
-      event.stopPropagation();
-      console.log('Put Ad-hoc function here');
-      this.closeDropdownMenu();
-    });
+    // this.shadowRoot.getElementById('item4_5_Id').addEventListener('click', (event) => {
+    //   // AdHoc function
+    //   event.stopPropagation();
+    //   console.log('Put Ad-hoc function here');
+    //   this.closeDropdownMenu();
+    // });
     this.shadowRoot.getElementById('item5_0_Id').addEventListener('click', (event) => {
       event.stopPropagation();
       document.getElementById('logoutPanel').handleLogoutRequest();

@@ -104,7 +104,7 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
           }
         }
       } else {
-        this.hidePanel();
+        this.collapsePanel();
       }
     });
 
@@ -143,6 +143,23 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
         }
       } else {
         this.hidePanel();
+      }
+    });
+
+    /**
+     * Global event listener on document object to detect state change of remote IRC server
+     * Detect addition of new IRC channels and create channel panel.
+     * Data source: ircState object
+     * @listens document:irc-state-changed
+     */
+    document.addEventListener('irc-state-changed', () => {
+      if (window.globals.ircState.ircConnected !== this.ircConnectedLast) {
+        this.ircConnectedLast = window.globals.ircState.ircConnected;
+        if (window.globals.ircState.ircConnected) {
+          this.collapsePanel();
+        } else {
+          this.showPanel();
+        }
       }
     });
 

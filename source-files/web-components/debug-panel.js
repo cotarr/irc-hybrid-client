@@ -128,7 +128,7 @@ window.customElements.define('debug-panel', class extends HTMLElement {
           }
         }
       } else {
-        this.hidePanel();
+        this.collapsePanel();
       }
     });
 
@@ -184,7 +184,7 @@ window.customElements.define('debug-panel', class extends HTMLElement {
           }
         }
       } else {
-        if (event.detail.debug) this.showPanel();
+        if ((event.detail) && (event.detail.debug)) this.showPanel();
       }
     });
 
@@ -258,7 +258,20 @@ window.customElements.define('debug-panel', class extends HTMLElement {
     });
 
     this.shadowRoot.getElementById('button04Id').addEventListener('click', () => {
-      document.getElementById('errorPanel').showError('This is a generic error message');
+      setTimeout(() => {
+        if (window.globals.ircState.ircConnected) {
+          window.globals.ircState.ircConnected = false;
+          window.globals.ircState.ircConnecting = false;
+          window.globals.ircState.ircRegistered = false;
+          window.globals.ircState.channels = [];
+          window.globals.ircState.channelStates = [];
+        } else {
+          window.globals.ircState.ircConnected = true;
+          window.globals.ircState.ircConnecting = false;
+          window.globals.ircState.ircRegistered = true;
+        }
+        document.dispatchEvent(new CustomEvent('irc-state-changed'));
+      }, 10);
     });
 
     this.shadowRoot.getElementById('button05Id').addEventListener('click', () => {

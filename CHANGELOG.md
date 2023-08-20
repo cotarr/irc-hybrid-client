@@ -10,7 +10,12 @@ and this project adheres to
 
 Work in progress, see top of README.md
 
-commit -
+Commit
+
+- Added code to hide dropdown menu items based on ircState flags
+- UI panels detect state change and self hide themselves.
+
+Commit - 9d51b6d
 
 This commit added a large number of UI web component files.
 The goal was to create all the anticipated UI panels as empty templates.
