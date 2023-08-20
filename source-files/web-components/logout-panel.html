@@ -1,0 +1,29 @@
+
+<!-- logout-panel -->
+
+<template id='logoutPanelTemplate'>
+  <link rel="stylesheet" href="css/styles.css">
+  <div id="panelVisibilityDivId" class="global-visibility-div">
+    <div id="panelDivId" class="global-panel-style-div logout-panel-theme">
+      <div class='global-head-flex'>
+        <div class="global-head-left">
+          <button id="closePanelButtonId" title="Hide Panel" class="global-show-hide-button mr5">x</button>
+          <span>Check IRC status</span>
+        </div>
+        <div class="global-head-center">
+        </div>
+        <div class="global-head-right">
+          <button id="cancelButtonId">Cancel</button>
+          <button id="webLogoutButtonId">Web Logout</button>
+        </div>
+    </div>
+    <div class="vh10"></div>
+    <div>
+      You are receiving this message because
+      your nickname is still present on IRC, or the
+      status of your IRC connection is unknown.
+      Your nickname may remain present on IRC.
+      Web page login is independent of IRC login.
+    </div>
+  </div>
+</template>

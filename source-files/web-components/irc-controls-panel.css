@@ -1,0 +1,13 @@
+
+/* irc-controls-panel */
+
+.irc-controls-panel-theme-light {
+  background-color: #b8f5ff;
+  border: 1px solid black;
+  color: black;
+}
+.irc-controls-panel-theme-dark {
+  background-color: #117180;
+  border: 1px solid #7ac4cf;
+  color: white;
+}

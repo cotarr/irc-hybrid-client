@@ -1,0 +1,28 @@
+
+<!-- irc-controls-panel -->
+
+<template id='ircControlsPanelTemplate'>
+  <link rel="stylesheet" href="css/styles.css">
+  <div id="panelVisibilityDivId" class="global-visibility-div">
+    <div id="panelDivId" class="global-panel-style-div irc-controls-panel-theme-dark">
+      <div>
+        <button id="closePanelButtonId" title="Hide Panel" class="global-show-hide-button">x</button>
+        <button id="collapsePanelButtonId" title="Collapse Panel to Bar" class="global-show-hide-button mr5">&#8645;</button>
+        <span>IRC Controls</span>
+      </div>      
+      <div id="panelCollapsedDivId" class="global-visibility-div">
+        <div class="vh20"></div>
+        <div>Collapsed panel here</div>
+        <div>Collapsed panel here</div>
+        <div>Collapsed panel here</div>
+        <div class="vh20"></div>
+        <div>
+          <button class="mr10">Connect</button>
+          <button class="mr10">Disconnect</button>
+          <button id="editServerButtonId" class="mr10">Edit Server</button>
+        </div>
+        <div class="vh20"></div>
+      </div>
+    </div>
+  </div>
+</template>

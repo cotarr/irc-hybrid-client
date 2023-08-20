@@ -21,14 +21,14 @@
 // SOFTWARE.
 // ------------------------------------------------------------------------------
 //
-// This web component is a UI panel to display IRC Notice messages
+// This web component is a UI panel to display IRC Wallops messages
 //
 // ------------------------------------------------------------------------------
 'use strict';
-window.customElements.define('notice-panel', class extends HTMLElement {
+window.customElements.define('wallops-panel', class extends HTMLElement {
   constructor () {
     super();
-    const template = document.getElementById('noticePanelTemplate');
+    const template = document.getElementById('wallopsPanelTemplate');
     const templateContent = template.content;
     this.attachShadow({ mode: 'open' })
       .appendChild(templateContent.cloneNode(true));
@@ -51,9 +51,9 @@ window.customElements.define('notice-panel', class extends HTMLElement {
   // Main entry point
   // ------------------
   initializePlugin = () => {
-    // console.log('notice-panel initializePlugin');
-    this.shadowRoot.getElementById('panelMessageDisplayId').value =
-      '12:01:26 MyNickname | This is an example NOTICE message\n';
+    // console.log('wallops-panel initializePlugin');
+    // this.shadowRoot.getElementById('panelMessageDisplayId').value =
+    //   '12:01:26 MyNickname | This is an example NOTICE message\n';
   };
 
   // add event listeners to connected callback
@@ -132,13 +132,13 @@ window.customElements.define('notice-panel', class extends HTMLElement {
       const panelDivEl = this.shadowRoot.getElementById('panelDivId');
       const panelMessageDisplayEl = this.shadowRoot.getElementById('panelMessageDisplayId');
       if (event.detail.theme === 'light') {
-        panelDivEl.classList.remove('notice-panel-theme-dark');
-        panelDivEl.classList.add('notice-panel-theme-light');
+        panelDivEl.classList.remove('wallops-panel-theme-dark');
+        panelDivEl.classList.add('wallops-panel-theme-light');
         panelMessageDisplayEl.classList.remove('global-text-theme-dark');
         panelMessageDisplayEl.classList.add('global-text-theme-light');
       } else {
-        panelDivEl.classList.remove('notice-panel-theme-light');
-        panelDivEl.classList.add('notice-panel-theme-dark');
+        panelDivEl.classList.remove('wallops-panel-theme-light');
+        panelDivEl.classList.add('wallops-panel-theme-dark');
         panelMessageDisplayEl.classList.remove('global-text-theme-light');
         panelMessageDisplayEl.classList.add('global-text-theme-dark');
       }

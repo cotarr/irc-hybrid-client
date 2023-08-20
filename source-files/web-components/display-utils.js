@@ -181,6 +181,38 @@ window.customElements.define('display-utils', class extends HTMLElement {
     }
   };
 
+  // ------ This is a color format removal test -------------
+  // let colorTest = 'This is ' +
+  //   String.fromCharCode(3) + '04' + 'Red' + String.fromCharCode(3) + ' color ' +
+  //   String.fromCharCode(3) + '04,12' + 'Red/Gray' + String.fromCharCode(3) + ' color ' +
+  //   String.fromCharCode(4) + '0Fd7ff' + 'Hex-color' + String.fromCharCode(4) + ' color ' +
+  //   String.fromCharCode(4) + '0Fd7ff,17a400' + 'Hex-color,hexcolor' + String.fromCharCode(4) +
+  //   ' color ' +
+  //   String.fromCharCode(2) + 'Bold' + String.fromCharCode(2) + ' text ';
+  // console.log('colorTest ' + cleanFormatting(colorTest));
+  // ------ end color format removal test -------------
+
+  // ------------------------------------------
+  // Function to strip CTCP delimiter
+  // ------------------------------------------
+  cleanCtcpDelimiter = (inString) => {
+    // Filterable formatting codes
+    const ctcpDelim = 1;
+    let outString = '';
+    const l = inString.length;
+    if (l === 0) return outString;
+    let i = 0;
+    while (i < l) {
+      if ((i < l) && (inString.charCodeAt(i) === ctcpDelim)) {
+        i++;
+      } else {
+        if (i < l) outString += inString.charAt(i);
+        i++;
+      }
+    }
+    return outString;
+  };
+
   // ------------------------------------------
   // Function to strip colors from a string
   // ------------------------------------------

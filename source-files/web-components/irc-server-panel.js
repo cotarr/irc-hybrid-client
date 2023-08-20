@@ -19,87 +19,56 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-// ------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------
 //
-// This web component is a UI panel to display IRC Notice messages
-//
-// ------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------
 'use strict';
-window.customElements.define('notice-panel', class extends HTMLElement {
+window.customElements.define('irc-server-panel', class extends HTMLElement {
   constructor () {
     super();
-    const template = document.getElementById('noticePanelTemplate');
+    const template = document.getElementById('ircServerPanelTemplate');
     const templateContent = template.content;
     this.attachShadow({ mode: 'open' })
       .appendChild(templateContent.cloneNode(true));
   }
 
+  /**
+   * Make panel visible
+   */
   showPanel = () => {
     this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
   };
 
-  // this panel does not collapse, so close it.
+  /**
+   * This panel does not collapse, instead close it.
+   */
   collapsePanel = () => {
     this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible');
   };
 
+  /**
+   * Hide panel
+   */
   hidePanel = () => {
     this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible');
   };
 
-  // ------------------
-  // Main entry point
-  // ------------------
-  initializePlugin = () => {
-    // console.log('notice-panel initializePlugin');
-    this.shadowRoot.getElementById('panelMessageDisplayId').value =
-      '12:01:26 MyNickname | This is an example NOTICE message\n';
-  };
+  /**
+   * Called once per second as task scheduler, called from js/_afterLoad.js
+   */
+  // timerTickHandler = () => {
+  // };
 
-  // add event listeners to connected callback
-  // -------------------------------------------
+  // initializePlugin () {
+  // }
+
   connectedCallback () {
     // -------------------------------------
     // 1 of 2 Listeners on internal elements
     // -------------------------------------
 
-    // -------------------------------------
-    // Panel Close Button
-    // -------------------------------------
     this.shadowRoot.getElementById('closePanelButtonId').addEventListener('click', () => {
-      this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible');
-    });
-
-    // -------------------------
-    // Erase button handler
-    // -------------------------
-    this.shadowRoot.getElementById('eraseButtonId').addEventListener('click', () => {
-      this.shadowRoot.getElementById('panelMessageDisplayId').value =
-        '\nTODO: fetch request to server for cache erase';
-    }); // panel erase button
-
-    // -------------------------
-    // Taller button handler
-    // -------------------------
-    this.shadowRoot.getElementById('tallerButtonId').addEventListener('click', () => {
-      const newRows =
-        parseInt(this.shadowRoot.getElementById('panelMessageDisplayId').getAttribute('rows')) + 5;
-      this.shadowRoot.getElementById('panelMessageDisplayId')
-        .setAttribute('rows', newRows.toString());
-    });
-
-    // -------------------------
-    // Normal button handler
-    // -------------------------
-    this.shadowRoot.getElementById('normalButtonId').addEventListener('click', () => {
-      this.shadowRoot.getElementById('panelMessageDisplayId').setAttribute('rows', '5');
-    });
-
-    // -------------------------------
-    // Clear message activity ICON by clicking on the main
-    // -------------------------------
-    this.shadowRoot.getElementById('panelDivId').addEventListener('click', function () {
-      // resetNotActivityIcon();
+      this.hidePanel();
     });
 
     // -------------------------------------
@@ -109,7 +78,7 @@ window.customElements.define('notice-panel', class extends HTMLElement {
     /**
      * Event to collapse all panels. This panel does not collapse so it is hidden
      * @listens document:collapse-all-panels
-     * @param {string|string[]} event.detail.except - No action if listed as exception
+     * @property {string|string[]} event.detail.except - No action if listed as exception
     */
     document.addEventListener('collapse-all-panels', (event) => {
       if ((event.detail) && (event.detail.except)) {
@@ -128,41 +97,24 @@ window.customElements.define('notice-panel', class extends HTMLElement {
       }
     });
 
+    /**
+     * Global event listener on document object to implement changes to color theme
+     * @listens document:color-theme-changed
+     * @param {object} event.detail.theme - Color theme values 'light' or 'dark'
+     */
     document.addEventListener('color-theme-changed', (event) => {
       const panelDivEl = this.shadowRoot.getElementById('panelDivId');
       const panelMessageDisplayEl = this.shadowRoot.getElementById('panelMessageDisplayId');
       if (event.detail.theme === 'light') {
-        panelDivEl.classList.remove('notice-panel-theme-dark');
-        panelDivEl.classList.add('notice-panel-theme-light');
+        panelDivEl.classList.remove('irc-server-panel-theme-dark');
+        panelDivEl.classList.add('irc-server-panel-theme-light');
         panelMessageDisplayEl.classList.remove('global-text-theme-dark');
         panelMessageDisplayEl.classList.add('global-text-theme-light');
       } else {
-        panelDivEl.classList.remove('notice-panel-theme-light');
-        panelDivEl.classList.add('notice-panel-theme-dark');
+        panelDivEl.classList.remove('irc-server-panel-theme-light');
+        panelDivEl.classList.add('irc-server-panel-theme-dark');
         panelMessageDisplayEl.classList.remove('global-text-theme-light');
         panelMessageDisplayEl.classList.add('global-text-theme-dark');
-      }
-    });
-
-    /**
-     * Hide panel (not visible)unless listed as exception.
-     * @listens document:hide-all-panels
-     * @param {string|string[]} event.detail.except - No action if listed as exception
-     */
-    document.addEventListener('hide-all-panels', (event) => {
-      if ((event.detail) && (event.detail.except)) {
-        if (typeof event.detail.except === 'string') {
-          // this.id assigned in html/_index.html
-          if (event.detail.except !== this.id) {
-            this.hidePanel();
-          }
-        } else if (Array.isArray(event.detail.except)) {
-          if (event.detail.except.indexOf(this.id) < 0) {
-            this.hidePanel();
-          }
-        }
-      } else {
-        this.hidePanel();
       }
     });
 
@@ -178,6 +130,28 @@ window.customElements.define('notice-panel', class extends HTMLElement {
         // set width of input area elements
         this.shadowRoot.getElementById('panelMessageDisplayId')
           .setAttribute('cols', calcInputAreaColSize(mar1));
+      }
+    });
+
+    /**
+     * Hide panel (not visible) unless listed as exception.
+     * @listens document:hide-all-panels
+     * @property {string|string[]} event.detail.except - No action if listed as exception
+     */
+    document.addEventListener('hide-all-panels', (event) => {
+      if ((event.detail) && (event.detail.except)) {
+        if (typeof event.detail.except === 'string') {
+          // this.id assigned in html/_index.html
+          if (event.detail.except !== this.id) {
+            this.hidePanel();
+          }
+        } else if (Array.isArray(event.detail.except)) {
+          if (event.detail.except.indexOf(this.id) < 0) {
+            this.hidePanel();
+          }
+        }
+      } else {
+        this.hidePanel();
       }
     });
 

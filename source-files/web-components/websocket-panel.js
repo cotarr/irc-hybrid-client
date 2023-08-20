@@ -20,8 +20,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 // --------------------------------------------------------------------------------
-
-// --------------------------------------------------------------------------------
 // Websocket Management
 // --------------------------------------------------------------------------------
 //
@@ -829,7 +827,7 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
           }
         }
       } else {
-        this.showPanel();
+        if (event.detail.debug) this.showPanel();
       }
     });
   } // connectedCallback()

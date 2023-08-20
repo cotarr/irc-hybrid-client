@@ -167,6 +167,7 @@ window.customElements.define('debug-panel', class extends HTMLElement {
 
     /**
      * Make panel visible unless listed as exception.
+     * Special case, only open panel if debug === true
      * @listens document:show-all-panels
      * @param {string|string[]} event.detail.except - No action if listed as exception
      */
@@ -174,16 +175,16 @@ window.customElements.define('debug-panel', class extends HTMLElement {
       if ((event.detail) && (event.detail.except)) {
         if (typeof event.detail.except === 'string') {
           // this.id assigned in html/_index.html
-          if (event.detail.except !== this.id) {
+          if ((event.detail.except !== this.id) && (event.detail.debug)) {
             this.showPanel();
           }
         } else if (Array.isArray(event.detail.except)) {
-          if (event.detail.except.indexOf(this.id) < 0) {
+          if ((event.detail.except.indexOf(this.id) < 0) && (event.detail.debug)) {
             this.showPanel();
           }
         }
       } else {
-        this.showPanel();
+        if (event.detail.debug) this.showPanel();
       }
     });
 
@@ -261,7 +262,6 @@ window.customElements.define('debug-panel', class extends HTMLElement {
     });
 
     this.shadowRoot.getElementById('button05Id').addEventListener('click', () => {
-      console.log('window.globals', JSON.stringify(window.globals, null, 2));
     });
 
     this.shadowRoot.getElementById('button06Id').addEventListener('click', () => {
@@ -322,7 +322,11 @@ window.customElements.define('debug-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('button14Id').addEventListener('click', () => {
       document.dispatchEvent(new CustomEvent('web-connect-changed'));
     });
+    this.shadowRoot.getElementById('button15Id').addEventListener('click', () => {
+      document.getElementById('showIrcState').showPanel();
+    });
     this.shadowRoot.getElementById('button16Id').addEventListener('click', () => {
+      document.getElementById('showWebState').showPanel();
     });
   }; // connectedCallback()
 }); // customElements.define

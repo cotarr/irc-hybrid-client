@@ -21,14 +21,14 @@
 // SOFTWARE.
 // ------------------------------------------------------------------------------
 //
-// This web component is a UI panel to display IRC Notice messages
+// Help Panel, MIT License, List of available IRC Commands
 //
 // ------------------------------------------------------------------------------
 'use strict';
-window.customElements.define('notice-panel', class extends HTMLElement {
+window.customElements.define('help-panel', class extends HTMLElement {
   constructor () {
     super();
-    const template = document.getElementById('noticePanelTemplate');
+    const template = document.getElementById('helpPanelTemplate');
     const templateContent = template.content;
     this.attachShadow({ mode: 'open' })
       .appendChild(templateContent.cloneNode(true));
@@ -50,11 +50,8 @@ window.customElements.define('notice-panel', class extends HTMLElement {
   // ------------------
   // Main entry point
   // ------------------
-  initializePlugin = () => {
-    // console.log('notice-panel initializePlugin');
-    this.shadowRoot.getElementById('panelMessageDisplayId').value =
-      '12:01:26 MyNickname | This is an example NOTICE message\n';
-  };
+  // initializePlugin = () => {
+  // };
 
   // add event listeners to connected callback
   // -------------------------------------------
@@ -68,38 +65,6 @@ window.customElements.define('notice-panel', class extends HTMLElement {
     // -------------------------------------
     this.shadowRoot.getElementById('closePanelButtonId').addEventListener('click', () => {
       this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible');
-    });
-
-    // -------------------------
-    // Erase button handler
-    // -------------------------
-    this.shadowRoot.getElementById('eraseButtonId').addEventListener('click', () => {
-      this.shadowRoot.getElementById('panelMessageDisplayId').value =
-        '\nTODO: fetch request to server for cache erase';
-    }); // panel erase button
-
-    // -------------------------
-    // Taller button handler
-    // -------------------------
-    this.shadowRoot.getElementById('tallerButtonId').addEventListener('click', () => {
-      const newRows =
-        parseInt(this.shadowRoot.getElementById('panelMessageDisplayId').getAttribute('rows')) + 5;
-      this.shadowRoot.getElementById('panelMessageDisplayId')
-        .setAttribute('rows', newRows.toString());
-    });
-
-    // -------------------------
-    // Normal button handler
-    // -------------------------
-    this.shadowRoot.getElementById('normalButtonId').addEventListener('click', () => {
-      this.shadowRoot.getElementById('panelMessageDisplayId').setAttribute('rows', '5');
-    });
-
-    // -------------------------------
-    // Clear message activity ICON by clicking on the main
-    // -------------------------------
-    this.shadowRoot.getElementById('panelDivId').addEventListener('click', function () {
-      // resetNotActivityIcon();
     });
 
     // -------------------------------------
@@ -130,17 +95,22 @@ window.customElements.define('notice-panel', class extends HTMLElement {
 
     document.addEventListener('color-theme-changed', (event) => {
       const panelDivEl = this.shadowRoot.getElementById('panelDivId');
-      const panelMessageDisplayEl = this.shadowRoot.getElementById('panelMessageDisplayId');
+      const licenseDivEl = this.shadowRoot.getElementById('licenseDivId');
+      const infoDivEl = this.shadowRoot.getElementById('infoDivId');
       if (event.detail.theme === 'light') {
-        panelDivEl.classList.remove('notice-panel-theme-dark');
-        panelDivEl.classList.add('notice-panel-theme-light');
-        panelMessageDisplayEl.classList.remove('global-text-theme-dark');
-        panelMessageDisplayEl.classList.add('global-text-theme-light');
+        panelDivEl.classList.remove('help-panel-theme-dark');
+        panelDivEl.classList.add('help-panel-theme-light');
+        licenseDivEl.classList.remove('global-text-theme-dark');
+        licenseDivEl.classList.add('global-text-theme-light');
+        infoDivEl.classList.remove('global-text-theme-dark');
+        infoDivEl.classList.add('global-text-theme-light');
       } else {
-        panelDivEl.classList.remove('notice-panel-theme-light');
-        panelDivEl.classList.add('notice-panel-theme-dark');
-        panelMessageDisplayEl.classList.remove('global-text-theme-light');
-        panelMessageDisplayEl.classList.add('global-text-theme-dark');
+        panelDivEl.classList.remove('help-panel-theme-light');
+        panelDivEl.classList.add('help-panel-theme-dark');
+        licenseDivEl.classList.remove('global-text-theme-light');
+        licenseDivEl.classList.add('global-text-theme-dark');
+        infoDivEl.classList.remove('global-text-theme-light');
+        infoDivEl.classList.add('global-text-theme-dark');
       }
     });
 
@@ -167,22 +137,8 @@ window.customElements.define('notice-panel', class extends HTMLElement {
     });
 
     /**
-     * Change size of textArea elements to fit page
-     * @listens document:resize-custom-elements
-     */
-    document.addEventListener('resize-custom-elements', () => {
-      if (window.globals.webState.dynamic.inputAreaCharWidthPx) {
-        const calcInputAreaColSize = document.getElementById('displayUtils').calcInputAreaColSize;
-        // pixel width mar1 is reserved space on edges of input area at full screen width
-        const mar1 = window.globals.webState.dynamic.commonMargin;
-        // set width of input area elements
-        this.shadowRoot.getElementById('panelMessageDisplayId')
-          .setAttribute('cols', calcInputAreaColSize(mar1));
-      }
-    });
-
-    /**
      * Make panel visible unless listed as exception.
+     * Special case, only open panel if debug === true
      * @listens document:show-all-panels
      * @param {string|string[]} event.detail.except - No action if listed as exception
      */
@@ -190,16 +146,16 @@ window.customElements.define('notice-panel', class extends HTMLElement {
       if ((event.detail) && (event.detail.except)) {
         if (typeof event.detail.except === 'string') {
           // this.id assigned in html/_index.html
-          if (event.detail.except !== this.id) {
+          if ((event.detail.except !== this.id) && (event.detail.debug)) {
             this.showPanel();
           }
         } else if (Array.isArray(event.detail.except)) {
-          if (event.detail.except.indexOf(this.id) < 0) {
+          if ((event.detail.except.indexOf(this.id) < 0) && (event.detail.debug)) {
             this.showPanel();
           }
         }
       } else {
-        this.showPanel();
+        if (event.detail.debug) this.showPanel();
       }
     });
   } // connectedCallback()

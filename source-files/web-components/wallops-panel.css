@@ -1,0 +1,13 @@
+
+/* wallops-panel */
+
+.wallops-panel-theme-light {
+  background-color: #effcae;
+  border: 1px solid black;
+  color: black;
+}
+.wallops-panel-theme-dark {
+  background-color: #5e7000;
+  border: 1px solid #b8d330;
+  color: white;
+}

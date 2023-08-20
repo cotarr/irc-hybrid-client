@@ -10,6 +10,34 @@ and this project adheres to
 
 Work in progress, see top of README.md
 
+commit -
+
+This commit added a large number of UI web component files.
+The goal was to create all the anticipated UI panels as empty templates.
+The panels have some basic functionality, such as close button
+and color theme selection, but no IRC controls or javascript has been included.
+The minimum functionality is operable from buttons in the the debug-panel.
+
+- help-panel
+- irc-controls-panel
+- irc-server-panel
+- logout-panel
+- server-form
+- show-irc-state
+- show-web-state
+- wallops-panel
+
+Several web components files for JavaScript functionality were added.
+These are empty at this time, serving as code placeholders.
+
+- beep-sounds
+- local-command-parser
+- remote-command-parser
+
+- Updated the gulp build file Gulpfile.js located in irc-hybrid-client-dev-tools, branch: web-components to include these files in the build.
+
+Commit 0123237
+
 - Renamed some variables and element id using common name conventions
 
 Commit 03f8cca

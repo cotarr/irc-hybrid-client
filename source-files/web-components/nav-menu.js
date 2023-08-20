@@ -142,13 +142,12 @@ customElements.define('nav-menu', class extends HTMLElement {
   // Main entry point
   // ------------------
   initializePlugin = () => {
-    const redirectFlag = false;
-    document.getElementById('userInfo').getLoginInfo(redirectFlag)
+    document.getElementById('userInfo').getLoginInfo()
       .then((userinfo) => {
-        // console.log('userinfo', JSON.stringify(window.globals.userinfo, null, 2));
+        // console.log('userinfo', JSON.stringify(userinfo, null, 2));
         if ((Object.hasOwn(userinfo, 'user')) && (userinfo.user.length > 0)) {
           // Update user real name in menu header bar
-          this.shadowRoot.getElementById('item5_0').textContent =
+          this.shadowRoot.getElementById('item5_0_Id').textContent =
             'Logout (' + userinfo.name + ')';
         }
       })
@@ -242,7 +241,28 @@ customElements.define('nav-menu', class extends HTMLElement {
 
     this.shadowRoot.getElementById('item3_1_Id').addEventListener('click', (event) => {
       event.stopPropagation();
+      document.getElementById('ircControlsPanel').showPanel();
+      this.closeDropdownMenu();
+    });
+    this.shadowRoot.getElementById('item3_2_Id').addEventListener('click', (event) => {
+      event.stopPropagation();
+      document.getElementById('ircServerPanel').showPanel();
+      this.closeDropdownMenu();
+    });
+    this.shadowRoot.getElementById('item3_3_Id').addEventListener('click', (event) => {
+      event.stopPropagation();
+      document.getElementById('wallopsPanel').showPanel();
+      this.closeDropdownMenu();
+    });
+    this.shadowRoot.getElementById('item3_4_Id').addEventListener('click', (event) => {
+      event.stopPropagation();
       document.getElementById('noticePanel').showPanel();
+      this.closeDropdownMenu();
+    });
+    this.shadowRoot.getElementById('item3_5_Id').addEventListener('click', (event) => {
+      event.stopPropagation();
+      document.getElementById('helpPanel').showPanel();
+      document.dispatchEvent(new CustomEvent('global-scroll-to-top'));
       this.closeDropdownMenu();
     });
     this.shadowRoot.getElementById('item4_1_Id').addEventListener('click', (event) => {
@@ -282,8 +302,8 @@ customElements.define('nav-menu', class extends HTMLElement {
     });
     this.shadowRoot.getElementById('item5_0_Id').addEventListener('click', (event) => {
       event.stopPropagation();
-      window.localStorage.clear();
-      window.location = '/logout';
+      document.getElementById('logoutPanel').handleLogoutRequest();
+      this.closeDropdownMenu();
     });
   }; // connectedCallback()
 });

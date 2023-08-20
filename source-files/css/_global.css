@@ -149,6 +149,8 @@ textarea {
 
 /* Short Style Definitions */
 
+.fs80p { font-size: 80%; }
+
 .mt5 { margin-top: 5px; }
 .mt10 { margin-top: 10px; }
 .mt20 { margin-top: 20px; }
@@ -166,6 +168,8 @@ textarea {
 .ml5 {margin-left: 5px;}
 .ml10 {margin-left: 10px;}
 .ml20 {margin-left: 20px;}
+
+.pd10 {padding: 10px};
 
 .vh5 {height: 5px;}
 .vh10 {height: 10px;}
