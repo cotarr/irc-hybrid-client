@@ -71,19 +71,6 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
   };
 
   /**
-   * Function contains code to be performed upon successful websocket connection.
-   * This is the final action of websocket handshake
-   */
-  _websocketConnectedActions = () => {
-    // Erase previous messages.
-    this.shadowRoot.getElementById('reconnectStatusDivId').textContent =
-      'Websocket opened successfully\n';
-    this.hidePanel();
-    document.getElementById('ircControlsPanel').showPanel();
-    document.getElementById('debugPanel').showPanel();
-  };
-
-  /**
    * Update panel visibility and set custom events to notify other panels
    * @fires web-connect-changed
    * @fires hide-all-panels
@@ -213,22 +200,56 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
       this.shadowRoot.getElementById('reconnectStatusDivId').textContent +=
         'Websocket opened successfully\n';
       this.updateWebsocketStatus();
-      // what to do, open panels, etc
-      this._websocketConnectedActions();
 
       this.resetHeartbeatTimer();
 
       // TODO
       // // load state of IRC connection
-      // getIrcState((err, data) => {
-      //   if (!err) {
-      //     // then pull in existing data
-      //     // updateFromCache();
-      //     document.dispatchEvent(new CustomEvent('update-from-cache', { bubbles: true }));
-      //   }
-      // });
-    });
+      // returns Promise, log's own fetch errors
+      document.getElementById('ircControlsPanel').getIrcState()
+        .then(() => {
+          // Clear web socket status panel
+          this.shadowRoot.getElementById('reconnectStatusDivId').textContent =
+            'Websocket opened successfully\n';
+          this.hidePanel();
 
+          // Temporary TODO
+          document.getElementById('debugPanel').showPanel();
+
+          // Web socket connected, request update from cache
+          document.dispatchEvent(new CustomEvent('update-from-cache', { bubbles: true }));
+        })
+        .catch((err) => {
+          console.log(err);
+          let message = err.message || err.toString() || 'Error calling getIrcState()';
+          // limit to 1 line
+          message = message.split('\n')[0];
+          document.getElementById('errorPanel').showError(message);
+          document.getElementById('errorPanel').showError(
+            'Error calling getIrcState() after web socket connection.');
+          this.shadowRoot.getElementById('reconnectStatusDivId').textContent +=
+            'Error calling getIrcState() after web socket connection.\n';
+          // Disconnect web socket
+
+          this.shadowRoot.getElementById('reconnectStatusDivId').textContent +=
+            'Closing websocket\n';
+          window.globals.webState.webConnectOn = false;
+          if (window.globals.wsocket) {
+            // Closing the web socket will generate a 'close' event.
+            window.globals.wsocket.close(3002, 'Closed due to getIrcState() error.');
+          }
+
+          //
+          // Error occurred, show error and then close other windows.
+          //
+          document.getElementById('websocketPanel').showPanel();
+          document.dispatchEvent(new CustomEvent('hide-all-panels', {
+            detail: {
+              except: ['websocketPanel']
+            }
+          }));
+        });
+    });
     /**
      * Event handler for websocket close events
      * @listens websocket:close
@@ -587,7 +608,9 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
     //
     if (window.globals.webState.webConnected) {
       window.globals.webState.webConnectOn = false;
-      window.globals.wsocket.close(3001, 'Disconnect on request');
+      if (window.globals.wsocket) {
+        window.globals.wsocket.close(3001, 'Disconnect on request');
+      }
     }
   };
 

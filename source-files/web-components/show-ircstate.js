@@ -116,9 +116,8 @@ window.customElements.define('show-ircstate', class extends HTMLElement {
      * @listens document:irc-state-changed
      */
     document.addEventListener('irc-state-changed', () => {
-      if (window.globals.ircState.ircConnected !== this.ircConnectedLast) {
-        this.ircConnectedLast = window.globals.ircState.ircConnected;
-        this.hidePanel();
+      if (this.shadowRoot.getElementById('panelVisibilityDivId').hasAttribute('visible')) {
+        this._populateJsonData();
       }
     });
 

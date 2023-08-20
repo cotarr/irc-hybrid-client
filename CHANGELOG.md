@@ -10,7 +10,21 @@ and this project adheres to
 
 Work in progress, see top of README.md
 
-Commit
+Commit 
+
+In irc-controls-panel.js, added network request handlers
+for minimal control of IRC server connection.
+This includes getting ircStte object after web socket initialized,
+then to connect,send message "/QUIT" or forcibly close the socket.
+
+```
+POST /irc/connect
+GET  /irc/ircstate
+POST /irc/message
+POST /irc/disconnect
+```
+
+Commit d34a8a6
 
 - Added code to hide dropdown menu items based on ircState flags
 - UI panels detect state change and self hide themselves.

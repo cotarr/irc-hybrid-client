@@ -275,6 +275,10 @@ window.customElements.define('debug-panel', class extends HTMLElement {
     });
 
     this.shadowRoot.getElementById('button05Id').addEventListener('click', () => {
+      // returns promise
+      document.getElementById('ircControlsPanel').getIrcState()
+        .catch(() => {
+        });
     });
 
     this.shadowRoot.getElementById('button06Id').addEventListener('click', () => {

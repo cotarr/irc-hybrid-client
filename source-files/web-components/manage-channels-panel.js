@@ -71,7 +71,7 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
       (document.getElementById('globVars').constants('channelPrefixChars')
         .indexOf(newChannel.charAt(0)) >= 0)) {
       const message = 'JOIN ' + newChannel;
-      document.getElementById('tempPlaceholder').sendIrcServerMessage(message);
+      document.getElementById('ircControlsPanel').sendIrcServerMessage(message);
     } else {
       document.getElementById('errorPanel').showError('Invalid Channel Name');
     }
@@ -104,7 +104,7 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
   _handleChannelButtonClick = (event) => {
     const channelName = this.shadowRoot.getElementById(event.target.id).textContent;
     if (channelName.length > 0) {
-      document.getElementById('tempPlaceholder').sendIrcServerMessage('JOIN ' + channelName);
+      document.getElementById('ircControlsPanel').sendIrcServerMessage('JOIN ' + channelName);
     }
   };
 

@@ -137,9 +137,8 @@ window.customElements.define('show-webstate', class extends HTMLElement {
      * @listens document:irc-state-changed
      */
     document.addEventListener('irc-state-changed', () => {
-      if (window.globals.ircState.ircConnected !== this.ircConnectedLast) {
-        this.ircConnectedLast = window.globals.ircState.ircConnected;
-        if (!window.globals.ircState.ircConnected) this.hidePanel();
+      if (this.shadowRoot.getElementById('panelVisibilityDivId').hasAttribute('visible')) {
+        this._populateJsonData();
       }
     });
 
@@ -185,6 +184,11 @@ window.customElements.define('show-webstate', class extends HTMLElement {
         }
       } else {
         if ((event.detail) && (event.detail.debug)) this.showPanel();
+      }
+    });
+    document.addEventListener('web-connect-changed', () => {
+      if (this.shadowRoot.getElementById('panelVisibilityDivId').hasAttribute('visible')) {
+        this._populateJsonData();
       }
     });
   } // connectedCallback()
