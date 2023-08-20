@@ -21,6 +21,13 @@
 // SOFTWARE.
 // ------------------------------------------------------------------------------
 //
+// IRC Server control methods
+//   getIrcState()                  returns Promise(ircState)
+//   sendIrcServerMessageHandler()  returns Promise(null)
+//   sendIrcServerMessage()         Function wrapped in error message handler
+//   connectHandler()               returns Promise(null)
+//   forceDisconnectHandler()       returns Promise(null)
+//   pruneIrcChannel()              returns Promise(null)
 // ------------------------------------------------------------------------------
 'use strict';
 window.customElements.define('irc-controls-panel', class extends HTMLElement {
@@ -55,7 +62,7 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
    * @param {number} code - Option number for level of connect
    * @returns {boolean} true if connected
    */
-  checkConnect (code) {
+  checkConnect = (code) => {
     if ((code >= 1) && (!window.globals.webState.webConnected)) {
       document.getElementById('errorPanel').showError('Error: not connected to web server');
       return false;
@@ -69,7 +76,7 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
       return false;
     }
     return true;
-  }
+  };
 
   lastConnectErrorCount = 0;
   /**
@@ -198,7 +205,7 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
    * @param {string} = message - The IRC message string to send to IRC server.
    * @returns {promise} Returns promise resolving null, else reject error
    */
-  sendIrcServerMessage (message) {
+  sendIrcServerMessageHandler = (message) => {
     return new Promise((resolve, reject) => {
       if (!this.checkConnect(3)) resolve(null);
       const fetchController = new AbortController();
@@ -268,7 +275,23 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
           reject(error);
         });
     }); // new Promise
-  }; // _sendIrcServerMessage
+  }; // sendIrcServerMessageHandler
+
+  /**
+   * Send IRC message to IRC server.
+   * This is a promise wrapper to handle error messages
+   * @param {string} = message - The IRC message string to send to IRC server.
+   */
+  sendIrcServerMessage = (message) => {
+    this.sendIrcServerMessageHandler(message)
+      .catch((err) => {
+        console.log(err);
+        let message = err.message || err.toString() || 'Error occurred calling /irc/connect';
+        // show only 1 line
+        message = message.split('\n')[0];
+        document.getElementById('errorPanel').showError(message);
+      });
+  };
 
   /**
    * Perform network POST request to /irc/connect to initiate a new connection to the IRC server.
@@ -444,6 +467,132 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
     }); // new Promise
   }; // forceDisconnectHandler()
 
+  // Fetch API to remove channel from backend server
+  pruneIrcChannel = (pruneChannel) => {
+    if ((typeof pruneChannel !== 'string') || (pruneChannel.length < 1)) {
+      return Promise.reject(new Error('Invalid channel name parameter'));
+    } else {
+      return new Promise((resolve, reject) => {
+        const fetchTimeout = document.getElementById('globVars').constants('fetchTimeout');
+        const activitySpinnerEl = document.getElementById('activitySpinner');
+        const fetchController = new AbortController();
+        const fetchOptions = {
+          method: 'POST',
+          redirect: 'error',
+          signal: fetchController.signal,
+          headers: {
+            'CSRF-Token': document.getElementById('globVars').csrfToken,
+            'Content-type': 'application/json',
+            Accept: 'application/json'
+          },
+          body: JSON.stringify({ channel: pruneChannel })
+        };
+        const fetchURL = document.getElementById('globVars').webServerUrl + '/irc/prune';
+        activitySpinnerEl.requestActivitySpinner();
+        const fetchTimerId = setTimeout(() => fetchController.abort(), fetchTimeout);
+        fetch(fetchURL, fetchOptions)
+          .then((response) => {
+            if (response.status === 200) {
+              return response.json();
+            } else {
+              // Retrieve error message from remote web server and pass to error handler
+              return response.text()
+                .then((remoteErrorText) => {
+                  const err = new Error('HTTP status error');
+                  err.status = response.status;
+                  err.statusText = response.statusText;
+                  err.remoteErrorText = remoteErrorText;
+                  throw err;
+                });
+            }
+          })
+          .then((responseJson) => {
+            // console.log(JSON.stringify(responseJson, null, 2));
+
+            // channel successfully removed from server
+            // The server will response with a state change
+            // The irc-state-change event handler
+            // will detect the channel has been removed
+            // It will remove it's window from the DOM
+            if (fetchTimerId) clearTimeout(fetchTimerId);
+            activitySpinnerEl.cancelActivitySpinner();
+            if (responseJson.error) {
+              reject(responseJson.message);
+            } else {
+              resolve(null);
+            }
+          })
+          .catch((err) => {
+            if (fetchTimerId) clearTimeout(fetchTimerId);
+            activitySpinnerEl.cancelActivitySpinner();
+            window.globals.webState.webConnected = false;
+            window.globals.webState.webConnecting = false;
+            // Build generic error message to catch network errors
+            let message = ('Fetch error, ' + fetchOptions.method + ' ' + fetchURL + ', ' +
+              (err.message || err.toString() || 'Error'));
+            if (err.status) {
+              // Case of HTTP status error, build descriptive error message
+              message = ('HTTP status error, ') + err.status.toString() + ' ' +
+                err.statusText + ', ' + fetchOptions.method + ' ' + fetchURL;
+            }
+            if (err.remoteErrorText) {
+              message += ', ' + err.remoteErrorText;
+            }
+            const error = new Error(message);
+            reject(error);
+          });
+      }); // new promise
+    } // valid param
+  }; // pruneIrcChannel()
+
+  // ------------------------------------------------
+  // Tap "Web" status icon to connect/disconnect
+  // ------------------------------------------------
+  ircStatusIconTouchDebounce = false;
+  webConnectHeaderBarIconHandler = () => {
+    // debounce button
+    if (this.ircStatusIconTouchDebounce) return;
+    this.ircStatusIconTouchDebounce = true;
+    setTimeout(() => {
+      this.ircStatusIconTouchDebounce = false;
+    }, 1000);
+    if ((window.globals.ircState.ircConnected) ||
+      (window.globals.ircState.ircConnecting) ||
+      (window.globals.webState.ircConnecting)) {
+      //
+      // disconnect
+      if ((window.globals.webState.ircConnecting) || (window.globals.ircState.webConnecting) ||
+        ((window.globals.ircState.ircConnected) && (!window.globals.ircState.ircRegistered))) {
+        // with this false, icon depend only on backend state
+        window.globals.webState.ircConnecting = false;
+        // stuck trying to connect, just request server to destroy socket
+        this.forceDisconnectHandler()
+          .catch((err) => {
+            console.log(err);
+            let message = err.message || err.toString() || 'Error occurred calling /irc/connect';
+            // show only 1 line
+            message = message.split('\n')[0];
+            document.getElementById('errorPanel').showError(message);
+          });
+      } else {
+        // else, connected to server, exit gracefully by command.
+        document.getElementById('ircControlsPanel').sendIrcServerMessage(
+          'QUIT :' + window.globals.ircState.progName + ' ' + window.globals.ircState.progVersion);
+      }
+    } else {
+      //
+      // Connect
+      this.connectHandler()
+        .catch((err) => {
+          console.log(err);
+          let message = err.message || err.toString() || 'Error occurred calling /irc/connect';
+          // show only 1 line
+          message = message.split('\n')[0];
+          document.getElementById('errorPanel').showError(message);
+        });
+    }
+  }; // webConnectHeaderBarIconHandler
+
   /**
    * Called once per second as task scheduler, called from js/_afterLoad.js
    */
@@ -512,18 +661,31 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
         // with this false, icon depend only on backend state
         window.globals.webState.ircConnecting = false;
         // stuck trying to connect, just request server to destroy socket
-        this.forceDisconnectHandler();
+        this.forceDisconnectHandler()
+          .catch((err) => {
+            console.log(err);
+            let message = err.message || err.toString() || 'Error occurred calling /irc/connect';
+            // show only 1 line
+            message = message.split('\n')[0];
+            document.getElementById('errorPanel').showError(message);
+          });
       } else if ((window.globals.ircState.ircAutoReconnect) &&
         (window.globals.ircState.ircConnectOn) &&
         (!window.globals.ircState.ircConnected) &&
         (!window.globals.ircState.ircConnecting)) {
         // case of backend waiting on timer to reconnect.
         // when QUIT pressed, send hard disconnet to kill timer.
-        this.forceDisconnectHandler();
+        this.forceDisconnectHandler()
+          .catch((err) => {
+            console.log(err);
+            let message = err.message || err.toString() || 'Error occurred calling /irc/connect';
+            // show only 1 line
+            message = message.split('\n')[0];
+            document.getElementById('errorPanel').showError(message);
+          });
       } else {
         // else, connected to server, exit gracefully by command.
-        document.getElementById('ircControlsPanel').sendIrcServerMessage(
-          'QUIT :' + window.globals.ircState.progName + ' ' +
+        this.sendIrcServerMessage('QUIT :' + window.globals.ircState.progName + ' ' +
           window.globals.ircState.progVersion);
       }
     });

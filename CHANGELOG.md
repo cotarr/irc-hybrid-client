@@ -6,11 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Next v2.0.0-dev 2023-08-17 (Draft)
+## Next v2.0.0-dev 2023-08-20 (Draft)
 
 Work in progress, see top of README.md
 
-Commit 
+Commit
+
+- Debugged irc-controls-panel interface to: channel-panel, manage-channel-panel and header-bar 
+
+Commit 788dd0b
 
 In irc-controls-panel.js, added network request handlers
 for minimal control of IRC server connection.

@@ -212,6 +212,8 @@ customElements.define('header-bar', class extends HTMLElement {
         // IRC server disconnected
         if ((window.globals.webState.ircConnecting) || (window.globals.ircState.ircConnecting)) {
           state.ircConnect = 'connecting';
+        } else {
+          state.ircConnect = 'disconnected';
         }
         if ((window.globals.ircState.ircAutoReconnect) &&
           (window.globals.ircState.ircConnectOn) &&
@@ -260,7 +262,7 @@ customElements.define('header-bar', class extends HTMLElement {
       document.getElementById('websocketPanel').webConnectHeaderBarIconHandler();
     });
     this.shadowRoot.getElementById('ircConnectIconId').addEventListener('click', () => {
-      console.log('clicked ircConnectIconId');
+      document.getElementById('ircControlsPanel').webConnectHeaderBarIconHandler();
     });
     this.shadowRoot.getElementById('ircIsAwayIconId').addEventListener('click', () => {
       console.log('clicked ircIsAwayIconId');

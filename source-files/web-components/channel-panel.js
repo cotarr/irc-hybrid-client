@@ -110,7 +110,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
             return;
           } else {
             if ((commandAction.ircMessage) && (commandAction.ircMessage.length > 0)) {
-              document.getElementById('tempPlaceholder')
+              document.getElementById('ircControlsPanel')
                 .sendIrcServerMessage(commandAction.ircMessage);
             }
             return;
@@ -127,7 +127,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
             if ((window.globals.ircState.ircConnected) && (window.globals.ircState.ircIsAway)) {
               // cancel away state, IRC server response will be parsed in backend
 
-              document.getElementById('tempPlaceholder').sendIrcServerMessage('AWAY');
+              document.getElementById('ircControlsPanel').sendIrcServerMessage('AWAY');
             }
           }, 1000);
         }
@@ -136,7 +136,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
         //
         const message = 'PRIVMSG ' +
         window.globals.ircState.channelStates[channelIndex].name + ' :' + text;
-        document.getElementById('tempPlaceholder').sendIrcServerMessage(message);
+        document.getElementById('ircControlsPanel').sendIrcServerMessage(message);
         textAreaEl.value = '';
       }
     }
@@ -276,18 +276,18 @@ window.customElements.define('channel-panel', class extends HTMLElement {
   // -------------------------
   // Join button handler
   // -------------------------
-  handleChannelJoinButtonElClick (event) {
+  handleChannelJoinButtonElClick = (event) => {
     const message = 'JOIN ' + this.channelName;
-    document.getElementById('tempPlaceholder').sendIrcServerMessage(message);
+    document.getElementById('ircControlsPanel').sendIrcServerMessage(message);
   };
 
   // -------------------------
   // Part button handler
   // -------------------------
-  handleChannelPartButtonElClick (event) {
+  handleChannelPartButtonElClick = (event) => {
     const message = 'PART ' + this.channelName + ' :' + window.globals.ircState.progName +
      ' ' + window.globals.ircState.progVersion;
-    document.getElementById('tempPlaceholder').sendIrcServerMessage(message);
+    document.getElementById('ircControlsPanel').sendIrcServerMessage(message);
   };
 
   // -------------------------
@@ -296,81 +296,25 @@ window.customElements.define('channel-panel', class extends HTMLElement {
   handleChannelPruneButtonElClick = (event) => {
     // Fetch API to remove channel from backend server
     const index = window.globals.ircState.channels.indexOf(this.channelName.toLowerCase());
-    const fetchTimeout = document.getElementById('globVars').constants('fetchTimeout');
-    const activitySpinnerEl = document.getElementById('activitySpinner');
     if (index >= 0) {
       // if not joined, this is quietly ignored without error
       if (!window.globals.ircState.channelStates[index].joined) {
-        const fetchController = new AbortController();
-        const fetchOptions = {
-          method: 'POST',
-          redirect: 'error',
-          signal: fetchController.signal,
-          headers: {
-            'CSRF-Token': document.getElementById('globVars').csrfToken,
-            'Content-type': 'application/json',
-            Accept: 'application/json'
-          },
-          body: JSON.stringify({ channel: this.channelName })
-        };
-        const fetchURL = document.getElementById('globVars').webServerUrl + '/irc/prune';
-        activitySpinnerEl.requestActivitySpinner();
-        const fetchTimerId = setTimeout(() => fetchController.abort(), fetchTimeout);
-
-        fetch(fetchURL, fetchOptions)
-          .then((response) => {
-            if (response.status === 200) {
-              return response.json();
-            } else {
-              // Retrieve error message from remote web server and pass to error handler
-              return response.text()
-                .then((remoteErrorText) => {
-                  const err = new Error('HTTP status error');
-                  err.status = response.status;
-                  err.statusText = response.statusText;
-                  err.remoteErrorText = remoteErrorText;
-                  throw err;
-                });
-            }
-          })
-          .then((responseJson) => {
-            // console.log(JSON.stringify(responseJson, null, 2));
-            if (fetchTimerId) clearTimeout(fetchTimerId);
-            activitySpinnerEl.cancelActivitySpinner();
-            if (responseJson.error) {
-              document.getElementById('errorPanel').showError(responseJson.message);
-            } else {
-              // channel successfully removed from server
-              // The server will response with a state change
-              // The irc-state-change event handler
-              // will detect the channel has been removed
-              // It will remove it's window from the DOM
-            }
-          })
+        // If the channel is successfully removed from server
+        // The server will response with a state change
+        // The irc-state-change event handler
+        // will detect the channel has been removed
+        // It will remove it's window from the DOM
+        document.getElementById('ircControlsPanel').pruneIrcChannel(this.channelName)
           .catch((err) => {
-            if (fetchTimerId) clearTimeout(fetchTimerId);
-            activitySpinnerEl.cancelActivitySpinner();
-            window.globals.webState.webConnected = false;
-            window.globals.webState.webConnecting = false;
-            // Build generic error message to catch network errors
-            let message = ('Fetch error, ' + fetchOptions.method + ' ' + fetchURL + ', ' +
-              (err.message || err.toString() || 'Error'));
-            if (err.status) {
-              // Case of HTTP status error, build descriptive error message
-              message = ('HTTP status error, ') + err.status.toString() + ' ' +
-                err.statusText + ', ' + fetchOptions.method + ' ' + fetchURL;
-            }
-            if (err.remoteErrorText) {
-              message += ', ' + err.remoteErrorText;
-            }
-            console.log(message);
-            // make single line
+            console.log(err);
+            let message = err.message || err.toString() || 'Error occurred calling /irc/connect';
+            // show only 1 line
             message = message.split('\n')[0];
-            document.getElementById('errorPanel').showError('prune channel error: ' + message);
+            document.getElementById('errorPanel').showError(message);
           });
-      }
-    }
-  };
+      } // not joined
+    } // index > 0
+  }; // handleChannelPruneButtonElClick
 
   _handleRefreshButton = () => {
     if (!window.globals.webState.cacheReloadInProgress) {
@@ -455,7 +399,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
               const message = 'PRIVMSG ' +
                 window.globals.ircState.channelStates[this.channelIndex].name +
                 ' :' + multiLineArray[i];
-              document.getElementById('tempPlaceholder').sendIrcServerMessage(message);
+              document.getElementById('ircControlsPanel').sendIrcServerMessage(message);
               if (i !== multiLineArray.length - 1) {
                 // Show each line in inputArea while waiting for timer
                 this.shadowRoot.getElementById('panelMessageInputId').value = multiLineArray[i + 1];
@@ -896,7 +840,8 @@ window.customElements.define('channel-panel', class extends HTMLElement {
             // Remove one of the space characters
             panelMessageInputEl.value =
               panelMessageInputEl.value.slice(0, panelMessageInputEl.value.length - 1);
-            if (panelMessageInputEl.value.toUpperCase() === '/PART ' + name.toUpperCase() + ' ') {
+            if (panelMessageInputEl.value.toUpperCase() ===
+              '/PART ' + this.channelName.toUpperCase() + ' ') {
             // First auto-completes /PART
             // Second auto-completes channel name
             // Third auto-completes program version
@@ -1555,6 +1500,17 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       // Check for joined change to true and show channel if hidden
       //
       if ((ircStateIndex >= 0) && (webStateIndex >= 0)) {
+        // Alternate Join, Prune,  verses Part buttons
+        if (window.globals.ircState.channelStates[ircStateIndex].joined) {
+          this.shadowRoot.getElementById('joinButtonId').setAttribute('hidden', '');
+          this.shadowRoot.getElementById('pruneButtonId').setAttribute('hidden', '');
+          this.shadowRoot.getElementById('partButtonId').removeAttribute('hidden');
+        } else {
+          this.shadowRoot.getElementById('joinButtonId').removeAttribute('hidden');
+          this.shadowRoot.getElementById('pruneButtonId').removeAttribute('hidden');
+          this.shadowRoot.getElementById('partButtonId').setAttribute('hidden', '');
+        };
+
         if (window.globals.ircState.channelStates[ircStateIndex].joined !==
           window.globals.webState.channelStates[webStateIndex].lastJoined) {
           if ((window.globals.ircState.channelStates[ircStateIndex].joined) &&
