@@ -61,6 +61,58 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
     this.shadowRoot.getElementById('panelCollapsedDivId').removeAttribute('visible');
   };
 
+  // -----------------------------------------------------------------------
+  // Channel windows are created dynamically and inserted into the DOM
+  // This is a channel message router to send message to matching channel`
+  // -----------------------------------------------------------------------
+  // :nick!~user@host.domain PRIVMSG #channel :This is channel text message.
+  // -----------------------------------------------------------------------
+  displayChannelMessage = (parsedMessage) => {
+    console.log('manageChannelsPanel', JSON.stringify(parsedMessage, null, 2));
+    const channelElements =
+      Array.from(document.getElementById('channelsContainerId').children);
+    channelElements.forEach((el) => {
+      if (('params' in parsedMessage) &&
+        ('channelName' in el) &&
+        (parsedMessage.params[0].toLowerCase() === el.channelName.toLowerCase())) {
+        el.displayChannelMessage(parsedMessage);
+      }
+    });
+  }; // displayChannelMessage()
+
+  // -----------------------------------------------------
+  // Notice messages to IRC channel are handled here
+  // -----------------------------------------------------
+  displayChannelNoticeMessage = (parsedMessage) => {
+    // console.log(JSON.stringify(parsedMessage));
+
+    // Ignore if called with other commands (Left from version v0.2.53)
+    if (parsedMessage.command !== 'NOTICE') return;
+
+    // Ignore if called for CTCP message
+    const ctcpDelim = 1;
+    if (((parsedMessage.params.length === 2) &&
+      (parsedMessage.params[1].charCodeAt(0) === ctcpDelim)) ||
+      ((parsedMessage.params.length === 3) &&
+      (parsedMessage.params[2].charCodeAt(0) === ctcpDelim))) {
+      return;
+    }
+
+    if ((parsedMessage.params[0] !== window.globals.ircState.nickName) &&
+      (window.globals.ircState.channels.indexOf(parsedMessage.params[0].toLowerCase()) >= 0)) {
+      // case of notice to #channel
+      const channelElements =
+        Array.from(document.getElementById('channelsContainerId').children);
+      channelElements.forEach((el) => {
+        if (('params' in parsedMessage) &&
+          ('channelName' in el) &&
+          (parsedMessage.params[0].toLowerCase() === el.channelName.toLowerCase())) {
+          el.displayChannelMessage(parsedMessage);
+        }
+      });
+    }
+  }; // displayChannelNoticeMessage()
+
   /**
    * Send /JOIN message to IRC server in response to user input
    */

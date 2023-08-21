@@ -4,7 +4,7 @@
 <template id='ircServerPanelTemplate'>
   <link rel="stylesheet" href="css/styles.css">
   <div id="panelVisibilityDivId" class="global-visibility-div">
-    <div id="panelDivId" class="global-panel-style-div irc-server-panel-theme-dark">
+    <div id="panelDivId" class="global-panel-style-div irc-server-panel-theme-dark" lastDate="0000-00-00">
       <div class='global-head-flex'>
         <div class="global-head-left">
           <button id="closePanelButtonId" title="Hide Panel" class="global-show-hide-button mr5">x</button>
@@ -18,7 +18,7 @@
           <button id="eraseButtonId">Erase</button>
         </div>
       </div>
-      <textarea id="panelMessageDisplayId" class="global-text-theme-dark" cols="84" rows="5" spellcheck="false" readonly="readonly"></textarea>
+      <textarea id="panelMessageDisplayId" class="global-text-theme-dark" cols="84" rows="20" spellcheck="false" readonly="readonly"></textarea>
     </div>
   </div>
 </template>

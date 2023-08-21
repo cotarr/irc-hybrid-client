@@ -1,0 +1,30 @@
+
+<!-- show-raw -->
+
+<template id='showRawTemplate'>
+  <link rel="stylesheet" href="css/styles.css">
+  <div id="panelVisibilityDivId" class="global-visibility-div" visible>
+    <div id="panelDivId" class="global-panel-style-div show-raw-theme-dark">
+      <div class='global-head-flex'>
+        <div class="global-head-left">
+          <button id="closePanelButtonId" title="Hide Panel" class="global-show-hide-button mr5">x</button>
+          <span id="titleDivId">Raw Server Messages (Paused)</span>
+        </div>
+        <div class="global-head-center">
+        </div>
+        <div class="global-head-right">
+          <button id="pauseButtonId">Start</button>
+          <button id="clearButtonId">Clear</button>
+        </div>
+      </div>
+      <div>
+        <textarea id="panelMessageDisplayId" class="global-text-theme-dark" cols="84" rows="24" spellcheck="false" readonly="readonly"></textarea>
+      </div>
+      <div>
+        <input class="global-valign-middle ml10" type="checkbox" id="showRawInHexCheckboxId">
+        <span class="global-valign-middle">Add-Hex</span>
+      </div>
+      <div class="vh10"></div>
+    </div>
+  </div>
+</template>

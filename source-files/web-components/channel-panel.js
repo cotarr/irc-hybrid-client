@@ -29,7 +29,6 @@
 //   cache-reload-done
 //   cache-reload-error
 //   cancel-beep-sounds
-//   channel-message
 //   collapse-all-panels
 //   color-theme-changed
 //   erase-before-reload
@@ -989,14 +988,16 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     this._resetMessageCount();
   };
 
-  handleChannelMessage = (event) => {
-    const channelMainSectionEl = this.shadowRoot.getElementById('panelDivId');
-    const channelTextAreaEl = this.shadowRoot.getElementById('panelMessageDisplayId');
+  displayChannelMessage = (parsedMessage) => {
+    const panelDivEl = this.shadowRoot.getElementById('panelDivId');
+    const panelMessageDisplayEl = this.shadowRoot.getElementById('panelMessageDisplayId');
     const nickChannelSpacer = document.getElementById('globVars').constants('nickChannelSpacer');
+    // console.log('Channel parsedMessage: ' + JSON.stringify(parsedMessage, null, 2));
+
     const _addText = (timestamp, nick, text) => {
       //
       let out = '';
-      if (channelMainSectionEl.hasAttribute('brief-enabled')) {
+      if (panelDivEl.hasAttribute('brief-enabled')) {
         out = timestamp + ' ';
         if (nick === '*') {
           out += nick + nickChannelSpacer;
@@ -1010,22 +1011,19 @@ window.customElements.define('channel-panel', class extends HTMLElement {
         document.getElementById('displayUtils').cleanFormatting(text) + '\n';
       }
       // append text to textarea
-      channelTextAreaEl.value += out;
+      panelMessageDisplayEl.value += out;
       // move scroll bar so text is scrolled all the way up
       // Performing this during cache reload will generate browser violation for forced reflow.
       if (!window.globals.webState.cacheReloadInProgress) {
-        channelTextAreaEl.scrollTop = channelTextAreaEl.scrollHeight;
+        panelMessageDisplayEl.scrollTop = panelMessageDisplayEl.scrollHeight;
       }
     }; // _addText()
 
-    const parsedMessage = event.detail.parsedMessage;
-    // console.log('Event channel-message: ' + JSON.stringify(parsedMessage, null, 2));
-
     // With each message, if date has changed, print the new date value
     if (parsedMessage.params[0].toLowerCase() === this.channelName.toLowerCase()) {
-      if (channelMainSectionEl.getAttribute('lastDate') !== parsedMessage.datestamp) {
-        channelMainSectionEl.setAttribute('lastDate', parsedMessage.datestamp);
-        channelTextAreaEl.value +=
+      if (panelDivEl.getAttribute('lastDate') !== parsedMessage.datestamp) {
+        panelDivEl.setAttribute('lastDate', parsedMessage.datestamp);
+        panelMessageDisplayEl.value +=
           '\n=== ' + parsedMessage.datestamp + ' ===\n\n';
       }
     }
@@ -1038,7 +1036,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
         if (parsedMessage.params[0].toLowerCase() === this.channelName.toLowerCase()) {
           let reason = ' ';
           if (parsedMessage.params[2]) reason = parsedMessage.params[2];
-          if (channelMainSectionEl.hasAttribute('brief-enabled')) {
+          if (panelDivEl.hasAttribute('brief-enabled')) {
             _addText(parsedMessage.timestamp,
               '*',
               parsedMessage.nick + ' has kicked ' + parsedMessage.params[1]);
@@ -1052,7 +1050,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
         break;
       case 'JOIN':
         if (parsedMessage.params[0].toLowerCase() === this.channelName.toLowerCase()) {
-          if (channelMainSectionEl.hasAttribute('brief-enabled')) {
+          if (panelDivEl.hasAttribute('brief-enabled')) {
             _addText(parsedMessage.timestamp,
               '*',
               parsedMessage.nick + ' has joined');
@@ -1061,7 +1059,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
               '*',
               parsedMessage.nick + ' (' + parsedMessage.host + ') has joined');
           }
-          if (channelMainSectionEl.hasAttribute('beep2-enabled') &&
+          if (panelDivEl.hasAttribute('beep2-enabled') &&
             (!window.globals.webState.cacheReloadInProgress)) {
             document.getElementById('tempPlaceholder').playBeep1Sound();
           }
@@ -1144,7 +1142,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
         if (parsedMessage.params[0].toLowerCase() === this.channelName.toLowerCase()) {
           let reason = ' ';
           if (parsedMessage.params[1]) reason = parsedMessage.params[1];
-          if (channelMainSectionEl.hasAttribute('brief-enabled')) {
+          if (panelDivEl.hasAttribute('brief-enabled')) {
             _addText(parsedMessage.timestamp,
               '*',
               parsedMessage.nick + ' has left');
@@ -1161,11 +1159,11 @@ window.customElements.define('channel-panel', class extends HTMLElement {
           _addText(parsedMessage.timestamp,
             parsedMessage.nick,
             parsedMessage.params[1]);
-          if (channelMainSectionEl.hasAttribute('beep1-enabled') &&
+          if (panelDivEl.hasAttribute('beep1-enabled') &&
             (!window.globals.webState.cacheReloadInProgress)) {
             document.getElementById('tempPlaceholder').playBeep1Sound();
           }
-          if (channelMainSectionEl.hasAttribute('beep3-enabled')) {
+          if (panelDivEl.hasAttribute('beep3-enabled')) {
             const checkLine = parsedMessage.params[1].toLowerCase();
             if ((checkLine.indexOf(window.globals.ircState.nickName.toLowerCase()) >= 0) &&
               (!window.globals.webState.cacheReloadInProgress)) {
@@ -1221,7 +1219,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
         if (parsedMessage.params[0].toLowerCase() === this.channelName.toLowerCase()) {
           let reason = ' ';
           if (parsedMessage.params[1]) reason = parsedMessage.params[1];
-          if (channelMainSectionEl.hasAttribute('brief-enabled')) {
+          if (panelDivEl.hasAttribute('brief-enabled')) {
             _addText(parsedMessage.timestamp,
               '*',
               parsedMessage.nick + ' has quit');
@@ -1238,7 +1236,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
         if (this._isNickInChannel(parsedMessage.nick, this.channelName)) {
           let reason = ' ';
           if (parsedMessage.params[0]) reason = parsedMessage.params[0];
-          if (channelMainSectionEl.hasAttribute('brief-enabled')) {
+          if (panelDivEl.hasAttribute('brief-enabled')) {
             _addText(parsedMessage.timestamp,
               '*',
               parsedMessage.nick + ' has quit');
@@ -1458,7 +1456,6 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       document.removeEventListener('cache-reload-done', this.handleCacheReloadDone);
       document.removeEventListener('cache-reload-error', this.handleCacheReloadError);
       document.removeEventListener('cancel-beep-sounds', this.handleCancelBeepSounds);
-      document.removeEventListener('channel-message', this.handleChannelMessage);
       document.removeEventListener('collapse-all-panels', this._handleCollapseAllPanels);
       document.removeEventListener('color-theme-changed', this._handleColorThemeChanged);
       document.removeEventListener('erase-before-reload', this.handleEraseBeforeReload);
@@ -1747,7 +1744,6 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     document.addEventListener('cache-reload-done', this.handleCacheReloadDone);
     document.addEventListener('cache-reload-error', this.handleCacheReloadError);
     document.addEventListener('cancel-beep-sounds', this.handleCancelBeepSounds);
-    document.addEventListener('channel-message', this.handleChannelMessage);
     document.addEventListener('collapse-all-panels', this._handleCollapseAllPanels);
     document.addEventListener('color-theme-changed', this._handleColorThemeChanged);
     document.addEventListener('erase-before-reload', this.handleEraseBeforeReload);

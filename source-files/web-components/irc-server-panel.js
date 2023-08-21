@@ -53,6 +53,391 @@ window.customElements.define('irc-server-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible');
   };
 
+  // -------------------------------------------------------------
+  // Server Message filter
+  //
+  // Messages with specific handlers, such as channel messages
+  // Are handled directly by the parser.
+  //
+  // This filter is to avoid duplication of messages
+  // in the server window for case of alternate display
+  //
+  // This does not filter from View-Raw display
+  //
+  // Format: simple Array of strings
+  // -------------------------------------------------------------
+  ircMessageCommandDisplayFilter = [
+    '331', // Topic
+    '332', // Topic
+    '333', // Topic
+    '353', // Names
+    '366', // End Names
+    'JOIN',
+    'KICK',
+    'MODE',
+    'cachedNICK'.toUpperCase(),
+    'NICK',
+    'NOTICE',
+    'PART',
+    'PING',
+    'PONG',
+    'PRIVMSG',
+    'cachedQUIT'.toUpperCase(),
+    'QUIT',
+    'TOPIC',
+    'WALLOPS'
+  ];
+
+  // ---------------------------------------------------------------------------
+  //
+  // Messages from the IRC server are parsed for commands in another module.
+  // If raw server message is selected, that is performed in another module.
+  // Non-server messages, i.e. channel PRIVMSG are filtered in another module.
+  //
+  // Else, this is where filtered server message are formatted for display
+  // ---------------------------------------------------------------------------
+
+  // -------------------------------------------
+  // This is called to apply message formatting
+  // to IRC server message for display
+  // -------------------------------------------
+  displayFormattedServerMessage = (parsedMessage, message) => {
+    const displayUtilsEl = document.getElementById('displayUtils');
+    const displayMessage = (msg) => {
+      const panelMessageDisplayEl = this.shadowRoot.getElementById('panelMessageDisplayId');
+      panelMessageDisplayEl.value += msg + '\n';
+      // scroll to view new text
+      panelMessageDisplayEl.scrollTop = panelMessageDisplayEl.scrollHeight;
+    };
+
+    // This will skip prefix, command, and param[0], printing the rest
+    // If title provided, it will replace timestamp
+    const _showAfterParamZero = (parsedMessage, title) => {
+      let msgString = '';
+      if (parsedMessage.params.length > 1) {
+        for (let i = 1; i < parsedMessage.params.length; i++) {
+          msgString += ' ' + parsedMessage.params[i];
+        }
+      } else {
+        console.log('Error _showAfterParamZero() no parsed field');
+      }
+      let outMessage = parsedMessage.timestamp + msgString;
+      if (title) {
+        outMessage = title + msgString;
+      }
+      displayMessage(
+        displayUtilsEl.cleanFormatting(
+          displayUtilsEl.cleanCtcpDelimiter(outMessage)));
+    };
+
+    // -------------------------------------------------
+    // In first text field of message
+    // Exchange Unix seconds with HH:MM:SS time format
+    // -------------------------------------------------
+    const _substituteHmsTime = (inMessage) => {
+      const timeString = inMessage.split(' ')[0];
+      const restOfMessage = inMessage.slice(timeString.length + 1, inMessage.length);
+      const hmsString = displayUtilsEl.timestampToHMS(timeString);
+      return hmsString + ' ' + restOfMessage;
+    };
+
+    //
+    // Skip filtered messages
+    //
+    // This is to avoid message duplicates when response is
+    //    shown from individual command processing
+    if (this.ircMessageCommandDisplayFilter.indexOf(parsedMessage.command.toUpperCase()) >= 0) {
+      return;
+    } // if (filtered)
+
+    if (this.shadowRoot.getElementById('panelDivId').getAttribute('lastDate') !==
+      parsedMessage.datestamp) {
+      this.shadowRoot.getElementById('panelDivId').setAttribute('lastDate',
+        parsedMessage.datestamp);
+      this.shadowRoot.getElementById('panelMessageDisplayId').value +=
+        '\n=== ' + parsedMessage.datestamp + ' ===\n\n';
+    }
+
+    if (!window.globals.webState.cacheReloadInProgress) {
+      if ((!('zoomPanelId' in window.globals.webState)) ||
+        (window.globals.webState.zoomPanelId.length < 1)) {
+        this.showPanel();
+      }
+    }
+
+    switch (parsedMessage.command) {
+      //
+      // Server First connect messages
+      //
+      case '001':
+      case '002':
+      case '003':
+      case '004':
+        _showAfterParamZero(parsedMessage, null);
+        break;
+      case '005':
+        break;
+      case '250':
+      case '251':
+      case '252':
+      case '254':
+      case '255':
+      case '265':
+        _showAfterParamZero(parsedMessage, null);
+        break;
+
+      // Admin
+      case '256':
+      case '257':
+      case '258':
+      case '259':
+        _showAfterParamZero(parsedMessage, null);
+        break;
+      //
+      // Who response
+      //
+      case '315':
+        displayMessage('WHO --End--');
+        break;
+      case '352':
+        _showAfterParamZero(parsedMessage, 'WHO');
+        break;
+
+      //
+      // Whois response
+      //
+      case '275':
+      case '307':
+      case '311':
+      case '312':
+      case '313':
+      case '317':
+      case '319':
+      case '330':
+      case '338':
+      case '378':
+      case '379':
+      case '671':
+        _showAfterParamZero(parsedMessage, 'WHOIS');
+        break;
+      // AWAY message
+      case '301':
+        if (parsedMessage.params.length !== 3) {
+          // unexpected parse, just display verbatum from server
+          _showAfterParamZero(parsedMessage, 'WHOIS');
+        } else {
+          // else, show: WHOIS <nick> is away: <away message>
+          const outMessage = 'WHOIS ' +
+            parsedMessage.params[1] +
+            ' is away: ' +
+            parsedMessage.params[2];
+          displayMessage(
+            displayUtilsEl.cleanFormatting(
+              displayUtilsEl.cleanCtcpDelimiter(outMessage)));
+        }
+        break;
+      case '318':
+        displayMessage('WHOIS --End--');
+        break;
+
+      //
+      // LIST
+      //
+      case '322': // irc server motd
+        if (parsedMessage.params.length === 4) {
+          let outMessage = 'LIST ' +
+            parsedMessage.params[1] + ' ' +
+            parsedMessage.params[2];
+          if (parsedMessage.params[3]) {
+            outMessage += ' ' + parsedMessage.params[3];
+          };
+          displayMessage(
+            displayUtilsEl.cleanFormatting(
+              displayUtilsEl.cleanCtcpDelimiter(outMessage)));
+        } else {
+          console.log('Error Msg 322 not have 4 parsed parameters');
+        }
+        break;
+      case '321': // Start LIST
+        // displayMessage('LIST --Start--');
+        break;
+      case '323': // End LIST
+        displayMessage('LIST --End--');
+        break;
+      //
+      // VERSION TODO
+      //
+      // case '351':
+      //   _showAfterParamZero(parsedMessage, null);
+      //   break;
+      //
+      // MOTD
+      //
+      case '372': // irc server motd
+        _showAfterParamZero(parsedMessage, null);
+        break;
+      case '375': // Start MOTD
+      case '376': // End MOTD
+        break;
+
+      //
+      // IRCv3 CAP SASL authentication success messages
+      //
+      case '900':
+      case '903':
+        _showAfterParamZero(parsedMessage, null);
+        break;
+
+      case 'MODE':
+        displayMessage(
+          displayUtilsEl.cleanFormatting(
+            displayUtilsEl.cleanCtcpDelimiter(
+              parsedMessage.timestamp + ' ' +
+              'MODE ' +
+              parsedMessage.params[0] + ' ' +
+              parsedMessage.params[1])));
+        break;
+      case 'cachedNICK':
+        // Own nickname changes will be cached as channel = default
+        if (parsedMessage.params[0] === 'default') {
+          displayMessage(
+            displayUtilsEl.cleanFormatting(
+              displayUtilsEl.cleanCtcpDelimiter(
+                parsedMessage.timestamp + ' ' +
+                parsedMessage.nick + ' is now known as ' +
+                parsedMessage.params[1])));
+        }
+        break;
+      case 'NICK':
+        // Only display own nickname changes in server window
+        if (window.globals.ircState.nickName.toLowerCase() === parsedMessage.nick.toLowerCase()) {
+          displayMessage(
+            displayUtilsEl.cleanFormatting(
+              displayUtilsEl.cleanCtcpDelimiter(
+                parsedMessage.timestamp + ' ' +
+                parsedMessage.nick + ' is now known as ' +
+                parsedMessage.params[0])));
+        }
+        break;
+      case 'NOTICE':
+        displayMessage(
+          displayUtilsEl.cleanFormatting(
+            displayUtilsEl.cleanCtcpDelimiter(
+              parsedMessage.timestamp + ' ' +
+              'NOTICE ' +
+              parsedMessage.params[0] + ' ' +
+              parsedMessage.params[1])));
+
+        break;
+      // none match, use default
+      default:
+        // this is catch-all, if no formatted case, then display here
+        displayMessage(
+          displayUtilsEl.cleanFormatting(
+            displayUtilsEl.cleanCtcpDelimiter(
+              _substituteHmsTime(message))));
+    } // switch
+    //
+    // If closed, open the server window to display the server message
+    //
+    if (!window.globals.webState.cacheReloadInProgress) {
+      //
+      // Do not open and display server window for these commands.
+      //
+      // 'NICK' (users changing nickname in channel is opening the server window
+      //
+      const inhibitCommandList = [
+        'NICK',
+        'PRIVMSG'
+      ];
+      if (('command' in parsedMessage) &&
+        (typeof parsedMessage.command === 'string') &&
+        (parsedMessage.command.length > 0)) {
+        if (inhibitCommandList.indexOf(parsedMessage.command.toUpperCase()) < 0) {
+          // Not in inhibit list, go ahead and open server window, else leave closed
+          this.showPanel();
+        }
+      } else {
+        this.showPanel();
+      }
+    }
+  }; // displayFormattedServerMessage()
+
+  // //
+  // // Add cache reload message to server window
+  // //
+  // // Example:  14:33:02 -----Cache Reload-----
+  // //
+  // document.addEventListener('cache-reload-done', function (event) {
+  //   //
+  //   // If server display in raw mode, but not HEX mode, then after reloading cache
+  //   // sort the lines by the timestamp in the cached message.
+  //   // this is because multiple different cache buffers and combined
+  //   // when viewing the raw server messages.
+  //   //
+  //   if ((webState.viewRawMessages) && (!webState.showRawInHex)) {
+  //     const tempRawMessages =
+  //       document.getElementById('rawMessageDisplay').value.split('\n');
+  //     if (tempRawMessages.length > 1) {
+  //       const tempTimestampArray = [];
+  //       const tempSortIndexArray = [];
+  //       const lineCount = tempRawMessages.length;
+  //       for (let i = 0; i < lineCount; i++) {
+  //         // @time=2022-09-04T19:56:01.900Z :nickname!user@host JOIN :#myChannel
+  //         tempTimestampArray.push(new Date(
+  //           tempRawMessages[i].split(' ')[0].split('=')[1]
+  //         ));
+  //         tempSortIndexArray.push(i);
+  //       }
+  //       let tempIndex = 0;
+  //       for (let i = 0; i < lineCount; i++) {
+  //         for (let j = 0; j < lineCount - 1; j++) {
+  //           if (tempTimestampArray[tempSortIndexArray[j]] >
+  //             tempTimestampArray[tempSortIndexArray[j + 1]]) {
+  //             tempIndex = tempSortIndexArray[j];
+  //             tempSortIndexArray[j] = tempSortIndexArray[j + 1];
+  //             tempSortIndexArray[j + 1] = tempIndex;
+  //           }
+  //         } // next j
+  //       } // next i
+  //       document.getElementById('rawMessageDisplay').value = '';
+  //       for (let i = 0; i < lineCount; i++) {
+  //         document.getElementById('rawMessageDisplay').value +=
+  //           tempRawMessages[tempSortIndexArray[i]] + '\n';
+  //       }
+  //     }
+  //   } // if webState.viewRawMessages
+
+  //   let markerString = '';
+  //   let timestampString = '';
+  //   if (('detail' in event) && ('timestamp' in event.detail)) {
+  //     timestampString = unixTimestampToHMS(event.detail.timestamp);
+  //   }
+  //   if (timestampString) {
+  //     markerString += timestampString;
+  //   }
+  //   markerString += ' ' + cacheReloadString + '\n';
+
+  //   if (document.getElementById('rawMessageDisplay').value !== '') {
+  //     document.getElementById('rawMessageDisplay').value += markerString;
+  //     document.getElementById('rawMessageDisplay').scrollTop =
+  //       document.getElementById('rawMessageDisplay').scrollHeight;
+  //   }
+  // });
+
+  // document.addEventListener('cache-reload-error', function (event) {
+  //   let errorString = '\n';
+  //   let timestampString = '';
+  //   if (('detail' in event) && ('timestamp' in event.detail)) {
+  //     timestampString = unixTimestampToHMS(event.detail.timestamp);
+  //   }
+  //   if (timestampString) {
+  //     errorString += timestampString;
+  //   }
+  //   errorString += ' ' + cacheErrorString + '\n\n';
+  //   document.getElementById('rawMessageDisplay').value = errorString;
+  // });
+
   /**
    * Called once per second as task scheduler, called from js/_afterLoad.js
    */

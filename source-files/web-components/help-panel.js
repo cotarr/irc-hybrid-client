@@ -47,6 +47,26 @@ window.customElements.define('help-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible');
   };
 
+  // //
+  // // The /docs folder is optional, enabled in the configuration
+  // // If /docs is available, then un-hide a button providing a link to the documentation pages.
+  // //
+  // const docsTestUrl = '/irc/docs/index.html';
+  // const fetchOptions = {
+  //   method: 'HEAD',
+  //   headers: {
+  //     Accept: 'text/html'
+  //   }
+  // };
+  // fetch(docsTestUrl, fetchOptions)
+  //   .then((response) => {
+  //     if (response.ok) {
+  //       // Make the irc-hybrid-client documentation link button visible
+  //       document.getElementById('viewDocsButtonDiv').removeAttribute('hidden');
+  //     }
+  //   })
+  //   .catch(() => {});
+
   // ------------------
   // Main entry point
   // ------------------

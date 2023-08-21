@@ -9,6 +9,19 @@
 'use strict';
 window.customElements.define('temp-placeholder', class extends HTMLElement {
   //
+  // webclient02.js
+  // -----------------------------------------------------------------------
+  // Private Mesage windows are created dynamically and inserted into the DOM
+  // Fire this event to send channel message to listener in channel window
+  //
+  // -----------------------------------------------------------------------
+  // :nick!~user@host.domain PRIVMSG nickname :This is private text message.
+  // -----------------------------------------------------------------------
+  displayPrivateMessage = (message) => {
+    console.log('emulate message sent: ', message);
+  };
+
+  //
   // webclient.js
   playBeep1Sound = () => {
     console.log('"beep"');

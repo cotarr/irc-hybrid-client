@@ -47,6 +47,100 @@ window.customElements.define('wallops-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible');
   };
 
+  // -----------------------------------------------------
+  // Wallops messages
+  // -----------------------------------------------------
+  // Wallops (+w) messages are displayed here
+  // Note: notice window controls are in another module
+  // -----------------------------------------------------
+  displayWallopsMessage = (parsedMessage) => {
+    const panelDivEl = this.shadowRoot.getElementById('panelDivId');
+    const panelMessageDisplayEl = this.shadowRoot.getElementById('panelMessageDisplayId');
+    const _addText = (text) => {
+      panelMessageDisplayEl.value +=
+        document.getElementById('displayUtils').cleanFormatting(text) + '\n';
+      if (!window.globals.webState.cacheReloadInProgress) {
+        panelMessageDisplayEl.scrollTop = panelMessageDisplayEl.scrollHeight;
+      }
+    };
+
+    if (!window.globals.webState.cacheReloadInProgress) {
+      if ((!('zoomPanelId' in window.globals.webState)) ||
+        (window.globals.webState.zoomPanelId.length < 1)) {
+        this.showPanel();
+      }
+    }
+
+    if (panelDivEl.getAttribute('lastDate') !== parsedMessage.datestamp) {
+      panelDivEl.setAttribute('lastDate', parsedMessage.datestamp);
+      panelMessageDisplayEl.value +=
+        '\n=== ' + parsedMessage.datestamp + ' ===\n\n';
+    }
+    if (('command' in parsedMessage) && (parsedMessage.command === 'WALLOPS')) {
+      if (parsedMessage.nick) {
+        _addText(parsedMessage.timestamp + ' ' +
+          parsedMessage.nick +
+          document.getElementById('globVars').constants('nickChannelSpacer') +
+          parsedMessage.params[0]);
+      } else {
+        _addText(parsedMessage.timestamp + ' ' +
+          parsedMessage.prefix +
+          document.getElementById('globVars').constants('nickChannelSpacer') +
+          parsedMessage.params[0]);
+      }
+      if (!window.globals.webState.cacheReloadInProgress) {
+        window.globals.webState.wallopsOpen = true;
+      }
+    }
+  }; // displayWallopsMessage
+
+  // //
+  // // Clear textarea before reloading cache (Wallops window)
+  // //
+  // document.addEventListener('erase-before-reload', (event) => {
+  //   document.getElementById('wallopsMessageDisplay').value = '';
+  //   document.getElementById('wallopsSectionDiv').setAttribute('lastDate', '0000-00-00');
+  //   updateDivVisibility();
+  // });
+
+  // //
+  // // Add cache reload message to wallops window
+  // //
+  // // Example:  14:33:02 -----Cache Reload-----
+  // //
+  // document.addEventListener('cache-reload-done', (event) => {
+  //   let markerString = '';
+  //   let timestampString = '';
+  //   if (('detail' in event) && ('timestamp' in event.detail)) {
+  //     timestampString = unixTimestampToHMS(event.detail.timestamp);
+  //   }
+  //   if (timestampString) {
+  //     markerString += timestampString;
+  //   }
+  //   markerString += ' ' + cacheReloadString + '\n';
+
+  //   //
+  //   // If text area is blank, leave blank
+  //   // If not blank, then append cache reload divider.
+  //   if (document.getElementById('wallopsMessageDisplay').value !== '') {
+  //     document.getElementById('wallopsMessageDisplay').value += markerString;
+  //     document.getElementById('wallopsMessageDisplay').scrollTop =
+  //       document.getElementById('wallopsMessageDisplay').scrollHeight;
+  //   }
+  // });
+  // document.addEventListener('cache-reload-error', (event) => {
+  //   let errorString = '\n';
+  //   let timestampString = '';
+  //   if (('detail' in event) && ('timestamp' in event.detail)) {
+  //     timestampString = unixTimestampToHMS(event.detail.timestamp);
+  //   }
+  //   if (timestampString) {
+  //     errorString += timestampString;
+  //   }
+  //   errorString += ' ' + cacheErrorString + '\n\n';
+  //   document.getElementById('wallopsMessageDisplay').value = errorString;
+  // });
+
   // ------------------
   // Main entry point
   // ------------------

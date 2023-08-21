@@ -6,11 +6,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Next v2.0.0-dev 2023-08-20 (Draft)
+## Next v2.0.0-dev 2023-08-21 (Draft)
 
 Work in progress, see top of README.md
 
 Commit
+
+This was a large commit. The IRC command parser for command entering 
+from the websocket was copied into the web component 
+remote-command-parser. Function calls into the channel-panel, 
+notice-panel, wallops-panel, and irc-server-panel were setup 
+to pass messages to the panels for display after parsing.
+More debugging is needed. New web components:
+
+- show-raw
+- ctcp-parser
+
+Commit d956971
 
 - Debugged irc-controls-panel interface to: channel-panel, manage-channel-panel and header-bar 
 

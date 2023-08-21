@@ -55,6 +55,7 @@ if (!(window.customElements && document.body.attachShadow)) {
   // document.getElementById('beepSounds').initializePlugin();
   // document.getElementById('localCommandParser').initializePlugin();
   // document.getElementById('remoteCommandParser').initializePlugin();
+  // document.getElementById('ctcpParser').initializePlugin();
   document.getElementById('websocketPanel').initializePlugin();
   document.getElementById('navMenu').initializePlugin();
   document.getElementById('headerBar').initializePlugin();
@@ -89,6 +90,7 @@ if (!(window.customElements && document.body.attachShadow)) {
     // document.getElementById('beepSounds').timerTickHandler();
     // document.getElementById('localCommandParser').timerTickHandler();
     // document.getElementById('remoteCommandParser').timerTickHandler();
+    // document.getElementById('ctcpCommandParser').timerTickHandler();
     document.getElementById('websocketPanel').timerTickHandler();
     // document.getElementById('ircControlsPanel').timerTickHandler();
     // document.getElementById('ircServerPanel').timerTickHandler();

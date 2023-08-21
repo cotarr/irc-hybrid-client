@@ -1,0 +1,13 @@
+
+/* show-raw */
+
+.show-raw-theme-light {
+  background-color: #d6d6d6;
+  color: black;
+  border: 1px solid black;
+}
+.show-raw-theme-dark {
+  background-color: #747474;
+  color: white;
+  border: 1px solid white;
+}

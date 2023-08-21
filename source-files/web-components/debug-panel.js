@@ -58,7 +58,6 @@ window.customElements.define('debug-panel', class extends HTMLElement {
         'cache-reload-done',
         'cache-reload-error',
         'cancel-beep-sounds',
-        'channel-message',
         'collapse-all-panels',
         'color-theme-changed',
         'debounced-update-from-cache',
@@ -230,27 +229,8 @@ window.customElements.define('debug-panel', class extends HTMLElement {
     });
 
     this.shadowRoot.getElementById('button02Id').addEventListener('click', () => {
-      setTimeout(() => {
-        document.dispatchEvent(new CustomEvent('channel-message',
-          {
-            bubbles: true,
-            detail: {
-              parsedMessage: {
-                timestamp: '10:23:34',
-                datestamp: '2023-08-18',
-                prefix: 'myNick!~myUser@192.168.1.100',
-                nick: 'myNick',
-                host: '~myUser@~myUser@192.168.1.100',
-                command: 'PRIVMSG',
-                params: [
-                  '#myNewChannel0',
-                  'This is a channel message to channel #myNewChannel1'
-                ]
-              }
-            }
-          }));
-      }, 10);
     });
+
     this.shadowRoot.getElementById('button03Id').addEventListener('click', () => {
       window.globals.ircState.channels = [];
       window.globals.ircState.channelStates = [];
@@ -299,13 +279,11 @@ window.customElements.define('debug-panel', class extends HTMLElement {
     });
 
     this.shadowRoot.getElementById('button07Id').addEventListener('click', () => {
-      document.getElementById('displayUtils').manualRecalcPageWidth();
+      console.log('set adhoc variables');
+      window.globals.webState.showCommsMessages = true;
     });
 
     this.shadowRoot.getElementById('button08Id').addEventListener('click', () => {
-      window.globals.ircState.channelList.push('#chan' +
-        window.globals.ircState.channelList.length.toString());
-      document.dispatchEvent(new CustomEvent('irc-state-changed'));
     });
 
     this.shadowRoot.getElementById('button09Id').addEventListener('click', () => {
@@ -344,6 +322,9 @@ window.customElements.define('debug-panel', class extends HTMLElement {
     });
     this.shadowRoot.getElementById('button16Id').addEventListener('click', () => {
       document.getElementById('showWebState').showPanel();
+    });
+    this.shadowRoot.getElementById('button17Id').addEventListener('click', () => {
+      document.getElementById('showRaw').showPanel();
     });
   }; // connectedCallback()
 }); // customElements.define

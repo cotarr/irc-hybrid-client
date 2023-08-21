@@ -47,13 +47,147 @@ window.customElements.define('notice-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible');
   };
 
+  // -----------------------------------------------------
+  // Notice messages are displayed here
+  // This is to allow integration of CTCP responses
+  //
+  // Note: notice window controls are in another module
+  // -----------------------------------------------------
+  displayNoticeMessage = (parsedMessage) => {
+    const panelDivEl = this.shadowRoot.getElementById('panelDivId');
+    const panelMessageDisplayEl = this.shadowRoot.getElementById('panelMessageDisplayId');
+    const _addText = (text) => {
+      panelMessageDisplayEl.value +=
+        document.getElementById('displayUtils').cleanFormatting(text) + '\n';
+      if (!window.globals.webState.cacheReloadInProgress) {
+        panelMessageDisplayEl.scrollTop = panelMessageDisplayEl.scrollHeight;
+      }
+    };
+
+    // console.log('parsedMessage ' + JSON.stringify(parsedMessage, null, 2));
+
+    // Ignore if called with other commands (Left from version v0.2.53)
+    if (parsedMessage.command !== 'NOTICE') return;
+
+    // Ignore if called for CTCP message
+    const ctcpDelim = 1;
+    if (((parsedMessage.params.length === 2) &&
+    (parsedMessage.params[1].charCodeAt(0) === ctcpDelim)) ||
+    ((parsedMessage.params.length === 3) &&
+    (parsedMessage.params[2].charCodeAt(0) === ctcpDelim))) {
+      return;
+    }
+
+    // Ignore channel message
+    if (window.globals.ircState.channels
+      .indexOf(parsedMessage.params[0].toLowerCase()) >= 0) {
+      return;
+    };
+
+    if (!window.globals.webState.cacheReloadInProgress) {
+      if ((!('zoomPanelId' in window.globals.webState)) ||
+        (window.globals.webState.zoomPanelId.length < 1)) {
+        this.showPanel();
+      }
+    }
+
+    if (panelDivEl.getAttribute('lastDate') !== parsedMessage.datestamp) {
+      panelDivEl.setAttribute('lastDate', parsedMessage.datestamp);
+      panelMessageDisplayEl.value +=
+        '\n=== ' + parsedMessage.datestamp + ' ===\n\n';
+    }
+
+    if (parsedMessage.params[0] === window.globals.ircState.nickName) {
+      // Case of regular notice address to my nickname, not CTCP reply
+      if (parsedMessage.nick) {
+        // case of valid user nickname parse
+        _addText(parsedMessage.timestamp + ' ' +
+        parsedMessage.nick +
+          document.getElementById('globVars').constants('nickChannelSpacer') +
+          parsedMessage.params[1]);
+      } else {
+        // else must be a services server message, use prefix
+        _addText(parsedMessage.timestamp + ' ' +
+        parsedMessage.prefix +
+        document.getElementById('globVars').constants('nickChannelSpacer') +
+          parsedMessage.params[1]);
+      }
+      if (!window.globals.webState.cacheReloadInProgress) {
+        window.globals.webState.noticeOpen = true;
+      }
+      // updateDivVisibility();
+
+      // Message activity Icon
+      // If NOT reload from cache in progress (timer not zero)
+      // then display incoming message activity icon
+      // TODO
+      // if (!window.globals.webState.cacheReloadInProgress) {
+      //   setNotActivityIcon();
+      // }
+    } else if (parsedMessage.nick === window.globals.ircState.nickName) {
+      // Case of regular notice, not CTCP reply
+      _addText(parsedMessage.timestamp + ' [to] ' +
+      parsedMessage.params[0] +
+      document.getElementById('globVars').constants('nickChannelSpacer') +
+      parsedMessage.params[1]);
+      window.globals.webState.noticeOpen = true;
+      // updateDivVisibility();
+    }
+  }; // displayNoticeMessage()
+
+  // //
+  // // Clear textarea before reloading cache (Notice window)
+  // //
+  // document.addEventListener('erase-before-reload', (event) => {
+  //   document.getElementById('noticeMessageDisplay').value = '';
+  //   document.getElementById('noticeSectionDiv').setAttribute('lastDate', '0000-00-00');
+  //   document.getElementById('noticeUnreadExistIcon').setAttribute('hidden', '');
+  //   updateDivVisibility();
+  // });
+
+  // //
+  // // Add cache reload message to notice window
+  // //
+  // // Example:  14:33:02 -----Cache Reload-----
+  // //
+  // document.addEventListener('cache-reload-done', (event) => {
+  //   let markerString = '';
+  //   let timestampString = '';
+  //   if (('detail' in event) && ('timestamp' in event.detail)) {
+  //     timestampString = unixTimestampToHMS(event.detail.timestamp);
+  //   }
+  //   if (timestampString) {
+  //     markerString += timestampString;
+  //   }
+  //   markerString += ' ' + cacheReloadString + '\n';
+  //   //
+  //   // If text area is blank, leave blank
+  //   // If not blank, then append cache reload divider.
+  //   if (document.getElementById('noticeMessageDisplay').value !== '') {
+  //     document.getElementById('noticeMessageDisplay').value += markerString;
+  //     document.getElementById('noticeMessageDisplay').scrollTop =
+  //       document.getElementById('noticeMessageDisplay').scrollHeight;
+  //   }
+  // });
+
+  // document.addEventListener('cache-reload-error', (event) => {
+  //   let errorString = '\n';
+  //   let timestampString = '';
+  //   if (('detail' in event) && ('timestamp' in event.detail)) {
+  //     timestampString = unixTimestampToHMS(event.detail.timestamp);
+  //   }
+  //   if (timestampString) {
+  //     errorString += timestampString;
+  //   }
+  //   errorString += ' ' + cacheErrorString + '\n\n';
+  //   document.getElementById('noticeMessageDisplay').value = errorString;
+  // });
+
   // ------------------
   // Main entry point
   // ------------------
   initializePlugin = () => {
     // console.log('notice-panel initializePlugin');
-    this.shadowRoot.getElementById('panelMessageDisplayId').value =
-      '12:01:26 MyNickname | This is an example NOTICE message\n';
   };
 
   // add event listeners to connected callback

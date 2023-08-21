@@ -349,8 +349,9 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
           // case of CR or LF as message separator
           if (count > 0) {
             const message = data.slice(index, index + count);
-            console.log('message: ', message);
-            // TODO _parseBufferMessage(message);
+            console.log('websocketPanel:', message);
+            document.getElementById('remoteCommandParser').parseBufferMessage(message);
+            document.getElementById('showRaw').displayRawIrcServerMessage(message);
           }
           index = i + 1;
           count = 0;
