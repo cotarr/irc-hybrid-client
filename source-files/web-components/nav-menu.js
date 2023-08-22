@@ -56,7 +56,7 @@ customElements.define('nav-menu', class extends HTMLElement {
   };
 
   _handleIrcStateChanged = () => {
-    console.log('navMenu irc-state-changed event');
+    // console.log('navMenu irc-state-changed event');
     // Detect state change for IRC server connection. if changed, close the dropdown
     if (window.globals.ircState.ircConnected !== this.ircConnectedLast) {
       this.ircConnectedLast = window.globals.ircState.ircConnected;
@@ -67,7 +67,6 @@ customElements.define('nav-menu', class extends HTMLElement {
         'group01ButtonId',
         'group02ButtonId',
         'group04ButtonId',
-        'item3_2_Id',
         'item3_3_Id',
         'item3_4_Id'
       ];
@@ -97,12 +96,12 @@ customElements.define('nav-menu', class extends HTMLElement {
       }
     }
     if (changed) {
-      console.log('navMenu channel list changed, updating menu');
+      // console.log  ('navMenu channel list changed, updating menu');
       // remove previous elements
       const parentEl = this.shadowRoot.getElementById('dropdownMenuChannelContainerId');
       while (parentEl.firstChild) {
         // 1 - Remove event listener
-        console.log('removing event listener', parentEl.firstChild.id);
+        // console.log('removing event listener', parentEl.firstChild.id);
         parentEl.firstChild.removeEventListener('click', this.handleChannelClick);
         // 2 - Then delete the element from the menu
         parentEl.removeChild(parentEl.firstChild);
@@ -112,7 +111,7 @@ customElements.define('nav-menu', class extends HTMLElement {
         for (let i = 0; i < channels.length; i++) {
           // Since there are 3 layered elements here, and event.stopPropagation() is called.
           // It is necessary to add an ID to each element, but id must be unique
-          console.log('adding channel', channels[i]);
+          // console.log('adding channel', channels[i]);
           const channelMenuItem = document.createElement('div');
           channelMenuItem.id = 'channelMenu1' + channels[i];
           channelMenuItem.classList.add('nav-group01');
@@ -145,7 +144,7 @@ customElements.define('nav-menu', class extends HTMLElement {
           channelMenuItem.appendChild(channelMessageCount);
 
           this.previousChannels.push(channels[i]);
-          console.log('adding event listener');
+          // console.log('adding event listener');
           this.shadowRoot.getElementById('dropdownMenuChannelContainerId')
             .appendChild(channelMenuItem);
           channelMenuItem.addEventListener('click', this.handleChannelClick);

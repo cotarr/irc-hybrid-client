@@ -198,60 +198,15 @@ window.customElements.define('debug-panel', class extends HTMLElement {
     });
 
     this.shadowRoot.getElementById('button01Id').addEventListener('click', () => {
-      const newChannelName = '#myNewChannel';
-      window.globals.ircState.ircConnectOn = true;
-      window.globals.ircState.ircConnecting = false;
-      window.globals.ircState.ircConnected = true;
-      window.globals.ircState.ircRegistered = true;
-      window.globals.ircState.nickName = 'myNick';
-
-      window.globals.webState.webConnectOn = true;
-      window.globals.webState.webConnected = true;
-      window.globals.webState.webConnecting = false;
-      window.globals.webState.ircConnecting = false;
-
-      const newName = newChannelName + window.globals.ircState.channels.length.toString();
-      window.globals.ircState.channels.push(newName.toLowerCase());
-      window.globals.ircState.channelStates.push({
-        name: newName.toLowerCase(),
-        csName: newName,
-        topic: 'This is an example channel topic',
-        names: [
-          '#nick1',
-          '+NickName2',
-          'OtherNick3',
-          'OtherNick4'
-        ],
-        joined: true,
-        kicked: false
-      });
-      document.dispatchEvent(new CustomEvent('irc-state-changed'));
     });
 
     this.shadowRoot.getElementById('button02Id').addEventListener('click', () => {
     });
 
     this.shadowRoot.getElementById('button03Id').addEventListener('click', () => {
-      window.globals.ircState.channels = [];
-      window.globals.ircState.channelStates = [];
-      document.dispatchEvent(new CustomEvent('irc-state-changed'));
     });
 
     this.shadowRoot.getElementById('button04Id').addEventListener('click', () => {
-      setTimeout(() => {
-        if (window.globals.ircState.ircConnected) {
-          window.globals.ircState.ircConnected = false;
-          window.globals.ircState.ircConnecting = false;
-          window.globals.ircState.ircRegistered = false;
-          window.globals.ircState.channels = [];
-          window.globals.ircState.channelStates = [];
-        } else {
-          window.globals.ircState.ircConnected = true;
-          window.globals.ircState.ircConnecting = false;
-          window.globals.ircState.ircRegistered = true;
-        }
-        document.dispatchEvent(new CustomEvent('irc-state-changed'));
-      }, 10);
     });
 
     this.shadowRoot.getElementById('button05Id').addEventListener('click', () => {
@@ -279,7 +234,7 @@ window.customElements.define('debug-panel', class extends HTMLElement {
     });
 
     this.shadowRoot.getElementById('button07Id').addEventListener('click', () => {
-      console.log('set adhoc variables');
+      console.log('Adhoc Function Here');
       window.globals.webState.showCommsMessages = true;
     });
 
@@ -295,14 +250,14 @@ window.customElements.define('debug-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('button11Id').addEventListener('click', () => {
       document.dispatchEvent(new CustomEvent('hide-all-panels', {
         detail: {
-          except: ['debugPanel']
+          except: []
         }
       }));
     });
     this.shadowRoot.getElementById('button12Id').addEventListener('click', () => {
       document.dispatchEvent(new CustomEvent('collapse-all-panels', {
         detail: {
-          except: ['debugPanel']
+          except: []
         }
       }));
     });
@@ -317,14 +272,14 @@ window.customElements.define('debug-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('button14Id').addEventListener('click', () => {
       document.dispatchEvent(new CustomEvent('web-connect-changed'));
     });
-    this.shadowRoot.getElementById('button15Id').addEventListener('click', () => {
-      document.getElementById('showIrcState').showPanel();
-    });
-    this.shadowRoot.getElementById('button16Id').addEventListener('click', () => {
-      document.getElementById('showWebState').showPanel();
-    });
     this.shadowRoot.getElementById('button17Id').addEventListener('click', () => {
       document.getElementById('showRaw').showPanel();
+    });
+    this.shadowRoot.getElementById('button23Id').addEventListener('click', () => {
+      document.getElementById('showIrcState').showPanel();
+    });
+    this.shadowRoot.getElementById('button24Id').addEventListener('click', () => {
+      document.getElementById('showWebState').showPanel();
     });
   }; // connectedCallback()
 }); // customElements.define

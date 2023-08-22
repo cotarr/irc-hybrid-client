@@ -639,17 +639,6 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
         });
     });
 
-    this.shadowRoot.getElementById('forceDisconnectButtonId').addEventListener('click', () => {
-      this.forceDisconnectHandler()
-        .catch((err) => {
-          console.log(err);
-          let message = err.message || err.toString() || 'Error occurred calling /irc/connect';
-          // show only 1 line
-          message = message.split('\n')[0];
-          document.getElementById('errorPanel').showError(message);
-        });
-    });
-
     // ------------------------------------------------------
     // Quit Button handler (Send QUIT message to IRC server)
     // ------------------------------------------------------

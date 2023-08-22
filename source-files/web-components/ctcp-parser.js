@@ -92,7 +92,7 @@ window.customElements.define('ctcp-parser', class extends HTMLElement {
         // case of match my nickname
         if (parsedMessage.command.toUpperCase() === 'PRIVMSG') {
           // case of outgoing CTCP request from me to other client
-          document.getElementById('noticePanel').displayNoticeMessage(
+          document.getElementById('noticePanel').displayCtcpNoticeMessage(
             parsedMessage.timestamp + ' ' +
             'CTCP 1 Request to ' + parsedMessage.params[0] + ': ' +
             ctcpCommand + ' ' + ctcpRest);
@@ -115,7 +115,7 @@ window.customElements.define('ctcp-parser', class extends HTMLElement {
               }
             }
           }
-          document.getElementById('noticePanel').displayNoticeMessage(
+          document.getElementById('noticePanel').displayCtcpNoticeMessage(
             parsedMessage.timestamp + ' ' +
             'CTCP 2 Reply to ' + parsedMessage.params[0] + ': ' +
             ctcpCommand + ' ' + replyContents);
@@ -124,13 +124,13 @@ window.customElements.define('ctcp-parser', class extends HTMLElement {
         // case of ctcp message/reply for other remote IRC client
         if (parsedMessage.command.toUpperCase() === 'PRIVMSG') {
           // case of remote client request to me for CTCP response
-          document.getElementById('noticePanel').displayNoticeMessage(
+          document.getElementById('noticePanel').displayCtcpNoticeMessage(
             parsedMessage.timestamp + ' ' +
             'CTCP 3 Request from ' + parsedMessage.nick + ': ' +
             ctcpCommand + ' ' + ctcpRest);
         } else {
           // case of showing remote response to my CTCP request
-          document.getElementById('noticePanel').displayNoticeMessage(
+          document.getElementById('noticePanel').displayCtcpNoticeMessage(
             parsedMessage.timestamp + ' ' +
             'CTCP 4 Reply from ' +
             parsedMessage.nick + ': ' +

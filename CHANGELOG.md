@@ -12,7 +12,15 @@ Work in progress, see top of README.md
 
 Commit
 
-This was a large commit. The IRC command parser for command entering 
+The local command parser for commands entering from user input was 
+copied to the local-command-parser web component.
+Text input from the channel-panel and the irc-server-panel was 
+setup with the auto-complete functions and tested to issue commands.
+This has now reached the point to interact in both directions with the IRC server.
+
+Commit a9d9765
+
+This was a large commit. The remote IRC command parser for commands entering 
 from the websocket was copied into the web component 
 remote-command-parser. Function calls into the channel-panel, 
 notice-panel, wallops-panel, and irc-server-panel were setup 

@@ -61,7 +61,7 @@ if (!(window.customElements && document.body.attachShadow)) {
   document.getElementById('headerBar').initializePlugin();
   // document.getElementById('serverForm').initializePlugin();
   // document.getElementById('ircControlsPanel').initializePlugin();
-  // document.getElementById('ircServerPanel').initializePlugin();
+  document.getElementById('ircServerPanel').initializePlugin();
   document.getElementById('wallopsPanel').initializePlugin();
   document.getElementById('noticePanel').initializePlugin();
 
@@ -93,7 +93,7 @@ if (!(window.customElements && document.body.attachShadow)) {
     // document.getElementById('ctcpCommandParser').timerTickHandler();
     document.getElementById('websocketPanel').timerTickHandler();
     // document.getElementById('ircControlsPanel').timerTickHandler();
-    // document.getElementById('ircServerPanel').timerTickHandler();
+    document.getElementById('ircServerPanel').timerTickHandler();
     document.getElementById('manageChannelsPanel').timerTickHandler();
   }, 1000);
 

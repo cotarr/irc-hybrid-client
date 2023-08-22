@@ -17,8 +17,15 @@ window.customElements.define('temp-placeholder', class extends HTMLElement {
   // -----------------------------------------------------------------------
   // :nick!~user@host.domain PRIVMSG nickname :This is private text message.
   // -----------------------------------------------------------------------
-  displayPrivateMessage = (message) => {
-    console.log('emulate message sent: ', message);
+  displayPrivateMessage = (parsedMessage) => {
+    const ircServerPanelEl = document.getElementById('ircServerPanel');
+    if (parsedMessage.command === 'PRIVMSG') {
+      const message = parsedMessage.nick +
+        ' PRIVMSG: ' + parsedMessage.params[1];
+      console.log(message);
+      ircServerPanelEl.showPanel();
+      ircServerPanelEl.displayPlainServerMessage(message);
+    }
   };
 
   //
@@ -26,29 +33,4 @@ window.customElements.define('temp-placeholder', class extends HTMLElement {
   playBeep1Sound = () => {
     console.log('"beep"');
   };
-
-  // webclient03.js
-  sendIrcServerMessage = (message) => {
-    console.log('emulate message sent: ', message);
-  };
-
-  // webclient05.js
-  textCommandParser = (inputObj) => {
-    return {
-      error: false,
-      message: null,
-      ircMessage: 'emulated string value'
-    };
-  };
-
-  autoCompleteCommandList = [
-    '/JOIN',
-    '/PART'
-  ];
-
-  // webclient05.jps
-  autoCompleteRawCommandList = [
-    'JOIN',
-    'PART'
-  ];
 });

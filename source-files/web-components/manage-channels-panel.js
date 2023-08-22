@@ -68,7 +68,7 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
   // :nick!~user@host.domain PRIVMSG #channel :This is channel text message.
   // -----------------------------------------------------------------------
   displayChannelMessage = (parsedMessage) => {
-    console.log('manageChannelsPanel', JSON.stringify(parsedMessage, null, 2));
+    // console.log('manageChannelsPanel', JSON.stringify(parsedMessage, null, 2));
     const channelElements =
       Array.from(document.getElementById('channelsContainerId').children);
     channelElements.forEach((el) => {
@@ -312,7 +312,16 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
 
       if (window.globals.ircState.ircConnected !== this.ircConnectedLast) {
         this.ircConnectedLast = window.globals.ircState.ircConnected;
-        if (!window.globals.ircState.ircConnected) this.hidePanel();
+        if (window.globals.ircState.ircConnected) {
+          if (window.globals.ircState.channels.length === 0) {
+            this.showPanel();
+          } else {
+            this.collapsePanel();
+          }
+        } else {
+          // Changed state to disconnected hide panel
+          this.hidePanel();
+        }
       }
 
       // Check list of server's channels and create new if missing.
@@ -320,7 +329,7 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
         for (let i = 0; i < window.globals.ircState.channels.length; i++) {
           const channelName = window.globals.ircState.channels[i];
           if (window.globals.webState.channels.indexOf(channelName.toLowerCase()) === -1) {
-            console.log('Creating new channel ' + channelName);
+            // console.log('Creating new channel ' + channelName);
             this._createChannelElement(channelName);
           }
         };
@@ -358,7 +367,7 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
       // remove all channel buttons, then create them,
       // skipping any that are currently open.
       if (needButtonUpdate) {
-        console.log('Updating favorite channel buttons');
+        // console.log('Updating favorite channel buttons');
         // remove old button elements and associated event listeners
         const channelJoinButtonContainerEl =
           this.shadowRoot.getElementById('channelJoinButtonContainerId');
@@ -369,12 +378,12 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
         }
         if (window.globals.ircState.channelList.length > 0) {
           for (let i = 0; i < window.globals.ircState.channelList.length; i++) {
-            console.log('channelList[i]', window.globals.ircState.channelList[i]);
+            // console.log('channelList[i]', window.globals.ircState.channelList[i]);
             const channelIndex = window.globals.ircState.channels
               .indexOf(window.globals.ircState.channelList[i].toLowerCase());
             if ((channelIndex < 0) ||
               (!window.globals.ircState.channelStates[channelIndex].joined)) {
-              console.log('adding ' + window.globals.ircState.channelList[i]);
+              // console.log('adding ' + window.globals.ircState.channelList[i]);
               const joinButtonEl = document.createElement('button');
               joinButtonEl.textContent = window.globals.ircState.channelList[i];
               joinButtonEl.setAttribute('title', 'Join IRC Channel');

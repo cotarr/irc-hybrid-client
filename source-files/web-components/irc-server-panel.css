@@ -11,3 +11,14 @@
   border: 1px solid #ae8ed1;
   color: white;
 }
+
+.irc-server-panel-div-time {
+  border-radius: 5px;
+  padding-left: 10px;
+  margin-right: 42px;
+  margin-bottom: 10px;
+}
+.irc-server-panel-pre-time {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}

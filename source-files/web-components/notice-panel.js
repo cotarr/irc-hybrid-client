@@ -47,13 +47,45 @@ window.customElements.define('notice-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible');
   };
 
+  displayCtcpNoticeMessage = (ctcpMessage) => {
+    // console.log('ctcpMessage', ctcpMessage);
+    const panelMessageDisplayEl = this.shadowRoot.getElementById('panelMessageDisplayId');
+    panelMessageDisplayEl.value +=
+      document.getElementById('displayUtils').cleanFormatting(ctcpMessage) + '\n';
+
+    if (!window.globals.webState.cacheReloadInProgress) {
+      if ((!('zoomPanelId' in window.globals.webState)) ||
+        (window.globals.webState.zoomPanelId.length < 1)) {
+        this.showPanel();
+      }
+    }
+
+    if (!window.globals.webState.cacheReloadInProgress) {
+      panelMessageDisplayEl.scrollTop = panelMessageDisplayEl.scrollHeight;
+    }
+  };
+
   // -----------------------------------------------------
   // Notice messages are displayed here
   // This is to allow integration of CTCP responses
   //
   // Note: notice window controls are in another module
-  // -----------------------------------------------------
+  // {
+  //   "timestamp": "11:39:42",
+  //   "datestamp": "2023-08-22",
+  //   "prefix": "sendingNick!~userl@192.168.1.100",
+  //   "nick": "sendingNick",
+  //   "host": "~userl@192.168.1.100",
+  //   "command": "NOTICE",
+  //   "params": [
+  //     "receivingNick",
+  //     "Notice message text example."
+  //   ]
+  // }
+  // // -----------------------------------------------------
   displayNoticeMessage = (parsedMessage) => {
+    // console.log(JSON.stringify(parsedMessage, null, 2));
+    console.log(parsedMessage);
     const panelDivEl = this.shadowRoot.getElementById('panelDivId');
     const panelMessageDisplayEl = this.shadowRoot.getElementById('panelMessageDisplayId');
     const _addText = (text) => {
@@ -112,10 +144,6 @@ window.customElements.define('notice-panel', class extends HTMLElement {
         document.getElementById('globVars').constants('nickChannelSpacer') +
           parsedMessage.params[1]);
       }
-      if (!window.globals.webState.cacheReloadInProgress) {
-        window.globals.webState.noticeOpen = true;
-      }
-      // updateDivVisibility();
 
       // Message activity Icon
       // If NOT reload from cache in progress (timer not zero)
@@ -130,8 +158,6 @@ window.customElements.define('notice-panel', class extends HTMLElement {
       parsedMessage.params[0] +
       document.getElementById('globVars').constants('nickChannelSpacer') +
       parsedMessage.params[1]);
-      window.globals.webState.noticeOpen = true;
-      // updateDivVisibility();
     }
   }; // displayNoticeMessage()
 

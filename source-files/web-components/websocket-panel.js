@@ -187,12 +187,12 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
 
     // Counter to avoid duplication of websockets
     window.globals.webState.websocketCount++;
-    console.log('Creating new websocket, count: ' + window.globals.webState.websocketCount);
+    // console.log('Creating new websocket, count: ' + window.globals.webState.websocketCount);
     // -----------------------
     // On Open event handler
     // -----------------------
     window.globals.wsocket.addEventListener('open', (event) => {
-      console.log('Websocket open, count: ' + window.globals.webState.websocketCount);
+      // console.log('Websocket open, count: ' + window.globals.webState.websocketCount);
       window.globals.webState.webConnected = true;
       window.globals.webState.webConnecting = false;
       window.globals.webState.times.webConnect = Math.floor(Date.now() / 1000);
@@ -212,11 +212,7 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
           this.shadowRoot.getElementById('reconnectStatusDivId').textContent =
             'Websocket opened successfully\n';
           this.hidePanel();
-
-          // Temporary TODO
-          document.getElementById('debugPanel').showPanel();
-
-          // Web socket connected, request update from cache
+          // panels will update new contents from cache
           document.dispatchEvent(new CustomEvent('update-from-cache', { bubbles: true }));
         })
         .catch((err) => {
@@ -349,7 +345,7 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
           // case of CR or LF as message separator
           if (count > 0) {
             const message = data.slice(index, index + count);
-            console.log('websocketPanel:', message);
+            // console.log('websocketPanel:', message);
             document.getElementById('remoteCommandParser').parseBufferMessage(message);
             document.getElementById('showRaw').displayRawIrcServerMessage(message);
           }

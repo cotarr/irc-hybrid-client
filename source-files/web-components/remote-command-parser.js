@@ -239,6 +239,8 @@ window.customElements.define('remote-command-parser', class extends HTMLElement 
   // then parse the command and relevant actions accordingly.
   // -------------------------------------------------------------
   parseBufferMessage = (message) => {
+    const errorPanelEl = document.getElementById('errorPanel');
+    const ircServerPanelEl = document.getElementById('ircServerPanel');
     if (message === 'HEARTBEAT') {
       // 1) Check if websocket heartbeat
       // console.log('heartbeat');
@@ -246,7 +248,7 @@ window.customElements.define('remote-command-parser', class extends HTMLElement 
     } else if (message === 'UPDATE') {
       // 2) Else check if backend requests browser to
       //       poll the state API and update
-      console.log('update');
+      // console.log('update');
       // calling this updates state itself
       document.getElementById('ircControlsPanel').getIrcState()
         .catch((err) => {
@@ -254,7 +256,7 @@ window.customElements.define('remote-command-parser', class extends HTMLElement 
           let message = err.message || err.toString() || 'Error occurred calling /irc/connect';
           // show only 1 line
           message = message.split('\n')[0];
-          document.getElementById('errorPanel').showError(message);
+          errorPanelEl.showError(message);
         });
     } else if (message === 'CACHERESET') {
       // 3) Else check if cache has been erased on the web server
@@ -300,10 +302,26 @@ window.customElements.define('remote-command-parser', class extends HTMLElement 
         // and show error only if condition not expired
         if (timeNowSeconds - timeMessageSeconds <
           // TODO does this pull seconds?
-          document.getElementById('errorPanel').errorExpireSeconds) {
-          document.getElementById('errorPanel').showError(errStr);
+          errorPanelEl.errorExpireSeconds) {
+          errorPanelEl.showError(errStr);
         }
       };
+
+      // Copies of outgoing message are echoed back by the web server prefixed by '--> '.
+      // These return messages should not be parsed as IRC commands, abort...
+      if (message.split(' ')[0] === '-->') {
+        return;
+      }
+
+      // Misc server messages prefixed with 'Webserver: ' should not be exposed to parser
+      if (message.split(' ')[0] === 'webServer:') {
+        return;
+      }
+      // Misc server messages prefixed with 'Webserver: ' should not be exposed to parser
+      if (message.split(' ')[0] === 'webError:') {
+        if (message.length > 10) errorPanelEl.showError(message.slice(10));
+        return;
+      }
 
       //
       // Main Parser
@@ -311,12 +329,14 @@ window.customElements.define('remote-command-parser', class extends HTMLElement 
       // parse message into: prefix, command, and param array
       //
       const parsedMessage = this._parseIrcMessage(message);
+      // ---------------------------
+      // Show parsed message for debug
+      // ---------------------------
       // console.log('parsedMessage' + JSON.stringify(parsedMessage, null, 2));
 
       //
       // Send message to IRC server panel for display of formatted IRC messages
-      document.getElementById('ircServerPanel')
-        .displayFormattedServerMessage(parsedMessage, message);
+      ircServerPanelEl.displayFormattedServerMessage(parsedMessage, message);
       //
       // Check if server is responding with error code
       //
@@ -348,8 +368,7 @@ window.customElements.define('remote-command-parser', class extends HTMLElement 
           if (parsedMessage.params[0] === window.globals.ircState.nickName) {
             // Case of me, my MODE has changed
             if (!window.globals.webState.viewRawMessages) {
-              document.getElementById('ircServerPanel')
-                .displayFormattedServerMessage(parsedMessage, message);
+              ircServerPanelEl.displayFormattedServerMessage(parsedMessage, message);
             }
           } else if (document.getElementById('globVars').constants('channelPrefixChars')
             .indexOf(parsedMessage.params[0].charAt(0)) >= 0) {
@@ -361,13 +380,11 @@ window.customElements.define('remote-command-parser', class extends HTMLElement 
           break;
         case 'cachedNICK':
           document.getElementById('manageChannelsPanel').displayChannelMessage(parsedMessage);
-          document.getElementById('ircServerPanel')
-            .displayFormattedServerMessage(parsedMessage, message);
+          ircServerPanelEl.displayFormattedServerMessage(parsedMessage, message);
           break;
         case 'NICK':
           document.getElementById('manageChannelsPanel').displayChannelMessage(parsedMessage);
-          document.getElementById('ircServerPanel')
-            .displayFormattedServerMessage(parsedMessage, message);
+          ircServerPanelEl.displayFormattedServerMessage(parsedMessage, message);
           break;
         case 'PART':
           document.getElementById('manageChannelsPanel')
@@ -376,8 +393,7 @@ window.customElements.define('remote-command-parser', class extends HTMLElement 
         case 'NOTICE':
           if ((!parsedMessage.nick) || (parsedMessage.nick.length === 0)) {
             // case of server messages, check raw disply to avoid duplication in server window
-            document.getElementById('ircServerPanel')
-              .displayFormattedServerMessage(parsedMessage, message);
+            ircServerPanelEl.displayFormattedServerMessage(parsedMessage, message);
           } else {
             const ctcpDelim = 1;
             if (parsedMessage.params[1] === null) parsedMessage.params[1] = '';
@@ -414,8 +430,7 @@ window.customElements.define('remote-command-parser', class extends HTMLElement 
                 // but that is no matching active channel,
                 // Therefore, message is in cache buffer, but channel no longer exist
                 // so show the message in the server window.
-                document.getElementById('ircServerPanel')
-                  .displayFormattedServerMessage(parsedMessage, message);
+                ircServerPanelEl.displayFormattedServerMessage(parsedMessage, message);
               } else {
                 // else case of private message, who in provate message window.
                 document.getElementById('tempPlaceholder').displayPrivateMessage(parsedMessage);

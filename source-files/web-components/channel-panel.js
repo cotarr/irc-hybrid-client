@@ -95,7 +95,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
         // Check slash character to see if it is an IRC command
         if (text.charAt(0) === '/') {
           // yes, it is command
-          const commandAction = document.getElementById('tempPlaceholder').textCommandParser(
+          const commandAction = document.getElementById('localCommandParser').textCommandParser(
             {
               inputString: text,
               originType: 'channel',
@@ -686,9 +686,9 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     const trailingSpaceKey = 32;
     const panelMessageInputEl = this.shadowRoot.getElementById('panelMessageInputId');
     const autoCompleteCommandList =
-      document.getElementById('tempPlaceholder').autoCompleteCommandList;
+      document.getElementById('localCommandParser').autoCompleteCommandList;
     const autoCompleteRawCommandList =
-      document.getElementById('tempPlaceholder').autoCompleteRawCommandList;
+      document.getElementById('localCommandParser').autoCompleteRawCommandList;
     const nicknamePrefixChars = document.getElementById('globVars')
       .constants('nicknamePrefixChars');
     // parse last space character delimitered string
@@ -1405,7 +1405,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
   // For each channel, handle changes in the ircState object
   //
   _handleIrcStateChanged = () => {
-    console.log('channel-panel Event: irc-state-changed changed element: ' + this.channelName);
+    // console.log('channel-panel Event: irc-state-changed changed element: ' + this.channelName);
     // console.log('connected ', window.globals.ircState.ircConnected);
     // console.log('name: ', this.channelName);
     // console.log(JSON.stringify(window.globals.ircState.channels));
