@@ -138,12 +138,8 @@ window.customElements.define('glob-vars', class extends HTMLElement {
     window.globals.webState.webConnected = false;
     window.globals.webState.webConnecting = false;
     window.globals.webState.ircConnecting = false;
+    window.globals.webState.ircServerEditOpen = false;
     window.globals.webState.websocketCount = 0;
-    window.globals.webState.noticeOpen = false;
-    window.globals.webState.wallopsOpen = false;
-    window.globals.webState.viewRawMessages = false;
-    window.globals.webState.showRawInHex = false;
-    window.globals.webState.showCommsMessages = false;
     window.globals.webState.lastIrcServerIndex = -1;
 
     // Some IRC channel local variables (most in ircState)

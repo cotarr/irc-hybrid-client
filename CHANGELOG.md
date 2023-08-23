@@ -10,7 +10,16 @@ and this project adheres to
 
 Work in progress, see top of README.md
 
-Commit
+The IRC server list editor was previous an independent 
+web page at /irc/serverlist.html. 
+It is being integrated to the main app.
+The IRC server configuration editor HTML form and JavaScript
+was copied to the server-form web component.
+Temporary buttons were added to the irc-controls-panel
+to perform an edit of the IRC server at index 0.
+There is no capability change index at this time.
+
+Commit 02240fb
 
 The local command parser for commands entering from user input was 
 copied to the local-command-parser web component.

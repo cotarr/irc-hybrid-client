@@ -182,6 +182,15 @@ customElements.define('header-bar', class extends HTMLElement {
     } else {
       ircConnectIconEl.title = 'Connect to the currently selected IRC server';
     }
+    const titleDivEl = this.shadowRoot.getElementById('titleDivId');
+    if (window.globals.ircState.ircConnected) {
+      titleDivEl.textContent =
+        // 'irc-hybrid-client ' +
+        window.globals.ircState.ircServerName + '(' +
+        window.globals.ircState.nickName + ')';
+    } else {
+      titleDivEl.textContent = 'irc-hybrid-client';
+    }
   }; //  _updateDynamicElementTitles()
 
   updateStatusIcons = () => {

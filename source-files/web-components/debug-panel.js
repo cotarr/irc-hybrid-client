@@ -235,7 +235,6 @@ window.customElements.define('debug-panel', class extends HTMLElement {
 
     this.shadowRoot.getElementById('button07Id').addEventListener('click', () => {
       console.log('Adhoc Function Here');
-      window.globals.webState.showCommsMessages = true;
     });
 
     this.shadowRoot.getElementById('button08Id').addEventListener('click', () => {

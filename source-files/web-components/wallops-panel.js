@@ -88,9 +88,6 @@ window.customElements.define('wallops-panel', class extends HTMLElement {
           document.getElementById('globVars').constants('nickChannelSpacer') +
           parsedMessage.params[0]);
       }
-      if (!window.globals.webState.cacheReloadInProgress) {
-        window.globals.webState.wallopsOpen = true;
-      }
     }
   }; // displayWallopsMessage
 

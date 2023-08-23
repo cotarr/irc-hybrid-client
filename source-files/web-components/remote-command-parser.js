@@ -367,9 +367,7 @@ window.customElements.define('remote-command-parser', class extends HTMLElement 
         case 'MODE':
           if (parsedMessage.params[0] === window.globals.ircState.nickName) {
             // Case of me, my MODE has changed
-            if (!window.globals.webState.viewRawMessages) {
-              ircServerPanelEl.displayFormattedServerMessage(parsedMessage, message);
-            }
+            ircServerPanelEl.displayFormattedServerMessage(parsedMessage, message);
           } else if (document.getElementById('globVars').constants('channelPrefixChars')
             .indexOf(parsedMessage.params[0].charAt(0)) >= 0) {
             // Case of channel name

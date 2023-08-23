@@ -11,3 +11,73 @@
   border: 1px solid #7ac4cf;
   color: white;
 }
+
+.server-form-input-group {
+  background-color: #d7fcee;
+  border: 1px solid black;
+  border-radius: 7px;
+  padding-top: 0px;
+  padding-left: 10px;
+  padding-bottom: 10px;
+}
+.server-form-input-group2 {
+  background-color: #c4deff;
+  border: 1px solid black;
+  border-radius: 7px;
+  padding-top: 0px;
+  padding-left: 10px;
+  padding-bottom: 10px;
+}
+
+.server-form-yellow-warning-div {
+  background-color: yellow;
+  border: 1px solid black;
+  border-radius: 7px;
+  margin-top: 10px;
+  margin-right: 10px;
+  padding: 10px;
+}
+
+.server-form-white-example-div {
+  background-color: white;
+  border: 1px solid black;
+  display: inline-block;
+  margin-top: 3px;
+  padding-top: 0px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.server-form-white-info-div {
+  background-color: white;
+  border: 1px solid black;
+  margin-top: 3px;
+  margin-bottom: 10px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+input[type='number'].server-form-group-input {
+  width: 50px;
+}
+
+input[type='number'].server-form-port-input {
+  width: 75px;
+}
+
+.server-form-required-input {
+  background-color: black;
+  border-radius: 5px;
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  margin-right: 3px;
+}
+.server-form-optional-input {
+  background-color: rgba(0,0,0,0);
+  border-radius: 5px;
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  margin-right: 3px;
+}

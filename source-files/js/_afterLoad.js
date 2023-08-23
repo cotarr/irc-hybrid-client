@@ -59,8 +59,8 @@ if (!(window.customElements && document.body.attachShadow)) {
   document.getElementById('websocketPanel').initializePlugin();
   document.getElementById('navMenu').initializePlugin();
   document.getElementById('headerBar').initializePlugin();
-  // document.getElementById('serverForm').initializePlugin();
-  // document.getElementById('ircControlsPanel').initializePlugin();
+  document.getElementById('serverForm').initializePlugin();
+  document.getElementById('ircControlsPanel').initializePlugin();
   document.getElementById('ircServerPanel').initializePlugin();
   document.getElementById('wallopsPanel').initializePlugin();
   document.getElementById('noticePanel').initializePlugin();

@@ -847,6 +847,8 @@ window.customElements.define('irc-server-panel', class extends HTMLElement {
           this.hidePanel();
         }
       }
+      this.shadowRoot.getElementById('programVersionDiv').textContent =
+        ' version-' + window.globals.ircState.progVersion;
     });
 
     /**

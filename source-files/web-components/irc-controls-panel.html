@@ -8,18 +8,25 @@
       <div>
         <button id="closePanelButtonId" title="Hide Panel" class="global-show-hide-button">x</button>
         <button id="collapsePanelButtonId" title="Collapse Panel to Bar" class="global-show-hide-button mr5">&#8645;</button>
-        <span>IRC Controls</span>
+        <span id="panelTitleDivId">IRC Controls</span>
       </div>      
       <div id="panelCollapsedDivId" class="global-visibility-div">
+        <div>
+          <button id="editServerButtonId" class="mr10">Edit Server (Index 0)</button>
+          <button id="newServerButtonId" class="mr10" >New Server</button>
+          <button id="forceUnlockButtonId" class="mr10">Force Unlock</button>
+        </div>
         <div class="vh20"></div>
-        <div>Collapsed panel here</div>
-        <div>Collapsed panel here</div>
-        <div>Collapsed panel here</div>
+        <div>Temporary Placeholder (TBD)</div>
+        <div class="vh10"></div>
+        <div>
+          <input type="text" id="nickNameInputId" value="">
+          <div class="global-inline-block">Nickname</div>
+        </div>
         <div class="vh20"></div>
         <div>
-          <button id="connectButtonId" class="mr10">Connect</button>
+          <button id="connectButtonId" class="mr10">Connect (Index 0)</button>
           <button id="quitButtonId" class="mr10">Disconnect</button>
-          <button id="editServerButtonId" class="mr10">Edit Server</button>
         </div>
         <div class="vh20"></div>
       </div>

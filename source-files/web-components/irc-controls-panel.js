@@ -54,6 +54,30 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('panelCollapsedDivId').removeAttribute('visible');
   };
 
+  enableConnectButtons = () => {
+    // TODO some conditional logic needed
+    this.shadowRoot.getElementById('connectButtonId').removeAttribute('disabled');
+  };
+
+  disableConnectButtons = () => {
+    // TODO some conditional logic needed
+    this.shadowRoot.getElementById('connectButtonId').setAttribute('disabled', '');
+  };
+
+  enableEditButtons = () => {
+    // TODO some conditional logic needed
+    this.shadowRoot.getElementById('editServerButtonId').removeAttribute('disabled');
+    this.shadowRoot.getElementById('newServerButtonId').removeAttribute('disabled');
+    this.shadowRoot.getElementById('forceUnlockButtonId').removeAttribute('disabled');
+  };
+
+  disableEditButtons = () => {
+    // TODO some conditional logic needed
+    this.shadowRoot.getElementById('editServerButtonId').setAttribute('disabled', '');
+    this.shadowRoot.getElementById('newServerButtonId').setAttribute('disabled', '');
+    this.shadowRoot.getElementById('forceUnlockButtonId').setAttribute('disabled', '');
+  };
+
   /**
    * Check if connected to IRC.
    * 1 = browser connect to web server only
@@ -136,7 +160,8 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
             window.globals.webState.ircConnecting = false;
 
             // TODO update panel display items
-            document.title = 'IRC-' + window.globals.ircState.ircServerName;
+            document.title = 'IRC-' + window.globals.ircState.ircServerName +
+              '(' + window.globals.ircState.nickName + ')';
           } // if (ircState.ircConnected) {
           if (!window.globals.ircState.ircConnected) {
             // If no server list, show message and link button to add new servers
@@ -168,10 +193,6 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
             // clear browser side connecting flag
             window.globals.webState.ircConnecting = false;
           }
-
-          // TODO
-          // document.getElementById('programVersionDiv').textContent =
-          //   ' version-' + ircState.progVersion
 
           // Fire custom event
           document.dispatchEvent(new CustomEvent('irc-state-changed'));
@@ -298,6 +319,9 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
    * @returns {promise} Returns promise resolving to null, else reject error
    */
   connectHandler = () => {
+    if (window.globals.webState.ircServerEditOpen) {
+      return Promise.reject(new Error('Connection not allowed during IRC server edit.'));
+    }
     return new Promise((resolve, reject) => {
       // Are we connected to web server?
       if (!this.checkConnect(1)) return;
@@ -324,7 +348,7 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
       const connectObject = {};
       // The username is set only in the config file
 
-      connectObject.nickName = window.globals.ircState.nickName;
+      connectObject.nickName = this.shadowRoot.getElementById('nickNameInputId').value;
       connectObject.realName = window.globals.ircState.realName;
       connectObject.userMode = window.globals.ircState.userMode;
 
@@ -602,8 +626,20 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
   // ------------------
   // Main entry point
   // ------------------
-  // initializePlugin = () => {
-  // }; // initializePlugin()
+  initializePlugin = () => {
+    // Set descriptive button titles
+    this.shadowRoot.getElementById('editServerButtonId').setAttribute('title',
+      'Opens form to edit IRC server configuration');
+    this.shadowRoot.getElementById('newServerButtonId').setAttribute('title',
+      'Opens form to create a new IRC server configuration');
+    this.shadowRoot.getElementById('forceUnlockButtonId').setAttribute('title',
+      'Press to unlock database. Refreshing or leaving editor ' +
+      'form during edit can leave database locked.');
+    this.shadowRoot.getElementById('connectButtonId').setAttribute('title',
+      'Connect to the IRC network');
+    this.shadowRoot.getElementById('quitButtonId').setAttribute('title',
+      'Disconnect (/QUIT) from the IRC network.');
+  }; // initializePlugin()
 
   // add event listeners to connected callback
   // -------------------------------------------
@@ -625,10 +661,86 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
     });
 
     this.shadowRoot.getElementById('editServerButtonId').addEventListener('click', () => {
-      document.getElementById('serverForm').showPanel();
+      const serverFormEl = document.getElementById('serverForm');
+      const index = 0;
+      this.disableConnectButtons();
+      this.disableEditButtons();
+      // test if locked by attempting to lock it
+      serverFormEl.fetchServerList(index, 1)
+        // was not locked, unlock before requesting edit
+        .then(() => { serverFormEl.fetchServerList(index, 0); })
+        // this returns leaving page open.
+        .then(() => { serverFormEl.editIrcServerAtIndex(index); })
+        .catch((err) => {
+          console.log(err);
+          let message = err.message || err.toString() ||
+            'Error attempting edit IRC server';
+          // limit to 1 line
+          message = message.split('\n')[0];
+          if (err.status === 409) {
+            document.getElementById('errorPanel').showError('Database Locked');
+          } else if (err.status === 405) {
+            document.getElementById('errorPanel').showError('Database Disabled');
+          } else {
+            document.getElementById('errorPanel').showError(message);
+          }
+          this.enableConnectButtons();
+          this.enableEditButtons();
+        });
+    });
+
+    this.shadowRoot.getElementById('newServerButtonId').addEventListener('click', () => {
+      const serverFormEl = document.getElementById('serverForm');
+      this.disableConnectButtons();
+      this.disableEditButtons();
+      // test if locked by attempting to lock it
+      serverFormEl.fetchServerList(0, 1)
+        // was not locked, unlock before requesting edit
+        .then(() => { serverFormEl.fetchServerList(0, 0); })
+        // this returns leaving page open.
+        .then(() => { serverFormEl.createNewIrcServer(); })
+        .catch((err) => {
+          console.log(err);
+          let message = err.message || err.toString() ||
+            'Error attempting to create new IRC server';
+          // limit to 1 line
+          message = message.split('\n')[0];
+          if (err.status === 409) {
+            document.getElementById('errorPanel').showError('Database Locked');
+          } else if (err.status === 405) {
+            document.getElementById('errorPanel').showError('Database Disabled');
+          } else {
+            document.getElementById('errorPanel').showError(message);
+          }
+          this.enableConnectButtons();
+          this.enableEditButtons();
+        });
+    });
+
+    this.shadowRoot.getElementById('forceUnlockButtonId').addEventListener('click', () => {
+      const serverFormEl = document.getElementById('serverForm');
+      serverFormEl.fetchServerList(0, 0)
+        .then(() => {
+          console.log('Database: unlock successful');
+          window.globals.webState.ircServerEditOpen = false;
+          this.enableConnectButtons();
+          this.enableEditButtons();
+        })
+        .catch((err) => {
+          console.log(err);
+          let message = err.message || err.toString() ||
+            'Error attempting to create new IRC server';
+          // limit to 1 line
+          message = message.split('\n')[0];
+          document.getElementById('errorPanel').showError(message);
+        });
     });
 
     this.shadowRoot.getElementById('connectButtonId').addEventListener('click', () => {
+      if (this.shadowRoot.getElementById('nickNameInputId').value.length < 1) {
+        document.getElementById('errorPanel').showError('Invalid nick name.');
+        return;
+      }
       this.connectHandler()
         .catch((err) => {
           console.log(err);
@@ -757,6 +869,34 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
         } else {
           this.showPanel();
         }
+      }
+      if (window.globals.ircState.ircConnected) {
+        this.shadowRoot.getElementById('nickNameInputId').value =
+          window.globals.ircState.nickName;
+      } else {
+        // ircServerIndex -1 if server list empty
+        if (window.globals.ircState.ircServerIndex >= 0) {
+          this.shadowRoot.getElementById('nickNameInputId').value =
+            window.globals.ircState.nickName;
+        }
+      }
+      if (window.globals.ircState.ircConnected) {
+        this.disableConnectButtons();
+        this.disableEditButtons();
+      } else {
+        this.enableConnectButtons();
+        if (window.globals.ircServerEditOpen) {
+          this.disableEditButtons();
+        } else {
+          this.enableEditButtons();
+        }
+      }
+      if (window.globals.ircState.ircConnected) {
+        this.shadowRoot.getElementById('panelTitleDivId').textContent =
+          'Connected: ' + window.globals.ircState.ircServerName + '(' +
+          window.globals.ircState.nickName + ')';
+      } else {
+        this.shadowRoot.getElementById('panelTitleDivId').textContent = 'IRC Controls';
       }
     });
 
