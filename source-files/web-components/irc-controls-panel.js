@@ -660,8 +660,12 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
       }
     });
 
+    this.shadowRoot.getElementById('showServerListButtonId').addEventListener('click', () => {
+      document.getElementById('serverListPanel').showPanel();
+    });
+
     this.shadowRoot.getElementById('editServerButtonId').addEventListener('click', () => {
-      const serverFormEl = document.getElementById('serverForm');
+      const serverFormEl = document.getElementById('serverFormPanel');
       const index = 0;
       this.disableConnectButtons();
       this.disableEditButtons();
@@ -690,7 +694,7 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
     });
 
     this.shadowRoot.getElementById('newServerButtonId').addEventListener('click', () => {
-      const serverFormEl = document.getElementById('serverForm');
+      const serverFormEl = document.getElementById('serverFormPanel');
       this.disableConnectButtons();
       this.disableEditButtons();
       // test if locked by attempting to lock it
@@ -718,7 +722,7 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
     });
 
     this.shadowRoot.getElementById('forceUnlockButtonId').addEventListener('click', () => {
-      const serverFormEl = document.getElementById('serverForm');
+      const serverFormEl = document.getElementById('serverFormPanel');
       serverFormEl.fetchServerList(0, 0)
         .then(() => {
           console.log('Database: unlock successful');

@@ -23,10 +23,10 @@
 //
 // ------------------------------------------------------------------------------
 'use strict';
-window.customElements.define('server-form', class extends HTMLElement {
+window.customElements.define('server-form-panel', class extends HTMLElement {
   constructor () {
     super();
-    const template = document.getElementById('serverFormTemplate');
+    const template = document.getElementById('serverFormPanelTemplate');
     const templateContent = template.content;
     this.attachShadow({ mode: 'open' })
       .appendChild(templateContent.cloneNode(true));

@@ -6,9 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Next v2.0.0-dev 2023-08-21 (Draft)
+## Next v2.0.0-dev 2023-08-23 (Draft)
 
 Work in progress, see top of README.md
+
+Commit 
+
+- renamed server-form.css server-form-panel.css
+- renamed server-form.html server-form-panel.html
+- renamed server-form.js server-form-panel.js (updated references)
+
+Created new web component server-list-panel, blank template for now.
+
+Commit 8b63dca
 
 The IRC server list editor was previous an independent 
 web page at /irc/serverlist.html. 

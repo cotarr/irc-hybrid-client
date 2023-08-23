@@ -67,8 +67,8 @@ customElements.define('nav-menu', class extends HTMLElement {
         'group01ButtonId',
         'group02ButtonId',
         'group04ButtonId',
-        'item3_3_Id',
-        'item3_4_Id'
+        'item3_4_Id',
+        'item3_5_Id'
       ];
       if (window.globals.ircState.ircConnected) {
         menuIdList.forEach((menuId) => {
@@ -269,31 +269,36 @@ customElements.define('nav-menu', class extends HTMLElement {
 
     this.shadowRoot.getElementById('item3_1_Id').addEventListener('click', (event) => {
       event.stopPropagation();
-      document.getElementById('ircControlsPanel').showPanel();
+      document.getElementById('serverListPanel').showPanel();
       this.closeDropdownMenu();
     });
     this.shadowRoot.getElementById('item3_2_Id').addEventListener('click', (event) => {
       event.stopPropagation();
-      document.getElementById('ircServerPanel').showPanel();
+      document.getElementById('ircControlsPanel').showPanel();
       this.closeDropdownMenu();
     });
     this.shadowRoot.getElementById('item3_3_Id').addEventListener('click', (event) => {
       event.stopPropagation();
-      document.getElementById('wallopsPanel').showPanel();
+      document.getElementById('ircServerPanel').showPanel();
       this.closeDropdownMenu();
     });
     this.shadowRoot.getElementById('item3_4_Id').addEventListener('click', (event) => {
       event.stopPropagation();
-      document.getElementById('noticePanel').showPanel();
+      document.getElementById('wallopsPanel').showPanel();
       this.closeDropdownMenu();
     });
     this.shadowRoot.getElementById('item3_5_Id').addEventListener('click', (event) => {
+      event.stopPropagation();
+      document.getElementById('noticePanel').showPanel();
+      this.closeDropdownMenu();
+    });
+    this.shadowRoot.getElementById('item3_6_Id').addEventListener('click', (event) => {
       event.stopPropagation();
       document.getElementById('helpPanel').showPanel();
       document.dispatchEvent(new CustomEvent('global-scroll-to-top'));
       this.closeDropdownMenu();
     });
-    this.shadowRoot.getElementById('item3_6_Id').addEventListener('click', (event) => {
+    this.shadowRoot.getElementById('item3_7_Id').addEventListener('click', (event) => {
       event.stopPropagation();
       document.getElementById('debugPanel').showPanel();
       this.closeDropdownMenu();
