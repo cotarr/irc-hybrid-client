@@ -11,26 +11,52 @@
         <span id="panelTitleDivId">IRC Controls</span>
       </div>      
       <div id="panelCollapsedDivId" class="global-visibility-div">
+        <div class="vh10"></div>
+        <div id="editorOpenWarningDivId" class="irc-controls-panel-warning-div" hidden>
+          <h3>Editor is OPEN</h3>
+          <p>
+            The IRC server edit form is currently open (scroll up).
+            The edit form must be closed in order to connect to IRC.
+            Finish the current edit and press either [Save] or [Cancel].
+          </p>
+        </div>
+         <div id="emptyTableWarningDivId" class="irc-controls-panel-warning-div" hidden>
+          <h2>No IRC Servers Available</h2>
+          <p>
+            At least 1 IRC server must be defined and not disabled.
+          </p>
+          <ul>
+            <li>Click the [Show IRC Server List] button.</li>
+            <li>If the server list is empty, click the [Create New IRC Server] button.</li>
+            <li>Check the &quot;(X) Disabled&quot; checkboxes and make sure at least 1 is not disabled.</li>
+          </ul>
+        </div>
+
+        <div class="vh10"></div>
         <div>
           <button id="showServerListButtonId" class="mr10">Show IRC Server List</button>
         </div>
-        <div class="vh10"></div>
-        <div>
-          <button id="editServerButtonId" class="mr10">Edit Server (Index 0)</button>
-          <button id="newServerButtonId" class="mr10" >New Server</button>
+        <div class="ml20">
+          <h3>Selected IRC Server</h3>
+          <div>
+            <!-- dynamically inserted content -->
+            <pre id="selectedServerPreId"></pre>
+          </div>
+          <div>
+            <input type="text" id="nickNameInputId" value="">
+            <div class="global-inline-block">Nickname</div>
+          </div>
+          <div class="vh10"></div>
+          <div>
+            <button id="connectButtonId" class="mr10">Connect</button>
+            <button id="quitButtonId" class="mr10">Disconnect</button>
+          </div>
+        </div>
+        <div id="hiddenEditButtonsDivId">
+          <div class="vh20"></div>
+          <div class="vh20"></div>
+          <button id="editServerButtonId" class="mr10">Edit Selected Server</button>
           <button id="forceUnlockButtonId" class="mr10">Force Unlock</button>
-        </div>
-        <div class="vh20"></div>
-        <div>Temporary Placeholder (TBD)</div>
-        <div class="vh10"></div>
-        <div>
-          <input type="text" id="nickNameInputId" value="">
-          <div class="global-inline-block">Nickname</div>
-        </div>
-        <div class="vh20"></div>
-        <div>
-          <button id="connectButtonId" class="mr10">Connect (Index 0)</button>
-          <button id="quitButtonId" class="mr10">Disconnect</button>
         </div>
         <div class="vh20"></div>
       </div>

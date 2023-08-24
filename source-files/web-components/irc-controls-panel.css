@@ -11,3 +11,18 @@
   border: 1px solid #7ac4cf;
   color: white;
 }
+
+
+.irc-controls-panel-warning-div {
+  background-color: #faeea2;
+  color: black;
+  border: 1px solid black;
+  border-radius: 7px;
+  margin-top: 10px;
+  margin-right: 10px;
+  margin-bottom: 20px;
+  padding-top: 0px;
+  padding-bottom: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
+}

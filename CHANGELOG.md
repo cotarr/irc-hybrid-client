@@ -12,6 +12,19 @@ Work in progress, see top of README.md
 
 Commit 
 
+This is another large commit that includes 
+the new server-list-panel web component.
+The irc-controls-panel, server-list-panel, server-form-panel 
+and the irc-controls-panel web components are now 
+interconnected and functioning.
+Additional edit and debug still required.
+
+### Server change
+
+- server/web-server.mjs, permission change, API route /irc/serverlist/ method GET is now readable even if server list editor is disabled in config.
+
+Commit f144aef
+
 - renamed server-form.css server-form-panel.css
 - renamed server-form.html server-form-panel.html
 - renamed server-form.js server-form-panel.js (updated references)

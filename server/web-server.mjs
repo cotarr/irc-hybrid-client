@@ -500,9 +500,11 @@ app.get('/irc/test2', authorizeOrFail, ircClient.test2Handler);
 // //
 // // API for Server List Editor
 // //
+app.get('/irc/serverlist',
+  authorizeOrFail,
+  ircServerListValidations.list,
+  ircServerListEditor.list);
 if (config.irc.disableServerListEditor) {
-  app.get('/irc/serverlist', authorizeOrFail,
-    (req, res) => res.status(405).json({ Error: 'Server List Editor Disabled' }));
   app.post('/irc/serverlist', authorizeOrFail, csrfProtection,
     (req, res) => res.status(405).json({ Error: 'Server List Editor Disabled' }));
   app.patch('/irc/serverlist', authorizeOrFail, csrfProtection,
@@ -514,10 +516,6 @@ if (config.irc.disableServerListEditor) {
   app.post('/irc/serverlist/tools', authorizeOrFail, csrfProtection,
     (req, res) => res.status(405).json({ Error: 'Server List Editor Disabled' }));
 } else {
-  app.get('/irc/serverlist',
-    authorizeOrFail,
-    ircServerListValidations.list,
-    ircServerListEditor.list);
   app.post('/irc/serverlist',
     authorizeOrFail, csrfProtection,
     ircServerListValidations.create,

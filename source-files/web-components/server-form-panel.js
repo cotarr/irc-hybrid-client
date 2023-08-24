@@ -85,8 +85,6 @@ window.customElements.define('server-form-panel', class extends HTMLElement {
         .catch((err) => {
           if (fetchTimerId) clearTimeout(fetchTimerId);
           activitySpinnerEl.cancelActivitySpinner();
-          window.globals.webState.webConnected = false;
-          window.globals.webState.webConnecting = false;
           // Build generic error message to catch network errors
           let message = ('Fetch error, ' + fetchOptions.method + ' ' + fetchURL + ', ' +
             (err.message || err.toString() || 'Error'));
@@ -161,8 +159,6 @@ window.customElements.define('server-form-panel', class extends HTMLElement {
         .catch((err) => {
           if (fetchTimerId) clearTimeout(fetchTimerId);
           activitySpinnerEl.cancelActivitySpinner();
-          window.globals.webState.webConnected = false;
-          window.globals.webState.webConnecting = false;
           // Build generic error message to catch network errors
           let message = ('Fetch error, ' + fetchOptions.method + ' ' + fetchURL + ', ' +
             (err.message || err.toString() || 'Error'));
@@ -433,6 +429,7 @@ window.customElements.define('server-form-panel', class extends HTMLElement {
       return;
     }
     window.globals.webState.ircServerEditOpen = true;
+    document.dispatchEvent(new CustomEvent('irc-server-edit-open'));
     this.clearIrcServerForm()
       .then(() => {
         this.shadowRoot.getElementById('saveNewButtonId').removeAttribute('hidden');
@@ -461,6 +458,7 @@ window.customElements.define('server-form-panel', class extends HTMLElement {
       return;
     }
     window.globals.webState.ircServerEditOpen = true;
+    document.dispatchEvent(new CustomEvent('irc-server-edit-open'));
     this.clearIrcServerForm()
       .then(() => this.fetchServerList(index, 1))
       .then((data) => this.populateIrcServerForm(data))
@@ -494,16 +492,17 @@ window.customElements.define('server-form-panel', class extends HTMLElement {
   };
 
   hidePanel = () => {
+    const ircControlsPanelEl = document.getElementById('ircControlsPanel');
     if (window.globals.webState.ircServerEditOpen) {
       // unlock database
       this.fetchServerList(0, 0)
         .then(() => {
           window.globals.webState.ircServerEditOpen = false;
-          document.getElementById('ircControlsPanel').enableConnectButtons();
-          document.getElementById('ircControlsPanel').enableEditButtons();
           console.log('Unlock database after aborted edit');
           this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible');
         })
+        // Get IRC state to force update of other windows.
+        .then(ircControlsPanelEl.getIrcState)
         .catch((err) => {
           console.log(err);
           let message = err.message || err.toString() || 'Error';

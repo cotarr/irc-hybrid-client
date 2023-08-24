@@ -17,8 +17,85 @@
       </div>
       <div class="vh20"></div>
 
-
+      <div id="serverListDisabledDivId" class="yellow-warning-div">
+        <p>
+          The Server List Editor has been disabled in the 
+          web server configuration file.
+        </p>
       </div>
+
+      <div>
+        <div id="editorOpenWarningDivId">
+          <h1>Editor is OPEN (TODO)</h1>
+        </div>
+        <div>
+          <button id="createNewButtonId">Create New IRC Server...</button>
+        </div>
+        <div class="vh10"></div>
+        <div class="server-list-button-div">
+          <div>
+            Set Table Width
+          </div>
+          <div class="vh10"></div>
+          <button id="showEditButtonId">Default</button>
+          <button id="showFullButtonId">Show All Columns</button>
+          <button id="showMobileButtonId">Thin Mobile</button>
+        </div>
+        <div class="vh10"></div>
+        <div>
+          <table class="server-list-table">
+            <tbody id="tbodyId">
+            </tbody>
+          </table>
+        </div>
+        <div class="all-disabled-warning-div" id="allDisabledWarningDivId" hidden>
+          <h2>All IRC servers are disabled</h2>
+          <p>
+            At least one server must be enabled before 
+            opening the IRC client page.
+          </p>
+        </div>
+        <div class="empty-table-div" id="emptyTableDivId" hiddenxxx>
+          <h2>No IRC servers have been defined</h2>
+          <p>
+            At least 1 IRC server must be defined here in the Server List Editor 
+            before opening the IRC client page.
+          </p>
+          <ul>
+            <li>Click the [Create new IRC server] button.</li>
+            <li>After data entry, click the [Save] button to close server edit form.</li>
+            <li>Click the [Return to IRC client...] button.</li>
+          </ul>
+        </div>
+        <div class="vh10"></div>
+        <div>
+          <button id="disconnectButtonId" class="ml10">Disconnect</button>
+          <button id="forceUnlockButtonId" class="ml10">Force Unlock</button>
+        </div>
+        <div class="vh10"></div>
+        <div>
+          <span id="ircProxyDiv"></span>
+          <button id="ircProxyInfoBtn" title="Show Help">?</button>
+        </div>
+        <div class="white-info-div" id="ircProxyInfo" hidden>
+          <p>
+            The proxy info displayed here shows the current socks5 network proxy 
+            settings that have been configured in the web server. 
+            The address and port may only be changed in the web server configuration.
+            See the Login Config section of the /docs.
+          </p>
+          <p>
+            If a socks5 proxy has been defined in the web server configuration,
+            the each IRC server definition will have the option to 
+            use the Socks5 Proxy to connect to the IRC server.
+            The socks5 proxy must be enabled individually for each server.
+          </p>
+          <p>
+            Click the [?] again to close this message.
+          </p>
+        </div>
+      </div>
+      <div class="vh10"></div>
     </div>
   </div>
 </template>

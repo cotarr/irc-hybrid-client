@@ -186,7 +186,7 @@ customElements.define('header-bar', class extends HTMLElement {
     if (window.globals.ircState.ircConnected) {
       titleDivEl.textContent =
         // 'irc-hybrid-client ' +
-        window.globals.ircState.ircServerName + '(' +
+        window.globals.ircState.ircServerName + ' (' +
         window.globals.ircState.nickName + ')';
     } else {
       titleDivEl.textContent = 'irc-hybrid-client';

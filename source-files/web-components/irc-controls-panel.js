@@ -37,16 +37,22 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
     const templateContent = template.content;
     this.attachShadow({ mode: 'open' })
       .appendChild(templateContent.cloneNode(true));
+    this.lastConnectErrorCount = 0;
+    this.ircConnectedLast = false;
+    this.ircConnectingLast = false;
+    this.ircFirstConnect = true;
   }
 
   showPanel = () => {
     this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
     this.shadowRoot.getElementById('panelCollapsedDivId').setAttribute('visible', '');
+    this.updateVisibility();
   };
 
   collapsePanel = () => {
     this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
     this.shadowRoot.getElementById('panelCollapsedDivId').removeAttribute('visible');
+    this.updateVisibility();
   };
 
   hidePanel = () => {
@@ -54,29 +60,30 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('panelCollapsedDivId').removeAttribute('visible');
   };
 
-  enableConnectButtons = () => {
-    // TODO some conditional logic needed
-    this.shadowRoot.getElementById('connectButtonId').removeAttribute('disabled');
-  };
-
-  disableConnectButtons = () => {
-    // TODO some conditional logic needed
-    this.shadowRoot.getElementById('connectButtonId').setAttribute('disabled', '');
-  };
-
-  enableEditButtons = () => {
-    // TODO some conditional logic needed
-    this.shadowRoot.getElementById('editServerButtonId').removeAttribute('disabled');
-    this.shadowRoot.getElementById('newServerButtonId').removeAttribute('disabled');
-    this.shadowRoot.getElementById('forceUnlockButtonId').removeAttribute('disabled');
-  };
-
-  disableEditButtons = () => {
-    // TODO some conditional logic needed
-    this.shadowRoot.getElementById('editServerButtonId').setAttribute('disabled', '');
-    this.shadowRoot.getElementById('newServerButtonId').setAttribute('disabled', '');
-    this.shadowRoot.getElementById('forceUnlockButtonId').setAttribute('disabled', '');
-  };
+  updateVisibility = () => {
+    const hiddenEditButtonsDivEl = this.shadowRoot.getElementById('hiddenEditButtonsDivId');
+    const connectButtonEl = this.shadowRoot.getElementById('connectButtonId');
+    const editorOpenWarningDivEl = this.shadowRoot.getElementById('editorOpenWarningDivId');
+    const emptyTableWarningDivEl = this.shadowRoot.getElementById('emptyTableWarningDivId');
+    // default visible, hide on conditions
+    hiddenEditButtonsDivEl.removeAttribute('hidden');
+    connectButtonEl.removeAttribute('disabled');
+    if ((window.globals.ircState.ircConnected) ||
+      (window.globals.webState.ircServerEditOpen)) {
+      hiddenEditButtonsDivEl.setAttribute('hidden', '');
+      connectButtonEl.setAttribute('disabled', '');
+    }
+    editorOpenWarningDivEl.setAttribute('hidden', '');
+    if (window.globals.webState.ircServerEditOpen) {
+      editorOpenWarningDivEl.removeAttribute('hidden');
+    }
+    emptyTableWarningDivEl.setAttribute('hidden', '');
+    if (window.globals.ircState.ircServerIndex < 0) {
+      emptyTableWarningDivEl.removeAttribute('hidden');
+      hiddenEditButtonsDivEl.setAttribute('hidden', '');
+      connectButtonEl.setAttribute('disabled', '');
+    }
+  }; // updateVisbility()
 
   /**
    * Check if connected to IRC.
@@ -102,7 +109,6 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
     return true;
   };
 
-  lastConnectErrorCount = 0;
   /**
    * Perform network GET request to /irc/getircstate to obtain update ircState object
    * @returns {promise} Returns promise resolving to ircState object, else reject error
@@ -146,40 +152,15 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
           activitySpinnerEl.cancelActivitySpinner();
           window.globals.ircState = responseJson;
 
-          // IRC server index changed
-          if ((!window.globals.ircState.ircConnected) &&
-            (window.globals.webState.lastIrcServerIndex !==
-              window.globals.ircState.ircServerIndex)) {
-            window.globals.webState.lastIrcServerIndex =
-              window.globals.ircState.ircServerIndex;
-            // TODO update panel display items
-          } // server index changed
-
-          if (window.globals.ircState.ircConnected) {
-            // for color icon
-            window.globals.webState.ircConnecting = false;
-
-            // TODO update panel display items
-            document.title = 'IRC-' + window.globals.ircState.ircServerName +
-              '(' + window.globals.ircState.nickName + ')';
-          } // if (ircState.ircConnected) {
-          if (!window.globals.ircState.ircConnected) {
-            // If no server list, show message and link button to add new servers
-            if (window.globals.ircState.ircServerIndex === -1) {
-              if (window.globals.ircState.disableServerListEditor) {
-                // TODO
-              } else {
-                // TODO
-              }
+          // If waiting for IRC socket connection, show spinner
+          if (window.globals.ircState.ircConnecting !== this.ircConnectingLast) {
+            this.ircConnectingLast = window.globals.ircState.ircConnecting;
+            if (window.globals.ircState.ircConnecting) {
+              activitySpinnerEl.requestActivitySpinner();
             } else {
-              // TODO
+              activitySpinnerEl.cancelActivitySpinner();
             }
-            // document.getElementById('headerServer').textContent = ircState.ircServerName;
-            // document.getElementById('headerUser').textContent = ' (' + ircState.nickName + ')';
-
-            // For display in browser tab
-            document.title = 'irc-hybrid-client';
-          } // if (!ircState.ircConnected) {
+          }
           if (this.lastConnectErrorCount !== window.globals.ircState.count.ircConnectError) {
             this.lastConnectErrorCount = window.globals.ircState.count.ircConnectError;
             if (window.globals.ircState.count.ircConnectError > 0) {
@@ -202,8 +183,6 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
         .catch((err) => {
           if (fetchTimerId) clearTimeout(fetchTimerId);
           activitySpinnerEl.cancelActivitySpinner();
-          window.globals.webState.webConnected = false;
-          window.globals.webState.webConnecting = false;
           // Build generic error message to catch network errors
           let message = ('Fetch error, ' + fetchOptions.method + ' ' + fetchURL + ', ' +
             (err.message || err.toString() || 'Error'));
@@ -279,8 +258,6 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
         .catch((err) => {
           if (fetchTimerId) clearTimeout(fetchTimerId);
           activitySpinnerEl.cancelActivitySpinner();
-          window.globals.webState.webConnected = false;
-          window.globals.webState.webConnecting = false;
           // Build generic error message to catch network errors
           let message = ('Fetch error, ' + fetchOptions.method + ' ' + fetchURL + ', ' +
             (err.message || err.toString() || 'Error'));
@@ -313,6 +290,82 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
         document.getElementById('errorPanel').showError(message);
       });
   };
+
+  /**
+   * Perform network POST request to set the IRC server list index number
+   * @returns {promise} Returns promise resolving to null, else reject error
+   */
+  serverSetIndexHandler = (index) => {
+    console.log('serverSetIndexHandler', index);
+    if (window.globals.ircState.ircConnected) {
+      return Promise.reject(new Error('Can not change servers while connected'));
+    }
+
+    return new Promise((resolve, reject) => {
+      const fetchController = new AbortController();
+      const fetchTimeout = document.getElementById('globVars').constants('fetchTimeout');
+      const activitySpinnerEl = document.getElementById('activitySpinner');
+      const fetchOptions = {
+        method: 'POST',
+        redirect: 'error',
+        signal: fetchController.signal,
+        headers: {
+          'CSRF-Token': document.getElementById('globVars').csrfToken,
+          'Content-type': 'application/json',
+          Accept: 'application/json'
+        },
+        body: JSON.stringify({ index: index })
+      };
+      const fetchURL =
+        document.getElementById('globVars').webServerUrl + '/irc/server';
+      activitySpinnerEl.requestActivitySpinner();
+      const fetchTimerId = setTimeout(() => fetchController.abort(), fetchTimeout);
+      fetch(fetchURL, fetchOptions)
+        .then((response) => {
+          if (response.status === 200) {
+            return response.json();
+          } else {
+            // Retrieve error message from remote web server and pass to error handler
+            return response.text()
+              .then((remoteErrorText) => {
+                const err = new Error('HTTP status error');
+                err.status = response.status;
+                err.statusText = response.statusText;
+                err.remoteErrorText = remoteErrorText;
+                throw err;
+              });
+          }
+        })
+        .then((responseJson) => {
+          // console.log(JSON.stringify(responseJson, null, 2));
+          if (fetchTimerId) clearTimeout(fetchTimerId);
+          activitySpinnerEl.cancelActivitySpinner();
+          // {
+          //   "error": false,
+          //   "index": 2,
+          //   "name": "label1"
+          // }
+          resolve(responseJson);
+        })
+        .catch((err) => {
+          if (fetchTimerId) clearTimeout(fetchTimerId);
+          activitySpinnerEl.cancelActivitySpinner();
+          // Build generic error message to catch network errors
+          let message = ('Fetch error, ' + fetchOptions.method + ' ' + fetchURL + ', ' +
+            (err.message || err.toString() || 'Error'));
+          if (err.status) {
+            // Case of HTTP status error, build descriptive error message
+            message = ('HTTP status error, ') + err.status.toString() + ' ' +
+              err.statusText + ', ' + fetchOptions.method + ' ' + fetchURL;
+          }
+          if (err.remoteErrorText) {
+            message += ', ' + err.remoteErrorText;
+          }
+          const error = new Error(message);
+          reject(error);
+        });
+    }); // new Promise
+  }; // cyclePrevServerButton()
 
   /**
    * Perform network POST request to /irc/connect to initiate a new connection to the IRC server.
@@ -399,8 +452,6 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
         .catch((err) => {
           if (fetchTimerId) clearTimeout(fetchTimerId);
           activitySpinnerEl.cancelActivitySpinner();
-          window.globals.webState.webConnected = false;
-          window.globals.webState.webConnecting = false;
           // Build generic error message to catch network errors
           let message = ('Fetch error, ' + fetchOptions.method + ' ' + fetchURL + ', ' +
             (err.message || err.toString() || 'Error'));
@@ -417,6 +468,46 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
         });
     }); // new Promise
   }; // connectButtonHandler
+
+  /**
+   * First try /QUIT, if this does not work, then force disconnect
+   */
+  disconnectHandler = () => {
+    if ((window.globals.webState.ircConnecting) ||
+      (window.globals.ircState.webConnecting) ||
+      ((window.globals.ircState.ircConnected) &&
+      (!window.globals.ircState.ircRegistered))) {
+      // with this false, icon depend only on backend state
+      window.globals.webState.ircConnecting = false;
+      // stuck trying to connect, just request server to destroy socket
+      this.forceDisconnectHandler()
+        .catch((err) => {
+          console.log(err);
+          let message = err.message || err.toString() || 'Error occurred calling /irc/connect';
+          // show only 1 line
+          message = message.split('\n')[0];
+          document.getElementById('errorPanel').showError(message);
+        });
+    } else if ((window.globals.ircState.ircAutoReconnect) &&
+      (window.globals.ircState.ircConnectOn) &&
+      (!window.globals.ircState.ircConnected) &&
+      (!window.globals.ircState.ircConnecting)) {
+      // case of backend waiting on timer to reconnect.
+      // when QUIT pressed, send hard disconnet to kill timer.
+      this.forceDisconnectHandler()
+        .catch((err) => {
+          console.log(err);
+          let message = err.message || err.toString() || 'Error occurred calling /irc/connect';
+          // show only 1 line
+          message = message.split('\n')[0];
+          document.getElementById('errorPanel').showError(message);
+        });
+    } else {
+      // else, connected to server, exit gracefully by command.
+      this.sendIrcServerMessage('QUIT :' + window.globals.ircState.progName + ' ' +
+        window.globals.ircState.progVersion);
+    }
+  };
 
   /**
    * Perform network POST request forcibly close IRC socket without using /QUIT
@@ -472,8 +563,6 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
         .catch((err) => {
           if (fetchTimerId) clearTimeout(fetchTimerId);
           activitySpinnerEl.cancelActivitySpinner();
-          window.globals.webState.webConnected = false;
-          window.globals.webState.webConnecting = false;
           // Build generic error message to catch network errors
           let message = ('Fetch error, ' + fetchOptions.method + ' ' + fetchURL + ', ' +
             (err.message || err.toString() || 'Error'));
@@ -549,8 +638,6 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
           .catch((err) => {
             if (fetchTimerId) clearTimeout(fetchTimerId);
             activitySpinnerEl.cancelActivitySpinner();
-            window.globals.webState.webConnected = false;
-            window.globals.webState.webConnecting = false;
             // Build generic error message to catch network errors
             let message = ('Fetch error, ' + fetchOptions.method + ' ' + fetchURL + ', ' +
               (err.message || err.toString() || 'Error'));
@@ -630,8 +717,6 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
     // Set descriptive button titles
     this.shadowRoot.getElementById('editServerButtonId').setAttribute('title',
       'Opens form to edit IRC server configuration');
-    this.shadowRoot.getElementById('newServerButtonId').setAttribute('title',
-      'Opens form to create a new IRC server configuration');
     this.shadowRoot.getElementById('forceUnlockButtonId').setAttribute('title',
       'Press to unlock database. Refreshing or leaving editor ' +
       'form during edit can leave database locked.');
@@ -666,9 +751,7 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
 
     this.shadowRoot.getElementById('editServerButtonId').addEventListener('click', () => {
       const serverFormEl = document.getElementById('serverFormPanel');
-      const index = 0;
-      this.disableConnectButtons();
-      this.disableEditButtons();
+      const index = window.globals.ircState.ircServerIndex;
       // test if locked by attempting to lock it
       serverFormEl.fetchServerList(index, 1)
         // was not locked, unlock before requesting edit
@@ -688,36 +771,6 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
           } else {
             document.getElementById('errorPanel').showError(message);
           }
-          this.enableConnectButtons();
-          this.enableEditButtons();
-        });
-    });
-
-    this.shadowRoot.getElementById('newServerButtonId').addEventListener('click', () => {
-      const serverFormEl = document.getElementById('serverFormPanel');
-      this.disableConnectButtons();
-      this.disableEditButtons();
-      // test if locked by attempting to lock it
-      serverFormEl.fetchServerList(0, 1)
-        // was not locked, unlock before requesting edit
-        .then(() => { serverFormEl.fetchServerList(0, 0); })
-        // this returns leaving page open.
-        .then(() => { serverFormEl.createNewIrcServer(); })
-        .catch((err) => {
-          console.log(err);
-          let message = err.message || err.toString() ||
-            'Error attempting to create new IRC server';
-          // limit to 1 line
-          message = message.split('\n')[0];
-          if (err.status === 409) {
-            document.getElementById('errorPanel').showError('Database Locked');
-          } else if (err.status === 405) {
-            document.getElementById('errorPanel').showError('Database Disabled');
-          } else {
-            document.getElementById('errorPanel').showError(message);
-          }
-          this.enableConnectButtons();
-          this.enableEditButtons();
         });
     });
 
@@ -727,8 +780,7 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
         .then(() => {
           console.log('Database: unlock successful');
           window.globals.webState.ircServerEditOpen = false;
-          this.enableConnectButtons();
-          this.enableEditButtons();
+          this.updateVisibility();
         })
         .catch((err) => {
           console.log(err);
@@ -759,40 +811,7 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
     // Quit Button handler (Send QUIT message to IRC server)
     // ------------------------------------------------------
     this.shadowRoot.getElementById('quitButtonId').addEventListener('click', () => {
-      if ((window.globals.webState.ircConnecting) ||
-        (window.globals.ircState.webConnecting) ||
-        ((window.globals.ircState.ircConnected) &&
-        (!window.globals.ircState.ircRegistered))) {
-        // with this false, icon depend only on backend state
-        window.globals.webState.ircConnecting = false;
-        // stuck trying to connect, just request server to destroy socket
-        this.forceDisconnectHandler()
-          .catch((err) => {
-            console.log(err);
-            let message = err.message || err.toString() || 'Error occurred calling /irc/connect';
-            // show only 1 line
-            message = message.split('\n')[0];
-            document.getElementById('errorPanel').showError(message);
-          });
-      } else if ((window.globals.ircState.ircAutoReconnect) &&
-        (window.globals.ircState.ircConnectOn) &&
-        (!window.globals.ircState.ircConnected) &&
-        (!window.globals.ircState.ircConnecting)) {
-        // case of backend waiting on timer to reconnect.
-        // when QUIT pressed, send hard disconnet to kill timer.
-        this.forceDisconnectHandler()
-          .catch((err) => {
-            console.log(err);
-            let message = err.message || err.toString() || 'Error occurred calling /irc/connect';
-            // show only 1 line
-            message = message.split('\n')[0];
-            document.getElementById('errorPanel').showError(message);
-          });
-      } else {
-        // else, connected to server, exit gracefully by command.
-        this.sendIrcServerMessage('QUIT :' + window.globals.ircState.progName + ' ' +
-          window.globals.ircState.progVersion);
-      }
+      this.disconnectHandler();
     });
 
     // -------------------------------------
@@ -860,12 +879,29 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
     });
 
     /**
+     * Global event listener on document object to detect editor panel has been opened
+     * @listens document:irc-server-edit-open
+     */
+    document.addEventListener('irc-server-edit-open', () => {
+      this.updateVisibility();
+    }); // irc-server-edit-open
+
+    /**
      * Global event listener on document object to detect state change of remote IRC server
      * Detect addition of new IRC channels and create channel panel.
      * Data source: ircState object
      * @listens document:irc-state-changed
      */
     document.addEventListener('irc-state-changed', () => {
+      // If this is first load of the page, open the panel.
+      if (this.ircFirstConnect) {
+        this.ircFirstConnect = false;
+        if (window.globals.ircState.ircConnected) {
+          this.collapsePanel();
+        } else {
+          this.showPanel();
+        }
+      }
       if (window.globals.ircState.ircConnected !== this.ircConnectedLast) {
         this.ircConnectedLast = window.globals.ircState.ircConnected;
         if (window.globals.ircState.ircConnected) {
@@ -885,23 +921,49 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
         }
       }
       if (window.globals.ircState.ircConnected) {
-        this.disableConnectButtons();
-        this.disableEditButtons();
-      } else {
-        this.enableConnectButtons();
-        if (window.globals.ircServerEditOpen) {
-          this.disableEditButtons();
-        } else {
-          this.enableEditButtons();
-        }
-      }
-      if (window.globals.ircState.ircConnected) {
         this.shadowRoot.getElementById('panelTitleDivId').textContent =
-          'Connected: ' + window.globals.ircState.ircServerName + '(' +
+          'IRC Controls ' + window.globals.ircState.ircServerName + ' (' +
           window.globals.ircState.nickName + ')';
       } else {
         this.shadowRoot.getElementById('panelTitleDivId').textContent = 'IRC Controls';
       }
+
+      if (window.globals.ircState.ircConnected) {
+        // for color icon
+        window.globals.webState.ircConnecting = false;
+        // TODO update panel display items
+        document.title = 'IRC-' + window.globals.ircState.ircServerName +
+          '(' + window.globals.ircState.nickName + ')';
+      } // if (ircState.ircConnected) {
+      if (!window.globals.ircState.ircConnected) {
+        // For display in browser tab
+        document.title = 'irc-hybrid-client';
+      } // if (!ircState.ircConnected) {
+
+      // Update select server display
+      let infoTls = '';
+      if (window.globals.ircState.ircTLSEnabled) {
+        infoTls = ' (TLS)';
+        if (window.globals.ircState.ircTLSVerify) infoTls = ' (TLS,verify)';
+      }
+      let infoReconnect = '';
+      if (window.globals.ircState.ircAutoReconnect) {
+        infoReconnect = '\nAuto-reconnect: enabled';
+        if ((window.globals.ircState.serverRotation) &&
+        (window.globals.ircServerGroup > 0)) {
+          infoReconnect = '\n' +
+          'Auto-reconnect, server rotation group:' +
+          window.globals.ircState.ircServerGroup.toString();
+        }
+      }
+      const selectedServerInfo =
+        'Label:              ' + window.globals.ircState.ircServerName +
+        ' (Index=' + window.globals.ircState.ircServerIndex.toString() + ')\n' +
+        'Server:             ' + window.globals.ircState.ircServerHost + ':' +
+        window.globals.ircState.ircServerPort + infoTls + '\n' +
+        'Default nickname:   ' + window.globals.ircState.nickName + infoReconnect;
+      this.shadowRoot.getElementById('selectedServerPreId').textContent = selectedServerInfo;
+      this.updateVisibility();
     });
 
     /**

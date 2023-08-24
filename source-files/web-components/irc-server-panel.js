@@ -827,6 +827,28 @@ window.customElements.define('irc-server-panel', class extends HTMLElement {
     });
 
     /**
+     * Hide panel (not visible) unless listed as exception.
+     * @listens document:hide-all-panels
+     * @property {string|string[]} event.detail.except - No action if listed as exception
+     */
+    document.addEventListener('hide-all-panels', (event) => {
+      if ((event.detail) && (event.detail.except)) {
+        if (typeof event.detail.except === 'string') {
+          // this.id assigned in html/_index.html
+          if (event.detail.except !== this.id) {
+            this.hidePanel();
+          }
+        } else if (Array.isArray(event.detail.except)) {
+          if (event.detail.except.indexOf(this.id) < 0) {
+            this.hidePanel();
+          }
+        }
+      } else {
+        this.hidePanel();
+      }
+    });
+
+    /**
      * Global event listener on document object to detect state change of remote IRC server
      * Detect addition of new IRC channels and create channel panel.
      * Data source: ircState object
@@ -849,28 +871,6 @@ window.customElements.define('irc-server-panel', class extends HTMLElement {
       }
       this.shadowRoot.getElementById('programVersionDiv').textContent =
         ' version-' + window.globals.ircState.progVersion;
-    });
-
-    /**
-     * Hide panel (not visible) unless listed as exception.
-     * @listens document:hide-all-panels
-     * @property {string|string[]} event.detail.except - No action if listed as exception
-     */
-    document.addEventListener('hide-all-panels', (event) => {
-      if ((event.detail) && (event.detail.except)) {
-        if (typeof event.detail.except === 'string') {
-          // this.id assigned in html/_index.html
-          if (event.detail.except !== this.id) {
-            this.hidePanel();
-          }
-        } else if (Array.isArray(event.detail.except)) {
-          if (event.detail.except.indexOf(this.id) < 0) {
-            this.hidePanel();
-          }
-        }
-      } else {
-        this.hidePanel();
-      }
     });
 
     /**
