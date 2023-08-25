@@ -44,24 +44,28 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
     this.ircConnectedLast = false;
   }
 
-  setVisibility = () => {
+  _updateVisibility = () => {
     if (window.globals.ircState.disableServerListEditor) {
       this.shadowRoot.getElementById('serverListDisabledDivId').removeAttribute('hidden');
     } else {
       this.shadowRoot.getElementById('serverListDisabledDivId').setAttribute('hidden', '');
     }
     const createNewButtonEl = this.shadowRoot.getElementById('createNewButtonId');
-    const forceUnlockButtonEl = this.shadowRoot.getElementById('forceUnlockButtonId');
+    const editorOpenWarningDivEl = this.shadowRoot.getElementById('editorOpenWarningDivId');
     createNewButtonEl.removeAttribute('hidden');
-    forceUnlockButtonEl.removeAttribute('hidden');
+    editorOpenWarningDivEl.setAttribute('hidden', '');
     if (window.globals.ircState.disableServerListEditor) {
       createNewButtonEl.setAttribute('hidden', '');
-      forceUnlockButtonEl.setAttribute('hidden', '');
     }
     if (window.globals.ircState.ircConnected) {
       createNewButtonEl.setAttribute('hidden', '');
-      forceUnlockButtonEl.setAttribute('hidden', '');
     }
+    if (window.globals.webState.ircServerEditOpen) {
+      createNewButtonEl.setAttribute('hidden', '');
+      editorOpenWarningDivEl.removeAttribute('hidden');
+    }
+    // Always hide unless specific error occurs
+    this.shadowRoot.getElementById('forceUnlockButtonId').setAttribute('hidden', '');
   };
 
   showPanel = () => {
@@ -81,7 +85,7 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
         }
       }
     }
-    this.setVisibility();
+    this._updateVisibility();
     // if (window.globals.ircState.ircConnected) {
     //   this.shadowRoot.getElementById('disconnectButtonId').removeAttribute('disabled');
     // } else {
@@ -107,19 +111,31 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
     this.hidePanel();
   };
 
+  _handleServerListOpenError = (err) => {
+    console.log(err);
+    let message = err.message || err.toString() ||
+      'Error attempting edit IRC server';
+    // limit to 1 line
+    message = message.split('\n')[0];
+    if (err.status === 409) {
+      this.shadowRoot.getElementById('forceUnlockButtonId').removeAttribute('hidden');
+      document.getElementById('errorPanel').showError('Database Locked');
+    } else if (err.status === 405) {
+      document.getElementById('errorPanel').showError('Database Disabled');
+    } else {
+      document.getElementById('errorPanel').showError(message);
+    }
+  };
+
   /**
    * Button Event Handler to service dynamically generated buttons in server list table
    * @param {Number} index - Integer index into IRC server Array
    */
   selectServerButtonHandler = (event) => {
     // console.log(event.target.id, event.target.getAttribute('index'));
-    if ((window.globals.ircState.ircConnected) || (window.globals.ircState.ircConnecting)) {
-      document.getElementById('errorPanel')
-        .showError('May not select server when connected to IRC');
-    } else {
+    if ((!window.globals.ircState.ircConnected) && (!window.globals.ircState.ircConnecting)) {
       const ircControlsPanelEl = document.getElementById('ircControlsPanel');
       const index = parseInt(event.target.getAttribute('index'));
-      this.clearServerListTable();
       ircControlsPanelEl.serverSetIndexHandler(index)
         .then((data) => {
           if (('index' in data) && (parseInt(data.index) === index)) {
@@ -148,7 +164,6 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
     } else {
       const ircControlsPanelEl = document.getElementById('ircControlsPanel');
       const index = parseInt(event.target.getAttribute('index'));
-      this.clearServerListTable();
       ircControlsPanelEl.serverSetIndexHandler(index)
         .then((data) => {
           if (('index' in data) && (parseInt(data.index) === index)) {
@@ -175,15 +190,9 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
     // console.log(event.target.id, event.target.getAttribute('index'));
     const serverFormPanelEl = document.getElementById('serverFormPanel');
     const index = parseInt(event.target.getAttribute('index'));
-    this.clearServerListTable();
     serverFormPanelEl.submitServer({ index: index, action: 'toggle-disabled' }, 'POST', index)
-      .then((data) => serverFormPanelEl.checkForApiError(data))
-      .catch((err) => {
-        console.log(err);
-        let message = err.message || err.toString() || 'Error';
-        message = message.split('\n')[0];
-        document.getElementById('errorPanel').showError(message);
-      });
+      .then(serverFormPanelEl.checkForApiError)
+      .catch(this._handleServerListOpenError);
   };
 
   /**
@@ -200,20 +209,7 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
       .then(() => { serverFormEl.fetchServerList(index, 0); })
       // this returns leaving page open.
       .then(() => { serverFormEl.editIrcServerAtIndex(index); })
-      .catch((err) => {
-        console.log(err);
-        let message = err.message || err.toString() ||
-          'Error attempting edit IRC server';
-        // limit to 1 line
-        message = message.split('\n')[0];
-        if (err.status === 409) {
-          document.getElementById('errorPanel').showError('Database Locked');
-        } else if (err.status === 405) {
-          document.getElementById('errorPanel').showError('Database Disabled');
-        } else {
-          document.getElementById('errorPanel').showError(message);
-        }
-      });
+      .catch(this._handleServerListOpenError);
   };
 
   /**
@@ -224,15 +220,9 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
     // console.log(event.target.id, event.target.getAttribute('index'));
     const serverFormPanelEl = document.getElementById('serverFormPanel');
     const index = parseInt(event.target.getAttribute('index'));
-    this.clearServerListTable();
     serverFormPanelEl.submitServer({ index: index }, 'COPY', index)
-      .then((data) => serverFormPanelEl.checkForApiError(data))
-      .catch((err) => {
-        console.log(err);
-        let message = err.message || err.toString() || 'Error';
-        message = message.split('\n')[0];
-        document.getElementById('errorPanel').showError(message);
-      });
+      .then(serverFormPanelEl.checkForApiError)
+      .catch(this._handleServerListOpenError);
   };
 
   /**
@@ -243,15 +233,9 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
     // console.log(event.target.id, event.target.getAttribute('index'));
     const serverFormPanelEl = document.getElementById('serverFormPanel');
     const index = parseInt(event.target.getAttribute('index'));
-    this.clearServerListTable();
     serverFormPanelEl.submitServer({ index: index }, 'DELETE', index)
-      .then((data) => serverFormPanelEl.checkForApiError(data))
-      .catch((err) => {
-        console.log(err);
-        let message = err.message || err.toString() || 'Error';
-        message = message.split('\n')[0];
-        document.getElementById('errorPanel').showError(message);
-      });
+      .then(serverFormPanelEl.checkForApiError)
+      .catch(this._handleServerListOpenError);
   };
 
   /**
@@ -262,15 +246,9 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
     console.log(event.target.id, event.target.getAttribute('index'));
     const serverFormPanelEl = document.getElementById('serverFormPanel');
     const index = parseInt(event.target.getAttribute('index'));
-    this.clearServerListTable();
     serverFormPanelEl.submitServer({ index: index, action: 'move-up' }, 'POST', index)
-      .then((data) => serverFormPanelEl.checkForApiError(data))
-      .catch((err) => {
-        console.log(err);
-        let message = err.message || err.toString() || 'Error';
-        message = message.split('\n')[0];
-        document.getElementById('errorPanel').showError(message);
-      });
+      .then(serverFormPanelEl.checkForApiError)
+      .catch(this._handleServerListOpenError);
   };
 
   /**
@@ -340,19 +318,20 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
       const tableNode = this.shadowRoot.getElementById('tbodyId');
 
       // Flags to set table windth (visible columns)
+      if (window.globals.webState.ircServerEditOpen) this.editable = false;
       const full = this.fullWidth;
       const mobile = this.mobileWidth;
       const edit = this.editable && !this.fullWidth && !this.mobileWidth;
       // Case of editor is open, hide all buttons
-      if (window.globals.webState.ircServerEditOpen) this.editable = false;
       //
       // dynamically build array of column headings for the server list
       //
       const columnTitles = [];
 
-      if (edit) columnTitles.push(''); // td01
-      if ((!full) && (!window.globals.webState.ircServerEditOpen)) columnTitles.push(''); // td02
-
+      if ((!full) && (!window.globals.webState.ircServerEditOpen)) {
+        columnTitles.push(''); // td01
+        columnTitles.push(''); // td02
+      };
       if (!mobile) columnTitles.push('Index'); // td03 Not a server property, array index number
       if (mobile) {
         columnTitles.push('Dis'); // td10 .disabled
@@ -399,7 +378,7 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
       columnTitles.forEach((titleName) => {
         const tdEl = document.createElement('th');
         tdEl.textContent = titleName;
-        tdEl.classList.add('server-list-header');
+        tdEl.classList.add('server-list-th');
         titleRowEl.appendChild(tdEl);
       });
       tableNode.appendChild(titleRowEl);
@@ -416,12 +395,12 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
           const rowEl = document.createElement('tr');
           rowEl.setAttribute('index', i.toString());
           if (data[i].disabled) {
-            rowEl.classList.add('disabled-tr');
+            rowEl.classList.add('server-list-disabled-tr');
           } else {
             allServersDisabled = false;
           }
 
-          if (edit) {
+          if ((!full) && (!window.globals.webState.ircServerEditOpen)) {
             //
             // <td><button> Select Button
             //
@@ -429,26 +408,27 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
             const selectButtonEl = document.createElement('button');
             selectButtonEl.setAttribute('index', i.toString());
             selectButtonEl.id = 'selectAtIndex' + i.toString();
-            this.selectButtonIdList.push('selectAtIndex' + i.toString());
             selectButtonEl.textContent = 'Select';
             selectButtonEl.title = 'Set as active server for IRC connections';
+            if (data[i].disabled) {
+              selectButtonEl.setAttribute('disabled', '');
+              selectButtonEl.setAttribute('title', 'Disabled');
+            }
             if (window.globals.ircState.ircConnected) {
               if (window.globals.ircState.ircServerIndex === i) {
+                selectButtonEl.setAttribute('title', 'Select is disabled when connected');
+                this.selectButtonIdList.push('selectAtIndex' + i.toString());
                 td01El.classList.add('server-list-button-connected');
+                td01El.appendChild(selectButtonEl);
               }
             } else {
               if (window.globals.ircState.ircServerIndex === i) {
                 td01El.classList.add('server-list-button-disconnected');
               }
+              this.selectButtonIdList.push('selectAtIndex' + i.toString());
+              td01El.appendChild(selectButtonEl);
             }
-            if (data[i].disabled) {
-              selectButtonEl.setAttribute('disabled', '');
-              selectButtonEl.setAttribute('title', 'Disabled');
-            }
-            td01El.appendChild(selectButtonEl);
             rowEl.appendChild(td01El);
-          }
-          if ((!full) && (!window.globals.webState.ircServerEditOpen)) {
             //
             // <td><button> Connect Button
             //
@@ -517,7 +497,7 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
           }
           if (('group' in data[i]) &&
             (data[i].group > 0) && (data[i].group < 6)) {
-            td11El.classList.add('group-color-' + data[i].group.toString());
+            td11El.classList.add('server-list-group-color-' + data[i].group.toString());
           }
           rowEl.appendChild(td11El);
 
@@ -550,11 +530,11 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
             const tlsIconInnerEl = document.createElement('div');
             tlsIconEl.appendChild(tlsIconInnerEl);
             if (data[i].tls) {
-              tlsIconEl.classList.add('icon-true');
-              tlsIconInnerEl.classList.add('icon-inner-true');
+              tlsIconEl.classList.add('server-list-icon-true');
+              tlsIconInnerEl.classList.add('server-list-icon-inner-true');
             } else {
-              tlsIconEl.classList.add('icon-false');
-              tlsIconInnerEl.classList.add('icon-inner-false');
+              tlsIconEl.classList.add('server-list-icon-false');
+              tlsIconInnerEl.classList.add('server-list-icon-inner-false');
             }
             td22El.appendChild(tlsIconEl);
             rowEl.appendChild(td22El);
@@ -566,11 +546,11 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
             const verifyIconInnerEl = document.createElement('div');
             verifyIconEl.appendChild(verifyIconInnerEl);
             if (data[i].verify) {
-              verifyIconEl.classList.add('icon-true');
-              verifyIconInnerEl.classList.add('icon-inner-true');
+              verifyIconEl.classList.add('server-list-icon-true');
+              verifyIconInnerEl.classList.add('server-list-icon-inner-true');
             } else {
-              verifyIconEl.classList.add('icon-false');
-              verifyIconInnerEl.classList.add('icon-inner-false');
+              verifyIconEl.classList.add('server-list-icon-false');
+              verifyIconInnerEl.classList.add('server-list-icon-inner-false');
             }
             td23El.appendChild(verifyIconEl);
             rowEl.appendChild(td23El);
@@ -582,11 +562,11 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
             const proxyIconInnerEl = document.createElement('div');
             proxyIconEl.appendChild(proxyIconInnerEl);
             if (data[i].proxy) {
-              proxyIconEl.classList.add('icon-true');
-              proxyIconInnerEl.classList.add('icon-inner-true');
+              proxyIconEl.classList.add('server-list-icon-true');
+              proxyIconInnerEl.classList.add('server-list-icon-inner-true');
             } else {
-              proxyIconEl.classList.add('icon-false');
-              proxyIconInnerEl.classList.add('icon-inner-false');
+              proxyIconEl.classList.add('server-list-icon-false');
+              proxyIconInnerEl.classList.add('server-list-icon-inner-false');
             }
             td24El.appendChild(proxyIconEl);
             rowEl.appendChild(td24El);
@@ -639,11 +619,11 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
             const recoverNickIconInnerEl = document.createElement('div');
             recoverNickIconEl.appendChild(recoverNickIconInnerEl);
             if (data[i].recoverNick) {
-              recoverNickIconEl.classList.add('icon-true');
-              recoverNickIconInnerEl.classList.add('icon-inner-true');
+              recoverNickIconEl.classList.add('server-list-icon-true');
+              recoverNickIconInnerEl.classList.add('server-list-icon-inner-true');
             } else {
-              recoverNickIconEl.classList.add('icon-false');
-              recoverNickIconInnerEl.classList.add('icon-inner-false');
+              recoverNickIconEl.classList.add('server-list-icon-false');
+              recoverNickIconInnerEl.classList.add('server-list-icon-inner-false');
             }
             td32El.appendChild(recoverNickIconEl);
             rowEl.appendChild(td32El);
@@ -702,11 +682,11 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
             const reconnectIconInnerEl = document.createElement('div');
             reconnectIconEl.appendChild(reconnectIconInnerEl);
             if (data[i].reconnect) {
-              reconnectIconEl.classList.add('icon-true');
-              reconnectIconInnerEl.classList.add('icon-inner-true');
+              reconnectIconEl.classList.add('server-list-icon-true');
+              reconnectIconInnerEl.classList.add('server-list-icon-inner-true');
             } else {
-              reconnectIconEl.classList.add('icon-false');
-              reconnectIconInnerEl.classList.add('icon-inner-false');
+              reconnectIconEl.classList.add('server-list-icon-false');
+              reconnectIconInnerEl.classList.add('server-list-icon-inner-false');
             }
             td60El.appendChild(reconnectIconEl);
             rowEl.appendChild(td60El);
@@ -718,11 +698,11 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
             const loggingIconInnerEl = document.createElement('div');
             loggingIconEl.appendChild(loggingIconInnerEl);
             if (data[i].logging) {
-              loggingIconEl.classList.add('icon-true');
-              loggingIconInnerEl.classList.add('icon-inner-true');
+              loggingIconEl.classList.add('server-list-icon-true');
+              loggingIconInnerEl.classList.add('server-list-icon-inner-true');
             } else {
-              loggingIconEl.classList.add('icon-false');
-              loggingIconInnerEl.classList.add('icon-inner-false');
+              loggingIconEl.classList.add('server-list-icon-false');
+              loggingIconInnerEl.classList.add('server-list-icon-inner-false');
             }
             td61El.appendChild(loggingIconEl);
             rowEl.appendChild(td61El);
@@ -791,7 +771,7 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
         //
         const tdEls = Array.from(this.shadowRoot.querySelectorAll('td'));
         tdEls.forEach((tdEl) => {
-          tdEl.classList.add('server-list-data');
+          tdEl.classList.add('server-list-td');
         });
 
         //
@@ -886,6 +866,7 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
         .then(() => {
           console.log('Database: unlock successful');
           window.globals.webState.ircServerEditOpen = false;
+          this.shadowRoot.getElementById('forceUnlockButtonId').setAttribute('hidden', '');
           // this.enableConnectButtons();
           // this.enableEditButtons();
         })
@@ -909,22 +890,7 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
         .then(() => { serverFormEl.fetchServerList(0, 0); })
         // this returns leaving page open.
         .then(() => { serverFormEl.createNewIrcServer(); })
-        .catch((err) => {
-          console.log(err);
-          let message = err.message || err.toString() ||
-            'Error attempting to create new IRC server';
-          // limit to 1 line
-          message = message.split('\n')[0];
-          if (err.status === 409) {
-            document.getElementById('errorPanel').showError('Database Locked');
-          } else if (err.status === 405) {
-            document.getElementById('errorPanel').showError('Database Disabled');
-          } else {
-            document.getElementById('errorPanel').showError(message);
-          }
-          // this.enableConnectButtons();
-          // this.enableEditButtons();
-        });
+        .catch(this._handleServerListOpenError);
     });
 
     /**
@@ -1000,16 +966,21 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
       }
     });
 
-    // document.addEventListener('color-theme-changed', (event) => {
-    //   const panelDivEl = this.shadowRoot.getElementById('panelDivId');
-    //   if (event.detail.theme === 'light') {
-    //     panelDivEl.classList.remove('server-list-theme-dark');
-    //     panelDivEl.classList.add('server-list-theme-light');
-    //   } else {
-    //     panelDivEl.classList.remove('server-list-theme-light');
-    //     panelDivEl.classList.add('server-list-theme-dark');
-    //   }
-    // });
+    document.addEventListener('color-theme-changed', (event) => {
+      const panelDivEl = this.shadowRoot.getElementById('panelDivId');
+      const tbodyEl = this.shadowRoot.getElementById('tbodyId');
+      if (event.detail.theme === 'light') {
+        panelDivEl.classList.remove('server-list-theme-dark');
+        panelDivEl.classList.add('server-list-theme-light');
+        tbodyEl.classList.remove('server-list-tbody-dark');
+        tbodyEl.classList.add('server-list-tbody-light');
+      } else {
+        panelDivEl.classList.remove('server-list-theme-light');
+        panelDivEl.classList.add('server-list-theme-dark');
+        tbodyEl.classList.remove('server-list-tbody-light');
+        tbodyEl.classList.add('server-list-tbody-dark');
+      }
+    });
 
     /**
      * Hide panel (not visible)unless listed as exception.
@@ -1043,7 +1014,8 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
         //   console.log(JSON.stringify(data, null, 2));
         //   return Promise.resolve(data);
         // })
-        .then((data) => this.buildServerListTable(data))
+        .then(this.buildServerListTable)
+        .then(this._updateVisibility)
         .catch((err) => {
           console.log(err);
           let message = err.message || err.toString() || 'Error';
@@ -1104,7 +1076,7 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
               document.getElementById('errorPanel').showError(message);
             });
         }
-        this.setVisibility();
+        this._updateVisibility();
       }
 
       // if (window.globals.ircState.ircConnected) {

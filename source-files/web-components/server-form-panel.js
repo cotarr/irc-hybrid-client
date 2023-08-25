@@ -832,16 +832,49 @@ window.customElements.define('server-form-panel', class extends HTMLElement {
       }
     });
 
-    // document.addEventListener('color-theme-changed', (event) => {
-    //   const panelDivEl = this.shadowRoot.getElementById('panelDivId');
-    //   if (event.detail.theme === 'light') {
-    //     panelDivEl.classList.remove('server-form-theme-dark');
-    //     panelDivEl.classList.add('server-form-theme-light');
-    //   } else {
-    //     panelDivEl.classList.remove('server-form-theme-light');
-    //     panelDivEl.classList.add('server-form-theme-dark');
-    //   }
-    // });
+    document.addEventListener('color-theme-changed', (event) => {
+      const panelDivEl = this.shadowRoot.getElementById('panelDivId');
+      if (event.detail.theme === 'light') {
+        panelDivEl.classList.remove('server-form-theme-dark');
+        panelDivEl.classList.add('server-form-theme-light');
+      } else {
+        panelDivEl.classList.remove('server-form-theme-light');
+        panelDivEl.classList.add('server-form-theme-dark');
+      }
+      let newTextTheme = 'global-text-theme-dark';
+      let oldTextTheme = 'global-text-theme-light';
+      if (document.querySelector('body').getAttribute('theme') === 'light') {
+        newTextTheme = 'global-text-theme-light';
+        oldTextTheme = 'global-text-theme-dark';
+      }
+      let inputEls = Array.from(this.shadowRoot.querySelectorAll('input'));
+      inputEls.forEach((el) => {
+        el.classList.remove(oldTextTheme);
+        el.classList.add(newTextTheme);
+      });
+      newTextTheme = 'server-form-input-group1-dark';
+      oldTextTheme = 'server-form-input-group1-light';
+      if (document.querySelector('body').getAttribute('theme') === 'light') {
+        newTextTheme = 'server-form-input-group1-light';
+        oldTextTheme = 'server-form-input-group1-dark';
+      }
+      inputEls = Array.from(this.shadowRoot.querySelectorAll('.server-form-group1'));
+      inputEls.forEach((el) => {
+        el.classList.remove(oldTextTheme);
+        el.classList.add(newTextTheme);
+      });
+      newTextTheme = 'server-form-input-group2-dark';
+      oldTextTheme = 'server-form-input-group2-light';
+      if (document.querySelector('body').getAttribute('theme') === 'light') {
+        newTextTheme = 'server-form-input-group2-light';
+        oldTextTheme = 'server-form-input-group2-dark';
+      }
+      inputEls = Array.from(this.shadowRoot.querySelectorAll('.server-form-group2'));
+      inputEls.forEach((el) => {
+        el.classList.remove(oldTextTheme);
+        el.classList.add(newTextTheme);
+      });
+    });
 
     /**
      * Hide panel (not visible)unless listed as exception.

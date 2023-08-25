@@ -61,16 +61,19 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
   };
 
   updateVisibility = () => {
-    const hiddenEditButtonsDivEl = this.shadowRoot.getElementById('hiddenEditButtonsDivId');
+    const editServerButtonEl = this.shadowRoot.getElementById('editServerButtonId');
     const connectButtonEl = this.shadowRoot.getElementById('connectButtonId');
+    const forceUnlockButtonEl = this.shadowRoot.getElementById('forceUnlockButtonId');
     const editorOpenWarningDivEl = this.shadowRoot.getElementById('editorOpenWarningDivId');
     const emptyTableWarningDivEl = this.shadowRoot.getElementById('emptyTableWarningDivId');
+    const awayHiddenDivEl = this.shadowRoot.getElementById('awayHiddenDivId');
     // default visible, hide on conditions
-    hiddenEditButtonsDivEl.removeAttribute('hidden');
+    editServerButtonEl.removeAttribute('hidden');
     connectButtonEl.removeAttribute('disabled');
+    awayHiddenDivEl.setAttribute('hidden', '');
     if ((window.globals.ircState.ircConnected) ||
       (window.globals.webState.ircServerEditOpen)) {
-      hiddenEditButtonsDivEl.setAttribute('hidden', '');
+      editServerButtonEl.setAttribute('hidden', '');
       connectButtonEl.setAttribute('disabled', '');
     }
     editorOpenWarningDivEl.setAttribute('hidden', '');
@@ -80,9 +83,14 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
     emptyTableWarningDivEl.setAttribute('hidden', '');
     if (window.globals.ircState.ircServerIndex < 0) {
       emptyTableWarningDivEl.removeAttribute('hidden');
-      hiddenEditButtonsDivEl.setAttribute('hidden', '');
+      editServerButtonEl.setAttribute('hidden', '');
       connectButtonEl.setAttribute('disabled', '');
     }
+    if (window.globals.ircState.ircConnected) {
+      awayHiddenDivEl.removeAttribute('hidden');
+    }
+    // always hide force button unless specific error
+    forceUnlockButtonEl.setAttribute('hidden', '');
   }; // updateVisbility()
 
   /**
@@ -704,6 +712,12 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
     }
   }; // webConnectHeaderBarIconHandler
 
+  awayButtonHeaderBarIconHandler = () => {
+    if ((window.globals.ircState.ircConnected) && (window.globals.ircState.ircIsAway)) {
+      this.sendIrcServerMessage('AWAY');
+    }
+  };
+
   /**
    * Called once per second as task scheduler, called from js/_afterLoad.js
    */
@@ -765,6 +779,7 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
           // limit to 1 line
           message = message.split('\n')[0];
           if (err.status === 409) {
+            this.shadowRoot.getElementById('forceUnlockButtonId').removeAttribute('hidden');
             document.getElementById('errorPanel').showError('Database Locked');
           } else if (err.status === 405) {
             document.getElementById('errorPanel').showError('Database Disabled');
@@ -814,6 +829,25 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
       this.disconnectHandler();
     });
 
+    // ---------------------------------
+    // Away icon and buttons
+    // ---------------------------------
+    this.shadowRoot.getElementById('setAwayButtonId').addEventListener('click', () => {
+      if ((window.globals.ircState.ircConnected) &&
+        (this.shadowRoot.getElementById('userAwayMessageId').value.length > 0)) {
+        this.sendIrcServerMessage(
+          'AWAY ' + this.shadowRoot.getElementById('userAwayMessageId').value);
+      }
+    });
+    this.shadowRoot.getElementById('setBackButtonId').addEventListener('click', () => {
+      if ((window.globals.ircState.ircConnected) && (window.globals.ircState.ircIsAway)) {
+        this.sendIrcServerMessage('AWAY');
+      }
+    });
+    this.shadowRoot.getElementById('setAwayInfoBtnId').addEventListener('click', () => {
+      this.shadowRoot.getElementById('setAwayInfoId').removeAttribute('hidden');
+    });
+
     // -------------------------------------
     // 2 of 2 Listeners on global events
     // -------------------------------------
@@ -854,6 +888,17 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
         panelDivEl.classList.remove('irc-controls-panel-theme-light');
         panelDivEl.classList.add('irc-controls-panel-theme-dark');
       }
+      let newTextTheme = 'global-text-theme-dark';
+      let oldTextTheme = 'global-text-theme-light';
+      if (document.querySelector('body').getAttribute('theme') === 'light') {
+        newTextTheme = 'global-text-theme-light';
+        oldTextTheme = 'global-text-theme-dark';
+      }
+      const inputEls = Array.from(this.shadowRoot.querySelectorAll('input'));
+      inputEls.forEach((el) => {
+        el.classList.remove(oldTextTheme);
+        el.classList.add(newTextTheme);
+      });
     });
 
     /**
@@ -948,20 +993,26 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
       }
       let infoReconnect = '';
       if (window.globals.ircState.ircAutoReconnect) {
-        infoReconnect = '\nAuto-reconnect: enabled';
-        if ((window.globals.ircState.serverRotation) &&
-        (window.globals.ircServerGroup > 0)) {
-          infoReconnect = '\n' +
-          'Auto-reconnect, server rotation group:' +
-          window.globals.ircState.ircServerGroup.toString();
-        }
+        infoReconnect = 'Auto-reconnect:   Enabled\n';
       }
-      const selectedServerInfo =
-        'Label:              ' + window.globals.ircState.ircServerName +
-        ' (Index=' + window.globals.ircState.ircServerIndex.toString() + ')\n' +
-        'Server:             ' + window.globals.ircState.ircServerHost + ':' +
-        window.globals.ircState.ircServerPort + infoTls + '\n' +
-        'Default nickname:   ' + window.globals.ircState.nickName + infoReconnect;
+      let infoRotate = '';
+      if ((window.globals.ircState.ircServerRotation) &&
+      (window.globals.ircState.ircServerGroup > 0)) {
+        infoRotate = '' +
+        'Rotate servers:   Group: ' +
+        window.globals.ircState.ircServerGroup.toString() + '\n';
+      }
+      let selectedServerInfo = 'Label:\nServer:\nNickname:';
+
+      if (window.globals.ircState.ircServerIndex >= 0) {
+        selectedServerInfo =
+          'Label:            ' + window.globals.ircState.ircServerName +
+          ' (Index=' + window.globals.ircState.ircServerIndex.toString() + ')\n' +
+          'Server:           ' + window.globals.ircState.ircServerHost + ':' +
+          window.globals.ircState.ircServerPort + infoTls + '\n' +
+          infoReconnect + infoRotate +
+          'Nickname:         ' + window.globals.ircState.nickName;
+      }
       this.shadowRoot.getElementById('selectedServerPreId').textContent = selectedServerInfo;
       this.updateVisibility();
     });

@@ -44,6 +44,9 @@ textarea {
   color: red;
   background-color: #080808;
 }
+.global-fw-bold {
+  font-weight: bold;
+}
 .global-border-theme-light {
   border: 1px solid black;
 }

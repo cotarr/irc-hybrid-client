@@ -271,6 +271,9 @@ window.customElements.define('debug-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('button14Id').addEventListener('click', () => {
       document.dispatchEvent(new CustomEvent('web-connect-changed'));
     });
+    this.shadowRoot.getElementById('button16Id').addEventListener('click', () => {
+      document.getElementById('displayUtils').toggleColorTheme();
+    });
     this.shadowRoot.getElementById('button17Id').addEventListener('click', () => {
       document.getElementById('showRaw').showPanel();
     });

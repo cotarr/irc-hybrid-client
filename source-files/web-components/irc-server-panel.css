@@ -22,3 +22,9 @@
   padding-top: 10px;
   padding-bottom: 10px;
 }
+
+.irc-server-panel-program-version-div {
+  font-size: 80%; 
+  text-align: right;
+  padding-right: 15px;
+}

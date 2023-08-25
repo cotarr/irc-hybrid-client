@@ -38,7 +38,7 @@
         </div>
         <div class="ml20">
           <h3>Selected IRC Server</h3>
-          <div>
+          <div> 
             <!-- dynamically inserted content -->
             <pre id="selectedServerPreId"></pre>
           </div>
@@ -52,13 +52,28 @@
             <button id="quitButtonId" class="mr10">Disconnect</button>
           </div>
         </div>
-        <div id="hiddenEditButtonsDivId">
-          <div class="vh20"></div>
-          <div class="vh20"></div>
+        <div class="vh20"></div>
+        <div class="vh10"></div>
+        <div>
           <button id="editServerButtonId" class="mr10">Edit Selected Server</button>
           <button id="forceUnlockButtonId" class="mr10">Force Unlock</button>
         </div>
-        <div class="vh20"></div>
+        <div id="awayHiddenDivId">
+          <input id="userAwayMessageId" type="text" size="20" value="AFK">
+          <button id=setAwayButtonId>Away</button>
+          <button id=setBackButtonId>Back</button>
+          <button id="setAwayInfoBtnId">?</button>
+          <div id="setAwayInfoId" class="white-info-div" hidden>
+            <p>
+              This will execute the IRC command /AWAY command providing a custom 
+              message if provided.
+            </p>
+            <p>
+              Click the [?] again to close this message.
+            </p>
+          </div>
+        </div>
+        <div class="vh10"></div>
       </div>
     </div>
   </div>

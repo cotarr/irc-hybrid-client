@@ -12,18 +12,38 @@
   color: white;
 }
 
-.server-form-input-group {
+.server-form-input-group1-light {
   background-color: #d7fcee;
   border: 1px solid black;
   border-radius: 7px;
+  color: black;
   padding-top: 0px;
   padding-left: 10px;
   padding-bottom: 10px;
 }
-.server-form-input-group2 {
+.server-form-input-group1-dark {
+  background-color: #1a5e42;
+  border: 1px solid white;
+  border-radius: 7px;
+  color: white;
+  padding-top: 0px;
+  padding-left: 10px;
+  padding-bottom: 10px;
+}
+.server-form-input-group2-light {
   background-color: #c4deff;
   border: 1px solid black;
   border-radius: 7px;
+  color: black;
+  padding-top: 0px;
+  padding-left: 10px;
+  padding-bottom: 10px;
+}
+.server-form-input-group2-dark {
+  background-color: #1d61b9;
+  border: 1px solid white;
+  border-radius: 7px;
+  color: white;
   padding-top: 0px;
   padding-left: 10px;
   padding-bottom: 10px;
@@ -33,14 +53,14 @@
   background-color: yellow;
   border: 1px solid black;
   border-radius: 7px;
+  color: black;
   margin-top: 10px;
   margin-right: 10px;
   padding: 10px;
 }
 
 .server-form-white-example-div {
-  background-color: white;
-  border: 1px solid black;
+  border: 1px solid #808080;
   display: inline-block;
   margin-top: 3px;
   padding-top: 0px;
@@ -51,6 +71,7 @@
 .server-form-white-info-div {
   background-color: white;
   border: 1px solid black;
+  color: black;
   margin-top: 3px;
   margin-bottom: 10px;
   padding-left: 5px;
@@ -66,7 +87,7 @@ input[type='number'].server-form-port-input {
 }
 
 .server-form-required-input {
-  background-color: black;
+  background-color: #cf23c7;
   border-radius: 5px;
   display: inline-block;
   width: 11px;
@@ -74,6 +95,7 @@ input[type='number'].server-form-port-input {
   margin-right: 3px;
 }
 .server-form-optional-input {
+  /* invisible, using as spacer */
   background-color: rgba(0,0,0,0);
   border-radius: 5px;
   display: inline-block;

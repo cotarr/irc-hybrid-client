@@ -274,7 +274,7 @@ customElements.define('header-bar', class extends HTMLElement {
       document.getElementById('ircControlsPanel').webConnectHeaderBarIconHandler();
     });
     this.shadowRoot.getElementById('ircIsAwayIconId').addEventListener('click', () => {
-      console.log('clicked ircIsAwayIconId');
+      document.getElementById('ircControlsPanel').awayButtonHeaderBarIconHandler();
     });
     this.shadowRoot.getElementById('channelUnreadExistIconId').addEventListener('click', () => {
       console.log('clicked channelUnreadExistIcon');

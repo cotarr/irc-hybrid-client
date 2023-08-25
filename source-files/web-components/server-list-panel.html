@@ -4,7 +4,7 @@
 <template id='serverListPanelTemplate'>
   <link rel="stylesheet" href="css/styles.css">
   <div id="panelVisibilityDivId" class="global-visibility-div">
-    <div id="panelDivId" class="global-panel-style-div server-form-theme-light">
+    <div id="panelDivId" class="global-panel-style-div server-form-theme-dark">
       <div class='global-head-flex'>
         <div class="global-head-left">
           <button id="closePanelButtonId" title="Hide Panel" class="global-show-hide-button mr5">x</button>
@@ -17,7 +17,7 @@
       </div>
       <div class="vh20"></div>
 
-      <div id="serverListDisabledDivId" class="yellow-warning-div">
+      <div id="serverListDisabledDivId" class="server-list-yellow-warning-div" hidden>
         <p>
           The Server List Editor has been disabled in the 
           web server configuration file.
@@ -25,8 +25,13 @@
       </div>
 
       <div>
-        <div id="editorOpenWarningDivId">
-          <h1>Editor is OPEN (TODO)</h1>
+        <div id="editorOpenWarningDivId" class="server-list-yellow-warning-div" hidden>
+          <h3>Editor is OPEN</h3>
+          <p>
+            The IRC server edit form is currently open (scroll up).
+            The edit form must be closed in order to connect to IRC.
+            Finish the current edit and press either [Save] or [Cancel].
+          </p>
         </div>
         <div>
           <button id="createNewButtonId">Create New IRC Server...</button>
@@ -44,18 +49,18 @@
         <div class="vh10"></div>
         <div>
           <table class="server-list-table">
-            <tbody id="tbodyId">
+            <tbody id="tbodyId" class="server-list-tbody-dark">
             </tbody>
           </table>
         </div>
-        <div class="all-disabled-warning-div" id="allDisabledWarningDivId" hidden>
+        <div id="allDisabledWarningDivId" class="server-list-yellow-warning-div" hidden>
           <h2>All IRC servers are disabled</h2>
           <p>
             At least one server must be enabled before 
             opening the IRC client page.
           </p>
         </div>
-        <div class="empty-table-div" id="emptyTableDivId" hiddenxxx>
+        <div id="emptyTableDivId" class="server-list-yellow-warning-div" hidden>
           <h2>No IRC servers have been defined</h2>
           <p>
             At least 1 IRC server must be defined here in the Server List Editor 
@@ -77,7 +82,7 @@
           <span id="ircProxyDiv"></span>
           <button id="ircProxyInfoBtn" title="Show Help">?</button>
         </div>
-        <div class="white-info-div" id="ircProxyInfo" hidden>
+        <div id="ircProxyInfo" class="server-list-white-info-div" hidden>
           <p>
             The proxy info displayed here shows the current socks5 network proxy 
             settings that have been configured in the web server. 

@@ -10,12 +10,16 @@ and this project adheres to
 
 Work in progress, see top of README.md
 
-Commit 
+Commit
+
+- Debug HTML and CSS in irc-controls-panel, server-list-panel, server-form-panel, irc-server-panel
+
+Commit 24687fa
 
 This is another large commit that includes 
 the new server-list-panel web component.
 The irc-controls-panel, server-list-panel, server-form-panel 
-and the irc-controls-panel web components are now 
+and the irc-server-panel web components are now 
 interconnected and functioning.
 Additional edit and debug still required.
 
