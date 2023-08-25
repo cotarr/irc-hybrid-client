@@ -36,6 +36,9 @@ window.customElements.define('wallops-panel', class extends HTMLElement {
 
   showPanel = () => {
     this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
+    // scroll to top
+    const panelMessageDisplayEl = this.shadowRoot.getElementById('panelMessageDisplayId');
+    panelMessageDisplayEl.scrollTop = panelMessageDisplayEl.scrollHeight;
   };
 
   // this panel does not collapse, so close it.
@@ -91,53 +94,6 @@ window.customElements.define('wallops-panel', class extends HTMLElement {
     }
   }; // displayWallopsMessage
 
-  // //
-  // // Clear textarea before reloading cache (Wallops window)
-  // //
-  // document.addEventListener('erase-before-reload', (event) => {
-  //   document.getElementById('wallopsMessageDisplay').value = '';
-  //   document.getElementById('wallopsSectionDiv').setAttribute('lastDate', '0000-00-00');
-  //   updateDivVisibility();
-  // });
-
-  // //
-  // // Add cache reload message to wallops window
-  // //
-  // // Example:  14:33:02 -----Cache Reload-----
-  // //
-  // document.addEventListener('cache-reload-done', (event) => {
-  //   let markerString = '';
-  //   let timestampString = '';
-  //   if (('detail' in event) && ('timestamp' in event.detail)) {
-  //     timestampString = unixTimestampToHMS(event.detail.timestamp);
-  //   }
-  //   if (timestampString) {
-  //     markerString += timestampString;
-  //   }
-  //   markerString += ' ' + cacheReloadString + '\n';
-
-  //   //
-  //   // If text area is blank, leave blank
-  //   // If not blank, then append cache reload divider.
-  //   if (document.getElementById('wallopsMessageDisplay').value !== '') {
-  //     document.getElementById('wallopsMessageDisplay').value += markerString;
-  //     document.getElementById('wallopsMessageDisplay').scrollTop =
-  //       document.getElementById('wallopsMessageDisplay').scrollHeight;
-  //   }
-  // });
-  // document.addEventListener('cache-reload-error', (event) => {
-  //   let errorString = '\n';
-  //   let timestampString = '';
-  //   if (('detail' in event) && ('timestamp' in event.detail)) {
-  //     timestampString = unixTimestampToHMS(event.detail.timestamp);
-  //   }
-  //   if (timestampString) {
-  //     errorString += timestampString;
-  //   }
-  //   errorString += ' ' + cacheErrorString + '\n\n';
-  //   document.getElementById('wallopsMessageDisplay').value = errorString;
-  // });
-
   // ------------------
   // Main entry point
   // ------------------
@@ -165,8 +121,14 @@ window.customElements.define('wallops-panel', class extends HTMLElement {
     // Erase button handler
     // -------------------------
     this.shadowRoot.getElementById('eraseButtonId').addEventListener('click', () => {
-      this.shadowRoot.getElementById('panelMessageDisplayId').value =
-        '\nTODO: fetch request to server for cache erase';
+      document.getElementById('ircControlsPanel').eraseIrcCache('WALLOPS')
+        .catch((err) => {
+          console.log(err);
+          let message = err.message || err.toString() || 'Error occurred calling /irc/connect';
+          // show only 1 line
+          message = message.split('\n')[0];
+          document.getElementById('errorPanel').showError(message);
+        });
     }); // panel erase button
 
     // -------------------------
@@ -196,6 +158,49 @@ window.customElements.define('wallops-panel', class extends HTMLElement {
     // -------------------------------------
     // 2 of 2 Listeners on global events
     // -------------------------------------
+
+    //
+    // Add cache reload message to notice window
+    //
+    // Example:  14:33:02 -----Cache Reload-----
+    //
+    document.addEventListener('cache-reload-done', (event) => {
+      const panelMessageDisplayEl = this.shadowRoot.getElementById('panelMessageDisplayId');
+      const cacheReloadString =
+        document.getElementById('globVars').constants('cacheReloadString');
+      let markerString = '';
+      let timestampString = '';
+      if (('detail' in event) && ('timestamp' in event.detail)) {
+        timestampString = document.getElementById('displayUtils')
+          .unixTimestampToHMS(event.detail.timestamp);
+      }
+      if (timestampString) {
+        markerString += timestampString;
+      }
+      markerString += ' ' + cacheReloadString + '\n';
+
+      if (panelMessageDisplayEl.value !== '') {
+        panelMessageDisplayEl.value += markerString;
+        panelMessageDisplayEl.scrollTop =
+          panelMessageDisplayEl.scrollHeight;
+      }
+    });
+
+    document.addEventListener('cache-reload-error', function (event) {
+      const cacheErrorString =
+        document.getElementById('globVars').constants('cacheErrorString');
+      let errorString = '\n';
+      let timestampString = '';
+      if (('detail' in event) && ('timestamp' in event.detail)) {
+        timestampString = document.getElementById('displayUtils')
+          .unixTimestampToHMS(event.detail.timestamp);
+      }
+      if (timestampString) {
+        errorString += timestampString;
+      }
+      errorString += ' ' + cacheErrorString + '\n\n';
+      this.shadowRoot.getElementById('panelMessageDisplayId').value = errorString;
+    });
 
     /**
      * Event to collapse all panels. This panel does not collapse so it is hidden
@@ -233,6 +238,15 @@ window.customElements.define('wallops-panel', class extends HTMLElement {
         panelMessageDisplayEl.classList.remove('global-text-theme-light');
         panelMessageDisplayEl.classList.add('global-text-theme-dark');
       }
+    });
+
+    //
+    // Clear textarea before reloading cache (Notice window)
+    //
+    document.addEventListener('erase-before-reload', (event) => {
+      this.shadowRoot.getElementById('panelMessageDisplayId').value = '';
+      this.shadowRoot.getElementById('panelDivId').setAttribute('lastDate', '0000-00-00');
+      // TODO this.shadowRoot.getElementById('noticeUnreadExistIcon').setAttribute('hidden', '');
     });
 
     /**

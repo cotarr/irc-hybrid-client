@@ -26,8 +26,11 @@
 //   sendIrcServerMessageHandler()  returns Promise(null)
 //   sendIrcServerMessage()         Function wrapped in error message handler
 //   connectHandler()               returns Promise(null)
+//   disconnectHandler()            Function sends /QUIT
 //   forceDisconnectHandler()       returns Promise(null)
 //   pruneIrcChannel()              returns Promise(null)
+//   updateFromCache                returns Promise
+//   webServerTerminate
 // ------------------------------------------------------------------------------
 'use strict';
 window.customElements.define('irc-controls-panel', class extends HTMLElement {
@@ -41,6 +44,7 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
     this.ircConnectedLast = false;
     this.ircConnectingLast = false;
     this.ircFirstConnect = true;
+    this.updateCacheDebounceActive = false;
   }
 
   showPanel = () => {
@@ -173,7 +177,7 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
             this.lastConnectErrorCount = window.globals.ircState.count.ircConnectError;
             if (window.globals.ircState.count.ircConnectError > 0) {
               // On page refresh, skip legacy IRC errors occurring on the
-              // first /irc/getwebstate call
+              // first /irc/getwebState call
               if (window.globals.webState.count.webStateCalls > 1) {
                 document.getElementById('errorPanel')
                   .showError('An IRC Server connection error occurred');
@@ -258,7 +262,7 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
           if (fetchTimerId) clearTimeout(fetchTimerId);
           activitySpinnerEl.cancelActivitySpinner();
           if (responseJson.error) {
-            reject(responseJson.message);
+            reject(new Error(responseJson.message));
           } else {
             resolve(null);
           }
@@ -452,7 +456,7 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
           if (fetchTimerId) clearTimeout(fetchTimerId);
           activitySpinnerEl.cancelActivitySpinner();
           if (responseJson.error) {
-            reject(responseJson.message);
+            reject(new Error(responseJson.message));
           } else {
             resolve(null);
           }
@@ -563,7 +567,7 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
           if (fetchTimerId) clearTimeout(fetchTimerId);
           activitySpinnerEl.cancelActivitySpinner();
           if (responseJson.error) {
-            reject(responseJson.message);
+            reject(new Error(responseJson.message));
           } else {
             resolve(null);
           }
@@ -588,7 +592,128 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
     }); // new Promise
   }; // forceDisconnectHandler()
 
-  // Fetch API to remove channel from backend server
+  // -------------------------------------------------
+  // This function performs API request to obtain
+  // the full IRC server message cache from the web server
+  // as an API response. The contents are then parsed as if
+  // the message were real time.
+  // -------------------------------------------------
+  updateFromCache = () => {
+    if (window.globals.webState.cacheReloadInProgress) {
+      // Abort in case of cache reload already in progress
+      return Promise.reject(new Error(
+        'Attempt cache reload, while previous in progress'));
+    }
+    // Used by event handlers to inhibit various actions.
+    window.globals.webState.cacheReloadInProgress = true;
+
+    // Clear activity icons
+    // TODO
+    // resetNotActivityIcon();
+
+    // Fire event to clear previous contents
+    // TODO this is async, could clear after fetch
+    document.dispatchEvent(new CustomEvent('erase-before-reload'));
+    return new Promise((resolve, reject) => {
+      const fetchTimeout = document.getElementById('globVars').constants('fetchTimeout');
+      const activitySpinnerEl = document.getElementById('activitySpinner');
+      const fetchController = new AbortController();
+      const fetchOptions = {
+        method: 'GET',
+        redirect: 'error',
+        signal: fetchController.signal,
+        headers: {
+          Accept: 'application/json'
+        }
+      };
+      const fetchURL = document.getElementById('globVars').webServerUrl + '/irc/cache';
+      activitySpinnerEl.requestActivitySpinner();
+      const fetchTimerId = setTimeout(() => fetchController.abort(), fetchTimeout);
+      fetch(fetchURL, fetchOptions)
+        .then((response) => {
+          if (response.status === 200) {
+            return response.json();
+          } else {
+            // Retrieve error message from remote web server and pass to error handler
+            return response.text()
+              .then((remoteErrorText) => {
+                const err = new Error('HTTP status error');
+                err.status = response.status;
+                err.statusText = response.statusText;
+                err.remoteErrorText = remoteErrorText;
+                throw err;
+              });
+          }
+        })
+        .then((responseArray) => {
+          if (fetchTimerId) clearTimeout(fetchTimerId);
+          activitySpinnerEl.cancelActivitySpinner();
+          if (Array.isArray(responseArray)) {
+            window.globals.webState.lastPMNick = '';
+            window.globals.webState.activePrivateMessageNicks = [];
+
+            //
+            // Option 1, receive array of NodeJS Buffer object and convert to utf8 string messages
+            //
+            // let utf8decoder = new TextDecoder('utf8');
+            // for (let i=0; i<responseArray.length; i++) {
+            //   if ((responseArray[i].type === 'Buffer') && (responseArray[i].data.length > 0)) {
+            //     let data = new Uint8Array(responseArray[i].data);
+            //     _parseBufferMessage(utf8decoder.decode(data));
+            //   }
+            // }
+            //
+            // Option 2, receive array of utf8 string message
+            //
+            const remoteCommandParserEl = document.getElementById('remoteCommandParser');
+            if (responseArray.length > 0) {
+              for (let i = 0; i < responseArray.length; i++) {
+                if (responseArray[i].length > 0) {
+                  remoteCommandParserEl.parseBufferMessage(responseArray[i]);
+                }
+              }
+            }
+          }
+          // this is to inform windows that cache reload has completed.
+          const timestamp = Math.floor(Date.now() / 1000);
+          document.dispatchEvent(new CustomEvent('cache-reload-done', {
+            detail: {
+              timestamp: timestamp
+            }
+          }));
+          resolve(null);
+        })
+        .catch((err) => {
+          if (fetchTimerId) clearTimeout(fetchTimerId);
+          activitySpinnerEl.cancelActivitySpinner();
+          // Build generic error message to catch network errors
+          let message = ('Fetch error, ' + fetchOptions.method + ' ' + fetchURL + ', ' +
+            (err.message || err.toString() || 'Error'));
+          if (err.status) {
+            // Case of HTTP status error, build descriptive error message
+            message = ('HTTP status error, ') + err.status.toString() + ' ' +
+              err.statusText + ', ' + fetchOptions.method + ' ' + fetchURL;
+          }
+          if (err.remoteErrorText) {
+            message += ', ' + err.remoteErrorText;
+          }
+          const timestamp = Math.floor(Date.now() / 1000);
+          document.dispatchEvent(new CustomEvent('cache-reload-error', {
+            detail: {
+              timestamp: timestamp
+            }
+          }));
+          const error = new Error(message);
+          reject(error);
+        });
+    }); // new Promise
+  }; // updateFromCache;
+
+  /**
+   * Fetch API to remove channel from backend server
+   * @param {string} pruneChannel - Name of channel to prune
+   * @returns {promise} Returns promise resolving to null, else reject error
+   */
   pruneIrcChannel = (pruneChannel) => {
     if ((typeof pruneChannel !== 'string') || (pruneChannel.length < 1)) {
       return Promise.reject(new Error('Invalid channel name parameter'));
@@ -638,7 +763,7 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
             if (fetchTimerId) clearTimeout(fetchTimerId);
             activitySpinnerEl.cancelActivitySpinner();
             if (responseJson.error) {
-              reject(responseJson.message);
+              reject(new Error(responseJson.message));
             } else {
               resolve(null);
             }
@@ -663,6 +788,152 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
       }); // new promise
     } // valid param
   }; // pruneIrcChannel()
+
+  /**
+   * Fetch API Request server to erase message cache
+   * @param {string} cacheType -Allowed: CACHE, NOTICE, WALLOPS, PRIVMSG
+   * @returns {promise} Returns promise resolving to null, else reject error
+   */
+  eraseIrcCache = (cacheType) => {
+    if ((typeof cacheType !== 'string') || (cacheType.length < 1)) {
+      return Promise.reject(new Error('Invalid erase cache parameter'));
+    } else {
+      // signal to panels to clear content before reload
+      document.dispatchEvent(new CustomEvent('erase-before-reload'));
+      return new Promise((resolve, reject) => {
+        const fetchTimeout = document.getElementById('globVars').constants('fetchTimeout');
+        const activitySpinnerEl = document.getElementById('activitySpinner');
+        const fetchController = new AbortController();
+        const fetchOptions = {
+          method: 'POST',
+          redirect: 'error',
+          signal: fetchController.signal,
+          headers: {
+            'CSRF-Token': document.getElementById('globVars').csrfToken,
+            'Content-type': 'application/json',
+            Accept: 'application/json'
+          },
+          body: JSON.stringify({ erase: cacheType })
+        };
+        const fetchURL = document.getElementById('globVars').webServerUrl + '/irc/erase';
+        activitySpinnerEl.requestActivitySpinner();
+        const fetchTimerId = setTimeout(() => fetchController.abort(), fetchTimeout);
+        fetch(fetchURL, fetchOptions)
+          .then((response) => {
+            if (response.status === 200) {
+              return response.json();
+            } else {
+              // Retrieve error message from remote web server and pass to error handler
+              return response.text()
+                .then((remoteErrorText) => {
+                  const err = new Error('HTTP status error');
+                  err.status = response.status;
+                  err.statusText = response.statusText;
+                  err.remoteErrorText = remoteErrorText;
+                  throw err;
+                });
+            }
+          })
+          .then((responseJson) => {
+            // console.log(JSON.stringify(responseJson, null, 2));
+            if (fetchTimerId) clearTimeout(fetchTimerId);
+            activitySpinnerEl.cancelActivitySpinner();
+            if (responseJson.error) {
+              reject(new Error(responseJson.message));
+            } else {
+              resolve(responseJson);
+            }
+          })
+          .catch((err) => {
+            if (fetchTimerId) clearTimeout(fetchTimerId);
+            activitySpinnerEl.cancelActivitySpinner();
+            // Build generic error message to catch network errors
+            let message = ('Fetch error, ' + fetchOptions.method + ' ' + fetchURL + ', ' +
+              (err.message || err.toString() || 'Error'));
+            if (err.status) {
+              // Case of HTTP status error, build descriptive error message
+              message = ('HTTP status error, ') + err.status.toString() + ' ' +
+                err.statusText + ', ' + fetchOptions.method + ' ' + fetchURL;
+            }
+            if (err.remoteErrorText) {
+              message += ', ' + err.remoteErrorText;
+            }
+            const error = new Error(message);
+            reject(error);
+          });
+      }); // new promise
+    } // valid param
+  }; // eraseIrcCache
+
+  /**
+   * Fetch API to shutdown (Die) web server and remote IRC client
+   * @returns {promise} Returns promise resolving to null, else reject error
+   */
+  webServerTerminate = () => {
+    return new Promise((resolve, reject) => {
+      const fetchTimeout = document.getElementById('globVars').constants('fetchTimeout');
+      const activitySpinnerEl = document.getElementById('activitySpinner');
+      const fetchController = new AbortController();
+      const fetchOptions = {
+        method: 'POST',
+        redirect: 'error',
+        signal: fetchController.signal,
+        headers: {
+          'CSRF-Token': document.getElementById('globVars').csrfToken,
+          'Content-type': 'application/json',
+          Accept: 'application/json'
+        },
+        body: JSON.stringify({ terminate: 'YES' })
+      };
+      const fetchURL =
+        document.getElementById('globVars').webServerUrl + '/terminate';
+      activitySpinnerEl.requestActivitySpinner();
+      const fetchTimerId = setTimeout(() => fetchController.abort(), fetchTimeout);
+      fetch(fetchURL, fetchOptions)
+        .then((response) => {
+          if (response.status === 200) {
+            return response.json();
+          } else {
+            // Retrieve error message from remote web server and pass to error handler
+            return response.text()
+              .then((remoteErrorText) => {
+                const err = new Error('HTTP status error');
+                err.status = response.status;
+                err.statusText = response.statusText;
+                err.remoteErrorText = remoteErrorText;
+                throw err;
+              });
+          }
+        })
+        .then((responseJson) => {
+          // console.log(JSON.stringify(responseJson, null, 2));
+          if (fetchTimerId) clearTimeout(fetchTimerId);
+          activitySpinnerEl.cancelActivitySpinner();
+          if (responseJson.error) {
+            reject(new Error(responseJson.message));
+          } else {
+            resolve(responseJson);
+          }
+        })
+        .catch((err) => {
+          if (fetchTimerId) clearTimeout(fetchTimerId);
+          activitySpinnerEl.cancelActivitySpinner();
+          // Build generic error message to catch network errors
+          let message = ('Fetch error, ' + fetchOptions.method + ' ' + fetchURL + ', ' +
+            (err.message || err.toString() || 'Error'));
+          if (err.status) {
+            // Case of HTTP status error, build descriptive error message
+            message = ('HTTP status error, ') + err.status.toString() + ' ' +
+              err.statusText + ', ' + fetchOptions.method + ' ' + fetchURL;
+          }
+          if (err.remoteErrorText) {
+            message += ', ' + err.remoteErrorText;
+          }
+          const error = new Error(message);
+          reject(error);
+        });
+    }); // new promise
+  }; // webServerTerminate
 
   // ------------------------------------------------
   // Tap "Web" status icon to connect/disconnect
@@ -762,6 +1033,9 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('showServerListButtonId').addEventListener('click', () => {
       document.getElementById('serverListPanel').showPanel();
     });
+    this.shadowRoot.getElementById('showServerPanelButtonId').addEventListener('click', () => {
+      document.getElementById('ircServerPanel').showPanel();
+    });
 
     this.shadowRoot.getElementById('editServerButtonId').addEventListener('click', () => {
       const serverFormEl = document.getElementById('serverFormPanel');
@@ -851,6 +1125,52 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
     // -------------------------------------
     // 2 of 2 Listeners on global events
     // -------------------------------------
+
+    //
+    // Global Cache Events
+    //
+    document.addEventListener('cache-reload-done', (event) => {
+      window.globals.webState.cacheReloadInProgress = false;
+    });
+
+    document.addEventListener('cache-reload-error', (event) => {
+      window.globals.webState.cacheReloadInProgress = false;
+    });
+
+    // updateFromCache with 1 second debounce
+    window.addEventListener('debounced-update-from-cache', (event) => {
+      if (!this.updateCacheDebounceActive) {
+        this.updateCacheDebounceActive = true;
+        setTimeout(() => {
+          this.updateCacheDebounceActive = false;
+          if (!window.globals.webState.cacheReloadInProgress) {
+            this.updateFromCache()
+              .catch((err) => {
+                console.log(err);
+                let message = err.message || err.toString() || 'Error';
+                // show only 1 line
+                message = message.split('\n')[0];
+                document.getElementById('errorPanel').showError(message);
+              });
+          }
+        }, 1000);
+      }
+    });
+
+    document.addEventListener('update-from-cache', (event) => {
+      this.updateFromCache()
+        .catch((err) => {
+          console.log(err);
+          let message = err.message || err.toString() || 'Error';
+          // show only 1 line
+          message = message.split('\n')[0];
+          document.getElementById('errorPanel').showError(message);
+        });
+    });
+
+    //
+    // Rest of non Cache events
+    //
 
     /**
      * Event to collapse all panels. This panel does not collapse so it is hidden
@@ -986,11 +1306,6 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
       } // if (!ircState.ircConnected) {
 
       // Update select server display
-      let infoTls = '';
-      if (window.globals.ircState.ircTLSEnabled) {
-        infoTls = ' (TLS)';
-        if (window.globals.ircState.ircTLSVerify) infoTls = ' (TLS,verify)';
-      }
       let infoReconnect = '';
       if (window.globals.ircState.ircAutoReconnect) {
         infoReconnect = 'Auto-reconnect:   Enabled\n';
@@ -1009,7 +1324,7 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
           'Label:            ' + window.globals.ircState.ircServerName +
           ' (Index=' + window.globals.ircState.ircServerIndex.toString() + ')\n' +
           'Server:           ' + window.globals.ircState.ircServerHost + ':' +
-          window.globals.ircState.ircServerPort + infoTls + '\n' +
+          window.globals.ircState.ircServerPort + '\n' +
           infoReconnect + infoRotate +
           'Nickname:         ' + window.globals.ircState.nickName;
       }

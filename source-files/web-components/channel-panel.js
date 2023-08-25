@@ -217,6 +217,9 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
     this.shadowRoot.getElementById('panelCollapsedDivId').setAttribute('visible', '');
     this.shadowRoot.getElementById('hideWithCollapseId').removeAttribute('hidden');
+    // scroll to top
+    const panelMessageDisplayEl = this.shadowRoot.getElementById('panelMessageDisplayId');
+    panelMessageDisplayEl.scrollTop = panelMessageDisplayEl.scrollHeight;
   };
 
   collapsePanel = () => {
@@ -1275,7 +1278,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     // needed to update date on first line printed
     this.shadowRoot.getElementById('panelDivId').setAttribute('lastDate', '0000-00-00');
     // Local count in channel window (to match global activity icon visibility)
-    this.resetMessageCount();
+    // TODO this.resetMessageCount();
   }; // handleEraseBeforeReload
 
   //

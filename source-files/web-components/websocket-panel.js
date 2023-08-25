@@ -740,8 +740,8 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
    * Called once per second as task scheduler, called from js/_afterLoad.js
    */
   timerTickHandler = () => {
-    // TODO this._reconnectTimerTickHandler();
-    // this.heartbeatTimerTickHandler();
+    this._reconnectTimerTickHandler();
+    this.heartbeatTimerTickHandler();
   };
 
   initializePlugin () {

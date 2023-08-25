@@ -6,11 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Next v2.0.0-dev 2023-08-23 (Draft)
+## Next v2.0.0-dev 2023-08-25 (Draft)
 
 Work in progress, see top of README.md
 
 Commit
+
+- Added websocket will auto-reconnect if browser disconnected.
+- Added API handler for route /terminate
+- Added API handler for route /irc/erase
+- Added API handler for route /irc/cache
+- Added and debugged cache reload to server panel, notice panel, and wallops panel
+
+Commit c743ea8
 
 - Debug HTML and CSS in irc-controls-panel, server-list-panel, server-form-panel, irc-server-panel
 

@@ -37,6 +37,9 @@ window.customElements.define('irc-server-panel', class extends HTMLElement {
    */
   showPanel = () => {
     this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
+    // scroll to top
+    const panelMessageDisplayEl = this.shadowRoot.getElementById('panelMessageDisplayId');
+    panelMessageDisplayEl.scrollTop = panelMessageDisplayEl.scrollHeight;
   };
 
   /**
@@ -734,8 +737,34 @@ window.customElements.define('irc-server-panel', class extends HTMLElement {
         '\nPanel cleared, this did not clear the message cache\n\n';
     });
 
+    this.shadowRoot.getElementById('loadFromCacheButtonId').addEventListener('click', () => {
+      document.dispatchEvent(new CustomEvent('update-from-cache'));
+    });
+
     this.shadowRoot.getElementById('forceDisconnectButtonId').addEventListener('click', () => {
       document.getElementById('ircControlsPanel').forceDisconnectHandler()
+        .catch((err) => {
+          console.log(err);
+          let message = err.message || err.toString() || 'Error occurred calling /irc/connect';
+          // show only 1 line
+          message = message.split('\n')[0];
+          document.getElementById('errorPanel').showError(message);
+        });
+    });
+
+    this.shadowRoot.getElementById('eraseCacheButtonId').addEventListener('click', () => {
+      document.getElementById('ircControlsPanel').eraseIrcCache('CACHE')
+        .catch((err) => {
+          console.log(err);
+          let message = err.message || err.toString() || 'Error occurred calling /irc/connect';
+          // show only 1 line
+          message = message.split('\n')[0];
+          document.getElementById('errorPanel').showError(message);
+        });
+    });
+
+    this.shadowRoot.getElementById('serverTerminateButtonId').addEventListener('click', () => {
+      document.getElementById('ircControlsPanel').webServerTerminate()
         .catch((err) => {
           console.log(err);
           let message = err.message || err.toString() || 'Error occurred calling /irc/connect';
@@ -772,6 +801,49 @@ window.customElements.define('irc-server-panel', class extends HTMLElement {
     // -------------------------------------
     // 2 of 2 Listeners on global events
     // -------------------------------------
+
+    //
+    // Add cache reload message to server window
+    //
+    // Example:  14:33:02 -----Cache Reload-----
+    //
+    document.addEventListener('cache-reload-done', (event) => {
+      const panelMessageDisplayEl = this.shadowRoot.getElementById('panelMessageDisplayId');
+      const cacheReloadString =
+        document.getElementById('globVars').constants('cacheReloadString');
+      let markerString = '';
+      let timestampString = '';
+      if (('detail' in event) && ('timestamp' in event.detail)) {
+        timestampString = document.getElementById('displayUtils')
+          .unixTimestampToHMS(event.detail.timestamp);
+      }
+      if (timestampString) {
+        markerString += timestampString;
+      }
+      markerString += ' ' + cacheReloadString + '\n';
+
+      if (panelMessageDisplayEl.value !== '') {
+        panelMessageDisplayEl.value += markerString;
+        panelMessageDisplayEl.scrollTop =
+          panelMessageDisplayEl.scrollHeight;
+      }
+    });
+
+    document.addEventListener('cache-reload-error', function (event) {
+      const cacheErrorString =
+        document.getElementById('globVars').constants('cacheErrorString');
+      let errorString = '\n';
+      let timestampString = '';
+      if (('detail' in event) && ('timestamp' in event.detail)) {
+        timestampString = document.getElementById('displayUtils')
+          .unixTimestampToHMS(event.detail.timestamp);
+      }
+      if (timestampString) {
+        errorString += timestampString;
+      }
+      errorString += ' ' + cacheErrorString + '\n\n';
+      this.shadowRoot.getElementById('panelMessageDisplayId').value = errorString;
+    });
 
     /**
      * Event to collapse all panels. This panel does not collapse so it is hidden
@@ -824,6 +896,11 @@ window.customElements.define('irc-server-panel', class extends HTMLElement {
         elapsedTimeOuterDivEl.classList.remove('global-text-theme-light');
         elapsedTimeOuterDivEl.classList.add('global-text-theme-dark');
       }
+    });
+
+    document.addEventListener('erase-before-reload', (event) => {
+      this.shadowRoot.getElementById('panelMessageDisplayId').value = '';
+      this.shadowRoot.getElementById('panelDivId').setAttribute('lastDate', '0000-00-00');
     });
 
     /**

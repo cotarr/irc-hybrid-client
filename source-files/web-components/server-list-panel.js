@@ -1105,7 +1105,7 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
           }
         }
       } else {
-        if ((event.detail) && (event.detail.debug)) this.showPanel();
+        this.showPanel();
       }
     });
   } // connectedCallback()

@@ -65,6 +65,7 @@ window.customElements.define('debug-panel', class extends HTMLElement {
         'global-scroll-to-top',
         'hide-all-panels',
         'irc-state-changed',
+        'irc-server-edit-open',
         'resize-custom-elements',
         'show-all-panels',
         'update-channel-count',

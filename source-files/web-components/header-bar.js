@@ -88,6 +88,14 @@ customElements.define('header-bar', class extends HTMLElement {
         this.shadowRoot.getElementById('ircIsAwayIconId').setAttribute('hidden', '');
       }
     }
+    if (Object.hasOwn(options, 'zoom')) {
+      if (options.zoom) {
+        noIcons = false;
+        this.shadowRoot.getElementById('panelZoomIconId').removeAttribute('hidden');
+      } else {
+        this.shadowRoot.getElementById('panelZoomIconId').setAttribute('hidden', '');
+      }
+    }
     if (Object.hasOwn(options, 'channelUnread')) {
       if (options.channelUnread) {
         noIcons = false;
@@ -153,6 +161,8 @@ customElements.define('header-bar', class extends HTMLElement {
       'Waiting to auto-reconnect to IRC server';
     this.shadowRoot.getElementById('ircIsAwayIconId').title =
       'Cancel IRC away (/AWAY)';
+    this.shadowRoot.getElementById('panelZoomIconId').title =
+      'Un-zoom panels';
     this.shadowRoot.getElementById('channelUnreadExistIconId').title =
       'Unread IRC channel message';
     this.shadowRoot.getElementById('privMsgUnreadExistIconId').title =
@@ -200,6 +210,7 @@ customElements.define('header-bar', class extends HTMLElement {
       ircConnect: 'unavailable',
       wait: false,
       away: false,
+      zoom: false,
       channelUnread: false,
       privMsgUnread: false,
       noticeUnread: false,
@@ -275,6 +286,9 @@ customElements.define('header-bar', class extends HTMLElement {
     });
     this.shadowRoot.getElementById('ircIsAwayIconId').addEventListener('click', () => {
       document.getElementById('ircControlsPanel').awayButtonHeaderBarIconHandler();
+    });
+    this.shadowRoot.getElementById('panelZoomIconId').addEventListener('click', () => {
+      console.log('clicked panelZoomIcon');
     });
     this.shadowRoot.getElementById('channelUnreadExistIconId').addEventListener('click', () => {
       console.log('clicked channelUnreadExistIcon');
