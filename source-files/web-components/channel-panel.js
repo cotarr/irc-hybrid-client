@@ -597,7 +597,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       panelDivEl.removeAttribute('beep1-enabled');
     } else {
       panelDivEl.setAttribute('beep1-enabled', '');
-      document.getElementById('tempPlaceholder').playBeep1Sound();
+      document.getElementById('beepSounds').playBeep1Sound();
     }
     this.updateLocalStorageBeepEnable();
     this.updateVisibility();
@@ -612,7 +612,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       panelDivEl.removeAttribute('beep2-enabled');
     } else {
       panelDivEl.setAttribute('beep2-enabled', '');
-      document.getElementById('tempPlaceholder').playBeep1Sound();
+      document.getElementById('beepSounds').playBeep1Sound();
     }
     this.updateLocalStorageBeepEnable();
     this.updateVisibility();
@@ -627,7 +627,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       panelDivEl.removeAttribute('beep3-enabled');
     } else {
       panelDivEl.setAttribute('beep3-enabled', '');
-      document.getElementById('tempPlaceholder').playBeep1Sound();
+      document.getElementById('beepSounds').playBeep1Sound();
     }
     this.updateLocalStorageBeepEnable();
     this.updateVisibility();
@@ -1064,7 +1064,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
           }
           if (panelDivEl.hasAttribute('beep2-enabled') &&
             (!window.globals.webState.cacheReloadInProgress)) {
-            document.getElementById('tempPlaceholder').playBeep1Sound();
+            document.getElementById('beepSounds').playBeep1Sound();
           }
           // If channel panel is closed, open it up when a new person joins
           if (!window.globals.webState.cacheReloadInProgress) {
@@ -1164,13 +1164,13 @@ window.customElements.define('channel-panel', class extends HTMLElement {
             parsedMessage.params[1]);
           if (panelDivEl.hasAttribute('beep1-enabled') &&
             (!window.globals.webState.cacheReloadInProgress)) {
-            document.getElementById('tempPlaceholder').playBeep1Sound();
+            document.getElementById('beepSounds').playBeep1Sound();
           }
           if (panelDivEl.hasAttribute('beep3-enabled')) {
             const checkLine = parsedMessage.params[1].toLowerCase();
             if ((checkLine.indexOf(window.globals.ircState.nickName.toLowerCase()) >= 0) &&
               (!window.globals.webState.cacheReloadInProgress)) {
-              setTimeout(document.getElementById('tempPlaceholder').playBeep2Sound, 250);
+              setTimeout(document.getElementById('beepSounds').playBeep2Sound, 250);
             }
           }
           // If channel panel is closed, open it up receiving new message

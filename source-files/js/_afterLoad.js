@@ -52,7 +52,7 @@ if (!(window.customElements && document.body.attachShadow)) {
   //
   document.getElementById('globVars').initializePlugin();
   document.getElementById('displayUtils').initializePlugin();
-  // document.getElementById('beepSounds').initializePlugin();
+  document.getElementById('beepSounds').initializePlugin();
   // document.getElementById('localCommandParser').initializePlugin();
   // document.getElementById('remoteCommandParser').initializePlugin();
   // document.getElementById('ctcpParser').initializePlugin();
@@ -88,7 +88,7 @@ if (!(window.customElements && document.body.attachShadow)) {
   setInterval(() => {
     document.getElementById('errorPanel').timerTickHandler();
     document.getElementById('displayUtils').timerTickHandler();
-    // document.getElementById('beepSounds').timerTickHandler();
+    document.getElementById('beepSounds').timerTickHandler();
     // document.getElementById('localCommandParser').timerTickHandler();
     // document.getElementById('remoteCommandParser').timerTickHandler();
     // document.getElementById('ctcpCommandParser').timerTickHandler();

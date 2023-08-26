@@ -45,6 +45,7 @@ customElements.define('header-bar', class extends HTMLElement {
     * @param {Object} options - Key/value pairs for each status icon
     */
   setHeaderBarIcons = (options) => {
+    // console.log(JSON.stringify(options, null, 2));
     const webConnectIconEl = this.shadowRoot.getElementById('webConnectIconId');
     const ircConnectIconEl = this.shadowRoot.getElementById('ircConnectIconId');
     let noIcons = true;
@@ -214,8 +215,8 @@ customElements.define('header-bar', class extends HTMLElement {
       channelUnread: false,
       privMsgUnread: false,
       noticeUnread: false,
-      nickRecovery: false,
-      enableAudio: false
+      nickRecovery: false
+      // enableAudio: false
     };
     if (window.globals.webState.webConnected) {
       state.webConnect = 'connected';
@@ -276,7 +277,7 @@ customElements.define('header-bar', class extends HTMLElement {
       document.getElementById('navMenu').toggleDropdownMenu();
     });
     this.shadowRoot.getElementById('enableAudioButtonId').addEventListener('click', () => {
-      console.log('clicked enableAudioButton');
+      document.getElementById('beepSounds').userInitiatedAudioPlay();
     });
     this.shadowRoot.getElementById('webConnectIconId').addEventListener('click', () => {
       document.getElementById('websocketPanel').webConnectHeaderBarIconHandler();

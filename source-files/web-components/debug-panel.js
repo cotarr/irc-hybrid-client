@@ -278,6 +278,15 @@ window.customElements.define('debug-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('button17Id').addEventListener('click', () => {
       document.getElementById('showRaw').showPanel();
     });
+    this.shadowRoot.getElementById('button19Id').addEventListener('click', () => {
+      document.getElementById('beepSounds').testPlayBeepSound1();
+    });
+    this.shadowRoot.getElementById('button20Id').addEventListener('click', () => {
+      document.getElementById('beepSounds').testPlayBeepSound2();
+    });
+    this.shadowRoot.getElementById('button21Id').addEventListener('click', () => {
+      document.getElementById('beepSounds').testPlayBeepSound3();
+    });
     this.shadowRoot.getElementById('button23Id').addEventListener('click', () => {
       document.getElementById('showIrcState').showPanel();
     });

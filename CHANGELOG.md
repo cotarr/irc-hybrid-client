@@ -12,6 +12,11 @@ Work in progress, see top of README.md
 
 Commit
 
+- Added media playback for audio "beep" sounds in web component beep-sounds.
+- Hooked media sounds into channel panel and header bar.
+
+Commit 14ba60c
+
 - Added websocket will auto-reconnect if browser disconnected.
 - Added API handler for route /terminate
 - Added API handler for route /irc/erase
