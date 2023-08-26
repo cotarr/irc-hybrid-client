@@ -369,11 +369,9 @@ window.customElements.define('irc-server-panel', class extends HTMLElement {
         '\n=== ' + parsedMessage.datestamp + ' ===\n\n';
     }
 
-    if (!window.globals.webState.cacheReloadInProgress) {
-      if ((!('zoomPanelId' in window.globals.webState)) ||
-        (window.globals.webState.zoomPanelId.length < 1)) {
-        this.showPanel();
-      }
+    if ((!window.globals.webState.cacheReloadInProgress) &&
+      (!document.querySelector('body').hasAttribute('zoomId'))) {
+      this.showPanel();
     }
 
     switch (parsedMessage.command) {
@@ -955,11 +953,11 @@ window.customElements.define('irc-server-panel', class extends HTMLElement {
      * @listens document:resize-custom-elements
      */
     document.addEventListener('resize-custom-elements', () => {
-      if (window.globals.webState.dynamic.inputAreaCharWidthPx) {
+      if (window.globals.webState.dynamic.testAreaColumnPxWidth) {
         const calcInputAreaColSize = document.getElementById('displayUtils').calcInputAreaColSize;
         // pixel width mar1 is reserved space on edges of input area at full screen width
-        const mar1 = window.globals.webState.dynamic.commonMargin;
-        const mar2 = window.globals.webState.dynamic.commonMargin + 5 +
+        const mar1 = window.globals.webState.dynamic.commonMarginRightPx;
+        const mar2 = window.globals.webState.dynamic.commonMarginRightPx + 5 +
           window.globals.webState.dynamic.sendButtonWidthPx;
         // set width of input area elements
         this.shadowRoot.getElementById('panelMessageDisplayId')

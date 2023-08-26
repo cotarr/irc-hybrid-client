@@ -58,7 +58,6 @@
 //   }
 // ------------------------------------------------------------------------------
 // TODO: Multi-line paste send not work in offline debug
-// TODO Zoom, hides other windows, need optimization logic
 
 'use strict';
 window.customElements.define('channel-panel', class extends HTMLElement {
@@ -77,7 +76,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
 
     // Default values
     this.mobileBreakpointPx = 600;
-    this.defaultHeightInRows = '17';
+    this.defaultHeightInRows = '12';
     this.channelNamesCharWidth = 20;
   }
 
@@ -217,6 +216,8 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
     this.shadowRoot.getElementById('panelCollapsedDivId').setAttribute('visible', '');
     this.shadowRoot.getElementById('hideWithCollapseId').removeAttribute('hidden');
+    this.shadowRoot.getElementById('bottomCollapseDivId').setAttribute('hidden', '');
+    this.handleCancelZoomEvent();
     // scroll to top
     const panelMessageDisplayEl = this.shadowRoot.getElementById('panelMessageDisplayId');
     panelMessageDisplayEl.scrollTop = panelMessageDisplayEl.scrollHeight;
@@ -226,12 +227,17 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
     this.shadowRoot.getElementById('panelCollapsedDivId').removeAttribute('visible');
     this.shadowRoot.getElementById('hideWithCollapseId').setAttribute('hidden', '');
+    this.shadowRoot.getElementById('bottomCollapseDivId').setAttribute('hidden', '');
+    // when collapsing panel channel, if zoomed, cancel the zoom
+    this.handleCancelZoomEvent();
   };
 
   hidePanel = () => {
     this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible');
     this.shadowRoot.getElementById('panelCollapsedDivId').removeAttribute('visible');
     this.shadowRoot.getElementById('hideWithCollapseId').removeAttribute('hidden');
+    // when closing channel, if zoomed, cancel the zoom
+    this.handleCancelZoomEvent();
   };
 
   _handleCloseButton = () => {
@@ -331,6 +337,8 @@ window.customElements.define('channel-panel', class extends HTMLElement {
   // -----------------------
   handleChannelInputAreaElPaste = (event) => {
     if (this._splitMultiLinePaste(event.clipboardData.getData('text')).length > 1) {
+      // Screen size changes when input area is taller, cancel zoom
+      this.handleCancelZoomEvent();
       // Make multi-line clipboard past notice visible and show button
       this.shadowRoot.getElementById('multiLineSendSpanId').textContent = 'Clipboard (' +
       this._splitMultiLinePaste(event.clipboardData.getData('text')).length + ' lines)';
@@ -453,6 +461,16 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     }
   };
 
+  handleBottomCollapseButton = () => {
+    this.handleCancelZoomEvent();
+    const bottomCollapseDivEl = this.shadowRoot.getElementById('bottomCollapseDivId');
+    if (bottomCollapseDivEl.hasAttribute('hidden')) {
+      bottomCollapseDivEl.removeAttribute('hidden');
+    } else {
+      bottomCollapseDivEl.setAttribute('hidden', '');
+    }
+  };
+
   updateVisibility = () => {
     const panelDivEl = this.shadowRoot.getElementById('panelDivId');
     const beep1CheckBoxEl = this.shadowRoot.getElementById('beep1CheckBoxId');
@@ -496,20 +514,54 @@ window.customElements.define('channel-panel', class extends HTMLElement {
   // Zoom button handler
   // -------------------------
   handleChannelZoomButtonElClick = (event) => {
-    if (this.shadowRoot.getElementById('panelDivId').hasAttribute('zoom')) {
+    const bodyEl = document.querySelector('body');
+    const headerBarEl = document.getElementById('headerBar');
+    const zoomButtonEl = this.shadowRoot.getElementById('zoomButtonId');
+    const bottomCollapseDivEl = this.shadowRoot.getElementById('bottomCollapseDivId');
+    if ((bodyEl.hasAttribute('zoomId')) &&
+      (bodyEl.getAttribute('zoomId') === 'channel' + this.channelName)) {
       // Turn off channel zoom
-      this.shadowRoot.getElementById('panelDivId').removeAttribute('zoom');
-      // scroll text to most recent messages
-      this.shadowRoot.getElementById('panelMessageDisplayId').scrollTop =
-      this.shadowRoot.getElementById('panelMessageDisplayId').scrollHeight;
-      // clearLastZoom();
+      bodyEl.removeAttribute('zoomId');
+      headerBarEl.setHeaderBarIcons({ zoom: false });
+      zoomButtonEl.textContent = 'Zoom';
+      zoomButtonEl.classList.remove('channel-panel-zoomed');
+      // reset screen size back to default
+      bottomCollapseDivEl.setAttribute('hidden', '');
+      this._handleNormalButton();
+      this._handleGlobalWindowResize();
     } else {
-      this.shadowRoot.getElementById('panelDivId').setAttribute('zoom', '');
+      bodyEl.setAttribute('zoomId', 'channel' + this.channelName);
+      headerBarEl.setHeaderBarIcons({ zoom: true });
+      zoomButtonEl.textContent = 'UnZoom';
+      zoomButtonEl.classList.add('channel-panel-zoomed');
       document.dispatchEvent(new CustomEvent('hide-all-panels', {
         detail: {
           except: ['channel' + this.channelName]
         }
       }));
+      // Hide stuff below the input bar.
+      bottomCollapseDivEl.setAttribute('hidden', '');
+      // This sets size for zoomed page
+      this._handleGlobalWindowResize();
+    }
+  };
+
+  handleCancelZoomEvent = () => {
+    const bodyEl = document.querySelector('body');
+    const headerBarEl = document.getElementById('headerBar');
+    const zoomButtonEl = this.shadowRoot.getElementById('zoomButtonId');
+    const bottomCollapseDivEl = this.shadowRoot.getElementById('bottomCollapseDivId');
+    if ((bodyEl.hasAttribute('zoomId')) &&
+      (bodyEl.getAttribute('zoomId') === 'channel' + this.channelName)) {
+      // Turn off channel zoom
+      bodyEl.removeAttribute('zoomId');
+      headerBarEl.setHeaderBarIcons({ zoom: false });
+      zoomButtonEl.textContent = 'Zoom';
+      zoomButtonEl.classList.remove('channel-panel-zoomed');
+      // reset screen size back to default
+      bottomCollapseDivEl.setAttribute('hidden', '');
+      this._handleNormalButton();
+      this._handleGlobalWindowResize();
     }
   };
 
@@ -1067,7 +1119,8 @@ window.customElements.define('channel-panel', class extends HTMLElement {
             document.getElementById('beepSounds').playBeep1Sound();
           }
           // If channel panel is closed, open it up when a new person joins
-          if (!window.globals.webState.cacheReloadInProgress) {
+          if ((!window.globals.webState.cacheReloadInProgress) &&
+            (!document.querySelector('body').hasAttribute('zoomId'))) {
             this.showPanel();
           }
           this.updateVisibility();
@@ -1125,7 +1178,8 @@ window.customElements.define('channel-panel', class extends HTMLElement {
 
           // Upon channel notice, make section visible.
           // If channel panel is closed, open it up when a new person joins
-          if (!window.globals.webState.cacheReloadInProgress) {
+          if ((!window.globals.webState.cacheReloadInProgress) &&
+            (!document.querySelector('body').hasAttribute('zoomId'))) {
             this.showPanel();
           }
           this.updateVisibility();
@@ -1174,7 +1228,8 @@ window.customElements.define('channel-panel', class extends HTMLElement {
             }
           }
           // If channel panel is closed, open it up receiving new message
-          if (!window.globals.webState.cacheReloadInProgress) {
+          if ((!window.globals.webState.cacheReloadInProgress) &&
+            (!document.querySelector('body').hasAttribute('zoomId'))) {
             this.showPanel();
           }
 
@@ -1328,24 +1383,26 @@ window.customElements.define('channel-panel', class extends HTMLElement {
   // Scale values for <textarea> are calculated in webclient10.js
   // and saved globally in the webState object
   //
-  _adjustChannelInputToWidowWidth = () => {
+  _adjustTextareaWidthDynamically = () => {
     const panelNickListEl = this.shadowRoot.getElementById('panelNickListId');
     const panelMessageDisplayEl = this.shadowRoot.getElementById('panelMessageDisplayId');
     // pixel width mar1 is reserved space on edges of input area at full screen width
-    const mar1 = window.globals.webState.dynamic.commonMargin;
-    // pixel width mar2 is reserved space on edges of input area with send button added
-    const mar2 = window.globals.webState.dynamic.commonMargin + 5 +
-      window.globals.webState.dynamic.sendButtonWidthPx;
+    const mar1 = window.globals.webState.dynamic.commonMarginRightPx;
+    // pixel width mar2 is reserved space on edges of
+    // input area with send button and collapse button added
+    const mar2 = window.globals.webState.dynamic.commonMarginRightPx + 5 +
+      window.globals.webState.dynamic.sendButtonWidthPx +
+      window.globals.webState.dynamic.collapseButtonWidthPx;
     // pixel width mar3 is reserved space on edges of input area with channel nickname list on sides
 
     // get size of nickname list element
-    const nicknameListPixelWidth = window.globals.webState.dynamic.inputAreaSideWidthPx +
-      (this.channelNamesCharWidth * window.globals.webState.dynamic.inputAreaCharWidthPx);
+    const nicknameListPixelWidth = window.globals.webState.dynamic.textAreaPaddingPxWidth +
+      (this.channelNamesCharWidth * window.globals.webState.dynamic.testAreaColumnPxWidth);
 
     // nickname list + right margin.
-    const mar3 = window.globals.webState.dynamic.commonMargin + nicknameListPixelWidth + 6;
+    const mar3 = window.globals.webState.dynamic.commonMarginRightPx + nicknameListPixelWidth + 6;
 
-    if (window.globals.webState.dynamic.bodyClientWidth > this.mobileBreakpointPx) {
+    if (window.globals.webState.dynamic.panelPxWidth > this.mobileBreakpointPx) {
       panelMessageDisplayEl.setAttribute('cols', document.getElementById('displayUtils')
         .calcInputAreaColSize(mar3));
       panelNickListEl.removeAttribute('hidden');
@@ -1360,11 +1417,52 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     }
     this.shadowRoot.getElementById('panelMessageInputId')
       .setAttribute('cols', document.getElementById('displayUtils').calcInputAreaColSize(mar2));
-  }; // adjustChannelInputToWidowWidth()
+  }; // _adjustTextareaWidthDynamically()
+
+  _adjustTextareaHeightDynamically = () => {
+    const bodyEl = document.querySelector('body');
+    if ((bodyEl.hasAttribute('zoomId')) &&
+      (bodyEl.getAttribute('zoomId') === 'channel' + this.channelName)) {
+      const panelNickListEl = this.shadowRoot.getElementById('panelNickListId');
+      const panelMessageDisplayEl = this.shadowRoot.getElementById('panelMessageDisplayId');
+
+      // ------------------------------------------
+      // Adjustable....
+      // Decrease to make channel panel taller
+      // ------------------------------------------
+      const marginPxHeight = 135;
+
+      // If page measurements have already been done
+      if ((window.globals.webState.dynamic.textAreaRowPxHeight) &&
+        (typeof window.globals.webState.dynamic.textAreaRowPxHeight === 'number') &&
+        (window.globals.webState.dynamic.textAreaRowPxHeight > 1) &&
+        (window.globals.webState.dynamic.textareaPaddingPxHeight) &&
+        (typeof window.globals.webState.dynamic.textareaPaddingPxHeight === 'number') &&
+        (window.globals.webState.dynamic.textareaPaddingPxHeight > 1)) {
+        // Then resize vertically
+        //
+        // calculate rows of textarea element
+        //
+        let rows = (window.globals.webState.dynamic.panelPxHeight -
+            window.globals.webState.dynamic.textareaPaddingPxHeight -
+            marginPxHeight);
+        rows = parseInt(rows / window.globals.webState.dynamic.textAreaRowPxHeight);
+
+        if (window.globals.webState.dynamic.panelPxWidth > this.mobileBreakpointPx) {
+          panelNickListEl.removeAttribute('hidden');
+        } else {
+          panelNickListEl.setAttribute('hidden', '');
+        }
+        panelMessageDisplayEl.setAttribute('rows', rows);
+        panelNickListEl.setAttribute('rows', rows);
+      }
+    } // is zoomed
+  }; // _adjustTextareaHeightDynamically()
 
   _handleGlobalWindowResize = () => {
-    if (window.globals.webState.dynamic.inputAreaCharWidthPx) {
-      this._adjustChannelInputToWidowWidth();
+    if (window.globals.webState.dynamic.testAreaColumnPxWidth) {
+      this._adjustTextareaWidthDynamically();
+      this._adjustTextareaHeightDynamically();
     }
   };
 
@@ -1438,6 +1536,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       this.shadowRoot.getElementById('beep1CheckBoxId').removeEventListener('click', this.handleChannelBeep1CBInputElClick);
       this.shadowRoot.getElementById('beep2CheckBoxId').removeEventListener('click', this.handleChannelBeep2CBInputElClick);
       this.shadowRoot.getElementById('beep3CheckBoxId').removeEventListener('click', this.handleChannelBeep3CBInputElClick);
+      this.shadowRoot.getElementById('bottomCollapseButtonId').removeEventListener('click', this.handleBottomCollapseButton);
       this.shadowRoot.getElementById('briefCheckboxId').removeEventListener('click', this.handleBriefCheckboxClick);
       this.shadowRoot.getElementById('clearButtonId').removeEventListener('click', this._handleClearButton);
       this.shadowRoot.getElementById('closePanelButtonId').removeEventListener('click', this._handleCloseButton);
@@ -1459,6 +1558,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       document.removeEventListener('cache-reload-done', this.handleCacheReloadDone);
       document.removeEventListener('cache-reload-error', this.handleCacheReloadError);
       document.removeEventListener('cancel-beep-sounds', this.handleCancelBeepSounds);
+      document.removeEventListener('cancel-zoom', this.handleCancelZoomEvent);
       document.removeEventListener('collapse-all-panels', this._handleCollapseAllPanels);
       document.removeEventListener('color-theme-changed', this._handleColorThemeChanged);
       document.removeEventListener('erase-before-reload', this.handleEraseBeforeReload);
@@ -1549,7 +1649,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
         }
       }
     } else {
-      this.hidePanel();
+      this.collapsePanel();
     }
   };
 
@@ -1631,7 +1731,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     this.loadBeepEnable();
 
     // enable brief mode on narrow screens
-    if (window.globals.webState.dynamic.bodyClientWidth < this.mobileBreakpointPx) {
+    if (window.globals.webState.dynamic.panelPxWidth < this.mobileBreakpointPx) {
       this.shadowRoot.getElementById('panelDivId').setAttribute('brief-enabled', '');
       this.shadowRoot.getElementById('briefCheckboxId').checked = true;
     } else {
@@ -1689,14 +1789,11 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       }
     );
 
-    // Upon creating new channel window, open it unzoomed
-    this.shadowRoot.getElementById('panelDivId').removeAttribute('zoom');
-    // TODO updateVisibility();
+    this.updateVisibility();
 
-    //
     // Resize on creating channel window
     //
-    this._adjustChannelInputToWidowWidth();
+    this._adjustTextareaWidthDynamically();
     //
     // This is a hack. If adding the channel window
     // causes the vertical scroll to appear,
@@ -1705,7 +1802,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     // Fix...wait 0.1 sec for scroll bar to appear and
     // dynamically size again.
     //
-    setTimeout(this._adjustChannelInputToWidowWidth.bind(this), 100);
+    setTimeout(this._adjustTextareaWidthDynamically.bind(this), 100);
   }; // initializePlugin
 
   // -------------------------------------------
@@ -1723,6 +1820,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('beep1CheckBoxId').addEventListener('click', this.handleChannelBeep1CBInputElClick);
     this.shadowRoot.getElementById('beep2CheckBoxId').addEventListener('click', this.handleChannelBeep2CBInputElClick);
     this.shadowRoot.getElementById('beep3CheckBoxId').addEventListener('click', this.handleChannelBeep3CBInputElClick);
+    this.shadowRoot.getElementById('bottomCollapseButtonId').addEventListener('click', this.handleBottomCollapseButton);
     this.shadowRoot.getElementById('briefCheckboxId').addEventListener('click', this.handleBriefCheckboxClick);
     this.shadowRoot.getElementById('clearButtonId').addEventListener('click', this._handleClearButton);
     this.shadowRoot.getElementById('collapsePanelButtonId').addEventListener('click', this._handleCollapseButton);
@@ -1747,6 +1845,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     document.addEventListener('cache-reload-done', this.handleCacheReloadDone);
     document.addEventListener('cache-reload-error', this.handleCacheReloadError);
     document.addEventListener('cancel-beep-sounds', this.handleCancelBeepSounds);
+    document.addEventListener('cancel-zoom', this.handleCancelZoomEvent);
     document.addEventListener('collapse-all-panels', this._handleCollapseAllPanels);
     document.addEventListener('color-theme-changed', this._handleColorThemeChanged);
     document.addEventListener('erase-before-reload', this.handleEraseBeforeReload);

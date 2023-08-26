@@ -168,14 +168,19 @@ window.customElements.define('glob-vars', class extends HTMLElement {
     // dynamic page layout, these values overwritten dynamically
     //
     window.globals.webState.dynamic = {
-      inputAreaCharWidthPx: null,
-      inputAreaSideWidthPx: null,
+      testAreaColumnPxWidth: null,
+      textAreaPaddingPxWidth: null,
+      textAreaRowPxHeight: null,
+      textareaPaddingPxHeight: null,
       sendButtonWidthPx: null,
-      // commonMargin represents a space on iPHone right side thumb scroll area
-      commonMargin: 50,
+      collapseButtonWidthPx: null,
+      // commonMarginRightPx represents a space on iPHone right side thumb scroll area
+      commonMarginRightPx: 50,
       lastDevicePixelRatio: 1,
-      bodyClientWidth: document.querySelector('body').clientWidth,
-      lastClientWidth: document.querySelector('body').clientWidth
+      panelPxWidth: document.querySelector('body').clientWidth,
+      panelPxHeight: window.innerHeight,
+      lastPanelPxWidth: document.querySelector('body').clientWidth,
+      lastPanelPxHeight: window.innerHeight
     };
     // only if browser support devicePixelRatio
     if (window.devicePixelRatio) {

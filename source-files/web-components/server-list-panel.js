@@ -79,7 +79,7 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
         this.editable = true;
         this.fullWidth = false;
         this.mobileWidth = false;
-        if (window.globals.webState.dynamic.bodyClientWidth <
+        if (window.globals.webState.dynamic.panelPxWidth <
           this.mobileWedthBreakpointPixels) {
           this.mobileWidth = true;
         }
@@ -1043,7 +1043,7 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
             this.editable = true;
             this.fullWidth = false;
             this.mobileWidth = false;
-            if (window.globals.webState.dynamic.bodyClientWidth <
+            if (window.globals.webState.dynamic.panelPxWidth <
               this.mobileWedthBreakpointPixels) {
               this.mobileWidth = true;
             }

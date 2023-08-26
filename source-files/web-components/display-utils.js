@@ -348,16 +348,15 @@ window.customElements.define('display-utils', class extends HTMLElement {
   //
   // This program displays and receives user input using <textarea> elements.
   // The <textarea> elements render differently in desktop and mobile devices
+  // The size of the textarea will change if the browser zoom is changed (not 100%)
   // The size of the buttons is different in desktop and mobile devices.
   //
   // Therefore, it is necessary to dynamically create <textarea> and <button>
   // elements and determine the size in pixels for a particular browser and zoom.
   //
   // The width of a <textarea> element is the sum of a fixed
-  // value for margin, or difference between element pixel internal characters.
-  // The second part is the pixel size of each character in the <textarea>
-  // For Chrome on my Linux desktop with a zoom of 100%,
-  // a <textarea> element is 7 pixels per character plus 21 pixels on the sides.
+  // value for textarea padding and the (column width * number of columns)
+  // or (row width * number of rows)
   //
   // For this to work, a fixed width font is required.
   //
@@ -365,10 +364,10 @@ window.customElements.define('display-utils', class extends HTMLElement {
   //   Dynamically insert 2 <textarea> elements into the shadowDOM of this custom element
   //       (these temporary elements are positioned underneath the header bar at the top)
   //   Set character width2
-  //   Measure element pixel width of each textarea
+  //   Measure textarea padding width of each textarea
   //   Calculate regression to get slope and intercept
-  //   The intercept is the margin width
-  //   The slope is the pixel width of each character.
+  //   The intercept is the padding in pixels
+  //   The slope is the pixel width of each column or row.
   //   Remove the element from the shadowDOM
   //
   //   Dynamically insert a <button> element
@@ -376,22 +375,29 @@ window.customElements.define('display-utils', class extends HTMLElement {
   //   Measure pixel width of [Send] button
   //   Remove the element
   //
-  // These values to be used to determine value of the "cols" attribute
-  // of a <textarea> element to dynamically size it to a variable window width.
+  // These values to be used to determine value of the "rows" and "cols" attribute
+  // of a <textarea> element to dynamically size it to a dynamic window size.
   // --------------------------------------------------------------------------
   //
   // This is a element measurement function
   // It should be run before resizing elements to avoid browser Reflow violations
   //
   _updatePageMeasurements () {
-    window.globals.webState.dynamic.bodyClientWidth =
+    // This is based on "body" width to be inside of the vertical slider bar if present
+    window.globals.webState.dynamic.panelPxWidth =
       document.querySelector('body').clientWidth.toString();
-    // Debug: To watch a variable, put it here.
+    // THis is based on "window" height because actual panels may be
+    // shorter than browser window height
+    window.globals.webState.dynamic.panelPxHeight =
+      window.innerHeight.toString();
+    // Determine browser window sizes
     if (!window.globals.webState.watch) window.globals.webState.watch = {};
     window.globals.webState.watch.innerHeight = window.innerHeight.toString() + 'px';
     window.globals.webState.watch.innerWidth = window.innerWidth.toString() + 'px';
-    window.globals.webState.watch.bodyClientWidth =
-      window.globals.webState.dynamic.bodyClientWidth.toString() + 'px';
+    window.globals.webState.watch.panelPxWidth =
+      window.globals.webState.dynamic.panelPxWidth.toString() + 'px';
+    window.globals.webState.watch.panelPxHeight =
+      window.globals.webState.dynamic.panelPxHeight.toString() + 'px';
     window.globals.webState.watch.devicePixelRatio = window.devicePixelRatio;
   }; // _updatePageMeasurements
 
@@ -405,40 +411,56 @@ window.customElements.define('display-utils', class extends HTMLElement {
     // Value of temporary character size (cols attribute)
     const rulerX1 = 10;
     const rulerX2 = 20;
+    const rulerY1 = 1;
+    const rulerY2 = 11;
 
     // Create size #1 <textarea> element using first width value
     const rulerTextareaEl1 = document.createElement('textarea');
     rulerTextareaEl1.setAttribute('cols', rulerX1.toString());
-    rulerTextareaEl1.setAttribute('rows', '1');
+    rulerTextareaEl1.setAttribute('rows', rulerY1.toString());
     displayUtilsElement.appendChild(rulerTextareaEl1);
 
     // Create size #2 <textarea> element using first width value
     const rulerTextareaEl2 = document.createElement('textarea');
     rulerTextareaEl2.setAttribute('cols', rulerX2.toString());
-    rulerTextareaEl2.setAttribute('rows', '1');
+    rulerTextareaEl2.setAttribute('rows', rulerY2.toString());
     displayUtilsElement.appendChild(rulerTextareaEl2);
 
     // Create <button> element and fill with "Send" string value
-    const rulerButtonEl = document.createElement('button');
-    rulerButtonEl.textContent = 'Send';
-    displayUtilsElement.appendChild(rulerButtonEl);
+    const rulerButton1El = document.createElement('button');
+    rulerButton1El.textContent = 'Send';
+    displayUtilsElement.appendChild(rulerButton1El);
 
-    // the rulerY1, is the pixel width of a textarea with rulerX1 characters
-    const rulerY1 = rulerTextareaEl1.getBoundingClientRect().width;
-    // repeat with different character and pixel width
-    const rulerY2 = rulerTextareaEl2.getBoundingClientRect().width;
+    // Button to show/hide the bottom part of channel panel
+    const rulerButton2El = document.createElement('button');
+    rulerButton2El.textContent = '⇅';
+    displayUtilsElement.appendChild(rulerButton2El);
+
+    // the size, is the pixel width of a textarea with rulerX1 characters
+    const sizeX1 = rulerTextareaEl1.getBoundingClientRect().width;
+    const sizeX2 = rulerTextareaEl2.getBoundingClientRect().width;
+    const sizeY1 = rulerTextareaEl1.getBoundingClientRect().height;
+    const sizeY2 = rulerTextareaEl2.getBoundingClientRect().height;
+    // console.log('small', sizeX1, sizeY1, 'large', sizeX2, sizeY2);
 
     // perform regression (2 equation, 2 variables) to get slope and intercept (Y = mX + b)
-    window.globals.webState.dynamic.inputAreaCharWidthPx =
-      (rulerY2 - rulerY1) / (rulerX2 - rulerX1);
-    window.globals.webState.dynamic.inputAreaSideWidthPx =
-      rulerY1 - (rulerX1 * window.globals.webState.dynamic.inputAreaCharWidthPx);
-
-    window.globals.webState.dynamic.sendButtonWidthPx = rulerButtonEl.getBoundingClientRect().width;
+    window.globals.webState.dynamic.testAreaColumnPxWidth =
+      (sizeX2 - sizeX1) / (rulerX2 - rulerX1);
+    window.globals.webState.dynamic.textAreaPaddingPxWidth =
+      sizeX1 - (rulerX1 * window.globals.webState.dynamic.testAreaColumnPxWidth);
+    window.globals.webState.dynamic.textAreaRowPxHeight =
+      (sizeY2 - sizeY1) / (rulerY2 - rulerY1);
+    window.globals.webState.dynamic.textareaPaddingPxHeight =
+      sizeY1 - (rulerY1 * window.globals.webState.dynamic.textAreaRowPxHeight);
+    window.globals.webState.dynamic.sendButtonWidthPx =
+      rulerButton1El.getBoundingClientRect().width;
+    window.globals.webState.dynamic.collapseButtonWidthPx =
+      rulerButton2El.getBoundingClientRect().width;
     // done, remove the temporary element
     displayUtilsElement.removeChild(rulerTextareaEl1);
     displayUtilsElement.removeChild(rulerTextareaEl2);
-    displayUtilsElement.removeChild(rulerButtonEl);
+    displayUtilsElement.removeChild(rulerButton1El);
+    displayUtilsElement.removeChild(rulerButton2El);
   }; // _calibrateElementSize()
 
   // ---------------------------------------------------------------------------
@@ -452,18 +474,18 @@ window.customElements.define('display-utils', class extends HTMLElement {
   // --------------------------------------------------------------------------
   calcInputAreaColSize (marginPxWidth) {
     if ((typeof marginPxWidth === 'number') &&
-      (window.globals.webState.dynamic.inputAreaCharWidthPx) &&
-      (typeof window.globals.webState.dynamic.inputAreaCharWidthPx === 'number') &&
-      (window.globals.webState.dynamic.inputAreaCharWidthPx > 1) &&
-      (window.globals.webState.dynamic.inputAreaSideWidthPx) &&
-      (typeof window.globals.webState.dynamic.inputAreaSideWidthPx === 'number') &&
-      (window.globals.webState.dynamic.inputAreaSideWidthPx > 1)) {
+      (window.globals.webState.dynamic.testAreaColumnPxWidth) &&
+      (typeof window.globals.webState.dynamic.testAreaColumnPxWidth === 'number') &&
+      (window.globals.webState.dynamic.testAreaColumnPxWidth > 1) &&
+      (window.globals.webState.dynamic.textAreaPaddingPxWidth) &&
+      (typeof window.globals.webState.dynamic.textAreaPaddingPxWidth === 'number') &&
+      (window.globals.webState.dynamic.textAreaPaddingPxWidth > 1)) {
       let margin = marginPxWidth;
       if (margin < 0) margin = 0;
       const cols = parseInt(
-        (window.globals.webState.dynamic.bodyClientWidth -
-          window.globals.webState.dynamic.inputAreaSideWidthPx - margin) /
-        window.globals.webState.dynamic.inputAreaCharWidthPx);
+        (window.globals.webState.dynamic.panelPxWidth -
+          window.globals.webState.dynamic.textAreaPaddingPxWidth - margin) /
+        window.globals.webState.dynamic.testAreaColumnPxWidth);
       return cols.toString();
     } else {
       console.log('alcInputAreaColSize() invalid input');
@@ -481,7 +503,7 @@ window.customElements.define('display-utils', class extends HTMLElement {
   handleExternalWindowResizeEvent (event) {
     this._updatePageMeasurements();
     // ignore resize events before dynamic size variables exist
-    if (window.globals.webState.dynamic.inputAreaCharWidthPx) {
+    if (window.globals.webState.dynamic.testAreaColumnPxWidth) {
       // console.log('window resize event');
       //
       // If browser supports devicePixelRatio, then compare
@@ -500,16 +522,13 @@ window.customElements.define('display-utils', class extends HTMLElement {
       }
 
       // Resize textarea elements
-      document.dispatchEvent(new CustomEvent('resize-custom-elements',
-        {
-          bubbles: true,
-          detail: {
-          }
-        }));
+      document.dispatchEvent(new CustomEvent('resize-custom-elements'));
 
       // This is to prevent unnecessary resize event on timer check (next function below)
-      window.globals.webState.dynamic.lastClientWidth =
-        window.globals.webState.dynamic.bodyClientWidth;
+      window.globals.webState.dynamic.lastPanelPxWidth =
+        window.globals.webState.dynamic.panelPxWidth;
+      window.globals.webState.dynamic.lastClientHeight =
+        window.globals.webState.dynamic.panelPxHeight;
     }
   };
 
@@ -523,21 +542,20 @@ window.customElements.define('display-utils', class extends HTMLElement {
     this._updatePageMeasurements();
 
     // skip if not initialized
-    if (window.globals.webState.dynamic.inputAreaCharWidthPx) {
+    if (window.globals.webState.dynamic.testAreaColumnPxWidth) {
       // Case of making window visible/hidden add or remove vertical slider, change width.
       // There is no event to catch this so it's done on a timer.
-      if (window.globals.webState.dynamic.lastClientWidth !==
-        window.globals.webState.dynamic.bodyClientWidth) {
-        window.globals.webState.dynamic.lastClientWidth =
-          window.globals.webState.dynamic.bodyClientWidth;
+      if ((window.globals.webState.dynamic.lastPanelPxWidth !==
+        window.globals.webState.dynamic.panelPxWidth) ||
+        (window.globals.webState.dynamic.lastPanelPxHeight !==
+          window.globals.webState.dynamic.panelPxHeight)) {
+        window.globals.webState.dynamic.lastPanelPxWidth =
+          window.globals.webState.dynamic.panelPxWidth;
+        window.globals.webState.dynamic.lastPanelPxHeight =
+          window.globals.webState.dynamic.panelPxHeight;
 
         // Resize textarea elements
-        document.dispatchEvent(new CustomEvent('resize-custom-elements',
-          {
-            bubbles: true,
-            detail: {
-            }
-          }));
+        document.dispatchEvent(new CustomEvent('resize-custom-elements'));
       }
     }
   }; // _checkVerticalSliderPageWidth()
@@ -550,13 +568,7 @@ window.customElements.define('display-utils', class extends HTMLElement {
     this._calibrateElementSize();
 
     // Resize textarea elements
-    document.dispatchEvent(new CustomEvent('resize-custom-elements',
-      {
-        bubbles: true,
-        detail: {
-        }
-      }
-    ));
+    document.dispatchEvent(new CustomEvent('resize-custom-elements'));
   };
 
   /**
@@ -574,8 +586,8 @@ window.customElements.define('display-utils', class extends HTMLElement {
     // Do initially on page load, calibrate textarea element size, and resize input area elements.
     //
     this._updatePageMeasurements();
-    window.globals.webState.dynamic.lastClientWidth =
-     window.globals.webState.dynamic.bodyClientWidth;
+    window.globals.webState.dynamic.lastPanelPxWidth =
+     window.globals.webState.dynamic.panelPxWidth;
     this._calibrateElementSize();
     // Resize textarea elements
     document.dispatchEvent(new CustomEvent('resize-custom-elements',

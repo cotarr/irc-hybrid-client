@@ -12,6 +12,16 @@ Work in progress, see top of README.md
 
 Commit
 
+This is a major rewrite of the channel panel "zoom" button code.
+Now it is more useful, especially on a smart phone.
+
+- Hides all other panels
+- Inhibits other channel and notice panels from automatically opening if new text arrives (server and wallops still open automatically.)
+- Set's channel panel textarea column and row heights to fill the entire browser window.
+- Set's a "zoom" icon in the header that if clicked will unzoom any zoomed window.
+
+Commit 2318a29
+
 - Added media playback for audio "beep" sounds in web component beep-sounds.
 - Hooked media sounds into channel panel and header bar.
 

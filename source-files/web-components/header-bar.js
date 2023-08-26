@@ -140,7 +140,7 @@ customElements.define('header-bar', class extends HTMLElement {
     if (noIcons) {
       this.shadowRoot.getElementById('titleDivId').setAttribute('noIcons', '');
       // Pixel with occurs 2 places on this page.
-      if (window.globals.webState.dynamic.bodyClientWidth > 500) {
+      if (window.globals.webState.dynamic.panelPxWidth > 500) {
         this.shadowRoot.getElementById('titleDivId').removeAttribute('hidden');
       } else {
         this.shadowRoot.getElementById('titleDivId').setAttribute('hidden', '');
@@ -223,11 +223,11 @@ customElements.define('header-bar', class extends HTMLElement {
       if (window.globals.ircState.ircConnected) {
         if (window.globals.ircState.ircRegistered) {
           state.ircConnect = 'connected';
-          if (window.globals.ircState.ircIsAway) {
-            state.away = true;
-          }
         } else {
           state.ircConnect = 'connecting';
+        } // ircRegistered
+        if (window.globals.ircState.ircIsAway) {
+          state.away = true;
         }
       } else {
         // IRC server disconnected
@@ -242,7 +242,7 @@ customElements.define('header-bar', class extends HTMLElement {
           (!window.globals.ircState.ircConnecting)) {
           state.wait = true;
         }
-      }
+      } // ircConnected
     } else {
       // Web not connected
       state.hideNavMenu = true;
@@ -289,7 +289,7 @@ customElements.define('header-bar', class extends HTMLElement {
       document.getElementById('ircControlsPanel').awayButtonHeaderBarIconHandler();
     });
     this.shadowRoot.getElementById('panelZoomIconId').addEventListener('click', () => {
-      console.log('clicked panelZoomIcon');
+      document.dispatchEvent(new CustomEvent('cancel-zoom'));
     });
     this.shadowRoot.getElementById('channelUnreadExistIconId').addEventListener('click', () => {
       console.log('clicked channelUnreadExistIcon');
@@ -363,7 +363,7 @@ customElements.define('header-bar', class extends HTMLElement {
     document.addEventListener('resize-custom-elements', () => {
       const titleDivEl = this.shadowRoot.getElementById('titleDivId');
       // Pixel with occurs 2 places on this page.
-      if ((window.globals.webState.dynamic.bodyClientWidth > 500) &&
+      if ((window.globals.webState.dynamic.panelPxWidth > 500) &&
       (titleDivEl.hasAttribute('noIcons'))) {
         titleDivEl.removeAttribute('hidden');
       } else {

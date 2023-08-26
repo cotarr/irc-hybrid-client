@@ -114,14 +114,3 @@
 .hbar-wait-icon[hidden] {
   display: none;
 }
-.hbar-zoom-icon {
-  background-color: blue;
-  border: 1px solid black;
-  border-radius: 12px;
-  color: white;
-  font-weight: bold;
-  display: inline-block;
-  margin-right: 2px;
-  padding: 3px 10px 2px 10px;
-  cursor: pointer;
-}

@@ -33,25 +33,28 @@
       <div class="mb5">
         <textarea id="panelMessageInputId" class="global-valign-middle rm5 global-text-theme-dark" cols="77" rows="1"></textarea>
         <button id="sendButtonId" class="global-valign-middle">Send</button>
+        <button id="bottomCollapseButtonId" class="global-valign-middle" >&#8645;</button>
       </div>
       <div id="multiLineActionDivId"hidden class="mb5">
         <span id="multiLineSendSpanId"class="mr7">Clipboard (0 lines)</span>
         <button id="multiLineSendButtonId" class="mr7">Send as multi-line</button>
       </div>
-      <div class="mb5">
-        <button id="refreshButtonId" title="Refresh from IRC message cache" class="mr7">Refresh</button>
-        <button id="clearButtonId" title="Clear Text Area (Does not clear cache)" class="rm7">Clear</button>
-        <button id="tallerButtonId" title="Enlarge Channel Text Area Vertically" class="rm7">Taller</button>
-        <button id="normalButtonId" title="Restore Channel Area to default size" class="rm7">Normal</button>
-      </div>
-      <div class="mb5">
-        <input id="briefCheckboxId"class="global-valign-middle" type="checkbox"><span class="channel-cb-span">Brief</span>
-        <input id="autocompleteCheckboxId" class="global-valign-middle" type="checkbox"><span id="autoCompleteTitle" class="channel-cb-span">Auto-complete (tab)</span>
-      </div>
-      <div class="mb5">
-        <input id="beep1CheckBoxId" class="global-valign-middle" type="checkbox"><span class="channel-cb-span">Line-beep</span>
-        <input id="beep2CheckBoxId" class="global-valign-middle" type="checkbox"><span class="channel-cb-span">Join-beep</span>
-        <input id="beep3CheckBoxId" class="global-valign-middle" type="checkbox"><span class="channel-cb-span">Name-beep</span>
+      <div id="bottomCollapseDivId" hidden>
+        <div class="mb5">
+          <button id="refreshButtonId" title="Refresh from IRC message cache" class="mr7">Refresh</button>
+          <button id="clearButtonId" title="Clear Text Area (Does not clear cache)" class="rm7">Clear</button>
+          <button id="tallerButtonId" title="Enlarge Channel Text Area Vertically" class="rm7">Taller</button>
+          <button id="normalButtonId" title="Restore Channel Area to default size" class="rm7">Normal</button>
+        </div>
+        <div class="mb5">
+          <input id="briefCheckboxId"class="global-valign-middle" type="checkbox"><span class="channel-cb-span">Brief</span>
+          <input id="autocompleteCheckboxId" class="global-valign-middle" type="checkbox"><span id="autoCompleteTitle" class="channel-cb-span">Auto-complete (tab)</span>
+        </div>
+        <div class="mb5">
+          <input id="beep1CheckBoxId" class="global-valign-middle" type="checkbox"><span class="channel-cb-span">Line-beep</span>
+          <input id="beep2CheckBoxId" class="global-valign-middle" type="checkbox"><span class="channel-cb-span">Join-beep</span>
+          <input id="beep3CheckBoxId" class="global-valign-middle" type="checkbox"><span class="channel-cb-span">Name-beep</span>
+        </div>
       </div>
     </div>
   </div>

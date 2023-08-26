@@ -12,6 +12,7 @@
   color: white;
 }
 
+
 .channel-panel-name-div {
   display: inline-block;
   font-size: 120%;
@@ -36,4 +37,14 @@
 }
 .channel-panel-been-kicked-icon[hidden] {
 display: none;
+}
+
+.channel-panel-zoomed {
+  background-color: rgb(255, 153, 0);
+  color: #000000;
+}
+/* For button on IOS mobile device */
+.channel-panel-zoomed:hover {
+  background-color: #1378a0;
+  color: #ffffff;
 }

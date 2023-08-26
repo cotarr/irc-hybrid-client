@@ -58,6 +58,7 @@ window.customElements.define('debug-panel', class extends HTMLElement {
         'cache-reload-done',
         'cache-reload-error',
         'cancel-beep-sounds',
+        'cancel-zoom',
         'collapse-all-panels',
         'color-theme-changed',
         'debounced-update-from-cache',
@@ -224,6 +225,7 @@ window.customElements.define('debug-panel', class extends HTMLElement {
         webConnect: 'connected',
         ircConnect: 'connected',
         wait: true,
+        zoom: true,
         away: true,
         channelUnread: true,
         privMsgUnread: true,
@@ -239,6 +241,7 @@ window.customElements.define('debug-panel', class extends HTMLElement {
     });
 
     this.shadowRoot.getElementById('button08Id').addEventListener('click', () => {
+      document.getElementById('displayUtils').manualRecalcPageWidth();
     });
 
     this.shadowRoot.getElementById('button09Id').addEventListener('click', () => {

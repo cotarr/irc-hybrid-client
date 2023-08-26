@@ -68,10 +68,8 @@ window.customElements.define('wallops-panel', class extends HTMLElement {
     };
 
     if (!window.globals.webState.cacheReloadInProgress) {
-      if ((!('zoomPanelId' in window.globals.webState)) ||
-        (window.globals.webState.zoomPanelId.length < 1)) {
-        this.showPanel();
-      }
+      // (!document.querySelector('body').hasAttribute('zoomId'))) {
+      this.showPanel();
     }
 
     if (panelDivEl.getAttribute('lastDate') !== parsedMessage.datestamp) {
@@ -289,10 +287,10 @@ window.customElements.define('wallops-panel', class extends HTMLElement {
      * @listens document:resize-custom-elements
      */
     document.addEventListener('resize-custom-elements', () => {
-      if (window.globals.webState.dynamic.inputAreaCharWidthPx) {
+      if (window.globals.webState.dynamic.testAreaColumnPxWidth) {
         const calcInputAreaColSize = document.getElementById('displayUtils').calcInputAreaColSize;
         // pixel width mar1 is reserved space on edges of input area at full screen width
-        const mar1 = window.globals.webState.dynamic.commonMargin;
+        const mar1 = window.globals.webState.dynamic.commonMarginRightPx;
         // set width of input area elements
         this.shadowRoot.getElementById('panelMessageDisplayId')
           .setAttribute('cols', calcInputAreaColSize(mar1));
