@@ -97,6 +97,14 @@ window.customElements.define('debug-panel', class extends HTMLElement {
   // add event listeners to connected callback
   // -------------------------------------------
   connectedCallback () {
+    // Debug option to open panel at page load.
+    if (document.location.hash === '#DEBUG') {
+      this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
+      this.shadowRoot.getElementById('showdebugFunctionsDivId').setAttribute('hidden', '');
+      this.shadowRoot.getElementById('debugFunctionsDivId').removeAttribute('hidden');
+      console.log('Debug: Detected URL hash=#DEBUG. Opened Debug panel at page load.');
+    }
+
     // -------------------------------------
     // 1 of 3 Listeners on internal elements
     // -------------------------------------
@@ -133,16 +141,16 @@ window.customElements.define('debug-panel', class extends HTMLElement {
       }
     });
 
-    document.addEventListener('color-theme-changed', (event) => {
-      const panelDivEl = this.shadowRoot.getElementById('panelDivId');
-      if (event.detail.theme === 'light') {
-        panelDivEl.classList.remove('debug-panel-theme-dark');
-        panelDivEl.classList.add('debug-panel-theme-light');
-      } else {
-        panelDivEl.classList.remove('debug-panel-theme-light');
-        panelDivEl.classList.add('debug-panel-theme-dark');
-      }
-    });
+    // document.addEventListener('color-theme-changed', (event) => {
+    //   const panelDivEl = this.shadowRoot.getElementById('panelDivId');
+    //   if (event.detail.theme === 'light') {
+    //     panelDivEl.classList.remove('debug-panel-theme-dark');
+    //     panelDivEl.classList.add('debug-panel-theme-light');
+    //   } else {
+    //     panelDivEl.classList.remove('debug-panel-theme-light');
+    //     panelDivEl.classList.add('debug-panel-theme-dark');
+    //   }
+    // });
 
     /**
      * Hide panel (not visible)unless listed as exception.
@@ -200,6 +208,7 @@ window.customElements.define('debug-panel', class extends HTMLElement {
     });
 
     this.shadowRoot.getElementById('button01Id').addEventListener('click', () => {
+      document.getElementById('navMenu').handlePmListUpdate();
     });
 
     this.shadowRoot.getElementById('button02Id').addEventListener('click', () => {

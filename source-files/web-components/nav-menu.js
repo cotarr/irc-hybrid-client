@@ -38,6 +38,7 @@ customElements.define('nav-menu', class extends HTMLElement {
     this.attachShadow({ mode: 'open' })
       .appendChild(templateContent.cloneNode(true));
     this.previousChannels = [];
+    this.previousPmPanels = [];
     this.arrayOfMenuElements = [];
     this.ircConnectedLast = null;
   }
@@ -53,6 +54,91 @@ customElements.define('nav-menu', class extends HTMLElement {
 
   closeDropdownMenu = () => {
     this.shadowRoot.getElementById('navDropdownDivId').classList.remove('nav-dropdown-div-show');
+  };
+
+  handlePmListUpdate = () => {
+    // list of PM panels list
+    const pmPanels = Array.from(window.globals.webState.activePrivateMessageNicks);
+    let changed = false;
+    if (pmPanels.length !== this.previousPmPanels.length) {
+      changed = true;
+    } else {
+      // pmPanels array same number of elements
+      if (pmPanels.length > 0) {
+        for (let i = 0; i < pmPanels.length; i++) {
+          if (pmPanels[i].toLowerCase() !== this.previousPmPanels[i].toLowerCase()) changed = true;
+        }
+      }
+    }
+    if (changed) {
+      console.log('navMenu pmPanels, array changed, updating menu');
+      // remove previous elements
+      const parentEl = this.shadowRoot.getElementById('dropdownMenuPrivMsgContainerId');
+      while (parentEl.firstChild) {
+        // 1 - Remove event listener
+        parentEl.firstChild.removeEventListener('click', this.handlePmPanelClick);
+        // 2 - Then delete the element from the menu
+        parentEl.removeChild(parentEl.firstChild);
+      }
+      this.previousPmPanels = [];
+      if (pmPanels.length > 0) {
+        for (let i = 0; i < pmPanels.length; i++) {
+          // Since there are 3 layered elements here, and event.stopPropagation() is called.
+          // It is necessary to add an ID to each element, but id must be unique
+          // console.log('navMenu pmPanels adding pm panel', pmPanels[i]);
+          const pmPanelMenuItem = document.createElement('div');
+          pmPanelMenuItem.classList.add('nav-group01');
+          pmPanelMenuItem.classList.add('nav-level1');
+          pmPanelMenuItem.pmPanelName = pmPanels[i].toLowerCase();
+          pmPanelMenuItem.setAttribute('pm-panel-name', pmPanels[i].toLowerCase());
+          // insert into the menu with same collapsed attribute as other menu members in same grop
+          if (this.shadowRoot.getElementById('item1_1_Id').hasAttribute('collapsed')) {
+            pmPanelMenuItem.setAttribute('collapsed', '');
+          }
+          const pmPanelNameSpan = document.createElement('span');
+          pmPanelNameSpan.classList.add('mr10');
+          // Get case sensitive pm panel name, else use lower case.
+          if (pmPanels[i].toLowerCase() ===
+            window.globals.webState.activePrivateMessageCsNicks[i].toLowerCase()) {
+            pmPanelNameSpan.textContent =
+              window.globals.webState.activePrivateMessageCsNicks[i];
+          } else {
+            pmPanelNameSpan.textContent = pmPanels[i];
+          }
+          pmPanelNameSpan.pmPanelName = pmPanels[i].toLowerCase();
+          pmPanelNameSpan.setAttribute('pm-panel-name', pmPanels[i].toLowerCase());
+          pmPanelMenuItem.appendChild(pmPanelNameSpan);
+
+          const pmPanelMessageCount = document.createElement('div');
+          pmPanelMessageCount.classList.add('global-count');
+          pmPanelMessageCount.classList.add('global-text-theme-inv-dark');
+          pmPanelMessageCount.setAttribute('title', 'Unread Message Count');
+          if (document.querySelector('body').getAttribute('theme') === 'light') {
+            pmPanelMessageCount.classList.add('global-border-theme-light');
+          } else {
+            pmPanelMessageCount.classList.add('global-border-theme-dark');
+          }
+          pmPanelMessageCount.textContent = '0';
+          pmPanelMessageCount.setAttribute('hidden', '');
+          pmPanelMessageCount.pmPanelName = pmPanels[i].toLowerCase();
+          pmPanelMessageCount.setAttribute('pm-panel-name', pmPanels[i].toLowerCase());
+          pmPanelMenuItem.appendChild(pmPanelMessageCount);
+
+          this.previousPmPanels.push(pmPanels[i].toLowerCase());
+          parentEl.appendChild(pmPanelMenuItem);
+          pmPanelMenuItem.addEventListener('click', this.handlePmPanelClick);
+        }
+      }
+      // Used to iterate menu items to show or hide visibility
+      this.arrayOfMenuElements = this.shadowRoot.querySelectorAll('.nav-level1');
+    } // changed
+  };
+
+  handlePmPanelClick = (event) => {
+    // event.stopPropagation();
+    // const channelNameId = event.target.pmPanelName;
+    // document.getElementById('channel:' + channelNameId).showPanel();
+    // this.closeDropdownMenu();
   };
 
   _handleIrcStateChanged = () => {
@@ -91,17 +177,16 @@ customElements.define('nav-menu', class extends HTMLElement {
       // channels array same number of elements
       if (channels.length > 0) {
         for (let i = 0; i < channels.length; i++) {
-          if (channels[i] !== this.previousChannels[i]) changed = true;
+          if (channels[i].toLowerCase() !== this.previousChannels[i].toLowerCase()) changed = true;
         }
       }
     }
     if (changed) {
-      // console.log  ('navMenu channel list changed, updating menu');
+      // console.log('navMenu channels channel list changed, updating menu');
       // remove previous elements
       const parentEl = this.shadowRoot.getElementById('dropdownMenuChannelContainerId');
       while (parentEl.firstChild) {
         // 1 - Remove event listener
-        // console.log('removing event listener', parentEl.firstChild.id);
         parentEl.firstChild.removeEventListener('click', this.handleChannelClick);
         // 2 - Then delete the element from the menu
         parentEl.removeChild(parentEl.firstChild);
@@ -111,25 +196,25 @@ customElements.define('nav-menu', class extends HTMLElement {
         for (let i = 0; i < channels.length; i++) {
           // Since there are 3 layered elements here, and event.stopPropagation() is called.
           // It is necessary to add an ID to each element, but id must be unique
-          // console.log('adding channel', channels[i]);
+          // console.log('navMenu channels adding channel', channels[i]);
           const channelMenuItem = document.createElement('div');
-          channelMenuItem.id = 'channelMenu1' + channels[i];
-          channelMenuItem.classList.add('nav-group01');
+          channelMenuItem.classList.add('nav-group02');
           channelMenuItem.classList.add('nav-level1');
-          channelMenuItem.setAttribute('channel', channels[i]);
+          channelMenuItem.channelName = channels[i].toLowerCase();
+          channelMenuItem.setAttribute('channel-name', channels[i].toLowerCase());
           // insert into the menu with same collapsed attribute as other menu members in same grop
-          if (this.shadowRoot.getElementById('item1_1_Id').hasAttribute('collapsed')) {
+          if (this.shadowRoot.getElementById('item2_1_Id').hasAttribute('collapsed')) {
             channelMenuItem.setAttribute('collapsed', '');
           }
           const channelNameSpan = document.createElement('span');
-          channelNameSpan.id = 'channelMenu2' + channels[i];
           channelNameSpan.classList.add('mr10');
-          channelNameSpan.textContent = channels[i];
-          channelNameSpan.setAttribute('channel', channels[i]);
+          // Get case sensitive channel name
+          channelNameSpan.textContent = window.globals.ircState.channelStates[i].csName;
+          channelNameSpan.channelName = channels[i].toLowerCase();
+          channelNameSpan.setAttribute('channel-name', channels[i].toLowerCase());
           channelMenuItem.appendChild(channelNameSpan);
 
           const channelMessageCount = document.createElement('div');
-          channelMessageCount.id = 'channelMenu3' + channels[i];
           channelMessageCount.classList.add('global-count');
           channelMessageCount.classList.add('global-text-theme-inv-dark');
           channelMessageCount.setAttribute('title', 'Unread Message Count');
@@ -140,13 +225,12 @@ customElements.define('nav-menu', class extends HTMLElement {
           }
           channelMessageCount.textContent = '0';
           channelMessageCount.setAttribute('hidden', '');
-          channelMessageCount.setAttribute('channel', channels[i]);
+          channelMessageCount.channelName = channels[i].toLowerCase();
+          channelMessageCount.setAttribute('channel-name', channels[i].toLowerCase());
           channelMenuItem.appendChild(channelMessageCount);
 
-          this.previousChannels.push(channels[i]);
-          // console.log('adding event listener');
-          this.shadowRoot.getElementById('dropdownMenuChannelContainerId')
-            .appendChild(channelMenuItem);
+          this.previousChannels.push(channels[i].toLowerCase());
+          parentEl.appendChild(channelMenuItem);
           channelMenuItem.addEventListener('click', this.handleChannelClick);
         }
       }
@@ -157,9 +241,8 @@ customElements.define('nav-menu', class extends HTMLElement {
 
   handleChannelClick = (event) => {
     event.stopPropagation();
-    const channelName = event.target.id
-      .replace('channelMenu1', '').replace('channelMenu2', '').replace('channelMenu3', '');
-    document.getElementById('channel' + channelName).showPanel();
+    const channelNameId = event.target.channelName;
+    document.getElementById('channel:' + channelNameId).showPanel();
     this.closeDropdownMenu();
   };
 
@@ -209,8 +292,8 @@ customElements.define('nav-menu', class extends HTMLElement {
         this.shadowRoot.getElementById('dropdownMenuChannelContainerId');
       const menuItemEls = Array.from(channelMenuItemElements.children);
       menuItemEls.forEach((itemEl) => {
-        const channelStr = itemEl.id.replace('channelMenu1', '');
-        const channelEl = document.getElementById('channel' + channelStr);
+        const channelStr = itemEl.channelName;
+        const channelEl = document.getElementById('channel:' + channelStr);
         const count = channelEl.unreadMessageCount;
         if (count > 0) {
           itemEl.lastChild.textContent = channelEl.unreadMessageCount.toString();
@@ -263,10 +346,14 @@ customElements.define('nav-menu', class extends HTMLElement {
     // --------------------------------
     this.shadowRoot.getElementById('item1_1_Id').addEventListener('click', (event) => {
       event.stopPropagation();
+      document.getElementById('managePmPanels').showPanel();
+      this.closeDropdownMenu();
+    });
+    this.shadowRoot.getElementById('item2_1_Id').addEventListener('click', (event) => {
+      event.stopPropagation();
       document.getElementById('manageChannelsPanel').showPanel();
       this.closeDropdownMenu();
     });
-
     this.shadowRoot.getElementById('item3_1_Id').addEventListener('click', (event) => {
       event.stopPropagation();
       document.getElementById('serverListPanel').showPanel();

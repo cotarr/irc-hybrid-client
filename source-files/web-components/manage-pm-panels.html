@@ -1,0 +1,43 @@
+
+<!-- manage-pm-panel -->
+
+<template id='managePmPanelsTemplate'>
+  <link rel="stylesheet" href="css/styles.css">
+  <div id="panelVisibilityDivId" class="global-visibility-div">
+    <div id="panelDivId" class="global-panel-style-div pm-panel-theme-dark">
+      <div class='global-head-flex'>
+        <div class="global-head-left">
+          <button id="closePanelButtonId" title="Hide Panel"class="global-show-hide-button">x</button>
+          <button id="collapsePanelButtonId" title="Collapse Panel to Bar"class="global-show-hide-button mr5" >&#8645;</button>
+          <span>Private Messages</span>
+          <div  id="activePmCountIconId" title="Count of Open PM Panels" class="global-count global-border-theme-dark">0</div>
+          <div id="pmUnreadCountIconId" title="Unread Message Count, All PM Panels" class="global-message-count global-text-theme-inv-dark global-border-theme-dark" hidden>0</div>
+        </div>
+          <div class="global-head-center">
+        </div>
+        <div class="global-head-right">
+          <div id="hideWithCollapseId">
+            <button id="eraseButtonId">Erase All PM</button>
+          </div>
+        </div>
+      </div>
+      <div id="panelCollapsedDivId" class="global-visibility-div">
+        <div class="vh10"></div>
+        <div class="mb5">
+          <span class="mr5">Private Msg To</span>
+          <textarea id="pmNickNameInputId" class="global-valign-middle global-text-theme-dark" cols="20" rows="1" spellcheck="false"></textarea>
+          <button id="whoisButtonId" class="ml5 global-valign-middle">Whois</button>
+        </div>
+        <div class="vh10"></div>
+        <div class="mb5">
+          <textarea id="panelMessageInputId" class="global-valign-middle rm5 global-text-theme-dark" cols="77" rows="1"></textarea>
+          <button id="sendButtonId" class="global-valign-middle">Send</button>
+        </div>  
+        <div class="mb5">
+          <input id="openPmWithBeepCheckBoxId" class="global-valign-middle" type="checkbox">
+          <span class="global-valign-middle">Open/Refresh with line-beep enabled</span>
+        </div>  
+      </div>
+    </div>
+  </div>
+</template>

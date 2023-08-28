@@ -168,12 +168,13 @@ textarea {
 .mb10 { margin-bottom: 10px; }
 .mb20 { margin-bottom: 20px; }
 
-.ml5 {margin-left: 5px;}
-.ml10 {margin-left: 10px;}
-.ml20 {margin-left: 20px;}
+.ml5 { margin-left: 5px; }
+.ml10 { margin-left: 10px; }
+.ml20 { margin-left: 20px; }
 
-.pd10 {padding: 10px};
+.pd10 { padding: 10px };
 
-.vh5 {height: 5px;}
-.vh10 {height: 10px;}
-.vh20 {height: 20px;}
+.vh5 { height: 5px; }
+.vh7 { height: 7px; }
+.vh10 {height: 10px; }
+.vh20 {height: 20px; }

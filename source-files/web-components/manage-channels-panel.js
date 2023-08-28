@@ -52,8 +52,10 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
   };
 
   collapsePanel = () => {
-    this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
-    this.shadowRoot.getElementById('panelCollapsedDivId').removeAttribute('visible');
+    if (this.shadowRoot.getElementById('panelVisibilityDivId').hasAttribute('visible')) {
+      this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
+      this.shadowRoot.getElementById('panelCollapsedDivId').removeAttribute('visible');
+    }
   };
 
   hidePanel = () => {
@@ -137,8 +139,16 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
     if (window.globals.webState.channels.indexOf(newChannelName) < 0) {
       const channelsContainerEl = document.getElementById('channelsContainerId');
       const newChannelEl = document.createElement('channel-panel');
-      newChannelEl.id = 'channel' + newChannelName.toLowerCase();
-      newChannelEl.setAttribute('channelName', newChannelName.toLowerCase());
+      // as ID, prefix "channel:" (lower Case)
+      newChannelEl.id = 'channel:' + newChannelName.toLowerCase();
+      // as property (Lower Case)
+      newChannelEl.channelName = newChannelName.toLowerCase();
+      // as attribute (Case sensitive)
+      newChannelEl.channelCsName = newChannelName;
+      // as attribute (Lower case)
+      newChannelEl.setAttribute('channel-name', newChannelName.toLowerCase());
+      // as attribute (Case sensitive)
+      newChannelEl.setAttribute('channel-cs-name', newChannelName);
       if (channelsContainerEl.firstChild) {
         channelsContainerEl.insertBefore(
           newChannelEl, channelsContainerEl.firstChild);
@@ -156,6 +166,7 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
   _handleChannelButtonClick = (event) => {
     const channelName = this.shadowRoot.getElementById(event.target.id).textContent;
     if (channelName.length > 0) {
+      // TODO validate name channel prefix chars
       document.getElementById('ircControlsPanel').sendIrcServerMessage('JOIN ' + channelName);
     }
   };
@@ -329,8 +340,10 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
         for (let i = 0; i < window.globals.ircState.channels.length; i++) {
           const channelName = window.globals.ircState.channels[i];
           if (window.globals.webState.channels.indexOf(channelName.toLowerCase()) === -1) {
-            // console.log('Creating new channel ' + channelName);
-            this._createChannelElement(channelName);
+            // get case sensitive channel name
+            const channelCsName = window.globals.ircState.channelStates[i].csName;
+            // console.log('Creating new channel ' + channelCsName);
+            this._createChannelElement(channelCsName);
           }
         };
       }
@@ -356,6 +369,11 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
 
       if (window.globals.ircState.ircServerIndex !== this.lastIrcServerIndex) {
         this.lastIrcServerIndex = window.globals.ircState.ircServerIndex;
+        needButtonUpdate = true;
+      }
+
+      if (window.globals.webState.ircServerModified) {
+        window.globals.webState.ircServerModified = false;
         needButtonUpdate = true;
       }
 
@@ -393,6 +411,10 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
               joinButtonEl.addEventListener('click', this._handleChannelButtonClick);
             }
           } // next i
+        } else {
+          const noPresetsWarningDivEl = document.createElement('div');
+          noPresetsWarningDivEl.textContent = '(No IRC channel presets defined)';
+          channelJoinButtonContainerEl.appendChild(noPresetsWarningDivEl);
         }
       } // needButtonUpdate
     }); // irc-state-changed

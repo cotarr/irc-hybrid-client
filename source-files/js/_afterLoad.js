@@ -65,6 +65,7 @@ if (!(window.customElements && document.body.attachShadow)) {
   document.getElementById('ircServerPanel').initializePlugin();
   document.getElementById('wallopsPanel').initializePlugin();
   document.getElementById('noticePanel').initializePlugin();
+  document.getElementById('managePmPanels').initializePlugin();
 
   /**
    * When requested, scroll page to top

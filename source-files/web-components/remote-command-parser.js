@@ -430,8 +430,8 @@ window.customElements.define('remote-command-parser', class extends HTMLElement 
                 // so show the message in the server window.
                 ircServerPanelEl.displayFormattedServerMessage(parsedMessage, message);
               } else {
-                // else case of private message, who in provate message window.
-                document.getElementById('tempPlaceholder').displayPrivateMessage(parsedMessage);
+                // else case of private message, show in private message window.
+                document.getElementById('managePmPanels').displayPrivateMessage(parsedMessage);
               }
             }
           }

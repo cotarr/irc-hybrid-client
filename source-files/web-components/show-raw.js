@@ -99,6 +99,14 @@ window.customElements.define('show-raw', class extends HTMLElement {
   // }
 
   connectedCallback () {
+    // Debug option to enable logging at page load.
+    if (document.location.hash === '#LOG_RAW') {
+      this._startCollectingRawMessages();
+      this.showPanel();
+      document.getElementById('debugPanel').showPanel();
+      console.log(
+        'Debug: Detected URL hash=#LOG_RAW. Enabled raw log before page initialization.');
+    }
     // -------------------------------------
     // 1 of 2 Listeners on internal elements
     // -------------------------------------
@@ -111,12 +119,133 @@ window.customElements.define('show-raw', class extends HTMLElement {
       this.shadowRoot.getElementById('panelMessageDisplayId').value = '';
     });
 
+    this.shadowRoot.getElementById('showHelpButtonId').addEventListener('click', () => {
+      this.shadowRoot.getElementById('helpPanelId').removeAttribute('hidden');
+    });
+
     this.shadowRoot.getElementById('pauseButtonId').addEventListener('click', () => {
       if (this.shadowRoot.getElementById('panelDivId').hasAttribute('collecting')) {
         this._pauseCollectingRawMessages();
       } else {
         this._startCollectingRawMessages();
       }
+    });
+
+    this.shadowRoot.getElementById('cacheButtonId').addEventListener('click', () => {
+      const panelMessageDisplayEl = this.shadowRoot.getElementById('panelMessageDisplayId');
+      // Stop collection
+      this._pauseCollectingRawMessages();
+      // Erase previous content
+      panelMessageDisplayEl.value = '';
+
+      // Fetch cache from server
+      //
+      const fetchTimeout = document.getElementById('globVars').constants('fetchTimeout');
+      const activitySpinnerEl = document.getElementById('activitySpinner');
+      const fetchController = new AbortController();
+      const fetchOptions = {
+        method: 'GET',
+        redirect: 'error',
+        signal: fetchController.signal,
+        headers: {
+          Accept: 'application/json'
+        }
+      };
+      const fetchURL = document.getElementById('globVars').webServerUrl + '/irc/cache';
+      activitySpinnerEl.requestActivitySpinner();
+      const fetchTimerId = setTimeout(() => fetchController.abort(), fetchTimeout);
+      fetch(fetchURL, fetchOptions)
+        .then((response) => {
+          if (response.status === 200) {
+            return response.json();
+          } else {
+            // Retrieve error message from remote web server and pass to error handler
+            return response.text()
+              .then((remoteErrorText) => {
+                const err = new Error('HTTP status error');
+                err.status = response.status;
+                err.statusText = response.statusText;
+                err.remoteErrorText = remoteErrorText;
+                throw err;
+              });
+          }
+        })
+        .then((responseArray) => {
+          if (fetchTimerId) clearTimeout(fetchTimerId);
+          activitySpinnerEl.cancelActivitySpinner();
+          if (Array.isArray(responseArray)) {
+            let lineCount = 0;
+            let charCount = 0;
+            if (responseArray.length > 1) {
+              const index = [];
+              // create index array
+              for (let i = 0; i < responseArray.length; i++) index.push(i);
+              // sort the index
+              for (let i = 0; i < responseArray.length; i++) {
+                let inOrder = true;
+                for (let j = 0; j < responseArray.length - 1; j++) {
+                  const date1 =
+                    new Date(responseArray[index[j]].split(' ')[0].replace('@time=', ''));
+                  const date2 =
+                    new Date(responseArray[index[j + 1]].split(' ')[0].replace('@time=', ''));
+                  if (date1 > date2) {
+                    inOrder = false;
+                    const tempIndex = index[j + 1];
+                    index[j + 1] = index[j];
+                    index[j] = tempIndex;
+                  }
+                } // next j
+                if (inOrder) break;
+              } // next i
+              // fill textarea using index applied to array
+              for (let i = 0; i < responseArray.length; i++) {
+                // add cached message
+                panelMessageDisplayEl.value += responseArray[index[i]].toString() + '\n';
+                lineCount++;
+                charCount += responseArray[index[i]].toString().length;
+                // Optional append hexadecimal
+                if (this.shadowRoot.getElementById('panelDivId').hasAttribute('hex')) {
+                  const uint8String =
+                    new TextEncoder('utf8').encode(responseArray[index[i]].toString());
+                  let hexString = '';
+                  for (let i = 0; i < uint8String.length; i++) {
+                    hexString += uint8String[i].toString(16).padStart(2, '0') + ' ';
+                  }
+                  this.shadowRoot.getElementById('panelMessageDisplayId').value += hexString + '\n';
+                }
+              }
+              const statsStr =
+                '----------------------------\n' +
+                charCount.toString() + ' characters, ' +
+                lineCount.toString() + ' lines\n' +
+                '----------------------------\n';
+              this.shadowRoot.getElementById('panelMessageDisplayId').value += statsStr;
+            } else if (responseArray.length === 1) {
+              panelMessageDisplayEl.value = responseArray[0];
+            }
+            // scroll to most recent
+            panelMessageDisplayEl.scrollTop = panelMessageDisplayEl.scrollHeight;
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          if (fetchTimerId) clearTimeout(fetchTimerId);
+          activitySpinnerEl.cancelActivitySpinner();
+          // Build generic error message to catch network errors
+          let message = ('Fetch error, ' + fetchOptions.method + ' ' + fetchURL + ', ' +
+            (err.message || err.toString() || 'Error'));
+          if (err.status) {
+            // Case of HTTP status error, build descriptive error message
+            message = ('HTTP status error, ') + err.status.toString() + ' ' +
+              err.statusText + ', ' + fetchOptions.method + ' ' + fetchURL;
+          }
+          if (err.remoteErrorText) {
+            message += ', ' + err.remoteErrorText;
+          }
+          // keep first line
+          message = message.split('\n')[0];
+          document.getElementById('errorPanel').showError(message);
+        });
     });
 
     this.shadowRoot.getElementById('showRawInHexCheckboxId').addEventListener('click', () => {

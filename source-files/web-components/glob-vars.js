@@ -141,6 +141,7 @@ window.customElements.define('glob-vars', class extends HTMLElement {
     window.globals.webState.ircServerEditOpen = false;
     window.globals.webState.websocketCount = 0;
     window.globals.webState.lastIrcServerIndex = -1;
+    window.globals.webState.ircServerModified = false;
 
     // Some IRC channel local variables (most in ircState)
     window.globals.webState.channels = [];
@@ -148,6 +149,7 @@ window.customElements.define('glob-vars', class extends HTMLElement {
     // Private message variables
     window.globals.webState.lastPMNick = '';
     window.globals.webState.activePrivateMessageNicks = [];
+    window.globals.webState.activePrivateMessageCsNicks = [];
     window.globals.webState.times = { webConnect: 0 };
     window.globals.webState.count = {
       webConnect: 0,

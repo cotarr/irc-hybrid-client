@@ -318,7 +318,9 @@ window.customElements.define('server-form-panel', class extends HTMLElement {
       if (data.user === '') errorStr = 'Unix ident user is required input.';
       if (data.real === '') errorStr = 'Real Name is required input.';
       if (errorStr) {
-        reject(new Error(errorStr));
+        const parseError = new Error(errorStr);
+        parseError.parseError = true;
+        reject(parseError);
       } else {
         resolve({ data: data, index: index });
       }
@@ -433,7 +435,9 @@ window.customElements.define('server-form-panel', class extends HTMLElement {
     this.clearIrcServerForm()
       .then(() => {
         this.shadowRoot.getElementById('saveNewButtonId').removeAttribute('hidden');
+        this.shadowRoot.getElementById('saveNewButtonId2').removeAttribute('hidden');
         this.shadowRoot.getElementById('saveModifiedButtonId').setAttribute('hidden', '');
+        this.shadowRoot.getElementById('saveModifiedButtonId2').setAttribute('hidden', '');
         this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
       })
       .catch((err) => {
@@ -465,7 +469,9 @@ window.customElements.define('server-form-panel', class extends HTMLElement {
       .then(() => {
         // console.log(JSON.stringify(data, null, 2));
         this.shadowRoot.getElementById('saveNewButtonId').setAttribute('hidden', '');
+        this.shadowRoot.getElementById('saveNewButtonId2').setAttribute('hidden', '');
         this.shadowRoot.getElementById('saveModifiedButtonId').removeAttribute('hidden');
+        this.shadowRoot.getElementById('saveModifiedButtonId2').removeAttribute('hidden');
         this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
       })
       .catch((err) => {
@@ -487,7 +493,9 @@ window.customElements.define('server-form-panel', class extends HTMLElement {
 
   showPanel = () => {
     this.shadowRoot.getElementById('saveNewButtonId').setAttribute('hidden', '');
+    this.shadowRoot.getElementById('saveNewButtonId2').setAttribute('hidden', '');
     this.shadowRoot.getElementById('saveModifiedButtonId').setAttribute('hidden', '');
+    this.shadowRoot.getElementById('saveModifiedButtonId2').setAttribute('hidden', '');
     this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
   };
 
@@ -510,7 +518,9 @@ window.customElements.define('server-form-panel', class extends HTMLElement {
           message = message.split('\n')[0];
           document.getElementById('errorPanel').showError(message);
           this.shadowRoot.getElementById('saveNewButtonId').setAttribute('hidden', '');
+          this.shadowRoot.getElementById('saveNewButtonId2').setAttribute('hidden', '');
           this.shadowRoot.getElementById('saveModifiedButtonId').setAttribute('hidden', '');
+          this.shadowRoot.getElementById('saveModifiedButtonId2').setAttribute('hidden', '');
           // on error leave panel open
         });
     } else {
@@ -524,6 +534,80 @@ window.customElements.define('server-form-panel', class extends HTMLElement {
     this.hidePanel();
   };
 
+  saveNewButtonHandler = () => {
+    this.parseFormInputValues()
+      // .then((data) => {
+      //   console.log(JSON.stringify(data, null, 2));
+      //   return Promise.resolve(data);
+      // })
+      .then((data) => this.submitServer(data.data, 'POST', -1))
+      .then((data) => this.checkForApiError(data))
+      .then((data) => {
+        // TODO dispatch event for edit done, or call method on panel
+        window.globals.webState.ircServerEditOpen = false;
+        this.hidePanel();
+        // To update channel preset buttons
+        window.globals.webState.ircServerModified = true;
+        // console.log('Created new server at index ' + data.index.toString());
+      })
+      .catch((err) => {
+        console.log(err);
+        let message = err.message || err.toString() || 'Error';
+        // keep only 1 line
+        message = message.split('\n')[0];
+        // allow retry for data validation error, else remove save buttons
+        if ((err.status) && (err.status === 422)) {
+          message = 'Input validation rejected by server (Status 422)';
+        } else {
+          if (!err.parseError) {
+            this.shadowRoot.getElementById('saveNewButtonId').setAttribute('hidden', '');
+            this.shadowRoot.getElementById('saveNewButtonId2').setAttribute('hidden', '');
+            this.shadowRoot.getElementById('saveModifiedButtonId').setAttribute('hidden', '');
+            this.shadowRoot.getElementById('saveModifiedButtonId2').setAttribute('hidden', '');
+          }
+        }
+        document.getElementById('errorPanel').showError(message);
+        // on error leave panel open
+      });
+  };
+
+  saveModifiedButtonHandler = () => {
+    this.parseFormInputValues()
+      .then((data) => {
+        // console.log(JSON.stringify(data, null, 2));
+        return Promise.resolve(data);
+      })
+      .then((data) => this.submitServer(data.data, 'PATCH', data.index))
+      .then((data) => this.checkForApiError(data))
+      .then((data) => {
+        // TODO dispatch event for edit done, or call method on panel
+        window.globals.webState.ircServerEditOpen = false;
+        this.hidePanel();
+        // To update channel preset buttons
+        window.globals.webState.ircServerModified = true;
+        // console.log('Saved modified server at index ' + data.index.toString());
+      })
+      .catch((err) => {
+        console.log(err);
+        let message = err.message || err.toString() || 'Error';
+        // keep only 1 line
+        message = message.split('\n')[0];
+        // allow retry for data validation error, else remove save buttons
+        if ((err.status) && (err.status === 422)) {
+          message = 'Input validation rejected by server (Status 422)';
+        } else {
+          if (!err.parseError) {
+            this.shadowRoot.getElementById('saveNewButtonId').setAttribute('hidden', '');
+            this.shadowRoot.getElementById('saveNewButtonId2').setAttribute('hidden', '');
+            this.shadowRoot.getElementById('saveModifiedButtonId').setAttribute('hidden', '');
+            this.shadowRoot.getElementById('saveModifiedButtonId2').setAttribute('hidden', '');
+          }
+        }
+        document.getElementById('errorPanel').showError(message);
+        // on error leave panel open
+      });
+  };
+
   // ------------------
   // Main entry point
   // ------------------
@@ -531,8 +615,14 @@ window.customElements.define('server-form-panel', class extends HTMLElement {
     // Set descriptive button titles
     this.shadowRoot.getElementById('saveNewButtonId').setAttribute('title',
       'Save new IRC server configuration to database and close form.');
+    this.shadowRoot.getElementById('saveNewButtonId2').setAttribute('title',
+      'Save new IRC server configuration to database and close form.');
+    this.shadowRoot.getElementById('saveModifiedButtonId2').setAttribute('title',
+      'Save updated IRC server configuration to database and close form.');
     this.shadowRoot.getElementById('saveModifiedButtonId').setAttribute('title',
       'Save updated IRC server configuration to database and close form.');
+    this.shadowRoot.getElementById('cancelEditButtonId').setAttribute('title',
+      'Discard changes and close form');
     this.shadowRoot.getElementById('cancelEditButtonId').setAttribute('title',
       'Discard changes and close form');
   };
@@ -554,64 +644,24 @@ window.customElements.define('server-form-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('cancelEditButtonId').addEventListener('click', () => {
       this.hidePanel();
     });
+    this.shadowRoot.getElementById('cancelEditButtonId2').addEventListener('click', () => {
+      this.hidePanel();
+    });
+    /**
+     * Save Modified Button Event Handler
+     */
+    this.shadowRoot.getElementById('saveModifiedButtonId').addEventListener('click',
+      this.saveModifiedButtonHandler);
+    this.shadowRoot.getElementById('saveModifiedButtonId2').addEventListener('click',
+      this.saveModifiedButtonHandler);
 
     /**
      * Save Modified Button Event Handler
      */
-    this.shadowRoot.getElementById('saveModifiedButtonId').addEventListener('click', () => {
-      this.parseFormInputValues()
-        .then((data) => {
-          // console.log(JSON.stringify(data, null, 2));
-          return Promise.resolve(data);
-        })
-        .then((data) => this.submitServer(data.data, 'PATCH', data.index))
-        .then((data) => this.checkForApiError(data))
-        .then((data) => {
-          // TODO dispatch event for edit done, or call method on panel
-          window.globals.webState.ircServerEditOpen = false;
-          this.hidePanel();
-          console.log('Saved modified server at index ' + data.index.toString());
-        })
-        .catch((err) => {
-          console.log(err);
-          let message = err.message || err.toString() || 'Error';
-          // keep only 1 line
-          message = message.split('\n')[0];
-          document.getElementById('errorPanel').showError(message);
-          this.shadowRoot.getElementById('saveNewButtonId').setAttribute('hidden', '');
-          this.shadowRoot.getElementById('saveModifiedButtonId').setAttribute('hidden', '');
-          // on error leave panel open
-        });
-    });
-
-    /**
-     * Save Modified Button Event Handler
-     */
-    this.shadowRoot.getElementById('saveNewButtonId').addEventListener('click', () => {
-      this.parseFormInputValues()
-        // .then((data) => {
-        //   console.log(JSON.stringify(data, null, 2));
-        //   return Promise.resolve(data);
-        // })
-        .then((data) => this.submitServer(data.data, 'POST', -1))
-        .then((data) => this.checkForApiError(data))
-        .then((data) => {
-          // TODO dispatch event for edit done, or call method on panel
-          window.globals.webState.ircServerEditOpen = false;
-          this.hidePanel();
-          console.log('Created new server at index ' + data.index.toString());
-        })
-        .catch((err) => {
-          console.log(err);
-          let message = err.message || err.toString() || 'Error';
-          // keep only 1 line
-          message = message.split('\n')[0];
-          document.getElementById('errorPanel').showError(message);
-          this.shadowRoot.getElementById('saveNewButtonId').setAttribute('hidden', '');
-          this.shadowRoot.getElementById('saveModifiedButtonId').setAttribute('hidden', '');
-          // on error leave panel open
-        });
-    });
+    this.shadowRoot.getElementById('saveNewButtonId').addEventListener('click',
+      this.saveModifiedButtonHandler);
+    this.shadowRoot.getElementById('saveNewButtonId2').addEventListener('click',
+      this.saveModifiedButtonHandler);
 
     /**
      * Replace IRC server password Button Event Handler

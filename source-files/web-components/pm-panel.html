@@ -1,0 +1,50 @@
+
+<!-- pm-panel -->
+
+<template id='pmPanelTemplate'>
+  <link rel="stylesheet" href="css/styles.css">
+  <div id="panelVisibilityDivId" class="global-visibility-div" visible>
+    <div id="panelDivId" class="global-panel-style-div pm-panel-theme-dark" lastDate="0000-00-00">
+      <div class='global-head-flex'>
+        <div class="global-head-left">
+          <button id="closePanelButtonId" title="Hide Panel"class="global-show-hide-button">x</button>
+          <button id="collapsePanelButtonId" title="Collapse Panel to Bar"class="global-show-hide-button mr5" >&#8645;</button>
+          <div id="pmNameDivId" class="pm-panel-name-div"></div>
+          <div id="messageCountIconId" title="Unread Message Count" class="global-message-count global-text-theme-inv-dark global-border-theme-dark" hidden>0</div>
+        </div>
+        <div class="global-head-center">
+        </div>
+        <div class="global-head-right">
+          <div id="hideWithCollapseId">
+            <button id="tallerButtonId" title="Enlarge PM Text Area Vertically" class="rm7">Taller</button>
+            <button id="normalButtonId" title="Restore PM Area to default size" class="rm7">Normal</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="panelCollapsedDivId" class="global-visibility-div" visible>
+        <textarea id="panelMessageDisplayId" class="global-text-theme-dark" id="chan0TextAreaId" cols="61" rows="5" spellcheck="false" readonly></textarea>
+        <div class="mb5">
+          <textarea id="panelMessageInputId" class="global-valign-middle rm5 global-text-theme-dark" cols="77" rows="1"></textarea>
+          <button id="sendButtonId" class="global-valign-middle">Send</button>
+          <button id="bottomCollapseButtonId" class="global-valign-middle" >&#8645;</button>
+        </div>
+        <div id="multiLineActionDivId"hidden class="mb5">
+          <span id="multiLineSendSpanId"class="mr7">Clipboard (0 lines)</span>
+          <button id="multiLineSendButtonId" class="mr7">Send as multi-line</button>
+        </div>
+        <div id="bottomCollapseDivId" hidden>
+          <div class="mb5">
+            <input id="beepCheckBoxId" class="global-valign-middle" type="checkbox"><span class="channel-cb-span">Line-beep</span>
+          </div>
+        </div>
+      </div>
+
+
+
+
+
+
+    </div>
+  </div>
+</template>

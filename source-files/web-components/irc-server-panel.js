@@ -572,81 +572,6 @@ window.customElements.define('irc-server-panel', class extends HTMLElement {
     }
   }; // displayFormattedServerMessage()
 
-  // //
-  // // Add cache reload message to server window
-  // //
-  // // Example:  14:33:02 -----Cache Reload-----
-  // //
-  // document.addEventListener('cache-reload-done', (event) => {
-  //   //
-  //   // If server display in raw mode, but not HEX mode, then after reloading cache
-  //   // sort the lines by the timestamp in the cached message.
-  //   // this is because multiple different cache buffers and combined
-  //   // when viewing the raw server messages.
-  //   //
-  //   if ((webState.viewRawMessages) && (!webState.showRawInHex)) {
-  //     const tempRawMessages =
-  //       document.getElementById('rawMessageDisplay').value.split('\n');
-  //     if (tempRawMessages.length > 1) {
-  //       const tempTimestampArray = [];
-  //       const tempSortIndexArray = [];
-  //       const lineCount = tempRawMessages.length;
-  //       for (let i = 0; i < lineCount; i++) {
-  //         // @time=2022-09-04T19:56:01.900Z :nickname!user@host JOIN :#myChannel
-  //         tempTimestampArray.push(new Date(
-  //           tempRawMessages[i].split(' ')[0].split('=')[1]
-  //         ));
-  //         tempSortIndexArray.push(i);
-  //       }
-  //       let tempIndex = 0;
-  //       for (let i = 0; i < lineCount; i++) {
-  //         for (let j = 0; j < lineCount - 1; j++) {
-  //           if (tempTimestampArray[tempSortIndexArray[j]] >
-  //             tempTimestampArray[tempSortIndexArray[j + 1]]) {
-  //             tempIndex = tempSortIndexArray[j];
-  //             tempSortIndexArray[j] = tempSortIndexArray[j + 1];
-  //             tempSortIndexArray[j + 1] = tempIndex;
-  //           }
-  //         } // next j
-  //       } // next i
-  //       document.getElementById('rawMessageDisplay').value = '';
-  //       for (let i = 0; i < lineCount; i++) {
-  //         document.getElementById('rawMessageDisplay').value +=
-  //           tempRawMessages[tempSortIndexArray[i]] + '\n';
-  //       }
-  //     }
-  //   } // if webState.viewRawMessages
-
-  //   let markerString = '';
-  //   let timestampString = '';
-  //   if (('detail' in event) && ('timestamp' in event.detail)) {
-  //     timestampString = unixTimestampToHMS(event.detail.timestamp);
-  //   }
-  //   if (timestampString) {
-  //     markerString += timestampString;
-  //   }
-  //   markerString += ' ' + cacheReloadString + '\n';
-
-  //   if (document.getElementById('rawMessageDisplay').value !== '') {
-  //     document.getElementById('rawMessageDisplay').value += markerString;
-  //     document.getElementById('rawMessageDisplay').scrollTop =
-  //       document.getElementById('rawMessageDisplay').scrollHeight;
-  //   }
-  // });
-
-  // document.addEventListener('cache-reload-error', (event) => {
-  //   let errorString = '\n';
-  //   let timestampString = '';
-  //   if (('detail' in event) && ('timestamp' in event.detail)) {
-  //     timestampString = unixTimestampToHMS(event.detail.timestamp);
-  //   }
-  //   if (timestampString) {
-  //     errorString += timestampString;
-  //   }
-  //   errorString += ' ' + cacheErrorString + '\n\n';
-  //   document.getElementById('rawMessageDisplay').value = errorString;
-  // });
-
   // -----------------------------------
   // Update elapsed time display
   // and connect counter
@@ -963,7 +888,7 @@ window.customElements.define('irc-server-panel', class extends HTMLElement {
         this.shadowRoot.getElementById('panelMessageDisplayId')
           .setAttribute('cols', calcInputAreaColSize(mar1));
         this.shadowRoot.getElementById('panelMessageInputId')
-          .setAttribute('cols', document.getElementById('displayUtils').calcInputAreaColSize(mar2));
+          .setAttribute('cols', calcInputAreaColSize(mar2));
       }
     });
 

@@ -622,13 +622,7 @@ window.customElements.define('display-utils', class extends HTMLElement {
     setTimeout(() => {
       this._calibrateElementSize();
       // Resize textarea elements
-      document.dispatchEvent(new CustomEvent('resize-custom-elements',
-        {
-          bubbles: true,
-          detail: {
-          }
-        }
-      ));
+      document.dispatchEvent(new CustomEvent('resize-custom-elements'));
     }, 900);
   }
 

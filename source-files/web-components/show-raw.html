@@ -15,6 +15,7 @@
         <div class="global-head-right">
           <button id="pauseButtonId">Start</button>
           <button id="clearButtonId">Clear</button>
+          <button id="cacheButtonId">Fetch Cache</button>
         </div>
       </div>
       <div>
@@ -22,7 +23,19 @@
       </div>
       <div>
         <input class="global-valign-middle ml10" type="checkbox" id="showRawInHexCheckboxId">
-        <span class="global-valign-middle">Add-Hex</span>
+        <span class="global-valign-middle">Append-Hexadecimal</span>
+        <button id="showHelpButtonId" class="ml20">Show Help</button>
+      </div>
+      <div id="helpPanelId" hidden>
+        <ul>
+          <li>The raw message cache is disabled by default and must be started with the [Start] button.</li>
+          <li>Log is limited to incoming websocket stream messages (IRC server messages)</li>
+          <li>Messages prefixed with &quot;-->&quot; are outgoing IRC commands echoed back by the web server.</li>
+          <li>Messages like HEARTBEAT and UPDATE are server to browser commands (see Documentation web page)</li>
+          <li>During logging, message cache reloads via HTTP fetch request are omitted.</li>
+          <li>The server's message cache can be viewed separately using the [Fetch cache] button.</li>
+          <li>To start raw log before page initialization, append the hash &quot;#LOG_RAW&quot; to page URL.</li>
+        </ul>
       </div>
       <div class="vh10"></div>
     </div>

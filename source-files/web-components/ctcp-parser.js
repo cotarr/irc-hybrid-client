@@ -85,7 +85,7 @@ window.customElements.define('ctcp-parser', class extends HTMLElement {
         // TODO action sent as regular PM for now
         parsedMessage.params[1] = ctcpRest;
         parsedMessage.isPmCtcpAction = true;
-        this.displayPrivateMessage(parsedMessage);
+        document.getElementById('managePmPanels').displayPrivateMessage(parsedMessage);
       }
     } else {
       if (parsedMessage.nick === window.globals.ircState.nickName) {

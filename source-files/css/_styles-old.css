@@ -97,7 +97,7 @@ body {
 .border-theme-dark {
   border: 1px solid white;
 }
-.pm-panel-theme-light {
+/* .pm-panel-theme-light {
   background-color: #a8cbe3;
   border: 1px solid black;
   color: black;
@@ -106,7 +106,7 @@ body {
   background-color: #075181;
   border: 1px solid #abd2ec;
   color: white;
-}
+} */
 .channel-panel-theme-light {
   background-color: #bef7bf;
   border: 1px solid black;

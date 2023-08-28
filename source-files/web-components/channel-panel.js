@@ -68,6 +68,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     this.attachShadow({ mode: 'open' })
       .appendChild(templateContent.cloneNode(true));
     this.channelName = '';
+    this.channelCsName = '';
     this.maxNickLength = 0;
     this.activityIconInhibitTimer = 0;
     this.channelIndex = null;
@@ -76,7 +77,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
 
     // Default values
     this.mobileBreakpointPx = 600;
-    this.defaultHeightInRows = '12';
+    this.defaultHeightInRows = '14';
     this.channelNamesCharWidth = 20;
   }
 
@@ -185,7 +186,6 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       .removeAttribute('hidden');
     document.dispatchEvent(new CustomEvent('update-channel-count',
       {
-        bubbles: true,
         detail: {
           channel: this.channelName,
           unreadMessageCount: this.unreadMessageCount
@@ -203,7 +203,6 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       .setAttribute('hidden', '');
     document.dispatchEvent(new CustomEvent('update-channel-count',
       {
-        bubbles: true,
         detail: {
           channel: this.channelName,
           unreadMessageCount: this.unreadMessageCount
@@ -285,7 +284,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
   // Join button handler
   // -------------------------
   handleChannelJoinButtonElClick = (event) => {
-    const message = 'JOIN ' + this.channelName;
+    const message = 'JOIN ' + this.channelCsName;
     document.getElementById('ircControlsPanel').sendIrcServerMessage(message);
   };
 
@@ -327,7 +326,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
   _handleRefreshButton = () => {
     if (!window.globals.webState.cacheReloadInProgress) {
       // this forces a global update which will refresh text area
-      document.dispatchEvent(new CustomEvent('update-from-cache', { bubbles: true }));
+      document.dispatchEvent(new CustomEvent('update-from-cache'));
     }
   };
 
@@ -519,7 +518,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     const zoomButtonEl = this.shadowRoot.getElementById('zoomButtonId');
     const bottomCollapseDivEl = this.shadowRoot.getElementById('bottomCollapseDivId');
     if ((bodyEl.hasAttribute('zoomId')) &&
-      (bodyEl.getAttribute('zoomId') === 'channel' + this.channelName)) {
+      (bodyEl.getAttribute('zoomId') === 'channel:' + this.channelName.toLowerCase())) {
       // Turn off channel zoom
       bodyEl.removeAttribute('zoomId');
       headerBarEl.setHeaderBarIcons({ zoom: false });
@@ -530,13 +529,13 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       this._handleNormalButton();
       this._handleGlobalWindowResize();
     } else {
-      bodyEl.setAttribute('zoomId', 'channel' + this.channelName);
+      bodyEl.setAttribute('zoomId', 'channel:' + this.channelName.toLowerCase());
       headerBarEl.setHeaderBarIcons({ zoom: true });
       zoomButtonEl.textContent = 'UnZoom';
       zoomButtonEl.classList.add('channel-panel-zoomed');
       document.dispatchEvent(new CustomEvent('hide-all-panels', {
         detail: {
-          except: ['channel' + this.channelName]
+          except: ['channel:' + this.channelName.toLowerCase()]
         }
       }));
       // Hide stuff below the input bar.
@@ -552,7 +551,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     const zoomButtonEl = this.shadowRoot.getElementById('zoomButtonId');
     const bottomCollapseDivEl = this.shadowRoot.getElementById('bottomCollapseDivId');
     if ((bodyEl.hasAttribute('zoomId')) &&
-      (bodyEl.getAttribute('zoomId') === 'channel' + this.channelName)) {
+      (bodyEl.getAttribute('zoomId') === 'channel:' + this.channelName.toLowerCase())) {
       // Turn off channel zoom
       bodyEl.removeAttribute('zoomId');
       headerBarEl.setHeaderBarIcons({ zoom: false });
@@ -709,10 +708,6 @@ window.customElements.define('channel-panel', class extends HTMLElement {
 
     // this forces a global update which will refresh text area
     document.dispatchEvent(new CustomEvent('update-from-cache', { bubbles: true }));
-
-    // THis will request a new nickname list from IRC server.
-    // channelNamesDisplayEl.value = '';
-    // sendIrcServerMessage('NAMES ' + this.channelNname);
   };
 
   // -------------------------
@@ -788,9 +783,10 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       // This also matches empty snipped, defaulting to channel name
       panelMessageInputEl.value =
         panelMessageInputEl.value.slice(0, panelMessageInputEl.value.length - snippet.length);
-      panelMessageInputEl.value += this.channelName;
+      // Use case sensitive name
+      panelMessageInputEl.value += this.channelCsName;
       panelMessageInputEl.value += String.fromCharCode(trailingSpaceKey);
-      last = this.channelName;
+      last = this.channelCsName;
     } else if (window.globals.ircState.nickName.toLowerCase()
       .indexOf(snippet.toLowerCase()) === 0) {
       // #4 check if my nickname
@@ -870,7 +866,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
             window.globals.ircState.progVersion;
         } else {
           // Tab auto-completes channel name
-          panelMessageInputEl.value += this.channelName;
+          panelMessageInputEl.value += this.channelCsName;
         }
         panelMessageInputEl.value += String.fromCharCode(trailingSpaceKey);
       }
@@ -908,7 +904,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
                 window.globals.ircState.progVersion;
             } else {
               // space auto-completes channel name
-              panelMessageInputEl.value += this.channelName;
+              panelMessageInputEl.value += this.channelCsName;
             }
             panelMessageInputEl.value += String.fromCharCode(trailingSpaceKey);
             e.preventDefault();
@@ -988,7 +984,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
   // Append user count to the end of the channel name string in title area
   //
   _updateChannelTitle = () => {
-    const titleStr = this.channelName;
+    const titleStr = this.channelCsName;
     let nickCount = 0;
     const index = window.globals.ircState.channels.indexOf(this.channelName.toLowerCase());
     if (index >= 0) {
@@ -999,8 +995,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
         nickCount = window.globals.ircState.channelStates[index].names.length;
       }
       // Update channel name with case sensitive name
-      this.shadowRoot.getElementById('channelNameDivId').textContent =
-        window.globals.ircState.channelStates[index].csName;
+      this.shadowRoot.getElementById('channelNameDivId').textContent = this.channelCsName;
     }
     this.shadowRoot.getElementById('channelNameDivId').textContent = titleStr;
     this.shadowRoot.getElementById('nickCountIconId').textContent = nickCount.toString();
@@ -1159,9 +1154,13 @@ window.customElements.define('channel-panel', class extends HTMLElement {
           // -----------
           let present = false;
           // previous nick
-          if (this._isNickInChannel(parsedMessage.nick, this.channelName)) present = true;
+          if (this._isNickInChannel(parsedMessage.nick, this.channelName.toLowerCase())) {
+            present = true;
+          }
           // new nick
-          if (this._isNickInChannel(parsedMessage.params[0], this.channelName)) present = true;
+          if (this._isNickInChannel(parsedMessage.params[0], this.channelName.toLowerCase())) {
+            present = true;
+          }
           if (present) {
             _addText(parsedMessage.timestamp,
               '*',
@@ -1187,7 +1186,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
           // Message activity Icon
           // If focus not channel panel then display incoming message activity icon
           if ((document.activeElement !==
-            document.getElementById('channel' + this.channelName)) &&
+            document.getElementById('channel:' + this.channelName.toLowerCase())) &&
             (!window.globals.webState.cacheReloadInProgress) &&
             (this.activityIconInhibitTimer === 0)) {
             this._incrementMessageCount();
@@ -1236,7 +1235,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
           // Message activity Icon
           // If focus not channel panel then display incoming message activity icon
           if ((document.activeElement !==
-            document.getElementById('channel' + this.channelName)) &&
+            document.getElementById('channel:' + this.channelName.toLowerCase())) &&
             (!window.globals.webState.cacheReloadInProgress) &&
             (this.activityIconInhibitTimer === 0)) {
             this._incrementMessageCount();
@@ -1291,7 +1290,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
         break;
       case 'QUIT':
         // Example: "nick!user@host QUIT :Reason for quitting"
-        if (this._isNickInChannel(parsedMessage.nick, this.channelName)) {
+        if (this._isNickInChannel(parsedMessage.nick, this.channelName.toLowerCase())) {
           let reason = ' ';
           if (parsedMessage.params[0]) reason = parsedMessage.params[0];
           if (panelDivEl.hasAttribute('brief-enabled')) {
@@ -1422,7 +1421,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
   _adjustTextareaHeightDynamically = () => {
     const bodyEl = document.querySelector('body');
     if ((bodyEl.hasAttribute('zoomId')) &&
-      (bodyEl.getAttribute('zoomId') === 'channel' + this.channelName)) {
+      (bodyEl.getAttribute('zoomId') === 'channel:' + this.channelName.toLowerCase())) {
       const panelNickListEl = this.shadowRoot.getElementById('panelNickListId');
       const panelMessageDisplayEl = this.shadowRoot.getElementById('panelMessageDisplayId');
 
@@ -1466,13 +1465,15 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     }
   };
 
+  /**
+     * Global event listener on document object to implement changes to color theme
+     * @listens document:color-theme-changed
+     * @param {object} event.detail.theme - Color theme values 'light' or 'dark'
+     */
   _handleColorThemeChanged = (event) => {
     const panelDivEl = this.shadowRoot.getElementById('panelDivId');
     const nickCountIconEl = this.shadowRoot.getElementById('nickCountIconId');
     const messageCountIconIdEl = this.shadowRoot.getElementById('messageCountIconId');
-    const panelNickListEl = this.shadowRoot.getElementById('panelNickListId');
-    const panelMessageDisplayEl = this.shadowRoot.getElementById('panelMessageDisplayId');
-    const panelMessageInputEl = this.shadowRoot.getElementById('panelMessageInputId');
     if (event.detail.theme === 'light') {
       panelDivEl.classList.remove('channel-panel-theme-dark');
       panelDivEl.classList.add('channel-panel-theme-light');
@@ -1480,12 +1481,6 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       nickCountIconEl.classList.add('global-border-theme-light');
       messageCountIconIdEl.classList.remove('global-border-theme-dark');
       messageCountIconIdEl.classList.add('global-border-theme-light');
-      panelNickListEl.classList.remove('global-text-theme-dark');
-      panelNickListEl.classList.add('global-text-theme-light');
-      panelMessageDisplayEl.classList.remove('global-text-theme-dark');
-      panelMessageDisplayEl.classList.add('global-text-theme-light');
-      panelMessageInputEl.classList.remove('global-text-theme-dark');
-      panelMessageInputEl.classList.add('global-text-theme-light');
     } else {
       panelDivEl.classList.remove('channel-panel-theme-light');
       panelDivEl.classList.add('channel-panel-theme-dark');
@@ -1493,18 +1488,23 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       nickCountIconEl.classList.add('global-border-theme-dark');
       messageCountIconIdEl.classList.remove('global-border-theme-light');
       messageCountIconIdEl.classList.add('global-border-theme-dark');
-      panelNickListEl.classList.remove('global-text-theme-light');
-      panelNickListEl.classList.add('global-text-theme-dark');
-      panelMessageDisplayEl.classList.remove('global-text-theme-light');
-      panelMessageDisplayEl.classList.add('global-text-theme-dark');
-      panelMessageInputEl.classList.remove('global-text-theme-light');
-      panelMessageInputEl.classList.add('global-text-theme-dark');
     }
+    let newTextTheme = 'global-text-theme-dark';
+    let oldTextTheme = 'global-text-theme-light';
+    if (document.querySelector('body').getAttribute('theme') === 'light') {
+      newTextTheme = 'global-text-theme-light';
+      oldTextTheme = 'global-text-theme-dark';
+    }
+    const textareaEls = Array.from(this.shadowRoot.querySelectorAll('textarea'));
+    textareaEls.forEach((el) => {
+      el.classList.remove(oldTextTheme);
+      el.classList.add(newTextTheme);
+    });
   };
 
-  //
-  // For each channel, handle changes in the ircState object
-  //
+  /**
+   * For each channel, handle changes in the ircState object
+   */
   _handleIrcStateChanged = () => {
     // console.log('channel-panel Event: irc-state-changed changed element: ' + this.channelName);
     // console.log('connected ', window.globals.ircState.ircConnected);
@@ -1572,7 +1572,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       // 3 - Channel panel removes itself from the DOM
       //
       const parentEl = document.getElementById('channelsContainerId');
-      const childEl = document.getElementById('channel' + this.channelName.toLowerCase());
+      const childEl = document.getElementById('channel:' + this.channelName.toLowerCase());
       if (parentEl.contains(childEl)) {
         // remove the channel element from DOM
         parentEl.removeChild(childEl);
@@ -1636,6 +1636,11 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     }
   }; // _handleIrcStateChanged
 
+  /**
+   * Event to collapse all panels. This panel does not collapse so it is hidden
+   * @listens document:collapse-all-panels
+   * @param {string|string[]} event.detail.except - No action if listed as exception
+  */
   _handleCollapseAllPanels = (event) => {
     if ((event.detail) && (event.detail.except)) {
       if (typeof event.detail.except === 'string') {
@@ -1653,6 +1658,11 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     }
   };
 
+  /**
+   * Hide panel (not visible)unless listed as exception.
+   * @listens document:hide-all-panels
+   * @param {string|string[]} event.detail.except - No action if listed as exception
+   */
   _handleHideAllPanels = (event) => {
     if ((event.detail) && (event.detail.except)) {
       if (typeof event.detail.except === 'string') {
@@ -1670,6 +1680,11 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     }
   };
 
+  /**
+   * Make panel visible unless listed as exception.
+   * @listens document:show-all-panels
+   * @param {string|string[]} event.detail.except - No action if listed as exception
+   */
   _handleShowAllPanels = (event) => {
     if ((event.detail) && (event.detail.except)) {
       if (typeof event.detail.except === 'string') {
@@ -1720,8 +1735,8 @@ window.customElements.define('channel-panel', class extends HTMLElement {
 
     this.shadowRoot.getElementById('panelDivId').setAttribute('lastDate', '0000-00-00');
 
-    this.shadowRoot.getElementById('channelNameDivId').textContent =
-      window.globals.ircState.channelStates[this.channelIndex].csName;
+    // Set Channel Name
+    this.shadowRoot.getElementById('channelNameDivId').textContent = this.channelCsName;
 
     this.shadowRoot.getElementById('channelTopicDivId').textContent =
       document.getElementById('displayUtils')
@@ -1809,14 +1824,11 @@ window.customElements.define('channel-panel', class extends HTMLElement {
   // add event listeners to connected callback
   // -------------------------------------------
   connectedCallback () {
-    this.channelName = this.getAttribute('channelName');
-
     // -------------------------------------
     // 1 of 2 Listeners on internal elements
     // -------------------------------------
     /* eslint-disable max-len */
     this.shadowRoot.getElementById('autocompleteCheckboxId').addEventListener('click', this.handleAutoCompleteCheckboxClick);
-
     this.shadowRoot.getElementById('beep1CheckBoxId').addEventListener('click', this.handleChannelBeep1CBInputElClick);
     this.shadowRoot.getElementById('beep2CheckBoxId').addEventListener('click', this.handleChannelBeep2CBInputElClick);
     this.shadowRoot.getElementById('beep3CheckBoxId').addEventListener('click', this.handleChannelBeep3CBInputElClick);
@@ -1853,7 +1865,6 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     document.addEventListener('irc-state-changed', this._handleIrcStateChanged);
     document.addEventListener('resize-custom-elements', this._handleGlobalWindowResize);
     document.addEventListener('show-all-panels', this._handleShowAllPanels);
-
     /* eslint-enable max-len */
   };
 });

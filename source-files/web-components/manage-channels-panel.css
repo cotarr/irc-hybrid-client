@@ -39,6 +39,11 @@
 display: none;
 }
 
+.channel-panel-presets-div {
+  border-radius: 5px; 
+  padding: 5px 10px 5px 10px;
+}
+
 .channel-panel-zoomed {
   background-color: rgb(255, 153, 0);
   color: #000000;
