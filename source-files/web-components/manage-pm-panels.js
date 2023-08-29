@@ -21,7 +21,27 @@
 // SOFTWARE.
 // ------------------------------------------------------------------------------
 //
-
+// This web component is a UI panel to manage PM (Private Message) panels
+//
+//  Detect new private messages and create new private message panel.
+//  by instantiating instance of pm-panel.
+//
+// Global Event listeners
+//   cache-reload-done
+//   cancel-beep-sounds
+//   collapse-all-panels
+//   color-theme-changed
+//   erase-before-reload
+//   hide-all-panels
+//   irc-state-changed
+//   resize-custom-elements
+//   show-all-panels
+//
+// Dispatched Events
+//   cancel-zoom
+//   update-from-cache
+//
+// ------------------------------------------------------------------------------
 'use strict';
 window.customElements.define('manage-pm-panels', class extends HTMLElement {
   constructor () {

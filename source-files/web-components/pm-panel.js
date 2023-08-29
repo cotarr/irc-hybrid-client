@@ -21,7 +21,48 @@
 // SOFTWARE.
 // ------------------------------------------------------------------------------
 //
-
+// This web component is an IRC channel panel.
+//
+// Each IRC channel panel is dynamically created and inserted
+// into the DOM by parent element manage-channels-panel.
+// When no longer needed, this component will self destroy itself.
+//
+// Global Event listeners
+//   cache-reload-done
+//   cache-reload-error
+//   cancel-beep-sounds
+//   collapse-all-panels
+//   color-theme-changed
+//   erase-before-reload
+//   hide-all-panels
+//   irc-state-changed
+//   resize-custom-elements
+//   show-all-panels
+//
+// Dispatched Events
+//   cancel-zoom
+//
+// External Methods
+//   showPanel()
+//   collapsePanel()
+//   hidePanel()
+//   displayPmMessage(parsedMessage)
+//
+// Example incoming private message (parsedMessage)
+// parsedMessage {
+//   "timestamp": "14:42:43",
+//   "datestamp": "2023-08-27",
+//   "prefix": "fromNick!~user@192.168.1.100",
+//   "nick": "fromNick",
+//   "host": "~user@192.168.1.100",
+//   "command": "PRIVMSG",
+//   "params": [
+//     "toNick",
+//     "This is the private channel message text"
+//   ]
+// }
+//
+// ------------------------------------------------------------------------------
 'use strict';
 window.customElements.define('pm-panel', class extends HTMLElement {
   constructor () {
@@ -37,10 +78,12 @@ window.customElements.define('pm-panel', class extends HTMLElement {
     this.activityIconInhibitTimer = 0;
   }
 
-  // --------------------------------------------
-  // Send text as private message to other user
-  //     (internal function)
-  // --------------------------------------------
+  /**
+   * Send text as private message to other user (internal function)
+   * Intercept IRC text command if detected
+   * @param {string} targetNickname - index into ircState channel array
+   * @param {object} textAreaEl - The HTML textarea element for message display
+   */
   _sendPrivMessageToUser = (targetNickname, textAreaEl) => {
     const displayUtilsEl = document.getElementById('displayUtils');
     const errorPanelEl = document.getElementById('errorPanel');
@@ -133,6 +176,9 @@ window.customElements.define('pm-panel', class extends HTMLElement {
     return outArray;
   }; // _splitMultiLinePaste
 
+  /**
+   * Make panel visible (both internal and external function)
+   */
   showPanel = () => {
     document.getElementById('managePmPanels')
       .setLastPmPanel(this.privmsgName.toLocaleLowerCase(), 'opened');
@@ -143,6 +189,9 @@ window.customElements.define('pm-panel', class extends HTMLElement {
     document.dispatchEvent(new CustomEvent('cancel-zoom'));
   };
 
+  /**
+   * Collapse panel to bar (both internal and external function)
+   */
   collapsePanel = () => {
     document.getElementById('managePmPanels')
       .setLastPmPanel(this.privmsgName.toLocaleLowerCase(), 'collapsed');
@@ -152,6 +201,9 @@ window.customElements.define('pm-panel', class extends HTMLElement {
     this._updateVisibility();
   };
 
+  /**
+   * Hide this panel (both internal and external function)
+   */
   hidePanel = () => {
     document.getElementById('managePmPanels')
       .setLastPmPanel(this.privmsgName.toLocaleLowerCase(), 'closed');
@@ -159,6 +211,9 @@ window.customElements.define('pm-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('panelCollapsedDivId').removeAttribute('visible');
   };
 
+  /**
+   * Show, hide, or update panel elements based on state variables
+   */
   _updateVisibility = () => {
     const beepCheckBoxEl = this.shadowRoot.getElementById('beepCheckBoxId');
     if (this.shadowRoot.getElementById('panelDivId').hasAttribute('beep3-enabled')) {
@@ -168,10 +223,16 @@ window.customElements.define('pm-panel', class extends HTMLElement {
     }
   };
 
+  /**
+   * Button event handler to hide panel
+   */
   _handleCloseButton = () => {
     this.hidePanel();
   };
 
+  /**
+   * Button event handler to collapse panel to bar
+   */
   _handleCollapseButton = () => {
     if (this.shadowRoot.getElementById('panelCollapsedDivId').hasAttribute('visible')) {
       this.collapsePanel();
@@ -180,6 +241,9 @@ window.customElements.define('pm-panel', class extends HTMLElement {
     }
   };
 
+  /**
+   * Show or hide additional controls at bottom of panel
+   */
   _handleBottomCollapseButton = () => {
     const bottomCollapseDivEl = this.shadowRoot.getElementById('bottomCollapseDivId');
     if (bottomCollapseDivEl.hasAttribute('hidden')) {
@@ -189,6 +253,9 @@ window.customElements.define('pm-panel', class extends HTMLElement {
     }
   };
 
+  /**
+   * Button handler to vertically enlarge the textarea element
+   */
   _handleTallerButton = () => {
     const newRows = parseInt(this.shadowRoot.getElementById('panelMessageDisplayId')
       .getAttribute('rows')) + 10;
@@ -196,16 +263,20 @@ window.customElements.define('pm-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('panelMessageInputId').setAttribute('rows', '3');
   };
 
+  /**
+   * Button handler to restore vertical size textarea element to default size
+   */
   _handleNormalButton = () => {
     this.shadowRoot.getElementById('panelMessageDisplayId')
       .setAttribute('rows', this.defaultHeightInRows);
     this.shadowRoot.getElementById('panelMessageInputId').setAttribute('rows', '1');
   };
 
-  // -----------------------
-  // Detect paste event,
-  // Check clipboard, if multi-line, make multi-line send button visible
-  // -----------------------
+  /**
+   * Respond to user clipboard paste of data into the input area.
+   * Detects multi-line input and opens hidden multi-line controls
+   * @param {object} event - Clipboard data
+   */
   _handlePrivmsgInputAreaElPaste = (event) => {
     if (this._splitMultiLinePaste(event.clipboardData.getData('text')).length > 1) {
       // Make multi-line clilpboard past notice visible and show button
@@ -216,11 +287,10 @@ window.customElements.define('pm-panel', class extends HTMLElement {
     };
   }; // handleprivMsgInputAreaElPaste()
 
-  // -------------
-  // Event handler for clipboard
-  // multi-line paste, Send button
-  // -------------
-  _handleMultiLineSendButtonClick = (event) => {
+  /**
+   * Initiate timers to send multi-line input one line at a time with delay
+   */
+  _handleMultiLineSendButtonClick = () => {
     const panelMessageInputEl = this.shadowRoot.getElementById('panelMessageInputId');
     const multiLineActionDivEl = this.shadowRoot.getElementById('multiLineActionDivId');
     const errorPanelEl = document.getElementById('errorPanel');
@@ -294,10 +364,10 @@ window.customElements.define('pm-panel', class extends HTMLElement {
     } // case of less than max allowed lines
   }; // handleMultiLineSendButtonClick()
 
-  // -------------
-  // send button
-  // -------------
-  _handlePrivMsgSendButtonElClick = (event) => {
+  /**
+   * Send user input to the IRC server (Send button)
+   */
+  _handlePrivMsgSendButtonElClick = () => {
     const panelMessageInputEl = this.shadowRoot.getElementById('panelMessageInputId');
     this._sendPrivMessageToUser(this.privmsgCsName, panelMessageInputEl);
     panelMessageInputEl.focus();
@@ -307,9 +377,10 @@ window.customElements.define('pm-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('multiLineActionDivId').setAttribute('hidden', '');
   };
 
-  // ---------------
-  // Enter pressed
-  // ---------------
+  /**
+   * Send user input to the IRC server (Enter pressed)
+   * @param {object} event - Data from keyboard Enter key activation
+   */
   _handlePrivmsgInputAreaElInput = (event) => {
     const panelMessageInputEl = this.shadowRoot.getElementById('panelMessageInputId');
     if (((event.inputType === 'insertText') && (event.data === null)) ||
@@ -324,22 +395,30 @@ window.customElements.define('pm-panel', class extends HTMLElement {
     }
   };
 
-  // -------------------------------
-  // Clear message activity ICON by clicking on the main
-  // -------------------------------
   _handlePanelClick = () => {
     // this._resetMessageCount();
     console.log('panel click TODO');
   };
 
-  // displayPmMessage = (parsedMessage) => {
-  //   try {
-  //     this.displayPmMessage2();
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // };
+  // Example incoming private message (parsedMessage)
+  // parsedMessage {
+  //   "timestamp": "14:42:43",
+  //   "datestamp": "2023-08-27",
+  //   "prefix": "fromNick!~user@192.168.1.100",
+  //   "nick": "fromNick",
+  //   "host": "~user@192.168.1.100",
+  //   "command": "PRIVMSG",
+  //   "params": [
+  //     "toNick",
+  //     "This is the private channel message text"
+  //   ]
+  // }
 
+  /**
+   * Add IRC private message to the textarea element.
+   * Input is formatted by the remoteCommandParser module
+   * @param {object} parsedMessage - Message meta-data
+   */
   displayPmMessage = (parsedMessage) => {
     const panelDivEl = this.shadowRoot.getElementById('panelDivId');
     const panelMessageDisplayEl = this.shadowRoot.getElementById('panelMessageDisplayId');
@@ -446,6 +525,9 @@ window.customElements.define('pm-panel', class extends HTMLElement {
     } // if PRIVMSG
   }; // displayPmMessage
 
+  /**
+   * Event listener fired when user resizes browser on desktop.
+   */
   _handleResizeCustomElements = () => {
     if (window.globals.webState.dynamic.testAreaColumnPxWidth) {
       const calcInputAreaColSize = document.getElementById('displayUtils').calcInputAreaColSize;
@@ -555,9 +637,9 @@ window.customElements.define('pm-panel', class extends HTMLElement {
     }
   };
 
-  // -------------------------
-  // Beep On Message checkbox handler
-  // -------------------------
+  /**
+   * Enable or disable audile beep sounds when checkbox is clicked
+   */
   _handlePrivMsgBeep1CBInputElClick = (event) => {
     const panelDivEl = this.shadowRoot.getElementById('panelDivId');
     if (panelDivEl.hasAttribute('beep3-enabled')) {
@@ -569,17 +651,17 @@ window.customElements.define('pm-panel', class extends HTMLElement {
     this._updateVisibility();
   };
 
-  // -----------------------
-  // Cancel all beep sounds
-  // -----------------------
-  _handleCancelBeepSounds = (event) => {
+  /**
+   * Event handler to cancel (remove checkbox check) for audio beeps
+   */
+  _handleCancelBeepSounds = () => {
     this.shadowRoot.getElementById('panelDivId').removeAttribute('beep3-enabled');
     this._updateVisibility();
   };
 
-  // ----------------------------------------------------------------------
-  // Internal function to release channel resources if channel is removed
-  // ----------------------------------------------------------------------
+  /**
+   * Remove timers, eventListeners, and remove self from DOM
+   */
   _removeSelfFromDOM = () => {
     // Don't do this more than once (stacked events)
     if (!this.privmsgCsName) return;
@@ -659,11 +741,11 @@ window.customElements.define('pm-panel', class extends HTMLElement {
     }
   };
 
-  //
-  // Add cache reload message to private message window
-  //
-  // Example:  14:33:02 -----Cache Reload-----
-  //
+  /**
+   * Event handler triggered when cache reload from server is done
+   * This is used to update textarea to mark end of cached data and start of new
+   * @param {object} event.detail.timestamp - unix time in seconds
+   */
   _handleCacheReloadDone = (event) => {
     const panelMessageDisplayEl = this.shadowRoot.getElementById('panelMessageDisplayId');
     let markerString = '';
@@ -677,12 +759,18 @@ window.customElements.define('pm-panel', class extends HTMLElement {
     }
     markerString += ' ' +
       document.getElementById('globVars').constants('cacheReloadString') + '\n';
-
+    //
+    // Example:  14:33:02 -----Cache Reload-----
+    //
     panelMessageDisplayEl.value += markerString;
     // move scroll bar so text is scrolled all the way up
     panelMessageDisplayEl.scrollTop = panelMessageDisplayEl.scrollHeight;
   };
 
+  /**
+   * Event handler to show error in textarea
+   * @param {*} event.detail.timestamp - unix time in seconds
+   */
   _handelCacheReloadError = (event) => {
     // Clear temporary array so next asynchronous API cache reload
     // can start with an empty array.
@@ -716,9 +804,9 @@ window.customElements.define('pm-panel', class extends HTMLElement {
   // timerTickHandler = () => {
   // };
 
-  // ------------------
-  // Main entry point
-  // ------------------
+  /**
+   * Called from js/_afterLoad.js after all panels are loaded.
+   */
   initializePlugin = (parsedMessage) => {
     const managePmPanelsEl = document.getElementById('managePmPanels');
     // if PM panel already exist abort
@@ -778,8 +866,25 @@ window.customElements.define('pm-panel', class extends HTMLElement {
 
     this._updateVisibility();
 
-    // PM windows are created when a new message is detected
-    // this add's the initial message to the window.
+    // Example private message (parsedMessage)
+    // parsedMessage {
+    //   "timestamp": "14:42:43",
+    //   "datestamp": "2023-08-27",
+    //   "prefix": "fromNick!~user@192.168.1.100",
+    //   "nick": "fromNick",
+    //   "host": "~user@192.168.1.100",
+    //   "command": "PRIVMSG",
+    //   "params": [
+    //     "toNick",
+    //     "This is the private channel message text"
+    //   ]
+    // }
+
+    /**
+     * Add private message to the textarea element.
+     * Input is formatted by the remoteCommandParser module
+     * @param {object} parsedMessage - Message meta-data
+     */
     this.displayPmMessage(parsedMessage);
     if (window.globals.webState.cacheReloadInProgress) {
       if (managePmPanelsEl.listOfOpenedPmPanels.indexOf(
@@ -822,8 +927,9 @@ window.customElements.define('pm-panel', class extends HTMLElement {
     setTimeout(this._handleResizeCustomElements, 100);
   };
 
-  // add event listeners to connected callback
-  // -------------------------------------------
+  /**
+   * Called by browser after this component is inserted into the DOM
+   */
   connectedCallback () {
     // -------------------------------------
     // 1 of 2 Listeners on internal elements

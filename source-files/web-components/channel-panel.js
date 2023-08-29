@@ -21,14 +21,17 @@
 // SOFTWARE.
 // ------------------------------------------------------------------------------
 //
-// This web component is a UI for a dynamically inserted IRC channel panel.
+// This web component is an IRC channel panel.
 //
-//   * TBD description
+// Each IRC channel panel is dynamically created and inserted
+// into the DOM by parent element manage-channels-panel.
+// When no longer needed, this component will self destroy itself.
 //
 // Global Event listeners
 //   cache-reload-done
 //   cache-reload-error
 //   cancel-beep-sounds
+//   cancel-zoom
 //   collapse-all-panels
 //   color-theme-changed
 //   erase-before-reload
@@ -39,11 +42,18 @@
 //
 // Dispatched Events
 //   debounced-update-from-cache
+//   cancel-zoom
 //   hide-all-panels
 //   update-channel-count
 //   update-from-cache
 //
-// Example channel message (event.detail)
+// External Methods
+//   showPanel()
+//   collapsePanel()
+//   hidePanel()
+//   displayChannelMessage(parsedMessage)
+//
+// Example channel message (parsedMessage)
 //   "parsedMessage": {
 //     "timestamp": "10:23:34",
 //     "datestamp": "2023-08-18",
@@ -57,8 +67,6 @@
 //     ]
 //   }
 // ------------------------------------------------------------------------------
-// TODO: Multi-line paste send not work in offline debug
-
 'use strict';
 window.customElements.define('channel-panel', class extends HTMLElement {
   constructor () {
@@ -74,6 +82,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     this.channelIndex = null;
     this.initIrcStateIndex = null;
     this.unreadMessageCount = 0;
+    this.lastAutoCompleteMatch = '';
 
     // Default values
     this.mobileBreakpointPx = 600;
@@ -85,6 +94,13 @@ window.customElements.define('channel-panel', class extends HTMLElement {
   // Send text to channel (internal function)
   // Intercept IRC text command if detected
   // ------------------------------------------
+
+  /**
+   * Send text to channel (internal function)
+   * Intercept IRC text command if detected
+   * @param {number} channelIndex - index into ircState channel array
+   * @param {object} textAreaEl - The HTML textarea element for message display
+   */
   _sendTextToChannel = (channelIndex, textAreaEl) => {
     const displayUtilsEl = document.getElementById('displayUtils');
     const errorPanelEl = document.getElementById('errorPanel');
@@ -178,9 +194,9 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     return outArray;
   }; // _splitMultiLinePaste
 
-  // -----------------------------------------------------
-  // Increment channel message counter and make visible
-  // -----------------------------------------------------
+  /**
+   * Increment channel message counter and make visible
+   */
   _incrementMessageCount = () => {
     this.unreadMessageCount++;
     this.shadowRoot.getElementById('messageCountIconId')
@@ -197,7 +213,9 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     ));
   };
 
-  // Clear and hide count icon
+  /**
+   * Increment channel message counter and make visible
+   */
   _resetMessageCount = () => {
     this.unreadMessageCount = 0;
     this.shadowRoot.getElementById('messageCountIconId')
@@ -214,6 +232,9 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     ));
   };
 
+  /**
+   * Make panel visible (both internal and external function)
+   */
   showPanel = () => {
     this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
     this.shadowRoot.getElementById('panelCollapsedDivId').setAttribute('visible', '');
@@ -226,6 +247,9 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     document.dispatchEvent(new CustomEvent('cancel-zoom'));
   };
 
+  /**
+   * Collapse panel to bar (both internal and external function)
+   */
   collapsePanel = () => {
     this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
     this.shadowRoot.getElementById('panelCollapsedDivId').removeAttribute('visible');
@@ -235,6 +259,9 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     this._handleCancelZoomEvent();
   };
 
+  /**
+   * Hide this panel (both internal and external function)
+   */
   hidePanel = () => {
     this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible');
     this.shadowRoot.getElementById('panelCollapsedDivId').removeAttribute('visible');
@@ -243,10 +270,58 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     this._handleCancelZoomEvent();
   };
 
+  /**
+   * Show, hide, or update panel elements based on state variables
+   */
+  _updateVisibility = () => {
+    const panelDivEl = this.shadowRoot.getElementById('panelDivId');
+    const beep1CheckBoxEl = this.shadowRoot.getElementById('beep1CheckBoxId');
+    const beep2CheckBoxEl = this.shadowRoot.getElementById('beep2CheckBoxId');
+    const beep3CheckBoxEl = this.shadowRoot.getElementById('beep3CheckBoxId');
+    const briefCheckboxEl = this.shadowRoot.getElementById('briefCheckboxId');
+    const autocompleteCheckboxEl = this.shadowRoot.getElementById('autocompleteCheckboxId');
+    const autoCompleteTitleEl = this.shadowRoot.getElementById('autoCompleteTitle');
+
+    if (panelDivEl.hasAttribute('beep1-enabled')) {
+      beep1CheckBoxEl.checked = true;
+    } else {
+      beep1CheckBoxEl.checked = false;
+    }
+    if (panelDivEl.hasAttribute('beep2-enabled')) {
+      beep2CheckBoxEl.checked = true;
+    } else {
+      beep2CheckBoxEl.checked = false;
+    }
+    if (panelDivEl.hasAttribute('beep3-enabled')) {
+      beep3CheckBoxEl.checked = true;
+    } else {
+      beep3CheckBoxEl.checked = false;
+    }
+
+    if (panelDivEl.hasAttribute('brief-enabled')) {
+      briefCheckboxEl.checked = true;
+      autoCompleteTitleEl.textContent = 'Auto-complete (tab, space-space)';
+    } else {
+      briefCheckboxEl.checked = false;
+      autoCompleteTitleEl.textContent = 'Auto-complete (tab)';
+    }
+    if (panelDivEl.hasAttribute('auto-comp-enabled')) {
+      autocompleteCheckboxEl.checked = true;
+    } else {
+      autocompleteCheckboxEl.checked = false;
+    }
+  };
+
+  /**
+   * Button event handler to hide panel
+   */
   _handleCloseButton = () => {
     this.hidePanel();
   };
 
+  /**
+   * Button event handler to collapse panel to bar
+   */
   _handleCollapseButton = () => {
     if (this.shadowRoot.getElementById('panelCollapsedDivId').hasAttribute('visible')) {
       this.collapsePanel();
@@ -255,6 +330,11 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     }
   };
 
+  /**
+   * Button handler to temporarily clear text displayed in textarea element
+   * This does not remove messages from message cache, and can be restored
+   * by using the refresh button
+   */
   _handleClearButton = () => {
     this.shadowRoot.getElementById('panelMessageDisplayId').value = '';
     // needed to display date on first message
@@ -268,6 +348,9 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       .setAttribute('rows', '1');
   };
 
+  /**
+   * Button handler to vertically enlarge the textarea element
+   */
   _handleTallerButton = () => {
     const newRows = parseInt(this.shadowRoot.getElementById('panelMessageDisplayId')
       .getAttribute('rows')) + 10;
@@ -276,6 +359,9 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('panelMessageInputId').setAttribute('rows', '3');
   };
 
+  /**
+   * Button handler to restore vertical size textarea element to default size
+   */
   _handleNormalButton = () => {
     this.shadowRoot.getElementById('panelNickListId')
       .setAttribute('rows', this.defaultHeightInRows);
@@ -284,27 +370,28 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('panelMessageInputId').setAttribute('rows', '1');
   };
 
-  // -------------------------
-  // Join button handler
-  // -------------------------
-  _handleChannelJoinButtonElClick = (event) => {
+  /**
+   * Sends /JOIN command to IRC server
+   */
+  _handleChannelJoinButtonElClick = () => {
     const message = 'JOIN ' + this.channelCsName;
     document.getElementById('ircControlsPanel').sendIrcServerMessage(message);
   };
 
-  // -------------------------
-  // Part button handler
-  // -------------------------
-  _handleChannelPartButtonElClick = (event) => {
+  /**
+   * Sends /PART command to IRC server
+
+   */
+  _handleChannelPartButtonElClick = () => {
     const message = 'PART ' + this.channelName + ' :' + window.globals.ircState.progName +
      ' ' + window.globals.ircState.progVersion;
     document.getElementById('ircControlsPanel').sendIrcServerMessage(message);
   };
 
-  // -------------------------
-  // Prune button handler
-  // -------------------------
-  _handleChannelPruneButtonElClick = (event) => {
+  /**
+   * Performs network API request to remove IRC channel.
+   */
+  _handleChannelPruneButtonElClick = () => {
     // Fetch API to remove channel from backend server
     const index = window.globals.ircState.channels.indexOf(this.channelName.toLowerCase());
     if (index >= 0) {
@@ -327,6 +414,9 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     } // index > 0
   }; // _handleChannelPruneButtonElClick
 
+  /**
+   * Initiate a full message cache refresh.
+   */
   _handleRefreshButton = () => {
     if (!window.globals.webState.cacheReloadInProgress) {
       // this forces a global update which will refresh text area
@@ -334,10 +424,11 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     }
   };
 
-  // -----------------------
-  // Detect paste event,
-  // Check clipboard, if multi-line, make multi-line send button visible
-  // -----------------------
+  /**
+   * Respond to user clipboard paste of data into the input area.
+   * Detects multi-line input and opens hidden multi-line controls
+   * @param {object} event - Clipboard data
+   */
   _handleChannelInputAreaElPaste = (event) => {
     if (this._splitMultiLinePaste(event.clipboardData.getData('text')).length > 1) {
       // Screen size changes when input area is taller, cancel zoom
@@ -350,11 +441,10 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     };
   }; // _handleChannelInputAreaElPaste()
 
-  // -------------
-  // Event handler for clipboard
-  // multi-line paste, Send button
-  // -------------
-  _handleMultiLineSendButtonClick = (event) => {
+  /**
+   * Initiate timers to send multi-line input one line at a time with delay
+   */
+  _handleMultiLineSendButtonClick = () => {
     const panelMessageInputEl = this.shadowRoot.getElementById('panelMessageInputId');
     const multiLineActionDivEl = this.shadowRoot.getElementById('multiLineActionDivId');
     const errorPanelEl = document.getElementById('errorPanel');
@@ -436,10 +526,10 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     } // case of less than max allowed lines
   }; // _handleMultiLineSendButtonClick()
 
-  // -------------
-  // send button
-  // -------------
-  _handleChannelSendButtonElClick = (event) => {
+  /**
+   * Send user input to the IRC server (Send button)
+   */
+  _handleChannelSendButtonElClick = () => {
     const panelMessageInputEl = this.shadowRoot.getElementById('panelMessageInputId');
     this._sendTextToChannel(this.channelIndex,
       panelMessageInputEl);
@@ -451,10 +541,11 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('multiLineActionDivId').setAttribute('hidden', '');
   };
 
-  // ---------------
-  // Enter pressed
-  // ---------------
-  handleChannelInputAreaElInput = (event) => {
+  /**
+   * Send user input to the IRC server (Enter pressed)
+   * @param {object} event - Data from keyboard Enter key activation
+   */
+  _handleChannelInputAreaElInput = (event) => {
     const panelMessageInputEl = this.shadowRoot.getElementById('panelMessageInputId');
     if (((event.inputType === 'insertText') && (event.data === null)) ||
       (event.inputType === 'insertLineBreak')) {
@@ -470,6 +561,9 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     }
   };
 
+  /**
+   * Show or hide additional controls at bottom of panel
+   */
   _handleBottomCollapseButton = () => {
     this._handleCancelZoomEvent();
     const bottomCollapseDivEl = this.shadowRoot.getElementById('bottomCollapseDivId');
@@ -480,49 +574,17 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     }
   };
 
-  updateVisibility = () => {
-    const panelDivEl = this.shadowRoot.getElementById('panelDivId');
-    const beep1CheckBoxEl = this.shadowRoot.getElementById('beep1CheckBoxId');
-    const beep2CheckBoxEl = this.shadowRoot.getElementById('beep2CheckBoxId');
-    const beep3CheckBoxEl = this.shadowRoot.getElementById('beep3CheckBoxId');
-    const briefCheckboxEl = this.shadowRoot.getElementById('briefCheckboxId');
-    const autocompleteCheckboxEl = this.shadowRoot.getElementById('autocompleteCheckboxId');
-    const autoCompleteTitleEl = this.shadowRoot.getElementById('autoCompleteTitle');
-
-    if (panelDivEl.hasAttribute('beep1-enabled')) {
-      beep1CheckBoxEl.checked = true;
-    } else {
-      beep1CheckBoxEl.checked = false;
-    }
-    if (panelDivEl.hasAttribute('beep2-enabled')) {
-      beep2CheckBoxEl.checked = true;
-    } else {
-      beep2CheckBoxEl.checked = false;
-    }
-    if (panelDivEl.hasAttribute('beep3-enabled')) {
-      beep3CheckBoxEl.checked = true;
-    } else {
-      beep3CheckBoxEl.checked = false;
-    }
-
-    if (panelDivEl.hasAttribute('brief-enabled')) {
-      briefCheckboxEl.checked = true;
-      autoCompleteTitleEl.textContent = 'Auto-complete (tab, space-space)';
-    } else {
-      briefCheckboxEl.checked = false;
-      autoCompleteTitleEl.textContent = 'Auto-complete (tab)';
-    }
-    if (panelDivEl.hasAttribute('auto-comp-enabled')) {
-      autocompleteCheckboxEl.checked = true;
-    } else {
-      autocompleteCheckboxEl.checked = false;
-    }
-  };
-
   // -------------------------
   // Zoom button handler
   // -------------------------
-  _handleChannelZoomButtonElClick = (event) => {
+  /**
+   * Zoom button handler
+   * Expand text area to optimum size (row and col) to fill screen
+   * Hide all other windows
+   * Inhibit other windows from opening while zoomed
+   * Add zoom icon to top status bar
+   */
+  _handleChannelZoomButtonElClick = () => {
     const bodyEl = document.querySelector('body');
     const headerBarEl = document.getElementById('headerBar');
     const zoomButtonEl = this.shadowRoot.getElementById('zoomButtonId');
@@ -537,7 +599,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       // reset screen size back to default
       bottomCollapseDivEl.setAttribute('hidden', '');
       this._handleNormalButton();
-      this._handleGlobalWindowResize();
+      this._handleResizeCustomElements();
     } else {
       bodyEl.setAttribute('zoomId', 'channel:' + this.channelName.toLowerCase());
       headerBarEl.setHeaderBarIcons({ zoom: true });
@@ -551,10 +613,13 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       // Hide stuff below the input bar.
       bottomCollapseDivEl.setAttribute('hidden', '');
       // This sets size for zoomed page
-      this._handleGlobalWindowResize();
+      this._handleResizeCustomElements();
     }
   };
 
+  /**
+   * Event handler to cancel this panel's zoom mode.
+   */
   _handleCancelZoomEvent = () => {
     const bodyEl = document.querySelector('body');
     const headerBarEl = document.getElementById('headerBar');
@@ -570,16 +635,16 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       // reset screen size back to default
       bottomCollapseDivEl.setAttribute('hidden', '');
       this._handleNormalButton();
-      this._handleGlobalWindowResize();
+      this._handleResizeCustomElements();
     }
   };
 
-  // --------------------------------------------------
-  // Function to update window.localStorage with IRC
-  //       channel beep enabled checkbox state.
-  // Called when checkbox is clicked to enable/disable
-  // --------------------------------------------------
-  updateLocalStorageBeepEnable = () => {
+  /**
+   * Function to update window.localStorage with IRC
+   * channel beep enabled checkbox state.
+   * Called when checkbox is clicked to enable/disable
+   */
+  _updateLocalStorageBeepEnable = () => {
     // new object for channel beep enable status
     const now = Math.floor(Date.now() / 1000);
     const beepEnableObj = {
@@ -615,13 +680,12 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       beepEnableChanArray.push(beepEnableObj);
     }
     window.localStorage.setItem('beepEnableChanArray', JSON.stringify(beepEnableChanArray));
-  }; // updateLocalStorageBeepEnable()
+  }; // _updateLocalStorageBeepEnable()
 
-  // ---------------------------------------------------
-  // For this channel, load web browser local storage
-  // beep enable state.
-  // ---------------------------------------------------
-  loadBeepEnable = () => {
+  /**
+   * For this channel, load web browser local storage beep enable state.
+   */
+  _loadBeepEnable = () => {
     let beepChannelIndex = -1;
     let beepEnableChanArray = null;
     beepEnableChanArray = JSON.parse(window.localStorage.getItem('beepEnableChanArray'));
@@ -646,13 +710,13 @@ window.customElements.define('channel-panel', class extends HTMLElement {
         this.shadowRoot.getElementById('panelDivId').setAttribute('beep3-enabled', '');
       }
     }
-    this.updateVisibility();
+    this._updateVisibility();
   };
 
-  // -------------------------
-  // Beep On Message checkbox handler
-  // -------------------------
-  _handleChannelBeep1CBInputElClick = (event) => {
+  /**
+   * Enable or disable audile beep sounds when checkbox is clicked
+   */
+  _handleChannelBeep1CBInputElClick = () => {
     const panelDivEl = this.shadowRoot.getElementById('panelDivId');
     if (panelDivEl.hasAttribute('beep1-enabled')) {
       panelDivEl.removeAttribute('beep1-enabled');
@@ -660,13 +724,13 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       panelDivEl.setAttribute('beep1-enabled', '');
       document.getElementById('beepSounds').playBeep1Sound();
     }
-    this.updateLocalStorageBeepEnable();
-    this.updateVisibility();
+    this._updateLocalStorageBeepEnable();
+    this._updateVisibility();
   };
 
-  // -------------------------
-  // Beep On Join checkbox handler
-  // -------------------------
+  /**
+   * Enable or disable audile beep sounds when checkbox is clicked
+   */
   _handleChannelBeep2CBInputElClick = (event) => {
     const panelDivEl = this.shadowRoot.getElementById('panelDivId');
     if (panelDivEl.hasAttribute('beep2-enabled')) {
@@ -675,13 +739,13 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       panelDivEl.setAttribute('beep2-enabled', '');
       document.getElementById('beepSounds').playBeep1Sound();
     }
-    this.updateLocalStorageBeepEnable();
-    this.updateVisibility();
+    this._updateLocalStorageBeepEnable();
+    this._updateVisibility();
   };
 
-  // -------------------------
-  // Beep On match my nickname checkbox handler
-  // -------------------------
+  /**
+   * Enable or disable audile beep sounds when checkbox is clicked
+   */
   _handleChannelBeep3CBInputElClick = (event) => {
     const panelDivEl = this.shadowRoot.getElementById('panelDivId');
     if (panelDivEl.hasAttribute('beep3-enabled')) {
@@ -690,57 +754,55 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       panelDivEl.setAttribute('beep3-enabled', '');
       document.getElementById('beepSounds').playBeep1Sound();
     }
-    this.updateLocalStorageBeepEnable();
-    this.updateVisibility();
+    this._updateLocalStorageBeepEnable();
+    this._updateVisibility();
   };
 
-  // -----------------------
-  // Cancel all beep sounds
-  // -----------------------
-  _handleCancelBeepSounds = (event) => {
+  /**
+   * Event handler to cancel (remove checkbox check) for audio beeps
+   */
+  _handleCancelBeepSounds = () => {
     const panelDivEl = this.shadowRoot.getElementById('panelDivId');
     panelDivEl.removeAttribute('beep1-enabled');
     panelDivEl.removeAttribute('beep2-enabled');
     panelDivEl.removeAttribute('beep3-enabled');
   };
 
-  // -------------------------
-  // Text Format checkbox handler
-  // -------------------------
-  _handleBriefCheckboxClick = (event) => {
+  /**
+   * Event handler to enable/disable narrow screen next mode
+   */
+  _handleBriefCheckboxClick = () => {
     const panelDivEl = this.shadowRoot.getElementById('panelDivId');
     if (panelDivEl.hasAttribute('brief-enabled')) {
       panelDivEl.removeAttribute('brief-enabled');
     } else {
       panelDivEl.setAttribute('brief-enabled', '');
     }
-    this.updateVisibility();
+    this._updateVisibility();
 
     // this forces a global update which will refresh text area
     document.dispatchEvent(new CustomEvent('update-from-cache', { bubbles: true }));
   };
 
-  // -------------------------
-  // AutoComplete checkbox handler
-  // -------------------------
-  _handleAutoCompleteCheckboxClick = (event) => {
+  /**
+   * Event handler to enable or disable auto-complete
+   */
+  _handleAutoCompleteCheckboxClick = () => {
     const panelDivEl = this.shadowRoot.getElementById('panelDivId');
     if (panelDivEl.hasAttribute('auto-comp-enabled')) {
       panelDivEl.removeAttribute('auto-comp-enabled');
     } else {
       panelDivEl.setAttribute('auto-comp-enabled', '');
     }
-    this.updateVisibility();
+    this._updateVisibility();
   };
 
-  // ---------------------------------------
-  // textarea before input event handler
-  //
-  // Auto complete function
-  //
-  // Keys:  desktop: tab,  mobile phone: space-space
-  // Channel name selected by tab-tab or space-space-space
-  // ---------------------------------------
+  /**
+   * Match a text snippet to IRC commands, channel names, or nicknames
+   * Internal function called by channelAutoComplete()
+   * @param {string} snippet - Partial word (keypress)
+   * @returns {string} Matched string
+   */
   _autoCompleteInputElement = (snippet) => {
     let last = '';
     const trailingSpaceKey = 32;
@@ -836,9 +898,15 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       }
     }
     return last;
-  };
+  }; // _autoCompleteInputElement()
 
-  lastAutoCompleteMatch = '';
+  /**
+   * Keypress event handler used to perform auto-complete while typing.
+   * Result: Modified input textarea element.
+   * Activation keys:  desktop: tab,  mobile phone: space-space
+   * Channel name selected by tab-tab or space-space-space
+   * @param {string} e - Keyboard character pressed by user
+   */
   _channelAutoComplete = (e) => {
     const autoCompleteTabKey = 9;
     const autoCompleteSpaceKey = 32;
@@ -949,9 +1017,11 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     } // case of tab key
   };
 
-  // ----------------
-  // Nickname list
-  // ----------------
+  /**
+   * Update nickname list
+   * List is shown in textarea panel for IRC channel nicknames
+   * Internal function call in response to irc-state-changed global events
+   */
   _updateNickList = () => {
     const panelNickListEl = this.shadowRoot.getElementById('panelNickListId');
     const index = window.globals.ircState.channels.indexOf(this.channelName.toLowerCase());
@@ -990,9 +1060,9 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     }
   }; // _updateNickList()
 
-  //
-  // Append user count to the end of the channel name string in title area
-  //
+  /**
+   * Append user count to the end of the channel name string in title area
+   */
   _updateChannelTitle = () => {
     const titleStr = this.channelCsName;
     let nickCount = 0;
@@ -1041,13 +1111,34 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     return present;
   }; // _nickInChannel()
 
-  // -------------------------------
-  // Clear message activity ICON by clicking on the main
-  // -------------------------------
+  /**
+   * Click event listener to clear message activity ICON by clicking on the main
+   */
   _handlePanelClick = () => {
     this._resetMessageCount();
   };
 
+  // Example channel message (parsedMessage)
+  //   "parsedMessage": {
+  //     "timestamp": "10:23:34",
+  //     "datestamp": "2023-08-18",
+  //     "prefix": "myNick!~myUser@127.0.0.1",
+  //     "nick": "myNick",
+  //     "host": "~myUser@127.0.0.1",
+  //     "command": "PRIVMSG",
+  //     "params": [
+  //       "#myChannel",
+  //       "This is a channel message"
+  //     ]
+  //   }
+
+  /**
+   * Add IRC channel message to the channel textarea element.
+   * Input is formatted by the remoteCommandParser module
+   * Command relevant to the IRC channel are parsed and handled here.
+   * Example, when a channel member /QUIT, the proper message is displayed in channel.
+   * @param {object} parsedMessage - Message meta-data
+   */
   displayChannelMessage = (parsedMessage) => {
     const panelDivEl = this.shadowRoot.getElementById('panelDivId');
     const panelMessageDisplayEl = this.shadowRoot.getElementById('panelMessageDisplayId');
@@ -1128,7 +1219,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
             (!document.querySelector('body').hasAttribute('zoomId'))) {
             this.showPanel();
           }
-          this.updateVisibility();
+          this._updateVisibility();
         }
         break;
       case 'MODE':
@@ -1191,7 +1282,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
             (!document.querySelector('body').hasAttribute('zoomId'))) {
             this.showPanel();
           }
-          this.updateVisibility();
+          this._updateVisibility();
 
           // Message activity Icon
           // If focus not channel panel then display incoming message activity icon
@@ -1335,7 +1426,10 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     } // switch (parsedMessage.command)
   }; // handleChannelMessage
 
-  _handleEraseBeforeReload = (event) => {
+  /**
+   * Event handler to clear text area before cache restore is sent by server
+   */
+  _handleEraseBeforeReload = () => {
     // console.log('Event erase-before-reload');
     this.shadowRoot.getElementById('panelMessageDisplayId').value = '';
     this.shadowRoot.getElementById('panelMessageInputId').value = '';
@@ -1346,10 +1440,12 @@ window.customElements.define('channel-panel', class extends HTMLElement {
   }; // _handleEraseBeforeReload
 
   //
-  // Add cache reload message to channel window
-  //
-  // Example:  14:33:02 -----Cache Reload-----
-  //
+
+  /**
+   * Event handler triggered when cache reload from server is done
+   * This is used to update textarea to mark end of cached data and start of new
+   * @param {object} event.detail.timestamp - unix time in seconds
+   */
   _handleCacheReloadDone = (event) => {
     let markerString = '';
     let timestampString = '';
@@ -1364,6 +1460,9 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     if (this.shadowRoot.getElementById('panelDivId').hasAttribute('brief-enabled')) {
       markerString += '\n';
     }
+    //
+    // Example:  14:33:02 -----Cache Reload-----
+    //
     this.shadowRoot.getElementById('panelMessageDisplayId').value += markerString;
 
     // move scroll bar so text is scrolled all the way up
@@ -1371,6 +1470,10 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       this.shadowRoot.getElementById('panelMessageDisplayId').scrollHeight;
   }; // _handleCacheReloadDone()
 
+  /**
+   * Event handler to show error in textarea
+   * @param {*} event.detail.timestamp - unix time in seconds
+   */
   _handleCacheReloadError = (event) => {
     let errorString = '\n';
     let timestampString = '';
@@ -1385,13 +1488,9 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('panelMessageDisplayId').value = errorString;
   };
 
-  // -----------------------------------------------------------
-  // Setup textarea elements as dynamically resizable
-  // -----------------------------------------------------------
-  //
-  // Scale values for <textarea> are calculated in webclient10.js
-  // and saved globally in the webState object
-  //
+  /**
+   * Dynamically set textarea column attributes to fit window size
+   */
   _adjustTextareaWidthDynamically = () => {
     const panelNickListEl = this.shadowRoot.getElementById('panelNickListId');
     const panelMessageDisplayEl = this.shadowRoot.getElementById('panelMessageDisplayId');
@@ -1428,6 +1527,9 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       .setAttribute('cols', document.getElementById('displayUtils').calcInputAreaColSize(mar2));
   }; // _adjustTextareaWidthDynamically()
 
+  /**
+   * Dynamically set textarea row attributes to fit window size
+   */
   _adjustTextareaHeightDynamically = () => {
     const bodyEl = document.querySelector('body');
     if ((bodyEl.hasAttribute('zoomId')) &&
@@ -1468,7 +1570,10 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     } // is zoomed
   }; // _adjustTextareaHeightDynamically()
 
-  _handleGlobalWindowResize = () => {
+  /**
+   * Event listener fired when user resizes browser on desktop.
+   */
+  _handleResizeCustomElements = () => {
     if (window.globals.webState.dynamic.testAreaColumnPxWidth) {
       this._adjustTextareaWidthDynamically();
       this._adjustTextareaHeightDynamically();
@@ -1524,9 +1629,10 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     // console.log(JSON.stringify(window.globals.webState.channels));
     // console.log(JSON.stringify(window.globals.webState.channelStates, null, 2));
     //
-    // ----------------------------------------------------------------------
-    // Internal function to release channel resources if channel is removed
-    // ----------------------------------------------------------------------
+
+    /**
+     * Remove timers, eventListeners, and remove self from DOM
+     */
     const _removeSelfFromDOM = () => {
       //
       // 1 - Remove channel name from list of channel active in browser
@@ -1559,7 +1665,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       this.shadowRoot.getElementById('panelMessageInputId').removeEventListener('paste', this._handleChannelInputAreaElPaste);
       this.shadowRoot.getElementById('partButtonId').removeEventListener('click', this._handleChannelPartButtonElClick);
       this.shadowRoot.getElementById('pruneButtonId').removeEventListener('click', this._handleChannelPruneButtonElClick);
-      this.shadowRoot.getElementById('panelMessageInputId').removeEventListener('input', this.handleChannelInputAreaElInput);
+      this.shadowRoot.getElementById('panelMessageInputId').removeEventListener('input', this._handleChannelInputAreaElInput);
       this.shadowRoot.getElementById('refreshButtonId').removeEventListener('click', this._handleRefreshButton);
       this.shadowRoot.getElementById('sendButtonId').removeEventListener('click', this._handleChannelSendButtonElClick);
       this.shadowRoot.getElementById('tallerButtonId').removeEventListener('click', this._handleTallerButton);
@@ -1574,7 +1680,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       document.removeEventListener('erase-before-reload', this._handleEraseBeforeReload);
       document.removeEventListener('hide-all-panels', this._handleHideAllPanels);
       document.removeEventListener('irc-state-changed', this._handleIrcStateChanged);
-      document.removeEventListener('resize-custom-elements', this._handleGlobalWindowResize);
+      document.removeEventListener('resize-custom-elements', this._handleResizeCustomElements);
       document.removeEventListener('show-all-panels', this._handleShowAllPanels);
       /* eslint-enable max-len */
 
@@ -1628,7 +1734,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
             if (!window.globals.webState.cacheReloadInProgress) {
               this.showPanel();
             }
-            // TODO updateVisibility();
+            // TODO _updateVisibility();
             // NO WAS ALREADY COMMENTED channelTopRightHidableDivEl.removeAttribute('hidden');
           }
           window.globals.webState.channelStates[webStateIndex].lastJoined =
@@ -1640,7 +1746,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       // Update title string to include some data
       this._updateChannelTitle();
       // show/hide disable or enable channel elements depend on state
-      this.updateVisibility();
+      this._updateVisibility();
     } else {
       // console.log('handleIrcStateChanged: Error no options match');
     }
@@ -1719,9 +1825,9 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     if (this.activityIconInhibitTimer > 0) this.activityIconInhibitTimer--;
   };
 
-  // ------------------
-  // Main entry point
-  // ------------------
+  /**
+   * Called from js/_afterLoad.js after all panels are loaded.
+   */
   initializePlugin = () => {
     // if channel already exist abort
     if (window.globals.webState.channels.indexOf(this.channelName.toLowerCase()) >= 0) {
@@ -1753,7 +1859,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
         .cleanFormatting(window.globals.ircState.channelStates[this.channelIndex].topic);
 
     // Load beep sound configuration from local storage
-    this.loadBeepEnable();
+    this._loadBeepEnable();
 
     // enable brief mode on narrow screens
     if (window.globals.webState.dynamic.panelPxWidth < this.mobileBreakpointPx) {
@@ -1814,7 +1920,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       }
     );
 
-    this.updateVisibility();
+    this._updateVisibility();
 
     // Resize on creating channel window
     //
@@ -1851,7 +1957,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('multiLineSendButtonId').addEventListener('click', this._handleMultiLineSendButtonClick);
     this.shadowRoot.getElementById('normalButtonId').addEventListener('click', this._handleNormalButton);
     this.shadowRoot.getElementById('panelDivId').addEventListener('click', this._handlePanelClick);
-    this.shadowRoot.getElementById('panelMessageInputId').addEventListener('input', this.handleChannelInputAreaElInput);
+    this.shadowRoot.getElementById('panelMessageInputId').addEventListener('input', this._handleChannelInputAreaElInput);
     this.shadowRoot.getElementById('panelMessageInputId').addEventListener('keydown', this._channelAutoComplete, false);
     this.shadowRoot.getElementById('panelMessageInputId').addEventListener('paste', this._handleChannelInputAreaElPaste);
     this.shadowRoot.getElementById('partButtonId').addEventListener('click', this._handleChannelPartButtonElClick);
@@ -1873,7 +1979,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     document.addEventListener('erase-before-reload', this._handleEraseBeforeReload);
     document.addEventListener('hide-all-panels', this._handleHideAllPanels);
     document.addEventListener('irc-state-changed', this._handleIrcStateChanged);
-    document.addEventListener('resize-custom-elements', this._handleGlobalWindowResize);
+    document.addEventListener('resize-custom-elements', this._handleResizeCustomElements);
     document.addEventListener('show-all-panels', this._handleShowAllPanels);
     /* eslint-enable max-len */
   };

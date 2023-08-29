@@ -23,14 +23,20 @@
 //
 // This web component is a UI panel to manage IRC channels
 //
-//   * Detect when new IRC channels are JOINed and create new channel panel.
-//   *    by instantiating instance of channel-panel.
-//   * Status icon tool-tip messages
-//   * Button to activate main navigation dropdown menu
-//   * Clickable connection status, click to connect/disconnect
-//   * Button to enable media play if disabled in browser
-//   * Initialization code and global event listeners
+//  Detect when new IRC channels are JOINed and create new channel panel.
+//  by instantiating instance of channel-panel.
 //
+// Global Event listeners
+//   collapse-all-panels
+//   color-theme-changed
+//   erase-before-reload
+//   hide-all-panels
+//   irc-state-changed
+//   show-all-panels
+//   update-channel-count
+//
+// Dispatched Events
+//   cancel-zoom
 // ------------------------------------------------------------------------------
 'use strict';
 window.customElements.define('manage-channels-panel', class extends HTMLElement {
