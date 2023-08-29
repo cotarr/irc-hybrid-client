@@ -36,6 +36,7 @@ window.customElements.define('help-panel', class extends HTMLElement {
 
   showPanel = () => {
     this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
+    document.dispatchEvent(new CustomEvent('cancel-zoom'));
   };
 
   // this panel does not collapse, so close it.

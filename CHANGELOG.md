@@ -12,6 +12,10 @@ Work in progress, see top of README.md
 
 Commit
 
+- Added message handling code to private message panel.
+
+Commit ea919a7
+
 - Added Private Message PM panel, open, close, message processing TBD.
 - Debugging channel-panel
 - Fixed, unable to save server edit after input validation fail

@@ -51,6 +51,7 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
     this.shadowRoot.getElementById('panelCollapsedDivId').setAttribute('visible', '');
     this.updateVisibility();
+    document.dispatchEvent(new CustomEvent('cancel-zoom'));
   };
 
   collapsePanel = () => {

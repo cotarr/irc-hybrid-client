@@ -86,10 +86,14 @@ window.customElements.define('channel-panel', class extends HTMLElement {
   // Intercept IRC text command if detected
   // ------------------------------------------
   _sendTextToChannel = (channelIndex, textAreaEl) => {
-    const text = document.getElementById('displayUtils').stripTrailingCrLf(textAreaEl.value);
-    if (document.getElementById('displayUtils').detectMultiLineString(text)) {
+    const displayUtilsEl = document.getElementById('displayUtils');
+    const errorPanelEl = document.getElementById('errorPanel');
+    const ircControlsPanelEl = document.getElementById('ircControlsPanel');
+    const text = displayUtilsEl.stripTrailingCrLf(textAreaEl.value);
+    if (displayUtilsEl.detectMultiLineString(text)) {
       textAreaEl.value = '';
-      document.getElementById('errorPanel').showError('Multi-line input is not supported.');
+      textAreaEl.setAttribute('rows', '1');
+      errorPanelEl.showError('Multi-line input is not supported.');
     } else {
       if (text.length > 0) {
         // Check slash character to see if it is an IRC command
@@ -105,12 +109,11 @@ window.customElements.define('channel-panel', class extends HTMLElement {
           // clear input element
           textAreaEl.value = '';
           if (commandAction.error) {
-            document.getElementById('errorPanel').showError(commandAction.message);
+            errorPanelEl.showError(commandAction.message);
             return;
           } else {
             if ((commandAction.ircMessage) && (commandAction.ircMessage.length > 0)) {
-              document.getElementById('ircControlsPanel')
-                .sendIrcServerMessage(commandAction.ircMessage);
+              ircControlsPanelEl.sendIrcServerMessage(commandAction.ircMessage);
             }
             return;
           }
@@ -126,7 +129,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
             if ((window.globals.ircState.ircConnected) && (window.globals.ircState.ircIsAway)) {
               // cancel away state, IRC server response will be parsed in backend
 
-              document.getElementById('ircControlsPanel').sendIrcServerMessage('AWAY');
+              ircControlsPanelEl.sendIrcServerMessage('AWAY');
             }
           }, 1000);
         }
@@ -135,7 +138,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
         //
         const message = 'PRIVMSG ' +
         window.globals.ircState.channelStates[channelIndex].name + ' :' + text;
-        document.getElementById('ircControlsPanel').sendIrcServerMessage(message);
+        ircControlsPanelEl.sendIrcServerMessage(message);
         textAreaEl.value = '';
       }
     }
@@ -216,10 +219,11 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('panelCollapsedDivId').setAttribute('visible', '');
     this.shadowRoot.getElementById('hideWithCollapseId').removeAttribute('hidden');
     this.shadowRoot.getElementById('bottomCollapseDivId').setAttribute('hidden', '');
-    this.handleCancelZoomEvent();
+    this._handleCancelZoomEvent();
     // scroll to top
     const panelMessageDisplayEl = this.shadowRoot.getElementById('panelMessageDisplayId');
     panelMessageDisplayEl.scrollTop = panelMessageDisplayEl.scrollHeight;
+    document.dispatchEvent(new CustomEvent('cancel-zoom'));
   };
 
   collapsePanel = () => {
@@ -228,7 +232,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('hideWithCollapseId').setAttribute('hidden', '');
     this.shadowRoot.getElementById('bottomCollapseDivId').setAttribute('hidden', '');
     // when collapsing panel channel, if zoomed, cancel the zoom
-    this.handleCancelZoomEvent();
+    this._handleCancelZoomEvent();
   };
 
   hidePanel = () => {
@@ -236,7 +240,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('panelCollapsedDivId').removeAttribute('visible');
     this.shadowRoot.getElementById('hideWithCollapseId').removeAttribute('hidden');
     // when closing channel, if zoomed, cancel the zoom
-    this.handleCancelZoomEvent();
+    this._handleCancelZoomEvent();
   };
 
   _handleCloseButton = () => {
@@ -283,7 +287,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
   // -------------------------
   // Join button handler
   // -------------------------
-  handleChannelJoinButtonElClick = (event) => {
+  _handleChannelJoinButtonElClick = (event) => {
     const message = 'JOIN ' + this.channelCsName;
     document.getElementById('ircControlsPanel').sendIrcServerMessage(message);
   };
@@ -291,7 +295,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
   // -------------------------
   // Part button handler
   // -------------------------
-  handleChannelPartButtonElClick = (event) => {
+  _handleChannelPartButtonElClick = (event) => {
     const message = 'PART ' + this.channelName + ' :' + window.globals.ircState.progName +
      ' ' + window.globals.ircState.progVersion;
     document.getElementById('ircControlsPanel').sendIrcServerMessage(message);
@@ -300,7 +304,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
   // -------------------------
   // Prune button handler
   // -------------------------
-  handleChannelPruneButtonElClick = (event) => {
+  _handleChannelPruneButtonElClick = (event) => {
     // Fetch API to remove channel from backend server
     const index = window.globals.ircState.channels.indexOf(this.channelName.toLowerCase());
     if (index >= 0) {
@@ -321,7 +325,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
           });
       } // not joined
     } // index > 0
-  }; // handleChannelPruneButtonElClick
+  }; // _handleChannelPruneButtonElClick
 
   _handleRefreshButton = () => {
     if (!window.globals.webState.cacheReloadInProgress) {
@@ -334,30 +338,31 @@ window.customElements.define('channel-panel', class extends HTMLElement {
   // Detect paste event,
   // Check clipboard, if multi-line, make multi-line send button visible
   // -----------------------
-  handleChannelInputAreaElPaste = (event) => {
+  _handleChannelInputAreaElPaste = (event) => {
     if (this._splitMultiLinePaste(event.clipboardData.getData('text')).length > 1) {
       // Screen size changes when input area is taller, cancel zoom
-      this.handleCancelZoomEvent();
+      this._handleCancelZoomEvent();
       // Make multi-line clipboard past notice visible and show button
       this.shadowRoot.getElementById('multiLineSendSpanId').textContent = 'Clipboard (' +
-      this._splitMultiLinePaste(event.clipboardData.getData('text')).length + ' lines)';
+        this._splitMultiLinePaste(event.clipboardData.getData('text')).length + ' lines)';
       this.shadowRoot.getElementById('multiLineActionDivId').removeAttribute('hidden');
       this.shadowRoot.getElementById('panelMessageInputId').setAttribute('rows', '3');
     };
-  }; // handleChannelInputAreaElPaste()
+  }; // _handleChannelInputAreaElPaste()
 
   // -------------
   // Event handler for clipboard
   // multi-line paste, Send button
   // -------------
-  handleMultiLineSendButtonClick = (event) => {
-    const multiLineArray = this._splitMultiLinePaste(
-      this.shadowRoot.getElementById('panelMessageInputId').value);
+  _handleMultiLineSendButtonClick = (event) => {
+    const panelMessageInputEl = this.shadowRoot.getElementById('panelMessageInputId');
+    const multiLineActionDivEl = this.shadowRoot.getElementById('multiLineActionDivId');
+    const errorPanelEl = document.getElementById('errorPanel');
+    const multiLineArray = this._splitMultiLinePaste(panelMessageInputEl.value);
     if (multiLineArray.length > 100) {
-      this.shadowRoot.getElementById('multiLineActionDivId').setAttribute('hidden', '');
-      this.shadowRoot.getElementById('panelMessageInputId').value = '';
-      document.getElementById('errorPanel')
-        .showError('Maximum multi-line clipboard paste 100 Lin`es');
+      multiLineActionDivEl.setAttribute('hidden', '');
+      panelMessageInputEl.value = '';
+      errorPanelEl.showError('Maximum multi-line clipboard paste 100 Lin`es');
     } else {
       // initialize state flags
       const lastIrcConnect = window.globals.ircState.times.ircConnect;
@@ -368,8 +373,8 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       let delayMs = 0;
       if (multiLineArray.length > 0) {
         // Show each line in inputArea while waiting for timer
-        this.shadowRoot.getElementById('panelMessageInputId').setAttribute('rows', '1');
-        this.shadowRoot.getElementById('panelMessageInputId').value = multiLineArray[0];
+        panelMessageInputEl.setAttribute('rows', '1');
+        panelMessageInputEl.value = multiLineArray[0];
         // Loop through lines creating a timer for each line
         for (let i = 0; i < multiLineArray.length; i++) {
           delayMs += delayIntervalMs;
@@ -391,13 +396,16 @@ window.customElements.define('channel-panel', class extends HTMLElement {
                 .indexOf(this.channelName.toLowerCase());
               if (index >= 0) {
                 // Is client still JOIN to the IRC channel?
-                if (!window.globals.ircState.channelStates[index].joined) okToSend = false;
-                // and channel window not hidden with [-] button
+                if (!window.globals.ircState.channelStates[index].joined) {
+                  okToSend = false;
+                }
               }
-              if (!this.shadowRoot.getElementById('panelDivId')
-                .hasAttribute('visible')) okToSend = false;
-              if (!this.shadowRoot.getElementById('panelCollapsedDivId')
-                .hasAttribute('visible')) okToSend = false;
+              if (!this.shadowRoot.getElementById('panelVisibilityDivId').hasAttribute('visible')) {
+                okToSend = false;
+              }
+              if (!this.shadowRoot.getElementById('panelCollapsedDivId').hasAttribute('visible')) {
+                okToSend = false;
+              }
             }
             // TODO okToSend = false in isolated panel debug after rewrite
             if (!okToSend) {
@@ -408,32 +416,34 @@ window.customElements.define('channel-panel', class extends HTMLElement {
               const message = 'PRIVMSG ' +
                 window.globals.ircState.channelStates[this.channelIndex].name +
                 ' :' + multiLineArray[i];
+              // Send the message
               document.getElementById('ircControlsPanel').sendIrcServerMessage(message);
               if (i !== multiLineArray.length - 1) {
                 // Show each line in inputArea while waiting for timer
-                this.shadowRoot.getElementById('panelMessageInputId').value = multiLineArray[i + 1];
+                panelMessageInputEl.value = multiLineArray[i + 1];
               } else {
-                this.shadowRoot.getElementById('panelMessageInputId').value = '';
+                panelMessageInputEl.value = '';
               }
             } // send to channel
           }, delayMs); // timer
         } // next i
         // timers created, now hide button
-        this.shadowRoot.getElementById('multiLineActionDivId').setAttribute('hidden', '');
+        multiLineActionDivEl.setAttribute('hidden', '');
       } else {
         // case of single line paste, hide div without action
-        this.shadowRoot.getElementById('multiLineActionDivId').setAttribute('hidden', '');
+        multiLineActionDivEl.setAttribute('hidden', '');
       }
     } // case of less than max allowed lines
-  }; // handleMultiLineSendButtonClick()
+  }; // _handleMultiLineSendButtonClick()
 
   // -------------
   // send button
   // -------------
-  handleChannelSendButtonElClick = (event) => {
+  _handleChannelSendButtonElClick = (event) => {
+    const panelMessageInputEl = this.shadowRoot.getElementById('panelMessageInputId');
     this._sendTextToChannel(this.channelIndex,
-      this.shadowRoot.getElementById('panelMessageInputId'));
-    this.shadowRoot.getElementById('panelMessageInputId').focus();
+      panelMessageInputEl);
+    panelMessageInputEl.focus();
     this._resetMessageCount();
     this.activityIconInhibitTimer = document.getElementById('globVars')
       .constants('activityIconInhibitTimerValue');
@@ -445,13 +455,13 @@ window.customElements.define('channel-panel', class extends HTMLElement {
   // Enter pressed
   // ---------------
   handleChannelInputAreaElInput = (event) => {
+    const panelMessageInputEl = this.shadowRoot.getElementById('panelMessageInputId');
     if (((event.inputType === 'insertText') && (event.data === null)) ||
       (event.inputType === 'insertLineBreak')) {
       // Remove EOL characters at cursor location
       document.getElementById('displayUtils')
-        .stripOneCrLfFromElement(this.shadowRoot.getElementById('panelMessageInputId'));
-      this._sendTextToChannel(this.channelIndex,
-        this.shadowRoot.getElementById('panelMessageInputId'));
+        .stripOneCrLfFromElement(panelMessageInputEl);
+      this._sendTextToChannel(this.channelIndex, panelMessageInputEl);
       this._resetMessageCount();
       this.activityIconInhibitTimer = document.getElementById('globVars')
         .constants('activityIconInhibitTimerValue');
@@ -460,8 +470,8 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     }
   };
 
-  handleBottomCollapseButton = () => {
-    this.handleCancelZoomEvent();
+  _handleBottomCollapseButton = () => {
+    this._handleCancelZoomEvent();
     const bottomCollapseDivEl = this.shadowRoot.getElementById('bottomCollapseDivId');
     if (bottomCollapseDivEl.hasAttribute('hidden')) {
       bottomCollapseDivEl.removeAttribute('hidden');
@@ -512,7 +522,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
   // -------------------------
   // Zoom button handler
   // -------------------------
-  handleChannelZoomButtonElClick = (event) => {
+  _handleChannelZoomButtonElClick = (event) => {
     const bodyEl = document.querySelector('body');
     const headerBarEl = document.getElementById('headerBar');
     const zoomButtonEl = this.shadowRoot.getElementById('zoomButtonId');
@@ -545,7 +555,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     }
   };
 
-  handleCancelZoomEvent = () => {
+  _handleCancelZoomEvent = () => {
     const bodyEl = document.querySelector('body');
     const headerBarEl = document.getElementById('headerBar');
     const zoomButtonEl = this.shadowRoot.getElementById('zoomButtonId');
@@ -642,7 +652,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
   // -------------------------
   // Beep On Message checkbox handler
   // -------------------------
-  handleChannelBeep1CBInputElClick = (event) => {
+  _handleChannelBeep1CBInputElClick = (event) => {
     const panelDivEl = this.shadowRoot.getElementById('panelDivId');
     if (panelDivEl.hasAttribute('beep1-enabled')) {
       panelDivEl.removeAttribute('beep1-enabled');
@@ -657,7 +667,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
   // -------------------------
   // Beep On Join checkbox handler
   // -------------------------
-  handleChannelBeep2CBInputElClick = (event) => {
+  _handleChannelBeep2CBInputElClick = (event) => {
     const panelDivEl = this.shadowRoot.getElementById('panelDivId');
     if (panelDivEl.hasAttribute('beep2-enabled')) {
       panelDivEl.removeAttribute('beep2-enabled');
@@ -672,7 +682,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
   // -------------------------
   // Beep On match my nickname checkbox handler
   // -------------------------
-  handleChannelBeep3CBInputElClick = (event) => {
+  _handleChannelBeep3CBInputElClick = (event) => {
     const panelDivEl = this.shadowRoot.getElementById('panelDivId');
     if (panelDivEl.hasAttribute('beep3-enabled')) {
       panelDivEl.removeAttribute('beep3-enabled');
@@ -687,7 +697,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
   // -----------------------
   // Cancel all beep sounds
   // -----------------------
-  handleCancelBeepSounds = (event) => {
+  _handleCancelBeepSounds = (event) => {
     const panelDivEl = this.shadowRoot.getElementById('panelDivId');
     panelDivEl.removeAttribute('beep1-enabled');
     panelDivEl.removeAttribute('beep2-enabled');
@@ -697,7 +707,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
   // -------------------------
   // Text Format checkbox handler
   // -------------------------
-  handleBriefCheckboxClick = (event) => {
+  _handleBriefCheckboxClick = (event) => {
     const panelDivEl = this.shadowRoot.getElementById('panelDivId');
     if (panelDivEl.hasAttribute('brief-enabled')) {
       panelDivEl.removeAttribute('brief-enabled');
@@ -713,7 +723,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
   // -------------------------
   // AutoComplete checkbox handler
   // -------------------------
-  handleAutoCompleteCheckboxClick = (event) => {
+  _handleAutoCompleteCheckboxClick = (event) => {
     const panelDivEl = this.shadowRoot.getElementById('panelDivId');
     if (panelDivEl.hasAttribute('auto-comp-enabled')) {
       panelDivEl.removeAttribute('auto-comp-enabled');
@@ -829,7 +839,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
   };
 
   lastAutoCompleteMatch = '';
-  channelAutoComplete = (e) => {
+  _channelAutoComplete = (e) => {
     const autoCompleteTabKey = 9;
     const autoCompleteSpaceKey = 32;
     const trailingSpaceKey = 32;
@@ -1325,7 +1335,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     } // switch (parsedMessage.command)
   }; // handleChannelMessage
 
-  handleEraseBeforeReload = (event) => {
+  _handleEraseBeforeReload = (event) => {
     // console.log('Event erase-before-reload');
     this.shadowRoot.getElementById('panelMessageDisplayId').value = '';
     this.shadowRoot.getElementById('panelMessageInputId').value = '';
@@ -1333,14 +1343,14 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('panelDivId').setAttribute('lastDate', '0000-00-00');
     // Local count in channel window (to match global activity icon visibility)
     // TODO this.resetMessageCount();
-  }; // handleEraseBeforeReload
+  }; // _handleEraseBeforeReload
 
   //
   // Add cache reload message to channel window
   //
   // Example:  14:33:02 -----Cache Reload-----
   //
-  handleCacheReloadDone = (event) => {
+  _handleCacheReloadDone = (event) => {
     let markerString = '';
     let timestampString = '';
     if (('detail' in event) && ('timestamp' in event.detail)) {
@@ -1359,9 +1369,9 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     // move scroll bar so text is scrolled all the way up
     this.shadowRoot.getElementById('panelMessageDisplayId').scrollTop =
       this.shadowRoot.getElementById('panelMessageDisplayId').scrollHeight;
-  }; // handleCacheReloadDone()
+  }; // _handleCacheReloadDone()
 
-  handleCacheReloadError = (event) => {
+  _handleCacheReloadError = (event) => {
     let errorString = '\n';
     let timestampString = '';
     if (('detail' in event) && ('timestamp' in event.detail)) {
@@ -1532,36 +1542,36 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       // 2 - Remove eventListeners
       //
       /* eslint-disable max-len */
-      this.shadowRoot.getElementById('autocompleteCheckboxId').removeEventListener('click', this.handleAutoCompleteCheckboxClick);
-      this.shadowRoot.getElementById('beep1CheckBoxId').removeEventListener('click', this.handleChannelBeep1CBInputElClick);
-      this.shadowRoot.getElementById('beep2CheckBoxId').removeEventListener('click', this.handleChannelBeep2CBInputElClick);
-      this.shadowRoot.getElementById('beep3CheckBoxId').removeEventListener('click', this.handleChannelBeep3CBInputElClick);
-      this.shadowRoot.getElementById('bottomCollapseButtonId').removeEventListener('click', this.handleBottomCollapseButton);
-      this.shadowRoot.getElementById('briefCheckboxId').removeEventListener('click', this.handleBriefCheckboxClick);
+      this.shadowRoot.getElementById('autocompleteCheckboxId').removeEventListener('click', this._handleAutoCompleteCheckboxClick);
+      this.shadowRoot.getElementById('beep1CheckBoxId').removeEventListener('click', this._handleChannelBeep1CBInputElClick);
+      this.shadowRoot.getElementById('beep2CheckBoxId').removeEventListener('click', this._handleChannelBeep2CBInputElClick);
+      this.shadowRoot.getElementById('beep3CheckBoxId').removeEventListener('click', this._handleChannelBeep3CBInputElClick);
+      this.shadowRoot.getElementById('bottomCollapseButtonId').removeEventListener('click', this._handleBottomCollapseButton);
+      this.shadowRoot.getElementById('briefCheckboxId').removeEventListener('click', this._handleBriefCheckboxClick);
       this.shadowRoot.getElementById('clearButtonId').removeEventListener('click', this._handleClearButton);
       this.shadowRoot.getElementById('closePanelButtonId').removeEventListener('click', this._handleCloseButton);
       this.shadowRoot.getElementById('collapsePanelButtonId').removeEventListener('click', this._handleCollapseButton);
-      this.shadowRoot.getElementById('joinButtonId').removeEventListener('click', this.handleChannelJoinButtonElClick);
-      this.shadowRoot.getElementById('multiLineSendButtonId').removeEventListener('click', this.handleMultiLineSendButtonClick);
+      this.shadowRoot.getElementById('joinButtonId').removeEventListener('click', this._handleChannelJoinButtonElClick);
+      this.shadowRoot.getElementById('multiLineSendButtonId').removeEventListener('click', this._handleMultiLineSendButtonClick);
       this.shadowRoot.getElementById('normalButtonId').removeEventListener('click', this._handleNormalButton);
       this.shadowRoot.getElementById('panelDivId').removeEventListener('click', this._handlePanelClick);
-      this.shadowRoot.getElementById('panelMessageInputId').removeEventListener('keydown', this.channelAutoComplete, false);
-      this.shadowRoot.getElementById('panelMessageInputId').removeEventListener('paste', this.handleChannelInputAreaElPaste);
-      this.shadowRoot.getElementById('partButtonId').removeEventListener('click', this.handleChannelPartButtonElClick);
-      this.shadowRoot.getElementById('pruneButtonId').removeEventListener('click', this.handleChannelPruneButtonElClick);
+      this.shadowRoot.getElementById('panelMessageInputId').removeEventListener('keydown', this._channelAutoComplete, false);
+      this.shadowRoot.getElementById('panelMessageInputId').removeEventListener('paste', this._handleChannelInputAreaElPaste);
+      this.shadowRoot.getElementById('partButtonId').removeEventListener('click', this._handleChannelPartButtonElClick);
+      this.shadowRoot.getElementById('pruneButtonId').removeEventListener('click', this._handleChannelPruneButtonElClick);
       this.shadowRoot.getElementById('panelMessageInputId').removeEventListener('input', this.handleChannelInputAreaElInput);
       this.shadowRoot.getElementById('refreshButtonId').removeEventListener('click', this._handleRefreshButton);
-      this.shadowRoot.getElementById('sendButtonId').removeEventListener('click', this.handleChannelSendButtonElClick);
+      this.shadowRoot.getElementById('sendButtonId').removeEventListener('click', this._handleChannelSendButtonElClick);
       this.shadowRoot.getElementById('tallerButtonId').removeEventListener('click', this._handleTallerButton);
-      this.shadowRoot.getElementById('zoomButtonId').removeEventListener('click', this.handleChannelZoomButtonElClick);
+      this.shadowRoot.getElementById('zoomButtonId').removeEventListener('click', this._handleChannelZoomButtonElClick);
 
-      document.removeEventListener('cache-reload-done', this.handleCacheReloadDone);
-      document.removeEventListener('cache-reload-error', this.handleCacheReloadError);
-      document.removeEventListener('cancel-beep-sounds', this.handleCancelBeepSounds);
-      document.removeEventListener('cancel-zoom', this.handleCancelZoomEvent);
+      document.removeEventListener('cache-reload-done', this._handleCacheReloadDone);
+      document.removeEventListener('cache-reload-error', this._handleCacheReloadError);
+      document.removeEventListener('cancel-beep-sounds', this._handleCancelBeepSounds);
+      document.removeEventListener('cancel-zoom', this._handleCancelZoomEvent);
       document.removeEventListener('collapse-all-panels', this._handleCollapseAllPanels);
       document.removeEventListener('color-theme-changed', this._handleColorThemeChanged);
-      document.removeEventListener('erase-before-reload', this.handleEraseBeforeReload);
+      document.removeEventListener('erase-before-reload', this._handleEraseBeforeReload);
       document.removeEventListener('hide-all-panels', this._handleHideAllPanels);
       document.removeEventListener('irc-state-changed', this._handleIrcStateChanged);
       document.removeEventListener('resize-custom-elements', this._handleGlobalWindowResize);
@@ -1828,39 +1838,39 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     // 1 of 2 Listeners on internal elements
     // -------------------------------------
     /* eslint-disable max-len */
-    this.shadowRoot.getElementById('autocompleteCheckboxId').addEventListener('click', this.handleAutoCompleteCheckboxClick);
-    this.shadowRoot.getElementById('beep1CheckBoxId').addEventListener('click', this.handleChannelBeep1CBInputElClick);
-    this.shadowRoot.getElementById('beep2CheckBoxId').addEventListener('click', this.handleChannelBeep2CBInputElClick);
-    this.shadowRoot.getElementById('beep3CheckBoxId').addEventListener('click', this.handleChannelBeep3CBInputElClick);
-    this.shadowRoot.getElementById('bottomCollapseButtonId').addEventListener('click', this.handleBottomCollapseButton);
-    this.shadowRoot.getElementById('briefCheckboxId').addEventListener('click', this.handleBriefCheckboxClick);
+    this.shadowRoot.getElementById('autocompleteCheckboxId').addEventListener('click', this._handleAutoCompleteCheckboxClick);
+    this.shadowRoot.getElementById('beep1CheckBoxId').addEventListener('click', this._handleChannelBeep1CBInputElClick);
+    this.shadowRoot.getElementById('beep2CheckBoxId').addEventListener('click', this._handleChannelBeep2CBInputElClick);
+    this.shadowRoot.getElementById('beep3CheckBoxId').addEventListener('click', this._handleChannelBeep3CBInputElClick);
+    this.shadowRoot.getElementById('bottomCollapseButtonId').addEventListener('click', this._handleBottomCollapseButton);
+    this.shadowRoot.getElementById('briefCheckboxId').addEventListener('click', this._handleBriefCheckboxClick);
     this.shadowRoot.getElementById('clearButtonId').addEventListener('click', this._handleClearButton);
     this.shadowRoot.getElementById('collapsePanelButtonId').addEventListener('click', this._handleCollapseButton);
     this.shadowRoot.getElementById('closePanelButtonId').addEventListener('click', this._handleCloseButton);
-    this.shadowRoot.getElementById('joinButtonId').addEventListener('click', this.handleChannelJoinButtonElClick);
-    this.shadowRoot.getElementById('multiLineSendButtonId').addEventListener('click', this.handleMultiLineSendButtonClick);
+    this.shadowRoot.getElementById('joinButtonId').addEventListener('click', this._handleChannelJoinButtonElClick);
+    this.shadowRoot.getElementById('multiLineSendButtonId').addEventListener('click', this._handleMultiLineSendButtonClick);
     this.shadowRoot.getElementById('normalButtonId').addEventListener('click', this._handleNormalButton);
     this.shadowRoot.getElementById('panelDivId').addEventListener('click', this._handlePanelClick);
     this.shadowRoot.getElementById('panelMessageInputId').addEventListener('input', this.handleChannelInputAreaElInput);
-    this.shadowRoot.getElementById('panelMessageInputId').addEventListener('keydown', this.channelAutoComplete, false);
-    this.shadowRoot.getElementById('panelMessageInputId').addEventListener('paste', this.handleChannelInputAreaElPaste);
-    this.shadowRoot.getElementById('partButtonId').addEventListener('click', this.handleChannelPartButtonElClick);
-    this.shadowRoot.getElementById('pruneButtonId').addEventListener('click', this.handleChannelPruneButtonElClick);
+    this.shadowRoot.getElementById('panelMessageInputId').addEventListener('keydown', this._channelAutoComplete, false);
+    this.shadowRoot.getElementById('panelMessageInputId').addEventListener('paste', this._handleChannelInputAreaElPaste);
+    this.shadowRoot.getElementById('partButtonId').addEventListener('click', this._handleChannelPartButtonElClick);
+    this.shadowRoot.getElementById('pruneButtonId').addEventListener('click', this._handleChannelPruneButtonElClick);
     this.shadowRoot.getElementById('refreshButtonId').addEventListener('click', this._handleRefreshButton);
-    this.shadowRoot.getElementById('sendButtonId').addEventListener('click', this.handleChannelSendButtonElClick);
+    this.shadowRoot.getElementById('sendButtonId').addEventListener('click', this._handleChannelSendButtonElClick);
     this.shadowRoot.getElementById('tallerButtonId').addEventListener('click', this._handleTallerButton);
-    this.shadowRoot.getElementById('zoomButtonId').addEventListener('click', this.handleChannelZoomButtonElClick);
+    this.shadowRoot.getElementById('zoomButtonId').addEventListener('click', this._handleChannelZoomButtonElClick);
 
     // -------------------------------------
     // 2 of 2 Listeners on global events
     // -------------------------------------
-    document.addEventListener('cache-reload-done', this.handleCacheReloadDone);
-    document.addEventListener('cache-reload-error', this.handleCacheReloadError);
-    document.addEventListener('cancel-beep-sounds', this.handleCancelBeepSounds);
-    document.addEventListener('cancel-zoom', this.handleCancelZoomEvent);
+    document.addEventListener('cache-reload-done', this._handleCacheReloadDone);
+    document.addEventListener('cache-reload-error', this._handleCacheReloadError);
+    document.addEventListener('cancel-beep-sounds', this._handleCancelBeepSounds);
+    document.addEventListener('cancel-zoom', this._handleCancelZoomEvent);
     document.addEventListener('collapse-all-panels', this._handleCollapseAllPanels);
     document.addEventListener('color-theme-changed', this._handleColorThemeChanged);
-    document.addEventListener('erase-before-reload', this.handleEraseBeforeReload);
+    document.addEventListener('erase-before-reload', this._handleEraseBeforeReload);
     document.addEventListener('hide-all-panels', this._handleHideAllPanels);
     document.addEventListener('irc-state-changed', this._handleIrcStateChanged);
     document.addEventListener('resize-custom-elements', this._handleGlobalWindowResize);

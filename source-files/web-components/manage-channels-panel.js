@@ -49,6 +49,7 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
   showPanel = () => {
     this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
     this.shadowRoot.getElementById('panelCollapsedDivId').setAttribute('visible', '');
+    document.dispatchEvent(new CustomEvent('cancel-zoom'));
   };
 
   collapsePanel = () => {

@@ -40,6 +40,7 @@ window.customElements.define('irc-server-panel', class extends HTMLElement {
     // scroll to top
     const panelMessageDisplayEl = this.shadowRoot.getElementById('panelMessageDisplayId');
     panelMessageDisplayEl.scrollTop = panelMessageDisplayEl.scrollHeight;
+    document.dispatchEvent(new CustomEvent('cancel-zoom'));
   };
 
   /**

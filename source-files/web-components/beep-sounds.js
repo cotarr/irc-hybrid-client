@@ -139,15 +139,20 @@ window.customElements.define('beep-sounds', class extends HTMLElement {
       }
     }
     if (this.beep3InhibitTimer === 0) {
-      this.beep3.play().catch((error) => {
-        if (error.name === 'NotAllowedError') {
-          console.info('playBeep3Sound() ' + this.audioPromiseErrorStr);
-        } else if (error.name === 'NotSupportedError') {
-          console.log('Audio download not available.');
-        } else {
-          console.error(error);
-        }
-      });
+      this.beep3.play()
+        .then(() => {
+          // upon successful play sound, then hide the button
+          document.getElementById('headerBar').setHeaderBarIcons({ enableAudio: false });
+        })
+        .catch((error) => {
+          if (error.name === 'NotAllowedError') {
+            console.info('playBeep3Sound() ' + this.audioPromiseErrorStr);
+          } else if (error.name === 'NotSupportedError') {
+            console.log('Audio download not available.');
+          } else {
+            console.error(error);
+          }
+        });
       this.beep3InhibitTimer = 5;
     }
   };

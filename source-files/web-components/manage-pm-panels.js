@@ -30,12 +30,16 @@ window.customElements.define('manage-pm-panels', class extends HTMLElement {
     const templateContent = template.content;
     this.attachShadow({ mode: 'open' })
       .appendChild(templateContent.cloneNode(true));
+    this.listOfOpenedPmPanels = [];
+    this.listOfCollapsedPmPanels = [];
+    this.listOfClosedPmPanels = [];
   }
 
   showPanel = () => {
     this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
     this.shadowRoot.getElementById('panelCollapsedDivId').setAttribute('visible', '');
     this.updateVisibility();
+    document.dispatchEvent(new CustomEvent('cancel-zoom'));
   };
 
   collapsePanel = () => {
@@ -51,8 +55,102 @@ window.customElements.define('manage-pm-panels', class extends HTMLElement {
     this.shadowRoot.getElementById('panelCollapsedDivId').removeAttribute('visible');
   };
 
-  updateVisibility = () => {
+  /**
+   * Set flags for last private message (PM) panel state
+   * These are used to maintain panel status when cache is reloaded.
+   * @param {string} pmPanelName - Lower case name of private message nickname
+   * @param {string} state - Allowed: 'opened', 'collapsed', 'closed'
+   */
+  setLastPmPanel = (pmPanelName, state) => {
+    // Clear previous flags
+    const openedIndex = this.listOfOpenedPmPanels.indexOf(pmPanelName.toLowerCase());
+    const collapsedIndex = this.listOfCollapsedPmPanels.indexOf(pmPanelName.toLowerCase());
+    const closedIndex = this.listOfClosedPmPanels.indexOf(pmPanelName.toLowerCase());
+    if (openedIndex >= 0) this.listOfOpenedPmPanels.splice(openedIndex, 1);
+    if (collapsedIndex >= 0) this.listOfCollapsedPmPanels.splice(collapsedIndex, 1);
+    if (closedIndex >= 0) this.listOfClosedPmPanels.splice(openedIndex, 1);
+    if (state === 'opened') {
+      this.listOfOpenedPmPanels.push(pmPanelName.toLowerCase());
+    } else if (state === 'collapsed') {
+      this.listOfCollapsedPmPanels.push(pmPanelName.toLowerCase());
+    } else if (state === 'closed') {
+      this.listOfClosedPmPanels.push(pmPanelName.toLowerCase());
+    } else {
+      console.log('Error, invalid panel state in setLastPmPanel()');
+    }
+  };
 
+  /**
+   * Iterate arrays of panels states, remove entries without panels.
+   */
+  cleanLastPmPanelStates = () => {
+    let needPrune;
+    let pruneIndexList;
+    const panelEls = Array.from(document.getElementById('pmContainerId').children);
+
+    // Opened
+    if (this.listOfOpenedPmPanels.length > 0) {
+      pruneIndexList = [];
+      for (let i = 0; i < this.listOfOpenedPmPanels.length; i++) {
+        needPrune = true;
+        panelEls.forEach((panelEl) => {
+          if (panelEl.privmsgName.toLowerCase() === this.listOfOpenedPmPanels[i].toLowerCase()) {
+            needPrune = false;
+          }
+        }); // next panelEl
+        // This array is index numbers in increasing order
+        if (needPrune) pruneIndexList.push(i);
+      } // next i
+      while (pruneIndexList.length > 0) {
+        // This will remove index in reverse order, biggest to smallest.
+        this.listOfOpenedPmPanels.splice(pruneIndexList.pop(), 1);
+      }
+    }
+
+    // Collapsed
+    if (this.listOfCollapsedPmPanels.length > 0) {
+      pruneIndexList = [];
+      for (let i = 0; i < this.listOfCollapsedPmPanels.length; i++) {
+        needPrune = true;
+        panelEls.forEach((panelEl) => {
+          if (panelEl.privmsgName.toLowerCase() === this.listOfCollapsedPmPanels[i].toLowerCase()) {
+            needPrune = false;
+          }
+        }); // next panelEl
+        // This array is index numbers in increasing order
+        if (needPrune) pruneIndexList.push(i);
+      } // next i
+      while (pruneIndexList.length > 0) {
+        // This will remove index in reverse order, biggest to smallest.
+        this.listOfCollapsedPmPanels.splice(pruneIndexList.pop(), 1);
+      }
+    }
+
+    // Closed
+    if (this.listOfClosedPmPanels.length > 0) {
+      pruneIndexList = [];
+      for (let i = 0; i < this.listOfClosedPmPanels.length; i++) {
+        needPrune = true;
+        panelEls.forEach((panelEl) => {
+          if (panelEl.privmsgName.toLowerCase() === this.listOfClosedPmPanels[i].toLowerCase()) {
+            needPrune = false;
+          }
+        }); // next panelEl
+        // This array is index numbers in increasing order
+        if (needPrune) pruneIndexList.push(i);
+      } // next i
+      while (pruneIndexList.length > 0) {
+        // This will remove index in reverse order, biggest to smallest.
+        this.listOfClosedPmPanels.splice(pruneIndexList.pop(), 1);
+      }
+    } // if length > 0
+  }; // clearLastPmPanelStates()
+
+  tempTextXXX = () => {
+    console.log('REMOVE ME TBD');
+  };
+
+  updateVisibility = () => {
   };
 
   /**
@@ -80,7 +178,7 @@ window.customElements.define('manage-pm-panels', class extends HTMLElement {
       } else {
         pmContainerEl.appendChild(newPmPanelEl);
       }
-      newPmPanelEl.initializePlugin();
+      newPmPanelEl.initializePlugin(parsedMessage);
     } else {
       throw new Error('Attempt to create channel that already exists');
     }
@@ -108,6 +206,9 @@ window.customElements.define('manage-pm-panels', class extends HTMLElement {
   //
   // -----------------------------------------------------------------------
   displayPrivateMessage = (parsedMessage) => {
+    // During cache reload when disconnected, ignore cached PM messages
+    if (!window.globals.ircState.ircConnected) return;
+
     // console.log('parsedMessage', JSON.stringify(parsedMessage, null, 2));
     if (!Object.hasOwn(parsedMessage, 'params')) return;
     // Determine if message is ingoing or outgoing
@@ -183,7 +284,7 @@ window.customElements.define('manage-pm-panels', class extends HTMLElement {
           // Else not slash / command, assume is input intended to send to private message.
           if (pmNickNameInputEl.value.length === 0) return;
           if (pmNickNameInputEl.value.split('\n').length !== 1) {
-            errorPanelEl.showPanel('Multi-line input not allowed in nick name field');
+            errorPanelEl.showError('Multi-line input not allowed in nick name field');
             return;
           }
           const targetNickname = pmNickNameInputEl.value;
@@ -201,7 +302,7 @@ window.customElements.define('manage-pm-panels', class extends HTMLElement {
   loadBeepEnable = () => {
     // Default disabled
     this.shadowRoot.getElementById('openPmWithBeepCheckBoxId').checked = false;
-    this.shadowRoot.getElementById('panelDivId').removeAttribute('beep-enabled');
+    this.removeAttribute('beep-enabled');
 
     let beepEnableObj = null;
     beepEnableObj = JSON.parse(window.localStorage.getItem('privMsgBeep'));
@@ -209,10 +310,10 @@ window.customElements.define('manage-pm-panels', class extends HTMLElement {
       (typeof beepEnableObj === 'object')) {
       if (beepEnableObj.beep) {
         this.shadowRoot.getElementById('openPmWithBeepCheckBoxId').checked = true;
-        this.shadowRoot.getElementById('panelDivId').setAttribute('beep-enabled', '');
+        this.setAttribute('beep-enabled', '');
       } else {
         this.shadowRoot.getElementById('openPmWithBeepCheckBoxId').checked = false;
-        this.shadowRoot.getElementById('panelDivId').removeAttribute('beep-enabled');
+        this.removeAttribute('beep-enabled');
       }
     }
   };
@@ -275,7 +376,7 @@ window.customElements.define('manage-pm-panels', class extends HTMLElement {
       .addEventListener('click', (event) => {
         const now = Math.floor(Date.now() / 1000);
         if (this.shadowRoot.getElementById('openPmWithBeepCheckBoxId').checked) {
-          this.shadowRoot.getElementById('panelDivId').setAttribute('beep-enabled', '');
+          this.setAttribute('beep-enabled', '');
           window.localStorage.setItem('privMsgBeep', JSON.stringify(
             {
               timestamp: now,
@@ -284,7 +385,7 @@ window.customElements.define('manage-pm-panels', class extends HTMLElement {
           ));
           document.getElementById('beepSounds').playBeep3Sound();
         } else {
-          this.shadowRoot.getElementById('panelDivId').removeAttribute('beep-enabled');
+          this.removeAttribute('beep-enabled');
           window.localStorage.setItem('privMsgBeep', JSON.stringify(
             {
               timestamp: now,
@@ -335,6 +436,16 @@ window.customElements.define('manage-pm-panels', class extends HTMLElement {
     // -------------------------------------
     // 2 of 2 Listeners on global events
     // -------------------------------------
+
+    document.addEventListener('cache-reload-done', (event) => {
+      // done loading cache, remove unused PM flags
+      this.cleanLastPmPanelStates();
+    });
+
+    document.addEventListener('cancel-beep-sounds', () => {
+      this.shadowRoot.getElementById('openPmWithBeepCheckBoxId').checked = false;
+      this.removeAttribute('beep-enabled');
+    });
 
     /**
      * Event to collapse all panels. This panel does not collapse so it is hidden

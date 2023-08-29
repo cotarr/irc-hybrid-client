@@ -71,7 +71,7 @@ customElements.define('nav-menu', class extends HTMLElement {
       }
     }
     if (changed) {
-      console.log('navMenu pmPanels, array changed, updating menu');
+      // console.log('navMenu pmPanels, array changed, updating menu');
       // remove previous elements
       const parentEl = this.shadowRoot.getElementById('dropdownMenuPrivMsgContainerId');
       while (parentEl.firstChild) {
@@ -135,10 +135,10 @@ customElements.define('nav-menu', class extends HTMLElement {
   };
 
   handlePmPanelClick = (event) => {
-    // event.stopPropagation();
-    // const channelNameId = event.target.pmPanelName;
-    // document.getElementById('channel:' + channelNameId).showPanel();
-    // this.closeDropdownMenu();
+    event.stopPropagation();
+    const privmsgName = event.target.pmPanelName.toLowerCase();
+    document.getElementById('privmsg:' + privmsgName).showPanel();
+    this.closeDropdownMenu();
   };
 
   _handleIrcStateChanged = () => {
@@ -398,11 +398,13 @@ customElements.define('nav-menu', class extends HTMLElement {
     this.shadowRoot.getElementById('item4_2_Id').addEventListener('click', (event) => {
       event.stopPropagation();
       document.dispatchEvent(new CustomEvent('show-all-panels'));
+      document.dispatchEvent(new CustomEvent('cancel-zoom'));
       this.closeDropdownMenu();
     });
     this.shadowRoot.getElementById('item4_3_Id').addEventListener('click', (event) => {
       event.stopPropagation();
       document.dispatchEvent(new CustomEvent('collapse-all-panels'));
+      document.dispatchEvent(new CustomEvent('cancel-zoom'));
       this.closeDropdownMenu();
     });
     this.shadowRoot.getElementById('item4_4_Id').addEventListener('click', (event) => {

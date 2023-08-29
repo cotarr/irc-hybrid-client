@@ -39,6 +39,7 @@ window.customElements.define('notice-panel', class extends HTMLElement {
     // scroll to top
     const panelMessageDisplayEl = this.shadowRoot.getElementById('panelMessageDisplayId');
     panelMessageDisplayEl.scrollTop = panelMessageDisplayEl.scrollHeight;
+    document.dispatchEvent(new CustomEvent('cancel-zoom'));
   };
 
   // this panel does not collapse, so close it.

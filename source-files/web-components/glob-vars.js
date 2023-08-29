@@ -50,7 +50,6 @@ window.customElements.define('glob-vars', class extends HTMLElement {
   // Token to reduce risk of Cross Site Request Forgery
   csrfToken = null;
   // Private message, temporary open PM windows across reload
-  listOfOpenPMPanels = [];
 
   webServerUrl = null;
   webSocketUrl = null;

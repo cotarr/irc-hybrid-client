@@ -99,6 +99,8 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
         message = message.split('\n')[0];
         document.getElementById('errorPanel').showError(message);
       });
+
+    document.dispatchEvent(new CustomEvent('cancel-zoom'));
   };
 
   hidePanel = () => {

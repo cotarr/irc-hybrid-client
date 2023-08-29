@@ -174,6 +174,8 @@ customElements.define('header-bar', class extends HTMLElement {
       'Waiting to recover main nickname';
     this.shadowRoot.getElementById('enableAudioButtonId').title =
       'Browser had disabled media playback. Click to enable beep sounds';
+    this.shadowRoot.getElementById('collapseAllButtonId').title =
+      'Show all available panels as collapsed bar elements';
   }; // _setFixedElementTitles()
 
   /**
@@ -299,6 +301,10 @@ customElements.define('header-bar', class extends HTMLElement {
     });
     this.shadowRoot.getElementById('noticeUnreadExistIconId').addEventListener('click', () => {
       console.log('clicked noticeUnreadExistIcon');
+    });
+    this.shadowRoot.getElementById('collapseAllButtonId').addEventListener('click', () => {
+      document.dispatchEvent(new CustomEvent('collapse-all-panels'));
+      document.dispatchEvent(new CustomEvent('cancel-zoom'));
     });
 
     // -------------------------------------

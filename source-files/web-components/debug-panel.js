@@ -53,7 +53,6 @@ window.customElements.define('debug-panel', class extends HTMLElement {
   _consoleLogGlobalEvents = () => {
     if (!this.loggingGlobalEvents) {
       this.loggingGlobalEvents = true;
-      console.log('Logging global events to console.log');
       const eventList = [
         'cache-reload-done',
         'cache-reload-error',
@@ -73,6 +72,7 @@ window.customElements.define('debug-panel', class extends HTMLElement {
         'update-from-cache',
         'web-connect-changed'
       ];
+      console.log('Logging global events to console.log', JSON.stringify(eventList, null, 2));
       eventList.forEach((eventTag) => {
         document.addEventListener(eventTag, (event) => {
           if ((event.detail) && (typeof event.detail === 'string')) {
@@ -212,9 +212,14 @@ window.customElements.define('debug-panel', class extends HTMLElement {
     });
 
     this.shadowRoot.getElementById('button02Id').addEventListener('click', () => {
+      const managePmPanelsEl = document.getElementById('managePmPanels');
+      console.log('opened', JSON.stringify(managePmPanelsEl.listOfOpenedPmPanels, null, 2));
+      console.log('collapsed', JSON.stringify(managePmPanelsEl.listOfCollapsedPmPanels, null, 2));
+      console.log('closed', JSON.stringify(managePmPanelsEl.listOfClosedPmPanels, null, 2));
     });
 
     this.shadowRoot.getElementById('button03Id').addEventListener('click', () => {
+      document.getElementById('managePmPanels').tempTextXXX();
     });
 
     this.shadowRoot.getElementById('button04Id').addEventListener('click', () => {
