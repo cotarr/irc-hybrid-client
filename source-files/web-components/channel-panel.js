@@ -593,7 +593,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       (bodyEl.getAttribute('zoomId') === 'channel:' + this.channelName.toLowerCase())) {
       // Turn off channel zoom
       bodyEl.removeAttribute('zoomId');
-      headerBarEl.setHeaderBarIcons({ zoom: false });
+      headerBarEl.removeAttribute('zoomicon');
       zoomButtonEl.textContent = 'Zoom';
       zoomButtonEl.classList.remove('channel-panel-zoomed');
       // reset screen size back to default
@@ -602,7 +602,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       this._handleResizeCustomElements();
     } else {
       bodyEl.setAttribute('zoomId', 'channel:' + this.channelName.toLowerCase());
-      headerBarEl.setHeaderBarIcons({ zoom: true });
+      headerBarEl.setAttribute('zoomicon', '');
       zoomButtonEl.textContent = 'UnZoom';
       zoomButtonEl.classList.add('channel-panel-zoomed');
       document.dispatchEvent(new CustomEvent('hide-all-panels', {
@@ -629,7 +629,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       (bodyEl.getAttribute('zoomId') === 'channel:' + this.channelName.toLowerCase())) {
       // Turn off channel zoom
       bodyEl.removeAttribute('zoomId');
-      headerBarEl.setHeaderBarIcons({ zoom: false });
+      headerBarEl.removeAttribute('zoomicon');
       zoomButtonEl.textContent = 'Zoom';
       zoomButtonEl.classList.remove('channel-panel-zoomed');
       // reset screen size back to default
@@ -1436,7 +1436,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     // needed to update date on first line printed
     this.shadowRoot.getElementById('panelDivId').setAttribute('lastDate', '0000-00-00');
     // Local count in channel window (to match global activity icon visibility)
-    // TODO this.resetMessageCount();
+    this._resetMessageCount();
   }; // _handleEraseBeforeReload
 
   //
@@ -1741,6 +1741,12 @@ window.customElements.define('channel-panel', class extends HTMLElement {
             window.globals.ircState.channelStates[ircStateIndex].joined;
         }
       }
+      // If left channel, show [Not in Channel] icon
+      if (window.globals.ircState.channelStates[ircStateIndex].joined) {
+        this.shadowRoot.getElementById('notInChanneldIconId').setAttribute('hidden', '');
+      } else {
+        this.shadowRoot.getElementById('notInChanneldIconId').removeAttribute('hidden');
+      }
       // state object includes up to date list of nicks in a channel
       this._updateNickList();
       // Update title string to include some data
@@ -1879,6 +1885,19 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       this.shadowRoot.getElementById('autocompleteCheckboxId').setAttribute('disabled', '');
     }
 
+    // If left channel, show [Not in Channel] icon
+    const ircStateIndex = window.globals.ircState.channels.indexOf(this.channelName.toLowerCase());
+    if (window.globals.ircState.channelStates[ircStateIndex].joined) {
+      this.shadowRoot.getElementById('notInChanneldIconId').setAttribute('hidden', '');
+      this.shadowRoot.getElementById('joinButtonId').setAttribute('hidden', '');
+      this.shadowRoot.getElementById('pruneButtonId').setAttribute('hidden', '');
+      this.shadowRoot.getElementById('partButtonId').removeAttribute('hidden');
+    } else {
+      this.shadowRoot.getElementById('notInChanneldIconId').removeAttribute('hidden');
+      this.shadowRoot.getElementById('joinButtonId').removeAttribute('hidden');
+      this.shadowRoot.getElementById('pruneButtonId').removeAttribute('hidden');
+      this.shadowRoot.getElementById('partButtonId').setAttribute('hidden', '');
+    }
     // populate it initially on creating the element
     this._updateNickList();
 

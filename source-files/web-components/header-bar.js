@@ -38,6 +38,98 @@ customElements.define('header-bar', class extends HTMLElement {
     const templateContent = template.content;
     this.attachShadow({ mode: 'open' })
       .appendChild(templateContent.cloneNode(true));
+    this.privmsgicon = false;
+  }
+
+  //
+  // For icons that are not available in the ircState and webState objects
+  // Several getter and setter functions have been defined.,
+  //
+  static get observedAttributes () {
+    return [
+      'beepicon',
+      'channelicon',
+      'noticeicon',
+      'privmsgicon',
+      'wallopsicon',
+      'zoomicon'
+    ];
+  }
+
+  get beepicon () {
+    return this.hasAttribute('beepicon');
+  }
+
+  set beepicon (val) {
+    if (val) {
+      this.setAttribute('beepicon', '');
+    } else {
+      this.removeAttribute('beepicon');
+    }
+  }
+
+  get channelicon () {
+    return this.hasAttribute('channelicon');
+  }
+
+  set channelicon (val) {
+    if (val) {
+      this.setAttribute('channelicon', '');
+    } else {
+      this.removeAttribute('channelicon');
+    }
+  }
+
+  get noticeicon () {
+    return this.hasAttribute('noticeicon');
+  }
+
+  set noticeicon (val) {
+    if (val) {
+      this.setAttribute('noticeicon', '');
+    } else {
+      this.removeAttribute('noticeicon');
+    }
+  }
+
+  get privmsgicon () {
+    return this.hasAttribute('privmsgicon');
+  }
+
+  set privmsgicon (val) {
+    if (val) {
+      this.setAttribute('privmsgicon', '');
+    } else {
+      this.removeAttribute('privmsgicon');
+    }
+  }
+
+  get wallopsicon () {
+    return this.hasAttribute('wallopsicon');
+  }
+
+  set wallopsicon (val) {
+    if (val) {
+      this.setAttribute('wallopsicon', '');
+    } else {
+      this.removeAttribute('wallopsicon');
+    }
+  }
+
+  get zoomicon () {
+    return this.hasAttribute('zoomicon');
+  }
+
+  set zoomicon (val) {
+    if (val) {
+      this.setAttribute('zoomicon', '');
+    } else {
+      this.removeAttribute('zoomicon');
+    }
+  }
+
+  attributeChangedCallback (name, oldValue, newValue) {
+    this.updateStatusIcons();
   }
 
   /**
@@ -121,6 +213,14 @@ customElements.define('header-bar', class extends HTMLElement {
         this.shadowRoot.getElementById('noticeUnreadExistIconId').setAttribute('hidden', '');
       }
     }
+    if (Object.hasOwn(options, 'wallopsUnread')) {
+      if (options.wallopsUnread) {
+        noIcons = false;
+        this.shadowRoot.getElementById('wallopsUnreadExistIconId').removeAttribute('hidden');
+      } else {
+        this.shadowRoot.getElementById('wallopsUnreadExistIconId').setAttribute('hidden', '');
+      }
+    }
     if (Object.hasOwn(options, 'nickRecovery')) {
       if (options.nickRecovery) {
         noIcons = false;
@@ -169,7 +269,9 @@ customElements.define('header-bar', class extends HTMLElement {
     this.shadowRoot.getElementById('privMsgUnreadExistIconId').title =
       'Unread Private Message (PM)';
     this.shadowRoot.getElementById('noticeUnreadExistIconId').title =
-      'Unread IRC Notice (Click to view)';
+      'Unread IRC Notice';
+    this.shadowRoot.getElementById('wallopsUnreadExistIconId').title =
+      'Unread IRC Wallops';
     this.shadowRoot.getElementById('nickRecovIconId').title =
       'Waiting to recover main nickname';
     this.shadowRoot.getElementById('enableAudioButtonId').title =
@@ -217,9 +319,18 @@ customElements.define('header-bar', class extends HTMLElement {
       channelUnread: false,
       privMsgUnread: false,
       noticeUnread: false,
-      nickRecovery: false
-      // enableAudio: false
+      wallopsUnread: false,
+      nickRecovery: false,
+      enableAudio: false
     };
+    // Set according to getter and setter values
+    if (this.hasAttribute('beepicon')) state.enableAudio = true;
+    if (this.hasAttribute('channelicon')) state.channelUnread = true;
+    if (this.hasAttribute('noticeicon')) state.noticeUnread = true;
+    if (this.hasAttribute('privmsgicon')) state.privMsgUnread = true;
+    if (this.hasAttribute('wallopsicon')) state.wallopsUnread = true;
+    if (this.hasAttribute('zoomicon')) state.zoom = true;
+    // Set icons based on ircState and webState
     if (window.globals.webState.webConnected) {
       state.webConnect = 'connected';
       if (window.globals.ircState.ircConnected) {
@@ -294,13 +405,16 @@ customElements.define('header-bar', class extends HTMLElement {
       document.dispatchEvent(new CustomEvent('cancel-zoom'));
     });
     this.shadowRoot.getElementById('channelUnreadExistIconId').addEventListener('click', () => {
-      console.log('clicked channelUnreadExistIcon');
+      this.removeAttribute('channelicon');
     });
     this.shadowRoot.getElementById('privMsgUnreadExistIconId').addEventListener('click', () => {
-      console.log('clicked privMsgUnreadExistIcon');
+      this.removeAttribute('privmsgicon');
     });
     this.shadowRoot.getElementById('noticeUnreadExistIconId').addEventListener('click', () => {
-      console.log('clicked noticeUnreadExistIcon');
+      this.removeAttribute('noticeicon');
+    });
+    this.shadowRoot.getElementById('wallopsUnreadExistIconId').addEventListener('click', () => {
+      this.removeAttribute('wallopsicon');
     });
     this.shadowRoot.getElementById('collapseAllButtonId').addEventListener('click', () => {
       document.dispatchEvent(new CustomEvent('collapse-all-panels'));
@@ -322,6 +436,7 @@ customElements.define('header-bar', class extends HTMLElement {
       const channelUnreadExistIconEl = this.shadowRoot.getElementById('channelUnreadExistIconId');
       const privMsgUnreadExistIconEl = this.shadowRoot.getElementById('privMsgUnreadExistIconId');
       const noticeUnreadExistIconEl = this.shadowRoot.getElementById('noticeUnreadExistIconId');
+      const wallopsUnreadExistIconEl = this.shadowRoot.getElementById('wallopsUnreadExistIconId');
       const nickRecovIconEl = this.shadowRoot.getElementById('nickRecovIconId');
       if (event.detail.theme === 'light') {
         hamburgerIconEl.setColorTheme('light');
@@ -333,6 +448,8 @@ customElements.define('header-bar', class extends HTMLElement {
         privMsgUnreadExistIconEl.classList.add('pm-panel-theme-light');
         noticeUnreadExistIconEl.classList.remove('notice-panel-theme-dark');
         noticeUnreadExistIconEl.classList.add('notice-panel-theme-light');
+        wallopsUnreadExistIconEl.classList.remove('wallops-panel-theme-dark');
+        wallopsUnreadExistIconEl.classList.add('wallops-panel-theme-light');
         nickRecovIconEl.classList.remove('hbar-recovery-theme-dark');
         nickRecovIconEl.classList.add('hbar-recovery-theme-light');
       } else {
@@ -345,6 +462,8 @@ customElements.define('header-bar', class extends HTMLElement {
         privMsgUnreadExistIconEl.classList.add('pm-panel-theme-dark');
         noticeUnreadExistIconEl.classList.remove('notice-panel-theme-light');
         noticeUnreadExistIconEl.classList.add('notice-panel-theme-dark');
+        wallopsUnreadExistIconEl.classList.remove('wallops-panel-theme-light');
+        wallopsUnreadExistIconEl.classList.add('wallops-panel-theme-dark');
         nickRecovIconEl.classList.remove('hbar-recovery-theme-light');
         nickRecovIconEl.classList.add('hbar-recovery-theme-dark');
       }
@@ -385,9 +504,23 @@ customElements.define('header-bar', class extends HTMLElement {
         totalCount += chanEl.unreadMessageCount;
       });
       if (totalCount > 0) {
-        this.shadowRoot.getElementById('channelUnreadExistIconId').removeAttribute('hidden');
+        this.setAttribute('channelicon', '');
       } else {
-        this.shadowRoot.getElementById('channelUnreadExistIconId').setAttribute('hidden', '');
+        this.removeAttribute('channelicon');
+      }
+    });
+
+    document.addEventListener('update-privmsg-count', (event) => {
+      let totalCount = 0;
+      const privmsgElements = document.getElementById('pmContainerId');
+      const privmsgEls = Array.from(privmsgElements.children);
+      privmsgEls.forEach((pmEl) => {
+        totalCount += pmEl.unreadMessageCount;
+      });
+      if (totalCount > 0) {
+        this.setAttribute('privmsgicon', '');
+      } else {
+        this.removeAttribute('privmsgicon');
       }
     });
 

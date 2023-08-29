@@ -36,6 +36,7 @@
 //   irc-state-changed
 //   resize-custom-elements
 //   show-all-panels
+//   update-privmsg-count
 //
 // Dispatched Events
 //   cancel-zoom
@@ -50,6 +51,7 @@ window.customElements.define('manage-pm-panels', class extends HTMLElement {
     const templateContent = template.content;
     this.attachShadow({ mode: 'open' })
       .appendChild(templateContent.cloneNode(true));
+    this.privmsgPanelCount = 0;
     this.listOfOpenedPmPanels = [];
     this.listOfCollapsedPmPanels = [];
     this.listOfClosedPmPanels = [];
@@ -199,6 +201,9 @@ window.customElements.define('manage-pm-panels', class extends HTMLElement {
         pmContainerEl.appendChild(newPmPanelEl);
       }
       newPmPanelEl.initializePlugin(parsedMessage);
+      this.privmsgPanelCount++;
+      this.shadowRoot.getElementById('activePmCountIconId').textContent =
+        this.privmsgPanelCount.toString();
     } else {
       throw new Error('Attempt to create channel that already exists');
     }
@@ -341,8 +346,13 @@ window.customElements.define('manage-pm-panels', class extends HTMLElement {
   /**
    * Called once per second as task scheduler, called from js/_afterLoad.js
    */
-  // timerTickHandler = () => {
-  // };
+  timerTickHandler = () => {
+    const privmsgElements = document.getElementById('pmContainerId');
+    const privmsgEls = Array.from(privmsgElements.children);
+    privmsgEls.forEach((pmEl) => {
+      pmEl.timerTickHandler();
+    });
+  };
 
   // ------------------
   // Main entry point
@@ -521,10 +531,13 @@ window.customElements.define('manage-pm-panels', class extends HTMLElement {
      * Action: erase all internal date prior to cache reload
      */
     document.addEventListener('erase-before-reload', () => {
-      // this.shadowRoot.getElementById('newChannelNameInputId').value = '';
+      this.shadowRoot.getElementById('pmNickNameInputId').value = '';
 
-      // this.shadowRoot.getElementById('channelUnreadCountIconId').textContent = '0';
-      // this.shadowRoot.getElementById('channelUnreadCountIconId').setAttribute('hidden', '');
+      this.shadowRoot.getElementById('pmUnreadCountIconId').textContent = '0';
+      this.shadowRoot.getElementById('pmUnreadCountIconId').setAttribute('hidden', '');
+      // Clear panel count
+      this.privmsgPanelCount = 0;
+      this.shadowRoot.getElementById('activePmCountIconId').textContent = '0';
     });
 
     /**
@@ -592,6 +605,31 @@ window.customElements.define('manage-pm-panels', class extends HTMLElement {
         }
       } else {
         this.showPanel();
+      }
+    });
+    // ---------------------------------------------------------
+    // Update unread message count in channel menu window
+    //
+    // This function will loop through all channel window elements
+    // For each element, build a sum of total un-read messages
+    // Then update the count displayed in the channel menu widow
+    // ---------------------------------------------------------
+    document.addEventListener('update-privmsg-count', (event) => {
+      let totalCount = 0;
+      const privmsgElements = document.getElementById('pmContainerId');
+      const privmsgEls = Array.from(privmsgElements.children);
+      privmsgEls.forEach((pmEl) => {
+        totalCount += pmEl.unreadMessageCount;
+      });
+      // console.log('total count', totalCount, '\n', JSON.stringify(event.detail, null, 2));
+      this.shadowRoot.getElementById('pmUnreadCountIconId')
+        .textContent = totalCount.toString();
+      if (totalCount > 0) {
+        // This is local icon at parent window to PM section
+        this.shadowRoot.getElementById('pmUnreadCountIconId').removeAttribute('hidden');
+      } else {
+        // This is local icon at parent window to PM section
+        this.shadowRoot.getElementById('pmUnreadCountIconId').setAttribute('hidden', '');
       }
     });
   } // connectedCallback()

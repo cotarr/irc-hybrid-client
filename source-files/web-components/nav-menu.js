@@ -56,6 +56,24 @@ customElements.define('nav-menu', class extends HTMLElement {
     this.shadowRoot.getElementById('navDropdownDivId').classList.remove('nav-dropdown-div-show');
   };
 
+  handleNoticeUnreadUpdate = (status) => {
+    const itemEl = this.shadowRoot.getElementById('item3_5_Id');
+    if (status) {
+      itemEl.textContent = 'Notices (New Messages)';
+    } else {
+      itemEl.textContent = 'Notices';
+    }
+  };
+
+  handleWallopsUnreadUpdate = (status) => {
+    const itemEl = this.shadowRoot.getElementById('item3_4_Id');
+    if (status) {
+      itemEl.textContent = 'Wallops (New Messages)';
+    } else {
+      itemEl.textContent = 'Wallops';
+    }
+  };
+
   handlePmListUpdate = () => {
     // list of PM panels list
     const pmPanels = Array.from(window.globals.webState.activePrivateMessageNicks);
@@ -111,11 +129,12 @@ customElements.define('nav-menu', class extends HTMLElement {
 
           const pmPanelMessageCount = document.createElement('div');
           pmPanelMessageCount.classList.add('global-count');
-          pmPanelMessageCount.classList.add('global-text-theme-inv-dark');
           pmPanelMessageCount.setAttribute('title', 'Unread Message Count');
           if (document.querySelector('body').getAttribute('theme') === 'light') {
+            pmPanelMessageCount.classList.add('global-text-theme-light');
             pmPanelMessageCount.classList.add('global-border-theme-light');
           } else {
+            pmPanelMessageCount.classList.add('global-text-theme-dark');
             pmPanelMessageCount.classList.add('global-border-theme-dark');
           }
           pmPanelMessageCount.textContent = '0';
@@ -216,12 +235,13 @@ customElements.define('nav-menu', class extends HTMLElement {
 
           const channelMessageCount = document.createElement('div');
           channelMessageCount.classList.add('global-count');
-          channelMessageCount.classList.add('global-text-theme-inv-dark');
           channelMessageCount.setAttribute('title', 'Unread Message Count');
           if (document.querySelector('body').getAttribute('theme') === 'light') {
             channelMessageCount.classList.add('global-border-theme-light');
+            channelMessageCount.classList.add('global-text-theme-light');
           } else {
             channelMessageCount.classList.add('global-border-theme-dark');
+            channelMessageCount.classList.add('global-text-theme-dark');
           }
           channelMessageCount.textContent = '0';
           channelMessageCount.setAttribute('hidden', '');
@@ -297,6 +317,24 @@ customElements.define('nav-menu', class extends HTMLElement {
         const count = channelEl.unreadMessageCount;
         if (count > 0) {
           itemEl.lastChild.textContent = channelEl.unreadMessageCount.toString();
+          itemEl.lastChild.removeAttribute('hidden');
+        } else {
+          itemEl.lastChild.textContent = '0';
+          itemEl.lastChild.setAttribute('hidden', '');
+        }
+      });
+    }); // addEventListener('update-channel-count
+
+    document.addEventListener('update-privmsg-count', (event) => {
+      const privmsgMenuItemElements =
+        this.shadowRoot.getElementById('dropdownMenuPrivMsgContainerId');
+      const menuItemEls = Array.from(privmsgMenuItemElements.children);
+      menuItemEls.forEach((itemEl) => {
+        const privmsgStr = itemEl.pmPanelName.toLowerCase();
+        const privmsgEl = document.getElementById('privmsg:' + privmsgStr);
+        const count = privmsgEl.unreadMessageCount;
+        if (count > 0) {
+          itemEl.lastChild.textContent = privmsgEl.unreadMessageCount.toString();
           itemEl.lastChild.removeAttribute('hidden');
         } else {
           itemEl.lastChild.textContent = '0';

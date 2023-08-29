@@ -41,6 +41,7 @@
 //
 // Dispatched Events
 //   cancel-zoom
+//   update-privmsg-count
 //
 // External Methods
 //   showPanel()
@@ -75,6 +76,7 @@ window.customElements.define('pm-panel', class extends HTMLElement {
     this.privmsgCsName = '';
     this.ircConnectedLast = false;
     this.defaultHeightInRows = 10;
+    this.unreadMessageCount = 0;
     this.activityIconInhibitTimer = 0;
   }
 
@@ -175,6 +177,44 @@ window.customElements.define('pm-panel', class extends HTMLElement {
     }
     return outArray;
   }; // _splitMultiLinePaste
+
+  /**
+   * Increment channel message counter and make visible
+   */
+  _incrementMessageCount = () => {
+    this.unreadMessageCount++;
+    this.shadowRoot.getElementById('messageCountIconId')
+      .textContent = this.unreadMessageCount.toString();
+    this.shadowRoot.getElementById('messageCountIconId')
+      .removeAttribute('hidden');
+    document.dispatchEvent(new CustomEvent('update-privmsg-count',
+      {
+        detail: {
+          channel: this.privmsgName.toLowerCase(),
+          unreadMessageCount: this.unreadMessageCount
+        }
+      }
+    ));
+  };
+
+  /**
+   * Increment channel message counter and make visible
+   */
+  _resetMessageCount = () => {
+    this.unreadMessageCount = 0;
+    this.shadowRoot.getElementById('messageCountIconId')
+      .textContent = this.unreadMessageCount.toString();
+    this.shadowRoot.getElementById('messageCountIconId')
+      .setAttribute('hidden', '');
+    document.dispatchEvent(new CustomEvent('update-privmsg-count',
+      {
+        detail: {
+          channel: this.privmsgName.toLowerCase(),
+          unreadMessageCount: this.unreadMessageCount
+        }
+      }
+    ));
+  };
 
   /**
    * Make panel visible (both internal and external function)
@@ -371,7 +411,7 @@ window.customElements.define('pm-panel', class extends HTMLElement {
     const panelMessageInputEl = this.shadowRoot.getElementById('panelMessageInputId');
     this._sendPrivMessageToUser(this.privmsgCsName, panelMessageInputEl);
     panelMessageInputEl.focus();
-    // TODO this.resetPrivMsgCount();
+    this._resetPrivMsgCount();
     this.activityIconInhibitTimer = document.getElementById('globVars')
       .constants('activityIconInhibitTimerValue');
     this.shadowRoot.getElementById('multiLineActionDivId').setAttribute('hidden', '');
@@ -389,15 +429,14 @@ window.customElements.define('pm-panel', class extends HTMLElement {
       document.getElementById('displayUtils')
         .stripOneCrLfFromElement(panelMessageInputEl);
       this._sendPrivMessageToUser(this.privmsgCsName, panelMessageInputEl);
-      // TODO resetPrivMsgCount();
+      this._resetPrivMsgCount();
       this.activityIconInhibitTimer = document.getElementById('globVars')
         .constants('activityIconInhibitTimerValue');
     }
   };
 
   _handlePanelClick = () => {
-    // this._resetMessageCount();
-    console.log('panel click TODO');
+    this._resetMessageCount();
   };
 
   // Example incoming private message (parsedMessage)
@@ -513,13 +552,12 @@ window.customElements.define('pm-panel', class extends HTMLElement {
           // and focus not message send button
           // and NOT reload from cache in progress (timer not zero)
           // then display incoming message activity icon
-
-          // if ((document.activeElement !== privMsgInputAreaEl) &&
-          // (document.activeElement !== privMsgSendButtonEl) &&
-          // (!window.globals.webState.cacheReloadInProgress) &&
-          // (activityIconInhibitTimer === 0)) {
-          //   incrementPrivMsgCount();
-          // }
+          if ((document.activeElement !== this.shadowRoot.getElementById('panelMessageInputId')) &&
+          (document.activeElement !== this.shadowRoot.getElementById('sendButtonId')) &&
+          (!window.globals.webState.cacheReloadInProgress) &&
+          (this.activityIconInhibitTimer === 0)) {
+            this._incrementMessageCount();
+          }
         }
       }
     } // if PRIVMSG
@@ -801,8 +839,9 @@ window.customElements.define('pm-panel', class extends HTMLElement {
   /**
    * Called once per second as task scheduler, called from js/_afterLoad.js
    */
-  // timerTickHandler = () => {
-  // };
+  timerTickHandler = () => {
+    if (this.activityIconInhibitTimer > 0) this.activityIconInhibitTimer--;
+  };
 
   /**
    * Called from js/_afterLoad.js after all panels are loaded.

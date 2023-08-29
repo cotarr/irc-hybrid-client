@@ -40,6 +40,8 @@ window.customElements.define('notice-panel', class extends HTMLElement {
     const panelMessageDisplayEl = this.shadowRoot.getElementById('panelMessageDisplayId');
     panelMessageDisplayEl.scrollTop = panelMessageDisplayEl.scrollHeight;
     document.dispatchEvent(new CustomEvent('cancel-zoom'));
+    document.getElementById('headerBar').removeAttribute('noticeicon');
+    document.getElementById('navMenu').handleNoticeUnreadUpdate(false);
   };
 
   // this panel does not collapse, so close it.
@@ -143,20 +145,26 @@ window.customElements.define('notice-panel', class extends HTMLElement {
         document.getElementById('globVars').constants('nickChannelSpacer') +
           parsedMessage.params[1]);
       }
-
       // Message activity Icon
       // If NOT reload from cache in progress (timer not zero)
       // then display incoming message activity icon
-      // TODO
-      // if (!window.globals.webState.cacheReloadInProgress) {
-      //   setNotActivityIcon();
-      // }
+      if (!window.globals.webState.cacheReloadInProgress) {
+        document.getElementById('headerBar').setAttribute('noticeicon', '');
+        document.getElementById('navMenu').handleNoticeUnreadUpdate(true);
+      }
     } else if (parsedMessage.nick === window.globals.ircState.nickName) {
       // Case of regular notice, not CTCP reply
       _addText(parsedMessage.timestamp + ' [to] ' +
       parsedMessage.params[0] +
       document.getElementById('globVars').constants('nickChannelSpacer') +
       parsedMessage.params[1]);
+      // Message activity Icon
+      // If NOT reload from cache in progress (timer not zero)
+      // then display incoming message activity icon
+      if (!window.globals.webState.cacheReloadInProgress) {
+        document.getElementById('headerBar').setAttribute('noticeicon', '');
+        document.getElementById('navMenu').handleNoticeUnreadUpdate(true);
+      }
     }
   }; // displayNoticeMessage()
 
@@ -216,7 +224,8 @@ window.customElements.define('notice-panel', class extends HTMLElement {
     // Clear message activity ICON by clicking on the main
     // -------------------------------
     this.shadowRoot.getElementById('panelDivId').addEventListener('click', function () {
-      // resetNotActivityIcon();
+      document.getElementById('headerBar').removeAttribute('noticeicon');
+      document.getElementById('navMenu').handleNoticeUnreadUpdate(false);
     });
 
     // -------------------------------------

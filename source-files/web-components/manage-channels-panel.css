@@ -39,6 +39,22 @@
 display: none;
 }
 
+.channel-panel-not-in-channel-icon {
+  background-color: #ff7b00;
+  border: 0px solid black;
+  border-radius: 12px;
+  color: #ffffff;
+  display: inline-block;
+  font-weight: bold;
+  margin-left: 2px;
+  margin-right: 0px;
+  padding: 0px 5px 0px 5px;
+  text-align: center;
+}
+.channel-panel-not-in-channel-icon[hidden] {
+display: none;
+}
+
 .channel-panel-presets-div {
   border-radius: 5px; 
   padding: 5px 10px 5px 10px;

@@ -96,6 +96,7 @@ if (!(window.customElements && document.body.attachShadow)) {
     document.getElementById('websocketPanel').timerTickHandler();
     // document.getElementById('ircControlsPanel').timerTickHandler();
     document.getElementById('ircServerPanel').timerTickHandler();
+    document.getElementById('managePmPanels').timerTickHandler();
     document.getElementById('manageChannelsPanel').timerTickHandler();
   }, 1000);
 

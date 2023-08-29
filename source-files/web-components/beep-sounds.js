@@ -84,7 +84,7 @@ window.customElements.define('beep-sounds', class extends HTMLElement {
       this.beep1.play()
         .then(() => {
           // upon successful play sound, then hide the button
-          document.getElementById('headerBar').setHeaderBarIcons({ enableAudio: false });
+          document.getElementById('headerBar').removeAttribute('beepicon');
         })
         .catch((error) => {
           if (error.name === 'NotAllowedError') {
@@ -142,7 +142,7 @@ window.customElements.define('beep-sounds', class extends HTMLElement {
       this.beep3.play()
         .then(() => {
           // upon successful play sound, then hide the button
-          document.getElementById('headerBar').setHeaderBarIcons({ enableAudio: false });
+          document.getElementById('headerBar').removeAttribute('beepicon');
         })
         .catch((error) => {
           if (error.name === 'NotAllowedError') {
@@ -202,7 +202,7 @@ window.customElements.define('beep-sounds', class extends HTMLElement {
    * Accepts User's event driven action to activate media play in browser.
    */
   userInitiatedAudioPlay = () => {
-    document.getElementById('headerBar').setHeaderBarIcons({ enableAudio: false });
+    document.getElementById('headerBar').removeAttribute('beepicon');
     // check if beep enabled in window.localStorage
     if (this._areBeepsConfigured()) {
       setTimeout(this.playBeep2Sound, 100);
@@ -240,7 +240,7 @@ window.customElements.define('beep-sounds', class extends HTMLElement {
   initializePlugin = () => {
     // Show button to enable sound in case browser localStorage has enabled beeps
     if (this._areBeepsConfigured()) {
-      document.getElementById('headerBar').setHeaderBarIcons({ enableAudio: true });
+      document.getElementById('headerBar').setAttribute('beepicon', '');
     }
   };
 

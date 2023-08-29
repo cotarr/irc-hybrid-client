@@ -6,11 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Next v2.0.0-dev 2023-08-28 (Draft)
+## Next v2.0.0-dev 2023-08-29 (Draft)
 
 Work in progress, see top of README.md
 
 Commit
+
+- Added getter and setter for headerBar status icons
+- Status bar unread message icons working for channel, pm, notice, and wallops
+- Unread message count display in dropdown menu for channel and PM messages
+- Unread message status for notice and wallops working in dropdown menu
+- The manage-channels-panel shows unread channel message count
+- The manage-pm-panels shows unread PM message count
+- Kicked and not in channel icons for channel window.
+
+Commit bc82646
 
 - Added message handling code to private message panel.
 

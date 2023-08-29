@@ -40,6 +40,8 @@ window.customElements.define('wallops-panel', class extends HTMLElement {
     const panelMessageDisplayEl = this.shadowRoot.getElementById('panelMessageDisplayId');
     panelMessageDisplayEl.scrollTop = panelMessageDisplayEl.scrollHeight;
     document.dispatchEvent(new CustomEvent('cancel-zoom'));
+    document.getElementById('headerBar').removeAttribute('wallopsicon');
+    document.getElementById('navMenu').handleWallopsUnreadUpdate(false);
   };
 
   // this panel does not collapse, so close it.
@@ -68,8 +70,8 @@ window.customElements.define('wallops-panel', class extends HTMLElement {
       }
     };
 
-    if (!window.globals.webState.cacheReloadInProgress) {
-      // (!document.querySelector('body').hasAttribute('zoomId'))) {
+    if ((!window.globals.webState.cacheReloadInProgress) &&
+      (!document.querySelector('body').hasAttribute('zoomId'))) {
       this.showPanel();
     }
 
@@ -89,6 +91,13 @@ window.customElements.define('wallops-panel', class extends HTMLElement {
           parsedMessage.prefix +
           document.getElementById('globVars').constants('nickChannelSpacer') +
           parsedMessage.params[0]);
+      }
+      // Message activity Icon
+      // If NOT reload from cache in progress (timer not zero)
+      // then display incoming message activity icon
+      if (!window.globals.webState.cacheReloadInProgress) {
+        document.getElementById('headerBar').setAttribute('wallopsicon', '');
+        document.getElementById('navMenu').handleWallopsUnreadUpdate(true);
       }
     }
   }; // displayWallopsMessage
@@ -151,7 +160,8 @@ window.customElements.define('wallops-panel', class extends HTMLElement {
     // Clear message activity ICON by clicking on the main
     // -------------------------------
     this.shadowRoot.getElementById('panelDivId').addEventListener('click', function () {
-      // resetNotActivityIcon();
+      document.getElementById('headerBar').removeAttribute('wallopsicon');
+      document.getElementById('navMenu').handleWallopsUnreadUpdate(false);
     });
 
     // -------------------------------------

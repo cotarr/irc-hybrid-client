@@ -208,18 +208,12 @@ window.customElements.define('debug-panel', class extends HTMLElement {
     });
 
     this.shadowRoot.getElementById('button01Id').addEventListener('click', () => {
-      document.getElementById('navMenu').handlePmListUpdate();
     });
 
     this.shadowRoot.getElementById('button02Id').addEventListener('click', () => {
-      const managePmPanelsEl = document.getElementById('managePmPanels');
-      console.log('opened', JSON.stringify(managePmPanelsEl.listOfOpenedPmPanels, null, 2));
-      console.log('collapsed', JSON.stringify(managePmPanelsEl.listOfCollapsedPmPanels, null, 2));
-      console.log('closed', JSON.stringify(managePmPanelsEl.listOfClosedPmPanels, null, 2));
     });
 
     this.shadowRoot.getElementById('button03Id').addEventListener('click', () => {
-      document.getElementById('managePmPanels').tempTextXXX();
     });
 
     this.shadowRoot.getElementById('button04Id').addEventListener('click', () => {
@@ -244,6 +238,7 @@ window.customElements.define('debug-panel', class extends HTMLElement {
         channelUnread: true,
         privMsgUnread: true,
         noticeUnread: true,
+        wallopsUnread: true,
         nickRecovery: true,
         enableAudio: true
       });
