@@ -87,6 +87,187 @@ window.customElements.define('debug-panel', class extends HTMLElement {
     }
   };
 
+  test1ButtonHandler = () => {
+    // ---------------------------------
+    console.log('Test1 button pressed.');
+    const fetchController = new AbortController();
+    const fetchOptions = {
+      method: 'GET',
+      redirect: 'error',
+      signal: fetchController.signal,
+      headers: {
+        Accept: 'application/json'
+      }
+    };
+    const fetchURL = document.getElementById('globVars').webServerUrl + '/irc/test1';
+    const fetchTimerId = setTimeout(() => fetchController.abort(), 5000);
+    fetch(fetchURL, fetchOptions)
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          // Retrieve error message from remote web server and pass to error handler
+          return response.text()
+            .then((remoteErrorText) => {
+              const err = new Error('HTTP status error');
+              err.status = response.status;
+              err.statusText = response.statusText;
+              err.remoteErrorText = remoteErrorText;
+              throw err;
+            });
+        }
+      })
+      .then((responseJson) => {
+        console.log(JSON.stringify(responseJson, null, 2));
+        if (fetchTimerId) clearTimeout(fetchTimerId);
+        if (responseJson.error) {
+          throw new Error(responseJson.error);
+        }
+      })
+      .catch((err) => {
+        if (fetchTimerId) clearTimeout(fetchTimerId);
+        // Build generic error message to catch network errors
+        let message = ('Fetch error, ' + fetchOptions.method + ' ' + fetchURL + ', ' +
+          (err.message || err.toString() || 'Error'));
+        if (err.status) {
+          // Case of HTTP status error, build descriptive error message
+          message = ('HTTP status error, ') + err.status.toString() + ' ' +
+            err.statusText + ', ' + fetchOptions.method + ' ' + fetchURL;
+        }
+        if (err.remoteErrorText) {
+          message += ', ' + err.remoteErrorText;
+        }
+        console.error(message);
+        // keep 1 line
+        message = message.split('\n')[0];
+        document.getElementById('errorPanel').showError(message);
+      });
+    // ---------------------------------
+  };
+
+  test2ButtonHandler = () => {
+    // ---------------------------------
+    console.log('Test1 button pressed.');
+    const fetchController = new AbortController();
+    const fetchOptions = {
+      method: 'GET',
+      redirect: 'error',
+      signal: fetchController.signal,
+      headers: {
+        Accept: 'application/json'
+      }
+    };
+    const fetchURL = document.getElementById('globVars').webServerUrl + '/irc/test2';
+    const fetchTimerId = setTimeout(() => fetchController.abort(), 5000);
+    fetch(fetchURL, fetchOptions)
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          // Retrieve error message from remote web server and pass to error handler
+          return response.text()
+            .then((remoteErrorText) => {
+              const err = new Error('HTTP status error');
+              err.status = response.status;
+              err.statusText = response.statusText;
+              err.remoteErrorText = remoteErrorText;
+              throw err;
+            });
+        }
+      })
+      .then((responseJson) => {
+        console.log(JSON.stringify(responseJson, null, 2));
+        if (fetchTimerId) clearTimeout(fetchTimerId);
+        if (responseJson.error) {
+          throw new Error(responseJson.error);
+        }
+      })
+      .catch((err) => {
+        if (fetchTimerId) clearTimeout(fetchTimerId);
+        // Build generic error message to catch network errors
+        let message = ('Fetch error, ' + fetchOptions.method + ' ' + fetchURL + ', ' +
+          (err.message || err.toString() || 'Error'));
+        if (err.status) {
+          // Case of HTTP status error, build descriptive error message
+          message = ('HTTP status error, ') + err.status.toString() + ' ' +
+            err.statusText + ', ' + fetchOptions.method + ' ' + fetchURL;
+        }
+        if (err.remoteErrorText) {
+          message += ', ' + err.remoteErrorText;
+        }
+        console.error(message);
+        // keep 1 line
+        message = message.split('\n')[0];
+        document.getElementById('errorPanel').showError(message);
+      });
+    // ---------------------------------
+  };
+
+  test3ButtonHandler = () => {
+    // ---------------------------------
+    console.log('Test3 button pressed.');
+    console.log('Echo request GET /irc/test3');
+    window.globals.startTimeMsTest3 = Date.now();
+    const fetchController = new AbortController();
+    const fetchOptions = {
+      method: 'GET',
+      redirect: 'error',
+      signal: fetchController.signal,
+      headers: {
+        Accept: 'application/json'
+      }
+    };
+    const fetchURL = document.getElementById('globVars').webServerUrl + '/irc/test3';
+    const fetchTimerId = setTimeout(() => fetchController.abort(), 5000);
+    fetch(fetchURL, fetchOptions)
+      .then((response) => {
+        if (response.status === 201) {
+          const pong1 = Date.now() - window.globals.startTimeMsTest3;
+          console.log('Fetch response: ' + pong1.toString() + ' ms');
+          if (fetchTimerId) clearTimeout(fetchTimerId);
+        } else {
+          // Retrieve error message from remote web server and pass to error handler
+          return response.text()
+            .then((remoteErrorText) => {
+              const err = new Error('HTTP status error');
+              err.status = response.status;
+              err.statusText = response.statusText;
+              err.remoteErrorText = remoteErrorText;
+              throw err;
+            });
+        }
+      })
+      .catch((err) => {
+        if (fetchTimerId) clearTimeout(fetchTimerId);
+        // Build generic error message to catch network errors
+        let message = ('Fetch error, ' + fetchOptions.method + ' ' + fetchURL + ', ' +
+          (err.message || err.toString() || 'Error'));
+        if (err.status) {
+          // Case of HTTP status error, build descriptive error message
+          message = ('HTTP status error, ') + err.status.toString() + ' ' +
+            err.statusText + ', ' + fetchOptions.method + ' ' + fetchURL;
+        }
+        if (err.remoteErrorText) {
+          message += ', ' + err.remoteErrorText;
+        }
+        console.error(message);
+        // keep 1 line
+        message = message.split('\n')[0];
+        document.getElementById('errorPanel').showError(message);
+      });
+    // ---------------------------------
+  }; // test3ButtonHandler()
+
+  test4ButtonHandler = () => {
+    // ---------------------------------
+    console.log('Test 3 button: expire heart beat timer');
+    const websocketPanelEl = document.getElementById('websocketPanel');
+    websocketPanelEl.heartbeatUpCounter =
+      websocketPanelEl.heartbeatExpirationTimeSeconds - 1;
+    // webState.webConnectOn = false;
+    // ---------------------------------
+  }; // test4ButtonHandler()
+
   // ------------------
   // Main entry point
   // ------------------
@@ -100,8 +281,6 @@ window.customElements.define('debug-panel', class extends HTMLElement {
     // Debug option to open panel at page load.
     if (document.location.hash === '#DEBUG') {
       this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
-      this.shadowRoot.getElementById('showdebugFunctionsDivId').setAttribute('hidden', '');
-      this.shadowRoot.getElementById('debugFunctionsDivId').removeAttribute('hidden');
       console.log('Debug: Detected URL hash=#DEBUG. Opened Debug panel at page load.');
     }
 
@@ -201,32 +380,37 @@ window.customElements.define('debug-panel', class extends HTMLElement {
     // 3 of 3 Debug Button Listeners
     // -------------------------------------
 
-    // Show debug function buttons
-    this.shadowRoot.getElementById('showDebugFunctionsButtonId').addEventListener('click', () => {
-      this.shadowRoot.getElementById('showdebugFunctionsDivId').setAttribute('hidden', '');
-      this.shadowRoot.getElementById('debugFunctionsDivId').removeAttribute('hidden');
+    // --------------------------
+    // Remote Server Functions
+    // --------------------------
+    this.shadowRoot.getElementById('button_1_1').addEventListener('click', () => {
+      this.test1ButtonHandler();
     });
 
-    this.shadowRoot.getElementById('button01Id').addEventListener('click', () => {
+    this.shadowRoot.getElementById('button_1_2').addEventListener('click', () => {
+      this.test2ButtonHandler();
     });
 
-    this.shadowRoot.getElementById('button02Id').addEventListener('click', () => {
+    this.shadowRoot.getElementById('button_1_3').addEventListener('click', () => {
+      this.test4ButtonHandler();
     });
 
-    this.shadowRoot.getElementById('button03Id').addEventListener('click', () => {
+    this.shadowRoot.getElementById('button_1_4').addEventListener('click', () => {
+      this.test3ButtonHandler();
     });
 
-    this.shadowRoot.getElementById('button04Id').addEventListener('click', () => {
+    // --------------------------
+    // Display Functions
+    // --------------------------
+    this.shadowRoot.getElementById('button_2_1').addEventListener('click', () => {
+      document.dispatchEvent(new CustomEvent('show-all-panels', {
+        detail: {
+          except: [],
+          debug: true
+        }
+      }));
     });
-
-    this.shadowRoot.getElementById('button05Id').addEventListener('click', () => {
-      // returns promise
-      document.getElementById('ircControlsPanel').getIrcState()
-        .catch(() => {
-        });
-    });
-
-    this.shadowRoot.getElementById('button06Id').addEventListener('click', () => {
+    this.shadowRoot.getElementById('button_2_2').addEventListener('click', () => {
       document.getElementById('activitySpinner').requestActivitySpinner();
       document.getElementById('headerBar').setHeaderBarIcons({
         hideNavMenu: false,
@@ -244,66 +428,68 @@ window.customElements.define('debug-panel', class extends HTMLElement {
       });
       document.getElementById('headerBar')._updateDynamicElementTitles();
     });
-
-    this.shadowRoot.getElementById('button07Id').addEventListener('click', () => {
-      console.log('Adhoc Function Here');
-    });
-
-    this.shadowRoot.getElementById('button08Id').addEventListener('click', () => {
-      document.getElementById('displayUtils').manualRecalcPageWidth();
-    });
-
-    this.shadowRoot.getElementById('button09Id').addEventListener('click', () => {
-      this._consoleLogGlobalEvents();
-    });
-    this.shadowRoot.getElementById('button10Id').addEventListener('click', () => {
-      document.dispatchEvent(new CustomEvent('irc-state-changed'));
-    });
-    this.shadowRoot.getElementById('button11Id').addEventListener('click', () => {
-      document.dispatchEvent(new CustomEvent('hide-all-panels', {
-        detail: {
-          except: []
-        }
-      }));
-    });
-    this.shadowRoot.getElementById('button12Id').addEventListener('click', () => {
-      document.dispatchEvent(new CustomEvent('collapse-all-panels', {
-        detail: {
-          except: []
-        }
-      }));
-    });
-    this.shadowRoot.getElementById('button13Id').addEventListener('click', () => {
-      document.dispatchEvent(new CustomEvent('show-all-panels', {
-        detail: {
-          except: [],
-          debug: true
-        }
-      }));
-    });
-    this.shadowRoot.getElementById('button14Id').addEventListener('click', () => {
-      document.dispatchEvent(new CustomEvent('web-connect-changed'));
-    });
-    this.shadowRoot.getElementById('button16Id').addEventListener('click', () => {
+    this.shadowRoot.getElementById('button_2_3').addEventListener('click', () => {
       document.getElementById('displayUtils').toggleColorTheme();
     });
-    this.shadowRoot.getElementById('button17Id').addEventListener('click', () => {
-      document.getElementById('showRaw').showPanel();
+    this.shadowRoot.getElementById('button_2_4').addEventListener('click', () => {
+      document.getElementById('displayUtils').manualRecalcPageWidth();
     });
-    this.shadowRoot.getElementById('button19Id').addEventListener('click', () => {
-      document.getElementById('beepSounds').testPlayBeepSound1();
-    });
-    this.shadowRoot.getElementById('button20Id').addEventListener('click', () => {
-      document.getElementById('beepSounds').testPlayBeepSound2();
-    });
-    this.shadowRoot.getElementById('button21Id').addEventListener('click', () => {
-      document.getElementById('beepSounds').testPlayBeepSound3();
-    });
-    this.shadowRoot.getElementById('button23Id').addEventListener('click', () => {
+    // --------------------
+    // Data and Variables
+    // --------------------
+    this.shadowRoot.getElementById('button_3_1').addEventListener('click', () => {
       document.getElementById('showIrcState').showPanel();
     });
-    this.shadowRoot.getElementById('button24Id').addEventListener('click', () => {
+    this.shadowRoot.getElementById('button_3_2').addEventListener('click', () => {
       document.getElementById('showWebState').showPanel();
+    });
+    this.shadowRoot.getElementById('button_3_3').addEventListener('click', () => {
+      document.getElementById('showRaw').showPanel();
+    });
+
+    // --------------------
+    //
+    // --------------------
+    this.shadowRoot.getElementById('button_4_1').addEventListener('click', () => {
+      // returns promise
+      document.getElementById('ircControlsPanel').getIrcState()
+        .catch(() => {
+        });
+    });
+
+    this.shadowRoot.getElementById('button_4_2').addEventListener('click', () => {
+      document.dispatchEvent(new CustomEvent('update-from-cache'));
+    });
+
+    this.shadowRoot.getElementById('button_4_3').addEventListener('click', () => {
+      document.dispatchEvent(new CustomEvent('irc-state-changed'));
+    });
+
+    this.shadowRoot.getElementById('button_4_4').addEventListener('click', () => {
+      document.dispatchEvent(new CustomEvent('web-connect-changed'));
+    });
+    this.shadowRoot.getElementById('button_4_5').addEventListener('click', () => {
+      this._consoleLogGlobalEvents();
+    });
+
+    // ----------------------------------
+    // Audio media playback functions
+    // ----------------------------------
+    this.shadowRoot.getElementById('button_5_1').addEventListener('click', () => {
+      document.getElementById('beepSounds').testPlayBeepSound1();
+    });
+    this.shadowRoot.getElementById('button_5_2').addEventListener('click', () => {
+      document.getElementById('beepSounds').testPlayBeepSound2();
+    });
+    this.shadowRoot.getElementById('button_5_3').addEventListener('click', () => {
+      document.getElementById('beepSounds').testPlayBeepSound3();
+    });
+
+    // --------------------
+    // Adhoc Functions
+    // --------------------
+    this.shadowRoot.getElementById('button_6_1').addEventListener('click', () => {
+      console.log('Adhoc Function is not defined (debug-panel)');
     });
   }; // connectedCallback()
 }); // customElements.define

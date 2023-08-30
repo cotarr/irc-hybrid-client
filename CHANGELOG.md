@@ -10,7 +10,29 @@ and this project adheres to
 
 Work in progress, see top of README.md
 
-Commit
+Commit 
+
+- Removed legacy _styles-old.css, the CSS file from previous version. Only new CSS is now included in the build.
+- Copied in remote server debug API calls into debug-panel.
+- Cleaned up the CSS layout of the debug-panel
+- Removed temporary functions from debug panel
+
+### Server change
+
+Code to assign the root directory of the web server was changed to avoid duplication of code in the git repository.
+
+- Changed code (server/web-server.mjs) used to assign the root folder of the web server.
+  * The source files are located in the "source-files" folder.
+  * A 2nd folder "build-prod" with bundled and minified files will commit to git.
+  * A 3rd folder "build-dev" is used in development for line number debugging of javascript.
+  * The "build-dev" folder will be cleaned before git commit to avoid a third copy.
+  * In the case where the server is started with NODE_ENV==='development' and the "build-dev" folder is empty, the web server will fall back to the "build-prod" folder as root directory for the web server.
+  * When NODE_ENV is "production", the "build-prod" folder will always be used.
+
+- Removed to code to dynamically generate serverlist.html because the server list editor is now included in the main page.
+- Added websocket ping capability using /irc/test3 test route, responding by sending DEBUGPONG over websocket stream.
+
+Commit ba25442
 
 - Added getter and setter for headerBar status icons
 - Status bar unread message icons working for channel, pm, notice, and wallops

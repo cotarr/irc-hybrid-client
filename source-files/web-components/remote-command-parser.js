@@ -269,6 +269,13 @@ window.customElements.define('remote-command-parser', class extends HTMLElement 
       // This may occur when erasing partial contents of the cache
       // In response to this event the cache will be reloaded in all browsers
       document.dispatchEvent(new CustomEvent('update-from-cache'));
+    } else if (message === 'DEBUGPONG') {
+      // 5) This is a debug function to measure websocket ping time.
+      if ((window.globals.startTimeMsTest3) &&
+        (typeof window.globals.startTimeMsTest3 === 'number')) {
+        const pong2 = Date.now() - window.globals.startTimeMsTest3;
+        console.log('Websocket response: ' + pong2.toString() + ' ms');
+      }
     } else if ((message.startsWith('LAG=')) && (message.length === 9)) {
       // 5) IRC server lag measurement for display
       // Example message: 'LAG=1.234'

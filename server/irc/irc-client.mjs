@@ -2311,6 +2311,23 @@ const test2Handler = function (req, res, next) {
   // -----------------------------------------
 };
 
+// --------------------------------------------------------------
+// Test route for Debug use
+//
+// Method: GET
+// Route:  /irc/test3
+//
+// You can place a function here called by /irc/test3 route.
+//
+// --------------------------------------------------------------
+
+const test3Handler = function (req, res, next) {
+  // -------- test code here -----------------
+  global.sendToBrowser('DEBUGPONG\n');
+  res.status(201).end();
+  // -----------------------------------------
+};
+
 //
 // 1 second timer
 //
@@ -2335,5 +2352,6 @@ export default {
   pruneChannel,
   eraseCache,
   test1Handler,
-  test2Handler
+  test2Handler,
+  test3Handler
 };

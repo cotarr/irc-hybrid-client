@@ -423,11 +423,7 @@ customElements.define('nav-menu', class extends HTMLElement {
       document.dispatchEvent(new CustomEvent('global-scroll-to-top'));
       this.closeDropdownMenu();
     });
-    this.shadowRoot.getElementById('item3_7_Id').addEventListener('click', (event) => {
-      event.stopPropagation();
-      document.getElementById('debugPanel').showPanel();
-      this.closeDropdownMenu();
-    });
+
     this.shadowRoot.getElementById('item4_1_Id').addEventListener('click', (event) => {
       event.stopPropagation();
       document.getElementById('displayUtils').toggleColorTheme();
@@ -450,12 +446,11 @@ customElements.define('nav-menu', class extends HTMLElement {
       document.dispatchEvent(new CustomEvent('hide-all-panels'));
       this.closeDropdownMenu();
     });
-    // this.shadowRoot.getElementById('item4_5_Id').addEventListener('click', (event) => {
-    //   // AdHoc function
-    //   event.stopPropagation();
-    //   console.log('Put Ad-hoc function here');
-    //   this.closeDropdownMenu();
-    // });
+    this.shadowRoot.getElementById('item4_5_Id').addEventListener('click', (event) => {
+      event.stopPropagation();
+      document.getElementById('debugPanel').showPanel();
+      this.closeDropdownMenu();
+    });
     this.shadowRoot.getElementById('item5_0_Id').addEventListener('click', (event) => {
       event.stopPropagation();
       document.getElementById('logoutPanel').handleLogoutRequest();

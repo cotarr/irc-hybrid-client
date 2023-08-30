@@ -12,3 +12,17 @@
   color: white;
 }
 
+.debug-panel-section-div {
+  background-color: darkslategrey;
+  border: 1px solid white;
+  border-radius: 8px;
+  color: white;
+  margin-right: 10px;
+  margin-bottom: 20px;
+  display: inline-block;
+  padding: 10px;
+  vertical-align: top;
+}
+
+.debug-panel-page-container {
+}

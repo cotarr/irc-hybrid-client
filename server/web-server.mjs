@@ -496,6 +496,7 @@ app.post('/irc/prune', authorizeOrFail, csrfProtection, ircClient.pruneChannel);
 app.post('/irc/erase', authorizeOrFail, csrfProtection, ircClient.eraseCache);
 app.get('/irc/test1', authorizeOrFail, ircClient.test1Handler);
 app.get('/irc/test2', authorizeOrFail, ircClient.test2Handler);
+app.get('/irc/test3', authorizeOrFail, ircClient.test3Handler);
 
 // //
 // // API for Server List Editor
@@ -538,6 +539,27 @@ if (config.irc.disableServerListEditor) {
     ircServerListEditor.tools);
 }
 
+// ------------------------------------------------------------
+// This is to avoid duplication of code in the git repository.
+// - The source files are located in the "source-files" folder.
+// - A 2nd folder "build-prod" with bundled and minified files will commit to git.
+// - A 3rd folder "build-dev" is used in development for line number debugging of javascript.
+// The "build-dev" folder will be cleaned before git commit to avoid a third copy.
+// In the case where the server is started with NODE_ENV==='development'
+// and the "build-dev" folder is empty, the web server will
+// fall back to the "build-prod" folder as root directory for the web server.
+// When NODE_ENV is "production", the "build-prod" folder will always be used.
+// ------------------------------------------------------------
+let secureDir = path.join(__dirname, '../build-dev');
+if (nodeEnv === 'development') {
+  if (!fs.existsSync(secureDir + '/js')) {
+    console.log('Development build not found, using production build');
+    secureDir = path.join(__dirname, '../build-prod');
+  }
+} else {
+  secureDir = path.join(__dirname, '../build-prod');
+}
+console.log('secureDir', secureDir);
 // -------------------------------
 // If unauthorized, redirect to /login for main html file /irc/webclient.html.
 // Else, past this point, all other static files return 403 if unauthorized
@@ -549,8 +571,7 @@ app.get('/irc/webclient.html',
   authorizeOrLogin,
   csrfProtection,
   function (req, res, next) {
-    let filename = './build-prod/webclient.html';
-    if (nodeEnv === 'development') filename = './build-dev/webclient.html';
+    const filename = path.join(secureDir, 'webclient.html');
     fs.readFile(filename, 'utf8', function (err, data) {
       if (err) {
         next(err);
@@ -560,31 +581,10 @@ app.get('/irc/webclient.html',
     });
   }
 );
-// app.get('/irc/serverlist.html',
-//   authorizeOrFail,
-//   csrfProtection,
-//   function (req, res, next) {
-//     let filename = './build-prod/serverlist.html';
-//     if (nodeEnv === 'development') filename = './build-dev/serverlist.html';
-//     fs.readFile(filename, 'utf8', function (err, data) {
-//       if (err) {
-//         next(err);
-//       } else {
-//         res.send(data.replace('{{csrfToken}}', req.csrfToken()));
-//       }
-//     });
-//   }
-// );
 
 // -------------------------------
 // Web server for static files
 // -------------------------------
-
-// If not production, serve HTML file from development folders
-let secureDir = path.join(__dirname, '../build-dev');
-
-// Else, if production, server the minified, bundled version
-if (nodeEnv === 'production') secureDir = path.join(__dirname, '../build-prod');
 
 console.log('Web server root folder: ' + secureDir);
 app.use('/irc', authorizeOrFail, express.static(secureDir));
