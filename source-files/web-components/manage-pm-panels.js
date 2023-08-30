@@ -52,6 +52,7 @@ window.customElements.define('manage-pm-panels', class extends HTMLElement {
     this.attachShadow({ mode: 'open' })
       .appendChild(templateContent.cloneNode(true));
     this.privmsgPanelCount = 0;
+    this.ircConnectedLast = false;
     this.listOfOpenedPmPanels = [];
     this.listOfCollapsedPmPanels = [];
     this.listOfClosedPmPanels = [];
@@ -60,7 +61,7 @@ window.customElements.define('manage-pm-panels', class extends HTMLElement {
   showPanel = () => {
     this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
     this.shadowRoot.getElementById('panelCollapsedDivId').setAttribute('visible', '');
-    this.updateVisibility();
+    this._updateVisibility();
     document.dispatchEvent(new CustomEvent('cancel-zoom'));
   };
 
@@ -68,7 +69,7 @@ window.customElements.define('manage-pm-panels', class extends HTMLElement {
     if (this.shadowRoot.getElementById('panelVisibilityDivId').hasAttribute('visible')) {
       this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
       this.shadowRoot.getElementById('panelCollapsedDivId').removeAttribute('visible');
-      this.updateVisibility();
+      this._updateVisibility();
     }
   };
 
@@ -168,11 +169,7 @@ window.customElements.define('manage-pm-panels', class extends HTMLElement {
     } // if length > 0
   }; // clearLastPmPanelStates()
 
-  tempTextXXX = () => {
-    console.log('REMOVE ME TBD');
-  };
-
-  updateVisibility = () => {
+  _updateVisibility = () => {
   };
 
   /**
@@ -584,13 +581,20 @@ window.customElements.define('manage-pm-panels', class extends HTMLElement {
      * Data source: ircState object
      * @listens document:irc-state-changed
      */
-    // document.addEventListener('irc-state-changed', () => {
-    // };
+    document.addEventListener('irc-state-changed', () => {
+      if (window.globals.ircState.ircConnected !== this.ircConnectedLast) {
+        this.ircConnectedLast = window.globals.ircState.ircConnected;
+        if (!window.globals.ircState.ircConnected) {
+          this.hidePanel();
+        }
+      }
+    });
+
     /**
-   * Make panel visible unless listed as exception.
-   * @listens document:show-all-panels
-   * @param {string|string[]} event.detail.except - No action if listed as exception
-   */
+    * Make panel visible unless listed as exception.
+    * @listens document:show-all-panels
+    * @param {string|string[]} event.detail.except - No action if listed as exception
+    */
     document.addEventListener('show-all-panels', (event) => {
       if ((event.detail) && (event.detail.except)) {
         if (typeof event.detail.except === 'string') {

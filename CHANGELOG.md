@@ -6,11 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Next v2.0.0-dev 2023-08-29 (Draft)
+## Next v2.0.0-dev 2023-08-30 (Draft)
 
 Work in progress, see top of README.md
 
-Commit 
+- On first page load, automatically display IRC server edit form to create new server during first page load when no servers have been defined.
+- On each websocket (re)connect show irc-controls-panel, as bar if IRC connected, else show full panel if not connected.
+- On page refresh, active channels and active PM panels are collapsed into bar display.
+- Added flashing timer to message activity icons
+
+- Fixed: Server edit form not closing when web socket disconnected.
+- Fixed: Private message panel not closed on IRC disconnect
+- Fixed: Manage PM panel not closed on IRC disconnect
+- Fixed: When creating new IRC server configuration, the Save button has wrong event listener.
+
+Commit e6ab5a0
 
 - Removed legacy _styles-old.css, the CSS file from previous version. Only new CSS is now included in the build.
 - Copied in remote server debug API calls into debug-panel.

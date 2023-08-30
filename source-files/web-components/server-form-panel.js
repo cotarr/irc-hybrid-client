@@ -20,6 +20,28 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 // ------------------------------------------------------------------------------
+
+// Global Event listeners
+//   collapse-all-panels
+//   color-theme-changed
+//   hide-all-panels
+//   show-all-panels
+//
+// Dispatched Events
+//   irc-server-edit-open
+//
+//  External methods
+//    createNewIrcServer()
+//    editIrcServerAtIndex(index)
+//    showPanel();
+//    collapsePanel();
+//    hidePanel();
+//
+//  External methods returning promise, run as chain of promises
+//    fetchServerList(index, lock)
+//    submitServer(body, method, index)
+//    checkForApiError = (data)
+//
 //
 // ------------------------------------------------------------------------------
 'use strict';
@@ -197,7 +219,7 @@ window.customElements.define('server-form-panel', class extends HTMLElement {
    * Set form input elements to default values
    * @returns (Promise) Resolving to null
    */
-  clearIrcServerForm = () => {
+  _clearIrcServerForm = () => {
     return new Promise((resolve, reject) => {
       this.shadowRoot.getElementById('indexInputId').value = '-1';
       this.shadowRoot.getElementById('disabledCheckboxId').checked = false;
@@ -240,7 +262,7 @@ window.customElements.define('server-form-panel', class extends HTMLElement {
    * Example: {index: 0, data: { ... }}
    * @returns (Promise) Resolving to Object, or reject if error
    */
-  parseFormInputValues = () => {
+  _parseFormInputValues = () => {
     return new Promise((resolve, reject) => {
       const index = parseInt(this.shadowRoot.getElementById('indexInputId').value);
       const data = {};
@@ -325,14 +347,14 @@ window.customElements.define('server-form-panel', class extends HTMLElement {
         resolve({ data: data, index: index });
       }
     });
-  }; // parseFormInputValues()
+  }; // _parseFormInputValues()
 
   /**
    * Set form input elements to downloaded values
    * @param {Object} data - Object containing IRC server properties
    * @returns (Promise) Resolving to null
    */
-  populateIrcServerForm = (data) => {
+  _populateIrcServerForm = (data) => {
     return new Promise((resolve, reject) => {
       this.shadowRoot.getElementById('indexInputId').value = data.index.toString();
       if (data.disabled) {
@@ -432,7 +454,7 @@ window.customElements.define('server-form-panel', class extends HTMLElement {
     }
     window.globals.webState.ircServerEditOpen = true;
     document.dispatchEvent(new CustomEvent('irc-server-edit-open'));
-    this.clearIrcServerForm()
+    this._clearIrcServerForm()
       .then(() => {
         this.shadowRoot.getElementById('saveNewButtonId').removeAttribute('hidden');
         this.shadowRoot.getElementById('saveNewButtonId2').removeAttribute('hidden');
@@ -463,9 +485,9 @@ window.customElements.define('server-form-panel', class extends HTMLElement {
     }
     window.globals.webState.ircServerEditOpen = true;
     document.dispatchEvent(new CustomEvent('irc-server-edit-open'));
-    this.clearIrcServerForm()
+    this._clearIrcServerForm()
       .then(() => this.fetchServerList(index, 1))
-      .then((data) => this.populateIrcServerForm(data))
+      .then((data) => this._populateIrcServerForm(data))
       .then(() => {
         // console.log(JSON.stringify(data, null, 2));
         this.shadowRoot.getElementById('saveNewButtonId').setAttribute('hidden', '');
@@ -500,42 +522,50 @@ window.customElements.define('server-form-panel', class extends HTMLElement {
   };
 
   hidePanel = () => {
-    const ircControlsPanelEl = document.getElementById('ircControlsPanel');
-    if (window.globals.webState.ircServerEditOpen) {
-      // unlock database
-      this.fetchServerList(0, 0)
-        .then(() => {
-          window.globals.webState.ircServerEditOpen = false;
-          console.log('Unlock database after aborted edit');
-          this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible');
-        })
-        // Get IRC state to force update of other windows.
-        .then(ircControlsPanelEl.getIrcState)
-        .catch((err) => {
-          console.log(err);
-          let message = err.message || err.toString() || 'Error';
-          // keep only 1 line
-          message = message.split('\n')[0];
-          document.getElementById('errorPanel').showError(message);
-          this.shadowRoot.getElementById('saveNewButtonId').setAttribute('hidden', '');
-          this.shadowRoot.getElementById('saveNewButtonId2').setAttribute('hidden', '');
-          this.shadowRoot.getElementById('saveModifiedButtonId').setAttribute('hidden', '');
-          this.shadowRoot.getElementById('saveModifiedButtonId2').setAttribute('hidden', '');
-          // on error leave panel open
-        });
-    } else {
-      // else not locked, close the panel
+    if (!window.globals.webState.webConnected) {
       this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible');
+      this.shadowRoot.getElementById('saveNewButtonId').setAttribute('hidden', '');
+      this.shadowRoot.getElementById('saveNewButtonId2').setAttribute('hidden', '');
+      this.shadowRoot.getElementById('saveModifiedButtonId').setAttribute('hidden', '');
+      this.shadowRoot.getElementById('saveModifiedButtonId2').setAttribute('hidden', '');
+    } else {
+      const ircControlsPanelEl = document.getElementById('ircControlsPanel');
+      if (window.globals.webState.ircServerEditOpen) {
+        // unlock database
+        this.fetchServerList(0, 0)
+          .then(() => {
+            window.globals.webState.ircServerEditOpen = false;
+            console.log('Unlock database after aborted edit');
+            this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible');
+          })
+          // Get IRC state to force update of other windows.
+          .then(ircControlsPanelEl.getIrcState)
+          .catch((err) => {
+            console.log(err);
+            let message = err.message || err.toString() || 'Error';
+            // keep only 1 line
+            message = message.split('\n')[0];
+            document.getElementById('errorPanel').showError(message);
+            this.shadowRoot.getElementById('saveNewButtonId').setAttribute('hidden', '');
+            this.shadowRoot.getElementById('saveNewButtonId2').setAttribute('hidden', '');
+            this.shadowRoot.getElementById('saveModifiedButtonId').setAttribute('hidden', '');
+            this.shadowRoot.getElementById('saveModifiedButtonId2').setAttribute('hidden', '');
+            // on error leave panel open
+          });
+      } else {
+        // else not locked, close the panel
+        this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible');
+      }
     }
   };
 
-  // this panel does not collapse, so close it.
+  //  this panel does not collapse, so close it.
   collapsePanel = () => {
     this.hidePanel();
   };
 
-  saveNewButtonHandler = () => {
-    this.parseFormInputValues()
+  _saveNewButtonHandler = () => {
+    this._parseFormInputValues()
       // .then((data) => {
       //   console.log(JSON.stringify(data, null, 2));
       //   return Promise.resolve(data);
@@ -571,8 +601,8 @@ window.customElements.define('server-form-panel', class extends HTMLElement {
       });
   };
 
-  saveModifiedButtonHandler = () => {
-    this.parseFormInputValues()
+  _saveModifiedButtonHandler = () => {
+    this._parseFormInputValues()
       .then((data) => {
         // console.log(JSON.stringify(data, null, 2));
         return Promise.resolve(data);
@@ -618,9 +648,9 @@ window.customElements.define('server-form-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('saveNewButtonId2').setAttribute('title',
       'Save new IRC server configuration to database and close form.');
     this.shadowRoot.getElementById('saveModifiedButtonId2').setAttribute('title',
-      'Save updated IRC server configuration to database and close form.');
+      'Save modified IRC server configuration to database and close form.');
     this.shadowRoot.getElementById('saveModifiedButtonId').setAttribute('title',
-      'Save updated IRC server configuration to database and close form.');
+      'Save modified IRC server configuration to database and close form.');
     this.shadowRoot.getElementById('cancelEditButtonId').setAttribute('title',
       'Discard changes and close form');
     this.shadowRoot.getElementById('cancelEditButtonId').setAttribute('title',
@@ -651,17 +681,17 @@ window.customElements.define('server-form-panel', class extends HTMLElement {
      * Save Modified Button Event Handler
      */
     this.shadowRoot.getElementById('saveModifiedButtonId').addEventListener('click',
-      this.saveModifiedButtonHandler);
+      this._saveModifiedButtonHandler);
     this.shadowRoot.getElementById('saveModifiedButtonId2').addEventListener('click',
-      this.saveModifiedButtonHandler);
+      this._saveModifiedButtonHandler);
 
     /**
      * Save Modified Button Event Handler
      */
     this.shadowRoot.getElementById('saveNewButtonId').addEventListener('click',
-      this.saveModifiedButtonHandler);
+      this._saveModifiedButtonHandler);
     this.shadowRoot.getElementById('saveNewButtonId2').addEventListener('click',
-      this.saveModifiedButtonHandler);
+      this._saveNewButtonHandler);
 
     /**
      * Replace IRC server password Button Event Handler

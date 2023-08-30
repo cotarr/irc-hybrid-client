@@ -71,6 +71,12 @@
   background-color: #bbe3fc;
   color: #000000;
 }
+.hbar-panel-flashing-div {
+  display: inline-block;
+}
+.hbar-panel-flashing-div[hidden] {
+  display: none;
+}
 .hbar-panel-div {
   border-radius: 6px;
   padding-top: 7px;

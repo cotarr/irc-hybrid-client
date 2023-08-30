@@ -884,9 +884,7 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
 
     this.shadowRoot.getElementById('createNewButtonId').addEventListener('click', () => {
       const serverFormEl = document.getElementById('serverFormPanel');
-      // this.disableConnectButtons();
-      // this.disableEditButtons();
-      // test if locked by attempting to lock it
+      // test if locked by attempting to open it
       serverFormEl.fetchServerList(0, 1)
         // was not locked, unlock before requesting edit
         .then(() => { serverFormEl.fetchServerList(0, 0); })

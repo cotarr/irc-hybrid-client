@@ -249,6 +249,12 @@ customElements.define('header-bar', class extends HTMLElement {
       this.shadowRoot.getElementById('titleDivId').removeAttribute('noIcons', '');
       this.shadowRoot.getElementById('titleDivId').setAttribute('hidden', '');
     }
+    // Hide view collapssed button if not connected.
+    if ((window.globals.ircState.ircConnected) && (window.globals.webState.webConnected)) {
+      this.shadowRoot.getElementById('collapseAllButtonId').removeAttribute('hidden');
+    } else {
+      this.shadowRoot.getElementById('collapseAllButtonId').setAttribute('hidden', '');
+    }
   };
 
   /**
@@ -375,6 +381,14 @@ customElements.define('header-bar', class extends HTMLElement {
     this.updateStatusIcons();
     this._setFixedElementTitles();
     this._updateDynamicElementTitles();
+    const timerFlashingDivEl = this.shadowRoot.getElementById('timerFlashingDivId');
+    setInterval(() => {
+      if (timerFlashingDivEl.hasAttribute('hidden')) {
+        timerFlashingDivEl.removeAttribute('hidden');
+      } else {
+        timerFlashingDivEl.setAttribute('hidden', '');
+      }
+    }, 500);
   };
 
   /**
@@ -404,6 +418,14 @@ customElements.define('header-bar', class extends HTMLElement {
     this.shadowRoot.getElementById('panelZoomIconId').addEventListener('click', () => {
       document.dispatchEvent(new CustomEvent('cancel-zoom'));
     });
+
+    // Flashing icons: channel privmsg notice wallops
+    this.shadowRoot.getElementById('timerFlashingDivId').addEventListener('click', () => {
+      this.removeAttribute('channelicon');
+      this.removeAttribute('privmsgicon');
+      this.removeAttribute('noticeicon');
+      this.removeAttribute('wallopsicon');
+    });
     this.shadowRoot.getElementById('channelUnreadExistIconId').addEventListener('click', () => {
       this.removeAttribute('channelicon');
     });
@@ -416,6 +438,7 @@ customElements.define('header-bar', class extends HTMLElement {
     this.shadowRoot.getElementById('wallopsUnreadExistIconId').addEventListener('click', () => {
       this.removeAttribute('wallopsicon');
     });
+
     this.shadowRoot.getElementById('collapseAllButtonId').addEventListener('click', () => {
       document.dispatchEvent(new CustomEvent('collapse-all-panels'));
       document.dispatchEvent(new CustomEvent('cancel-zoom'));

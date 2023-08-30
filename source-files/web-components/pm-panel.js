@@ -74,7 +74,6 @@ window.customElements.define('pm-panel', class extends HTMLElement {
       .appendChild(templateContent.cloneNode(true));
     this.privmsgName = '';
     this.privmsgCsName = '';
-    this.ircConnectedLast = false;
     this.defaultHeightInRows = 10;
     this.unreadMessageCount = 0;
     this.activityIconInhibitTimer = 0;
@@ -702,7 +701,10 @@ window.customElements.define('pm-panel', class extends HTMLElement {
    */
   _removeSelfFromDOM = () => {
     // Don't do this more than once (stacked events)
-    if (!this.privmsgCsName) return;
+    if (!this.privmsgCsName) {
+      console.log('Error, request to remove self from DOM when already removed.');
+      return;
+    }
     delete this.privmsgCsName;
     this.removeAttribute('privmsg-cs-name');
     //
@@ -731,6 +733,7 @@ window.customElements.define('pm-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('bottomCollapseButtonId').removeEventListener('click', this._handleBottomCollapseButton);
     this.shadowRoot.getElementById('closePanelButtonId').removeEventListener('click', this._handleCloseButton);
     this.shadowRoot.getElementById('collapsePanelButtonId').removeEventListener('click', this._handleCollapseButton);
+    this.shadowRoot.getElementById('eraseButtonId').removeEventListener('click', this._handleEraseAllButton);
     this.shadowRoot.getElementById('multiLineSendButtonId').removeEventListener('click', this._handleMultiLineSendButtonClick);
     this.shadowRoot.getElementById('normalButtonId').removeEventListener('click', this._handleNormalButton);
     this.shadowRoot.getElementById('panelDivId').removeEventListener('click', this._handlePanelClick);
@@ -745,7 +748,7 @@ window.customElements.define('pm-panel', class extends HTMLElement {
     document.removeEventListener('collapse-all-panels', this._handleCollapseAllPanels);
     document.removeEventListener('color-theme-changed', this._handleColorThemeChanged);
     document.removeEventListener('erase-before-reload', this._handleEraseBeforeReload);
-    document.removeEventListener('hide-all-panels', this._handleShowAllPanels);
+    document.removeEventListener('hide-all-panels', this._handleHideAllPanels);
     document.removeEventListener('irc-state-changed', this._handleIrcStateChanged);
     document.removeEventListener('resize-custom-elements', this._handleResizeCustomElements);
     document.removeEventListener('show-all-panels', this._handleShowAllPanels);
@@ -766,14 +769,10 @@ window.customElements.define('pm-panel', class extends HTMLElement {
    * handle changes in the ircState object
    */
   _handleIrcStateChanged = () => {
-    console.log('irc-state-changed ircConnected', window.globals.ircState.ircConnected);
-    // if (window.globals.ircState.ircConnected) {
-    //   // this._removeSelfFromDOM();
-    // }
-    if (window.globals.ircState.ircConnected !== this.ircConnectedLast) {
-      this.ircConnectedLast = window.globals.ircState.ircConnected;
-      // Handle case of IRC disconnect
-      if (!window.globals.ircState.ircConnected) {
+    if (!window.globals.ircState.ircConnected) {
+      if (window.globals.webState.activePrivateMessageNicks
+        .indexOf(this.privmsgName.toLowerCase()) >= 0) {
+        console.log('removing from DOM');
         this._removeSelfFromDOM();
       }
     }
@@ -803,6 +802,15 @@ window.customElements.define('pm-panel', class extends HTMLElement {
     panelMessageDisplayEl.value += markerString;
     // move scroll bar so text is scrolled all the way up
     panelMessageDisplayEl.scrollTop = panelMessageDisplayEl.scrollHeight;
+    //
+    // This is to open the PM panel on refresh page, or net connect
+    //
+    const now = Math.floor(Date.now() / 1000);
+    const uptime = now - window.globals.webState.times.webConnect;
+    if ((uptime < 5) &&
+    (!this.shadowRoot.getElementById('panelVisibilityDivId').hasAttribute('visible'))) {
+      this.collapsePanel();
+    }
   };
 
   /**
@@ -835,6 +843,26 @@ window.customElements.define('pm-panel', class extends HTMLElement {
   _handleEraseBeforeReload = () => {
     this._removeSelfFromDOM();
   };
+
+  /**
+   * Button handler for API request to erase all private message from teh message cache
+   */
+  _handleEraseAllButton = () => {
+    document.getElementById('ircControlsPanel').eraseIrcCache('PRIVMSG')
+      .then(() => {
+        // erase successful, reload
+        if (!window.globals.webState.cacheReloadInProgress) {
+          document.dispatchEvent(new CustomEvent('update-from-cache'));
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        let message = err.message || err.toString() || 'Error occurred calling /irc/connect';
+        // show only 1 line
+        message = message.split('\n')[0];
+        document.getElementById('errorPanel').showError(message);
+      });
+  }; // panel erase button
 
   /**
    * Called once per second as task scheduler, called from js/_afterLoad.js
@@ -979,6 +1007,7 @@ window.customElements.define('pm-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('bottomCollapseButtonId').addEventListener('click', this._handleBottomCollapseButton);
     this.shadowRoot.getElementById('closePanelButtonId').addEventListener('click', this._handleCloseButton);
     this.shadowRoot.getElementById('collapsePanelButtonId').addEventListener('click', this._handleCollapseButton);
+    this.shadowRoot.getElementById('eraseButtonId').addEventListener('click', this._handleEraseAllButton);
     this.shadowRoot.getElementById('multiLineSendButtonId').addEventListener('click', this._handleMultiLineSendButtonClick);
     this.shadowRoot.getElementById('normalButtonId').addEventListener('click', this._handleNormalButton);
     this.shadowRoot.getElementById('panelDivId').addEventListener('click', this._handlePanelClick);

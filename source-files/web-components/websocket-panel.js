@@ -238,7 +238,7 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
           //
           // Error occurred, show error and then close other windows.
           //
-          document.getElementById('websocketPanel').showPanel();
+          this.showPanel();
           document.dispatchEvent(new CustomEvent('hide-all-panels', {
             detail: {
               except: ['websocketPanel']

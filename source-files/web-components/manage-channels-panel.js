@@ -34,9 +34,19 @@
 //   irc-state-changed
 //   show-all-panels
 //   update-channel-count
+//   web-connect-changed
 //
 // Dispatched Events
 //   cancel-zoom
+//
+//  External methods
+//    showPanel()
+//    collapsePanel()
+//    hidePanel()
+//    displayChannelMessage(parsedMessage)   Open panel if needed, route messages to channel panels
+//    displayChannelNoticeMessage(ParsedMessage)  Notices to channel
+//
+
 // ------------------------------------------------------------------------------
 'use strict';
 window.customElements.define('manage-channels-panel', class extends HTMLElement {
@@ -49,7 +59,8 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
     this.lastJoinedChannelCount = -1;
     this.lastChannelListCount = -1;
     this.lastIrcServerIndex = -1;
-    this.ircConnectedLast = null;
+    this.ircConnectedLast = false;
+    this.ircFirstConnect = true;
   }
 
   showPanel = () => {
@@ -59,8 +70,22 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
   };
 
   collapsePanel = () => {
+    // if (window.globals.ircState.channels.length === 0) {
+    //   this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
+    //   const now = Math.floor(Date.now() / 1000);
+    //   const uptime = now - window.globals.ircState.times.ircConnect;
+    //   // if connected to IRC server less than 5 seconds, channel panel
+    //   console.log('uptime', uptime);
+    //   if (uptime < 5) {
+    //     this.shadowRoot.getElementById('panelCollapsedDivId').setAttribute('visible', '');
+    //   } else {
+    //     this.shadowRoot.getElementById('panelCollapsedDivId').removeAttribute('visible');
+    //   }
+    // } else {
+    //   this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible');
+    //   this.shadowRoot.getElementById('panelCollapsedDivId').removeAttribute('visible');
+    // }
     if (this.shadowRoot.getElementById('panelVisibilityDivId').hasAttribute('visible')) {
-      this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
       this.shadowRoot.getElementById('panelCollapsedDivId').removeAttribute('visible');
     }
   };
@@ -328,16 +353,20 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
       // console.log(JSON.stringify(window.globals.ircState.channels));
       // console.log(JSON.stringify(window.globals.webState.channels));
 
-      if (window.globals.ircState.ircConnected !== this.ircConnectedLast) {
-        this.ircConnectedLast = window.globals.ircState.ircConnected;
-        if (window.globals.ircState.ircConnected) {
+      if (window.globals.ircState.ircConnected) {
+        if (this.ircFirstConnect) {
+          this.ircFirstConnect = false;
           if (window.globals.ircState.channels.length === 0) {
             this.showPanel();
-          } else {
-            this.collapsePanel();
           }
-        } else {
-          // Changed state to disconnected hide panel
+        }
+      } else {
+        this.ircFirstConnect = true;
+      }
+
+      if (window.globals.ircState.ircConnected !== this.ircConnectedLast) {
+        this.ircConnectedLast = window.globals.ircState.ircConnected;
+        if (!window.globals.ircState.ircConnected) {
           this.hidePanel();
         }
       }
@@ -478,6 +507,21 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
       } else {
         // This is local icon at parent window to PM section
         this.shadowRoot.getElementById('channelUnreadCountIconId').setAttribute('hidden', '');
+      }
+    });
+
+    /**
+     *
+     * @listens document:web-connect-changed
+     */
+    document.addEventListener('web-connect-changed', () => {
+      // Detect change in websocket connected state
+      if (window.globals.webState.webConnected !== this.webConnectedLast) {
+        this.webConnectedLast = window.globals.webState.webConnected;
+        if (!window.globals.webState.webConnected) {
+          // reset to have proper display based on ircConnected state
+          this.ircFirstConnect = true;
+        }
       }
     });
   } // connectedCallback()

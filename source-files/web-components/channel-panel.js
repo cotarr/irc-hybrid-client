@@ -27,6 +27,11 @@
 // into the DOM by parent element manage-channels-panel.
 // When no longer needed, this component will self destroy itself.
 //
+// This panel opens differently.
+// The panel is set to visible in the HTML template
+// When the event cache-reload-done fires, if the
+// time since page load is less than 5 seconds, collapses the panel
+//
 // Global Event listeners
 //   cache-reload-done
 //   cache-reload-error
@@ -1468,6 +1473,15 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     // move scroll bar so text is scrolled all the way up
     this.shadowRoot.getElementById('panelMessageDisplayId').scrollTop =
       this.shadowRoot.getElementById('panelMessageDisplayId').scrollHeight;
+    //
+    // If page refresh or first visit, collapse channels to bar.
+    //
+    const now = Math.floor(Date.now() / 1000);
+    const uptime = now - window.globals.webState.times.webConnect;
+    if ((uptime < 5) &&
+      (this.shadowRoot.getElementById('panelVisibilityDivId').hasAttribute('visible'))) {
+      this.collapsePanel();
+    }
   }; // _handleCacheReloadDone()
 
   /**
@@ -1634,6 +1648,14 @@ window.customElements.define('channel-panel', class extends HTMLElement {
      * Remove timers, eventListeners, and remove self from DOM
      */
     const _removeSelfFromDOM = () => {
+      // Don't do this more than once (stacked events)
+      if (!this.channelCsName) {
+        console.log('Error, Request to remove self from DOM when already removed.');
+        return;
+      }
+      delete this.channelCsName;
+      this.removeAttribute('channelCsName');
+
       //
       // 1 - Remove channel name from list of channel active in browser
       //
@@ -1694,6 +1716,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
         parentEl.removeChild(childEl);
       }
     }; // _removeSelfFromDOM()
+
     const ircStateIndex = window.globals.ircState.channels.indexOf(this.channelName.toLowerCase());
     const webStateIndex = window.globals.webState.channels.indexOf(this.channelName.toLowerCase());
 
@@ -1727,6 +1750,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
           this.shadowRoot.getElementById('partButtonId').setAttribute('hidden', '');
         };
 
+        // TODO, what is this for? is it multiple browsers leave/re-join?
         if (window.globals.ircState.channelStates[ircStateIndex].joined !==
           window.globals.webState.channelStates[webStateIndex].lastJoined) {
           if ((window.globals.ircState.channelStates[ircStateIndex].joined) &&
@@ -1734,8 +1758,6 @@ window.customElements.define('channel-panel', class extends HTMLElement {
             if (!window.globals.webState.cacheReloadInProgress) {
               this.showPanel();
             }
-            // TODO _updateVisibility();
-            // NO WAS ALREADY COMMENTED channelTopRightHidableDivEl.removeAttribute('hidden');
           }
           window.globals.webState.channelStates[webStateIndex].lastJoined =
             window.globals.ircState.channelStates[ircStateIndex].joined;
