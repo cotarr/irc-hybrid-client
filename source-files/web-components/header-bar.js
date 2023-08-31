@@ -444,28 +444,31 @@ customElements.define('header-bar', class extends HTMLElement {
       document.dispatchEvent(new CustomEvent('cancel-zoom'));
     });
 
-    // Flashing icons: channel privmsg notice wallops
-    this.shadowRoot.getElementById('timerFlashingDivId').addEventListener('click', () => {
+    const _cancelFlashingIcons = () => {
       this.removeAttribute('servericon');
       this.removeAttribute('channelicon');
       this.removeAttribute('privmsgicon');
       this.removeAttribute('noticeicon');
       this.removeAttribute('wallopsicon');
+    };
+
+    this.shadowRoot.getElementById('wholeBarId').addEventListener('click', () => {
+      _cancelFlashingIcons();
     });
     this.shadowRoot.getElementById('serverUnreadExistIconId').addEventListener('click', () => {
-      this.removeAttribute('servericon');
+      _cancelFlashingIcons();
     });
     this.shadowRoot.getElementById('channelUnreadExistIconId').addEventListener('click', () => {
-      this.removeAttribute('channelicon');
+      _cancelFlashingIcons();
     });
     this.shadowRoot.getElementById('privMsgUnreadExistIconId').addEventListener('click', () => {
-      this.removeAttribute('privmsgicon');
+      _cancelFlashingIcons();
     });
     this.shadowRoot.getElementById('noticeUnreadExistIconId').addEventListener('click', () => {
-      this.removeAttribute('noticeicon');
+      _cancelFlashingIcons();
     });
     this.shadowRoot.getElementById('wallopsUnreadExistIconId').addEventListener('click', () => {
-      this.removeAttribute('wallopsicon');
+      _cancelFlashingIcons();
     });
 
     this.shadowRoot.getElementById('collapseAllButtonId').addEventListener('click', () => {

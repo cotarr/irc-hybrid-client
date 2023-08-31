@@ -174,17 +174,7 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
     if ((window.globals.ircState.ircConnected) || (window.globals.ircState.ircConnecting)) {
       document.getElementById('ircControlsPanel').disconnectHandler();
     } else {
-      const ircControlsPanelEl = document.getElementById('ircControlsPanel');
-      const index = parseInt(event.target.getAttribute('index'));
-      ircControlsPanelEl.serverSetIndexHandler(index)
-        .then((data) => {
-          if (('index' in data) && (parseInt(data.index) === index)) {
-            return Promise.resolve(index);
-          } else {
-            throw new Error('Unable to set server index');
-          }
-        })
-        .then(ircControlsPanelEl.connectHandler)
+      document.getElementById('ircControlsPanel').connectHandler()
         .catch((err) => {
           console.log(err);
           let message = err.message || err.toString() || 'Error';
@@ -453,28 +443,27 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
             connectButtonEl.textContent = 'Connect';
             connectButtonEl.setAttribute('index', i.toString());
             connectButtonEl.id = 'connectAtIndex' + i.toString();
-            if (window.globals.ircState.ircConnected) {
-              if (window.globals.ircState.ircServerIndex === i) {
+            this.pendingConnectButtonId = null;
+            if (window.globals.ircState.ircServerIndex === i) {
+              if (window.globals.ircState.ircConnected) {
                 td02El.classList.add('server-list-button-connected');
                 connectButtonEl.textContent = 'Disconnect';
                 connectButtonEl.setAttribute('title', 'Disconnect from IRC server');
                 // Connected, only add button and eventListener to selected server
                 this.connectButtonIdList.push('connectAtIndex' + i.toString());
                 td02El.appendChild(connectButtonEl);
-              }
-            } else {
-              if (window.globals.ircState.ircServerIndex === i) {
+              } else {
                 td02El.classList.add('server-list-button-disconnected');
+                connectButtonEl.setAttribute('title', 'Connect server to IRC network');
+                if (data[i].disabled) {
+                  connectButtonEl.setAttribute('disabled', '');
+                  connectButtonEl.setAttribute('title', 'Disabled');
+                }
+                // Not connected, always add button and eventListener
+                this.connectButtonIdList.push('connectAtIndex' + i.toString());
+                td02El.appendChild(connectButtonEl);
               }
-              connectButtonEl.setAttribute('title', 'Connect server to IRC network');
-              if (data[i].disabled) {
-                connectButtonEl.setAttribute('disabled', '');
-                connectButtonEl.setAttribute('title', 'Disabled');
-              }
-              // Not connected, always add button and eventListener
-              this.connectButtonIdList.push('connectAtIndex' + i.toString());
-              td02El.appendChild(connectButtonEl);
-            }
+            } // not index = i
             rowEl.appendChild(td02El);
           }
           //
@@ -1056,6 +1045,7 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
           if (window.globals.ircState.ircConnected) {
             this.editable = false;
             needUpdate = true;
+            this.hidePanel();
           } else {
             // Case of panel visible, just disconnected from IRC
             this.editable = true;
@@ -1096,12 +1086,6 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
         }
         this._updateVisibility();
       }
-
-      // if (window.globals.ircState.ircConnected) {
-      //   this.shadowRoot.getElementById('disconnectButtonId').removeAttribute('disabled');
-      // } else {
-      //   this.shadowRoot.getElementById('disconnectButtonId').setAttribute('disabled', '');
-      // }
     }); // irc-state-changed
 
     /**

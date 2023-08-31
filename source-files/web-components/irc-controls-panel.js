@@ -346,7 +346,7 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
    * @returns {promise} Returns promise resolving to null, else reject error
    */
   serverSetIndexHandler = (index) => {
-    console.log('serverSetIndexHandler', index);
+    // console.log('serverSetIndexHandler', index);
     if (window.globals.ircState.ircConnected) {
       return Promise.reject(new Error('Can not change servers while connected'));
     }

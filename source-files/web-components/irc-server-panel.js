@@ -358,10 +358,16 @@ window.customElements.define('irc-server-panel', class extends HTMLElement {
       (!document.querySelector('body').hasAttribute('zoomId'))) {
       this.showPanel();
     }
+    //
+    // This must come after showPanel(), since showPanel() cancels the icons
     // Message activity Icon
+    // If web connected more than 5 seconds (assumes server clock and browser clock match)
     // If NOT reload from cache in progress (timer not zero)
     // then display incoming message activity icon
-    if ((document.activeElement !== document.getElementById('ircServerPanel')) &&
+    const now = Math.floor(Date.now() / 1000);
+    const ircConnectTime = now - window.globals.ircState.times.ircConnect;
+    if ((ircConnectTime > 5) &&
+      (document.activeElement !== document.getElementById('ircServerPanel')) &&
       (!window.globals.webState.cacheReloadInProgress)) {
       document.getElementById('headerBar').setAttribute('servericon', '');
       document.getElementById('navMenu').handleServerUnreadUpdate(true);
@@ -639,9 +645,14 @@ window.customElements.define('irc-server-panel', class extends HTMLElement {
     //
     // This must come after showPanel(), since showPanel() cancels the icons
     // Message activity Icon
+    // If web connected more than 5 seconds (assumes server clock and browser clock match)
     // If NOT reload from cache in progress (timer not zero)
     // then display incoming message activity icon
-    if ((document.activeElement !== document.getElementById('ircServerPanel')) &&
+    const now = Math.floor(Date.now() / 1000);
+    const ircConnectTime = now - window.globals.ircState.times.ircConnect;
+    console.log('ircConnecTTime', ircConnectTime);
+    if ((ircConnectTime > 5) &&
+      (document.activeElement !== document.getElementById('ircServerPanel')) &&
       (!window.globals.webState.cacheReloadInProgress)) {
       document.getElementById('headerBar').setAttribute('servericon', '');
       document.getElementById('navMenu').handleServerUnreadUpdate(true);
@@ -740,30 +751,8 @@ window.customElements.define('irc-server-panel', class extends HTMLElement {
       document.dispatchEvent(new CustomEvent('update-from-cache'));
     });
 
-    this.shadowRoot.getElementById('forceDisconnectButtonId').addEventListener('click', () => {
-      document.getElementById('ircControlsPanel').forceDisconnectHandler()
-        .catch((err) => {
-          console.log(err);
-          let message = err.message || err.toString() || 'Error occurred calling /irc/connect';
-          // show only 1 line
-          message = message.split('\n')[0];
-          document.getElementById('errorPanel').showError(message);
-        });
-    });
-
     this.shadowRoot.getElementById('eraseCacheButtonId').addEventListener('click', () => {
       document.getElementById('ircControlsPanel').eraseIrcCache('CACHE')
-        .catch((err) => {
-          console.log(err);
-          let message = err.message || err.toString() || 'Error occurred calling /irc/connect';
-          // show only 1 line
-          message = message.split('\n')[0];
-          document.getElementById('errorPanel').showError(message);
-        });
-    });
-
-    this.shadowRoot.getElementById('serverTerminateButtonId').addEventListener('click', () => {
-      document.getElementById('ircControlsPanel').webServerTerminate()
         .catch((err) => {
           console.log(err);
           let message = err.message || err.toString() || 'Error occurred calling /irc/connect';
@@ -942,8 +931,13 @@ window.customElements.define('irc-server-panel', class extends HTMLElement {
         this.ircConnectedLast = window.globals.ircState.ircConnected;
         this.shadowRoot.getElementById('programVersionDiv').textContent =
           ' version-' + window.globals.ircState.progVersion;
-      };
-
+        // Irc state changed, clean activity icons
+        console.log('changed state');
+        setTimeout(() => {
+          document.getElementById('headerBar').removeAttribute('servericon');
+          document.getElementById('navMenu').handleServerUnreadUpdate(false);
+        }, 2000);
+      }
       if (!window.globals.ircState.ircConnected) {
         this.hidePanel();
       }

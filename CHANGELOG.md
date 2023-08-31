@@ -6,11 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Next v2.0.0-dev 2023-08-30 (Draft)
+## Next v2.0.0-dev 2023-08-31 (Draft)
 
 Work in progress, see top of README.md
 
-Commit
+- Fixed server-list-panel connect button used wrong nickname from other panel.
+- More debugging and adjustment unread message activity icons
+
+Commit 9eb8d8b
 
 This commit is a deep dive into panel visibility and scroll panel position 
 in response to state changes. The behavior for panels differs depending on

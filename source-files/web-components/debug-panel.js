@@ -305,6 +305,28 @@ window.customElements.define('debug-panel', class extends HTMLElement {
       this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible');
     });
 
+    this.shadowRoot.getElementById('forceDisconnectButtonId').addEventListener('click', () => {
+      document.getElementById('ircControlsPanel').forceDisconnectHandler()
+        .catch((err) => {
+          console.log(err);
+          let message = err.message || err.toString() || 'Error occurred calling /irc/connect';
+          // show only 1 line
+          message = message.split('\n')[0];
+          document.getElementById('errorPanel').showError(message);
+        });
+    });
+
+    this.shadowRoot.getElementById('serverTerminateButtonId').addEventListener('click', () => {
+      document.getElementById('ircControlsPanel').webServerTerminate()
+        .catch((err) => {
+          console.log(err);
+          let message = err.message || err.toString() || 'Error occurred calling /irc/connect';
+          // show only 1 line
+          message = message.split('\n')[0];
+          document.getElementById('errorPanel').showError(message);
+        });
+    });
+
     // -------------------------------------
     // 2 of 3 Listeners on global events
     // -------------------------------------
