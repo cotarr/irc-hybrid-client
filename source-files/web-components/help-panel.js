@@ -34,9 +34,19 @@ window.customElements.define('help-panel', class extends HTMLElement {
       .appendChild(templateContent.cloneNode(true));
   }
 
+  /**
+   * Scroll web component to align top of panel with top of viewport and set focus
+   */
+  _scrollToTop = () => {
+    this.focus();
+    const newVertPos = window.scrollY + this.getBoundingClientRect().top - 50;
+    window.scrollTo({ top: newVertPos, behavior: 'smooth' });
+  };
+
   showPanel = () => {
     this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
     document.dispatchEvent(new CustomEvent('cancel-zoom'));
+    this._scrollToTop();
   };
 
   // this panel does not collapse, so close it.

@@ -51,6 +51,7 @@ customElements.define('header-bar', class extends HTMLElement {
       'channelicon',
       'noticeicon',
       'privmsgicon',
+      'servericon',
       'wallopsicon',
       'zoomicon'
     ];
@@ -101,6 +102,18 @@ customElements.define('header-bar', class extends HTMLElement {
       this.setAttribute('privmsgicon', '');
     } else {
       this.removeAttribute('privmsgicon');
+    }
+  }
+
+  get servericon () {
+    return this.hasAttribute('servericon');
+  }
+
+  set servericon (val) {
+    if (val) {
+      this.setAttribute('servericon', '');
+    } else {
+      this.removeAttribute('servericon');
     }
   }
 
@@ -189,6 +202,14 @@ customElements.define('header-bar', class extends HTMLElement {
         this.shadowRoot.getElementById('panelZoomIconId').setAttribute('hidden', '');
       }
     }
+    if (Object.hasOwn(options, 'serverUnread')) {
+      if (options.serverUnread) {
+        noIcons = false;
+        this.shadowRoot.getElementById('serverUnreadExistIconId').removeAttribute('hidden');
+      } else {
+        this.shadowRoot.getElementById('serverUnreadExistIconId').setAttribute('hidden', '');
+      }
+    }
     if (Object.hasOwn(options, 'channelUnread')) {
       if (options.channelUnread) {
         noIcons = false;
@@ -270,6 +291,8 @@ customElements.define('header-bar', class extends HTMLElement {
       'Cancel IRC away (/AWAY)';
     this.shadowRoot.getElementById('panelZoomIconId').title =
       'Un-zoom panels';
+    this.shadowRoot.getElementById('serverUnreadExistIconId').title =
+      'Unread IRC server message';
     this.shadowRoot.getElementById('channelUnreadExistIconId').title =
       'Unread IRC channel message';
     this.shadowRoot.getElementById('privMsgUnreadExistIconId').title =
@@ -322,6 +345,7 @@ customElements.define('header-bar', class extends HTMLElement {
       wait: false,
       away: false,
       zoom: false,
+      serverUnread: false,
       channelUnread: false,
       privMsgUnread: false,
       noticeUnread: false,
@@ -334,6 +358,7 @@ customElements.define('header-bar', class extends HTMLElement {
     if (this.hasAttribute('channelicon')) state.channelUnread = true;
     if (this.hasAttribute('noticeicon')) state.noticeUnread = true;
     if (this.hasAttribute('privmsgicon')) state.privMsgUnread = true;
+    if (this.hasAttribute('servericon')) state.serverUnread = true;
     if (this.hasAttribute('wallopsicon')) state.wallopsUnread = true;
     if (this.hasAttribute('zoomicon')) state.zoom = true;
     // Set icons based on ircState and webState
@@ -421,10 +446,14 @@ customElements.define('header-bar', class extends HTMLElement {
 
     // Flashing icons: channel privmsg notice wallops
     this.shadowRoot.getElementById('timerFlashingDivId').addEventListener('click', () => {
+      this.removeAttribute('servericon');
       this.removeAttribute('channelicon');
       this.removeAttribute('privmsgicon');
       this.removeAttribute('noticeicon');
       this.removeAttribute('wallopsicon');
+    });
+    this.shadowRoot.getElementById('serverUnreadExistIconId').addEventListener('click', () => {
+      this.removeAttribute('servericon');
     });
     this.shadowRoot.getElementById('channelUnreadExistIconId').addEventListener('click', () => {
       this.removeAttribute('channelicon');
@@ -456,6 +485,7 @@ customElements.define('header-bar', class extends HTMLElement {
     document.addEventListener('color-theme-changed', (event) => {
       const hamburgerIconEl = this.shadowRoot.getElementById('hamburgerIconId');
       const headerBarDivEl = this.shadowRoot.getElementById('headerBarDivId');
+      const serverUnreadExistIconEl = this.shadowRoot.getElementById('serverUnreadExistIconId');
       const channelUnreadExistIconEl = this.shadowRoot.getElementById('channelUnreadExistIconId');
       const privMsgUnreadExistIconEl = this.shadowRoot.getElementById('privMsgUnreadExistIconId');
       const noticeUnreadExistIconEl = this.shadowRoot.getElementById('noticeUnreadExistIconId');
@@ -465,6 +495,8 @@ customElements.define('header-bar', class extends HTMLElement {
         hamburgerIconEl.setColorTheme('light');
         headerBarDivEl.classList.remove('header-bar-theme-dark');
         headerBarDivEl.classList.add('header-bar-theme-light');
+        serverUnreadExistIconEl.classList.remove('irc-server-panel-theme-dark');
+        serverUnreadExistIconEl.classList.add('irc-server-panel-theme-light');
         channelUnreadExistIconEl.classList.remove('channel-panel-theme-dark');
         channelUnreadExistIconEl.classList.add('channel-panel-theme-light');
         privMsgUnreadExistIconEl.classList.remove('pm-panel-theme-dark');
@@ -479,8 +511,8 @@ customElements.define('header-bar', class extends HTMLElement {
         hamburgerIconEl.setColorTheme('dark');
         headerBarDivEl.classList.remove('header-bar-theme-light');
         headerBarDivEl.classList.add('header-bar-theme-dark');
-        channelUnreadExistIconEl.classList.remove('channel-panel-theme-light');
-        channelUnreadExistIconEl.classList.add('channel-panel-theme-dark');
+        serverUnreadExistIconEl.classList.remove('irc-server-panel-theme-light');
+        serverUnreadExistIconEl.classList.add('irc-server-panel-theme-dark');
         privMsgUnreadExistIconEl.classList.remove('pm-panel-theme-light');
         privMsgUnreadExistIconEl.classList.add('pm-panel-theme-dark');
         noticeUnreadExistIconEl.classList.remove('notice-panel-theme-light');

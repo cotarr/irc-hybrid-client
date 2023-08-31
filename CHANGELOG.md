@@ -10,6 +10,29 @@ and this project adheres to
 
 Work in progress, see top of README.md
 
+Commit
+
+This commit is a deep dive into panel visibility and scroll panel position 
+in response to state changes. The behavior for panels differs depending on
+the trigger action (new page load, page reload, message-cache reload, 
+incoming IRC messages, or user activation of page elements).
+
+This is expected to evolve further after some experience, but some initial comments:
+
+- Both manage-channels-panel and created channel-panel elements will always scroll to the bottom of the viewport.
+- Other panels, including private message PM, notice, and wallops will scroll to the top fo the viewport.
+- Refreshing the page will show the irc-controls-panel and each active channel-panel or pm-panel as a collapsed bar.
+- If a window is 'zoomed', then no other windows will open, but activity icons will show.
+
+Changes:
+
+- Added default attribute to activity-spinner web component so initial state can be specified 'show' or 'hide'
+- Added activity irc-server-panel unread message status icon to header bar
+- Dropdown navigation menu added unread message indicator for server panel in menu
+- server-list-panel in the HTML table, fixed CSS for 'disabled' table td row, text color and background-color were same (invisible)
+
+Commit 145d1f9
+
 - On first page load, automatically display IRC server edit form to create new server during first page load when no servers have been defined.
 - On each websocket (re)connect show irc-controls-panel, as bar if IRC connected, else show full panel if not connected.
 - On page refresh, active channels and active PM panels are collapsed into bar display.

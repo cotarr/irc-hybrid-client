@@ -499,7 +499,6 @@ window.customElements.define('display-utils', class extends HTMLElement {
   // was not allowed inside a custom element.
   // An external listener will call this function
   // --------------------------------------------------------
-  // TODO remove
   handleExternalWindowResizeEvent (event) {
     this._updatePageMeasurements();
     // ignore resize events before dynamic size variables exist

@@ -28,6 +28,8 @@
 //   cancelActivitySpinner() -  Decrement count, if 0 then hide spinner
 //   resetActivityCounter() - Set counter to 0, hide spinner
 //
+// Attributes
+//   default   values: "show", "hide"
 // ------------------------------------------------------------------------------
 'use strict';
 customElements.define('activity-spinner', class extends HTMLElement {
@@ -71,6 +73,10 @@ customElements.define('activity-spinner', class extends HTMLElement {
   // }
 
   connectedCallback () {
-    this.resetActivitySpinner();
+    if ((this.hasAttribute('default')) && (this.getAttribute('default') === 'show')) {
+      this.requestActivitySpinner();
+    } else {
+      this.resetActivitySpinner();
+    }
   }
 });

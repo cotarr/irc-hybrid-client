@@ -72,6 +72,70 @@
 //     ]
 //   }
 // ------------------------------------------------------------------------------
+//   Panel visibility
+//
+// Issue:
+//   The remote web server manages channel membership.
+//   Upon successful JOIN command with remote IRC server, the #channelName
+//   is added to the ircState.channels array.
+//   The web browser receives a getIrcState() response, detects the new array element
+//   and creates a new channel-panel web component dynamically.
+//   The issue is: there is no way to distinguish the difference between
+//   a browser page reload and a user issuing a JOIN command for a new channel.
+//
+//   To address this, when one of 3 things occur:
+//      - local-command-parser detects a "/JOIN #channel"
+//      - manage-channels-panel user input channel name and press [Join] button
+//      - manage-channels-panel user clicks channel preset button
+//   When one of these occurs, the parsed channel name is added to ircChannelsPendingJoin array
+//   located in the manage-channels-panel web component.
+//   When a new channel appears in webState.channels[] array, the
+//   ircChannelsPendingJoin array can be used to see if this is a newly joined
+//   channel verses a page refresh.
+//
+// Panel creation
+//   No channel-panel elements exist at page load, so hide/unhide is not relevant
+//   The channel-panel elements are inserted into the DOM dynamically by manage-channel-panel.
+//   When inserted, the HTML Template channel-panel visible by default
+//
+// Panel removal from DOM,
+//   When the remote web server removes an IRC channel from the
+//   ircState.channel[] array, each separate channel-panel
+//   with detect the removal and remove event listeners and
+//   remove itself from the DOM automatically after the array changes.
+//   The user's request to prune a channel is an API call to the web server.
+//   There are no user local actions to remove channel panels.
+//
+// Event: cache-reload-done (initial display of panel)
+//   If the panel's channel is present in both webState.channels[]
+//   and manageChannelsPanel.ircChannelsPendingJoin[] array
+//   A showPanel() is called, and a time is started
+//   to scroll the page to the bottom of the viewport.
+//
+//   If the panel's channel is not present in ircChannelsPendingJoin[]
+//   then it is necessary to distinguish between connecting the browser
+//   to a web server that is already present in IRC channels,
+//   verses a routine cache reload triggered by other panels.
+//   This is done by checking the time since IRC connect.
+//   The IRC connect time in Unix seconds is sent by server.
+//   If the IRC connect time is less than 5 seconds,
+//   a collapsePanel() is called to show it as a collapsed bar.
+//   else there is no change to panel visibility
+//
+// IRC incoming message events Events:
+//   Condition: any panel not "zoom", not cache reload
+//    New user JOIN channel, then show channel-panel, scroll to bottom
+//    New NOTICE message to channel,then show channel-panel, scroll to bottom
+//    New PRIVMSG message to channel, then show channel-panel, scroll to bottom
+//
+// TODO
+//   When auto-reconnect is enabled, the remote web server will auto-reconnect
+//   to up to 5 channels. There is no visibility code to address this edge case.
+//
+// Scroll: channel panel scrolls to bottom of viewport when showPanel() is called.
+//
+// ------------------------------------------------------------------------------
+
 'use strict';
 window.customElements.define('channel-panel', class extends HTMLElement {
   constructor () {
@@ -238,6 +302,25 @@ window.customElements.define('channel-panel', class extends HTMLElement {
   };
 
   /**
+   * Scroll web component to align top of panel with top of viewport and set focus
+   */
+  _scrollToTop = () => {
+    this.focus();
+    const newVertPos = window.scrollY + this.getBoundingClientRect().top - 50;
+    window.scrollTo({ top: newVertPos, behavior: 'smooth' });
+  };
+
+  /**
+   * Scroll web component to align bottom of panel with bottom of viewport and set focus
+   */
+  _scrollToBottom = () => {
+    this.focus();
+    const newVertPos =
+      this.getBoundingClientRect().bottom - window.innerHeight + window.scrollY;
+    window.scrollTo({ top: newVertPos, behavior: 'smooth' });
+  };
+
+  /**
    * Make panel visible (both internal and external function)
    */
   showPanel = () => {
@@ -250,6 +333,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     const panelMessageDisplayEl = this.shadowRoot.getElementById('panelMessageDisplayId');
     panelMessageDisplayEl.scrollTop = panelMessageDisplayEl.scrollHeight;
     document.dispatchEvent(new CustomEvent('cancel-zoom'));
+    this._scrollToBottom();
   };
 
   /**
@@ -502,7 +586,6 @@ window.customElements.define('channel-panel', class extends HTMLElement {
                 okToSend = false;
               }
             }
-            // TODO okToSend = false in isolated panel debug after rewrite
             if (!okToSend) {
               // once not ok, don't try again
               abortedFlag = true;
@@ -1186,7 +1269,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
 
     switch (parsedMessage.command) {
       //
-      // TODO cases for channel closed or other error
+      // TODO cases for channel closed for other error
       //
       case 'KICK':
         if (parsedMessage.params[0].toLowerCase() === this.channelName.toLowerCase()) {
@@ -1452,6 +1535,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
    * @param {object} event.detail.timestamp - unix time in seconds
    */
   _handleCacheReloadDone = (event) => {
+    const manageChannelsPanelEl = document.getElementById('manageChannelsPanel');
     let markerString = '';
     let timestampString = '';
     if (('detail' in event) && ('timestamp' in event.detail)) {
@@ -1474,13 +1558,38 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('panelMessageDisplayId').scrollTop =
       this.shadowRoot.getElementById('panelMessageDisplayId').scrollHeight;
     //
-    // If page refresh or first visit, collapse channels to bar.
+    // This set's initial channel-panel visibility and scroll
     //
-    const now = Math.floor(Date.now() / 1000);
-    const uptime = now - window.globals.webState.times.webConnect;
-    if ((uptime < 5) &&
-      (this.shadowRoot.getElementById('panelVisibilityDivId').hasAttribute('visible'))) {
-      this.collapsePanel();
+    // If this is a new request to create or join a channel by user request
+    // the panel should be shown in full size.
+    // If this is a browser reload, or first page visit when the remote web server
+    // is already present in IRC channels, the channels are shown as collapsed bars
+    //
+    const pendingJoinChannelIndex =
+      manageChannelsPanelEl.ircChannelsPendingJoin.indexOf(this.channelName.toLowerCase());
+    if (pendingJoinChannelIndex >= 0) {
+      manageChannelsPanelEl.ircChannelsPendingJoin.splice(pendingJoinChannelIndex, 1);
+      // This is redundant since HTML template has attribute visible by default
+      // but it adds clarity to understanding code to show it here compared to collapsePanel()
+      this.showPanel();
+      // The purpose of the time is to assure that when a user JOIN a channel
+      // for the first time, when the remote server subsequently adds the new
+      // channel to the ircState.channels[] array, the page new channel-panel
+      // scroll to a visible position. Other actions in the irc-server-panel
+      // could grab the initial scroll.
+      //
+      // TODO Optimize the time value experimentally
+      //
+      setTimeout(() => {
+        this._scrollToBottom();
+      }, 250);
+    } else {
+      const now = Math.floor(Date.now() / 1000);
+      const websocketConnectTime = now - window.globals.webState.times.webConnect;
+      if ((websocketConnectTime < 5) &&
+        (this.shadowRoot.getElementById('panelVisibilityDivId').hasAttribute('visible'))) {
+        this.collapsePanel();
+      }
     }
   }; // _handleCacheReloadDone()
 
@@ -1749,19 +1858,6 @@ window.customElements.define('channel-panel', class extends HTMLElement {
           this.shadowRoot.getElementById('pruneButtonId').removeAttribute('hidden');
           this.shadowRoot.getElementById('partButtonId').setAttribute('hidden', '');
         };
-
-        // TODO, what is this for? is it multiple browsers leave/re-join?
-        if (window.globals.ircState.channelStates[ircStateIndex].joined !==
-          window.globals.webState.channelStates[webStateIndex].lastJoined) {
-          if ((window.globals.ircState.channelStates[ircStateIndex].joined) &&
-            (!window.globals.webState.channelStates[webStateIndex].lastJoined)) {
-            if (!window.globals.webState.cacheReloadInProgress) {
-              this.showPanel();
-            }
-          }
-          window.globals.webState.channelStates[webStateIndex].lastJoined =
-            window.globals.ircState.channelStates[ircStateIndex].joined;
-        }
       }
       // If left channel, show [Not in Channel] icon
       if (window.globals.ircState.channelStates[ircStateIndex].joined) {
@@ -1925,7 +2021,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
 
     this._updateChannelTitle();
 
-    // TODO need when in html template?
+    // TODO is this needed when in html template?
     this.shadowRoot.getElementById('panelNickListId').setAttribute('cols',
       this.channelNamesCharWidth.toString());
     this.shadowRoot.getElementById('panelNickListId')

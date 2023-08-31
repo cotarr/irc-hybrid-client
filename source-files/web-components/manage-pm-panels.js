@@ -43,6 +43,16 @@
 //   update-from-cache
 //
 // ------------------------------------------------------------------------------
+//
+//  Panel visibility
+//
+//    HTML template is hidden by default.
+//    There are no auto-open capabilities, the manage-pm-channels panel
+//        will open only from the dropdown menu
+//
+//    Scroll, the panel scrolls to the top of the viewport when opened.
+//
+// ------------------------------------------------------------------------------
 'use strict';
 window.customElements.define('manage-pm-panels', class extends HTMLElement {
   constructor () {
@@ -58,11 +68,21 @@ window.customElements.define('manage-pm-panels', class extends HTMLElement {
     this.listOfClosedPmPanels = [];
   }
 
+  /**
+   * Scroll web component to align top of panel with top of viewport and set focus
+   */
+  _scrollToTop = () => {
+    this.focus();
+    const newVertPos = window.scrollY + this.getBoundingClientRect().top - 50;
+    window.scrollTo({ top: newVertPos, behavior: 'smooth' });
+  };
+
   showPanel = () => {
     this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
     this.shadowRoot.getElementById('panelCollapsedDivId').setAttribute('visible', '');
     this._updateVisibility();
     document.dispatchEvent(new CustomEvent('cancel-zoom'));
+    this._scrollToTop();
   };
 
   collapsePanel = () => {

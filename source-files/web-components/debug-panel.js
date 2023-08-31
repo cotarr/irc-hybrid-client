@@ -34,8 +34,19 @@ window.customElements.define('debug-panel', class extends HTMLElement {
       .appendChild(templateContent.cloneNode(true));
   }
 
+  /**
+   * Scroll web component to align top of panel with top of viewport and set focus
+   */
+  _scrollToTop = () => {
+    this.focus();
+    const newVertPos = window.scrollY + this.getBoundingClientRect().top - 50;
+    window.scrollTo({ top: newVertPos, behavior: 'smooth' });
+  };
+
   showPanel = () => {
     this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
+    document.dispatchEvent(new CustomEvent('cancel-zoom'));
+    this._scrollToTop();
   };
 
   // this panel does not collapse, so close it.
@@ -419,6 +430,7 @@ window.customElements.define('debug-panel', class extends HTMLElement {
         wait: true,
         zoom: true,
         away: true,
+        serverUnread: true,
         channelUnread: true,
         privMsgUnread: true,
         noticeUnread: true,
@@ -490,6 +502,16 @@ window.customElements.define('debug-panel', class extends HTMLElement {
     // --------------------
     this.shadowRoot.getElementById('button_6_1').addEventListener('click', () => {
       console.log('Adhoc Function is not defined (debug-panel)');
+      // const el = document.getElementById('manageChannelsPanel');
+      // const wTop = window.scrollY;
+      // console.log('scrollY wTop', wTop);
+      // const eTop = el.getBoundingClientRect().top;
+      // console.log('bounding eTop', eTop);
+      // // window.scroll(0, wTop + eTop - 50);
+      // window.scrollTo({
+      //   top: wTop + eTop - 50,
+      //   behavior: 'smooth'
+      // });
     });
   }; // connectedCallback()
 }); // customElements.define

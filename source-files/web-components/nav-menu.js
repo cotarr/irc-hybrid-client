@@ -56,6 +56,15 @@ customElements.define('nav-menu', class extends HTMLElement {
     this.shadowRoot.getElementById('navDropdownDivId').classList.remove('nav-dropdown-div-show');
   };
 
+  handleServerUnreadUpdate = (status) => {
+    const itemEl = this.shadowRoot.getElementById('item3_3_Id');
+    if (status) {
+      itemEl.textContent = 'IRC Server (New Messages)';
+    } else {
+      itemEl.textContent = 'IRC Server';
+    }
+  };
+
   handleNoticeUnreadUpdate = (status) => {
     const itemEl = this.shadowRoot.getElementById('item3_5_Id');
     if (status) {

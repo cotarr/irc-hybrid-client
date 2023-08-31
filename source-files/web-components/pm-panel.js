@@ -64,6 +64,40 @@
 // }
 //
 // ------------------------------------------------------------------------------
+//
+//  Panel visibility
+//
+// Panel creation
+//   No pm-panel elements exit at page load, so hide/unhide is not relevant
+//   The pm-panel elements are inserted into the DOM dynamically by manage-pm-panels.
+//   When inserted, the HTML Template pm-panel hidden by default
+//
+//   A new pm-panel element is dynamically create by manage-pm-panels
+//   after parsing incoming PRIVMSG commands has detected a new PM nickname.
+//   A list of current nicknames is kept in webState.activePrivateMessageNicks[] array.
+//   When a pm-panel initializes itself, it add's it's name to activePrivateMessageNicks[] array.
+//   A pm-panel is hidden after creation, pending events...
+//
+// Event: cache-reload-done
+//   Upon receiving cache-reload-done, the web connect time is calculated.
+//   If the websocket has been connected less than 5 seconds,
+//   the event is assumed to be a page reload and collapsePanel()
+//   is called to show the pm-panel as a collapsed bar.
+//   If the time is greater than 5 seconds, the no changes in visibility occur.
+//
+// Event; erase-before-reload
+//   When an erase-before-reload event occurs, all pm-panel elements
+//   will self detect the event, remove internal event listeners, and remove
+//   itself from the DOM.
+//   Thus... each cache reload removes all PM panels and restores new instances.
+//
+// Function call to public method displayPmMessage(parsedMessage) will
+//   make the panel visible and scroll it to the top of the viewport,
+//   unless any other panel is zoom or unless a cache reload is in progress.
+//
+// Scroll - Upon showPanel() a pm-panel element is scrolled to the top of the viewport.
+//
+// ------------------------------------------------------------------------------
 'use strict';
 window.customElements.define('pm-panel', class extends HTMLElement {
   constructor () {
@@ -216,6 +250,15 @@ window.customElements.define('pm-panel', class extends HTMLElement {
   };
 
   /**
+   * Scroll web component to align top of panel with top of viewport and set focus
+   */
+  _scrollToTop = () => {
+    this.focus();
+    const newVertPos = window.scrollY + this.getBoundingClientRect().top - 50;
+    window.scrollTo({ top: newVertPos, behavior: 'smooth' });
+  };
+
+  /**
    * Make panel visible (both internal and external function)
    */
   showPanel = () => {
@@ -226,6 +269,7 @@ window.customElements.define('pm-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('bottomCollapseDivId').setAttribute('hidden', '');
     this._updateVisibility();
     document.dispatchEvent(new CustomEvent('cancel-zoom'));
+    this._scrollToTop();
   };
 
   /**
@@ -772,7 +816,6 @@ window.customElements.define('pm-panel', class extends HTMLElement {
     if (!window.globals.ircState.ircConnected) {
       if (window.globals.webState.activePrivateMessageNicks
         .indexOf(this.privmsgName.toLowerCase()) >= 0) {
-        console.log('removing from DOM');
         this._removeSelfFromDOM();
       }
     }

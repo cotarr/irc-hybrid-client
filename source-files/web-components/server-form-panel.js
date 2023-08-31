@@ -513,12 +513,22 @@ window.customElements.define('server-form-panel', class extends HTMLElement {
       });
   };
 
+  /**
+   * Scroll web component to align top of panel with top of viewport and set focus
+   */
+  _scrollToTop = () => {
+    this.focus();
+    const newVertPos = window.scrollY + this.getBoundingClientRect().top - 50;
+    window.scrollTo({ top: newVertPos, behavior: 'smooth' });
+  };
+
   showPanel = () => {
     this.shadowRoot.getElementById('saveNewButtonId').setAttribute('hidden', '');
     this.shadowRoot.getElementById('saveNewButtonId2').setAttribute('hidden', '');
     this.shadowRoot.getElementById('saveModifiedButtonId').setAttribute('hidden', '');
     this.shadowRoot.getElementById('saveModifiedButtonId2').setAttribute('hidden', '');
     this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
+    this._scrollToTop();
   };
 
   hidePanel = () => {

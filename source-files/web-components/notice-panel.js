@@ -23,6 +23,13 @@
 //
 // This web component is a UI panel to display IRC Notice messages
 //
+// Panel visibility
+//   - Panel is hidden by default
+//   - Panel becomes visible upon receipt of message unless any panel is zoom state
+//              or a cache reload is in progress.
+//
+// Scroll - upon showPanel() the panel is scrolled to the top of the viewport.
+//
 // ------------------------------------------------------------------------------
 'use strict';
 window.customElements.define('notice-panel', class extends HTMLElement {
@@ -34,6 +41,15 @@ window.customElements.define('notice-panel', class extends HTMLElement {
       .appendChild(templateContent.cloneNode(true));
   }
 
+  /**
+   * Scroll web component to align top of panel with top of viewport and set focus
+   */
+  _scrollToTop = () => {
+    this.focus();
+    const newVertPos = window.scrollY + this.getBoundingClientRect().top - 50;
+    window.scrollTo({ top: newVertPos, behavior: 'smooth' });
+  };
+
   showPanel = () => {
     this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
     // scroll to top
@@ -42,6 +58,7 @@ window.customElements.define('notice-panel', class extends HTMLElement {
     document.dispatchEvent(new CustomEvent('cancel-zoom'));
     document.getElementById('headerBar').removeAttribute('noticeicon');
     document.getElementById('navMenu').handleNoticeUnreadUpdate(false);
+    this._scrollToTop();
   };
 
   // this panel does not collapse, so close it.
@@ -319,7 +336,6 @@ window.customElements.define('notice-panel', class extends HTMLElement {
     document.addEventListener('erase-before-reload', (event) => {
       this.shadowRoot.getElementById('panelMessageDisplayId').value = '';
       this.shadowRoot.getElementById('panelDivId').setAttribute('lastDate', '0000-00-00');
-      // TODO this.shadowRoot.getElementById('noticeUnreadExistIcon').setAttribute('hidden', '');
     });
 
     /**

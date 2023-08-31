@@ -49,10 +49,12 @@ th.server-list-th {
 .server-list-button-disconnected {
   background-color: #ff0000;
 }
-.server-list-disabled-tr {
-  background-color: #e0e0e0;
+.server-list-disabled-dark-tr {
+  background-color: #3d3d3d;
 }
-
+.server-list-disabled-light-tr {
+  background-color: #bebebe;
+}
 .server-list-group-color-1 {
   background-color: rgb(168, 233, 255);
   color: #000000;

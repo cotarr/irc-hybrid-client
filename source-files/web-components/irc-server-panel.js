@@ -21,6 +21,48 @@
 // SOFTWARE.
 // --------------------------------------------------------------------------------
 //
+// Server Message Display
+//
+// The purpose of this panel is to show IRC server messages to the user
+// in a special formatted method.
+// The messages show here exclude messages that are shown in other panels
+// i.e. channel messages are not duplicated here.
+// Some IRC server message are for control purposes and may be filtered,
+//
+// In order to view raw IRC sever messages, the debug panel has
+// a button to open such a raw message panel.
+//
+// Public Methods
+//   showPanel()
+//   collapsePanel() calls showPanel()
+//   hidePanel()
+//   displayPlainServerMessage(message)
+//   displayFormattedServerMessage(parsedMessage, message)
+//
+// Global Event listeners
+//   cache-reload-done
+//   cache-reload-error
+//   collapse-all-panels
+//   color-theme-changed
+//   hide-all-panels
+//   irc-state-changed
+//   resize-custom-elements
+//   show-all-panels
+//
+// Dispatched Events
+//   cancel-zoom
+//   update-from-cache
+//
+// Panel visibility
+//   The HTML template is hidden by default
+//   The local-command-parser can issue showPanel() calls to irc-server-panel
+//      when parsing a command that would expect a server response
+//      THis is blocked if any window is zoomed.
+//   Incoming server message to displayFormattedServerMessage = (parsedMessage, message)
+//      will make the panel visible is not cache reload and not zoomed.
+//
+// Scroll - this panel scroll to the top of the view area when showPanel() is called.
+//
 // --------------------------------------------------------------------------------
 'use strict';
 window.customElements.define('irc-server-panel', class extends HTMLElement {
@@ -30,7 +72,17 @@ window.customElements.define('irc-server-panel', class extends HTMLElement {
     const templateContent = template.content;
     this.attachShadow({ mode: 'open' })
       .appendChild(templateContent.cloneNode(true));
+    this.ircConnectedLast = false;
   }
+
+  /**
+   * Scroll web component to align top of panel with top of viewport and set focus
+   */
+  _scrollToTop = () => {
+    this.focus();
+    const newVertPos = window.scrollY + this.getBoundingClientRect().top - 50;
+    window.scrollTo({ top: newVertPos, behavior: 'smooth' });
+  };
 
   /**
    * Make panel visible
@@ -41,6 +93,9 @@ window.customElements.define('irc-server-panel', class extends HTMLElement {
     const panelMessageDisplayEl = this.shadowRoot.getElementById('panelMessageDisplayId');
     panelMessageDisplayEl.scrollTop = panelMessageDisplayEl.scrollHeight;
     document.dispatchEvent(new CustomEvent('cancel-zoom'));
+    document.getElementById('headerBar').removeAttribute('servericon');
+    document.getElementById('navMenu').handleServerUnreadUpdate(false);
+    this._scrollToTop();
   };
 
   /**
@@ -296,8 +351,21 @@ window.customElements.define('irc-server-panel', class extends HTMLElement {
   displayPlainServerMessage = (message) => {
     const panelMessageDisplayEl = this.shadowRoot.getElementById('panelMessageDisplayId');
     panelMessageDisplayEl.value += message + '\n';
-    // scroll to view new text
+    // scroll to textarea new text
     panelMessageDisplayEl.scrollTop = panelMessageDisplayEl.scrollHeight;
+    // Make panel visible which scrolls the page.
+    if ((!window.globals.webState.cacheReloadInProgress) &&
+      (!document.querySelector('body').hasAttribute('zoomId'))) {
+      this.showPanel();
+    }
+    // Message activity Icon
+    // If NOT reload from cache in progress (timer not zero)
+    // then display incoming message activity icon
+    if ((document.activeElement !== document.getElementById('ircServerPanel')) &&
+      (!window.globals.webState.cacheReloadInProgress)) {
+      document.getElementById('headerBar').setAttribute('servericon', '');
+      document.getElementById('navMenu').handleServerUnreadUpdate(true);
+    }
   };
 
   // ---------------------------------------------------------------------------
@@ -368,11 +436,6 @@ window.customElements.define('irc-server-panel', class extends HTMLElement {
         parsedMessage.datestamp);
       this.shadowRoot.getElementById('panelMessageDisplayId').value +=
         '\n=== ' + parsedMessage.datestamp + ' ===\n\n';
-    }
-
-    if ((!window.globals.webState.cacheReloadInProgress) &&
-      (!document.querySelector('body').hasAttribute('zoomId'))) {
-      this.showPanel();
     }
 
     switch (parsedMessage.command) {
@@ -550,7 +613,9 @@ window.customElements.define('irc-server-panel', class extends HTMLElement {
     //
     // If closed, open the server window to display the server message
     //
-    if (!window.globals.webState.cacheReloadInProgress) {
+
+    if ((!window.globals.webState.cacheReloadInProgress) &&
+      (!document.querySelector('body').hasAttribute('zoomId'))) {
       //
       // Do not open and display server window for these commands.
       //
@@ -571,6 +636,16 @@ window.customElements.define('irc-server-panel', class extends HTMLElement {
         this.showPanel();
       }
     }
+    //
+    // This must come after showPanel(), since showPanel() cancels the icons
+    // Message activity Icon
+    // If NOT reload from cache in progress (timer not zero)
+    // then display incoming message activity icon
+    if ((document.activeElement !== document.getElementById('ircServerPanel')) &&
+      (!window.globals.webState.cacheReloadInProgress)) {
+      document.getElementById('headerBar').setAttribute('servericon', '');
+      document.getElementById('navMenu').handleServerUnreadUpdate(true);
+    }
   }; // displayFormattedServerMessage()
 
   // -----------------------------------
@@ -578,7 +653,7 @@ window.customElements.define('irc-server-panel', class extends HTMLElement {
   // and connect counter
   // called 1/second by timer tick
   // -----------------------------------
-  updateElapsedTimeDisplay = () => {
+  _updateElapsedTimeDisplay = () => {
     const toTimeString = (seconds) => {
       let remainSec = seconds;
       let day = 0;
@@ -639,12 +714,12 @@ window.customElements.define('irc-server-panel', class extends HTMLElement {
    * Called once per second as task scheduler, called from js/_afterLoad.js
    */
   timerTickHandler = () => {
-    this.updateElapsedTimeDisplay();
+    this._updateElapsedTimeDisplay();
   };
 
   initializePlugin () {
     // do first to prevent page jitter
-    this.updateElapsedTimeDisplay();
+    this._updateElapsedTimeDisplay();
   }
 
   connectedCallback () {
@@ -722,6 +797,15 @@ window.customElements.define('irc-server-panel', class extends HTMLElement {
     // Auto complete, keypress detector
     this.shadowRoot.getElementById('panelMessageInputId')
       .addEventListener('keydown', this._serverAutoComplete, false);
+
+    // -------------------------------
+    // Clear message activity ICON by clicking on the main
+    // -------------------------------
+    this.shadowRoot.getElementById('panelDivId').addEventListener('click', function () {
+      document.getElementById('headerBar').removeAttribute('servericon');
+      document.getElementById('navMenu').handleServerUnreadUpdate(false);
+    });
+
     // -------------------------------------
     // 2 of 2 Listeners on global events
     // -------------------------------------
@@ -851,27 +935,18 @@ window.customElements.define('irc-server-panel', class extends HTMLElement {
 
     /**
      * Global event listener on document object to detect state change of remote IRC server
-     * Detect addition of new IRC channels and create channel panel.
-     * Data source: ircState object
      * @listens document:irc-state-changed
      */
     document.addEventListener('irc-state-changed', () => {
       if (window.globals.ircState.ircConnected !== this.ircConnectedLast) {
         this.ircConnectedLast = window.globals.ircState.ircConnected;
-        if (window.globals.ircState.ircConnected) {
-          const now = Math.floor(Date.now() / 1000);
-          const uptime = now - window.globals.ircState.times.ircConnect;
-          // if connected to IRC server less than 5 seconds, show MOTD message
-          if (uptime < 5) {
-            this.showPanel();
-          }
-        }
-        if (!window.globals.ircState.ircConnected) {
-          this.hidePanel();
-        }
+        this.shadowRoot.getElementById('programVersionDiv').textContent =
+          ' version-' + window.globals.ircState.progVersion;
+      };
+
+      if (!window.globals.ircState.ircConnected) {
+        this.hidePanel();
       }
-      this.shadowRoot.getElementById('programVersionDiv').textContent =
-        ' version-' + window.globals.ircState.progVersion;
     });
 
     /**

@@ -38,6 +38,26 @@
 //    webServerTerminate
 //    webConnectHeaderBarIconHandler (called externally when bar iconclicked)
 // ------------------------------------------------------------------------------
+//
+// Panel Visibility
+//   HTML template: irc-controls-panel hidden by default, flag webSocketFirstConnect = true
+//
+//   Websocket (re)connect:  (page refresh, page initial load)
+//     Any getIrcState() response after web socket connected (detect first time)
+//       if (webSocketFirstConnect===true) Show irc-controls-panel  flag set false
+//
+//   Connect and disconnect from IRC network
+//   getIrcState() response, ircConnected changed:
+//       ircConnected:  false to true  --> Collapse irc-controls-panel to bar
+//       ircConnected:  true to false  --> Show irc-controls-panel
+//
+//   Websocket disconnect
+//       Global hide-all-panels event hides the panel
+//       webState.webConnected changes true to false, reset flag webSocketFirstConnect = true
+//
+//   Scroll:  panel scrolls to top on showPanel()
+//
+// ------------------------------------------------------------------------------
 'use strict';
 window.customElements.define('irc-controls-panel', class extends HTMLElement {
   constructor () {
@@ -54,11 +74,21 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
     this.updateCacheDebounceActive = false;
   }
 
+  /**
+   * Scroll web component to align top of panel with top of viewport and set focus
+   */
+  _scrollToTop = () => {
+    this.focus();
+    const newVertPos = window.scrollY + this.getBoundingClientRect().top - 50;
+    window.scrollTo({ top: newVertPos, behavior: 'smooth' });
+  };
+
   showPanel = () => {
     this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
     this.shadowRoot.getElementById('panelCollapsedDivId').setAttribute('visible', '');
     this._updateVisibility();
     document.dispatchEvent(new CustomEvent('cancel-zoom'));
+    this._scrollToTop();
   };
 
   collapsePanel = () => {
@@ -412,12 +442,6 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
       // change color of icon
       window.globals.webState.ircConnecting = true;
 
-      // TODO input field for nickname
-      // if (document.getElementById('nickNameInputId').value.length < 1) {
-      //   document.getElementById('errorPanel').showError('Invalid nick name.');
-      //   return;
-      // }
-      // connectObject.nickName = document.getElementById('nickNameInputId').value;
       const connectObject = {};
       // The username is set only in the config file
 
@@ -614,10 +638,6 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
     }
     // Used by event handlers to inhibit various actions.
     window.globals.webState.cacheReloadInProgress = true;
-
-    // Clear activity icons
-    // TODO
-    // resetNotActivityIcon();
 
     // Fire event to clear previous contents
     // TODO this is async, could clear after fetch
@@ -1402,9 +1422,7 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
       // Detect change in websocket connected state
       if (window.globals.webState.webConnected !== this.webConnectedLast) {
         this.webConnectedLast = window.globals.webState.webConnected;
-        if (window.globals.webState.webConnected) {
-          this.showPanel();
-        } else {
+        if (!window.globals.webState.webConnected) {
           // reset to have proper display based on ircConnected state
           this.webSocketFirstConnect = true;
         }

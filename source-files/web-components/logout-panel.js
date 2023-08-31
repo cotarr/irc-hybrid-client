@@ -34,10 +34,20 @@ window.customElements.define('logout-panel', class extends HTMLElement {
   }
 
   /**
+   * Scroll web component to align top of panel with top of viewport and set focus
+   */
+  _scrollToTop = () => {
+    this.focus();
+    const newVertPos = window.scrollY + this.getBoundingClientRect().top - 50;
+    window.scrollTo({ top: newVertPos, behavior: 'smooth' });
+  };
+
+  /**
    * Make panel visible
    */
   showPanel = () => {
     this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
+    this._scrollToTop();
   };
 
   /**

@@ -129,7 +129,14 @@ window.customElements.define('local-command-parser', class extends HTMLElement {
   textCommandParser = (inputObj) => {
     const channelPrefixChars =
       document.getElementById('globVars').constants('channelPrefixChars');
-    const showRawMessageWindow = document.getElementById('ircServerPanel').showPanel;
+    /**
+     * Internal function to open server window, nuless zoom in progress
+     */
+    const _showRawMessageWindow = () => {
+      if (!document.querySelector('body').hasAttribute('zoomId')) {
+        document.getElementById('ircServerPanel').showPanel();
+      }
+    };
 
     // Internal function, detect whitespace character
     const _isWS = (inChar) => {
@@ -415,7 +422,7 @@ window.customElements.define('local-command-parser', class extends HTMLElement {
     switch (parsedCommand.command) {
       //
       case 'ADMIN':
-        showRawMessageWindow();
+        _showRawMessageWindow();
         ircMessage = 'ADMIN';
         if (parsedCommand.restOf.length === 1) {
           ircMessage = 'ADMIN ' + parsedCommand.restOf[0];
@@ -477,14 +484,22 @@ window.customElements.define('local-command-parser', class extends HTMLElement {
         }
         if (parsedCommand.params.length === 1) {
           ircMessage = 'JOIN ' + parsedCommand.restOf[0];
+          // After the server adds the channel to the ircState.channels array,
+          // The channel panel will be created automatically in manageChannelsPanel.
+          // This array is to identify the IRC server as freshly created
+          // as opposed to one that already exists during a browser page reload.
+          document.getElementById('manageChannelsPanel')
+            .ircChannelsPendingJoin.push(parsedCommand.restOf[0].toLowerCase());
         }
         if (parsedCommand.params.length === 2) {
           ircMessage = 'JOIN ' + parsedCommand.params[1] + ' ' + parsedCommand.restOf[1];
+          document.getElementById('manageChannelsPanel')
+            .ircChannelsPendingJoin.push(parsedCommand.params[1].toLowerCase());
         }
         break;
       //
       case 'LIST':
-        showRawMessageWindow();
+        _showRawMessageWindow();
         if (parsedCommand.params.length === 0) {
           ircMessage = 'LIST';
         } else {
@@ -565,7 +580,7 @@ window.customElements.define('local-command-parser', class extends HTMLElement {
         break;
       //
       case 'MOTD':
-        showRawMessageWindow();
+        _showRawMessageWindow();
         ircMessage = 'MOTD';
         if (parsedCommand.restOf.length === 1) {
           ircMessage = 'MOTD ' + parsedCommand.restOf[0];
@@ -593,7 +608,7 @@ window.customElements.define('local-command-parser', class extends HTMLElement {
             ircMessage: null
           };
         }
-        showRawMessageWindow();
+        _showRawMessageWindow();
         ircMessage = 'NICK ' + parsedCommand.restOf[0];
         break;
       //
@@ -677,7 +692,7 @@ window.customElements.define('local-command-parser', class extends HTMLElement {
       //
       case 'QUOTE':
         if (parsedCommand.restOf.length > 0) {
-          showRawMessageWindow();
+          _showRawMessageWindow();
           ircMessage = parsedCommand.restOf[0];
         } else {
           return {
@@ -705,7 +720,7 @@ window.customElements.define('local-command-parser', class extends HTMLElement {
         }
         break;
       case 'VERSION':
-        showRawMessageWindow();
+        _showRawMessageWindow();
         ircMessage = 'VERSION';
         if (parsedCommand.restOf.length === 1) {
           ircMessage = 'VERSION ' + parsedCommand.restOf[0];
@@ -723,10 +738,10 @@ window.customElements.define('local-command-parser', class extends HTMLElement {
         break;
       case 'WHO':
         if (parsedCommand.params.length === 0) {
-          showRawMessageWindow();
+          _showRawMessageWindow();
           ircMessage = 'WHO';
         } else {
-          showRawMessageWindow();
+          _showRawMessageWindow();
           ircMessage = 'WHO ' + parsedCommand.restOf[0];
         }
         break;
@@ -738,7 +753,7 @@ window.customElements.define('local-command-parser', class extends HTMLElement {
             ircMessage: null
           };
         }
-        showRawMessageWindow();
+        _showRawMessageWindow();
         ircMessage = 'WHOIS ' + parsedCommand.restOf[0];
         break;
       //

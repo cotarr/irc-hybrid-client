@@ -39,6 +39,20 @@
 //    6) Upon successful response event from ircGetState, browser is "connected"
 //
 // --------------------------------------------------------------------------------
+//
+// Panel Visibility
+//   HTML template: websocket-panel hidden by default at load
+//   Page Load: websocket-panel remains hidden during initial connect, spinner is going
+//   First Connect: Hide spinner, websocket-panel remains hidden
+//   Websocket event: 'open" --> fetch request by calling getIrcState()
+//      ircGetState() success --> Hide websocket-panel
+//      ircGetState() error --> Show websocket-panel (remains visible)
+//
+//   Websocket event: 'close' --> Show websocket-panel, attempt reconnect
+//   Websocket event: 'error' --> Show websocket-panel, attempt reconnect
+//
+//   Scroll:  No scroll, is only panel visible when websocket not connected
+// --------------------------------------------------------------------------------
 'use strict';
 window.customElements.define('websocket-panel', class extends HTMLElement {
   constructor () {
@@ -47,6 +61,7 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
     const templateContent = template.content;
     this.attachShadow({ mode: 'open' })
       .appendChild(templateContent.cloneNode(true));
+    this.firstConnect = true;
   }
 
   /**
@@ -203,8 +218,7 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
 
       this.resetHeartbeatTimer();
 
-      // TODO
-      // // load state of IRC connection
+      // load state of IRC connection
       // returns Promise, log's own fetch errors
       document.getElementById('ircControlsPanel').getIrcState()
         .then(() => {
@@ -212,6 +226,10 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
           this.shadowRoot.getElementById('reconnectStatusDivId').textContent =
             'Websocket opened successfully\n';
           this.hidePanel();
+          if (this.firstConnect) {
+            this.firstConnect = false;
+            document.getElementById('activitySpinner').cancelActivitySpinner();
+          }
           // panels will update new contents from cache
           document.dispatchEvent(new CustomEvent('update-from-cache', { bubbles: true }));
         })

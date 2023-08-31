@@ -68,6 +68,15 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('forceUnlockButtonId').setAttribute('hidden', '');
   };
 
+  /**
+   * Scroll web component to align top of panel with top of viewport and set focus
+   */
+  _scrollToTop = () => {
+    this.focus();
+    const newVertPos = window.scrollY + this.getBoundingClientRect().top - 50;
+    window.scrollTo({ top: newVertPos, behavior: 'smooth' });
+  };
+
   showPanel = () => {
     if (!this.shadowRoot.getElementById('panelVisibilityDivId').hasAttribute('visible')) {
       this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
@@ -101,6 +110,7 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
       });
 
     document.dispatchEvent(new CustomEvent('cancel-zoom'));
+    this._scrollToTop();
   };
 
   hidePanel = () => {
@@ -397,7 +407,11 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
           const rowEl = document.createElement('tr');
           rowEl.setAttribute('index', i.toString());
           if (data[i].disabled) {
-            rowEl.classList.add('server-list-disabled-tr');
+            if (document.querySelector('body').getAttribute('theme') === 'light') {
+              rowEl.classList.add('server-list-disabled-light-tr');
+            } else {
+              rowEl.classList.add('server-list-disabled-dark-tr');
+            }
           } else {
             allServersDisabled = false;
           }
@@ -979,6 +993,10 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
         panelDivEl.classList.add('server-list-theme-dark');
         tbodyEl.classList.remove('server-list-tbody-light');
         tbodyEl.classList.add('server-list-tbody-dark');
+      }
+      if (this.shadowRoot.getElementById('panelVisibilityDivId').hasAttribute('visible')) {
+        // this is to force new table
+        this.showPanel();
       }
     });
 

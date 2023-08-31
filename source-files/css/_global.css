@@ -37,11 +37,11 @@ textarea {
 }
 /* color set to Red to detect missing styles */
 .global-body-theme-light {
-  color: red;
+  color:  black;
   background-color: #f8f8f8;
 }
 .global-body-theme-dark {
-  color: red;
+  color: white;
   background-color: #080808;
 }
 .global-fw-bold {

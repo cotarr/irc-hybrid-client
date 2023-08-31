@@ -46,7 +46,25 @@
 //    displayChannelMessage(parsedMessage)   Open panel if needed, route messages to channel panels
 //    displayChannelNoticeMessage(ParsedMessage)  Notices to channel
 //
-
+// ------------------------------------------------------------------------------
+//
+// Panel Visibility
+//    HTML template - hidden by default, flag ircFirstConnect set to false by default
+//
+// Any getIrcState() response with ircState.ircConnected, check ircFirstConnect flag
+//   if (ircFirstConnect === true) and (webState.ircConnected)
+//      then show manage-channels-panel, clear flag ircFirstConnect
+//
+// Events;
+//   ircState.ircConnected true to false:  set flag ircFirstConnect=true
+//   webState.webConnected true to false:  set flag ircFirstConnect=true
+//
+// Scroll:
+//   Panel scrolls to bottom on open.
+//   Upon becoming visible for first time, a delay timer handles the scroll
+//       This is to allow irc-server-panel to display MOTD above the channel connect panel
+//       (see comments at showPanel(), and setTimeout() below)
+//
 // ------------------------------------------------------------------------------
 'use strict';
 window.customElements.define('manage-channels-panel', class extends HTMLElement {
@@ -61,30 +79,36 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
     this.lastIrcServerIndex = -1;
     this.ircConnectedLast = false;
     this.ircFirstConnect = true;
+    this.ircChannelsPendingJoin = [];
   }
+
+  /**
+   * Scroll web component to align top of panel with top of viewport and set focus
+   */
+  _scrollToTop = () => {
+    this.focus();
+    const newVertPos = window.scrollY + this.getBoundingClientRect().top - 50;
+    window.scrollTo({ top: newVertPos, behavior: 'smooth' });
+  };
+
+  /**
+   * Scroll web component to align bottom of panel with bottom of viewport and set focus
+   */
+  _scrollToBottom = () => {
+    this.focus();
+    const newVertPos =
+      this.getBoundingClientRect().bottom - window.innerHeight + window.scrollY;
+    window.scrollTo({ top: newVertPos, behavior: 'smooth' });
+  };
 
   showPanel = () => {
     this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
     this.shadowRoot.getElementById('panelCollapsedDivId').setAttribute('visible', '');
     document.dispatchEvent(new CustomEvent('cancel-zoom'));
+    this._scrollToBottom();
   };
 
   collapsePanel = () => {
-    // if (window.globals.ircState.channels.length === 0) {
-    //   this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
-    //   const now = Math.floor(Date.now() / 1000);
-    //   const uptime = now - window.globals.ircState.times.ircConnect;
-    //   // if connected to IRC server less than 5 seconds, channel panel
-    //   console.log('uptime', uptime);
-    //   if (uptime < 5) {
-    //     this.shadowRoot.getElementById('panelCollapsedDivId').setAttribute('visible', '');
-    //   } else {
-    //     this.shadowRoot.getElementById('panelCollapsedDivId').removeAttribute('visible');
-    //   }
-    // } else {
-    //   this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible');
-    //   this.shadowRoot.getElementById('panelCollapsedDivId').removeAttribute('visible');
-    // }
     if (this.shadowRoot.getElementById('panelVisibilityDivId').hasAttribute('visible')) {
       this.shadowRoot.getElementById('panelCollapsedDivId').removeAttribute('visible');
     }
@@ -158,6 +182,11 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
         .indexOf(newChannel.charAt(0)) >= 0)) {
       const message = 'JOIN ' + newChannel;
       document.getElementById('ircControlsPanel').sendIrcServerMessage(message);
+      // After the server adds the channel to the ircState.channels array,
+      // The channel panel will be created automatically in manageChannelsPanel.
+      // This array is to identify the IRC server as freshly created
+      // as opposed to one that already exists during a browser page reload.
+      this.ircChannelsPendingJoin.push(newChannel.toLowerCase());
     } else {
       document.getElementById('errorPanel').showError('Invalid Channel Name');
     }
@@ -181,12 +210,7 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
       newChannelEl.setAttribute('channel-name', newChannelName.toLowerCase());
       // as attribute (Case sensitive)
       newChannelEl.setAttribute('channel-cs-name', newChannelName);
-      if (channelsContainerEl.firstChild) {
-        channelsContainerEl.insertBefore(
-          newChannelEl, channelsContainerEl.firstChild);
-      } else {
-        channelsContainerEl.appendChild(newChannelEl);
-      }
+      channelsContainerEl.appendChild(newChannelEl);
       newChannelEl.initializePlugin();
     } else {
       throw new Error('Attempt to create channel that already exists');
@@ -200,6 +224,11 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
     if (channelName.length > 0) {
       // TODO validate name channel prefix chars
       document.getElementById('ircControlsPanel').sendIrcServerMessage('JOIN ' + channelName);
+      // After the server adds the channel to the ircState.channels array,
+      // The channel panel will be created automatically in manageChannelsPanel.
+      // This array is to identify the IRC server as freshly created
+      // as opposed to one that already exists during a browser page reload.
+      this.ircChannelsPendingJoin.push(channelName.toLowerCase());
     }
   };
 
@@ -358,16 +387,42 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
           this.ircFirstConnect = false;
           if (window.globals.ircState.channels.length === 0) {
             this.showPanel();
+            // ----------------------------
+            // Special case, using timer (work around)
+            //
+            // When connecting to IRC server for the first time
+            // both the ircServerPanel and the manageChannelsPanel
+            // will be visible.
+            //
+            // The goal is to show some of the IRC server MOTD at the top
+            // with the channel JOIN panel at the bottom.
+            //
+            // The issue is multiple cache reloads trying to scroll the screen.
+            //
+            // Wait for double cache reload to complete using timer
+            // Then calculate vertical offset such that the
+            // bottom of the panel will align at the bottom of the viewport.
+            // Set timer then scroll so panel is at bottom of page view area.
+            //
+            // TODO optimize the time value experimentally
+            //
+            // ------------------------------
+            setTimeout(() => {
+              this._scrollToBottom();
+            }, 750);
           }
         }
       } else {
         this.ircFirstConnect = true;
       }
 
+      //
+      // Detect IRC disconnect
       if (window.globals.ircState.ircConnected !== this.ircConnectedLast) {
         this.ircConnectedLast = window.globals.ircState.ircConnected;
         if (!window.globals.ircState.ircConnected) {
           this.hidePanel();
+          this.ircChannelsPendingJoin = [];
         }
       }
 
@@ -521,6 +576,7 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
         if (!window.globals.webState.webConnected) {
           // reset to have proper display based on ircConnected state
           this.ircFirstConnect = true;
+          this.ircChannelsPendingJoin = [];
         }
       }
     });
