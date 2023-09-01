@@ -21,6 +21,9 @@
 // SOFTWARE.
 // ------------------------------------------------------------------------------
 //
+//    Basic IRC control to Connect and Disconnect remotely the IRC network
+//
+// ------------------------------------------------------------------------------
 //  External methods
 //    showPanel()
 //    collapsePanel()
@@ -83,6 +86,9 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
     window.scrollTo({ top: newVertPos, behavior: 'smooth' });
   };
 
+  /**
+   * Make panel visible (both internal and external function)
+   */
   showPanel = () => {
     this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
     this.shadowRoot.getElementById('panelCollapsedDivId').setAttribute('visible', '');
@@ -91,17 +97,26 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
     this._scrollToTop();
   };
 
+  /**
+   * Collapse panel to bar (both internal and external function)
+   */
   collapsePanel = () => {
     this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
     this.shadowRoot.getElementById('panelCollapsedDivId').removeAttribute('visible');
     this._updateVisibility();
   };
 
+  /**
+   * Hide this panel (both internal and external function)
+   */
   hidePanel = () => {
     this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible');
     this.shadowRoot.getElementById('panelCollapsedDivId').removeAttribute('visible');
   };
 
+  /**
+   * Internal function to control element visibility
+   */
   _updateVisibility = () => {
     const editServerButtonEl = this.shadowRoot.getElementById('editServerButtonId');
     const connectButtonEl = this.shadowRoot.getElementById('connectButtonId');

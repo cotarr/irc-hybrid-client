@@ -21,7 +21,7 @@
 // SOFTWARE.
 // --------------------------------------------------------------------------------
 //
-//  Show current state variables for the remote IRC client inside web server.
+//    Show current state variables for the remote IRC client inside web server.
 //
 // --------------------------------------------------------------------------------
 'use strict';

@@ -24,6 +24,9 @@
 // This web component is a simple CSS based hamburger icon used to call a menu.
 // It is a static element without any functionality.
 //
+// Public Methods:
+//    setColorTheme(theme)
+//
 // ------------------------------------------------------------------------------
 'use strict';
 customElements.define('hamburger-icon', class extends HTMLElement {
@@ -36,6 +39,10 @@ customElements.define('hamburger-icon', class extends HTMLElement {
     this.activitySpinnerCounter = 0;
   }
 
+  /**
+   * Change colors of the hamburger icon
+   * @param {string} theme - Allowed:  'light', 'dark'
+   */
   setColorTheme = (theme) => {
     const hamburgerIconEl = this.shadowRoot.getElementById('hamburgerBorderId');
     const hamburgerLine1El = this.shadowRoot.getElementById('hamburgerLine1Id');

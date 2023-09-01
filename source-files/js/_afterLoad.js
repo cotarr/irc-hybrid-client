@@ -23,10 +23,11 @@
 //
 // This JavaScript file loads globally at program start.
 //
-//  - Before this script runs, the /irc/webclient.html (build from html/_index.html) is
-//      the  main HTML index file used to load web components.
+//  - Before this script runs, the /irc/webclient.html (build from source-files/html/_index.html)
+//      is the  main HTML index file used to load web components.
 //  - After the HTML and web components are loaded, this file "_afterLoad.js" is used
 //       to run initial functions inside each web component, executed in the proper order.
+//  - This script also contains a global 1 second timer that web components can hook.
 //  - This script has some eventListener functions for window events that
 //       are not available within web component shawDOM scope.
 // ------------------------------------------------------------------------------

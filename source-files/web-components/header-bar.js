@@ -21,6 +21,9 @@
 // SOFTWARE.
 // ------------------------------------------------------------------------------
 //
+//    Header Bar at top of web page.
+//
+// ------------------------------------------------------------------------------
 // This web component contains a header bar at the top of the page.
 //   * Dynamically generate status icons, some clickable
 //   * Status icon tool-tip messages
@@ -28,6 +31,27 @@
 //   * Clickable connection status, click to connect/disconnect
 //   * Button to enable media play if disabled in browser
 //   * Initialization code and global event listeners
+//
+// Public methods
+//   setHeaderBarIcons(options)
+//
+// Public Properties
+//   beepicon (boolean)
+//   channelicon (boolean)
+//   noticeicon (boolean)
+//   privmsgicon (boolean)
+//   servericon (boolean)
+//   wallopsicon (boolean)
+//   zoomicon (boolean)
+//
+// Public attributes
+//   beepicon (if attribute exists)
+//   channelicon (if attribute exists)
+//   noticeicon (if attribute exists)
+//   privmsgicon (if attribute exists)
+//   servericon (if attribute exists)
+//   wallopsicon (if attribute exists)
+//   zoomicon (if attribute exists)
 //
 // ------------------------------------------------------------------------------
 'use strict';

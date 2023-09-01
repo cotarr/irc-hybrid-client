@@ -21,8 +21,9 @@
 // SOFTWARE.
 // --------------------------------------------------------------------------------
 //
-// Server Message Display
+//    Server Message Display
 //
+// --------------------------------------------------------------------------------
 // The purpose of this panel is to show IRC server messages to the user
 // in a special formatted method.
 // The messages show here exclude messages that are shown in other panels

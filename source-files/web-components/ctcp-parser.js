@@ -21,7 +21,22 @@
 // SOFTWARE.
 // ------------------------------------------------------------------------------
 //
+//    CTCP Command Parser
+//
 // ------------------------------------------------------------------------------
+//
+// When the remote-command-parser detects a possible CTCP message
+// from the IRC server, it forwards the parsedMessage to the
+// parseCtcpMessage(parsedMessage, message) function.
+// This handles incoming CTCP requests from other users.
+// This handles CTCP replies from other users.
+//
+// This program does not support DCC connections.
+//
+// Public Methods:
+//   parseCtcpMessage(parsedMessage, message)
+//
+// -----------------------------------------------------------------------------
 'use strict';
 window.customElements.define('ctcp-parser', class extends HTMLElement {
   // ---------------------------------------------

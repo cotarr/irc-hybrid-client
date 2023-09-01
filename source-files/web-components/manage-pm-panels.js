@@ -21,10 +21,19 @@
 // SOFTWARE.
 // ------------------------------------------------------------------------------
 //
-// This web component is a UI panel to manage PM (Private Message) panels
+//    This web component is a UI panel to manage PM (Private Message) panels
 //
+// ------------------------------------------------------------------------------
 //  Detect new private messages and create new private message panel.
 //  by instantiating instance of pm-panel.
+//
+// Public Methods
+//   showPanel()
+//   collapsePanel()
+//   hidePanel()
+//   setLastPmPanel(pmPanelName, state)
+//   displayPrivateMessage(parsedMessage)
+//
 //
 // Global Event listeners
 //   cache-reload-done
@@ -77,22 +86,29 @@ window.customElements.define('manage-pm-panels', class extends HTMLElement {
     window.scrollTo({ top: newVertPos, behavior: 'smooth' });
   };
 
+  /**
+   * Make panel visible (both internal and external function)
+   */
   showPanel = () => {
     this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
     this.shadowRoot.getElementById('panelCollapsedDivId').setAttribute('visible', '');
-    this._updateVisibility();
     document.dispatchEvent(new CustomEvent('cancel-zoom'));
     this._scrollToTop();
   };
 
+  /**
+   * Collapse panel to bar (both internal and external function)
+   */
   collapsePanel = () => {
     if (this.shadowRoot.getElementById('panelVisibilityDivId').hasAttribute('visible')) {
       this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
       this.shadowRoot.getElementById('panelCollapsedDivId').removeAttribute('visible');
-      this._updateVisibility();
     }
   };
 
+  /**
+   * Hide this panel (both internal and external function)
+   */
   hidePanel = () => {
     this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible');
     this.shadowRoot.getElementById('panelCollapsedDivId').removeAttribute('visible');
@@ -126,7 +142,7 @@ window.customElements.define('manage-pm-panels', class extends HTMLElement {
   /**
    * Iterate arrays of panels states, remove entries without panels.
    */
-  cleanLastPmPanelStates = () => {
+  _cleanLastPmPanelStates = () => {
     let needPrune;
     let pruneIndexList;
     const panelEls = Array.from(document.getElementById('pmContainerId').children);
@@ -189,9 +205,6 @@ window.customElements.define('manage-pm-panels', class extends HTMLElement {
     } // if length > 0
   }; // clearLastPmPanelStates()
 
-  _updateVisibility = () => {
-  };
-
   /**
    * Instantiate new channel panel and insert into the DOM
    * @param {string} newChannelName - Name of new IRC #channel
@@ -247,6 +260,13 @@ window.customElements.define('manage-pm-panels', class extends HTMLElement {
   // }
   //
   // -----------------------------------------------------------------------
+
+  /**
+   * Accept IRC PRIVMSG private chat message, check if a PM panel already exists
+   * and if needed create pm-panel element and insert to DOM.
+   * If pm-panel already exists, forward message to that channel web component.
+   * @param {Object} parsedMessage - Object containing IRC message
+   */
   displayPrivateMessage = (parsedMessage) => {
     // During cache reload when disconnected, ignore cached PM messages
     if (!window.globals.ircState.ircConnected) return;
@@ -282,9 +302,11 @@ window.customElements.define('manage-pm-panels', class extends HTMLElement {
     }
   };
 
-  // --------------------------------
-  // Send private message
-  // --------------------------------
+  /**
+   * Build an IRC private message PM and send it for the case of a new PM message
+   * where no pm-panel elements have been create yet.
+   * A new panel will be created when the IRC message echo's back from the server
+   */
   _buildPrivateMessageText = () => {
     const panelMessageInputEl = this.shadowRoot.getElementById('panelMessageInputId');
     const pmNickNameInputEl = this.shadowRoot.getElementById('pmNickNameInputId');
@@ -338,10 +360,10 @@ window.customElements.define('manage-pm-panels', class extends HTMLElement {
     }
   }; // _buildPrivateMessageText ()
 
-  // ---------------------------------------------------
-  // Load Private Message beep enable from local storage
-  // ---------------------------------------------------
-  loadBeepEnable = () => {
+  /**
+   * Load Private Message beep enable from local storage
+   */
+  _loadBeepEnable = () => {
     // Default disabled
     this.shadowRoot.getElementById('openPmWithBeepCheckBoxId').checked = false;
     this.removeAttribute('beep-enabled');
@@ -375,7 +397,7 @@ window.customElements.define('manage-pm-panels', class extends HTMLElement {
   // Main entry point
   // ------------------
   initializePlugin = () => {
-    this.loadBeepEnable();
+    this._loadBeepEnable();
   };
 
   // add event listeners to connected callback
@@ -486,7 +508,7 @@ window.customElements.define('manage-pm-panels', class extends HTMLElement {
 
     document.addEventListener('cache-reload-done', (event) => {
       // done loading cache, remove unused PM flags
-      this.cleanLastPmPanelStates();
+      this._cleanLastPmPanelStates();
     });
 
     document.addEventListener('cancel-beep-sounds', () => {

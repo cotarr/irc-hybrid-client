@@ -21,8 +21,9 @@
 // SOFTWARE.
 // ------------------------------------------------------------------------------
 //
-// This web component is an IRC channel panel.
+//     This web component is an IRC channel panel.
 //
+// ------------------------------------------------------------------------------
 // Each IRC channel panel is dynamically created and inserted
 // into the DOM by parent element manage-channels-panel.
 // When no longer needed, this component will self destroy itself.
@@ -52,7 +53,7 @@
 //   update-channel-count
 //   update-from-cache
 //
-// External Methods
+// Public Methods:
 //   showPanel()
 //   collapsePanel()
 //   hidePanel()

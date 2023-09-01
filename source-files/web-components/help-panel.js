@@ -21,7 +21,14 @@
 // SOFTWARE.
 // ------------------------------------------------------------------------------
 //
-// Help Panel, MIT License, List of available IRC Commands
+//    Help Panel, MIT License, List of available IRC Commands
+//
+// ------------------------------------------------------------------------------
+//
+// Public methods:
+//   showPanel()
+//   collapsePanel()
+//   hidePanel()
 //
 // ------------------------------------------------------------------------------
 'use strict';
@@ -43,17 +50,25 @@ window.customElements.define('help-panel', class extends HTMLElement {
     window.scrollTo({ top: newVertPos, behavior: 'smooth' });
   };
 
+  /**
+   * Make panel visible (both internal and external function)
+   */
   showPanel = () => {
     this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
     document.dispatchEvent(new CustomEvent('cancel-zoom'));
     this._scrollToTop();
   };
 
-  // this panel does not collapse, so close it.
+  /**
+   * Collapse panel to bar (both internal and external function)
+   */
   collapsePanel = () => {
     this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible');
   };
 
+  /**
+   * Hide this panel (both internal and external function)
+   */
   hidePanel = () => {
     this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible');
   };

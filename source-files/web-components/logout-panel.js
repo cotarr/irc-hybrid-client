@@ -20,8 +20,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 // --------------------------------------------------------------------------------
-//   Logout Panel, notify user that IRC is still connected and will
-//   remain connected after web page user logout.
+//
+//    Logout Confirmation Panel
+//
+// --------------------------------------------------------------------------------
+//  Check if IRC server is still connected to remote web server
+//  If not connected, proceed to logout network request.
+//  Else, if the IRC is still connected, a web logout will leave the nickname present on IRC
+//  Make the logout-panel visible to notify user that IRC wil still
+//  connected and will remain connected after web page user logout.
+//
+// Public methods
+//    showPanel()
+//    collapsePanel()
+//    hidePanel()
+//    handleLogoutRequest()
+//
 // --------------------------------------------------------------------------------
 'use strict';
 window.customElements.define('logout-panel', class extends HTMLElement {

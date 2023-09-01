@@ -21,7 +21,13 @@
 // SOFTWARE.
 // ------------------------------------------------------------------------------
 //
-// This web component is the main error display UI for the page
+//    This web component is the main error display UI for the page
+//
+// ------------------------------------------------------------------------------
+//
+// Public methods:
+//   clearError()
+//   showError(errorString)
 //
 // ------------------------------------------------------------------------------
 'use strict';
@@ -36,10 +42,9 @@ window.customElements.define('error-panel', class extends HTMLElement {
     this.errorRemainSeconds = 0;
   }
 
-  // ------- -------------------
-  // Error display functions
-  // --------------------------
-
+  /**
+   * Immediately clear error message panel without waiting for the timer
+   */
   clearError = () => {
     this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible');
     const errorContentDivEl = this.shadowRoot.getElementById('errorContentDivId');
@@ -49,6 +54,10 @@ window.customElements.define('error-panel', class extends HTMLElement {
     this.errorRemainSeconds = 0;
   };
 
+  /**
+   * Make error panel visible and show error message
+   * @param {string} errorString = The error message
+   */
   showError = (errorString) => {
     this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
     const errorContentDivEl = this.shadowRoot.getElementById('errorContentDivId');
@@ -58,6 +67,9 @@ window.customElements.define('error-panel', class extends HTMLElement {
     this.errorRemainSeconds = this.errorExpireSeconds;
   };
 
+  /**
+   * Timer service routine to clear messages
+   */
   _expireErrorMessages = () => {
     if (this.errorRemainSeconds > 0) {
       this.errorRemainSeconds--;

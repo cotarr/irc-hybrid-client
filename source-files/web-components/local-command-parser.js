@@ -21,6 +21,16 @@
 // SOFTWARE.
 // ------------------------------------------------------------------------------
 //
+//    Parse outgoing user input to detect and handle IRC user commands
+//
+// ------------------------------------------------------------------------------
+// This is the command input parser to interpret and execute IRC text commands.
+// If commands are detected (such as /JOIN), then the proper command
+// is sent to the remote server for processing.
+//
+// Public Methods
+//      textCommandParser(inputObj)
+//
 // ------------------------------------------------------------------------------
 'use strict';
 window.customElements.define('local-command-parser', class extends HTMLElement {
@@ -110,9 +120,6 @@ window.customElements.define('local-command-parser', class extends HTMLElement {
   ];
 
   // --------------------------------------------------------
-  // This is the command input parser to interpret
-  // and execute IRC text commands, such as /JOIN
-  //
   // inputObj = {
   //   inputString: '/'+command [arguments...]
   //   originType: ('channel', 'private', 'generic')
@@ -126,6 +133,12 @@ window.customElements.define('local-command-parser', class extends HTMLElement {
   // }
   //
   // --------------------------------------------------------
+
+  /**
+   * This is the command input parser to interpret and
+   * execute IRC text commands, such as /JOIN
+   * @param {Object} inputObj - User keyboard input with meta-data
+   */
   textCommandParser = (inputObj) => {
     const channelPrefixChars =
       document.getElementById('globVars').constants('channelPrefixChars');
@@ -776,7 +789,7 @@ window.customElements.define('local-command-parser', class extends HTMLElement {
         '" unknown command.',
       ircMessage: null
     };
-  };
+  }; // textCommandParser()
 
   /**
    * Called once per second as task scheduler, called from js/_afterLoad.js

@@ -21,9 +21,19 @@
 // SOFTWARE.
 // ------------------------------------------------------------------------------
 //
-//    Parse command from remote IRC server
+//    Parse input from remote IRC server to detect and handle IRC server commands
 //
 // ------------------------------------------------------------------------------
+// This function will accept one line of text from IRC server
+// First it will check for "HEARTBEAT" and "UPDATE" requests
+// else will parse message string into prefix, command, and arguments
+// then parse the command and relevant actions accordingly.
+//
+//    IRC server ---> backend --> Browser (parse here)
+//
+// Public Methods
+//    parseBufferMessage(message)
+//
 'use strict';
 window.customElements.define('remote-command-parser', class extends HTMLElement {
   // ------------------------------------------------------------------
@@ -235,9 +245,15 @@ window.customElements.define('remote-command-parser', class extends HTMLElement 
   //
   // This function will accept one line of text from IRC server
   // First it will check for "HEARTBEAT" and "UPDATE" requests
-  // else will parse message string into prefix, command, and arugments
+  // else will parse message string into prefix, command, and arguments
   // then parse the command and relevant actions accordingly.
   // -------------------------------------------------------------
+
+  /**
+   * Parse IRC message and build parsedMessageObject
+   * Check for match on IRC command handlers, if found call handler function
+   * @param {string} message - RFC 2812 formatted IRC server message
+   */
   parseBufferMessage = (message) => {
     const errorPanelEl = document.getElementById('errorPanel');
     const ircServerPanelEl = document.getElementById('ircServerPanel');
@@ -492,7 +508,7 @@ window.customElements.define('remote-command-parser', class extends HTMLElement 
         default:
       }
     }
-  };
+  }; // parseBufferMessage()
 
   /**
    * Called once per second as task scheduler, called from js/_afterLoad.js

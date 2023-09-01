@@ -21,7 +21,9 @@
 // SOFTWARE.
 // ------------------------------------------------------------------------------
 //
-// This is a simple CSS based activity spinner (spinning circle)
+//    This is a simple CSS based activity spinner (spinning circle)
+//
+// ------------------------------------------------------------------------------
 //
 // Methods:
 //   requestActivitySpinner() - Increments counter, make spinner visible
@@ -42,15 +44,18 @@ customElements.define('activity-spinner', class extends HTMLElement {
     this.activitySpinnerCounter = 0;
   }
 
-  // ----------------------------------
-  // Public methods to enable spinner
-  // ----------------------------------
+  /**
+   * Increment counter of active requests and make spinner visible
+   */
   requestActivitySpinner = () => {
     // console.log('request activity spinner', this.id);
     this.activitySpinnerCounter += 1;
     this.shadowRoot.getElementById('activitySpinner').removeAttribute('hidden');
   };
 
+  /**
+   * Decrement counter of active requests and if zero hide the spinner
+   */
   cancelActivitySpinner = () => {
     // console.log('cancel activity spinner');
     this.activitySpinnerCounter -= 1;
@@ -64,6 +69,9 @@ customElements.define('activity-spinner', class extends HTMLElement {
     }
   };
 
+  /**
+   * Reset counter of active requests to 0 and hide spinner
+   */
   resetActivitySpinner = () => {
     this.activitySpinnerCounter = 0;
     this.shadowRoot.getElementById('activitySpinner').setAttribute('hidden', '');

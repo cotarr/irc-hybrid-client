@@ -21,7 +21,17 @@
 // SOFTWARE.
 // ------------------------------------------------------------------------------
 //
-// This web component initializes global variables on the window object
+//    This web component initializes global variables on the window object
+//
+// ------------------------------------------------------------------------------
+// This program requires some use of global javascript variables to hold state info.
+// An object 'globals' has been added to the browser window object as window.globals.
+// This modules initializes global variables on the window object.
+//
+// Other variables are declared as properties of the glob-vars web component
+//
+// Public methods:
+//    constants(key)
 //
 // ------------------------------------------------------------------------------
 'use strict';

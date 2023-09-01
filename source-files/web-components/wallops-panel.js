@@ -21,8 +21,15 @@
 // SOFTWARE.
 // ------------------------------------------------------------------------------
 //
-// This web component is a UI panel to display IRC Wallops messages
+//    This web component is a UI panel to display IRC Wallops messages
 //
+// ------------------------------------------------------------------------------
+//
+// Public Methods
+//    showPanel()
+//    collapsePanel()
+//    hidePanel()
+//    displayWallopsMessage()
 //
 // Panel visibility
 //   - Panel is hidden by default
@@ -50,6 +57,9 @@ window.customElements.define('wallops-panel', class extends HTMLElement {
     window.scrollTo({ top: newVertPos, behavior: 'smooth' });
   };
 
+  /**
+   * Make panel visible and scroll into position
+   */
   showPanel = () => {
     this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
     // scroll to top
@@ -61,21 +71,25 @@ window.customElements.define('wallops-panel', class extends HTMLElement {
     this._scrollToTop();
   };
 
-  // this panel does not collapse, so close it.
+  /**
+   * This panel does not collapse, instead close it.
+   */
   collapsePanel = () => {
     this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible');
   };
 
+  /**
+   * Hide panel
+   */
   hidePanel = () => {
     this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible');
   };
 
-  // -----------------------------------------------------
-  // Wallops messages
-  // -----------------------------------------------------
-  // Wallops (+w) messages are displayed here
-  // Note: notice window controls are in another module
-  // -----------------------------------------------------
+  /**
+   * Add IRC WALLOPS (+w) message to the wallops-panel textarea element.
+   * Input is formatted by the remoteCommandParser module
+   * @param {object} parsedMessage - Message meta-data
+   */
   displayWallopsMessage = (parsedMessage) => {
     const panelDivEl = this.shadowRoot.getElementById('panelDivId');
     const panelMessageDisplayEl = this.shadowRoot.getElementById('panelMessageDisplayId');

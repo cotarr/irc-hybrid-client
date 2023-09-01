@@ -20,7 +20,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 // ------------------------------------------------------------------------------
-
+//
+//    HTML form for editing an IRC server definition
+//
+// ------------------------------------------------------------------------------
 // Global Event listeners
 //   collapse-all-panels
 //   color-theme-changed
@@ -30,14 +33,14 @@
 // Dispatched Events
 //   irc-server-edit-open
 //
-//  External methods
+//  Public Methods
 //    createNewIrcServer()
 //    editIrcServerAtIndex(index)
 //    showPanel();
 //    collapsePanel();
 //    hidePanel();
 //
-//  External methods returning promise, run as chain of promises
+//  Public methods returning promise, run as chain of promises
 //    fetchServerList(index, lock)
 //    submitServer(body, method, index)
 //    checkForApiError = (data)
@@ -204,7 +207,6 @@ window.customElements.define('server-form-panel', class extends HTMLElement {
    * @param {data} data - API response, example: {"status":"success","method":"PATCH","index":0}
    * @returns {Promise} Resolved to previous server response or reject with error
    */
-
   checkForApiError = (data) => {
     return new Promise((resolve, reject) => {
       if (data.status === 'success') {
@@ -441,6 +443,10 @@ window.customElements.define('server-form-panel', class extends HTMLElement {
     });
   };
 
+  /**
+   * Make server form visible, with proper buttons configured
+   * This for has javascript capability to submit POST to database
+   */
   createNewIrcServer = () => {
     if (window.globals.ircState.ircConnected) {
       document.getElementById('errorPanel').showError(
@@ -470,8 +476,13 @@ window.customElements.define('server-form-panel', class extends HTMLElement {
         window.globals.webState.ircServerEditOpen = false;
         this.hidePanel();
       });
-  };
+  }; // createNewIrcServer
 
+  /**
+   * Make server form visible, with proper buttons configured
+   * Fetch existing IRC server definition and populate form with previous values
+   * This for has javascript capability to submit PATCH to database with new data
+   */
   editIrcServerAtIndex = (index) => {
     if (window.globals.ircState.ircConnected) {
       document.getElementById('errorPanel').showError(
@@ -522,6 +533,9 @@ window.customElements.define('server-form-panel', class extends HTMLElement {
     window.scrollTo({ top: newVertPos, behavior: 'smooth' });
   };
 
+  /**
+   * Make panel visible
+   */
   showPanel = () => {
     this.shadowRoot.getElementById('saveNewButtonId').setAttribute('hidden', '');
     this.shadowRoot.getElementById('saveNewButtonId2').setAttribute('hidden', '');
@@ -531,6 +545,9 @@ window.customElements.define('server-form-panel', class extends HTMLElement {
     this._scrollToTop();
   };
 
+  /**
+   * Hide panel
+   */
   hidePanel = () => {
     if (!window.globals.webState.webConnected) {
       this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible');
@@ -569,11 +586,16 @@ window.customElements.define('server-form-panel', class extends HTMLElement {
     }
   };
 
-  //  this panel does not collapse, so close it.
+  /**
+   * this panel does not collapse, so close it.
+   */
   collapsePanel = () => {
     this.hidePanel();
   };
 
+  /**
+   * Event handle for form Save button (New Record)
+   */
   _saveNewButtonHandler = () => {
     this._parseFormInputValues()
       // .then((data) => {
@@ -611,6 +633,9 @@ window.customElements.define('server-form-panel', class extends HTMLElement {
       });
   };
 
+  /**
+   * Event handler for browser Save button (Modified record)
+   */
   _saveModifiedButtonHandler = () => {
     this._parseFormInputValues()
       .then((data) => {

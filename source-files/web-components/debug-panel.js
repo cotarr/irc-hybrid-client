@@ -24,6 +24,14 @@
 // This web component is a developer interface used to debug the program.
 //
 // ------------------------------------------------------------------------------
+//
+// Public Methods:
+//   showPanel()
+//   collapsePanel()
+//   hidePanel()
+//
+// ------------------------------------------------------------------------------
+
 'use strict';
 window.customElements.define('debug-panel', class extends HTMLElement {
   constructor () {
@@ -98,7 +106,7 @@ window.customElements.define('debug-panel', class extends HTMLElement {
     }
   };
 
-  test1ButtonHandler = () => {
+  _test1ButtonHandler = () => {
     // ---------------------------------
     console.log('Test1 button pressed.');
     const fetchController = new AbortController();
@@ -156,7 +164,7 @@ window.customElements.define('debug-panel', class extends HTMLElement {
     // ---------------------------------
   };
 
-  test2ButtonHandler = () => {
+  _test2ButtonHandler = () => {
     // ---------------------------------
     console.log('Test1 button pressed.');
     const fetchController = new AbortController();
@@ -214,7 +222,7 @@ window.customElements.define('debug-panel', class extends HTMLElement {
     // ---------------------------------
   };
 
-  test3ButtonHandler = () => {
+  _test3ButtonHandler = () => {
     // ---------------------------------
     console.log('Test3 button pressed.');
     console.log('Echo request GET /irc/test3');
@@ -267,9 +275,9 @@ window.customElements.define('debug-panel', class extends HTMLElement {
         document.getElementById('errorPanel').showError(message);
       });
     // ---------------------------------
-  }; // test3ButtonHandler()
+  }; // _test3ButtonHandler()
 
-  test4ButtonHandler = () => {
+  _test4ButtonHandler = () => {
     // ---------------------------------
     console.log('Test 3 button: expire heart beat timer');
     const websocketPanelEl = document.getElementById('websocketPanel');
@@ -277,7 +285,7 @@ window.customElements.define('debug-panel', class extends HTMLElement {
       websocketPanelEl.heartbeatExpirationTimeSeconds - 1;
     // webState.webConnectOn = false;
     // ---------------------------------
-  }; // test4ButtonHandler()
+  }; // _test4ButtonHandler()
 
   // ------------------
   // Main entry point
@@ -417,19 +425,19 @@ window.customElements.define('debug-panel', class extends HTMLElement {
     // Remote Server Functions
     // --------------------------
     this.shadowRoot.getElementById('button_1_1').addEventListener('click', () => {
-      this.test1ButtonHandler();
+      this._test1ButtonHandler();
     });
 
     this.shadowRoot.getElementById('button_1_2').addEventListener('click', () => {
-      this.test2ButtonHandler();
+      this._test2ButtonHandler();
     });
 
     this.shadowRoot.getElementById('button_1_3').addEventListener('click', () => {
-      this.test4ButtonHandler();
+      this._test4ButtonHandler();
     });
 
     this.shadowRoot.getElementById('button_1_4').addEventListener('click', () => {
-      this.test3ButtonHandler();
+      this._test3ButtonHandler();
     });
 
     // --------------------------

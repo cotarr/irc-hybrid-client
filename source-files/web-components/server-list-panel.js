@@ -21,7 +21,21 @@
 // SOFTWARE.
 // ------------------------------------------------------------------------------
 //
+//    IRC Server List Panel
+//
 // ------------------------------------------------------------------------------
+// Remove previous server list contents from HTML <table>
+// Perform database fetch request to obtain array of all IRC server definitions
+// Dynamically populate the HTML <table><tbody> with <tr> row elements
+// that contain configuration data for each defined IRC server.
+// Depending on state, add buttons and event listeners to the table.
+//
+// Public methods
+//   showPanel()
+//   collapsePanel()
+//   hidePanel()
+//
+// -----------------------------------------------------------------------------
 'use strict';
 window.customElements.define('server-list-panel', class extends HTMLElement {
   constructor () {
@@ -44,6 +58,9 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
     this.ircConnectedLast = false;
   }
 
+  /**
+   * Set visibility of page HTML elements
+   */
   _updateVisibility = () => {
     if (window.globals.ircState.disableServerListEditor) {
       this.shadowRoot.getElementById('serverListDisabledDivId').removeAttribute('hidden');
@@ -77,6 +94,9 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
     window.scrollTo({ top: newVertPos, behavior: 'smooth' });
   };
 
+  /**
+   * Make panel visible
+   */
   showPanel = () => {
     if (!this.shadowRoot.getElementById('panelVisibilityDivId').hasAttribute('visible')) {
       this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
@@ -101,7 +121,7 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
     //   this.shadowRoot.getElementById('disconnectButtonId').setAttribute('disabled', '');
     // }
     document.getElementById('serverFormPanel').fetchServerList(-1, -1)
-      .then((data) => this.buildServerListTable(data))
+      .then((data) => this._buildServerListTable(data))
       .catch((err) => {
         console.log(err);
         let message = err.message || err.toString() || 'Error';
@@ -113,16 +133,28 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
     this._scrollToTop();
   };
 
+  /**
+   * Hide this panel
+   */
   hidePanel = () => {
-    this.clearServerListTable();
+    this._clearServerListTable();
     this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible');
   };
 
-  // this panel does not collapse, so close it.
+  /**
+   * this panel does not collapse, so close it.
+   */
   collapsePanel = () => {
     this.hidePanel();
   };
 
+  /**
+   * Parse javascript error to see if status 409 property has been
+   * added. If 409 found, display 'database locked' message and
+   * make the Force Unlock button visible.
+   * Send error messages to the error-panel web component
+   * @param {error} err - javascript error object
+   */
   _handleServerListOpenError = (err) => {
     console.log(err);
     let message = err.message || err.toString() ||
@@ -143,7 +175,7 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
    * Button Event Handler to service dynamically generated buttons in server list table
    * @param {Number} index - Integer index into IRC server Array
    */
-  selectServerButtonHandler = (event) => {
+  _selectServerButtonHandler = (event) => {
     // console.log(event.target.id, event.target.getAttribute('index'));
     if ((!window.globals.ircState.ircConnected) && (!window.globals.ircState.ircConnecting)) {
       const ircControlsPanelEl = document.getElementById('ircControlsPanel');
@@ -169,7 +201,7 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
    * Button Event Handler to service dynamically generated buttons in server list table
    * @param {Number} index - Integer index into IRC server Array
    */
-  connectToIrcButtonHandler = (event) => {
+  _connectToIrcButtonHandler = (event) => {
     // console.log(event.target.id, event.target.getAttribute('index'));
     if ((window.globals.ircState.ircConnected) || (window.globals.ircState.ircConnecting)) {
       document.getElementById('ircControlsPanel').disconnectHandler();
@@ -188,7 +220,7 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
    * Button Event Handler to service dynamically generated buttons in server list table
    * @param {Number} index - Integer index into IRC server Array
    */
-  toggleDisabledCheckboxHandler = (event) => {
+  _toggleDisabledCheckboxHandler = (event) => {
     // console.log(event.target.id, event.target.getAttribute('index'));
     const serverFormPanelEl = document.getElementById('serverFormPanel');
     const index = parseInt(event.target.getAttribute('index'));
@@ -201,7 +233,7 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
    * Button Event Handler to service dynamically generated buttons in server list table
    * @param {Number} index - Integer index into IRC server Array
    */
-  editIrcServerButtonHandler = (event) => {
+  _editIrcServerButtonHandler = (event) => {
     // console.log(event.target.id, event.target.getAttribute('index'));
     const serverFormEl = document.getElementById('serverFormPanel');
     const index = parseInt(event.target.getAttribute('index'));
@@ -218,7 +250,7 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
    * Button Event Handler to service dynamically generated buttons in server list table
    * @param {Number} index - Integer index into IRC server Array
    */
-  copyIrcServerToNewButtonHandler = (event) => {
+  _copyIrcServerToNewButtonHandler = (event) => {
     // console.log(event.target.id, event.target.getAttribute('index'));
     const serverFormPanelEl = document.getElementById('serverFormPanel');
     const index = parseInt(event.target.getAttribute('index'));
@@ -231,7 +263,7 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
    * Button Event Handler to service dynamically generated buttons in server list table
    * @param {Number} index - Integer index into IRC server Array
    */
-  deleteIrcServerButtonHandler = (event) => {
+  _deleteIrcServerButtonHandler = (event) => {
     // console.log(event.target.id, event.target.getAttribute('index'));
     const serverFormPanelEl = document.getElementById('serverFormPanel');
     const index = parseInt(event.target.getAttribute('index'));
@@ -244,7 +276,7 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
    * Button Event Handler to service dynamically generated buttons in server list table
    * @param {Number} index - Integer index into IRC server Array
    */
-  moveUpInListButtonHandler = (event) => {
+  _moveUpInListButtonHandler = (event) => {
     console.log(event.target.id, event.target.getAttribute('index'));
     const serverFormPanelEl = document.getElementById('serverFormPanel');
     const index = parseInt(event.target.getAttribute('index'));
@@ -256,44 +288,44 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
   /**
    * Removes eventListener and <tr> row elements from table
    */
-  clearServerListTable = (data) => {
+  _clearServerListTable = (data) => {
     const tableNode = this.shadowRoot.getElementById('tbodyId');
     //
     // (1 of 2) Remove previous event listeners
     //
     this.selectButtonIdList.forEach((id) => {
       this.shadowRoot.getElementById(id)
-        .removeEventListener('click', this.selectServerButtonHandler);
+        .removeEventListener('click', this._selectServerButtonHandler);
     });
     this.selectButtonIdList = [];
     this.connectButtonIdList.forEach((id) => {
       this.shadowRoot.getElementById(id)
-        .removeEventListener('click', this.connectToIrcButtonHandler);
+        .removeEventListener('click', this._connectToIrcButtonHandler);
     });
     this.connectButtonIdList = [];
     this.disabledCheckboxIdList.forEach((id) => {
       this.shadowRoot.getElementById(id)
-        .removeEventListener('click', this.toggleDisabledCheckboxHandler);
+        .removeEventListener('click', this._toggleDisabledCheckboxHandler);
     });
     this.disabledCheckboxIdList = [];
     this.editButtonIdList.forEach((id) => {
       this.shadowRoot.getElementById(id)
-        .removeEventListener('click', this.editIrcServerButtonHandler);
+        .removeEventListener('click', this._editIrcServerButtonHandler);
     });
     this.editButtonIdList = [];
     this.copyButtonIdList.forEach((id) => {
       this.shadowRoot.getElementById(id)
-        .removeEventListener('click', this.copyIrcServerToNewButtonHandler);
+        .removeEventListener('click', this._copyIrcServerToNewButtonHandler);
     });
     this.copyButtonIdList = [];
     this.deleteButtonIdList.forEach((id) => {
       this.shadowRoot.getElementById(id)
-        .removeEventListener('click', this.deleteIrcServerButtonHandler);
+        .removeEventListener('click', this._deleteIrcServerButtonHandler);
     });
     this.deleteButtonIdList = [];
     this.moveUpButtonIdList.forEach((id) => {
       this.shadowRoot.getElementById(id)
-        .removeEventListener('click', this.moveUpInListButtonHandler);
+        .removeEventListener('click', this._moveUpInListButtonHandler);
     });
     this.moveUpButtonIdList = [];
 
@@ -303,18 +335,18 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
     while (tableNode.firstChild) {
       tableNode.removeChild(tableNode.firstChild);
     }
-  }; // clearServerListTable
+  }; // _clearServerListTable
 
   /**
    * Dynamically add rows to HTML table for list of IRC servers
    * @param {Object} data - Array of Objects
    * @returns {Promise} resolved to null
    */
-  buildServerListTable = (data) => {
+  _buildServerListTable = (data) => {
     // console.log(JSON.stringify(data, null, 2));
     return new Promise((resolve, reject) => {
       // Remove eventListener and <tr> row elements from table
-      this.clearServerListTable();
+      this._clearServerListTable();
 
       // Contents will be inserted into the <tbody> element
       const tableNode = this.shadowRoot.getElementById('tbodyId');
@@ -784,31 +816,31 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
         //
         this.selectButtonIdList.forEach((id) => {
           this.shadowRoot.getElementById(id)
-            .addEventListener('click', this.selectServerButtonHandler);
+            .addEventListener('click', this._selectServerButtonHandler);
         });
         this.connectButtonIdList.forEach((id) => {
           this.shadowRoot.getElementById(id)
-            .addEventListener('click', this.connectToIrcButtonHandler);
+            .addEventListener('click', this._connectToIrcButtonHandler);
         });
         this.disabledCheckboxIdList.forEach((id) => {
           this.shadowRoot.getElementById(id)
-            .addEventListener('click', this.toggleDisabledCheckboxHandler);
+            .addEventListener('click', this._toggleDisabledCheckboxHandler);
         });
         this.editButtonIdList.forEach((id) => {
           this.shadowRoot.getElementById(id)
-            .addEventListener('click', this.editIrcServerButtonHandler);
+            .addEventListener('click', this._editIrcServerButtonHandler);
         });
         this.copyButtonIdList.forEach((id) => {
           this.shadowRoot.getElementById(id)
-            .addEventListener('click', this.copyIrcServerToNewButtonHandler);
+            .addEventListener('click', this._copyIrcServerToNewButtonHandler);
         });
         this.deleteButtonIdList.forEach((id) => {
           this.shadowRoot.getElementById(id)
-            .addEventListener('click', this.deleteIrcServerButtonHandler);
+            .addEventListener('click', this._deleteIrcServerButtonHandler);
         });
         this.moveUpButtonIdList.forEach((id) => {
           this.shadowRoot.getElementById(id)
-            .addEventListener('click', this.moveUpInListButtonHandler);
+            .addEventListener('click', this._moveUpInListButtonHandler);
         });
 
         if (allServersDisabled) {
@@ -822,7 +854,7 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
       }
       resolve(null);
     });
-  }; // buildServerListTable()
+  }; // _buildServerListTable()
 
   // ------------------
   // Main entry point
@@ -903,7 +935,7 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
       this.fullWidth = true;
       this.mobileWidth = false;
       document.getElementById('serverFormPanel').fetchServerList(-1, -1)
-        .then((data) => this.buildServerListTable(data))
+        .then((data) => this._buildServerListTable(data))
         .catch((err) => {
           console.log(err);
           let message = err.message || err.toString() || 'Error';
@@ -918,7 +950,7 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
       this.fullWidth = false;
       this.mobileWidth = false;
       document.getElementById('serverFormPanel').fetchServerList(-1, -1)
-        .then((data) => this.buildServerListTable(data))
+        .then((data) => this._buildServerListTable(data))
         .catch((err) => {
           console.log(err);
           let message = err.message || err.toString() || 'Error';
@@ -934,7 +966,7 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
       this.fullWidth = false;
       this.mobileWidth = true;
       document.getElementById('serverFormPanel').fetchServerList(-1, -1)
-        .then((data) => this.buildServerListTable(data))
+        .then((data) => this._buildServerListTable(data))
         .catch((err) => {
           console.log(err);
           let message = err.message || err.toString() || 'Error';
@@ -1021,7 +1053,7 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
         //   console.log(JSON.stringify(data, null, 2));
         //   return Promise.resolve(data);
         // })
-        .then(this.buildServerListTable)
+        .then(this._buildServerListTable)
         .then(this._updateVisibility)
         .catch((err) => {
           console.log(err);
@@ -1076,7 +1108,7 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
             //   console.log(JSON.stringify(data, null, 2));
             //   return Promise.resolve(data);
             // })
-            .then((data) => this.buildServerListTable(data))
+            .then((data) => this._buildServerListTable(data))
             .catch((err) => {
               console.log(err);
               let message = err.message || err.toString() || 'Error';

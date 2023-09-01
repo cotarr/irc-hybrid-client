@@ -21,7 +21,9 @@
 // SOFTWARE.
 // ------------------------------------------------------------------------------
 //
-// This web component is an IRC channel panel.
+//    This web component is an IRC channel panel.
+//
+// ------------------------------------------------------------------------------
 //
 // Each IRC channel panel is dynamically created and inserted
 // into the DOM by parent element manage-channels-panel.
@@ -43,7 +45,7 @@
 //   cancel-zoom
 //   update-privmsg-count
 //
-// External Methods
+// Public Methods
 //   showPanel()
 //   collapsePanel()
 //   hidePanel()

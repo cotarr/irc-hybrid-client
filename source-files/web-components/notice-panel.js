@@ -21,7 +21,16 @@
 // SOFTWARE.
 // ------------------------------------------------------------------------------
 //
-// This web component is a UI panel to display IRC Notice messages
+//    This web component is a UI panel to display IRC Notice messages
+//
+// ------------------------------------------------------------------------------
+//
+// Public Methods
+//    showPanel()
+//    collapsePanel()
+//    hidePanel()
+//    displayCtcpNoticeMessage()
+//    displayNoticeMessage()
 //
 // Panel visibility
 //   - Panel is hidden by default
@@ -50,6 +59,9 @@ window.customElements.define('notice-panel', class extends HTMLElement {
     window.scrollTo({ top: newVertPos, behavior: 'smooth' });
   };
 
+  /**
+   * Make panel visible and scroll into position
+   */
   showPanel = () => {
     this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
     // scroll to top
@@ -61,15 +73,25 @@ window.customElements.define('notice-panel', class extends HTMLElement {
     this._scrollToTop();
   };
 
-  // this panel does not collapse, so close it.
+  /**
+   * This panel does not collapse, instead close it.
+   */
   collapsePanel = () => {
     this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible');
   };
 
+  /**
+   * Hide panel
+   */
   hidePanel = () => {
     this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible');
   };
 
+  /**
+   * CTCP responses sent as NOTICE messages are displayed here
+   * Input is formatted by the remoteCommandParser module
+   * @param {object} parsedMessage - Message meta-data
+   */
   displayCtcpNoticeMessage = (ctcpMessage) => {
     // console.log('ctcpMessage', ctcpMessage);
     const panelMessageDisplayEl = this.shadowRoot.getElementById('panelMessageDisplayId');
@@ -103,7 +125,14 @@ window.customElements.define('notice-panel', class extends HTMLElement {
   //     "Notice message text example."
   //   ]
   // }
-  // // -----------------------------------------------------
+  //
+  // -----------------------------------------------------
+
+  /**
+   * Add IRC NOTICE message to the notice-panel textarea element.
+   * Input is formatted by the remoteCommandParser module
+   * @param {object} parsedMessage - Message meta-data
+   */
   displayNoticeMessage = (parsedMessage) => {
     // console.log(JSON.stringify(parsedMessage, null, 2));
     const panelDivEl = this.shadowRoot.getElementById('panelDivId');

@@ -20,12 +20,20 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 // ------------------------------------------------------------------------------
-//  Play Audio "beep" sounds
+//
+//     Play Audio "beep" sounds
+//
+// ------------------------------------------------------------------------------
 //
 //  Public methods
+//    inhibitBeep()
 //    playBeep1Sound()
 //    playBeep2Sound()
 //    playBeep3Sound()
+//    userInitiatedAudioPlay()
+//    testPlayBeepSound1()
+//    testPlayBeepSound2()
+//    testPlayBeepSound3()
 //
 // ------------------------------------------------------------------------------
 'use strict';

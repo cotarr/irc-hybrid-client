@@ -21,6 +21,10 @@
 // SOFTWARE.
 // ------------------------------------------------------------------------------
 //
+//    Utility toolbox of common text processing and pixel calculations
+//
+// ------------------------------------------------------------------------------
+//
 // This web component is toolbox of functions that individual UI panels
 // can call to perform common display tasks.
 //
@@ -28,12 +32,23 @@
 // that are used by UI panels to dynamically adjust testArea elements
 // when the browser window size is changed by dragging the mouse.
 //
+// Public methods
+//   toggleColorTheme()
+//   timestampToHMS(timeString)
+//   timestampToYMD(timeString)
+//   unixTimestampToHMS(seconds)
+//   timestampToUnixSeconds(timeString)
+//   stripTrailingCrLf(inString)
+//   detectMultiLineString(inString)
+//   handleExternalWindowResizeEvent()
+//   manualRecalcPageWidth()
+//
 // ------------------------------------------------------------------------------
 'use strict';
 window.customElements.define('display-utils', class extends HTMLElement {
-  //
-  // Called without argument to toggle the page color theme between light and dark
-  //
+  /**
+   * Called without argument to toggle the page color theme between light and dark
+   */
   toggleColorTheme = () => {
     if (document.querySelector('body').getAttribute('theme') === 'light') {
       document.querySelector('body').setAttribute('theme', 'dark');
@@ -48,9 +63,11 @@ window.customElements.define('display-utils', class extends HTMLElement {
     }
   };
 
-  // --------------------------------------------------------
-  // Convert string with IRCv3 timestamp to HH:MM:SS string
-  // --------------------------------------------------------
+  /**
+   * Convert string with IRCv3 timestamp to HH:MM:SS string
+   * @param {string} timeString - IRCv3 timestamp prefix
+   * @returns {string} in format HH:MM:DD
+   */
   timestampToHMS = (timeString) => {
     // console.log('timeString ' + timeString);
     // Reference: https://ircv3.net/specs/extensions/server-time
@@ -71,9 +88,11 @@ window.customElements.define('display-utils', class extends HTMLElement {
     return outString;
   };
 
-  // --------------------------------------------------------
-  // Convert string with IRCv3 timestamp to HH:MM:SS string
-  // --------------------------------------------------------
+  /**
+   * Convert string with IRCv3 timestamp to YYYY-MM-DD string
+   * @param {string} timeString - IRCv3 timestamp prefix
+   * @returns {string} - in format YYYY-MM-DD
+   */
   timestampToYMD = (timeString) => {
     let outString = '';
     if (timeString.length === 0) {
@@ -92,9 +111,11 @@ window.customElements.define('display-utils', class extends HTMLElement {
     return outString;
   };
 
-  // ----------------------------------------------------------------
-  // Convert unix timestamp in seconds to HH:MM:SS string local time
-  // ----------------------------------------------------------------
+  /**
+   * Convert unix timestamp in seconds to HH:MM:SS string local time
+   * @param {number} seconds - Unix time in seconds
+   * @returns {string} in format HH:MM:DD
+   */
   unixTimestampToHMS = (seconds) => {
     // console.log('timeString ' + timeString);
     let outString = '';
@@ -117,9 +138,11 @@ window.customElements.define('display-utils', class extends HTMLElement {
     return outString;
   };
 
-  // --------------------------------------------------------
-  // Convert string with IRCv3 timestamp to Unix Seconds
-  // --------------------------------------------------------
+  /**
+   * Convert string with IRCv3 timestamp to Unix Seconds
+   * @param {string} timeString - IRCv3 timestamp prefix
+   * @returns {number} - Unix time in seconds
+   */
   timestampToUnixSeconds = (timeString) => {
     // Reference: https://ircv3.net/specs/extensions/server-time
     // @time=2011-10-19T16:40:51.620Z :Angel!angel@example.org PRIVMSG Wiz :Hello
@@ -192,9 +215,11 @@ window.customElements.define('display-utils', class extends HTMLElement {
   // console.log('colorTest ' + cleanFormatting(colorTest));
   // ------ end color format removal test -------------
 
-  // ------------------------------------------
-  // Function to strip CTCP delimiter
-  // ------------------------------------------
+  /**
+   * strip CTCP delimiter from text
+   * @param {string} inString - IRC text content starting with CTCP marker
+   * @returns {string} - Processed string
+   */
   cleanCtcpDelimiter = (inString) => {
     // Filterable formatting codes
     const ctcpDelim = 1;
@@ -213,9 +238,6 @@ window.customElements.define('display-utils', class extends HTMLElement {
     return outString;
   };
 
-  // ------------------------------------------
-  // Function to strip colors from a string
-  // ------------------------------------------
   /**
    * Clean IRC color format codes from string
    * @param {string} inString - IRC text with possible color codes
@@ -300,11 +322,10 @@ window.customElements.define('display-utils', class extends HTMLElement {
     return outString;
   };
 
-  // -------------------------------------------------
-  // Remove one CR-LF anywhere from inputArea element
-  //
-  // Modifies HTML element value (contents)
-  // ------------------------------------------------
+  /**
+   * Modifies HTML element in DOM to remove one CR-LF anywhere from inputArea element
+   * @param {Object} textAreaElement - HTML <textarea> or <input> element
+   */
   stripOneCrLfFromElement = (textAreaElement) => {
     if (!textAreaElement.value) return;
     const inString = textAreaElement.value.toString();
@@ -378,10 +399,11 @@ window.customElements.define('display-utils', class extends HTMLElement {
   // These values to be used to determine value of the "rows" and "cols" attribute
   // of a <textarea> element to dynamically size it to a dynamic window size.
   // --------------------------------------------------------------------------
-  //
-  // This is a element measurement function
-  // It should be run before resizing elements to avoid browser Reflow violations
-  //
+
+  /**
+   * This is a element measurement function
+   * It should be run before resizing elements to avoid browser Reflow violations
+   */
   _updatePageMeasurements () {
     // This is based on "body" width to be inside of the vertical slider bar if present
     window.globals.webState.dynamic.panelPxWidth =
@@ -401,9 +423,9 @@ window.customElements.define('display-utils', class extends HTMLElement {
     window.globals.webState.watch.devicePixelRatio = window.devicePixelRatio;
   }; // _updatePageMeasurements
 
-  // -----------------------------------------------------------------------
-  // Create temporary elements and measure the size in pixels, the delete
-  // -----------------------------------------------------------------------
+  /**
+   * Create temporary elements and measure the size in pixels, the delete
+   */
   _calibrateElementSize () {
     // Insertion parent element
     const displayUtilsElement = document.getElementById('displayUtils');
@@ -463,15 +485,14 @@ window.customElements.define('display-utils', class extends HTMLElement {
     displayUtilsElement.removeChild(rulerButton2El);
   }; // _calibrateElementSize()
 
-  // ---------------------------------------------------------------------------
-  // Function to calculate <textarea> "cols" attribute for proper width on page.
-  //
-  // This is called by various panels with IRC chat textarea elements
-  // to set the character size of textarea for proper page layout.
-  //
-  // Input: margin width outside <textarea>  (innerWidth - element width)
-  // Output: String containing integer value of textarea "cols" attribute
-  // --------------------------------------------------------------------------
+  /**
+   * Function to calculate <textarea> "cols" attribute for proper width on page.
+   *
+   * This is called by various panels with IRC chat textarea elements
+   * to set the character size of textarea for proper page layout.
+   * @param {*} marginPxWidth - Margin width outside <textarea>  (innerWidth - element width)
+   * @returns {string} String containing integer value of textarea "cols" attribute
+   */
   calcInputAreaColSize (marginPxWidth) {
     if ((typeof marginPxWidth === 'number') &&
       (window.globals.webState.dynamic.testAreaColumnPxWidth) &&
@@ -493,13 +514,13 @@ window.customElements.define('display-utils', class extends HTMLElement {
     }
   }; // calcInputAreaColSize()
 
-  // --------------------------------------------------------
-  // Event listener for resize window (generic browser event)
-  //
-  // was not allowed inside a custom element.
-  // An external listener will call this function
-  // --------------------------------------------------------
-  handleExternalWindowResizeEvent (event) {
+  /**
+   * Event handler called from js/_afterLoad.js when window.resize is fired
+   * The resize event was not available inside the web component.
+   * All sizes are obtained from DOM, event object not used.
+   * @fires resize-custom-elements
+   */
+  handleExternalWindowResizeEvent () {
     this._updatePageMeasurements();
     // ignore resize events before dynamic size variables exist
     if (window.globals.webState.dynamic.testAreaColumnPxWidth) {
@@ -531,12 +552,11 @@ window.customElements.define('display-utils', class extends HTMLElement {
     }
   };
 
-  //
-  // Timer service routine
-  //
-  // Resize input area elements after pageClientWidth unexpectedly changes without event.
-  // Typically appearance of vertical slider causes this.
-  //
+  /**
+   * Timer service routine to check for changes in page size
+   * Typically appearance or disappearance of vertical slider causes this.
+   * @fires resize-custom-elements
+   */
   _checkVerticalSliderPageWidth () {
     this._updatePageMeasurements();
 
@@ -559,7 +579,9 @@ window.customElements.define('display-utils', class extends HTMLElement {
     }
   }; // _checkVerticalSliderPageWidth()
 
-  // Button event handlers can call this during debug
+  /**
+   * Button event handlers can call this during debug
+   */
   manualRecalcPageWidth () {
     this._updatePageMeasurements();
 

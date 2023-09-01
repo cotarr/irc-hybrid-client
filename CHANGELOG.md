@@ -12,6 +12,12 @@ Work in progress, see top of README.md
 
 Commit
 
+- Made a pass through the javascript files updating comments.
+- Clean up CSS and HTML files (remove extra blank lines, etc)
+- Removed temp-placeholder web component (contained ghost functions to avoid build errors)
+
+Commit 7a74411
+
 - Adjusted zoom and un-zooomed dynamic screen size to better fit iPhone screen.
 - Fixed Channel topic not updating when changed.
 

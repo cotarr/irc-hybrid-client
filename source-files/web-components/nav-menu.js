@@ -21,12 +21,24 @@
 // SOFTWARE.
 // ------------------------------------------------------------------------------
 //
-// This web component contains inserts a simple dropdown menu.
+//    Dropdown navigation menu
+//
+// ------------------------------------------------------------------------------
 //
 //   * Navigation: clicking menu items will run assigned functions
 //   * List of active Private Message PM panels dynamically generated
 //   * List of active IRC channels dynamically generated
 //   * IRC channel includes count of unread messages
+//
+// Public Methods:
+//   toggleDropdownMenu()
+//   closeDropdownMenu()
+//   handleServerUnreadUpdate(status)
+//   handleNoticeUnreadUpdate(status)
+//   handleWallopsUnreadUpdate(status)
+//   handlePmListUpdate()
+//   handlePmPanelClick()
+//    handleChannelClick()
 //
 // ------------------------------------------------------------------------------
 'use strict';
@@ -43,6 +55,9 @@ customElements.define('nav-menu', class extends HTMLElement {
     this.ircConnectedLast = null;
   }
 
+  /**
+   * Make dropdown menu visible
+   */
   toggleDropdownMenu = () => {
     this.shadowRoot.getElementById('navDropdownDivId').classList.toggle('nav-dropdown-div-show');
     // Make sure dropdown menu is visible by scrolling to the top when opening menu
@@ -52,10 +67,17 @@ customElements.define('nav-menu', class extends HTMLElement {
     // }
   };
 
+  /**
+   * Hide dropdown menu
+   */
   closeDropdownMenu = () => {
     this.shadowRoot.getElementById('navDropdownDivId').classList.remove('nav-dropdown-div-show');
   };
 
+  /**
+   * Update icons to show or hide icon for unread Server messages
+   * @param {boolean} status - True will make icon visible
+   */
   handleServerUnreadUpdate = (status) => {
     const itemEl = this.shadowRoot.getElementById('item3_3_Id');
     if (status) {
@@ -65,6 +87,10 @@ customElements.define('nav-menu', class extends HTMLElement {
     }
   };
 
+  /**
+   * Update icons to show or hide icon for unread Notice messages
+   * @param {boolean} status - True will make icon visible
+   */
   handleNoticeUnreadUpdate = (status) => {
     const itemEl = this.shadowRoot.getElementById('item3_5_Id');
     if (status) {
@@ -74,6 +100,10 @@ customElements.define('nav-menu', class extends HTMLElement {
     }
   };
 
+  /**
+   * Update icons to show or hide icon for unread Wallops messages
+   * @param {boolean} status - True will make icon visible
+   */
   handleWallopsUnreadUpdate = (status) => {
     const itemEl = this.shadowRoot.getElementById('item3_4_Id');
     if (status) {
@@ -83,6 +113,9 @@ customElements.define('nav-menu', class extends HTMLElement {
     }
   };
 
+  /**
+   * Called by a pm-panel element to update count of unread messages for a panel.
+   */
   handlePmListUpdate = () => {
     // list of PM panels list
     const pmPanels = Array.from(window.globals.webState.activePrivateMessageNicks);
@@ -162,6 +195,10 @@ customElements.define('nav-menu', class extends HTMLElement {
     } // changed
   };
 
+  /**
+   * Called by pm-panel to clear unread message count
+   * @param {Object} event.target.pmPanelName
+   */
   handlePmPanelClick = (event) => {
     event.stopPropagation();
     const privmsgName = event.target.pmPanelName.toLowerCase();
@@ -169,6 +206,9 @@ customElements.define('nav-menu', class extends HTMLElement {
     this.closeDropdownMenu();
   };
 
+  /**
+   * Event handler called when irc-state-changed fires
+   */
   _handleIrcStateChanged = () => {
     // console.log('navMenu irc-state-changed event');
     // Detect state change for IRC server connection. if changed, close the dropdown
@@ -268,6 +308,10 @@ customElements.define('nav-menu', class extends HTMLElement {
     } // changed
   };
 
+  /**
+   * Called by channel-panel to clear unread message count
+   * @param {Object} event.target.channelName
+   */
   handleChannelClick = (event) => {
     event.stopPropagation();
     const channelNameId = event.target.channelName;

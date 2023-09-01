@@ -21,8 +21,9 @@
 // SOFTWARE.
 // ------------------------------------------------------------------------------
 //
-// This web component is a UI panel to manage IRC channels
+//    This web component is a UI panel to manage IRC channels
 //
+// ------------------------------------------------------------------------------
 //  Detect when new IRC channels are JOINed and create new channel panel.
 //  by instantiating instance of channel-panel.
 //
@@ -39,7 +40,7 @@
 // Dispatched Events
 //   cancel-zoom
 //
-//  External methods
+//  Public methods
 //    showPanel()
 //    collapsePanel()
 //    hidePanel()
@@ -101,6 +102,9 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
     window.scrollTo({ top: newVertPos, behavior: 'smooth' });
   };
 
+  /**
+   * Make panel visible (both internal and external function)
+   */
   showPanel = () => {
     this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
     this.shadowRoot.getElementById('panelCollapsedDivId').setAttribute('visible', '');
@@ -108,23 +112,29 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
     this._scrollToBottom();
   };
 
+  /**
+   * Collapse panel to bar (both internal and external function)
+   */
   collapsePanel = () => {
     if (this.shadowRoot.getElementById('panelVisibilityDivId').hasAttribute('visible')) {
       this.shadowRoot.getElementById('panelCollapsedDivId').removeAttribute('visible');
     }
   };
 
+  /**
+   * Hide this panel (both internal and external function)
+   */
   hidePanel = () => {
     this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible');
     this.shadowRoot.getElementById('panelCollapsedDivId').removeAttribute('visible');
   };
 
-  // -----------------------------------------------------------------------
-  // Channel windows are created dynamically and inserted into the DOM
-  // This is a channel message router to send message to matching channel`
-  // -----------------------------------------------------------------------
-  // :nick!~user@host.domain PRIVMSG #channel :This is channel text message.
-  // -----------------------------------------------------------------------
+  /**
+   * Accept IRC PRIVMSG channel message, parse for creation of new IRC channel,
+   * and if needed create channel-panel element and insert to DOM.
+   * If channel already exists, forward message to that channel web component.
+   * @param {Object} parsedMessage - Object containing IRC message
+   */
   displayChannelMessage = (parsedMessage) => {
     // console.log('manageChannelsPanel', JSON.stringify(parsedMessage, null, 2));
     const channelElements =
@@ -138,9 +148,10 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
     });
   }; // displayChannelMessage()
 
-  // -----------------------------------------------------
-  // Notice messages to IRC channel are handled here
-  // -----------------------------------------------------
+  /**
+   * Accept IRC NOTICE notice message and forward message to that channel web component.
+   * @param {Object} parsedMessage - Object containing IRC message
+   */
   displayChannelNoticeMessage = (parsedMessage) => {
     // console.log(JSON.stringify(parsedMessage));
 
@@ -217,8 +228,12 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
     }
   }; // _createChannelElement
 
-  // Event handler for button click to open new IRC channel
-  // windows and /JOIN the channel named on the button.
+  /**
+   * Event handler for button click to open new IRC channel
+   * Extract the channel name from button textContent
+   * Build /JOIN message and send to IRC server.
+   * @param {Object} event.target.id - Id of button element
+   */
   _handleChannelButtonClick = (event) => {
     const channelName = this.shadowRoot.getElementById(event.target.id).textContent;
     if (channelName.length > 0) {

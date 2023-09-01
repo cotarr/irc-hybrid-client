@@ -20,7 +20,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 // --------------------------------------------------------------------------------
-// Websocket Management
+//
+//    Websocket Management
+//
 // --------------------------------------------------------------------------------
 //
 //                     Web Server Authentication notes
@@ -40,6 +42,15 @@
 //
 // --------------------------------------------------------------------------------
 //
+// Public Methods
+//   showPanel()
+//   collapsePanel()
+//   hidePanel()
+//   firstWebSocketConnectOnPageLoad()
+//   webConnectHeaderBarIconHandler()
+//   onHeartbeatReceived()
+//
+
 // Panel Visibility
 //   HTML template: websocket-panel hidden by default at load
 //   Page Load: websocket-panel remains hidden during initial connect, spinner is going
@@ -90,7 +101,7 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
    * @fires web-connect-changed
    * @fires hide-all-panels
    */
-  updateWebsocketStatus = () => {
+  _updateWebsocketStatus = () => {
     if (!window.globals.webState.webConnected) {
       //
       // Disconnected
@@ -214,9 +225,9 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
       window.globals.webState.count.webConnect++;
       this.shadowRoot.getElementById('reconnectStatusDivId').textContent +=
         'Websocket opened successfully\n';
-      this.updateWebsocketStatus();
+      this._updateWebsocketStatus();
 
-      this.resetHeartbeatTimer();
+      this._resetHeartbeatTimer();
 
       // load state of IRC connection
       // returns Promise, log's own fetch errors
@@ -295,7 +306,7 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
           }
           window.globals.webState.webConnected = false;
           window.globals.webState.webConnecting = false;
-          this.updateWebsocketStatus();
+          this._updateWebsocketStatus();
         }
       }
     });
@@ -317,7 +328,7 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
       // showError('WebSocket error occurred.');
       window.globals.webState.webConnected = false;
       window.globals.webState.webConnecting = false;
-      this.updateWebsocketStatus();
+      this._updateWebsocketStatus();
     });
 
     // -----------------------------------------------------------------------------
@@ -532,7 +543,7 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
    * Function to manage re-connection of disconnected web socket
    * 1) Test /status, 2) Test /secure, 3) Call function to open socket
    */
-  re_connectWebSocketAfterDisconnect = () => {
+  _reConnectWebSocketAfterDisconnect = () => {
     this._testWebServerRunning()
       .then(() => {
         this.shadowRoot.getElementById('reconnectStatusDivId').textContent +=
@@ -564,7 +575,7 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
           'Error: authorizing websocket.\n';
         window.globals.webState.webConnected = false;
         window.globals.webState.webConnecting = false;
-        this.updateWebsocketStatus();
+        this._updateWebsocketStatus();
       });
   };
 
@@ -612,10 +623,10 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
     if ((!window.globals.webState.webConnected) && (!window.globals.webState.webConnecting)) {
       window.globals.webState.webConnectOn = true;
       window.globals.webState.webConnecting = true;
-      this.updateWebsocketStatus();
+      this._updateWebsocketStatus();
       this.shadowRoot.getElementById('reconnectStatusDivId').textContent +=
         'Reconnect to web server initiated (Manual)\n';
-      this.re_connectWebSocketAfterDisconnect();
+      this._reConnectWebSocketAfterDisconnect();
       return;
     }
     //
@@ -656,23 +667,23 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
     if (this.wsReconnectCounter === 0) {
       if (this.wsReconnectTimer > 0) {
         window.globals.webState.webConnecting = true;
-        this.updateWebsocketStatus();
+        this._updateWebsocketStatus();
         this.wsReconnectTimer = 0;
         this.wsReconnectCounter++;
         this.shadowRoot.getElementById('reconnectStatusDivId').textContent +=
           'Reconnect to web server initiated (Timer-1)\n';
-        this.re_connectWebSocketAfterDisconnect();
+        this._reConnectWebSocketAfterDisconnect();
       }
     } else if (this.wsReconnectCounter === 1) {
       // then second try in 5 seconds
       if (this.wsReconnectTimer > 5) {
         window.globals.webState.webConnecting = true;
-        this.updateWebsocketStatus();
+        this._updateWebsocketStatus();
         this.wsReconnectTimer = 0;
         this.wsReconnectCounter++;
         this.shadowRoot.getElementById('reconnectStatusDivId').textContent +=
           'Reconnect to web server initiated (Timer-2)\n';
-        this.re_connectWebSocketAfterDisconnect();
+        this._reConnectWebSocketAfterDisconnect();
       }
     } else if (this.wsReconnectCounter > 10) {
       // Stop at the limit
@@ -686,12 +697,12 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
     } else {
       if (this.wsReconnectTimer > 15) {
         window.globals.webState.webConnecting = true;
-        this.updateWebsocketStatus();
+        this._updateWebsocketStatus();
         this.wsReconnectTimer = 0;
         this.wsReconnectCounter++;
         this.shadowRoot.getElementById('reconnectStatusDivId').textContent +=
           'Reconnect to web server initiated (Timer-3)\n';
-        this.re_connectWebSocketAfterDisconnect();
+        this._reConnectWebSocketAfterDisconnect();
       }
     }
   };
@@ -708,7 +719,7 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
   /**
    * De-activate heartbeat timer when not connected
    */
-  resetHeartbeatTimer = () => {
+  _resetHeartbeatTimer = () => {
     this.heartbeatUpCounter = 0;
   };
 
@@ -722,7 +733,7 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
   /**
    * Websocket watchdog timer
    */
-  heartbeatTimerTickHandler = () => {
+  _heartbeatTimerTickHandler = () => {
     // console.log('tick');
     //
     // Case 1, socket still connected, but HEARTBEAT stopped
@@ -740,7 +751,7 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
           'Web socket connection timeout, socket unresponsive, force disconnect\n';
         window.globals.webState.webConnected = false;
         window.globals.webState.webConnecting = false;
-        this.updateWebsocketStatus();
+        this._updateWebsocketStatus();
         // TODO (removed channels) setVariablesShowingIRCDisconnected();
       } else if (this.heartbeatUpCounter === this.heartbeatExpirationTimeSeconds) {
         console.log('HEARTBEAT timeout + 0 seconds , attempting to closing socket');
@@ -759,7 +770,7 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
    */
   timerTickHandler = () => {
     this._reconnectTimerTickHandler();
-    this.heartbeatTimerTickHandler();
+    this._heartbeatTimerTickHandler();
   };
 
   initializePlugin () {
@@ -778,10 +789,10 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
         if ((!window.globals.webState.webConnected) && (!window.globals.webState.webConnecting)) {
           window.globals.webState.webConnectOn = true;
           window.globals.webState.webConnecting = true;
-          this.updateWebsocketStatus();
+          this._updateWebsocketStatus();
           this.shadowRoot.getElementById('reconnectStatusDivId').textContent +=
             'Reconnect to web server initiated (Manual)\n';
-          this.re_connectWebSocketAfterDisconnect();
+          this._reConnectWebSocketAfterDisconnect();
         }
       });
 
@@ -793,7 +804,7 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
         if (!window.globals.webState.webConnected) {
           window.globals.webState.webConnectOn = false;
           window.globals.webState.webConnecting = false;
-          this.updateWebsocketStatus();
+          this._updateWebsocketStatus();
           this.shadowRoot.getElementById('reconnectStatusDivId').textContent =
             'Reconnect disabled\n';
         }

@@ -21,8 +21,9 @@
 // SOFTWARE.
 // ------------------------------------------------------------------------------
 //
-// This web component performs a network fetch request to /userinfo
+//    This web component performs a network fetch request to /userinfo
 //
+// ------------------------------------------------------------------------------
 // Example response object:
 //
 //   user {
@@ -31,10 +32,16 @@
 //     "userid": 1
 //   }
 //
+// Public methods:
+//   getLoginInfo()
 //
 // ------------------------------------------------------------------------------
 'use strict';
 window.customElements.define('user-info', class extends HTMLElement {
+  /**
+   * Fetch user login info from server to update user's info on page.
+   * @returns {promise} Resolves to user object or reject error
+   */
   getLoginInfo = () => {
     return new Promise((resolve, reject) => {
       const fetchController = new AbortController();
