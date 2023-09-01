@@ -650,7 +650,6 @@ window.customElements.define('irc-server-panel', class extends HTMLElement {
     // then display incoming message activity icon
     const now = Math.floor(Date.now() / 1000);
     const ircConnectTime = now - window.globals.ircState.times.ircConnect;
-    console.log('ircConnecTTime', ircConnectTime);
     if ((ircConnectTime > 5) &&
       (document.activeElement !== document.getElementById('ircServerPanel')) &&
       (!window.globals.webState.cacheReloadInProgress)) {
@@ -932,7 +931,6 @@ window.customElements.define('irc-server-panel', class extends HTMLElement {
         this.shadowRoot.getElementById('programVersionDiv').textContent =
           ' version-' + window.globals.ircState.progVersion;
         // Irc state changed, clean activity icons
-        console.log('changed state');
         setTimeout(() => {
           document.getElementById('headerBar').removeAttribute('servericon');
           document.getElementById('navMenu').handleServerUnreadUpdate(false);

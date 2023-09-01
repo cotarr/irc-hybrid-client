@@ -153,9 +153,11 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     this.unreadMessageCount = 0;
     this.lastAutoCompleteMatch = '';
 
-    // Default values
+    // sized for iPhone screen
     this.mobileBreakpointPx = 600;
-    this.defaultHeightInRows = '14';
+    this.textareaHeightInRows = '15';
+    // decrease verticalZoomMarginPixels to make zoomed panel vertically taller
+    this.verticalZoomMarginPixels = 135;
     this.channelNamesCharWidth = 20;
   }
 
@@ -430,9 +432,9 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('panelDivId')
       .setAttribute('lastDate', '0000-00-00');
     this.shadowRoot.getElementById('panelNickListId')
-      .setAttribute('rows', this.defaultHeightInRows);
+      .setAttribute('rows', this.textareaHeightInRows);
     this.shadowRoot.getElementById('panelMessageDisplayId')
-      .setAttribute('rows', this.defaultHeightInRows);
+      .setAttribute('rows', this.textareaHeightInRows);
     this.shadowRoot.getElementById('panelMessageInputId')
       .setAttribute('rows', '1');
   };
@@ -453,9 +455,9 @@ window.customElements.define('channel-panel', class extends HTMLElement {
    */
   _handleNormalButton = () => {
     this.shadowRoot.getElementById('panelNickListId')
-      .setAttribute('rows', this.defaultHeightInRows);
+      .setAttribute('rows', this.textareaHeightInRows);
     this.shadowRoot.getElementById('panelMessageDisplayId')
-      .setAttribute('rows', this.defaultHeightInRows);
+      .setAttribute('rows', this.textareaHeightInRows);
     this.shadowRoot.getElementById('panelMessageInputId').setAttribute('rows', '1');
   };
 
@@ -677,6 +679,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     const headerBarEl = document.getElementById('headerBar');
     const zoomButtonEl = this.shadowRoot.getElementById('zoomButtonId');
     const bottomCollapseDivEl = this.shadowRoot.getElementById('bottomCollapseDivId');
+    const channelTopicDivEl = this.shadowRoot.getElementById('channelTopicDivId');
     if ((bodyEl.hasAttribute('zoomId')) &&
       (bodyEl.getAttribute('zoomId') === 'channel:' + this.channelName.toLowerCase())) {
       // Turn off channel zoom
@@ -685,6 +688,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       zoomButtonEl.textContent = 'Zoom';
       zoomButtonEl.classList.remove('channel-panel-zoomed');
       // reset screen size back to default
+      channelTopicDivEl.removeAttribute('hidden');
       bottomCollapseDivEl.setAttribute('hidden', '');
       this._handleNormalButton();
       this._handleResizeCustomElements();
@@ -698,6 +702,8 @@ window.customElements.define('channel-panel', class extends HTMLElement {
           except: ['channel:' + this.channelName.toLowerCase()]
         }
       }));
+      // hide channel topic
+      channelTopicDivEl.setAttribute('hidden', '');
       // Hide stuff below the input bar.
       bottomCollapseDivEl.setAttribute('hidden', '');
       // This sets size for zoomed page
@@ -713,6 +719,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     const headerBarEl = document.getElementById('headerBar');
     const zoomButtonEl = this.shadowRoot.getElementById('zoomButtonId');
     const bottomCollapseDivEl = this.shadowRoot.getElementById('bottomCollapseDivId');
+    const channelTopicDivEl = this.shadowRoot.getElementById('channelTopicDivId');
     if ((bodyEl.hasAttribute('zoomId')) &&
       (bodyEl.getAttribute('zoomId') === 'channel:' + this.channelName.toLowerCase())) {
       // Turn off channel zoom
@@ -721,6 +728,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       zoomButtonEl.textContent = 'Zoom';
       zoomButtonEl.classList.remove('channel-panel-zoomed');
       // reset screen size back to default
+      channelTopicDivEl.removeAttribute('hidden');
       bottomCollapseDivEl.setAttribute('hidden', '');
       this._handleNormalButton();
       this._handleResizeCustomElements();
@@ -1660,12 +1668,6 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       const panelNickListEl = this.shadowRoot.getElementById('panelNickListId');
       const panelMessageDisplayEl = this.shadowRoot.getElementById('panelMessageDisplayId');
 
-      // ------------------------------------------
-      // Adjustable....
-      // Decrease to make channel panel taller
-      // ------------------------------------------
-      const marginPxHeight = 135;
-
       // If page measurements have already been done
       if ((window.globals.webState.dynamic.textAreaRowPxHeight) &&
         (typeof window.globals.webState.dynamic.textAreaRowPxHeight === 'number') &&
@@ -1679,7 +1681,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
         //
         let rows = (window.globals.webState.dynamic.panelPxHeight -
             window.globals.webState.dynamic.textareaPaddingPxHeight -
-            marginPxHeight);
+            this.verticalZoomMarginPixels);
         rows = parseInt(rows / window.globals.webState.dynamic.textAreaRowPxHeight);
 
         if (window.globals.webState.dynamic.panelPxWidth > this.mobileBreakpointPx) {
@@ -1865,6 +1867,9 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       } else {
         this.shadowRoot.getElementById('notInChanneldIconId').removeAttribute('hidden');
       }
+      this.shadowRoot.getElementById('channelTopicDivId').textContent =
+        document.getElementById('displayUtils')
+          .cleanFormatting(window.globals.ircState.channelStates[this.channelIndex].topic);
       // state object includes up to date list of nicks in a channel
       this._updateNickList();
       // Update title string to include some data
@@ -2025,10 +2030,10 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('panelNickListId').setAttribute('cols',
       this.channelNamesCharWidth.toString());
     this.shadowRoot.getElementById('panelNickListId')
-      .setAttribute('rows', this.defaultHeightInRows);
+      .setAttribute('rows', this.textareaHeightInRows);
 
     this.shadowRoot.getElementById('panelMessageDisplayId')
-      .setAttribute('rows', this.defaultHeightInRows);
+      .setAttribute('rows', this.textareaHeightInRows);
 
     // inhibit timer to prevent display of activity icon
     this.activityIconInhibitTimer = 0;

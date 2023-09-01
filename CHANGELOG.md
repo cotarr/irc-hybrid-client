@@ -10,6 +10,13 @@ and this project adheres to
 
 Work in progress, see top of README.md
 
+Commit
+
+- Adjusted zoom and un-zooomed dynamic screen size to better fit iPhone screen.
+- Fixed Channel topic not updating when changed.
+
+Commit fbf5ea8
+
 - Fixed server-list-panel connect button used wrong nickname from other panel.
 - More debugging and adjustment unread message activity icons
 
