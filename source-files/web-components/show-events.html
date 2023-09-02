@@ -1,0 +1,28 @@
+
+<!-- show-events -->
+
+<template id='showEventsTemplate'>
+  <link rel="stylesheet" href="css/styles.css">
+  <div id="panelVisibilityDivId" class="global-visibility-div">
+    <div id="panelDivId" class="global-panel-style-div show-events-theme-dark">
+      <div class='global-head-flex'>
+        <div class="global-head-left">
+          <button id="closePanelButtonId" title="Hide Panel" class="global-show-hide-button mr5">x</button>
+          <span id="titleDivId">Display global javascript browser events</span>
+        </div>
+        <div class="global-head-center">
+        </div>
+        <div class="global-head-right">
+          <button id="startButtonId">Start Global Event Log</button>
+        </div>
+      </div>
+      <div>
+        <textarea id="panelMessageDisplayId" class="global-text-theme-dark" cols="84" rows="24" spellcheck="false" readonly="readonly"></textarea>
+      </div>
+      <div>
+        It is necessary to refresh the page in the browser to cancel the global event log.
+      </div>
+      <div class="vh10"></div>
+    </div>
+  </div>
+</template>

@@ -878,7 +878,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     this._updateVisibility();
 
     // this forces a global update which will refresh text area
-    document.dispatchEvent(new CustomEvent('update-from-cache', { bubbles: true }));
+    document.dispatchEvent(new CustomEvent('update-from-cache'));
   };
 
   /**
@@ -2052,7 +2052,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     // If other windows are opening concurrently,
     // this event will debounce them over 1 second delay.
     document.dispatchEvent(
-      new CustomEvent('debounced-update-from-cache', { bubbles: true }));
+      new CustomEvent('debounced-update-from-cache'));
 
     // Upon creation of new channel element panel, set the color theme
     this._handleColorThemeChanged(

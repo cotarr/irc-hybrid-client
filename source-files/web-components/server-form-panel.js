@@ -218,6 +218,24 @@ window.customElements.define('server-form-panel', class extends HTMLElement {
   };
 
   /**
+   * Update form to show if Socks5 proxy is enabled, if so show address
+   */
+  _showSocks5ProxyAvailability = () => {
+    // Show availability of Socks5 proxy
+    if (window.globals.ircState.enableSocks5Proxy) {
+      this.shadowRoot.getElementById('ircProxyEnabledDivId').textContent =
+        'Socks5 Proxy: Available';
+      this.shadowRoot.getElementById('ircProxyAddrDivId').textContent =
+        window.globals.ircState.socks5Host + ':' +
+        window.globals.ircState.socks5Port;
+    } else {
+      this.shadowRoot.getElementById('ircProxyEnabledDivId').textContent =
+        'Socks5 Proxy: Disabled by server';
+      this.shadowRoot.getElementById('ircProxyAddrDivId').textContent = '';
+    }
+  }; // _showSocks5ProxyAvailability
+
+  /**
    * Set form input elements to default values
    * @returns (Promise) Resolving to null
    */
@@ -231,6 +249,7 @@ window.customElements.define('server-form-panel', class extends HTMLElement {
       this.shadowRoot.getElementById('portInputId').value = 6697;
       this.shadowRoot.getElementById('tlsCheckboxId').checked = true;
       this.shadowRoot.getElementById('verifyCheckboxId').checked = true;
+      this._showSocks5ProxyAvailability();
       this.shadowRoot.getElementById('proxyCheckboxId').checked = false;
       this.shadowRoot.getElementById('autoReconnectCheckboxId').checked = false;
       this.shadowRoot.getElementById('loggingCheckboxId').checked = false;
@@ -441,17 +460,7 @@ window.customElements.define('server-form-panel', class extends HTMLElement {
       this.shadowRoot.getElementById('channelListInputId').value = data.channelList;
 
       // Show availability of Socks5 proxy
-      if (window.globals.ircState.enableSocks5Proxy) {
-        this.shadowRoot.getElementById('ircProxyEnabledDivId').textContent =
-          'Socks5 Proxy: Available';
-        this.shadowRoot.getElementById('ircProxyAddrDivId').textContent =
-          window.globals.ircState.socks5Host + ':' +
-          window.globals.ircState.socks5Port;
-      } else {
-        this.shadowRoot.getElementById('ircProxyEnabledDivId').textContent =
-          'Socks5 Proxy: Disabled by server';
-        this.shadowRoot.getElementById('ircProxyAddrDivId').textContent = '';
-      }
+      this._showSocks5ProxyAvailability();
       resolve(data);
     });
   };
@@ -611,6 +620,13 @@ window.customElements.define('server-form-panel', class extends HTMLElement {
    * Event handle for form Save button (New Record)
    */
   _saveNewButtonHandler = () => {
+    const ircControlsPanelEl = document.getElementById('ircControlsPanel');
+    const errorPanelEl = document.getElementById('errorPanel');
+    // Calling submitServer() will reset the selected index to 0
+    let previousSelectedIndex = window.globals.ircState.ircServerIndex;
+    // Case of no servers exist, then index -1 should be changed to 0
+    if (previousSelectedIndex === -1) previousSelectedIndex = 0;
+
     this._parseFormInputValues()
       // .then((data) => {
       //   console.log(JSON.stringify(data, null, 2));
@@ -618,13 +634,17 @@ window.customElements.define('server-form-panel', class extends HTMLElement {
       // })
       .then((data) => this.submitServer(data.data, 'POST', -1))
       .then((data) => this.checkForApiError(data))
+      .then(() => ircControlsPanelEl.serverSetIndexHandler(previousSelectedIndex))
       .then((data) => {
-        // TODO dispatch event for edit done, or call method on panel
-        window.globals.webState.ircServerEditOpen = false;
-        this.hidePanel();
-        // To update channel preset buttons
-        window.globals.webState.ircServerModified = true;
-        // console.log('Created new server at index ' + data.index.toString());
+        if (('index' in data) && (parseInt(data.index) === previousSelectedIndex)) {
+          window.globals.webState.ircServerEditOpen = false;
+          this.hidePanel();
+          // To update channel preset buttons
+          window.globals.webState.ircServerModified = true;
+          // End of promise chain, return
+        } else {
+          return Promise.reject(new Error('Unable to restore server index after edit'));
+        }
       })
       .catch((err) => {
         console.log(err);
@@ -642,7 +662,7 @@ window.customElements.define('server-form-panel', class extends HTMLElement {
             this.shadowRoot.getElementById('saveModifiedButtonId2').setAttribute('hidden', '');
           }
         }
-        document.getElementById('errorPanel').showError(message);
+        errorPanelEl.showError(message);
         // on error leave panel open
       });
   };
@@ -651,20 +671,28 @@ window.customElements.define('server-form-panel', class extends HTMLElement {
    * Event handler for browser Save button (Modified record)
    */
   _saveModifiedButtonHandler = () => {
+    const ircControlsPanelEl = document.getElementById('ircControlsPanel');
+    const errorPanelEl = document.getElementById('errorPanel');
+    // Calling submitServer() will reset the selected index to 0
+    const previousSelectedIndex = window.globals.ircState.ircServerIndex;
     this._parseFormInputValues()
-      .then((data) => {
-        // console.log(JSON.stringify(data, null, 2));
-        return Promise.resolve(data);
-      })
+      // .then((data) => {
+      //   console.log(JSON.stringify(data, null, 2));
+      //   return Promise.resolve(data);
+      // })
       .then((data) => this.submitServer(data.data, 'PATCH', data.index))
       .then((data) => this.checkForApiError(data))
+      .then(() => ircControlsPanelEl.serverSetIndexHandler(previousSelectedIndex))
       .then((data) => {
-        // TODO dispatch event for edit done, or call method on panel
-        window.globals.webState.ircServerEditOpen = false;
-        this.hidePanel();
-        // To update channel preset buttons
-        window.globals.webState.ircServerModified = true;
-        // console.log('Saved modified server at index ' + data.index.toString());
+        if (('index' in data) && (parseInt(data.index) === previousSelectedIndex)) {
+          window.globals.webState.ircServerEditOpen = false;
+          this.hidePanel();
+          // To update channel preset buttons
+          window.globals.webState.ircServerModified = true;
+          // End of promise chain, return
+        } else {
+          return Promise.reject(new Error('Unable to restore server index after edit'));
+        }
       })
       .catch((err) => {
         console.log(err);
@@ -682,7 +710,7 @@ window.customElements.define('server-form-panel', class extends HTMLElement {
             this.shadowRoot.getElementById('saveModifiedButtonId2').setAttribute('hidden', '');
           }
         }
-        document.getElementById('errorPanel').showError(message);
+        errorPanelEl.showError(message);
         // on error leave panel open
       });
   };

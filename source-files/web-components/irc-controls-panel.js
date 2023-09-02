@@ -272,6 +272,7 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
    */
   sendIrcServerMessageHandler = (message) => {
     return new Promise((resolve, reject) => {
+      // argument 3 requires web, IRC, and Registered
       if (!this._checkConnect(3)) resolve(null);
       const fetchController = new AbortController();
       const fetchTimeout = document.getElementById('globVars').constants('fetchTimeout');
@@ -442,6 +443,7 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
     }
     return new Promise((resolve, reject) => {
       // Are we connected to web server?
+      // 1 is require websocket connected, but IRC and registered not checked.
       if (!this._checkConnect(1)) return;
       // Is web server already connected to IRC?
       if ((window.globals.ircState.ircConnected) ||

@@ -54,12 +54,12 @@ window.customElements.define('display-utils', class extends HTMLElement {
       document.querySelector('body').setAttribute('theme', 'dark');
       window.localStorage.setItem('colorTheme', JSON.stringify({ theme: 'dark' }));
       document.dispatchEvent(new CustomEvent('color-theme-changed',
-        { bubbles: true, detail: { theme: 'dark' } }));
+        { detail: { theme: 'dark' } }));
     } else {
       document.querySelector('body').setAttribute('theme', 'light');
       window.localStorage.setItem('colorTheme', JSON.stringify({ theme: 'light' }));
       document.dispatchEvent(new CustomEvent('color-theme-changed',
-        { bubbles: true, detail: { theme: 'light' } }));
+        { detail: { theme: 'light' } }));
     }
   };
 
@@ -613,7 +613,6 @@ window.customElements.define('display-utils', class extends HTMLElement {
     // Resize textarea elements
     document.dispatchEvent(new CustomEvent('resize-custom-elements',
       {
-        bubbles: true,
         detail: {
         }
       }
@@ -627,12 +626,12 @@ window.customElements.define('display-utils', class extends HTMLElement {
     if ((localStorageColorTheme) && (localStorageColorTheme.theme === 'dark')) {
       document.querySelector('body').setAttribute('theme', 'dark');
       document.dispatchEvent(new CustomEvent('color-theme-changed',
-        { bubbles: true, detail: { theme: 'dark' } }));
+        { detail: { theme: 'dark' } }));
     }
     if ((localStorageColorTheme) && (localStorageColorTheme.theme === 'light')) {
       document.querySelector('body').setAttribute('theme', 'light');
       document.dispatchEvent(new CustomEvent('color-theme-changed',
-        { bubbles: true, detail: { theme: 'light' } }));
+        { detail: { theme: 'light' } }));
     }
 
     //

@@ -84,46 +84,6 @@ window.customElements.define('debug-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('debugResponsePreId').textContent = '';
   };
 
-  //
-  // Console.log global events
-  //
-  _consoleLogGlobalEvents = () => {
-    if (!this.loggingGlobalEvents) {
-      this.loggingGlobalEvents = true;
-      const eventList = [
-        'cache-reload-done',
-        'cache-reload-error',
-        'cancel-beep-sounds',
-        'cancel-zoom',
-        'collapse-all-panels',
-        'color-theme-changed',
-        'debounced-update-from-cache',
-        'erase-before-reload',
-        'global-scroll-to-top',
-        'hide-all-panels',
-        'irc-state-changed',
-        'irc-server-edit-open',
-        'resize-custom-elements',
-        'show-all-panels',
-        'update-channel-count',
-        'update-from-cache',
-        'web-connect-changed'
-      ];
-      console.log('Logging global events to console.log', JSON.stringify(eventList, null, 2));
-      eventList.forEach((eventTag) => {
-        document.addEventListener(eventTag, (event) => {
-          if ((event.detail) && (typeof event.detail === 'string')) {
-            console.log('Event: ' + eventTag + ' ' + event.detail);
-          } else if ((event.detail) && (typeof event.detail === 'object')) {
-            console.log('Event: ' + eventTag + ' ' + JSON.stringify(event.detail));
-          } else {
-            console.log('Event: ' + eventTag);
-          }
-        });
-      });
-    }
-  };
-
   _test1ButtonHandler = () => {
     // ---------------------------------
     console.log('Test1 button pressed.');
@@ -511,7 +471,9 @@ window.customElements.define('debug-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('button_3_3').addEventListener('click', () => {
       document.getElementById('showRaw').showPanel();
     });
-
+    this.shadowRoot.getElementById('button_3_4').addEventListener('click', () => {
+      document.getElementById('showEvents').showPanel();
+    });
     // --------------------
     //
     // --------------------
@@ -532,9 +494,6 @@ window.customElements.define('debug-panel', class extends HTMLElement {
 
     this.shadowRoot.getElementById('button_4_4').addEventListener('click', () => {
       document.dispatchEvent(new CustomEvent('web-connect-changed'));
-    });
-    this.shadowRoot.getElementById('button_4_5').addEventListener('click', () => {
-      this._consoleLogGlobalEvents();
     });
 
     // ----------------------------------

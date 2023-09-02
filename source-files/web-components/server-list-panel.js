@@ -172,14 +172,18 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
   };
 
   /**
+   * User selects IRC server from the server list.
    * Button Event Handler to service dynamically generated buttons in server list table
+   * Each button includes an index number attribute.
+   * A network fetch is performed to submit the intended index to the web server.
    * @param {Number} index - Integer index into IRC server Array
    */
   _selectServerButtonHandler = (event) => {
     // console.log(event.target.id, event.target.getAttribute('index'));
+    const ircControlsPanelEl = document.getElementById('ircControlsPanel');
+    const index = parseInt(event.target.getAttribute('index'));
     if ((!window.globals.ircState.ircConnected) && (!window.globals.ircState.ircConnecting)) {
-      const ircControlsPanelEl = document.getElementById('ircControlsPanel');
-      const index = parseInt(event.target.getAttribute('index'));
+      // call irc-controls-panel to issue network fetch request
       ircControlsPanelEl.serverSetIndexHandler(index)
         .then((data) => {
           if (('index' in data) && (parseInt(data.index) === index)) {
@@ -198,20 +202,31 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
   };
 
   /**
+   * User connects to the IRC network
    * Button Event Handler to service dynamically generated buttons in server list table
+   * This assumes the remote web server has already set the index number of the selected server.
+   * In the server list, it is assumed that only the selected server button is visible.
    * @param {Number} index - Integer index into IRC server Array
    */
   _connectToIrcButtonHandler = (event) => {
     // console.log(event.target.id, event.target.getAttribute('index'));
+    const ircControlsPanelEl = document.getElementById('ircControlsPanel');
+    const errorPanelEl = document.getElementById('errorPanel');
+    const index = parseInt(event.target.getAttribute('index'));
+
     if ((window.globals.ircState.ircConnected) || (window.globals.ircState.ircConnecting)) {
       document.getElementById('ircControlsPanel').disconnectHandler();
+    } else if (index !== window.globals.ircState.ircServerIndex) {
+      // Application supports multiple connections, make sure button index matches current selection
+      errorPanelEl.showError(
+        'Unable to connect because index number on button does not match selected server.');
     } else {
-      document.getElementById('ircControlsPanel').connectHandler()
+      ircControlsPanelEl.connectHandler()
         .catch((err) => {
           console.log(err);
           let message = err.message || err.toString() || 'Error';
           message = message.split('\n')[0];
-          document.getElementById('errorPanel').showError(message);
+          errorPanelEl.showError(message);
         });
     }
   };
@@ -277,7 +292,7 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
    * @param {Number} index - Integer index into IRC server Array
    */
   _moveUpInListButtonHandler = (event) => {
-    console.log(event.target.id, event.target.getAttribute('index'));
+    // console.log(event.target.id, event.target.getAttribute('index'));
     const serverFormPanelEl = document.getElementById('serverFormPanel');
     const index = parseInt(event.target.getAttribute('index'));
     serverFormPanelEl.submitServer({ index: index, action: 'move-up' }, 'POST', index)
@@ -356,7 +371,14 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
       const full = this.fullWidth;
       const mobile = this.mobileWidth;
       const edit = this.editable && !this.fullWidth && !this.mobileWidth;
-      // Case of editor is open, hide all buttons
+
+      // Show/hide warning about possible changes in selected server
+      if ((!full) && (!mobile) && (!window.globals.ircState.ircConnected)) {
+        this.shadowRoot.getElementById('serverIndexChangeInfoDivId').removeAttribute('hidden');
+      } else {
+        this.shadowRoot.getElementById('serverIndexChangeInfoDivId').setAttribute('hidden', '');
+      }
+
       //
       // dynamically build array of column headings for the server list
       //

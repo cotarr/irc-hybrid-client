@@ -63,7 +63,7 @@ customElements.define('nav-menu', class extends HTMLElement {
     // Make sure dropdown menu is visible by scrolling to the top when opening menu
     // if (this.shadowRoot.getElementById('navDropdownDivId').classList.contains(
     //   'nav-dropdown-div-show')) {
-    //   document.dispatchEvent(new CustomEvent('global-scroll-to-top', { bubbles: true }));
+    //   document.dispatchEvent(new CustomEvent('global-scroll-to-top'));
     // }
   };
 

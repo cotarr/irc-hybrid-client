@@ -10,6 +10,55 @@ and this project adheres to
 
 Work in progress, see top of README.md
 
+Commit
+
+Issue:
+
+When using the irc-controls-panel as the screen panel from which to connect to IRC,
+there is a button for Edit Selected Server. If this is used, and the edit is successfully 
+saved, then the 'selected' server will revert to index 0. This could cause a user to connect to the 
+wrong server after an edit, if the change in selection is not noticed in the panel.
+
+This behavior is controlled in the backend web server. In the previous version, the 
+server list editor was an independent web page (serverlist.html). Changes to the
+server list required disconnect from IRC, exit the IRC client page, and navigation to a different editing page.
+Upon re-open of the IRC client page, the user was required to select a server before connecting.
+
+At a higher level this is actually a desired behavior because changes to the list 
+can involve deleting, inserting, and re-ordering the list of servers.
+After an edit, a given server server may be at a different index than before the edit.
+Although this could be solved with complex logic in the backend, such a change would create a breaking
+change for anyone using the backend with alternate HTML frontend browser.
+
+The problem is compounded because a user can have multiple browsers connected simultaneously, 
+like desktop, tablet, and smartphone. Each of these concurrent connections can 
+display simultaneously the irc-controls-panel, server-list-panel, and the server-form-panel.
+
+Solution:
+
+For the case where a given IRC server is edited, which does not reorder the list, the selected index number
+is saved before edit and restored after the edit by code in the browser in the server-form-panel web component. 
+An edit workflow would be as follows:
+
+- Server form opens in edit mode, the previous selected index number is saved.
+- User enters changes and then presses the SAVE button
+- Changes are submitted to the backend database and the selected server index is reverted to 0
+- Upon successful HTTP response from the POST request, a second POST request is sent to select the previous server index number.
+- When the backend changes the selection index number, the backend sends a "UPDATE" command to all connected browsers.
+- Each browser performs getIrcState() call and then updates all browsers to the correct index number.
+- The server-list-panel highlights the proper server in the list as 'selected'
+- The irc-controls-panel change the panel content to show the selected server.
+
+To address changes on the server-list-panel that could change the order of the server list, such as Delete,
+a text warning was added to the panel below the server table. Such a change can not be initiated from any other panels.
+
+Other change:
+
+- Added check to server list Connect button handler to make sure the index encoded as attribute of the button matches currently selected index.
+- A new web component 'show-events' was added selectable from the debug panel to display global javascript events as they occur. (needed for debugging)
+
+Commit 7151bde
+
 - Add Socks5 Proxy address info to irc-controls-panel, server-list-panel and server-form-panel.
 - Split help-panel into 2 panel, help-panel and license-panel
 - Improvements to debug panel

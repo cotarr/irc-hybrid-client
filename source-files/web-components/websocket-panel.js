@@ -242,7 +242,7 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
             document.getElementById('activitySpinner').cancelActivitySpinner();
           }
           // panels will update new contents from cache
-          document.dispatchEvent(new CustomEvent('update-from-cache', { bubbles: true }));
+          document.dispatchEvent(new CustomEvent('update-from-cache'));
         })
         .catch((err) => {
           console.log(err);

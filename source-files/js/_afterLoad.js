@@ -81,7 +81,7 @@ if (!(window.customElements && document.body.attachShadow)) {
    */
   window.addEventListener('resize', (event) => {
     document.getElementById('displayUtils').handleExternalWindowResizeEvent(event);
-    document.dispatchEvent(new CustomEvent('resize-custom-elements', { bubbles: true }));
+    document.dispatchEvent(new CustomEvent('resize-custom-elements'));
   });
 
   /**
