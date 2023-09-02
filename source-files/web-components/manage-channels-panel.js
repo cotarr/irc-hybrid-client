@@ -54,7 +54,8 @@
 //
 // Any getIrcState() response with ircState.ircConnected, check ircFirstConnect flag
 //   if (ircFirstConnect === true) and (webState.ircConnected)
-//      then show manage-channels-panel, clear flag ircFirstConnect
+//      Check if an IRC auto-reconnect is in progress
+//      if not, then then show manage-channels-panel, clear flags
 //
 // Events;
 //   ircState.ircConnected true to false:  set flag ircFirstConnect=true
@@ -80,6 +81,7 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
     this.lastIrcServerIndex = -1;
     this.ircConnectedLast = false;
     this.ircFirstConnect = true;
+    this.ircReconnectActivatedFlag = false;
     this.ircChannelsPendingJoin = [];
   }
 
@@ -116,7 +118,11 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
    * Collapse panel to bar (both internal and external function)
    */
   collapsePanel = () => {
-    if (this.shadowRoot.getElementById('panelVisibilityDivId').hasAttribute('visible')) {
+    if (window.globals.ircState.channels.length === 0) {
+      this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
+      this.shadowRoot.getElementById('panelCollapsedDivId').removeAttribute('visible');
+    } else {
+      this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible');
       this.shadowRoot.getElementById('panelCollapsedDivId').removeAttribute('visible');
     }
   };
@@ -393,42 +399,77 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
      */
     document.addEventListener('irc-state-changed', () => {
       // console.log('Event irc-state-changed - global - checking for channel updates');
-      // console.log('connected ', window.globals.ircState.ircConnected);
+
+      console.log('ircState: ',
+        window.globals.ircState.ircConnectOn,
+        window.globals.ircState.ircConnected,
+        window.globals.ircState.ircConnecting,
+        window.globals.ircState.ircAutoReconnect,
+        window.globals.ircState.channels.length,
+        this.ircReconnectActivatedFlag);
+
       // console.log(JSON.stringify(window.globals.ircState.channels));
       // console.log(JSON.stringify(window.globals.webState.channels));
 
       if (window.globals.ircState.ircConnected) {
         if (this.ircFirstConnect) {
           this.ircFirstConnect = false;
+          // If  channels exist, leave panel hidden, else...
           if (window.globals.ircState.channels.length === 0) {
-            this.showPanel();
-            // ----------------------------
-            // Special case, using timer (work around)
-            //
-            // When connecting to IRC server for the first time
-            // both the ircServerPanel and the manageChannelsPanel
-            // will be visible.
-            //
-            // The goal is to show some of the IRC server MOTD at the top
-            // with the channel JOIN panel at the bottom.
-            //
-            // The issue is multiple cache reloads trying to scroll the screen.
-            //
-            // Wait for double cache reload to complete using timer
-            // Then calculate vertical offset such that the
-            // bottom of the panel will align at the bottom of the viewport.
-            // Set timer then scroll so panel is at bottom of page view area.
-            //
-            // TODO optimize the time value experimentally
-            //
-            // ------------------------------
-            setTimeout(() => {
-              this._scrollToBottom();
-            }, 750);
-          }
+            if (this.ircReconnectActivatedFlag) {
+              // case of reconnect with previous channels
+              this.ircReconnectActivatedFlag = false;
+              // As channels create themselves after disconnect,
+              // this instruct them to open collapsed, instead of full panel
+              setTimeout(() => {
+                // TODO optimize time
+              }, 5000);
+            } else {
+              this.showPanel();
+              // ----------------------------
+              // Special case, using timer (work around)
+              //
+              // When connecting to IRC server for the first time
+              // both the ircServerPanel and the manageChannelsPanel
+              // will be visible.
+              //
+              // The goal is to show some of the IRC server MOTD at the top
+              // with the channel JOIN panel at the bottom.
+              //
+              // The issue is multiple cache reloads trying to scroll the screen.
+              //
+              // Wait for double cache reload to complete using timer
+              // Then calculate vertical offset such that the
+              // bottom of the panel will align at the bottom of the viewport.
+              // Set timer then scroll so panel is at bottom of page view area.
+              //
+              // TODO optimize the time value experimentally
+              //
+              // ------------------------------
+              setTimeout(() => {
+                this._scrollToBottom();
+              }, 750);
+            } // reconnect flag
+          } // no channels
+        } // first connect
+
+        // Case of special state, reconnect active
+        // Wait icon would be displayed.
+        if ((window.globals.ircState.ircAutoReconnect) &&
+        (window.globals.ircState.ircConnectOn) &&
+        (window.globals.ircState.ircConnected) &&
+        (!window.globals.ircState.ircConnecting) &&
+        (window.globals.ircState.channels.length > 0)) {
+          this.ircReconnectActivatedFlag = true;
         }
       } else {
+        // case of IRC not connected.
         this.ircFirstConnect = true;
+      } // not connected
+      // Case of both connected and not connected
+      if ((!window.globals.ircState.ircAutoReconnect) ||
+        (!window.globals.ircState.ircConnectOn)) {
+        this.ircReconnectActivatedFlag = false;
       }
 
       //

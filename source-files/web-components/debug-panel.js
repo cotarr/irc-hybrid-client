@@ -263,10 +263,11 @@ window.customElements.define('debug-panel', class extends HTMLElement {
   _test4ButtonHandler = () => {
     // ---------------------------------
     console.log('Test 3 button: expire heart beat timer');
-    const websocketPanelEl = document.getElementById('websocketPanel');
-    websocketPanelEl.heartbeatUpCounter =
-      websocketPanelEl.heartbeatExpirationTimeSeconds - 1;
-    // webState.webConnectOn = false;
+    setTimeout(() => {
+      const websocketPanelEl = document.getElementById('websocketPanel');
+      websocketPanelEl.heartbeatUpCounter =
+        websocketPanelEl.heartbeatExpirationTimeSeconds - 1;
+    }, 2000);
     // ---------------------------------
   }; // _test4ButtonHandler()
 
@@ -514,6 +515,8 @@ window.customElements.define('debug-panel', class extends HTMLElement {
     // --------------------
     this.shadowRoot.getElementById('button_6_1').addEventListener('click', () => {
       console.log('Adhoc Function is not defined (debug-panel)');
+      this.clearDebugResult();
+      this.appendDebugResult('Adhoc function not defined\n');
       // const el = document.getElementById('manageChannelsPanel');
       // const wTop = window.scrollY;
       // console.log('scrollY wTop', wTop);

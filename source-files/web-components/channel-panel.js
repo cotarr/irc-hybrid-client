@@ -81,10 +81,13 @@
 //   is added to the ircState.channels array.
 //   The web browser receives a getIrcState() response, detects the new array element
 //   and creates a new channel-panel web component dynamically.
-//   The issue is: there is no way to distinguish the difference between
-//   a browser page reload and a user issuing a JOIN command for a new channel.
+//   The issue is: there is no way to distinguish the difference between:
+//     1) User creates new channel
+//     2) Auto-reconnect IRC network
+//     3) Auto-reconnect websocket
+//     4) User refreshes web page.
 //
-//   To address this, when one of 3 things occur:
+//   To address this, when one of three events occur:...
 //      - local-command-parser detects a "/JOIN #channel"
 //      - manage-channels-panel user input channel name and press [Join] button
 //      - manage-channels-panel user clicks channel preset button
@@ -92,12 +95,13 @@
 //   located in the manage-channels-panel web component.
 //   When a new channel appears in webState.channels[] array, the
 //   ircChannelsPendingJoin array can be used to see if this is a newly joined
-//   channel verses a page refresh.
+//   channel
 //
 // Panel creation
 //   No channel-panel elements exist at page load, so hide/unhide is not relevant
 //   The channel-panel elements are inserted into the DOM dynamically by manage-channel-panel.
-//   When inserted, the HTML Template channel-panel visible by default
+//   When inserted, the HTML Template channel-panel hidden by default
+//   and the initializePlugin() function is called from manage-channels-panel.
 //
 // Panel removal from DOM,
 //   When the remote web server removes an IRC channel from the
@@ -107,31 +111,43 @@
 //   The user's request to prune a channel is an API call to the web server.
 //   There are no user local actions to remove channel panels.
 //
-// Event: cache-reload-done (initial display of panel)
-//   If the panel's channel is present in both webState.channels[]
-//   and manageChannelsPanel.ircChannelsPendingJoin[] array
-//   A showPanel() is called, and a time is started
-//   to scroll the page to the bottom of the viewport.
+//   Controlling visibility can occur in several ways
 //
-//   If the panel's channel is not present in ircChannelsPendingJoin[]
-//   then it is necessary to distinguish between connecting the browser
-//   to a web server that is already present in IRC channels,
-//   verses a routine cache reload triggered by other panels.
-//   This is done by checking the time since IRC connect.
-//   The IRC connect time in Unix seconds is sent by server.
-//   If the IRC connect time is less than 5 seconds,
-//   a collapsePanel() is called to show it as a collapsed bar.
-//   else there is no change to panel visibility
+//   Case 1 of 5 User Creates new IRC channel
 //
-// IRC incoming message events Events:
+//   The initializePlugin() function is called by manage-channels-panel.
+//   In the is case the channel name is present in the array of pending joins.
+//   The full panel is made visible.
+//
+//   Case 2 of 5 Auto-reconnect of the IRC network on the backend web server
+//
+//   The initializePlugin() function is called by manage-channels-panel.
+//   The channel name is not present in the array, so the
+//   channel-panel is made visible in collapsed mode.
+//
+//   Case 3 of 5 Auto-reconnect websocket
+//
+//   In the case of a web-socket disconnect, the all panels are temporarily
+//   hidden, but not destroyed. Therefore, initializePlugin is not called.
+//   Instead, a message cache reload occurs, and an event cache-reload-done is fired.
+//   In response to this, a flag used to detect websocket disconnect
+//   The cache-reload-done handler will make the channel panel visible in collapsed mode.
+//
+//   Case 4 of 5 User refreshes web page.
+//
+//   When a user reload the page and IRC is already connected and channels
+//   are already JOINed, a cache reload is needed.
+//   When the cache-reload-done event handler runs, it checks the
+//   time since the page was connected to the webserver
+//   If less than 5 seconds, the page is made visible in collapsed mode.
+//
+//   Case 5 of 5  IRC incoming PRIVMSG channel message events Events:
+//
 //   Condition: any panel not "zoom", not cache reload
 //    New user JOIN channel, then show channel-panel, scroll to bottom
 //    New NOTICE message to channel,then show channel-panel, scroll to bottom
 //    New PRIVMSG message to channel, then show channel-panel, scroll to bottom
-//
-// TODO
-//   When auto-reconnect is enabled, the remote web server will auto-reconnect
-//   to up to 5 channels. There is no visibility code to address this edge case.
+//    This also opens panel with other messages like JOIN
 //
 // Scroll: channel panel scrolls to bottom of viewport when showPanel() is called.
 //
@@ -153,12 +169,14 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     this.initIrcStateIndex = null;
     this.unreadMessageCount = 0;
     this.lastAutoCompleteMatch = '';
+    this.webConnectedLast = true;
+    this.webSocketFirstConnect = false;
 
     // sized for iPhone screen
     this.mobileBreakpointPx = 600;
     this.textareaHeightInRows = '15';
     // decrease verticalZoomMarginPixels to make zoomed panel vertically taller
-    this.verticalZoomMarginPixels = 135;
+    this.verticalZoomMarginPixels = 137;
     this.channelNamesCharWidth = 20;
   }
 
@@ -700,7 +718,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       zoomButtonEl.classList.add('channel-panel-zoomed');
       document.dispatchEvent(new CustomEvent('hide-all-panels', {
         detail: {
-          except: ['channel:' + this.channelName.toLowerCase()]
+          except: ['channel:' + this.channelName.toLowerCase(), 'debugPanel']
         }
       }));
       // hide channel topic
@@ -1424,6 +1442,10 @@ window.customElements.define('channel-panel', class extends HTMLElement {
               setTimeout(document.getElementById('beepSounds').playBeep2Sound, 250);
             }
           }
+          // -----------------------------------
+          // Case 5 of 5 - Incoming PRIVMSG
+          // -----------------------------------
+          // console.log('cache refresh - Websocket auto-reconnect (set visibility 5 of 5)');
           // If channel panel is closed, open it up receiving new message
           if ((!window.globals.webState.cacheReloadInProgress) &&
             (!document.querySelector('body').hasAttribute('zoomId'))) {
@@ -1544,7 +1566,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
    * @param {object} event.detail.timestamp - unix time in seconds
    */
   _handleCacheReloadDone = (event) => {
-    const manageChannelsPanelEl = document.getElementById('manageChannelsPanel');
+    // console.log('cache-reload-done fired');
     let markerString = '';
     let timestampString = '';
     if (('detail' in event) && ('timestamp' in event.detail)) {
@@ -1567,32 +1589,20 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('panelMessageDisplayId').scrollTop =
       this.shadowRoot.getElementById('panelMessageDisplayId').scrollHeight;
     //
-    // This set's initial channel-panel visibility and scroll
+    // This set's channel-panel visibility if needed after cache refresh
     //
-    // If this is a new request to create or join a channel by user request
-    // the panel should be shown in full size.
-    // If this is a browser reload, or first page visit when the remote web server
-    // is already present in IRC channels, the channels are shown as collapsed bars
-    //
-    const pendingJoinChannelIndex =
-      manageChannelsPanelEl.ircChannelsPendingJoin.indexOf(this.channelName.toLowerCase());
-    if (pendingJoinChannelIndex >= 0) {
-      manageChannelsPanelEl.ircChannelsPendingJoin.splice(pendingJoinChannelIndex, 1);
-      // This is redundant since HTML template has attribute visible by default
-      // but it adds clarity to understanding code to show it here compared to collapsePanel()
-      this.showPanel();
-      // The purpose of the time is to assure that when a user JOIN a channel
-      // for the first time, when the remote server subsequently adds the new
-      // channel to the ircState.channels[] array, the page new channel-panel
-      // scroll to a visible position. Other actions in the irc-server-panel
-      // could grab the initial scroll.
-      //
-      // TODO Optimize the time value experimentally
-      //
-      setTimeout(() => {
-        this._scrollToBottom();
-      }, 250);
+    if (this.webSocketFirstConnect) {
+      // -----------------------------------
+      // Case 3 of 5 - Auto-reconnect websocket
+      // -----------------------------------
+      // console.log('cache refresh - Websocket auto-reconnect (set visibility 3 of 5)');
+      this.webConnectedLast = false;
+      this.collapsePanel();
     } else {
+      // -----------------------------------
+      // Case 4 of 5 - User refreshes web page
+      // -----------------------------------
+      // console.log('cache refresh - User reload web page (set visibility 4 of 5)');
       const now = Math.floor(Date.now() / 1000);
       const websocketConnectTime = now - window.globals.webState.times.webConnect;
       if ((websocketConnectTime < 5) &&
@@ -1601,6 +1611,20 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       }
     }
   }; // _handleCacheReloadDone()
+
+  /**
+   * Set flags for case of browser disconnect web socket from backend web server
+   */
+  _handleWebConnectChanged = () => {
+    // Detect change in websocket connected state
+    if (window.globals.webState.webConnected !== this.webConnectedLast) {
+      this.webConnectedLast = window.globals.webState.webConnected;
+      if (!window.globals.webState.webConnected) {
+        // reset to have proper display based on ircConnected state
+        this.webSocketFirstConnect = true;
+      }
+    }
+  };
 
   /**
    * Event handler to show error in textarea
@@ -1618,7 +1642,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     }
     errorString += ' ' + document.getElementById('globVars').constants('cacheErrorString') + '\n\n';
     this.shadowRoot.getElementById('panelMessageDisplayId').value = errorString;
-  };
+  }; // _handleCacheReloadError()
 
   /**
    * Dynamically set textarea column attributes to fit window size
@@ -1816,6 +1840,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       document.removeEventListener('irc-state-changed', this._handleIrcStateChanged);
       document.removeEventListener('resize-custom-elements', this._handleResizeCustomElements);
       document.removeEventListener('show-all-panels', this._handleShowAllPanels);
+      document.removeEventListener('web-connect-changed', this._handleWebConnectChanged);
       /* eslint-enable max-len */
 
       //
@@ -1864,9 +1889,9 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       }
       // If left channel, show [Not in Channel] icon
       if (window.globals.ircState.channelStates[ircStateIndex].joined) {
-        this.shadowRoot.getElementById('notInChanneldIconId').setAttribute('hidden', '');
+        this.shadowRoot.getElementById('notInChannelIconId').setAttribute('hidden', '');
       } else {
-        this.shadowRoot.getElementById('notInChanneldIconId').removeAttribute('hidden');
+        this.shadowRoot.getElementById('notInChannelIconId').removeAttribute('hidden');
       }
       this.shadowRoot.getElementById('channelTopicDivId').textContent =
         document.getElementById('displayUtils')
@@ -1959,6 +1984,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
    * Called from js/_afterLoad.js after all panels are loaded.
    */
   initializePlugin = () => {
+    const manageChannelsPanelEl = document.getElementById('manageChannelsPanel');
     // if channel already exist abort
     if (window.globals.webState.channels.indexOf(this.channelName.toLowerCase()) >= 0) {
       throw new Error('createChannelEl: channel already exist');
@@ -2012,12 +2038,12 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     // If left channel, show [Not in Channel] icon
     const ircStateIndex = window.globals.ircState.channels.indexOf(this.channelName.toLowerCase());
     if (window.globals.ircState.channelStates[ircStateIndex].joined) {
-      this.shadowRoot.getElementById('notInChanneldIconId').setAttribute('hidden', '');
+      this.shadowRoot.getElementById('notInChannelIconId').setAttribute('hidden', '');
       this.shadowRoot.getElementById('joinButtonId').setAttribute('hidden', '');
       this.shadowRoot.getElementById('pruneButtonId').setAttribute('hidden', '');
       this.shadowRoot.getElementById('partButtonId').removeAttribute('hidden');
     } else {
-      this.shadowRoot.getElementById('notInChanneldIconId').removeAttribute('hidden');
+      this.shadowRoot.getElementById('notInChannelIconId').removeAttribute('hidden');
       this.shadowRoot.getElementById('joinButtonId').removeAttribute('hidden');
       this.shadowRoot.getElementById('pruneButtonId').removeAttribute('hidden');
       this.shadowRoot.getElementById('partButtonId').setAttribute('hidden', '');
@@ -2063,7 +2089,28 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       }
     );
 
+    const pendingJoinChannelIndex =
+    manageChannelsPanelEl.ircChannelsPendingJoin.indexOf(this.channelName.toLowerCase());
+    if (pendingJoinChannelIndex >= 0) {
+      manageChannelsPanelEl.ircChannelsPendingJoin.splice(pendingJoinChannelIndex, 1);
+      // -----------------------------------
+      // Case 1 of 5 - User creates new channel
+      // -----------------------------------
+      // console.log('init - User create channel (Visibility 1 of 5)');
+      this.showPanel();
+    } else {
+      // -----------------------------------
+      // Case 2 of 5 - IRC Auto-reconnect after IRC disconnect
+      // -----------------------------------
+      // console.log('init = Auto-reconnect IRC (Visibility 2 of 5');
+      this.collapsePanel();
+    }
+
     this._updateVisibility();
+
+    // Assume already connected to web socket unless it becomes disconnected
+    this.webConnectedLast = true;
+    this.webSocketFirstConnect = false;
 
     // Resize on creating channel window
     //
@@ -2124,6 +2171,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     document.addEventListener('irc-state-changed', this._handleIrcStateChanged);
     document.addEventListener('resize-custom-elements', this._handleResizeCustomElements);
     document.addEventListener('show-all-panels', this._handleShowAllPanels);
+    document.addEventListener('web-connect-changed', this._handleWebConnectChanged);
     /* eslint-enable max-len */
   };
 });

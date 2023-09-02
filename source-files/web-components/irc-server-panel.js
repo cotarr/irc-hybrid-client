@@ -936,6 +936,11 @@ window.customElements.define('irc-server-panel', class extends HTMLElement {
           document.getElementById('headerBar').removeAttribute('servericon');
           document.getElementById('navMenu').handleServerUnreadUpdate(false);
         }, 2000);
+        if (window.globals.ircState.ircConnected) {
+          setTimeout(() => {
+            this.hidePanel();
+          }, 3500);
+        }
       }
       if (!window.globals.ircState.ircConnected) {
         this.hidePanel();

@@ -1306,7 +1306,11 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
       // If this is first load of the page, open the panel.
       if (this.webSocketFirstConnect) {
         this.webSocketFirstConnect = false;
-        if (!window.globals.ircState.ircConnected) {
+        if (window.globals.ircState.ircConnected) {
+          // Upon web-socket re-connect while on IRC, show the panel in collapsed state
+          this.collapsePanel();
+        } else {
+          // Else first websocket, or re-connect, but not on IRC show panel to get 'connect' button
           this.showPanel();
           //
           // This is to handle a new installation of the server.

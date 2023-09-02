@@ -235,6 +235,10 @@ customElements.define('nav-menu', class extends HTMLElement {
           this.shadowRoot.getElementById(menuId).setAttribute('unavailable', '');
         });
       }
+      // collapse all items, else state corruption
+      this.arrayOfMenuElements.forEach((itemId) => {
+        itemId.setAttribute('collapsed', '');
+      });
     }
 
     // Channel list

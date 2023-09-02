@@ -10,7 +10,12 @@ and this project adheres to
 
 Work in progress, see top of README.md
 
-Commit
+- Fixed navigation dropdown menu corruption when IRC connect state changes with menu expanded.
+- Setup channel panel visibility from new channel, page refresh, websocket auto-reconnect, IRC auto-reconnect, incoming message
+- Setup manage-channel-panels to hide itself after page reload and auto-reconnect for case of no IRC channels are joined, else show it.
+- irc-server-panel will hide itself 3.5 seconds after a new connection to IRC network.
+
+Commit 874f59b
 
 Issue:
 
