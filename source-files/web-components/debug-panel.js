@@ -66,6 +66,24 @@ window.customElements.define('debug-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible');
   };
 
+  /**
+   * Add formatted text to the Debug Result panel
+   * Multi-line values should append \n
+   * @param {string} formattedText - Test for display
+   */
+  appendDebugResult = (formattedText) => {
+    this.shadowRoot.getElementById('debugResponseSectionId').removeAttribute('hidden');
+    this.shadowRoot.getElementById('debugResponsePreId').textContent += formattedText;
+  };
+
+  /**
+   * Erase Debug Result area
+   */
+  clearDebugResult = () => {
+    this.shadowRoot.getElementById('debugResponseSectionId').setAttribute('hidden', '');
+    this.shadowRoot.getElementById('debugResponsePreId').textContent = '';
+  };
+
   //
   // Console.log global events
   //
@@ -109,6 +127,7 @@ window.customElements.define('debug-panel', class extends HTMLElement {
   _test1ButtonHandler = () => {
     // ---------------------------------
     console.log('Test1 button pressed.');
+    this.appendDebugResult('Memory Usage\nNodeJs garbage collect response\n');
     const fetchController = new AbortController();
     const fetchOptions = {
       method: 'GET',
@@ -137,6 +156,7 @@ window.customElements.define('debug-panel', class extends HTMLElement {
         }
       })
       .then((responseJson) => {
+        this.appendDebugResult(JSON.stringify(responseJson, null, 2));
         console.log(JSON.stringify(responseJson, null, 2));
         if (fetchTimerId) clearTimeout(fetchTimerId);
         if (responseJson.error) {
@@ -224,7 +244,9 @@ window.customElements.define('debug-panel', class extends HTMLElement {
 
   _test3ButtonHandler = () => {
     // ---------------------------------
+    this.clearDebugResult();
     console.log('Test3 button pressed.');
+    this.appendDebugResult('Websocket Ping\n');
     console.log('Echo request GET /irc/test3');
     window.globals.startTimeMsTest3 = Date.now();
     const fetchController = new AbortController();
@@ -242,7 +264,8 @@ window.customElements.define('debug-panel', class extends HTMLElement {
       .then((response) => {
         if (response.status === 201) {
           const pong1 = Date.now() - window.globals.startTimeMsTest3;
-          console.log('Fetch response: ' + pong1.toString() + ' ms');
+          this.appendDebugResult('Fetch response:     ' + pong1.toString() + ' ms\n');
+          console.log('Fetch response:  ' + pong1.toString() + ' ms');
           if (fetchTimerId) clearTimeout(fetchTimerId);
         } else {
           // Retrieve error message from remote web server and pass to error handler
@@ -425,15 +448,15 @@ window.customElements.define('debug-panel', class extends HTMLElement {
     // Remote Server Functions
     // --------------------------
     this.shadowRoot.getElementById('button_1_1').addEventListener('click', () => {
-      this._test1ButtonHandler();
-    });
-
-    this.shadowRoot.getElementById('button_1_2').addEventListener('click', () => {
       this._test2ButtonHandler();
     });
 
-    this.shadowRoot.getElementById('button_1_3').addEventListener('click', () => {
+    this.shadowRoot.getElementById('button_1_2').addEventListener('click', () => {
       this._test4ButtonHandler();
+    });
+
+    this.shadowRoot.getElementById('button_1_3').addEventListener('click', () => {
+      this._test1ButtonHandler();
     });
 
     this.shadowRoot.getElementById('button_1_4').addEventListener('click', () => {

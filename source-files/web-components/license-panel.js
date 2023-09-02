@@ -21,7 +21,7 @@
 // SOFTWARE.
 // ------------------------------------------------------------------------------
 //
-//    Help Panel, MIT License, List of available IRC Commands
+//    License Panel, MIT License, List of available IRC Commands
 //
 // ------------------------------------------------------------------------------
 //
@@ -32,10 +32,10 @@
 //
 // ------------------------------------------------------------------------------
 'use strict';
-window.customElements.define('help-panel', class extends HTMLElement {
+window.customElements.define('license-panel', class extends HTMLElement {
   constructor () {
     super();
-    const template = document.getElementById('helpPanelTemplate');
+    const template = document.getElementById('licensePanelTemplate');
     const templateContent = template.content;
     this.attachShadow({ mode: 'open' })
       .appendChild(templateContent.cloneNode(true));
@@ -72,26 +72,6 @@ window.customElements.define('help-panel', class extends HTMLElement {
   hidePanel = () => {
     this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible');
   };
-
-  // //
-  // // The /docs folder is optional, enabled in the configuration
-  // // If /docs is available, then un-hide a button providing a link to the documentation pages.
-  // //
-  // const docsTestUrl = '/irc/docs/index.html';
-  // const fetchOptions = {
-  //   method: 'HEAD',
-  //   headers: {
-  //     Accept: 'text/html'
-  //   }
-  // };
-  // fetch(docsTestUrl, fetchOptions)
-  //   .then((response) => {
-  //     if (response.ok) {
-  //       // Make the irc-hybrid-client documentation link button visible
-  //       document.getElementById('viewDocsButtonDiv').removeAttribute('hidden');
-  //     }
-  //   })
-  //   .catch(() => {});
 
   // ------------------
   // Main entry point
@@ -141,17 +121,18 @@ window.customElements.define('help-panel', class extends HTMLElement {
 
     document.addEventListener('color-theme-changed', (event) => {
       const panelDivEl = this.shadowRoot.getElementById('panelDivId');
-      const infoDivEl = this.shadowRoot.getElementById('infoDivId');
+      const licenseDivEl = this.shadowRoot.getElementById('licenseDivId');
+
       if (event.detail.theme === 'light') {
-        panelDivEl.classList.remove('help-panel-theme-dark');
-        panelDivEl.classList.add('help-panel-theme-light');
-        infoDivEl.classList.remove('global-text-theme-dark');
-        infoDivEl.classList.add('global-text-theme-light');
+        panelDivEl.classList.remove('license-panel-theme-dark');
+        panelDivEl.classList.add('license-panel-theme-light');
+        licenseDivEl.classList.remove('global-text-theme-dark');
+        licenseDivEl.classList.add('global-text-theme-light');
       } else {
-        panelDivEl.classList.remove('help-panel-theme-light');
-        panelDivEl.classList.add('help-panel-theme-dark');
-        infoDivEl.classList.remove('global-text-theme-light');
-        infoDivEl.classList.add('global-text-theme-dark');
+        panelDivEl.classList.remove('license-panel-theme-light');
+        panelDivEl.classList.add('license-panel-theme-dark');
+        licenseDivEl.classList.remove('global-text-theme-light');
+        licenseDivEl.classList.add('global-text-theme-dark');
       }
     });
 

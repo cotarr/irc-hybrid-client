@@ -1,18 +1,18 @@
 
-/* help-panel */
+/* license-panel */
 
- .help-panel-theme-light {
+ .license-panel-theme-light {
   background-color: #aaaaaa;
   border: 1px solid black;
   color: black;
 }
-.help-panel-theme-dark {
+.license-panel-theme-dark {
   background-color: #5c5c5c;
   border: 1px solid #a3a3a3;
   color: white;
 }
 
-.help-panel-help-div {
+.license-panel-license-div {
   border: 1px solid black;
   border-radius: 5px;
   margin-right: 10px;

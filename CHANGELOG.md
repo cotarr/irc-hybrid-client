@@ -10,7 +10,11 @@ and this project adheres to
 
 Work in progress, see top of README.md
 
-Commit
+- Add Socks5 Proxy address info to irc-controls-panel, server-list-panel and server-form-panel.
+- Split help-panel into 2 panel, help-panel and license-panel
+- Improvements to debug panel
+
+Commit d6c3685
 
 - Made a pass through the javascript files updating comments.
 - Clean up CSS and HTML files (remove extra blank lines, etc)

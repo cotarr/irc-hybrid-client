@@ -23,3 +23,6 @@
   padding: 10px;
   vertical-align: top;
 }
+.debug-panel-section-div[hidden] {
+  display: none;
+}

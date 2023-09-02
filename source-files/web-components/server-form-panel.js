@@ -439,6 +439,19 @@ window.customElements.define('server-form-panel', class extends HTMLElement {
       this.shadowRoot.getElementById('realInputId').value = data.real;
       this.shadowRoot.getElementById('modesInputId').value = data.modes;
       this.shadowRoot.getElementById('channelListInputId').value = data.channelList;
+
+      // Show availability of Socks5 proxy
+      if (window.globals.ircState.enableSocks5Proxy) {
+        this.shadowRoot.getElementById('ircProxyEnabledDivId').textContent =
+          'Socks5 Proxy: Available';
+        this.shadowRoot.getElementById('ircProxyAddrDivId').textContent =
+          window.globals.ircState.socks5Host + ':' +
+          window.globals.ircState.socks5Port;
+      } else {
+        this.shadowRoot.getElementById('ircProxyEnabledDivId').textContent =
+          'Socks5 Proxy: Disabled by server';
+        this.shadowRoot.getElementById('ircProxyAddrDivId').textContent = '';
+      }
       resolve(data);
     });
   };
@@ -482,7 +495,8 @@ window.customElements.define('server-form-panel', class extends HTMLElement {
    * Make server form visible, with proper buttons configured
    * Fetch existing IRC server definition and populate form with previous values
    * This for has javascript capability to submit PATCH to database with new data
-   */
+   * @param {Number} index - Integer index into IRC server array
+  */
   editIrcServerAtIndex = (index) => {
     if (window.globals.ircState.ircConnected) {
       document.getElementById('errorPanel').showError(

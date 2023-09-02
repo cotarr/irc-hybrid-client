@@ -447,6 +447,7 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
             selectButtonEl.setAttribute('index', i.toString());
             selectButtonEl.id = 'selectAtIndex' + i.toString();
             selectButtonEl.textContent = 'Select';
+            if (mobile) selectButtonEl.textContent = 'Sel';
             selectButtonEl.title = 'Set as active server for IRC connections';
             if (data[i].disabled) {
               selectButtonEl.setAttribute('disabled', '');
@@ -473,6 +474,7 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
             const td02El = document.createElement('td');
             const connectButtonEl = document.createElement('button');
             connectButtonEl.textContent = 'Connect';
+            if (mobile) connectButtonEl.textContent = 'Con';
             connectButtonEl.setAttribute('index', i.toString());
             connectButtonEl.id = 'connectAtIndex' + i.toString();
             this.pendingConnectButtonId = null;
@@ -480,6 +482,7 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
               if (window.globals.ircState.ircConnected) {
                 td02El.classList.add('server-list-button-connected');
                 connectButtonEl.textContent = 'Disconnect';
+                if (mobile) connectButtonEl.textContent = 'Dis';
                 connectButtonEl.setAttribute('title', 'Disconnect from IRC server');
                 // Connected, only add button and eventListener to selected server
                 this.connectButtonIdList.push('connectAtIndex' + i.toString());
@@ -852,6 +855,16 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
         // else case of empty server list, show instructions
         this.shadowRoot.getElementById('emptyTableDivId').removeAttribute('hidden');
       }
+      // Show availability of Socks5 proxy
+      if (window.globals.ircState.enableSocks5Proxy) {
+        this.shadowRoot.getElementById('ircProxyDivId').textContent =
+          'Socks5 Proxy: Available (' +
+          window.globals.ircState.socks5Host + ':' +
+          window.globals.ircState.socks5Port + ')';
+      } else {
+        this.shadowRoot.getElementById('ircProxyDivId').textContent =
+          'Socks5 Proxy: Disabled by server';
+      }
       resolve(null);
     });
   }; // _buildServerListTable()
@@ -888,6 +901,15 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
     // -------------------------------------
     this.shadowRoot.getElementById('closePanelButtonId').addEventListener('click', () => {
       this.hidePanel();
+    });
+
+    this.shadowRoot.getElementById('ircProxyInfoBtnId').addEventListener('click', () => {
+      const ircProxyInfoEl = this.shadowRoot.getElementById('ircProxyInfoId');
+      if (ircProxyInfoEl.hasAttribute('hidden')) {
+        ircProxyInfoEl.removeAttribute('hidden');
+      } else {
+        ircProxyInfoEl.setAttribute('hidden', '');
+      }
     });
 
     /**

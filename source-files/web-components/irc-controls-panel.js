@@ -1392,6 +1392,13 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
         'Rotate servers:   Group: ' +
         window.globals.ircState.ircServerGroup.toString() + '\n';
       }
+      let infoProxy = '';
+      if ((window.globals.ircState.ircProxy) &&
+        (window.globals.ircState.enableSocks5Proxy)) {
+        infoProxy = 'Socks5 proxy:     ' +
+        window.globals.ircState.socks5Host + ':' +
+        window.globals.ircState.socks5Port + '\n';
+      }
       let selectedServerInfo = 'Label:\nServer:\nNickname:';
 
       if (window.globals.ircState.ircServerIndex >= 0) {
@@ -1400,7 +1407,7 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
           ' (Index=' + window.globals.ircState.ircServerIndex.toString() + ')\n' +
           'Server:           ' + window.globals.ircState.ircServerHost + ':' +
           window.globals.ircState.ircServerPort + '\n' +
-          infoReconnect + infoRotate +
+          infoProxy + infoReconnect + infoRotate +
           'Nickname:         ' + window.globals.ircState.nickName;
       }
       this.shadowRoot.getElementById('selectedServerPreId').textContent = selectedServerInfo;

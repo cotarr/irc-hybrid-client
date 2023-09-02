@@ -220,9 +220,11 @@ customElements.define('nav-menu', class extends HTMLElement {
       const menuIdList = [
         'group01ButtonId',
         'group02ButtonId',
-        'group04ButtonId',
         'item3_4_Id',
-        'item3_5_Id'
+        'item3_5_Id',
+        'item4_2_Id',
+        'item4_3_Id',
+        'item4_4_Id'
       ];
       if (window.globals.ircState.ircConnected) {
         menuIdList.forEach((menuId) => {
@@ -331,7 +333,7 @@ customElements.define('nav-menu', class extends HTMLElement {
         // console.log('userinfo', JSON.stringify(userinfo, null, 2));
         if ((Object.hasOwn(userinfo, 'user')) && (userinfo.user.length > 0)) {
           // Update user real name in menu header bar
-          this.shadowRoot.getElementById('item5_0_Id').textContent =
+          this.shadowRoot.getElementById('item5_1_Id').textContent =
             'Logout (' + userinfo.name + ')';
         }
       })
@@ -505,6 +507,11 @@ customElements.define('nav-menu', class extends HTMLElement {
       this.closeDropdownMenu();
     });
     this.shadowRoot.getElementById('item5_0_Id').addEventListener('click', (event) => {
+      event.stopPropagation();
+      document.getElementById('licensePanel').showPanel();
+      this.closeDropdownMenu();
+    });
+    this.shadowRoot.getElementById('item5_1_Id').addEventListener('click', (event) => {
       event.stopPropagation();
       document.getElementById('logoutPanel').handleLogoutRequest();
       this.closeDropdownMenu();

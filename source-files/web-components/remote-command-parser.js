@@ -290,6 +290,8 @@ window.customElements.define('remote-command-parser', class extends HTMLElement 
       if ((window.globals.startTimeMsTest3) &&
         (typeof window.globals.startTimeMsTest3 === 'number')) {
         const pong2 = Date.now() - window.globals.startTimeMsTest3;
+        document.getElementById('debugPanel')
+          .appendDebugResult('Websocket response: ' + pong2.toString() + ' ms\n');
         console.log('Websocket response: ' + pong2.toString() + ' ms');
       }
     } else if ((message.startsWith('LAG=')) && (message.length === 9)) {
