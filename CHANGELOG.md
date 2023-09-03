@@ -10,6 +10,13 @@ and this project adheres to
 
 Work in progress, see top of README.md
 
+Commit
+
+- Added inhibit-auto-scroll checkbox to channel-panel. This is used to prevent scroll when trying to Edit-Copy to clipboard.
+- More adjustments to panel visibility
+
+Commit b20cd28
+
 - Fixed navigation dropdown menu corruption when IRC connect state changes with menu expanded.
 - Setup channel panel visibility from new channel, page refresh, websocket auto-reconnect, IRC auto-reconnect, incoming message
 - Setup manage-channel-panels to hide itself after page reload and auto-reconnect for case of no IRC channels are joined, else show it.

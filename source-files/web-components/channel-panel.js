@@ -323,6 +323,15 @@ window.customElements.define('channel-panel', class extends HTMLElement {
   };
 
   /**
+   * Scroll channel textarea to show most recent message (scroll to bottom)
+   * Conditions: panel must be visible for scroll to execute in browser
+   */
+  _scrollChannelTextAreaToRecent = () => {
+    const panelMessageDisplayEl = this.shadowRoot.getElementById('panelMessageDisplayId');
+    panelMessageDisplayEl.scrollTop = panelMessageDisplayEl.scrollHeight;
+  };
+
+  /**
    * Scroll web component to align top of panel with top of viewport and set focus
    */
   _scrollToTop = () => {
@@ -345,15 +354,25 @@ window.customElements.define('channel-panel', class extends HTMLElement {
    * Make panel visible (both internal and external function)
    */
   showPanel = () => {
-    this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
+    const panelVisibilityDivEl = this.shadowRoot.getElementById('panelVisibilityDivId');
+    if (!panelVisibilityDivEl.hasAttribute('visible')) {
+      panelVisibilityDivEl.setAttribute('visible', '');
+      this.shadowRoot.getElementById('panelCollapsedDivId').setAttribute('visible', '');
+      this.shadowRoot.getElementById('hideWithCollapseId').removeAttribute('hidden');
+      // If panel previously hidden, then scroll to bottom of textarea
+      this._scrollChannelTextAreaToRecent();
+      // And uncheck the inhibit scroll checkbox
+      this.shadowRoot.getElementById('noScrollCheckboxId').checked = false;
+      // and hide controls below input bar bottom half
+      this.shadowRoot.getElementById('bottomCollapseDivId').setAttribute('hidden', '');
+    }
+    // This is redundant intentionally to un-collapse
     this.shadowRoot.getElementById('panelCollapsedDivId').setAttribute('visible', '');
     this.shadowRoot.getElementById('hideWithCollapseId').removeAttribute('hidden');
-    this.shadowRoot.getElementById('bottomCollapseDivId').setAttribute('hidden', '');
     this._handleCancelZoomEvent();
-    // scroll to top
-    const panelMessageDisplayEl = this.shadowRoot.getElementById('panelMessageDisplayId');
-    panelMessageDisplayEl.scrollTop = panelMessageDisplayEl.scrollHeight;
+    // Note: showPanel is not called on PRMVMSG when zoomed is active on own panel
     document.dispatchEvent(new CustomEvent('cancel-zoom'));
+    // this is whole web page scroll
     this._scrollToBottom();
   };
 
@@ -364,7 +383,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
     this.shadowRoot.getElementById('panelCollapsedDivId').removeAttribute('visible');
     this.shadowRoot.getElementById('hideWithCollapseId').setAttribute('hidden', '');
-    this.shadowRoot.getElementById('bottomCollapseDivId').setAttribute('hidden', '');
+    // this.shadowRoot.getElementById('bottomCollapseDivId').setAttribute('hidden', '');
     // when collapsing panel channel, if zoomed, cancel the zoom
     this._handleCancelZoomEvent();
   };
@@ -391,6 +410,9 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     const briefCheckboxEl = this.shadowRoot.getElementById('briefCheckboxId');
     const autocompleteCheckboxEl = this.shadowRoot.getElementById('autocompleteCheckboxId');
     const autoCompleteTitleEl = this.shadowRoot.getElementById('autoCompleteTitle');
+
+    const ircStateIndex = window.globals.ircState.channels.indexOf(this.channelName.toLowerCase());
+    const webStateIndex = window.globals.webState.channels.indexOf(this.channelName.toLowerCase());
 
     if (panelDivEl.hasAttribute('beep1-enabled')) {
       beep1CheckBoxEl.checked = true;
@@ -420,6 +442,32 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     } else {
       autocompleteCheckboxEl.checked = false;
     }
+    //
+    // If channel was previously joined, then parted, then re-joined
+    // Check for joined change to true and show channel if hidden
+    //
+    if ((ircStateIndex >= 0) && (webStateIndex >= 0)) {
+      // Alternate Join, Prune,  verses Part buttons
+      if (window.globals.ircState.channelStates[ircStateIndex].joined) {
+        this.shadowRoot.getElementById('joinButtonId').setAttribute('hidden', '');
+        this.shadowRoot.getElementById('pruneButtonId').setAttribute('hidden', '');
+        this.shadowRoot.getElementById('partButtonId').removeAttribute('hidden');
+      } else {
+        this.shadowRoot.getElementById('joinButtonId').removeAttribute('hidden');
+        this.shadowRoot.getElementById('pruneButtonId').removeAttribute('hidden');
+        this.shadowRoot.getElementById('partButtonId').setAttribute('hidden', '');
+      };
+    }
+    // If left channel, show [Not in Channel] icon
+    if (window.globals.ircState.channelStates[ircStateIndex].joined) {
+      this.shadowRoot.getElementById('notInChannelIconId').setAttribute('hidden', '');
+      this.shadowRoot.getElementById('sendButtonId').removeAttribute('disabled');
+      this.shadowRoot.getElementById('panelMessageInputId').removeAttribute('disabled');
+    } else {
+      this.shadowRoot.getElementById('notInChannelIconId').removeAttribute('hidden');
+      this.shadowRoot.getElementById('sendButtonId').setAttribute('disabled', '');
+      this.shadowRoot.getElementById('panelMessageInputId').setAttribute('disabled', '');
+    }
   };
 
   /**
@@ -436,7 +484,12 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     if (this.shadowRoot.getElementById('panelCollapsedDivId').hasAttribute('visible')) {
       this.collapsePanel();
     } else {
+      // make panel visible
       this.showPanel();
+      // If panel previously collapsed, then scroll to bottom of text
+      this._scrollChannelTextAreaToRecent();
+      // and remove check from inhibit scroll checkbox
+      this.shadowRoot.getElementById('noScrollCheckboxId').checked = false;
     }
   };
 
@@ -710,6 +763,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       channelTopicDivEl.removeAttribute('hidden');
       bottomCollapseDivEl.setAttribute('hidden', '');
       this._handleNormalButton();
+      this._scrollChannelTextAreaToRecent();
       this._handleResizeCustomElements();
     } else {
       bodyEl.setAttribute('zoomId', 'channel:' + this.channelName.toLowerCase());
@@ -725,6 +779,9 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       channelTopicDivEl.setAttribute('hidden', '');
       // Hide stuff below the input bar.
       bottomCollapseDivEl.setAttribute('hidden', '');
+      // Uncheck no scroll checkbox
+      this.shadowRoot.getElementById('noScrollCheckboxId').checked = false;
+      this._scrollChannelTextAreaToRecent();
       // This sets size for zoomed page
       this._handleResizeCustomElements();
     }
@@ -1280,8 +1337,9 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       panelMessageDisplayEl.value += out;
       // move scroll bar so text is scrolled all the way up
       // Performing this during cache reload will generate browser violation for forced reflow.
-      if (!window.globals.webState.cacheReloadInProgress) {
-        panelMessageDisplayEl.scrollTop = panelMessageDisplayEl.scrollHeight;
+      if ((!window.globals.webState.cacheReloadInProgress) &&
+        (this.shadowRoot.getElementById('noScrollCheckboxId').checked === false)) {
+        this._scrollChannelTextAreaToRecent();
       }
     }; // _addText()
 
@@ -1586,8 +1644,9 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('panelMessageDisplayId').value += markerString;
 
     // move scroll bar so text is scrolled all the way up
-    this.shadowRoot.getElementById('panelMessageDisplayId').scrollTop =
-      this.shadowRoot.getElementById('panelMessageDisplayId').scrollHeight;
+    if ((this.shadowRoot.getElementById('noScrollCheckboxId').checked === false)) {
+      this._scrollChannelTextAreaToRecent();
+    }
     //
     // This set's channel-panel visibility if needed after cache refresh
     //
@@ -1871,28 +1930,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       _removeSelfFromDOM();
     } else if (window.globals.ircState.ircConnected) {
       // console.log('connected, no DOM changes');
-      //
-      // If channel was previously joined, then parted, then re-joined
-      // Check for joined change to true and show channel if hidden
-      //
-      if ((ircStateIndex >= 0) && (webStateIndex >= 0)) {
-        // Alternate Join, Prune,  verses Part buttons
-        if (window.globals.ircState.channelStates[ircStateIndex].joined) {
-          this.shadowRoot.getElementById('joinButtonId').setAttribute('hidden', '');
-          this.shadowRoot.getElementById('pruneButtonId').setAttribute('hidden', '');
-          this.shadowRoot.getElementById('partButtonId').removeAttribute('hidden');
-        } else {
-          this.shadowRoot.getElementById('joinButtonId').removeAttribute('hidden');
-          this.shadowRoot.getElementById('pruneButtonId').removeAttribute('hidden');
-          this.shadowRoot.getElementById('partButtonId').setAttribute('hidden', '');
-        };
-      }
-      // If left channel, show [Not in Channel] icon
-      if (window.globals.ircState.channelStates[ircStateIndex].joined) {
-        this.shadowRoot.getElementById('notInChannelIconId').setAttribute('hidden', '');
-      } else {
-        this.shadowRoot.getElementById('notInChannelIconId').removeAttribute('hidden');
-      }
+      // Update channel topic from channel state
       this.shadowRoot.getElementById('channelTopicDivId').textContent =
         document.getElementById('displayUtils')
           .cleanFormatting(window.globals.ircState.channelStates[this.channelIndex].topic);
