@@ -8,9 +8,15 @@ and this project adheres to
 
 ## Next v2.0.0-dev 2023-08-31 (Draft)
 
+
+
 Work in progress, see top of README.md
 
 Commit
+
+- Disable certain hotkeys when not connected to IRC
+
+Commit 7007a5e
 
 - When opening channel-panel, pm-panel, or irc-server-panel set focus to input textarea element.
 - Fixed channel-panel, eventListener still active after element removed from DOM

@@ -807,25 +807,31 @@ window.customElements.define('local-command-parser', class extends HTMLElement {
      * Detect Hotkey from keypress and call web component to show/hide panels
      */
     window.addEventListener('keydown', (e) => {
-      if (!window.globals.ircState.ircConnected) return;
       if (!window.globals.webState.webConnected) return;
       // console.log('code', e.code);
       if ((e.altKey) &&
         (!e.ctrlKey) &&
         (!e.shiftKey)) {
-        if (e.code === 'KeyB') {
-          // Alt-B, show panels as collapsed bars
-          document.dispatchEvent(new CustomEvent('collapse-all-panels'));
-          document.dispatchEvent(new CustomEvent('cancel-zoom'));
+        if (window.globals.ircState.ircConnected) {
+          //
+          // Hot keys enabled when connected to IRC server
+          //
+          if (e.code === 'KeyB') {
+            // Alt-B, show panels as collapsed bars
+            document.dispatchEvent(new CustomEvent('collapse-all-panels'));
+            document.dispatchEvent(new CustomEvent('cancel-zoom'));
+          }
+          if (e.code === 'KeyC') document.getElementById('manageChannelsPanel').handleHotKey();
+          if (e.code === 'KeyN') {
+            document.getElementById('manageChannelsPanel').handleHotKeyNextChannel();
+          }
+          if (e.code === 'KeyP') document.getElementById('managePmPanels').handleHotKey();
         }
-        if (e.code === 'KeyC') document.getElementById('manageChannelsPanel').handleHotKey();
+        //
+        // Hot keys available both connected and disconnected from IRC server
         if (e.code === 'KeyH') document.getElementById('helpPanel').handleHotKey();
         if (e.code === 'KeyI') document.getElementById('ircControlsPanel').handleHotKey();
         if (e.code === 'KeyL') document.getElementById('serverListPanel').handleHotKey();
-        if (e.code === 'KeyN') {
-          document.getElementById('manageChannelsPanel').handleHotKeyNextChannel();
-        }
-        if (e.code === 'KeyP') document.getElementById('managePmPanels').handleHotKey();
         if (e.code === 'KeyS') document.getElementById('ircServerPanel').handleHotKey();
         if (e.code === 'KeyX') {
           document.dispatchEvent(new CustomEvent('hide-all-panels'));
