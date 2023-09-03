@@ -73,6 +73,17 @@ window.customElements.define('help-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible');
   };
 
+  /**
+   * Handle keydown event to show/hide panel, called from local-command-parser.
+   */
+  handleHotKey = () => {
+    if (this.shadowRoot.getElementById('panelVisibilityDivId').hasAttribute('visible')) {
+      this.hidePanel();
+    } else {
+      this.showPanel();
+    }
+  };
+
   // //
   // // The /docs folder is optional, enabled in the configuration
   // // If /docs is available, then un-hide a button providing a link to the documentation pages.

@@ -108,6 +108,7 @@ window.customElements.define('pm-panel', class extends HTMLElement {
     const templateContent = template.content;
     this.attachShadow({ mode: 'open' })
       .appendChild(templateContent.cloneNode(true));
+    this.elementExistsInDom = true;
     this.privmsgName = '';
     this.privmsgCsName = '';
     this.defaultHeightInRows = 10;
@@ -272,6 +273,7 @@ window.customElements.define('pm-panel', class extends HTMLElement {
     this._updateVisibility();
     document.dispatchEvent(new CustomEvent('cancel-zoom'));
     this._scrollToTop();
+    this.shadowRoot.getElementById('panelMessageInputId').focus();
   };
 
   /**
@@ -747,12 +749,11 @@ window.customElements.define('pm-panel', class extends HTMLElement {
    */
   _removeSelfFromDOM = () => {
     // Don't do this more than once (stacked events)
-    if (!this.privmsgCsName) {
-      console.log('Error, request to remove self from DOM when already removed.');
-      return;
+    if (!this.elementExistsInDom) {
+      throw new Error('Error, Request to remove self from DOM after already removed.');
     }
-    delete this.privmsgCsName;
-    this.removeAttribute('privmsg-cs-name');
+    this.elementExistsInDom = false;
+
     //
     // Remove channel name from list of channel active in browser
     //
@@ -815,6 +816,10 @@ window.customElements.define('pm-panel', class extends HTMLElement {
    * handle changes in the ircState object
    */
   _handleIrcStateChanged = () => {
+    if (!this.elementExistsInDom) {
+      throw new Error('Calling irc-state-changed after channel element was destroyed.');
+    }
+
     if (!window.globals.ircState.ircConnected) {
       if (window.globals.webState.activePrivateMessageNicks
         .indexOf(this.privmsgName.toLowerCase()) >= 0) {

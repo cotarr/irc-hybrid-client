@@ -12,6 +12,26 @@ Work in progress, see top of README.md
 
 Commit
 
+- When opening channel-panel, pm-panel, or irc-server-panel set focus to input textarea element.
+- Fixed channel-panel, eventListener still active after element removed from DOM
+- Upgraded auto-complete to replace deprecated `event.keyCode` property with `event.code` for keydown events.
+- Added (experimental) hotkey assignments to show/hide panels. This was developed using Chrome/Linux, unknown if hotkey assignments will conflict with other browser/OS.
+
+```
+Alt-B - Bars, collapse panels to bars
+Alt-C - Channel Panels (Show/Hide)
+Alt-H - Help, IRC commands (Show/Hide)
+Alt-I - IRC Connect/Disconnect Controls
+Alt-L - List of IRC Servers (Show/Hide)
+ALT-X - Next, Cycle IRC channel panels
+Alt-P - Private Message Panels (Show/Hide)
+Alt-S - Server Messages (Show/Hide)
+Alt-X - Hide all panels.
+Alt-Z - Zoom, (Channel panel only)
+```
+
+Commit 19a5aec
+
 - Added inhibit-auto-scroll checkbox to channel-panel. This is used to prevent scroll when trying to Edit-Copy to clipboard.
 - More adjustments to panel visibility
 

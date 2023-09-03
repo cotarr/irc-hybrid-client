@@ -115,6 +115,27 @@ window.customElements.define('manage-pm-panels', class extends HTMLElement {
   };
 
   /**
+   * Handle keydown event to show/hide panel, called from local-command-parser.
+   */
+  handleHotKey = () => {
+    if (this.shadowRoot.getElementById('panelVisibilityDivId').hasAttribute('visible')) {
+      // Relay function call to child PM panels
+      const panelEls = Array.from(document.getElementById('pmContainerId').children);
+      panelEls.forEach((panelEl) => {
+        panelEl.hidePanel();
+      });
+      this.hidePanel();
+    } else {
+      // Relay function call to child PM panels
+      const panelEls = Array.from(document.getElementById('pmContainerId').children);
+      panelEls.forEach((panelEl) => {
+        panelEl.collapsePanel();
+      });
+      this.showPanel();
+    }
+  };
+
+  /**
    * Set flags for last private message (PM) panel state
    * These are used to maintain panel status when cache is reloaded.
    * @param {string} pmPanelName - Lower case name of private message nickname

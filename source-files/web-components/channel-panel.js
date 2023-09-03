@@ -161,6 +161,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     const templateContent = template.content;
     this.attachShadow({ mode: 'open' })
       .appendChild(templateContent.cloneNode(true));
+    this.elementExistsInDom = true;
     this.channelName = '';
     this.channelCsName = '';
     this.maxNickLength = 0;
@@ -374,6 +375,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     document.dispatchEvent(new CustomEvent('cancel-zoom'));
     // this is whole web page scroll
     this._scrollToBottom();
+    this.shadowRoot.getElementById('panelMessageInputId').focus();
   };
 
   /**
@@ -1080,14 +1082,21 @@ window.customElements.define('channel-panel', class extends HTMLElement {
    * @param {string} e - Keyboard character pressed by user
    */
   _channelAutoComplete = (e) => {
-    const autoCompleteTabKey = 9;
+    // Before auto-complete, check for Alt-Z zoom hotkey
+    if ((e.altKey) &&
+      (!e.ctrlKey) &&
+      (!e.shiftKey)) {
+      if (e.code === 'KeyZ') {
+        this._handleChannelZoomButtonElClick();
+      }
+    }
     const autoCompleteSpaceKey = 32;
     const trailingSpaceKey = 32;
     const panelMessageInputEl = this.shadowRoot.getElementById('panelMessageInputId');
     if (this.shadowRoot.getElementById('autocompleteCheckboxId').hasAttribute('disabled')) return;
     if (!this.shadowRoot.getElementById('panelDivId').hasAttribute('auto-comp-enabled')) return;
-    if (!e.keyCode) return;
-    if ((e.keyCode) && (e.keyCode === autoCompleteTabKey)) {
+    if (!e.code) return;
+    if ((e.code) && (e.code === 'Tab')) {
       if (panelMessageInputEl.value.length < 2) {
         e.preventDefault();
         return;
@@ -1098,7 +1107,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
         snippet = snippetArray[snippetArray.length - 1];
       }
       if (snippet.length > 0) {
-        if ((e.keyCode === autoCompleteTabKey) && (snippet.length > 0)) {
+        if ((e.code === 'Tab') && (snippet.length > 0)) {
           this._autoCompleteInputElement(snippet);
         }
       } else {
@@ -1125,7 +1134,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     //
     // Case of space key to autocomplete on space-space
     // Auto-complete with space is only active with format: brief
-    if ((e.keyCode) && (e.keyCode === autoCompleteSpaceKey) &&
+    if ((e.code) && (e.code === 'Space') &&
       (this.shadowRoot.getElementById('panelDivId').hasAttribute('brief-enabled'))) {
       if (panelMessageInputEl.value.length > 0) {
         // if previous characters is space (and this key is space too)
@@ -1827,6 +1836,78 @@ window.customElements.define('channel-panel', class extends HTMLElement {
   };
 
   /**
+   * Remove timers, eventListeners, and remove self from DOM
+   */
+  _removeSelfFromDOM = () => {
+    // Don't do this more than once (stacked events)
+    if (!this.elementExistsInDom) {
+      throw new Error('Error, Request to remove self from DOM after already removed.');
+    }
+    this.elementExistsInDom = false;
+
+    //
+    // 1 - Remove channel name from list of channel active in browser
+    //
+    const webStateChannelIndex =
+      window.globals.webState.channels.indexOf(this.channelName.toLowerCase());
+    if (webStateChannelIndex >= 0) {
+      window.globals.webState.channels.splice(webStateChannelIndex, 1);
+      window.globals.webState.channelStates.splice(webStateChannelIndex, 1);
+    }
+
+    //
+    // 2 - Remove eventListeners
+    //
+    /* eslint-disable max-len */
+    this.shadowRoot.getElementById('autocompleteCheckboxId').removeEventListener('click', this._handleAutoCompleteCheckboxClick);
+    this.shadowRoot.getElementById('beep1CheckBoxId').removeEventListener('click', this._handleChannelBeep1CBInputElClick);
+    this.shadowRoot.getElementById('beep2CheckBoxId').removeEventListener('click', this._handleChannelBeep2CBInputElClick);
+    this.shadowRoot.getElementById('beep3CheckBoxId').removeEventListener('click', this._handleChannelBeep3CBInputElClick);
+    this.shadowRoot.getElementById('bottomCollapseButtonId').removeEventListener('click', this._handleBottomCollapseButton);
+    this.shadowRoot.getElementById('briefCheckboxId').removeEventListener('click', this._handleBriefCheckboxClick);
+    this.shadowRoot.getElementById('clearButtonId').removeEventListener('click', this._handleClearButton);
+    this.shadowRoot.getElementById('closePanelButtonId').removeEventListener('click', this._handleCloseButton);
+    this.shadowRoot.getElementById('collapsePanelButtonId').removeEventListener('click', this._handleCollapseButton);
+    this.shadowRoot.getElementById('joinButtonId').removeEventListener('click', this._handleChannelJoinButtonElClick);
+    this.shadowRoot.getElementById('multiLineSendButtonId').removeEventListener('click', this._handleMultiLineSendButtonClick);
+    this.shadowRoot.getElementById('normalButtonId').removeEventListener('click', this._handleNormalButton);
+    this.shadowRoot.getElementById('panelDivId').removeEventListener('click', this._handlePanelClick);
+    this.shadowRoot.getElementById('panelMessageInputId').removeEventListener('keydown', this._channelAutoComplete, false);
+    this.shadowRoot.getElementById('panelMessageInputId').removeEventListener('paste', this._handleChannelInputAreaElPaste);
+    this.shadowRoot.getElementById('partButtonId').removeEventListener('click', this._handleChannelPartButtonElClick);
+    this.shadowRoot.getElementById('pruneButtonId').removeEventListener('click', this._handleChannelPruneButtonElClick);
+    this.shadowRoot.getElementById('panelMessageInputId').removeEventListener('input', this._handleChannelInputAreaElInput);
+    this.shadowRoot.getElementById('refreshButtonId').removeEventListener('click', this._handleRefreshButton);
+    this.shadowRoot.getElementById('sendButtonId').removeEventListener('click', this._handleChannelSendButtonElClick);
+    this.shadowRoot.getElementById('tallerButtonId').removeEventListener('click', this._handleTallerButton);
+    this.shadowRoot.getElementById('zoomButtonId').removeEventListener('click', this._handleChannelZoomButtonElClick);
+
+    document.removeEventListener('cache-reload-done', this._handleCacheReloadDone);
+    document.removeEventListener('cache-reload-error', this._handleCacheReloadError);
+    document.removeEventListener('cancel-beep-sounds', this._handleCancelBeepSounds);
+    document.removeEventListener('cancel-zoom', this._handleCancelZoomEvent);
+    document.removeEventListener('collapse-all-panels', this._handleCollapseAllPanels);
+    document.removeEventListener('color-theme-changed', this._handleColorThemeChanged);
+    document.removeEventListener('erase-before-reload', this._handleEraseBeforeReload);
+    document.removeEventListener('hide-all-panels', this._handleHideAllPanels);
+    document.removeEventListener('irc-state-changed', this._handleIrcStateChanged);
+    document.removeEventListener('resize-custom-elements', this._handleResizeCustomElements);
+    document.removeEventListener('show-all-panels', this._handleShowAllPanels);
+    document.removeEventListener('web-connect-changed', this._handleWebConnectChanged);
+    /* eslint-enable max-len */
+
+    //
+    // 3 - Channel panel removes itself from the DOM
+    //
+    const parentEl = document.getElementById('channelsContainerId');
+    const childEl = document.getElementById('channel:' + this.channelName.toLowerCase());
+    if (parentEl.contains(childEl)) {
+      // remove the channel element from DOM
+      parentEl.removeChild(childEl);
+    }
+  }; // _removeSelfFromDOM()
+
+  /**
    * For each channel, handle changes in the ircState object
    */
   _handleIrcStateChanged = () => {
@@ -1839,79 +1920,9 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     // console.log(JSON.stringify(window.globals.webState.channelStates, null, 2));
     //
 
-    /**
-     * Remove timers, eventListeners, and remove self from DOM
-     */
-    const _removeSelfFromDOM = () => {
-      // Don't do this more than once (stacked events)
-      if (!this.channelCsName) {
-        console.log('Error, Request to remove self from DOM when already removed.');
-        return;
-      }
-      delete this.channelCsName;
-      this.removeAttribute('channelCsName');
-
-      //
-      // 1 - Remove channel name from list of channel active in browser
-      //
-      const webStateChannelIndex =
-        window.globals.webState.channels.indexOf(this.channelName.toLowerCase());
-      if (webStateChannelIndex >= 0) {
-        window.globals.webState.channels.splice(webStateChannelIndex, 1);
-        window.globals.webState.channelStates.splice(webStateChannelIndex, 1);
-      }
-
-      //
-      // 2 - Remove eventListeners
-      //
-      /* eslint-disable max-len */
-      this.shadowRoot.getElementById('autocompleteCheckboxId').removeEventListener('click', this._handleAutoCompleteCheckboxClick);
-      this.shadowRoot.getElementById('beep1CheckBoxId').removeEventListener('click', this._handleChannelBeep1CBInputElClick);
-      this.shadowRoot.getElementById('beep2CheckBoxId').removeEventListener('click', this._handleChannelBeep2CBInputElClick);
-      this.shadowRoot.getElementById('beep3CheckBoxId').removeEventListener('click', this._handleChannelBeep3CBInputElClick);
-      this.shadowRoot.getElementById('bottomCollapseButtonId').removeEventListener('click', this._handleBottomCollapseButton);
-      this.shadowRoot.getElementById('briefCheckboxId').removeEventListener('click', this._handleBriefCheckboxClick);
-      this.shadowRoot.getElementById('clearButtonId').removeEventListener('click', this._handleClearButton);
-      this.shadowRoot.getElementById('closePanelButtonId').removeEventListener('click', this._handleCloseButton);
-      this.shadowRoot.getElementById('collapsePanelButtonId').removeEventListener('click', this._handleCollapseButton);
-      this.shadowRoot.getElementById('joinButtonId').removeEventListener('click', this._handleChannelJoinButtonElClick);
-      this.shadowRoot.getElementById('multiLineSendButtonId').removeEventListener('click', this._handleMultiLineSendButtonClick);
-      this.shadowRoot.getElementById('normalButtonId').removeEventListener('click', this._handleNormalButton);
-      this.shadowRoot.getElementById('panelDivId').removeEventListener('click', this._handlePanelClick);
-      this.shadowRoot.getElementById('panelMessageInputId').removeEventListener('keydown', this._channelAutoComplete, false);
-      this.shadowRoot.getElementById('panelMessageInputId').removeEventListener('paste', this._handleChannelInputAreaElPaste);
-      this.shadowRoot.getElementById('partButtonId').removeEventListener('click', this._handleChannelPartButtonElClick);
-      this.shadowRoot.getElementById('pruneButtonId').removeEventListener('click', this._handleChannelPruneButtonElClick);
-      this.shadowRoot.getElementById('panelMessageInputId').removeEventListener('input', this._handleChannelInputAreaElInput);
-      this.shadowRoot.getElementById('refreshButtonId').removeEventListener('click', this._handleRefreshButton);
-      this.shadowRoot.getElementById('sendButtonId').removeEventListener('click', this._handleChannelSendButtonElClick);
-      this.shadowRoot.getElementById('tallerButtonId').removeEventListener('click', this._handleTallerButton);
-      this.shadowRoot.getElementById('zoomButtonId').removeEventListener('click', this._handleChannelZoomButtonElClick);
-
-      document.removeEventListener('cache-reload-done', this._handleCacheReloadDone);
-      document.removeEventListener('cache-reload-error', this._handleCacheReloadError);
-      document.removeEventListener('cancel-beep-sounds', this._handleCancelBeepSounds);
-      document.removeEventListener('cancel-zoom', this._handleCancelZoomEvent);
-      document.removeEventListener('collapse-all-panels', this._handleCollapseAllPanels);
-      document.removeEventListener('color-theme-changed', this._handleColorThemeChanged);
-      document.removeEventListener('erase-before-reload', this._handleEraseBeforeReload);
-      document.removeEventListener('hide-all-panels', this._handleHideAllPanels);
-      document.removeEventListener('irc-state-changed', this._handleIrcStateChanged);
-      document.removeEventListener('resize-custom-elements', this._handleResizeCustomElements);
-      document.removeEventListener('show-all-panels', this._handleShowAllPanels);
-      document.removeEventListener('web-connect-changed', this._handleWebConnectChanged);
-      /* eslint-enable max-len */
-
-      //
-      // 3 - Channel panel removes itself from the DOM
-      //
-      const parentEl = document.getElementById('channelsContainerId');
-      const childEl = document.getElementById('channel:' + this.channelName.toLowerCase());
-      if (parentEl.contains(childEl)) {
-        // remove the channel element from DOM
-        parentEl.removeChild(childEl);
-      }
-    }; // _removeSelfFromDOM()
+    if (!this.elementExistsInDom) {
+      throw new Error('Calling irc-state-changed after channel element was destroyed.');
+    }
 
     const ircStateIndex = window.globals.ircState.channels.indexOf(this.channelName.toLowerCase());
     const webStateIndex = window.globals.webState.channels.indexOf(this.channelName.toLowerCase());
@@ -1920,14 +1931,14 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       // console.log('pruned removing from DOM');
       //
       // Case of channel has been pruned from the IRC client with [Prune] button
-      _removeSelfFromDOM();
+      this._removeSelfFromDOM();
     } else if ((!window.globals.ircState.ircConnected)) {
       // console.log('disconnected removing from DOM');
       //
       // Case of disconnect from IRC, any channel windows are no longer valid
       // This function is executing due to active irc-state-changed event
       // within the channel window scope. Therefore... remove it.
-      _removeSelfFromDOM();
+      this._removeSelfFromDOM();
     } else if (window.globals.ircState.ircConnected) {
       // console.log('connected, no DOM changes');
       // Update channel topic from channel state

@@ -76,6 +76,7 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
     const templateContent = template.content;
     this.attachShadow({ mode: 'open' })
       .appendChild(templateContent.cloneNode(true));
+    this.hotKeyCycleIndex = 0;
     this.lastJoinedChannelCount = -1;
     this.lastChannelListCount = -1;
     this.lastIrcServerIndex = -1;
@@ -111,7 +112,7 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
     this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
     this.shadowRoot.getElementById('panelCollapsedDivId').setAttribute('visible', '');
     document.dispatchEvent(new CustomEvent('cancel-zoom'));
-    this._scrollToBottom();
+    this._scrollToTop();
   };
 
   /**
@@ -133,6 +134,52 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
   hidePanel = () => {
     this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible');
     this.shadowRoot.getElementById('panelCollapsedDivId').removeAttribute('visible');
+  };
+
+  /**
+   * Handle keydown event to show/hide panel, called from local-command-parser.
+   */
+  handleHotKey = () => {
+    if (this.shadowRoot.getElementById('panelVisibilityDivId').hasAttribute('visible')) {
+      // Relay function call to child PM panels
+      const panelEls = Array.from(document.getElementById('channelsContainerId').children);
+      panelEls.forEach((panelEl) => {
+        panelEl.hidePanel();
+      });
+      this.hidePanel();
+    } else {
+      // Relay function call to child PM panels
+      const panelEls = Array.from(document.getElementById('channelsContainerId').children);
+      panelEls.forEach((panelEl) => {
+        panelEl.collapsePanel();
+      });
+      this.showPanel();
+    }
+  };
+
+  /**
+   * Handle keydown event to cycle to next IRC channel
+   */
+  handleHotKeyNextChannel = () => {
+    if (!window.globals.ircState.ircConnected) return;
+    if (!window.globals.webState.webConnected) return;
+    if (window.globals.ircState.channels.length < 2) return;
+    this.hotKeyCycleIndex += 1;
+    if (this.hotKeyCycleIndex >= window.globals.ircState.channels.length) {
+      this.hotKeyCycleIndex = 0;
+    }
+    const channelPanelId =
+      'channel:' + window.globals.ircState.channels[this.hotKeyCycleIndex];
+    const panelEls = Array.from(document.getElementById('channelsContainerId').children);
+    panelEls.forEach((panelEl) => {
+      if (panelEl.id.toLowerCase() === channelPanelId) {
+        panelEl.showPanel();
+      } else {
+        panelEl.hidePanel();
+      }
+    });
+    // hide the manage-channels-panel when viewing cycled channels
+    this.hidePanel();
   };
 
   /**
@@ -400,13 +447,13 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
     document.addEventListener('irc-state-changed', () => {
       // console.log('Event irc-state-changed - global - checking for channel updates');
 
-      console.log('ircState: ',
-        window.globals.ircState.ircConnectOn,
-        window.globals.ircState.ircConnected,
-        window.globals.ircState.ircConnecting,
-        window.globals.ircState.ircAutoReconnect,
-        window.globals.ircState.channels.length,
-        this.ircReconnectActivatedFlag);
+      // console.log('ircState: ',
+      //   window.globals.ircState.ircConnectOn,
+      //   window.globals.ircState.ircConnected,
+      //   window.globals.ircState.ircConnecting,
+      //   window.globals.ircState.ircAutoReconnect,
+      //   window.globals.ircState.channels.length,
+      //   this.ircReconnectActivatedFlag);
 
       // console.log(JSON.stringify(window.globals.ircState.channels));
       // console.log(JSON.stringify(window.globals.webState.channels));

@@ -149,6 +149,17 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
   };
 
   /**
+   * Handle keydown event to show/hide panel, called from local-command-parser.
+   */
+  handleHotKey = () => {
+    if (this.shadowRoot.getElementById('panelVisibilityDivId').hasAttribute('visible')) {
+      this.hidePanel();
+    } else {
+      this.showPanel();
+    }
+  };
+
+  /**
    * Parse javascript error to see if status 409 property has been
    * added. If 409 found, display 'database locked' message and
    * make the Force Unlock button visible.

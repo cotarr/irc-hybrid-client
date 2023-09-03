@@ -97,6 +97,7 @@ window.customElements.define('irc-server-panel', class extends HTMLElement {
     document.getElementById('headerBar').removeAttribute('servericon');
     document.getElementById('navMenu').handleServerUnreadUpdate(false);
     this._scrollToTop();
+    this.shadowRoot.getElementById('panelMessageInputId').focus();
   };
 
   /**
@@ -111,6 +112,17 @@ window.customElements.define('irc-server-panel', class extends HTMLElement {
    */
   hidePanel = () => {
     this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible');
+  };
+
+  /**
+   * Handle keydown event to show/hide panel, called from local-command-parser.
+   */
+  handleHotKey = () => {
+    if (this.shadowRoot.getElementById('panelVisibilityDivId').hasAttribute('visible')) {
+      this.hidePanel();
+    } else {
+      this.showPanel();
+    }
   };
 
   // -------------------------------------------------------------------------
@@ -221,12 +233,11 @@ window.customElements.define('irc-server-panel', class extends HTMLElement {
   lastServAutoCompleteMatch = '';
   _serverAutoComplete = (e) => {
     const serverInputAreaEl = this.shadowRoot.getElementById('panelMessageInputId');
-    const autoCompleteTabKey = 9;
     const autoCompleteSpaceKey = 32;
     const trailingSpaceKey = 32;
-    if (!e.keyCode) return;
+    if (!e.code) return;
 
-    if ((e.keyCode) && (e.keyCode === autoCompleteTabKey)) {
+    if ((e.code) && (e.code === 'Tab')) {
       if (serverInputAreaEl.value.length < 2) {
         e.preventDefault();
         return;
@@ -237,7 +248,7 @@ window.customElements.define('irc-server-panel', class extends HTMLElement {
         snippet = snippetArray[snippetArray.length - 1];
       }
       if (snippet.length > 0) {
-        if ((e.keyCode === autoCompleteTabKey) && (snippet.length > 0)) {
+        if ((e.code === 'Tab') && (snippet.length > 0)) {
           this._autoCompleteServInputElement(snippet);
         }
       } else {
@@ -255,7 +266,7 @@ window.customElements.define('irc-server-panel', class extends HTMLElement {
     } // case of tab key
     //
     // Case of space key to autocomplete on space-space
-    if ((e.keyCode) && (e.keyCode === autoCompleteSpaceKey)) {
+    if ((e.code) && (e.code === 'Space')) {
       if (serverInputAreaEl.value.length > 0) {
         // if previous characters is space (and this key is space too)
         if (serverInputAreaEl.value.charCodeAt(serverInputAreaEl.value.length - 1) ===
