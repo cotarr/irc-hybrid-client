@@ -14,6 +14,10 @@ Work in progress, see top of README.md
 
 Commit
 
+- Committed the bundled and minified folder "build-prod" to the repository. All future commits will include this folder.
+
+Commit fefb4a2
+
 - Disable certain hotkeys when not connected to IRC
 
 Commit 7007a5e

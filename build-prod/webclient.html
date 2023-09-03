@@ -1,11 +1,364 @@
-<!DOCTYPE html>
-<html lang="en" dir="ltr">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1.0">
-  <title>irc-hybrid-client</title>
-</head>
-<body>
-  <h1>Build Placeholder Page</h1>
-</body>
-</html>
+<!DOCTYPE html><html lang="en" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"><meta name="csrf-token" content="{{csrfToken}}">
+<link rel="stylesheet" href="css/styles.css"><script src="./js/webclient.js" defer="defer"></script><title>irc-hybrid-client</title></head><body class="global-body-theme-dark" theme="dark"><noscript>
+<br><h1>JavaScript is required to load this page.</h1></noscript><template id="websocketPanelTemplate"><link rel="stylesheet" href="css/styles.css"><div id="panelVisibilityDivId" 
+class="global-visibility-div"><div id="panelDivId" class="global-panel-style-div websocket-panel-theme"><h2 class="mt5">Web Server Connection</h2><div class="button-div"><button 
+id="manualWebSocketReconnectButtonId">Reconnect to Web Site</button> <button id="stopWebSocketReconnectButtonId">Stop</button></div><pre id="reconnectStatusDivId" class="websocket-panel-status-div">
+</pre></div></div></template><template id="navMenuTemplate"><link rel="stylesheet" href="css/styles.css"><div id="navDropdownDivId" class="nav-dropdown-div nav-menu-theme-dark"><div 
+id="group01ButtonId" class="nav-group">+ Private Messages</div><div id="item1_1_Id" class="nav-group01 nav-level1" collapsed>New Private Message...</div><div id="dropdownMenuPrivMsgContainerId"></div>
+<div id="group02ButtonId" class="nav-group">+ IRC Channels</div><div id="item2_1_Id" class="nav-group02 nav-level1" collapsed>New Channel ...</div><div id="dropdownMenuChannelContainerId"></div><div 
+id="group03ButtonId" class="nav-group">+ View Panels</div><div id="item3_1_Id" class="nav-group03 nav-level1" collapsed>IRC Server List</div><div id="item3_2_Id" class="nav-group03 nav-level1" 
+collapsed>IRC Controls</div><div id="item3_3_Id" class="nav-group03 nav-level1" collapsed>IRC Server</div><div id="item3_4_Id" class="nav-group03 nav-level1" collapsed>Wallops</div><div 
+id="item3_5_Id" class="nav-group03 nav-level1" collapsed>Notices</div><div id="item3_6_Id" class="nav-group03 nav-level1" collapsed>IRC Command List</div><div id="group04ButtonId" class="nav-group">
++ More...</div><div id="item4_1_Id" class="nav-group04 nav-level1" collapsed>Toggle Light/Dark Theme</div><div id="item4_2_Id" class="nav-group04 nav-level1" collapsed>Show All Panels</div><div 
+id="item4_3_Id" class="nav-group04 nav-level1" collapsed>Collapsed Panels</div><div id="item4_4_Id" class="nav-group04 nav-level1" collapsed>Hide All Panels</div><div id="item4_5_Id" 
+class="nav-group04 nav-level1" collapsed>Debug Tools</div><div id="item5_0_Id" class="nav-level0">MIT License</div><div id="item5_1_Id" class="nav-level0">Logout...</div></div></template><template 
+id="activitySpinnerTemplate"><link rel="stylesheet" href="css/styles.css"><div id="activitySpinner"><div class="activity-spinner-div"></div></div></template><template id="hamburgerIconTemplate"><link 
+rel="stylesheet" href="css/styles.css"><div id="hamburgerBorderId" class="hamburger-icon hamburger-icon-theme-dark"><div id="hamburgerLine1Id" class="hamburger-line hamburger-line-theme-dark"></div>
+<div id="hamburgerLine2Id" class="hamburger-line hamburger-line-theme-dark"></div><div id="hamburgerLine3Id" class="hamburger-line hamburger-line-theme-dark"></div></div></template><template 
+id="headerBarTemplate"><link rel="stylesheet" href="css/styles.css"><div><div id="headerBarDivId" class="hbar-panel-div header-bar-theme-dark"><div id="wholeBarId" class="global-head-flex"><div 
+class="global-head-left"><div id="navDropdownButtonId"><hamburger-icon id="hamburgerIconId"></hamburger-icon></div></div><div class="global-head-center"><div id="titleDivId" class="hbar-title-div">
+irc-hybrid-client</div></div><div class="global-head-right"><button id="enableAudioButtonId" class="hbar-enable-audio" hidden>+Audio</button> <button id="collapseAllButtonId" 
+class="global-show-hide-button mr5">&#8722;</button></div></div></div><div id="annunciatiorDivId" class="hbar-annunciator-div"><div id="webConnectIconId" class="hbar-connect-icon">Web</div><div 
+id="ircConnectIconId" class="hbar-connect-icon">IRC</div><div id="waitConnectIconId" class="hbar-wait-icon" hidden>Wait...</div><div id="ircIsAwayIconId" class="hbar-away-icon" hidden>Away</div><div 
+id="panelZoomIconId" class="global-message-icon channel-panel-zoomed" hidden>Zoom</div><div id="nickRecovIconId" class="global-message-icon hbar-recovery-theme-dark" hidden>R</div><div 
+id="timerFlashingDivId" class="hbar-panel-flashing-div"><div id="serverUnreadExistIconId" class="global-message-icon irc-server-panel-theme-dark" hidden>S</div><div id="wallopsUnreadExistIconId" 
+class="global-message-icon wallops-panel-theme-dark" hidden>W</div><div id="noticeUnreadExistIconId" class="global-message-icon notice-panel-theme-dark" hidden>N</div><div 
+id="privMsgUnreadExistIconId" class="global-message-icon pm-panel-theme-dark" hidden>P</div><div id="channelUnreadExistIconId" class="global-message-icon channel-panel-theme-dark" hidden>C</div></div>
+</div></div></template><template id="errorPanelTemplate"><link rel="stylesheet" href="css/styles.css"><div id="panelVisibilityDivId" class="global-visibility-div"><div id="panelDivId" 
+class="global-panel-style-div error-panel-div"><div id="errorContentDivId"></div><div id="errorTitleId" class="error-panel-title">Tap to Close</div></div></div></template><template 
+id="helpPanelTemplate"><link rel="stylesheet" href="css/styles.css"><div id="panelVisibilityDivId" class="global-visibility-div"><div id="panelDivId" 
+class="global-panel-style-div help-panel-theme-dark"><div class="global-head-flex"><div class="global-head-left"><button id="closePanelButtonId" title="Hide Panel" class="global-show-hide-button mr5">
+x</button> <span>IRC Command List</span></div></div><div id="infoDivId" class="help-panel-help-div global-text-theme-dark"><pre class="pd10">
+Available IRC Text Commands
+
+/ADMIN [server]
+/AWAY [away-message]
+/CTCP &ltnickname&gt &ltctcp-command&gt
+/DEOP &ltnick1&gt ... [nick5]
+/DEVOICE &ltnick1&gt ... [nick5]
+/JOIN &lt#channel&gt
+/LIST [#channel-mask]
+/ME &ltaction-message&gt
+/MODE &lt#channel&gt [channel-mode(s)]
+/MODE &ltnickname&gt [user-mode(s)]
+/MOTD [server]
+/MSG &ltnickname&gt &ltprivate-message&gt
+/NICK &ltnew-nickname&gt
+/NOP ...inert testing command...
+/NOTICE &ltnickname&gt &ltnotice-message&gt
+/OP &ltnick1&gt ... [nick5]
+/PART &lt#channel&gt [Optional part message]
+/QUERY &ltnickname&gt &ltprivate-message&gt
+/QUIT [optional quit message]
+/QUOTE &ltIRC server raw command&gt
+/TOPIC &lt#channel&gt &ltnew-topic&gt
+/VERSION [server]
+/VOICE &ltnick1&gt ... [nick5]
+/WHO [mask] [o]
+/WHOIS &ltnickname&gt
+
+If the command you are looking for is not
+available, please use the /QUOTE to send
+a raw command to the IRC server directly.
+
+Keyboard HotKeys
+
+Alt-B - Bars, collapse panels to bars
+Alt-C - Channel Panels (Show/Hide)
+Alt-H - Help, IRC commands (Show/Hide)
+Alt-I - IRC Connect/Disconnect Controls
+Alt-L - List of IRC Servers (Show/Hide)
+ALT-X - Next, Cycle IRC channel panels
+Alt-P - Private Message Panels (Show/Hide)
+Alt-S - Server Messages (Show/Hide)
+Alt-X - Hide all panels.
+Alt-Z - Zoom, (Channel panel only)
+</pre></div></div></div></template><template id="licensePanelTemplate"><link rel="stylesheet" href="css/styles.css"><div id="panelVisibilityDivId" class="global-visibility-div"><div id="panelDivId" 
+class="global-panel-style-div license-panel-theme-dark"><div class="global-head-flex"><div class="global-head-left"><button id="closePanelButtonId" title="Hide Panel" 
+class="global-show-hide-button mr5">x</button> <span>MIT License</span></div></div><div id="licenseDivId" class="license-panel-license-div global-text-theme-dark"><p>MIT License</p><p>
+Copyright (c) 2021 Dave Bolenbaugh</p><p></p>
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+<p></p><p></p>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.<p></p><p></p>
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+<p></p></div></div></div></template><template id="logoutPanelTemplate"><link rel="stylesheet" href="css/styles.css"><div id="panelVisibilityDivId" class="global-visibility-div"><div id="panelDivId" 
+class="global-panel-style-div logout-panel-theme"><div class="global-head-flex"><div class="global-head-left"><button id="closePanelButtonId" title="Hide Panel" class="global-show-hide-button mr5">x
+</button> <span>Check IRC status</span></div><div class="global-head-center"></div><div class="global-head-right"><button id="cancelButtonId">Cancel</button> <button id="webLogoutButtonId">Web Logout
+</button></div></div><div class="vh10"></div><div>
+You are receiving this message because your nickname is still present on IRC, or the status of your IRC connection is unknown. Your nickname may remain present on IRC. Web page login is independent of IRC login.
+</div></div></div></template><template id="serverFormPanelTemplate"><link rel="stylesheet" href="css/styles.css"><div id="panelVisibilityDivId" class="global-visibility-div"><div id="panelDivId" 
+class="global-panel-style-div server-form-theme-light"><div class="global-head-flex"><div class="global-head-left"><button id="closePanelButtonId" title="Hide Panel" 
+class="global-show-hide-button mr5">x</button> <span>IRC Server Configuration</span></div><div class="global-head-center"></div><div class="global-head-right"></div></div><div class="vh20"></div><div 
+class="form-style-div>"><div><button id="saveNewButtonId" hidden>Save</button> <button id="saveModifiedButtonId" hidden>Save</button> <button id="cancelEditButtonId">Cancel</button> <a 
+href="/irc/docs/server-config.html"><button id="showHelpDocsButton" hidden>Help</button></a></div><div class="vh10"></div><div><div class="server-form-required-input"></div><span>- Required Field
+</span></div><div class="vh10"></div><div class="server-form-group2 server-form-input-group2-dark"><div class="vh10"></div><div class="mb5" hidden><input id="indexInputId" type="number" value="" 
+readonly="readonly"><div class="global-inline-block">index</div></div><div class="mb5"><div class="server-form-optional-input"></div><input id="disabledCheckboxId" type="checkbox"><div 
+class="global-inline-block">Disable/Hide this IRC server definition</div><button id="disabledCheckboxInfoBtn">?</button></div><div id="disabledCheckboxInfo" class="server-form-white-info-div" hidden>
+<p>
+The Disable/Hide checkbox is used to prevent an individual IRC server definition from being selected using the [Next], [Prev] buttons in the web client. Disabled IRC server definitions are excluded from automatic server rotation when connections fail.
+</p><p>IRC server definitions may also be enabled or disabled using the checkboxes in the main IRC server table (previous screen).</p><p>Click the [?] again to close this message.</p></div><div 
+class="mb5"><div class="server-form-required-input"></div><input id="groupInputId" type="number" class="server-form-group-input" value=""><div class="global-inline-block">Server Rotation Group Number
+</div><button id="groupInputInfoBtn">?</button></div><div id="groupInputInfo" class="server-form-white-info-div" hidden><p>
+The &quot;Server Rotation Group Number&quot; column defines an integer group number. Groups are used to configure and define a common group of IRC server definitions. In the event of IRC server network connection failures, different IRC servers within a common group number can be automatically rotated to other servers in the group. Group 0 is reserved for stand alone servers. A rotation group is defined when the group number is 1 or greater . If more than two server in a group are not disabled and both have the Auto Reconnect property enabled, then upon disconnect, the client will automatically rotate IRC server definitions within a server group. In typical use, a server group would allow different IRC networks such as DALnet or Undernet to have different group numbers.
+</p><ul><li>The Group input field accepts integer values 0 to 9999</li><li>Group 0 is used to define individual IRC server addresses that do not rotate.</li><li>
+Group 1 or greater defines a set of server where servers of the same group number will automatically rotate after disconnect.</li><li>
+Each server in the group must have &quot;Auto Reconnect&quot; enabled.</li></ul><p>Click the [?] again to close this message.</p></div><div class="mb5"><div class="server-form-required-input"></div>
+<input id="nameInputId" type="text" value=""><div class="global-inline-block">Label</div><button id="nameInputInfoBtn">?</button></div><div id="nameInputInfo" class="server-form-white-info-div" 
+hidden><p>
+The &quot;Label&quot; is used to provide a descriptive name for an IRC server definition. The Label is not otherwise used, and it may contain any arbitrary string values. If you are using a small screen smartphone, it is best to keep the Label short.
+</p><p>Click the [?] again to close this message.</p></div><div class="mb5"><div class="server-form-optional-input"></div><input id="autoReconnectCheckboxId" type="checkbox"><div 
+class="global-inline-block">Automatic Reconnect</div><button id="autoReconnectCheckboxInfoBtn">?</button></div><div id="autoReconnectCheckboxInfo" class="server-form-white-info-div" hidden><p>
+When the Automatic Reconnect checkbox is checked, after disconnect, the IRC client will attempt to reconnect to IRC. For the first try, it will use the existing server definition and existing nickname. In the case where first reconnect attempt using the same IRC server and nickname fails, if additional IRC servers have been defined within a Group, other IRC server definitions will be tried. Upon reconnect, it will attempt to re-join up to 5 channels that were open at the time of disconnection. This feature does not support channel passwords.
+</p><p>At this time there are no provisions to configure a server to auto-connect to IRC on startup. There is no provision to auto-join channels on startup.</p><p>
+Click the [?] again to close this message.</p></div><div class="mb5"><div class="server-form-optional-input"></div><input id="loggingCheckboxId" type="checkbox"><div class="global-inline-block">
+Log IRC raw server messages</div><button id="loggingCheckboxInfoBtn">?</button></div><div id="loggingCheckboxInfo" class="server-form-white-info-div" hidden><p>
+When the log checkbox is checked, the raw IRC messages from the IRC server are written the file &quot;irc.log&quot; located in the logs folder. Caution should be used as logging of passwords or other bot credentials may occur. Some filters are included to redact common password syntax before writing to the log, but the list may not include all possibilities. This is really intended for debugging. There are obvious privacy concerns here. It is recommended to leave this set to false.
+</p><p>Click the [?] again to close this message.</p></div></div><div class="vh10"></div><div class="server-form-group1 server-form-input-group1-dark"><h3>IRC Server Connection</h3><div class="mb5">
+<div class="server-form-required-input"></div><input id="hostInputId" type="text" value=""><div class="global-inline-block">IRC Server: Host or IP</div><button id="hostInputInfoBtn">?</button></div>
+<div id="hostInputInfo" class="server-form-white-info-div" hidden><p>
+The IRC server address, port, and TLS settings are similar to other IRC clients. The IRC server address may be entered as a fully qualified domain name, an IPV4 address, or an IPV6 address. An IPV6 address should not include brackets [...]. The port number should not be appended to the address.
+</p><p>
+Caution: In the web server settings, if the outbound IRC network socket address has been specified by use of an IP address, then the IRC server address defined here must be the same IPV4/IPV6 family as the bound interface. This could be an issue where IRC server domain names lookup both IPV4 and IPV6 addresses. Many IRC networks provide family specific domain names such as &quot;ipv6.dal.net&quot;.
+</p><ul><li>Hostname: irc.example.com</li><li>IPV4 Address: 192.168.1.50</li><li>IPV6 Address: fc00:1234::5678</li></ul><p>Click the [?] again to close this message.</p></div><div class="mb5"><div 
+class="server-form-required-input"></div><input id="portInputId" type="number" class="server-form-port-input" value=""><div class="global-inline-block">IRC Server: Port</div></div><div class="mb5">
+<div class="server-form-required-input"></div><input id="tlsCheckboxId" type="checkbox"><div class="global-inline-block">Use TLS</div><input id="verifyCheckboxId" type="checkbox"><div 
+class="global-inline-block">TLS certificate verify</div></div><div><div id="ircProxyEnabledDivId" class="ml20"></div><div id="ircProxyAddrDivId" class="ml40"></div></div><div class="mb5"><div 
+class="server-form-optional-input"></div><input id="proxyCheckboxId" type="checkbox"><div class="global-inline-block">Use Socks5 Proxy if available.</div><button id="proxyCheckboxInfoBtn">?</button>
+</div><div id="proxyCheckboxInfo" class="server-form-white-info-div" hidden><p>
+The irc-hybrid-client has limited capability to connect to an IRC server using a socks5 network proxy. The configuration settings for the socks5 proxy are defined in the web server configuration credentials.json file or with environment variables. Configuration is explained in the Login Config section of /docs.
+</p><p>Socks5 is a pure network protocol and does not include encryptions. For privacy, is recommended to use TLS inside the proxy network connection.</p><p>
+If a socks5 proxy has been defined in the web server configuration, the each individual IRC server definition will have the option to use the Socks5 Proxy to connect to the IRC server. The current sock5 proxy address, if configured, will be displayed at the bottom of the server list page.
+</p><ul><li>Check the box to use socks5 network proxy for this server.</li></ul><p>Click the [?] again to close this message.</p></div><div class="mb5"><div><div class="server-form-optional-input">
+</div><input id="passwordInputId" type="text" value=""><div class="global-inline-block">IRC server password (Optional)</div><button id="replacePasswordButton">Replace</button> <button 
+id="passwordInputInfoBtn">?</button></div><div id="serverPasswordWarningDiv"><ul><li>Enter new IRC server password, then press [Save] button</li><li>
+To clear previous entry, leave blank and press [Save] button</li><li>To abort changing the previous value, press [Cancel] button above</li><li>
+It is not possible to view the previous password from the web browser.</li></ul><div class="server-form-yellow-warning-div">
+Note: IRC server passwords will be stored unencrypted in clear text in &quot;servers.json&quot; located in the base folder of the web server.</div></div><div id="passwordInputInfo" 
+class="server-form-white-info-div" hidden><p></p><thead></thead>
+IRC server password field is optional. It may be used for IRC servers that require a password in order to connect to the IRC network. The password is a write-only field and the current value may not be viewed from the web page for security reasons.
+<p></p><p>Security note: The IRC server password is stored in plain text in the servers.json file, and it may be viewed there.</p><p>Click the [?] again to close this message.</p></div></div><div 
+class="mb5"><div class="server-form-optional-input"></div><input id="saslUsernameInputId" type="text" value=""><div class="global-inline-block">IRC server SASL username (Optional)</div><button 
+id="saslUsernameInputInfoBtn">?</button></div><div id="saslUsernameInputInfo" class="server-form-white-info-div" hidden><p>
+The IRC Server SASL username is optional. If both SASL username and password contain valid string values, the SASL username and SASL password will be sent to the IRC server during the initial connection.
+</p><p>SASL authorization was added specifically for use with libera.chat and has not been tested on any other IRC networks.</p><ul><li>To disable, leave the SASL values blank.</li><li>
+The only mechanism supported at this time is PLAIN.</li><li>In the event of a login failure, a standard IRC connection will be attempted without SASL.</li></ul><p>
+Click the [?] again to close this message.</p></div><div class="mb5"><div><div class="server-form-optional-input"></div><input id="saslPasswordInputId" type="text" value=""><div 
+class="global-inline-block">IRC server SASL password (Optional)</div><button id="replaceSaslPasswordButton">Replace</button> <button id="saslPasswordInputInfoBtn">?</button></div><div 
+id="serverSaslPasswordWarningDiv"><ul><li>Enter new IRC server SASL password, then press [Save] button</li><li>To clear previous entry, leave blank and press [Save] button</li><li>
+To abort changing the previous value, press [Cancel] button above</li><li>It is not possible to view the previous SASL password from the web browser.</li><li>SASL mechanism: only <b>plain</b>
+ is supported.</li></ul><div class="server-form-yellow-warning-div">
+Note: IRC server SASL passwords will be stored unencrypted in clear text in &quot;servers.json&quot; located in the base folder of the web server.</div></div><div id="saslPasswordInputInfo" 
+class="server-form-white-info-div" hidden><p>
+The IRC Server SASL password is optional. If both SASL username and password contain valid string values, the SASL username and SASL password will be sent to the IRC server during the initial connection.
+</p><p>SASL authorization was added specifically for use with libera.chat and has not been tested on any other IRC networks.</p><p>
+The SASL password is a write-only field and the current value may not be viewed from the web page for security reasons. Security note: The SASL password is stored in plain text in the servers.json file, and it may be viewed there.
+</p><p></p><ul><li>To disable, leave the SASL values blank.</li><li>The only mechanism supported at this time is PLAIN.</li><li>
+In the event of a login failure, a standard IRC connection will be attempted without SASL.</li></ul><p>Click the [?] again to close this message.</p></div></div></div><div class="vh20"></div><div 
+class="server-form-group1 server-form-input-group1-dark"><h3>User Settings</h3><div class="mb5"><div class="server-form-required-input"></div><input id="nickInputId" type="text" value=""><div 
+class="global-inline-block">User IRC nickname</div><button id="nickInputInfoBtn">?</button></div><div id="nickInputInfo" class="server-form-white-info-div" hidden><p>
+The User IRC Nickname is the name you will known as when you sign into IRC. When you open the IRC client web page, the default nickname for a specific IRC server definition is the one specified here. At the time you connect to IRC, an different nickname may be specified on the IRC Controls panel, but it would revert to the one set here for subsequent connections.
+</p><p>
+Some characters are restricted like @ and + because they designate channel operator or voice. Allowed are uppercase or lowercase characters, numbers, hyphens, underscores, square brackets, curly braces, backslash, backticks, or pipes. Please note that different types of IRC servers have different requirements for the number of characters allowed in a nickname, user or real name. These are often displayed in a server message when you first connect to IRC. At the present time, the maximum length of these values is not checked by this program, so exceeding the limit set by the server would generate an IRC server error.
+</p><p>Click the [?] again to close this message.</p></div><div class="mb5"><div class="server-form-optional-input"></div><input id="altNickInputId" type="text" value=""><div 
+class="global-inline-block">Alternate nickname (Disabled when blank)</div><button id="altNickInputInfoBtn">?</button></div><div id="altNickInputInfo" class="server-form-white-info-div" hidden><p>
+If an optional alternate nickname is specified, it will be tried when the primary nickname is not available. If the nickname recovery checkbox is checked, should the primary nickname become available while the user is logged in to IRC with the alternate nickname, automatic recovery of the primary nickname will be attempted.
+</p><p>Click the [?] again to close this message.</p></div><div class="mb5"><div class="server-form-optional-input"></div><input id="recoverNickCheckboxId" type="checkbox"><div 
+class="global-inline-block">Attempt to auto-recover nickname from alternate.</div><button id="recoverNickCheckboxInfoBtn">?</button></div><div id="recoverNickCheckboxInfo" 
+class="server-form-white-info-div" hidden><p>The automatic recovery of a nickname can be cancelled at any time by using the /NICK command to change nicknames.</p><p>
+In the case where an IRC server returns a 433 ERR_NICKNAMEINUSE prior to nickname registration, the altNick value will be submitted as an alternate nickname. If recoverNick is set to true, the automatic nickname recovery process will be activated by the 433 message.
+</p><p>
+In the case where an IRC server returns a 432 ERR_ERRONEUSNICKNAME prior to nickname registration, the altNick value will be submitted as an alternate nickname. However, auto-recovery of the primary nickname is not enabled. This is because 432 is probably caused by a services/nickserv nickname lock, and manual user intervention will most likely be needed to clear the 432 IRC server message.
+</p><p>
+Upon IRC disconnect of the intended nickname, if the alternate nickname is in use at the time of disconnect, the requested nickname will revert back to the primary nickname value. The next connection event will therefore use the primary nickname. If the use has entered an ad-hoc nickname value different from both the primary and alternate nicknames, the ad-hoc nickname will persist after disconnect.
+</p><p>
+If recoverNick is set to the true, the client will automatically attempt to recover the primary nickname by sending a NICK command with the primary nickname. This is triggered in 2 ways. If a ghost user with primary nickname is present in an IRC channel with the active alternate nickname, a QUIT message will trigger immediate nickname recovery. Otherwise, a cycle timer will periodically attempt to send NICK commands with the primary nickname until a time limit is reached. The duration between attempts increases over time.
+</p><p>Click the [?] again to close this message.</p></div><div class="mb5"><div class="server-form-required-input"></div><input id="realInputId" type="text" value=""><div class="global-inline-block">
+User real name</div><button id="realInputInfoBtn">?</button></div><div id="realInputInfo" class="server-form-white-info-div" hidden><p>
+The User real name field can be set to an arbitrary string value. This is the value shown for a user's /WHOIS request. Most people make up something interesting here, or duplicate their nickname.</p>
+<p>Click the [?] again to close this message.</p></div><div class="mb5"><div class="server-form-required-input"></div><input id="userInputId" type="text" value=""><div class="global-inline-block">
+Unix ident user (for address mask)</div><button id="userInputInfoBtn">?</button></div><div id="userInputInfo" class="server-form-white-info-div" hidden><p>
+The Unix ident user is an IRC client property which will be used by an IRC server for the case where the client computer did not provide a response to an identd query to port 113. This is typically up to 8 alphabet characters without a space.
+</p><p>
+This is a hold over from the original days of UNIX. When a client on a unix system makes an outbound connection request, it was possible for the server receiving the request to query back to the connecting computer's identd service on port 113. The server would provide the port number from the user's computer, and the identd service would respond with the UNIX username of the user's login account who is attempting the connection. With the advent of single user personal computers, the identd service is not likely running, and no identd username would be available. To satisfy the IRC server's username value, an IRC client must provide a backup, self defined, username.
+</p><p>
+On IRC, a user's /WHOIS response would prepend a tilde (~) character to the username as shown here, first UNIX username &quot;unixuser&quot; and backup client username &quot;myuser&quot;. Do not add the tilde, it is added automatically by the IRC server.
+</p><pre>
+mynickname!unixuser@example.com
+mynickname!~myuser@exmaple.com
+</pre><p>Click the [?] again to close this message.</p></div><div class="mb5"><div class="server-form-optional-input"></div><input id="modesInputId" type="text" value=""><div 
+class="global-inline-block">Initial user modes Example: &quot;+i&quot; (Optional)</div><button id="modesInputInfoBtn">?</button></div><div id="modesInputInfo" class="server-form-white-info-div" 
+hidden><p>
+An IRC user has the ability to set various user modes using the format: /MODE username &lt;mode&gt;, where modes are a single letter preceded by a + or - character. For example, the letter i is the invisible mode, set to +i or -i. Different IRC networks allow different mode letters. Each IRC network usually has a help page showing allowed user modes.
+</p><p>This field is a string value that is sent to the IRC server after a user connects. This will be the initial user mode. A typical entry would be &quot;+i&quot;.</p><p>
+Click the [?] again to close this message.</p></div></div><div class="vh20"></div><div class="server-form-group1 server-form-input-group1-dark"><h3>Channel Preset Buttons</h3><div class="mb5"><div 
+class="server-form-optional-input"></div><input id="channelListInputId" type="text" value=""><div class="global-inline-block">IRC Channels, Comma separated list (Optional)</div><button 
+id="channelListInputInfoBtn">?</button></div><div id="channelListInputInfo" class="server-form-white-info-div" hidden><p>
+The IRC channel list is a comma separated list of channel names. In the client interface, a button will be created for each channel. Pressing the pre-defined button will cause the client to /JOIN the channel listed on the button when pressed. Channel are not automatically joined on startup. The user must press the pre-defined channel buttons. Remember, channel names start with a pound sign like #mychannel.
+</p><p>Click the [?] again to close this message.</p></div><ul><li>Example:<div class="server-form-white-example-div">#coolchannel, #lamechannel, #helpchannel</div></li></ul></div><div class="vh20">
+</div><div class="server-form-group1 server-form-input-group1-dark"><h3>IRC Services</h3><div class="mb5"><div class="server-form-optional-input"></div><input id="identifyNickInputId" type="text" 
+value=""><div class="global-inline-block">Nickserv identify nick (Optional)</div><button id="identifyNickInputInfoBtn">?</button></div><div id="identifyNickInputInfo" 
+class="server-form-white-info-div" hidden><p>
+The IRC services section is optional. Leave these field empty to disable this feature. The purpose is to send a user IDENTIFY message to a NickServ service during initial connect to IRC.</p><ul><li>
+The value entered here must exactly match the user's current IRC nickname, no no command is sent.</li><li>If a backup nickname is used as fallback, the name will not match and no command is sent.</li>
+</ul><p>Click the [?] again to close this message.</p></div><div class="mb5"><div><div class="server-form-optional-input"></div><input id="identifyCommandInputId" type="text" value=""><div 
+class="global-inline-block">Nickserv identify command (Optional)</div><button id="replaceIdentifyCommandButton">Replace</button> <button id="identifyCommandInputInfoBtn">?</button></div><div 
+id="nickservCommandWarningDiv"><ul><li>Enter new value, then press [Save] button</li><li>To clear previous entry, leave blank and press [Save] button</li><li>
+To abort changing the previous value, press [Cancel] button above</li><li>It is not possible to view the previous identify command from the web browser.</li><li>Example command:<div 
+class="server-form-white-example-div">PRIVMSG NickServ :IDENTIFY xxxxxxxx</div></li><li>Example command:<div class="server-form-white-example-div">PRIVMSG NickServ@services.dal.net :IDENTIFY xxxxxxxx
+</div></li><li>Example command:<div class="server-form-white-example-div">NICKSERV IDENTIFY xxxxxxxx</div></li></ul><div class="server-form-yellow-warning-div">
+Note: NickServ command including any passwords will be stored unencrypted in clear text in &quot;servers.json&quot; located in the base folder of the web server.</div></div><div 
+id="identifyCommandInputInfo" class="server-form-white-info-div" hidden><p>
+The IRC services section is optional. Leave these field empty to disable this feature. The purpose is to send a user IDENTIFY message to a NickServ service during initial connect to IRC.</p><p>
+The command may contain passwords so it is a write-only value and the command may not be viewed from the web page.</p><ul><li>This is a full IRC command, not an individual password.</li><li>
+The command is stored in the servers.json files on the web server in plain text format.</li></ul><p>Example commands:</p><pre>
+PRIVMSG NickServ :IDENTIFY xxxxxxxx
+PRIVMSG NickServ@services.dal.net :IDENTIFY xxxxxxxx
+NICKSERV IDENTIFY xxxxxxxx
+</pre><p>Click the [?] again to close this message.</p></div></div></div><div class="vh10"></div><div><button id="saveNewButtonId2" hidden>Save</button> <button id="saveModifiedButtonId2" hidden>Save
+</button> <button id="cancelEditButtonId2">Cancel</button></div><div class="vh10"></div></div></div></div></template><template id="serverListPanelTemplate"><link rel="stylesheet" 
+href="css/styles.css"><div id="panelVisibilityDivId" class="global-visibility-div"><div id="panelDivId" class="global-panel-style-div server-form-theme-dark"><div class="global-head-flex"><div 
+class="global-head-left"><button id="closePanelButtonId" title="Hide Panel" class="global-show-hide-button mr5">x</button> <span>IRC Server List</span></div><div class="global-head-center"></div><div 
+class="global-head-right"></div></div><div class="vh20"></div><div id="serverListDisabledDivId" class="server-list-yellow-warning-div" hidden><p>
+The Server List Editor has been disabled in the web server configuration file.</p></div><div><div id="editorOpenWarningDivId" class="server-list-yellow-warning-div" hidden><h3>Editor is OPEN</h3><p>
+The IRC server edit form is currently open (scroll up). The edit form must be closed in order to connect to IRC. Finish the current edit and press either [Save] or [Cancel].</p></div><div><button 
+id="createNewButtonId">Create New IRC Server...</button></div><div class="vh10"></div><div class="server-list-button-div"><div>Set Table Width</div><div class="vh10"></div><button 
+id="showEditButtonId">Default</button> <button id="showFullButtonId">Show All Columns</button> <button id="showMobileButtonId">Thin Mobile</button></div><div class="vh10"></div><div><table 
+class="server-list-table"><tbody id="tbodyId" class="server-list-tbody-dark"></tbody></table></div><div id="allDisabledWarningDivId" class="server-list-yellow-warning-div" hidden><h2>
+All IRC servers are disabled</h2><p>At least one server must be enabled before opening the IRC client page.</p></div><div id="emptyTableDivId" class="server-list-yellow-warning-div" hidden><h2>
+No IRC servers have been defined</h2><p>At least 1 IRC server must be defined here in the Server List Editor before opening the IRC client page.</p><ul><li>Click the [Create new IRC server] button.
+</li><li>After data entry, click the [Save] button to close server edit form.</li><li>Click the [Return to IRC client...] button.</li></ul></div><div id="serverIndexChangeInfoDivId">
+Note: Disabling, Duplicating, Deleting, or Up-move will change selected server.</div><div class="vh10"></div><div><button id="disconnectButtonId" class="ml10">Disconnect</button> <button 
+id="forceUnlockButtonId" class="ml10">Force Unlock</button></div><div class="vh10"></div><div><span id="ircProxyDivId"></span> <button id="ircProxyInfoBtnId" class="ml10" title="Show Help">?</button>
+</div><div id="ircProxyInfoId" class="server-list-white-info-div" hidden><p>
+The proxy info displayed here shows the current socks5 network proxy settings that have been configured in the web server. The address and port may only be changed in the web server configuration. See the Login Config section of the /docs.
+</p><p>
+If a socks5 proxy has been defined in the web server configuration, the each IRC server definition will have the option to use the Socks5 Proxy to connect to the IRC server. The socks5 proxy must be enabled individually for each server.
+</p><p>Click the [?] again to close this message.</p></div></div><div class="vh10"></div></div></div></template><template id="ircControlsPanelTemplate"><link rel="stylesheet" href="css/styles.css">
+<div id="panelVisibilityDivId" class="global-visibility-div"><div id="panelDivId" class="global-panel-style-div irc-controls-panel-theme-dark"><div><button id="closePanelButtonId" title="Hide Panel" 
+class="global-show-hide-button">x</button> <button id="collapsePanelButtonId" title="Collapse Panel to Bar" class="global-show-hide-button mr5">&#8645;</button> <span id="panelTitleDivId">IRC Controls
+</span></div><div id="panelCollapsedDivId" class="global-visibility-div"><div class="vh10"></div><div id="editorOpenWarningDivId" class="irc-controls-panel-warning-div" hidden><h3>Editor is OPEN</h3>
+<p>The IRC server edit form is currently open (scroll up). The edit form must be closed in order to connect to IRC. Finish the current edit and press either [Save] or [Cancel].</p></div><div 
+id="emptyTableWarningDivId" class="irc-controls-panel-warning-div" hidden><h2>No IRC Servers Available</h2><p>At least 1 IRC server must be defined and not disabled.</p><ul><li>
+Click the [Show IRC Server List] button.</li><li>If the server list is empty, click the [Create New IRC Server] button.</li><li>
+Check the &quot;(X) Disabled&quot; checkboxes and make sure at least 1 is not disabled.</li></ul></div><div class="vh10"></div><div><button id="showServerListButtonId" class="mr10">
+Show IRC Server List</button> <button id="showServerPanelButtonId" class="mr10">Show Server Panel</button></div><div class="ml20"><h3>Selected IRC Server</h3><div><pre id="selectedServerPreId"></pre>
+</div><div><input type="text" id="nickNameInputId" value=""><div class="global-inline-block">Nickname</div></div><div class="vh10"></div><div><button id="connectButtonId" class="mr10">Connect</button>
+ <button id="quitButtonId" class="mr10">Disconnect</button></div></div><div class="vh20"></div><div class="vh10"></div><div><button id="editServerButtonId" class="mr10">Edit Selected Server</button> 
+<button id="forceUnlockButtonId" class="mr10">Force Unlock</button></div><div id="awayHiddenDivId"><input id="userAwayMessageId" type="text" size="20" value="AFK"> <button id="setAwayButtonId">Away
+</button> <button id="setBackButtonId">Back</button> <button id="setAwayInfoBtnId">?</button><div id="setAwayInfoId" class="white-info-div" hidden><p>
+This will execute the IRC command /AWAY command providing a custom message if provided.</p><p>Click the [?] again to close this message.</p></div></div><div class="vh10"></div></div></div></div>
+</template><template id="ircServerPanelTemplate"><link rel="stylesheet" href="css/styles.css"><div id="panelVisibilityDivId" class="global-visibility-div"><div id="panelDivId" 
+class="global-panel-style-div irc-server-panel-theme-dark" lastdate="0000-00-00"><div class="global-head-flex"><div class="global-head-left"><button id="closePanelButtonId" title="Hide Panel" 
+class="global-show-hide-button mr5">x</button> <span>IRC Server</span></div><div class="global-head-center"></div><div class="global-head-right"><button id="tallerButtonId">Taller</button> <button 
+id="normalButtonId">Normal</button> <button id="clearButtonId">Clear</button></div></div><div><textarea id="panelMessageDisplayId" class="global-text-theme-dark" cols="84" rows="20" 
+spellcheck="false" readonly="readonly"></textarea></div><div class="mb5"><textarea id="panelMessageInputId" class="global-valign-middle rm5 global-text-theme-dark" cols="77" rows="1"></textarea> 
+<button id="sendButtonId" class="global-valign-middle">Send</button></div><div class="mb5"><button id="loadFromCacheButtonId">Refresh</button> <button id="eraseCacheButtonId">Erase Cache</button>
+</div><div id="elapsedTimeOuterDivId" class="irc-server-panel-div-time global-text-theme-dark"><div><pre id="elapsedTimeDiv" class="irc-server-panel-pre-time"></pre></div></div><div 
+class="irc-server-panel-program-version-div"><span id="programVersionDiv">Version-v0.0.0</span></div></div></div></template><template id="wallopsPanelTemplate"><link rel="stylesheet" 
+href="css/styles.css"><div id="panelVisibilityDivId" class="global-visibility-div"><div id="panelDivId" class="global-panel-style-div wallops-panel-theme-dark" lastdate="0000-00-00"><div 
+class="global-head-flex"><div class="global-head-left"><button id="closePanelButtonId" title="Hide Panel" class="global-show-hide-button mr5">x</button> <span>Wallops</span></div><div 
+class="global-head-center"></div><div class="global-head-right"><button id="tallerButtonId">Taller</button> <button id="normalButtonId">Normal</button> <button id="eraseButtonId">Erase</button></div>
+</div><textarea id="panelMessageDisplayId" class="global-text-theme-dark" cols="84" rows="5" spellcheck="false" readonly="readonly"></textarea></div></div></template><template 
+id="noticePanelTemplate"><link rel="stylesheet" href="css/styles.css"><div id="panelVisibilityDivId" class="global-visibility-div"><div id="panelDivId" 
+class="global-panel-style-div notice-panel-theme-dark" lastdate="0000-00-00"><div class="global-head-flex"><div class="global-head-left"><button id="closePanelButtonId" title="Hide Panel" 
+class="global-show-hide-button mr5">x</button> <span>Notice</span></div><div class="global-head-center"></div><div class="global-head-right"><button id="tallerButtonId">Taller</button> <button 
+id="normalButtonId">Normal</button> <button id="eraseButtonId">Erase</button></div></div><textarea id="panelMessageDisplayId" class="global-text-theme-dark" cols="84" rows="5" spellcheck="false" 
+readonly="readonly"></textarea></div></div></template><template id="managePmPanelsTemplate"><link rel="stylesheet" href="css/styles.css"><div id="panelVisibilityDivId" class="global-visibility-div">
+<div id="panelDivId" class="global-panel-style-div pm-panel-theme-dark"><div class="global-head-flex"><div class="global-head-left"><button id="closePanelButtonId" title="Hide Panel" 
+class="global-show-hide-button">x</button> <button id="collapsePanelButtonId" title="Collapse Panel to Bar" class="global-show-hide-button mr5">&#8645;</button> <span>Private Messages</span><div 
+id="activePmCountIconId" title="Count of Open PM Panels" class="global-count global-border-theme-dark">0</div><div id="pmUnreadCountIconId" title="Unread Message Count, All PM Panels" 
+class="global-message-count global-text-theme-inv-dark global-border-theme-dark" hidden>0</div></div><div class="global-head-center"></div><div class="global-head-right"><div id="hideWithCollapseId">
+<button id="eraseButtonId">Erase All PM</button></div></div></div><div id="panelCollapsedDivId" class="global-visibility-div"><div class="vh10"></div><div class="mb5"><span class="mr5">Private Msg To
+</span> <textarea id="pmNickNameInputId" class="global-valign-middle global-text-theme-dark" cols="20" rows="1" spellcheck="false"></textarea> <button id="whoisButtonId" 
+class="ml5 global-valign-middle">Whois</button></div><div class="vh10"></div><div class="mb5"><textarea id="panelMessageInputId" class="global-valign-middle rm5 global-text-theme-dark" cols="77" 
+rows="1"></textarea> <button id="sendButtonId" class="global-valign-middle">Send</button></div><div class="mb5"><input id="openPmWithBeepCheckBoxId" class="global-valign-middle" type="checkbox"> <span
+ class="global-valign-middle">Open/Refresh with line-beep enabled</span></div></div></div></div></template><template id="pmPanelTemplate"><link rel="stylesheet" href="css/styles.css"><div 
+id="panelVisibilityDivId" class="global-visibility-div"><div id="panelDivId" class="global-panel-style-div pm-panel-theme-dark" lastdate="0000-00-00"><div class="global-head-flex"><div 
+class="global-head-left"><button id="closePanelButtonId" title="Hide Panel" class="global-show-hide-button">x</button> <button id="collapsePanelButtonId" title="Collapse Panel to Bar" 
+class="global-show-hide-button mr5">&#8645;</button><div id="pmNameDivId" class="pm-panel-name-div"></div><div id="messageCountIconId" title="Unread Message Count" 
+class="global-message-count global-text-theme-inv-dark global-border-theme-dark" hidden>0</div></div><div class="global-head-center"></div><div class="global-head-right"></div></div><div 
+id="panelCollapsedDivId" class="global-visibility-div"><textarea id="panelMessageDisplayId" class="global-text-theme-dark" id="chan0TextAreaId" cols="61" rows="10" spellcheck="false" 
+readonly="readonly"></textarea><div class="mb5"><textarea id="panelMessageInputId" class="global-valign-middle rm5 global-text-theme-dark" cols="77" rows="1"></textarea> <button id="sendButtonId" 
+class="global-valign-middle">Send</button> <button id="bottomCollapseButtonId" class="global-valign-middle">&#8645;</button></div><div id="multiLineActionDivId" hidden class="mb5"><span 
+id="multiLineSendSpanId" class="mr7">Clipboard (0 lines)</span> <button id="multiLineSendButtonId" class="mr7">Send as multi-line</button></div><div id="bottomCollapseDivId" hidden><div class="mb5">
+<button id="tallerButtonId" title="Enlarge PM Text Area Vertically" class="rm7">Taller</button> <button id="normalButtonId" title="Restore PM Area to default size" class="rm7">Normal</button> <button 
+id="eraseButtonId">Erase ALL PM panels</button></div><div class="mb5"><input id="beepCheckBoxId" class="global-valign-middle" type="checkbox"><span class="channel-cb-span">Line-beep</span></div></div>
+</div></div></div></template><template id="manageChannelsPanelTemplate"><link rel="stylesheet" href="css/styles.css"><div id="panelVisibilityDivId" class="global-visibility-div"><div id="panelDivId" 
+class="global-panel-style-div channel-panel-theme-dark"><div><button id="closePanelButtonId" title="Hide Panel" class="global-show-hide-button">x</button> <button id="collapsePanelButtonId" 
+title="Collapse Panel to Bar" class="global-show-hide-button mr5">&#8645;</button> <span>Join IRC Channels</span><div id="activeChannelCountIconId" title="Count of Open Channels" 
+class="global-count global-border-theme-dark">0</div><div id="channelUnreadCountIconId" title="Unread Message Count, All Channels" 
+class="global-message-count global-text-theme-inv-dark global-border-theme-dark" hidden>0</div></div><div id="panelCollapsedDivId" class="global-visibility-div"><div class="vh10"></div><div 
+class="mb5"><textarea id="newChannelNameInputId" class="global-valign-middle global-text-theme-dark" cols="20" rows="1"></textarea> <button id="newChannelButtonId" class="global-valign-middle">
+Join Channel</button></div><div class="vh10"></div><div class="mr10 global-border-theme-dark channel-panel-presets-div"><div>Click to /JOIN the IRC channel</div><div class="vh7"></div><div 
+id="channelJoinButtonContainerId" class="mb5"></div></div><div class="vh10"></div></div></div></div></template><template id="channelPanelTemplate"><link rel="stylesheet" href="css/styles.css"><div 
+id="panelVisibilityDivId" class="global-visibility-div"><div id="panelDivId" class="global-panel-style-div channel-panel-theme-dark" lastdate="0000-00-00"><div class="global-head-flex"><div 
+class="global-head-left"><button id="closePanelButtonId" title="Hide Panel" class="global-show-hide-button">x</button> <button id="collapsePanelButtonId" title="Collapse Panel to Bar" 
+class="global-show-hide-button mr5">&#8645;</button><div id="channelNameDivId" class="channel-panel-name-div"></div><div id="beenKickedIconId" class="channel-panel-been-kicked-icon" hidden>Kicked
+</div><div id="notInChannelIconId" class="channel-panel-not-in-channel-icon" hidden>Not In Channel</div><div id="nickCountIconId" title="Count of Channel Nicknames" 
+class="global-count global-border-theme-dark">0</div><div id="messageCountIconId" title="Channel Unread Message Count" class="global-message-count global-text-theme-inv-dark global-border-theme-dark" 
+hidden>0</div></div><div class="global-head-center"></div><div class="global-head-right"><div id="hideWithCollapseId"><button id="joinButtonId" class="mr7" hidden>Join</button> <button 
+id="pruneButtonId" class="mr7" hidden>Prune</button> <button id="partButtonId" class="mr7">Leave</button> <button id="zoomButtonId" class="mr7">Zoom</button></div></div></div><div 
+id="panelCollapsedDivId" class="global-visibility-div" visible><div id="channelTopicDivId" class="channel-panel-topic-div"></div><textarea id="panelNickListId" class="mr6 global-text-theme-dark" 
+cols="20" rows="5" spellcheck="false" readonly="readonly"></textarea> <textarea id="panelMessageDisplayId" class="global-text-theme-dark" id="chan0TextAreaId" cols="61" rows="5" spellcheck="false" 
+readonly="readonly"></textarea><div class="mb5"><textarea id="panelMessageInputId" class="global-valign-middle rm5 global-text-theme-dark" cols="77" rows="1"></textarea> <button id="sendButtonId" 
+class="global-valign-middle">Send</button> <button id="bottomCollapseButtonId" class="global-valign-middle">&#8645;</button></div><div id="multiLineActionDivId" hidden class="mb5"><span 
+id="multiLineSendSpanId" class="mr7">Clipboard (0 lines)</span> <button id="multiLineSendButtonId" class="mr7">Send as multi-line</button></div><div id="bottomCollapseDivId" hidden><div class="mb5">
+<button id="refreshButtonId" title="Refresh from IRC message cache" class="mr7">Refresh</button> <button id="clearButtonId" title="Clear Text Area (Does not clear cache)" class="rm7">Clear</button> 
+<button id="tallerButtonId" title="Enlarge Channel Text Area Vertically" class="rm7">Taller</button> <button id="normalButtonId" title="Restore Channel Area to default size" class="rm7">Normal
+</button></div><div class="mb5"><input id="noScrollCheckboxId" class="global-valign-middle" type="checkbox"> <span class="channel-cb-span">Inhibit-auto-scroll (clipboard use)</span></div><div 
+class="mb5"><input id="briefCheckboxId" class="global-valign-middle" type="checkbox"><span class="channel-cb-span">Brief</span> <input id="autocompleteCheckboxId" class="global-valign-middle" 
+type="checkbox"><span id="autoCompleteTitle" class="channel-cb-span">Auto-complete (tab)</span></div><div><input id="beep1CheckBoxId" class="global-valign-middle" type="checkbox"><span 
+class="channel-cb-span">Line-beep</span> <input id="beep2CheckBoxId" class="global-valign-middle" type="checkbox"><span class="channel-cb-span">Join-beep</span> <input id="beep3CheckBoxId" 
+class="global-valign-middle" type="checkbox"><span class="channel-cb-span">Name-beep</span></div></div><div class="vh7"></div></div></div></div></template><template id="debugPanelTemplate"><link 
+rel="stylesheet" href="css/styles.css"><div id="panelVisibilityDivId" class="global-visibility-div"><div id="panelDivId" class="global-panel-style-div debug-panel-theme-dark"><div 
+class="global-head-flex"><div class="global-head-left"><button id="closePanelButtonId" title="Hide Panel" class="global-show-hide-button">x</button> <span>Debug Panel</span></div><div 
+class="global-head-center"></div><div class="global-head-right"></div></div><div><div class="debug-panel-section-div"><div class="fs120p">Admin Functions</div><div class="mt10"><button 
+id="forceDisconnectButtonId" class="mr10">Force Dissconnect</button> <span>When &quot;/QUIT&quot; fails</span></div><div class="mt10"><button id="serverTerminateButtonId" class="mr10">Die Web Server
+</button> <span>Remote IRC client shutdown</span></div></div><div class="debug-panel-section-div"><div class="fs120p">Remote Server Functions</div><div class="mt10"><button id="button_1_1" 
+class="mr10">Button 1-2</button> <span>Server: Emulate IRC ping timeout<span></span></span></div><div class="mt10"><button id="button_1_2" class="mr10">Button 1-3</button> <span>
+Local: Emulate websocket timeout</span></div><div class="vh10"></div><div class="fs80p">Results at bottom of debug panel.</div><div class="mt10"><button id="button_1_3" class="mr10">Button 1-1
+</button> <span>Server: Memory usage</span></div><div class="mt10"><button id="button_1_4" class="mr10">Button 1-4</button> <span>Server: Websocket ping</span></div></div><div 
+class="debug-panel-section-div"><div class="fs120p">Browser Display Functions</div><div class="mt10"><button id="button_2_1" class="mr10">Button 2-1</button> <span>Force all panels visible</span>
+</div><div class="mt10"><button id="button_2_2" class="mr10">Button 2-2</button> <span>Force status icons visible</span></div><div class="mt10"><button id="button_2_3" class="mr10">Button 2-3</button>
+ <span>Toggle Theme Light/Dark</span></div><div class="mt10"><button id="button_2_4" class="mr10">Button 2-4</button> <span>Recalculate page size</span></div></div><div 
+class="debug-panel-section-div"><div class="fs120p">Show data and variables</div><div class="fs80p">New panels open at bottom</div><div class="mt10"><button id="button_3_1" class="mr10">Button 3-1
+</button> <span>Open: Remote variables (ircState)</span></div><div class="mt10"><button id="button_3_2" class="mr10">Button 3-2</button> <span>Open: Local variables (webState)</span></div><div 
+class="mt10"><button id="button_3_3" class="mr10">Button 3-3</button> <span>Open: IRC raw message log</span></div><div class="mt10"><button id="button_3_4" class="mr10">Button 3-4</button> <span>
+Open: Global event log</span></div></div><div class="debug-panel-section-div"><div class="fs120p">State and event functions</div><div class="mt10"><button id="button_4_1" class="mr10">Button 4-1
+</button> <span>Call getIrcState()</span></div><div class="mt10"><button id="button_4_2" class="mr10">Button 4-2</button> <span>Force message cache reload</span></div><div class="mt10"><button 
+id="button_4_3" class="mr10">Button 4-3</button> <span>Emit: &quot;irc-state-changed&quot; event</span></div><div class="mt10"><button id="button_4_4" class="mr10">Button 4-4</button> <span>
+Emit: &quot;web-connect-changed&quot;</span></div></div><div class="debug-panel-section-div"><div class="fs120p">Audio media functions</div><div class="mt10"><button id="button_5_1" class="mr10">
+Button 5-1</button> <span>Play Beep Sound 1</span></div><div class="mt10"><button id="button_5_2" class="mr10">Button 5-2</button> <span>Play Beep Sound 2</span></div><div class="mt10"><button 
+id="button_5_3" class="mr10">Button 5-3</button> <span>Play Beep Sound 3</span></div></div><div class="debug-panel-section-div"><div class="fs120p">Miscellaneous</div><div class="mt10"><button 
+id="button_6_1" class="mr10">Button 6-1</button> <span>AdHoc function (not defined)</span></div></div><div id="debugResponseSectionId" class="debug-panel-section-div" hidden><div class="fs120p">
+Debug Response</div><div class="mt10"><pre id="debugResponsePreId"></pre></div></div><div><ul><li>To open debug panel at page load append hash &quot;#DEBUG&quot; to page URL</li></ul></div></div><div 
+class="vh10"></div></div></div></template><template id="showRawTemplate"><link rel="stylesheet" href="css/styles.css"><div id="panelVisibilityDivId" class="global-visibility-div"><div id="panelDivId" 
+class="global-panel-style-div show-raw-theme-dark"><div class="global-head-flex"><div class="global-head-left"><button id="closePanelButtonId" title="Hide Panel" class="global-show-hide-button mr5">x
+</button> <span id="titleDivId">Raw Server Messages (Paused)</span></div><div class="global-head-center"></div><div class="global-head-right"><button id="pauseButtonId">Start</button> <button 
+id="clearButtonId">Clear</button> <button id="cacheButtonId">Fetch Cache</button></div></div><div><textarea id="panelMessageDisplayId" class="global-text-theme-dark" cols="84" rows="24" 
+spellcheck="false" readonly="readonly"></textarea></div><div><input class="global-valign-middle ml10" type="checkbox" id="showRawInHexCheckboxId"> <span class="global-valign-middle">Append-Hexadecimal
+</span> <button id="showHelpButtonId" class="ml20">Show Help</button></div><div id="helpPanelId" hidden><ul><li>
+The raw message cache is disabled by default and must be started with the [Start] button.</li><li>Log is limited to incoming websocket stream messages (IRC server messages)</li><li>
+Messages prefixed with &quot;-->&quot; are outgoing IRC commands echoed back by the web server.</li><li>Messages like HEARTBEAT and UPDATE are server to browser commands (see Documentation web page)
+</li><li>During logging, message cache reloads via HTTP fetch request are omitted.</li><li>The server's message cache can be viewed separately using the [Fetch cache] button.</li><li>
+To start raw log before page initialization, append the hash &quot;#LOG_RAW&quot; to page URL.</li></ul></div><div class="vh10"></div></div></div></template><template id="showEventsTemplate"><link 
+rel="stylesheet" href="css/styles.css"><div id="panelVisibilityDivId" class="global-visibility-div"><div id="panelDivId" class="global-panel-style-div show-events-theme-dark"><div 
+class="global-head-flex"><div class="global-head-left"><button id="closePanelButtonId" title="Hide Panel" class="global-show-hide-button mr5">x</button> <span id="titleDivId">
+Display global javascript browser events</span></div><div class="global-head-center"></div><div class="global-head-right"><button id="startButtonId">Start Global Event Log</button></div></div><div>
+<textarea id="panelMessageDisplayId" class="global-text-theme-dark" cols="84" rows="24" spellcheck="false" readonly="readonly"></textarea></div><div>
+It is necessary to refresh the page in the browser to cancel the global event log.</div><div class="vh10"></div></div></div></template><template id="showIrcStateTemplate"><link rel="stylesheet" 
+href="css/styles.css"><div id="panelVisibilityDivId" class="global-visibility-div"><div id="panelDivId" class="global-panel-style-div show-ircstate-theme-dark"><div class="global-head-flex"><div 
+class="global-head-left"><button id="closePanelButtonId" title="Hide Panel" class="global-show-hide-button mr5">x</button> <span>IRC Server Variables (ircState)</span></div><div 
+class="global-head-center"></div><div class="global-head-right"><button id="refreshButtonId">Refresh</button></div></div><div id="jsonDisplayDivId" class="mr10 global-text-theme-dark"><pre 
+id="jsonDisplayPreId" class="pd10"></pre></div></div></div></template><template id="showWebStateTemplate"><link rel="stylesheet" href="css/styles.css"><div id="panelVisibilityDivId" 
+class="global-visibility-div"><div id="panelDivId" class="global-panel-style-div show-webstate-theme-dark"><div class="global-head-flex"><div class="global-head-left"><button id="closePanelButtonId" 
+title="Hide Panel" class="global-show-hide-button mr5">x</button> <span>IRC Browser Variables (webState)</span></div><div class="global-head-center"></div><div class="global-head-right"><button 
+id="refreshButtonId">Refresh</button></div></div><div id="jsonDisplayDivId" class="mr10 global-text-theme-dark"><pre id="jsonDisplayPreId" class="pd10"></pre></div></div></div></template><glob-vars 
+id="globVars"></glob-vars><display-utils id="displayUtils"></display-utils><beep-sounds id="beepSounds"></beep-sounds><local-command-parser id="localCommandParser"></local-command-parser>
+<remote-command-parser id="remoteCommandParser"></remote-command-parser><ctcp-parser id="ctcpParser"></ctcp-parser><user-info id="userInfo"></user-info><activity-spinner id="activitySpinner" 
+default="show"></activity-spinner><header-bar id="headerBar"></header-bar><nav-menu id="navMenu"></nav-menu><error-panel id="errorPanel"></error-panel><div class="global-scrollable-div-offset" 
+id="scrollableDivId" hiddenxxx><websocket-panel id="websocketPanel"></websocket-panel><help-panel id="helpPanel"></help-panel><license-panel id="licensePanel"></license-panel><logout-panel 
+id="logoutPanel"></logout-panel><server-form-panel id="serverFormPanel"></server-form-panel><server-list-panel id="serverListPanel"></server-list-panel><irc-controls-panel id="ircControlsPanel">
+</irc-controls-panel><irc-server-panel id="ircServerPanel"></irc-server-panel><wallops-panel id="wallopsPanel"></wallops-panel><notice-panel id="noticePanel"></notice-panel><manage-pm-panels 
+id="managePmPanels"></manage-pm-panels><div id="pmContainerId"></div><manage-channels-panel id="manageChannelsPanel"></manage-channels-panel><div id="channelsContainerId"></div><debug-panel 
+id="debugPanel"></debug-panel><show-raw id="showRaw"></show-raw><show-events id="showEvents"></show-events><show-ircstate id="showIrcState"></show-ircstate><show-webstate id="showWebState">
+</show-webstate></div></body></html>
