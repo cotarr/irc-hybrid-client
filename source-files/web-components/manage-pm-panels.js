@@ -515,6 +515,7 @@ window.customElements.define('manage-pm-panels', class extends HTMLElement {
           document.getElementById('ircControlsPanel').sendIrcServerMessage(message);
           // open up server messages to show
           document.getElementById('ircServerPanel').showPanel();
+          document.dispatchEvent(new CustomEvent('cancel-zoom'));
         } else {
           document.getElementById('errorPanel').showError('Multi-line input not allowed');
         }

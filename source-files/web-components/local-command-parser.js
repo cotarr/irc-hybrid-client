@@ -143,12 +143,11 @@ window.customElements.define('local-command-parser', class extends HTMLElement {
     const channelPrefixChars =
       document.getElementById('globVars').constants('channelPrefixChars');
     /**
-     * Internal function to open server window, nuless zoom in progress
+     * Internal function to open server window
      */
     const _showRawMessageWindow = () => {
-      if (!document.querySelector('body').hasAttribute('zoomId')) {
-        document.getElementById('ircServerPanel').showPanel();
-      }
+      document.getElementById('ircServerPanel').showPanel();
+      document.dispatchEvent(new CustomEvent('cancel-zoom'));
     };
 
     // Internal function, detect whitespace character

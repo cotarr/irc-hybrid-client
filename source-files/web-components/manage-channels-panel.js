@@ -163,7 +163,8 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
   handleHotKeyNextChannel = () => {
     if (!window.globals.ircState.ircConnected) return;
     if (!window.globals.webState.webConnected) return;
-    if (window.globals.ircState.channels.length < 2) return;
+    if (window.globals.ircState.channels.length === 0) return;
+    // Else multiple channel panels, cycle in sequence
     this.hotKeyCycleIndex += 1;
     if (this.hotKeyCycleIndex >= window.globals.ircState.channels.length) {
       this.hotKeyCycleIndex = 0;

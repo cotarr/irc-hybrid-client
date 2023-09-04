@@ -74,6 +74,8 @@ window.customElements.define('irc-server-panel', class extends HTMLElement {
     this.attachShadow({ mode: 'open' })
       .appendChild(templateContent.cloneNode(true));
     this.ircConnectedLast = false;
+    this.ircConnectOnLast = false;
+    this.ircConnectingLast = false;
   }
 
   /**
@@ -365,11 +367,15 @@ window.customElements.define('irc-server-panel', class extends HTMLElement {
     panelMessageDisplayEl.value += message + '\n';
     // scroll to textarea new text
     panelMessageDisplayEl.scrollTop = panelMessageDisplayEl.scrollHeight;
-    // Make panel visible which scrolls the page.
-    if ((!window.globals.webState.cacheReloadInProgress) &&
-      (!document.querySelector('body').hasAttribute('zoomId'))) {
-      this.showPanel();
-    }
+
+    // Don't show panel, unexpected popup was annoying, rely on flashing icon
+    //
+    // // Make panel visible which scrolls the page.
+    // if ((!window.globals.webState.cacheReloadInProgress) &&
+    //   (!document.querySelector('body').hasAttribute('zoomId'))) {
+    //   this.showPanel();
+    // }
+
     //
     // This must come after showPanel(), since showPanel() cancels the icons
     // Message activity Icon
@@ -632,28 +638,31 @@ window.customElements.define('irc-server-panel', class extends HTMLElement {
     // If closed, open the server window to display the server message
     //
 
-    if ((!window.globals.webState.cacheReloadInProgress) &&
-      (!document.querySelector('body').hasAttribute('zoomId'))) {
-      //
-      // Do not open and display server window for these commands.
-      //
-      // 'NICK' (users changing nickname in channel is opening the server window
-      //
-      const inhibitCommandList = [
-        'NICK',
-        'PRIVMSG'
-      ];
-      if (('command' in parsedMessage) &&
-        (typeof parsedMessage.command === 'string') &&
-        (parsedMessage.command.length > 0)) {
-        if (inhibitCommandList.indexOf(parsedMessage.command.toUpperCase()) < 0) {
-          // Not in inhibit list, go ahead and open server window, else leave closed
-          this.showPanel();
-        }
-      } else {
-        this.showPanel();
-      }
-    }
+    // Don't show panel, unexpected popup was annoying, rely on flashing icon
+    //
+    // if ((!window.globals.webState.cacheReloadInProgress) &&
+    //   (!document.querySelector('body').hasAttribute('zoomId'))) {
+    //   //
+    //   // Do not open and display server window for these commands.
+    //   //
+    //   // 'NICK' (users changing nickname in channel is opening the server window
+    //   //
+    //   const inhibitCommandList = [
+    //     'NICK',
+    //     'PRIVMSG'
+    //   ];
+    //   if (('command' in parsedMessage) &&
+    //     (typeof parsedMessage.command === 'string') &&
+    //     (parsedMessage.command.length > 0)) {
+    //     if (inhibitCommandList.indexOf(parsedMessage.command.toUpperCase()) < 0) {
+    //       // Not in inhibit list, go ahead and open server window, else leave closed
+    //       this.showPanel();
+    //     }
+    //   } else {
+    //     this.showPanel();
+    //   }
+    // }
+
     //
     // This must come after showPanel(), since showPanel() cancels the icons
     // Message activity Icon
@@ -806,6 +815,23 @@ window.customElements.define('irc-server-panel', class extends HTMLElement {
       document.getElementById('navMenu').handleServerUnreadUpdate(false);
     });
 
+    // -------------------------
+    // Taller button handler
+    // -------------------------
+    this.shadowRoot.getElementById('tallerButtonId').addEventListener('click', () => {
+      const newRows =
+        parseInt(this.shadowRoot.getElementById('panelMessageDisplayId').getAttribute('rows')) + 5;
+      this.shadowRoot.getElementById('panelMessageDisplayId')
+        .setAttribute('rows', newRows.toString());
+    });
+
+    // -------------------------
+    // Normal button handler
+    // -------------------------
+    this.shadowRoot.getElementById('normalButtonId').addEventListener('click', () => {
+      this.shadowRoot.getElementById('panelMessageDisplayId').setAttribute('rows', '5');
+    });
+
     // -------------------------------------
     // 2 of 2 Listeners on global events
     // -------------------------------------
@@ -938,23 +964,35 @@ window.customElements.define('irc-server-panel', class extends HTMLElement {
      * @listens document:irc-state-changed
      */
     document.addEventListener('irc-state-changed', () => {
+      // ircConnectOn is a user requested state. It stays on during reconnect.
+      if (window.globals.ircState.ircConnectOn !== this.ircConnectOnLast) {
+        this.ircConnectOnLast = window.globals.ircState.ircConnectOn;
+        // If not connected to IRC, hide panel to make room for irc-controls-panel
+        if (!window.globals.ircState.ircConnectOn) this.hidePanel();
+      }
+      // ircConnecting indicates a connection attempt is in progress.
+      if (window.globals.ircState.ircConnecting !== this.ircConnectingLast) {
+        this.ircConnectingLast = window.globals.ircState.ircConnecting;
+        // Make server panel visible to see connection progress
+        if (window.globals.ircState.ircConnecting) this.showPanel();
+      }
       if (window.globals.ircState.ircConnected !== this.ircConnectedLast) {
         this.ircConnectedLast = window.globals.ircState.ircConnected;
         this.shadowRoot.getElementById('programVersionDiv').textContent =
           ' version-' + window.globals.ircState.progVersion;
-        // Irc state changed, clean activity icons
+        //
+        // After an IRC connect, or an IRC disconnect
+        // cancel flashing activity icon.
+        //
+        document.getElementById('headerBar').removeAttribute('servericon');
+        document.getElementById('navMenu').handleServerUnreadUpdate(false);
         setTimeout(() => {
           document.getElementById('headerBar').removeAttribute('servericon');
           document.getElementById('navMenu').handleServerUnreadUpdate(false);
         }, 2000);
-        if (window.globals.ircState.ircConnected) {
-          setTimeout(() => {
-            this.hidePanel();
-          }, 3500);
+        if ((window.globals.ircState.ircConnected) && (!window.globals.ircState.ircConnecting)) {
+          this.hidePanel();
         }
-      }
-      if (!window.globals.ircState.ircConnected) {
-        this.hidePanel();
       }
     });
 

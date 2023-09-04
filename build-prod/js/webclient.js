@@ -131,7 +131,7 @@ if(this._areBeepsConfigured())document.getElementById('headerBar').setAttribute(
 autoCompleteCommandList=['/ADMIN','/AWAY','/CTCP','/DEOP','/DEVOICE','/JOIN','/LIST','/ME','/MODE','/MOTD','/MSG','/NICK','/NOP','/NOTICE','/OP','/PART','/QUERY','/QUIT','/QUOTE','/TOPIC','/VERSION','/VOICE','/WHO','/WHOIS']
 ;autoCompleteRawCommandList=['ADMIN','AWAY','CAP','CONNECT','DIE','DISCONNECT','ERROR','GLINE','HELP','INFO','INVITE','ISON','JOIN','KICK','KILL','KLINE','LINKS','LIST','LUSERS','MODE','MOTD','NAMES','NICK','NOTICE','OPER','PART','PASS','PING','PONG','PRIVMSG','QUIT','REHASH','RESTART','SERVLIST','SQUERY','SQUIT','STATS','SUMMON','TIME','TOPIC','TRACE','USER','USERHOST','USERS','VERSION','WALLOPS','WHO','WHOIS','WHOWAS']
 ;textCommandParser=inputObj=>{const channelPrefixChars=document.getElementById('globVars').constants('channelPrefixChars');const _showRawMessageWindow=()=>{
-if(!document.querySelector('body').hasAttribute('zoomId'))document.getElementById('ircServerPanel').showPanel()};const _isWS=inChar=>{if(' '===inChar.charAt(0))return true
+document.getElementById('ircServerPanel').showPanel();document.dispatchEvent(new CustomEvent('cancel-zoom'))};const _isWS=inChar=>{if(' '===inChar.charAt(0))return true
 ;if(9===inChar.charCodeAt(0))return true;return false};const _isEOL=inChar=>{if('\n'===inChar.charAt(0))return true;if('\r'===inChar.charAt(0))return true;return false};let inStr=inputObj.inputString
 ;if(inStr.length>0&&_isEOL(inStr.charAt(inStr.length-1)))inStr=inStr.slice(0,inStr.length-1);if(inStr.length>0&&_isEOL(inStr.charAt(inStr.length-1)))inStr=inStr.slice(0,inStr.length-1)
 ;const inStrLen=inStr.length;const parsedCommand={command:'',params:[],restOf:[]};if(inStr.length<2)return{error:true,message:'Error no command not found',ircMessage:null}
@@ -1161,8 +1161,8 @@ if(event.detail&&event.detail.except){if('string'===typeof event.detail.except){
 }else if(Array.isArray(event.detail.except))if(event.detail.except.indexOf(this.id)<0)this.showPanel()}else this.showPanel()});document.addEventListener('web-connect-changed',()=>{
 if(window.globals.webState.webConnected!==this.webConnectedLast){this.webConnectedLast=window.globals.webState.webConnected;if(!window.globals.webState.webConnected)this.webSocketFirstConnect=true}})}
 });window.customElements.define('irc-server-panel',class extends HTMLElement{constructor(){super();const template=document.getElementById('ircServerPanelTemplate')
-;const templateContent=template.content;this.attachShadow({mode:'open'}).appendChild(templateContent.cloneNode(true));this.ircConnectedLast=false}_scrollToTop=()=>{this.focus()
-;const newVertPos=window.scrollY+this.getBoundingClientRect().top-50;window.scrollTo({top:newVertPos,behavior:'smooth'})};showPanel=()=>{
+;const templateContent=template.content;this.attachShadow({mode:'open'}).appendChild(templateContent.cloneNode(true));this.ircConnectedLast=false;this.ircConnectOnLast=false
+;this.ircConnectingLast=false}_scrollToTop=()=>{this.focus();const newVertPos=window.scrollY+this.getBoundingClientRect().top-50;window.scrollTo({top:newVertPos,behavior:'smooth'})};showPanel=()=>{
 this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible','');const panelMessageDisplayEl=this.shadowRoot.getElementById('panelMessageDisplayId')
 ;panelMessageDisplayEl.scrollTop=panelMessageDisplayEl.scrollHeight;document.dispatchEvent(new CustomEvent('cancel-zoom'));document.getElementById('headerBar').removeAttribute('servericon')
 ;document.getElementById('navMenu').handleServerUnreadUpdate(false);this._scrollToTop();this.shadowRoot.getElementById('panelMessageInputId').focus()};collapsePanel=()=>{
@@ -1199,8 +1199,7 @@ const matchStr=this._autoCompleteServInputElement(snippet);if(this.lastServAutoC
 }else serverInputAreaEl.value+=String.fromCharCode(autoCompleteSpaceKey)}}
 ;ircMessageCommandDisplayFilter=['331','332','333','353','366','JOIN','KICK','MODE','cachedNICK'.toUpperCase(),'NICK','NOTICE','PART','PING','PONG','PRIVMSG','cachedQUIT'.toUpperCase(),'QUIT','TOPIC','WALLOPS']
 ;displayPlainServerMessage=message=>{const panelMessageDisplayEl=this.shadowRoot.getElementById('panelMessageDisplayId');panelMessageDisplayEl.value+=message+'\n'
-;panelMessageDisplayEl.scrollTop=panelMessageDisplayEl.scrollHeight;if(!window.globals.webState.cacheReloadInProgress&&!document.querySelector('body').hasAttribute('zoomId'))this.showPanel()
-;const now=Math.floor(Date.now()/1e3);const ircConnectTime=now-window.globals.ircState.times.ircConnect
+;panelMessageDisplayEl.scrollTop=panelMessageDisplayEl.scrollHeight;const now=Math.floor(Date.now()/1e3);const ircConnectTime=now-window.globals.ircState.times.ircConnect
 ;if(ircConnectTime>5&&document.activeElement!==document.getElementById('ircServerPanel')&&!window.globals.webState.cacheReloadInProgress){
 document.getElementById('headerBar').setAttribute('servericon','');document.getElementById('navMenu').handleServerUnreadUpdate(true)}};displayFormattedServerMessage=(parsedMessage,message)=>{
 const displayUtilsEl=document.getElementById('displayUtils');const displayMessage=msg=>{const panelMessageDisplayEl=this.shadowRoot.getElementById('panelMessageDisplayId')
@@ -1224,10 +1223,8 @@ if('default'===parsedMessage.params[0])displayMessage(displayUtilsEl.cleanFormat
 ;break;case'NICK':
 if(window.globals.ircState.nickName.toLowerCase()===parsedMessage.nick.toLowerCase())displayMessage(displayUtilsEl.cleanFormatting(displayUtilsEl.cleanCtcpDelimiter(parsedMessage.timestamp+' '+parsedMessage.nick+' is now known as '+parsedMessage.params[0])))
 ;break;case'NOTICE':displayMessage(displayUtilsEl.cleanFormatting(displayUtilsEl.cleanCtcpDelimiter(parsedMessage.timestamp+' '+'NOTICE '+parsedMessage.params[0]+' '+parsedMessage.params[1])));break
-;default:displayMessage(displayUtilsEl.cleanFormatting(displayUtilsEl.cleanCtcpDelimiter(_substituteHmsTime(message))))}
-if(!window.globals.webState.cacheReloadInProgress&&!document.querySelector('body').hasAttribute('zoomId')){const inhibitCommandList=['NICK','PRIVMSG']
-;if('command'in parsedMessage&&'string'===typeof parsedMessage.command&&parsedMessage.command.length>0){if(inhibitCommandList.indexOf(parsedMessage.command.toUpperCase())<0)this.showPanel()
-}else this.showPanel()}const now=Math.floor(Date.now()/1e3);const ircConnectTime=now-window.globals.ircState.times.ircConnect
+;default:displayMessage(displayUtilsEl.cleanFormatting(displayUtilsEl.cleanCtcpDelimiter(_substituteHmsTime(message))))}const now=Math.floor(Date.now()/1e3)
+;const ircConnectTime=now-window.globals.ircState.times.ircConnect
 ;if(ircConnectTime>5&&document.activeElement!==document.getElementById('ircServerPanel')&&!window.globals.webState.cacheReloadInProgress){
 document.getElementById('headerBar').setAttribute('servericon','');document.getElementById('navMenu').handleServerUnreadUpdate(true)}};_updateElapsedTimeDisplay=()=>{const toTimeString=seconds=>{
 let remainSec=seconds;let day=0;let hour=0;let min=0;let sec=0;day=parseInt(remainSec/86400);remainSec-=86400*day;hour=parseInt(remainSec/3600);remainSec-=3600*hour;min=parseInt(remainSec/60)
@@ -1250,7 +1247,10 @@ if('insertText'===event.inputType&&null===event.data||'insertLineBreak'===event.
 document.getElementById('displayUtils').stripOneCrLfFromElement(this.shadowRoot.getElementById('panelMessageInputId'))
 ;this._parseInputForIRCCommands(this.shadowRoot.getElementById('panelMessageInputId'))}})
 ;this.shadowRoot.getElementById('panelMessageInputId').addEventListener('keydown',this._serverAutoComplete,false);this.shadowRoot.getElementById('panelDivId').addEventListener('click',(function(){
-document.getElementById('headerBar').removeAttribute('servericon');document.getElementById('navMenu').handleServerUnreadUpdate(false)}));document.addEventListener('cache-reload-done',event=>{
+document.getElementById('headerBar').removeAttribute('servericon');document.getElementById('navMenu').handleServerUnreadUpdate(false)}))
+;this.shadowRoot.getElementById('tallerButtonId').addEventListener('click',()=>{const newRows=parseInt(this.shadowRoot.getElementById('panelMessageDisplayId').getAttribute('rows'))+5
+;this.shadowRoot.getElementById('panelMessageDisplayId').setAttribute('rows',newRows.toString())});this.shadowRoot.getElementById('normalButtonId').addEventListener('click',()=>{
+this.shadowRoot.getElementById('panelMessageDisplayId').setAttribute('rows','5')});document.addEventListener('cache-reload-done',event=>{
 const panelMessageDisplayEl=this.shadowRoot.getElementById('panelMessageDisplayId');const cacheReloadString=document.getElementById('globVars').constants('cacheReloadString');let markerString=''
 ;let timestampString='';if('detail'in event&&'timestamp'in event.detail)timestampString=document.getElementById('displayUtils').unixTimestampToHMS(event.detail.timestamp)
 ;if(timestampString)markerString+=timestampString;markerString+=' '+cacheReloadString+'\n';if(''!==panelMessageDisplayEl.value){panelMessageDisplayEl.value+=markerString
@@ -1270,10 +1270,13 @@ panelDivEl.classList.remove('irc-server-panel-theme-dark');panelDivEl.classList.
 ;elapsedTimeOuterDivEl.classList.add('global-text-theme-dark')}});document.addEventListener('erase-before-reload',event=>{this.shadowRoot.getElementById('panelMessageDisplayId').value=''
 ;this.shadowRoot.getElementById('panelDivId').setAttribute('lastDate','0000-00-00')});document.addEventListener('hide-all-panels',event=>{if(event.detail&&event.detail.except){
 if('string'===typeof event.detail.except){if(event.detail.except!==this.id)this.hidePanel()}else if(Array.isArray(event.detail.except))if(event.detail.except.indexOf(this.id)<0)this.hidePanel()
-}else this.hidePanel()});document.addEventListener('irc-state-changed',()=>{if(window.globals.ircState.ircConnected!==this.ircConnectedLast){this.ircConnectedLast=window.globals.ircState.ircConnected
-;this.shadowRoot.getElementById('programVersionDiv').textContent=' version-'+window.globals.ircState.progVersion;setTimeout(()=>{document.getElementById('headerBar').removeAttribute('servericon')
-;document.getElementById('navMenu').handleServerUnreadUpdate(false)},2e3);if(window.globals.ircState.ircConnected)setTimeout(()=>{this.hidePanel()},3500)}
-if(!window.globals.ircState.ircConnected)this.hidePanel()});document.addEventListener('resize-custom-elements',()=>{if(window.globals.webState.dynamic.testAreaColumnPxWidth){
+}else this.hidePanel()});document.addEventListener('irc-state-changed',()=>{if(window.globals.ircState.ircConnectOn!==this.ircConnectOnLast){this.ircConnectOnLast=window.globals.ircState.ircConnectOn
+;if(!window.globals.ircState.ircConnectOn)this.hidePanel()}if(window.globals.ircState.ircConnecting!==this.ircConnectingLast){this.ircConnectingLast=window.globals.ircState.ircConnecting
+;if(window.globals.ircState.ircConnecting)this.showPanel()}if(window.globals.ircState.ircConnected!==this.ircConnectedLast){this.ircConnectedLast=window.globals.ircState.ircConnected
+;this.shadowRoot.getElementById('programVersionDiv').textContent=' version-'+window.globals.ircState.progVersion;document.getElementById('headerBar').removeAttribute('servericon')
+;document.getElementById('navMenu').handleServerUnreadUpdate(false);setTimeout(()=>{document.getElementById('headerBar').removeAttribute('servericon')
+;document.getElementById('navMenu').handleServerUnreadUpdate(false)},2e3);if(window.globals.ircState.ircConnected&&!window.globals.ircState.ircConnecting)this.hidePanel()}})
+;document.addEventListener('resize-custom-elements',()=>{if(window.globals.webState.dynamic.testAreaColumnPxWidth){
 const calcInputAreaColSize=document.getElementById('displayUtils').calcInputAreaColSize;const mar1=window.globals.webState.dynamic.commonMarginRightPx
 ;const mar2=window.globals.webState.dynamic.commonMarginRightPx+5+window.globals.webState.dynamic.sendButtonWidthPx
 ;this.shadowRoot.getElementById('panelMessageDisplayId').setAttribute('cols',calcInputAreaColSize(mar1))
@@ -1432,7 +1435,7 @@ if(!window.globals.webState.cacheReloadInProgress)document.dispatchEvent(new Cus
 ;this.shadowRoot.getElementById('whoisButtonId').addEventListener('click',()=>{
 if(this.shadowRoot.getElementById('pmNickNameInputId').value.length>0)if(1===this.shadowRoot.getElementById('pmNickNameInputId').value.split('\n').length){
 const message='WHOIS '+this.shadowRoot.getElementById('pmNickNameInputId').value;document.getElementById('ircControlsPanel').sendIrcServerMessage(message)
-;document.getElementById('ircServerPanel').showPanel()
+;document.getElementById('ircServerPanel').showPanel();document.dispatchEvent(new CustomEvent('cancel-zoom'))
 }else document.getElementById('errorPanel').showError('Multi-line input not allowed');else document.getElementById('errorPanel').showError('Input required')})
 ;document.addEventListener('cache-reload-done',event=>{this._cleanLastPmPanelStates()});document.addEventListener('cancel-beep-sounds',()=>{
 this.shadowRoot.getElementById('openPmWithBeepCheckBoxId').checked=false;this.removeAttribute('beep-enabled')});document.addEventListener('collapse-all-panels',event=>{
@@ -1614,7 +1617,7 @@ this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible'
 this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible');this.shadowRoot.getElementById('panelCollapsedDivId').removeAttribute('visible')};handleHotKey=()=>{
 if(this.shadowRoot.getElementById('panelVisibilityDivId').hasAttribute('visible')){const panelEls=Array.from(document.getElementById('channelsContainerId').children);panelEls.forEach(panelEl=>{
 panelEl.hidePanel()});this.hidePanel()}else{const panelEls=Array.from(document.getElementById('channelsContainerId').children);panelEls.forEach(panelEl=>{panelEl.collapsePanel()});this.showPanel()}}
-;handleHotKeyNextChannel=()=>{if(!window.globals.ircState.ircConnected)return;if(!window.globals.webState.webConnected)return;if(window.globals.ircState.channels.length<2)return
+;handleHotKeyNextChannel=()=>{if(!window.globals.ircState.ircConnected)return;if(!window.globals.webState.webConnected)return;if(0===window.globals.ircState.channels.length)return
 ;this.hotKeyCycleIndex+=1;if(this.hotKeyCycleIndex>=window.globals.ircState.channels.length)this.hotKeyCycleIndex=0
 ;const channelPanelId='channel:'+window.globals.ircState.channels[this.hotKeyCycleIndex];const panelEls=Array.from(document.getElementById('channelsContainerId').children);panelEls.forEach(panelEl=>{
 if(panelEl.id.toLowerCase()===channelPanelId)panelEl.showPanel();else panelEl.hidePanel()});this.hidePanel()};displayChannelMessage=parsedMessage=>{

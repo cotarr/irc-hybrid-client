@@ -6,13 +6,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Next v2.0.0-dev 2023-08-31 (Draft)
-
-
+## Next v2.0.0-dev.1 2023-09-04 (Draft)
 
 Work in progress, see top of README.md
 
 Commit
+
+- Fixed hotkey Alt-N not show channel panel when only 1 channel is joined.
+
+Changes for irc-server-panel
+
+- Removed IRC server panel auto-close 3.5 second after connect, (annoying behavior)
+- Removed irc-server-panel auto-open on IRC server raw messages, rely on activity icons.
+- Specific user text commands that return an IRC message, such as /ADMIN, will show irc-server-panel and cancel zoom.
+- The irc-server-panel will show temporarily when ircState.ircConnecting is true (connect in progress), then auto-hide.
+- The irc-server-panel activity icon is cancelled after an IRC connect/disconnect
+
+Commit d5092be
 
 - Committed the bundled and minified folder "build-prod" to the repository. All future commits will include this folder.
 
