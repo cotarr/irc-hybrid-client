@@ -6,11 +6,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Next v2.0.0-dev.1 2023-09-04 (Draft)
+## Next v2.0.0-dev.2 2023-09-04 (Draft)
 
 Work in progress, see top of README.md
 
 Commit
+
+- Fixed: disconnect from IRC, then reconnect, open channel, message cache was not loading.
+- Fixed: disconnect from IRC, then reconnect, private chat message cache not loading from cache.
+- Moved Erase Cache button from irc-server-panel to debug-panel.
+- Changed behavior of channel panel and private message panels, visibility and unread message counter:
+  - If a channel or PM panel is hidden and a message arrives it will open, scroll into position, place focus on text input area
+  - If a channel or PM panel is collapsed to a bar and a message arrives, the panel will remain collapsed, but unread message counter will increment and display in dropdown menu, collapsed bar, and show header bar icon
+  - If a channel or PM panel is open, but does not have the focus, and a message arrives, the open panel will display message, but not scroll and not grab focus. The unread message counter will increment and display in dropdown menu, collapsed bar, and show header bar icon
+  - If a channel is in zoom mode and a message arrives for another panel, no other windows or bar will open. The unread message counter will increment and display in dropdown menu, collapsed bar, and show header bar icon
+
+Commit 0f980d4
 
 - Fixed hotkey Alt-N not show channel panel when only 1 channel is joined.
 
@@ -21,6 +32,7 @@ Changes for irc-server-panel
 - Specific user text commands that return an IRC message, such as /ADMIN, will show irc-server-panel and cancel zoom.
 - The irc-server-panel will show temporarily when ircState.ircConnecting is true (connect in progress), then auto-hide.
 - The irc-server-panel activity icon is cancelled after an IRC connect/disconnect
+- Fixed normal/taller button handlers were missing, added them.
 
 Commit d5092be
 

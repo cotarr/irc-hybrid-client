@@ -253,6 +253,15 @@ window.customElements.define('pm-panel', class extends HTMLElement {
   };
 
   /**
+   * Scroll pm textarea to show most recent message (scroll to bottom)
+   * Conditions: panel must be visible for scroll to execute in browser
+   */
+  _scrollTextAreaToRecent = () => {
+    const panelMessageDisplayEl = this.shadowRoot.getElementById('panelMessageDisplayId');
+    panelMessageDisplayEl.scrollTop = panelMessageDisplayEl.scrollHeight;
+  };
+
+  /**
    * Scroll web component to align top of panel with top of viewport and set focus
    */
   _scrollToTop = () => {
@@ -272,6 +281,7 @@ window.customElements.define('pm-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('bottomCollapseDivId').setAttribute('hidden', '');
     this._updateVisibility();
     document.dispatchEvent(new CustomEvent('cancel-zoom'));
+    this._scrollTextAreaToRecent();
     this._scrollToTop();
     this.shadowRoot.getElementById('panelMessageInputId').focus();
   };
@@ -458,7 +468,7 @@ window.customElements.define('pm-panel', class extends HTMLElement {
     const panelMessageInputEl = this.shadowRoot.getElementById('panelMessageInputId');
     this._sendPrivMessageToUser(this.privmsgCsName, panelMessageInputEl);
     panelMessageInputEl.focus();
-    this._resetPrivMsgCount();
+    this._resetMessageCount();
     this.activityIconInhibitTimer = document.getElementById('globVars')
       .constants('activityIconInhibitTimerValue');
     this.shadowRoot.getElementById('multiLineActionDivId').setAttribute('hidden', '');
@@ -476,7 +486,7 @@ window.customElements.define('pm-panel', class extends HTMLElement {
       document.getElementById('displayUtils')
         .stripOneCrLfFromElement(panelMessageInputEl);
       this._sendPrivMessageToUser(this.privmsgCsName, panelMessageInputEl);
-      this._resetPrivMsgCount();
+      this._resetMessageCount();
       this.activityIconInhibitTimer = document.getElementById('globVars')
         .constants('activityIconInhibitTimerValue');
     }
@@ -519,7 +529,7 @@ window.customElements.define('pm-panel', class extends HTMLElement {
       panelMessageDisplayEl.value += displayUtilsEl.cleanFormatting(text) + '\n';
       // move scroll bar so text is scrolled all the way up
       if (!window.globals.webState.cacheReloadInProgress) {
-        panelMessageDisplayEl.scrollTop = panelMessageDisplayEl.scrollHeight;
+        this._scrollTextAreaToRecent();
       }
     };
 
@@ -562,8 +572,6 @@ window.customElements.define('pm-panel', class extends HTMLElement {
             //
             // Outgoing message will open, even if unzoomed.
             //
-            // (!document.querySelector('body').hasAttribute('zoomId'))) {
-            console.log('Outgoing message, not cache reload, not zoom calling showPanel()');
             document.dispatchEvent(new CustomEvent('cancel-zoom'));
             this.showPanel();
           }
@@ -584,9 +592,10 @@ window.customElements.define('pm-panel', class extends HTMLElement {
           }
           // Upon privMsg message, make section visible, unless reload in progress
           if ((!window.globals.webState.cacheReloadInProgress) &&
+            (!this.shadowRoot.getElementById('panelVisibilityDivId').hasAttribute('visible')) &&
             (!document.querySelector('body').hasAttribute('zoomId'))) {
-            console.log('Incoming message, not cache reload, not zoom calling showPanel()');
             this.showPanel();
+            this._updateVisibility();
           }
 
           if (this.privmsgCsName !== parsedMessage.nick) {
@@ -599,10 +608,11 @@ window.customElements.define('pm-panel', class extends HTMLElement {
           // and focus not message send button
           // and NOT reload from cache in progress (timer not zero)
           // then display incoming message activity icon
-          if ((document.activeElement !== this.shadowRoot.getElementById('panelMessageInputId')) &&
-          (document.activeElement !== this.shadowRoot.getElementById('sendButtonId')) &&
-          (!window.globals.webState.cacheReloadInProgress) &&
-          (this.activityIconInhibitTimer === 0)) {
+          if (((document.activeElement.id !== this.id) ||
+            (!this.shadowRoot.getElementById('panelVisibilityDivId').hasAttribute('visible')) ||
+            (!this.shadowRoot.getElementById('panelCollapsedDivId').hasAttribute('visible'))) &&
+            (!window.globals.webState.cacheReloadInProgress) &&
+            (this.activityIconInhibitTimer === 0)) {
             this._incrementMessageCount();
           }
         }
@@ -851,7 +861,7 @@ window.customElements.define('pm-panel', class extends HTMLElement {
     //
     panelMessageDisplayEl.value += markerString;
     // move scroll bar so text is scrolled all the way up
-    panelMessageDisplayEl.scrollTop = panelMessageDisplayEl.scrollHeight;
+    this._scrollTextAreaToRecent();
     //
     // This is to open the PM panel on refresh page, or net connect
     //

@@ -1127,7 +1127,7 @@ if(window.globals.ircState.ircConnected&&this.shadowRoot.getElementById('userAwa
 });this.shadowRoot.getElementById('setBackButtonId').addEventListener('click',()=>{if(window.globals.ircState.ircConnected&&window.globals.ircState.ircIsAway)this.sendIrcServerMessage('AWAY')})
 ;this.shadowRoot.getElementById('setAwayInfoBtnId').addEventListener('click',()=>{this.shadowRoot.getElementById('setAwayInfoId').removeAttribute('hidden')})
 ;document.addEventListener('cache-reload-done',event=>{window.globals.webState.cacheReloadInProgress=false});document.addEventListener('cache-reload-error',event=>{
-window.globals.webState.cacheReloadInProgress=false});window.addEventListener('debounced-update-from-cache',event=>{if(!this.updateCacheDebounceActive){this.updateCacheDebounceActive=true
+window.globals.webState.cacheReloadInProgress=false});document.addEventListener('debounced-update-from-cache',event=>{if(!this.updateCacheDebounceActive){this.updateCacheDebounceActive=true
 ;setTimeout(()=>{this.updateCacheDebounceActive=false;if(!window.globals.webState.cacheReloadInProgress)this.updateFromCache().catch(err=>{console.log(err)
 ;let message=err.message||err.toString()||'Error';message=message.split('\n')[0];document.getElementById('errorPanel').showError(message)})},1e3)}})
 ;document.addEventListener('update-from-cache',event=>{this.updateFromCache().catch(err=>{console.log(err);let message=err.message||err.toString()||'Error';message=message.split('\n')[0]
@@ -1145,8 +1145,8 @@ this._updateVisibility()});document.addEventListener('irc-state-changed',()=>{if
 this.shadowRoot.getElementById('editServerButtonId').setAttribute('hidden','');this.shadowRoot.getElementById('connectButtonId').setAttribute('disabled','')
 ;const serverFormEl=document.getElementById('serverFormPanel');serverFormEl.fetchServerList(0,1).then(()=>{serverFormEl.fetchServerList(0,0)}).then(()=>{serverFormEl.createNewIrcServer()
 }).catch(err=>{console.log(err);let message=err.message||err.toString()||'Error';message=message.split('\n')[0];document.getElementById('errorPanel').showError(message)})}}}
-if(window.globals.ircState.ircConnected!==this.ircConnectedLast){this.ircConnectedLast=window.globals.ircState.ircConnected
-;if(window.globals.ircState.ircConnected)this.collapsePanel();else this.showPanel()}
+if(window.globals.ircState.ircConnected!==this.ircConnectedLast){this.ircConnectedLast=window.globals.ircState.ircConnected;if(window.globals.ircState.ircConnected){this.collapsePanel()
+;if(!window.globals.webState.cacheReloadInProgress)document.dispatchEvent(new CustomEvent('debounced-update-from-cache'))}else this.showPanel()}
 if(window.globals.ircState.ircConnected)this.shadowRoot.getElementById('nickNameInputId').value=window.globals.ircState.nickName;else if(window.globals.ircState.ircServerIndex>=0)this.shadowRoot.getElementById('nickNameInputId').value=window.globals.ircState.nickName
 ;if(window.globals.ircState.ircConnected)this.shadowRoot.getElementById('panelTitleDivId').textContent='IRC Controls '+window.globals.ircState.ircServerName+' ('+window.globals.ircState.nickName+')';else this.shadowRoot.getElementById('panelTitleDivId').textContent='IRC Controls'
 ;if(window.globals.ircState.ircConnected){window.globals.webState.ircConnecting=false;document.title='IRC-'+window.globals.ircState.ircServerName+'('+window.globals.ircState.nickName+')'}
@@ -1239,8 +1239,6 @@ this._updateElapsedTimeDisplay()};initializePlugin(){this._updateElapsedTimeDisp
 this.hidePanel()});this.shadowRoot.getElementById('clearButtonId').addEventListener('click',()=>{
 this.shadowRoot.getElementById('panelMessageDisplayId').value='\nPanel cleared, this did not clear the message cache\n\n'})
 ;this.shadowRoot.getElementById('loadFromCacheButtonId').addEventListener('click',()=>{document.dispatchEvent(new CustomEvent('update-from-cache'))})
-;this.shadowRoot.getElementById('eraseCacheButtonId').addEventListener('click',()=>{document.getElementById('ircControlsPanel').eraseIrcCache('CACHE').catch(err=>{console.log(err)
-;let message=err.message||err.toString()||'Error occurred calling /irc/connect';message=message.split('\n')[0];document.getElementById('errorPanel').showError(message)})})
 ;this.shadowRoot.getElementById('sendButtonId').addEventListener('click',()=>{this._parseInputForIRCCommands(document.getElementById('panelMessageInputId'))
 ;document.getElementById('panelMessageInputId').focus()});this.shadowRoot.getElementById('panelMessageInputId').addEventListener('input',event=>{
 if('insertText'===event.inputType&&null===event.data||'insertLineBreak'===event.inputType){
@@ -1475,15 +1473,17 @@ if(window.globals.ircState.ircConnected&&window.globals.ircState.ircIsAway)ircCo
 ;this.shadowRoot.getElementById('messageCountIconId').removeAttribute('hidden');document.dispatchEvent(new CustomEvent('update-privmsg-count',{detail:{channel:this.privmsgName.toLowerCase(),
 unreadMessageCount:this.unreadMessageCount}}))};_resetMessageCount=()=>{this.unreadMessageCount=0;this.shadowRoot.getElementById('messageCountIconId').textContent=this.unreadMessageCount.toString()
 ;this.shadowRoot.getElementById('messageCountIconId').setAttribute('hidden','');document.dispatchEvent(new CustomEvent('update-privmsg-count',{detail:{channel:this.privmsgName.toLowerCase(),
-unreadMessageCount:this.unreadMessageCount}}))};_scrollToTop=()=>{this.focus();const newVertPos=window.scrollY+this.getBoundingClientRect().top-50;window.scrollTo({top:newVertPos,behavior:'smooth'})}
-;showPanel=()=>{document.getElementById('managePmPanels').setLastPmPanel(this.privmsgName.toLocaleLowerCase(),'opened')
+unreadMessageCount:this.unreadMessageCount}}))};_scrollTextAreaToRecent=()=>{const panelMessageDisplayEl=this.shadowRoot.getElementById('panelMessageDisplayId')
+;panelMessageDisplayEl.scrollTop=panelMessageDisplayEl.scrollHeight};_scrollToTop=()=>{this.focus();const newVertPos=window.scrollY+this.getBoundingClientRect().top-50;window.scrollTo({top:newVertPos,
+behavior:'smooth'})};showPanel=()=>{document.getElementById('managePmPanels').setLastPmPanel(this.privmsgName.toLocaleLowerCase(),'opened')
 ;this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible','');this.shadowRoot.getElementById('panelCollapsedDivId').setAttribute('visible','')
-;this.shadowRoot.getElementById('bottomCollapseDivId').setAttribute('hidden','');this._updateVisibility();document.dispatchEvent(new CustomEvent('cancel-zoom'));this._scrollToTop()
-;this.shadowRoot.getElementById('panelMessageInputId').focus()};collapsePanel=()=>{document.getElementById('managePmPanels').setLastPmPanel(this.privmsgName.toLocaleLowerCase(),'collapsed')
-;this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible','');this.shadowRoot.getElementById('panelCollapsedDivId').removeAttribute('visible')
-;this.shadowRoot.getElementById('bottomCollapseDivId').setAttribute('hidden','');this._updateVisibility()};hidePanel=()=>{
-document.getElementById('managePmPanels').setLastPmPanel(this.privmsgName.toLocaleLowerCase(),'closed');this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible')
-;this.shadowRoot.getElementById('panelCollapsedDivId').removeAttribute('visible')};_updateVisibility=()=>{const beepCheckBoxEl=this.shadowRoot.getElementById('beepCheckBoxId')
+;this.shadowRoot.getElementById('bottomCollapseDivId').setAttribute('hidden','');this._updateVisibility();document.dispatchEvent(new CustomEvent('cancel-zoom'));this._scrollTextAreaToRecent()
+;this._scrollToTop();this.shadowRoot.getElementById('panelMessageInputId').focus()};collapsePanel=()=>{
+document.getElementById('managePmPanels').setLastPmPanel(this.privmsgName.toLocaleLowerCase(),'collapsed');this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible','')
+;this.shadowRoot.getElementById('panelCollapsedDivId').removeAttribute('visible');this.shadowRoot.getElementById('bottomCollapseDivId').setAttribute('hidden','');this._updateVisibility()}
+;hidePanel=()=>{document.getElementById('managePmPanels').setLastPmPanel(this.privmsgName.toLocaleLowerCase(),'closed')
+;this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible');this.shadowRoot.getElementById('panelCollapsedDivId').removeAttribute('visible')};_updateVisibility=()=>{
+const beepCheckBoxEl=this.shadowRoot.getElementById('beepCheckBoxId')
 ;if(this.shadowRoot.getElementById('panelDivId').hasAttribute('beep3-enabled'))beepCheckBoxEl.checked=true;else beepCheckBoxEl.checked=false};_handleCloseButton=()=>{this.hidePanel()}
 ;_handleCollapseButton=()=>{if(this.shadowRoot.getElementById('panelCollapsedDivId').hasAttribute('visible'))this.collapsePanel();else this.showPanel()};_handleBottomCollapseButton=()=>{
 const bottomCollapseDivEl=this.shadowRoot.getElementById('bottomCollapseDivId')
@@ -1506,28 +1506,27 @@ if(window.globals.webState.activePrivateMessageNicks.indexOf(this.privmsgName.to
 if(!okToSend)abortedFlag=true;else{const message='PRIVMSG '+this.privmsgCsName+' :'+multiLineArray[i];document.getElementById('ircControlsPanel').sendIrcServerMessage(message)
 ;if(i!==multiLineArray.length-1)panelMessageInputEl.value=multiLineArray[i+1];else panelMessageInputEl.value=''}},delayMs)}multiLineActionDivEl.setAttribute('hidden','')
 }else multiLineActionDivEl.setAttribute('hidden','')}};_handlePrivMsgSendButtonElClick=()=>{const panelMessageInputEl=this.shadowRoot.getElementById('panelMessageInputId')
-;this._sendPrivMessageToUser(this.privmsgCsName,panelMessageInputEl);panelMessageInputEl.focus();this._resetPrivMsgCount()
+;this._sendPrivMessageToUser(this.privmsgCsName,panelMessageInputEl);panelMessageInputEl.focus();this._resetMessageCount()
 ;this.activityIconInhibitTimer=document.getElementById('globVars').constants('activityIconInhibitTimerValue');this.shadowRoot.getElementById('multiLineActionDivId').setAttribute('hidden','')}
 ;_handlePrivmsgInputAreaElInput=event=>{const panelMessageInputEl=this.shadowRoot.getElementById('panelMessageInputId')
 ;if('insertText'===event.inputType&&null===event.data||'insertLineBreak'===event.inputType){document.getElementById('displayUtils').stripOneCrLfFromElement(panelMessageInputEl)
-;this._sendPrivMessageToUser(this.privmsgCsName,panelMessageInputEl);this._resetPrivMsgCount()
+;this._sendPrivMessageToUser(this.privmsgCsName,panelMessageInputEl);this._resetMessageCount()
 ;this.activityIconInhibitTimer=document.getElementById('globVars').constants('activityIconInhibitTimerValue')}};_handlePanelClick=()=>{this._resetMessageCount()};displayPmMessage=parsedMessage=>{
 const panelDivEl=this.shadowRoot.getElementById('panelDivId');const panelMessageDisplayEl=this.shadowRoot.getElementById('panelMessageDisplayId')
 ;const displayUtilsEl=document.getElementById('displayUtils');const globVarsEl=document.getElementById('globVars');const pmNameSpacer=globVarsEl.constants('pmNameSpacer');const _addText=text=>{
-panelMessageDisplayEl.value+=displayUtilsEl.cleanFormatting(text)+'\n';if(!window.globals.webState.cacheReloadInProgress)panelMessageDisplayEl.scrollTop=panelMessageDisplayEl.scrollHeight}
+panelMessageDisplayEl.value+=displayUtilsEl.cleanFormatting(text)+'\n';if(!window.globals.webState.cacheReloadInProgress)this._scrollTextAreaToRecent()}
 ;if(parsedMessage.params[0].toLowerCase()===this.privmsgName.toLowerCase()||parsedMessage.params[0].toLowerCase()!==this.privmsgName.toLowerCase()&&parsedMessage.nick.toLowerCase()===this.privmsgName.toLowerCase())if(panelDivEl.getAttribute('lastDate')!==parsedMessage.datestamp){
 panelDivEl.setAttribute('lastDate',parsedMessage.datestamp);panelMessageDisplayEl.value+='\n=== '+parsedMessage.datestamp+' ===\n\n'}
 if('PRIVMSG'===parsedMessage.command)if(parsedMessage.nick===window.globals.ircState.nickName){if(parsedMessage.params[0].toLowerCase()===this.privmsgName.toLowerCase()){
 if('isPmCtcpAction'in parsedMessage)_addText(parsedMessage.timestamp+pmNameSpacer+parsedMessage.nick+' '+parsedMessage.params[1]);else _addText(parsedMessage.timestamp+' '+parsedMessage.nick+pmNameSpacer+parsedMessage.params[1])
 ;if(panelDivEl.hasAttribute('beep3-enabled')&&!window.globals.webState.cacheReloadInProgress)document.getElementById('beepSounds').playBeep3Sound();if(!window.globals.webState.cacheReloadInProgress){
-console.log('Outgoing message, not cache reload, not zoom calling showPanel()');document.dispatchEvent(new CustomEvent('cancel-zoom'));this.showPanel()}}
-}else if(parsedMessage.nick.toLowerCase()===this.privmsgName.toLowerCase()){
+document.dispatchEvent(new CustomEvent('cancel-zoom'));this.showPanel()}}}else if(parsedMessage.nick.toLowerCase()===this.privmsgName.toLowerCase()){
 if('isPmCtcpAction'in parsedMessage)_addText(parsedMessage.timestamp+pmNameSpacer+parsedMessage.nick+' '+parsedMessage.params[1]);else _addText(parsedMessage.timestamp+' '+parsedMessage.nick+pmNameSpacer+parsedMessage.params[1])
 ;if(panelDivEl.hasAttribute('beep3-enabled')&&!window.globals.webState.cacheReloadInProgress)document.getElementById('beepSounds').playBeep3Sound()
-;if(!window.globals.webState.cacheReloadInProgress&&!document.querySelector('body').hasAttribute('zoomId')){console.log('Incoming message, not cache reload, not zoom calling showPanel()')
-;this.showPanel()}if(this.privmsgCsName!==parsedMessage.nick){this.privmsgCsName=parsedMessage.nick;this.shadowRoot.getElementById('pmNameDivId').textContent=this.privmsgCsName
+;if(!window.globals.webState.cacheReloadInProgress&&!this.shadowRoot.getElementById('panelVisibilityDivId').hasAttribute('visible')&&!document.querySelector('body').hasAttribute('zoomId')){
+this.showPanel();this._updateVisibility()}if(this.privmsgCsName!==parsedMessage.nick){this.privmsgCsName=parsedMessage.nick;this.shadowRoot.getElementById('pmNameDivId').textContent=this.privmsgCsName
 ;this.setAttribute('privmsg-cs-name',this.privmsgCsName)}
-if(document.activeElement!==this.shadowRoot.getElementById('panelMessageInputId')&&document.activeElement!==this.shadowRoot.getElementById('sendButtonId')&&!window.globals.webState.cacheReloadInProgress&&0===this.activityIconInhibitTimer)this._incrementMessageCount()
+if((document.activeElement.id!==this.id||!this.shadowRoot.getElementById('panelVisibilityDivId').hasAttribute('visible')||!this.shadowRoot.getElementById('panelCollapsedDivId').hasAttribute('visible'))&&!window.globals.webState.cacheReloadInProgress&&0===this.activityIconInhibitTimer)this._incrementMessageCount()
 }};_handleResizeCustomElements=()=>{if(window.globals.webState.dynamic.testAreaColumnPxWidth){const calcInputAreaColSize=document.getElementById('displayUtils').calcInputAreaColSize
 ;const mar1=window.globals.webState.dynamic.commonMarginRightPx
 ;const mar2=window.globals.webState.dynamic.commonMarginRightPx+5+window.globals.webState.dynamic.sendButtonWidthPx+window.globals.webState.dynamic.collapseButtonWidthPx
@@ -1571,9 +1570,9 @@ if(!this.elementExistsInDom)throw new Error('Calling irc-state-changed after cha
 ;if(!window.globals.ircState.ircConnected)if(window.globals.webState.activePrivateMessageNicks.indexOf(this.privmsgName.toLowerCase())>=0)this._removeSelfFromDOM()};_handleCacheReloadDone=event=>{
 const panelMessageDisplayEl=this.shadowRoot.getElementById('panelMessageDisplayId');let markerString='';let timestampString=''
 ;if('detail'in event&&'timestamp'in event.detail)timestampString=document.getElementById('displayUtils').unixTimestampToHMS(event.detail.timestamp);if(timestampString)markerString+=timestampString
-;markerString+=' '+document.getElementById('globVars').constants('cacheReloadString')+'\n';panelMessageDisplayEl.value+=markerString;panelMessageDisplayEl.scrollTop=panelMessageDisplayEl.scrollHeight
-;const now=Math.floor(Date.now()/1e3);const uptime=now-window.globals.webState.times.webConnect
-;if(uptime<5&&!this.shadowRoot.getElementById('panelVisibilityDivId').hasAttribute('visible'))this.collapsePanel()};_handelCacheReloadError=event=>{let errorString='\n';let timestampString=''
+;markerString+=' '+document.getElementById('globVars').constants('cacheReloadString')+'\n';panelMessageDisplayEl.value+=markerString;this._scrollTextAreaToRecent();const now=Math.floor(Date.now()/1e3)
+;const uptime=now-window.globals.webState.times.webConnect;if(uptime<5&&!this.shadowRoot.getElementById('panelVisibilityDivId').hasAttribute('visible'))this.collapsePanel()}
+;_handelCacheReloadError=event=>{let errorString='\n';let timestampString=''
 ;if('detail'in event&&'timestamp'in event.detail)timestampString=document.getElementById('displayUtils').unixTimestampToHMS(event.detail.timestamp);if(timestampString)errorString+=timestampString
 ;errorString+=' '+document.getElementById('globVar').constants('cacheErrorString')+'\n\n';this.shadowRoot.getElementById('panelMessageDisplayId').value=errorString};_handleEraseBeforeReload=()=>{
 this._removeSelfFromDOM()};_handleEraseAllButton=()=>{document.getElementById('ircControlsPanel').eraseIrcCache('PRIVMSG').then(()=>{
@@ -1704,15 +1703,18 @@ if(window.globals.ircState.ircConnected&&window.globals.ircState.ircIsAway)ircCo
 ;this.shadowRoot.getElementById('messageCountIconId').textContent=this.unreadMessageCount.toString();this.shadowRoot.getElementById('messageCountIconId').removeAttribute('hidden')
 ;document.dispatchEvent(new CustomEvent('update-channel-count',{detail:{channel:this.channelName,unreadMessageCount:this.unreadMessageCount}}))};_resetMessageCount=()=>{this.unreadMessageCount=0
 ;this.shadowRoot.getElementById('messageCountIconId').textContent=this.unreadMessageCount.toString();this.shadowRoot.getElementById('messageCountIconId').setAttribute('hidden','')
-;document.dispatchEvent(new CustomEvent('update-channel-count',{detail:{channel:this.channelName,unreadMessageCount:this.unreadMessageCount}}))};_scrollChannelTextAreaToRecent=()=>{
+;document.dispatchEvent(new CustomEvent('update-channel-count',{detail:{channel:this.channelName,unreadMessageCount:this.unreadMessageCount}}))};_scrollTextAreaToRecent=()=>{
 const panelMessageDisplayEl=this.shadowRoot.getElementById('panelMessageDisplayId');panelMessageDisplayEl.scrollTop=panelMessageDisplayEl.scrollHeight};_scrollToTop=()=>{this.focus()
 ;const newVertPos=window.scrollY+this.getBoundingClientRect().top-50;window.scrollTo({top:newVertPos,behavior:'smooth'})};_scrollToBottom=()=>{this.focus()
 ;const newVertPos=this.getBoundingClientRect().bottom-window.innerHeight+window.scrollY;window.scrollTo({top:newVertPos,behavior:'smooth'})};showPanel=()=>{
-const panelVisibilityDivEl=this.shadowRoot.getElementById('panelVisibilityDivId');if(!panelVisibilityDivEl.hasAttribute('visible')){panelVisibilityDivEl.setAttribute('visible','')
-;this.shadowRoot.getElementById('panelCollapsedDivId').setAttribute('visible','');this.shadowRoot.getElementById('hideWithCollapseId').removeAttribute('hidden');this._scrollChannelTextAreaToRecent()
-;this.shadowRoot.getElementById('noScrollCheckboxId').checked=false;this.shadowRoot.getElementById('bottomCollapseDivId').setAttribute('hidden','')}
-this.shadowRoot.getElementById('panelCollapsedDivId').setAttribute('visible','');this.shadowRoot.getElementById('hideWithCollapseId').removeAttribute('hidden');this._handleCancelZoomEvent()
-;document.dispatchEvent(new CustomEvent('cancel-zoom'));this._scrollToBottom();this.shadowRoot.getElementById('panelMessageInputId').focus()};collapsePanel=()=>{
+const panelVisibilityDivEl=this.shadowRoot.getElementById('panelVisibilityDivId');const panelCollapsedDivEl=this.shadowRoot.getElementById('panelCollapsedDivId')
+;const hideWithCollapseEl=this.shadowRoot.getElementById('hideWithCollapseId');const bottomCollapseDivEl=this.shadowRoot.getElementById('bottomCollapseDivId')
+;const panelMessageInputEl=this.shadowRoot.getElementById('panelMessageInputId');if(panelVisibilityDivEl.hasAttribute('visible')&&!panelCollapsedDivEl.hasAttribute('visible')){
+panelVisibilityDivEl.setAttribute('visible','');panelCollapsedDivEl.setAttribute('visible','');hideWithCollapseEl.removeAttribute('hidden')
+;this.shadowRoot.getElementById('noScrollCheckboxId').checked=false;this._scrollTextAreaToRecent();this._scrollToBottom();panelMessageInputEl.focus()
+}else if(!panelVisibilityDivEl.hasAttribute('visible')){panelVisibilityDivEl.setAttribute('visible','');panelCollapsedDivEl.setAttribute('visible','');hideWithCollapseEl.removeAttribute('hidden')
+;this.shadowRoot.getElementById('noScrollCheckboxId').checked=false;bottomCollapseDivEl.setAttribute('hidden','');this._scrollTextAreaToRecent();this._scrollToBottom();panelMessageInputEl.focus()}
+this._handleCancelZoomEvent();if(document.querySelector('body').hasAttribute('zoomId'))document.dispatchEvent(new CustomEvent('cancel-zoom'))};collapsePanel=()=>{
 this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible','');this.shadowRoot.getElementById('panelCollapsedDivId').removeAttribute('visible')
 ;this.shadowRoot.getElementById('hideWithCollapseId').setAttribute('hidden','');this._handleCancelZoomEvent()};hidePanel=()=>{
 this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible');this.shadowRoot.getElementById('panelCollapsedDivId').removeAttribute('visible')
@@ -1733,7 +1735,7 @@ this.shadowRoot.getElementById('joinButtonId').removeAttribute('hidden');this.sh
 this.shadowRoot.getElementById('notInChannelIconId').setAttribute('hidden','');this.shadowRoot.getElementById('sendButtonId').removeAttribute('disabled')
 ;this.shadowRoot.getElementById('panelMessageInputId').removeAttribute('disabled')}else{this.shadowRoot.getElementById('notInChannelIconId').removeAttribute('hidden')
 ;this.shadowRoot.getElementById('sendButtonId').setAttribute('disabled','');this.shadowRoot.getElementById('panelMessageInputId').setAttribute('disabled','')}};_handleCloseButton=()=>{this.hidePanel()
-};_handleCollapseButton=()=>{if(this.shadowRoot.getElementById('panelCollapsedDivId').hasAttribute('visible'))this.collapsePanel();else{this.showPanel();this._scrollChannelTextAreaToRecent()
+};_handleCollapseButton=()=>{if(this.shadowRoot.getElementById('panelCollapsedDivId').hasAttribute('visible'))this.collapsePanel();else{this.showPanel();this._scrollTextAreaToRecent()
 ;this.shadowRoot.getElementById('noScrollCheckboxId').checked=false}};_handleClearButton=()=>{this.shadowRoot.getElementById('panelMessageDisplayId').value=''
 ;this.shadowRoot.getElementById('panelDivId').setAttribute('lastDate','0000-00-00');this.shadowRoot.getElementById('panelNickListId').setAttribute('rows',this.textareaHeightInRows)
 ;this.shadowRoot.getElementById('panelMessageDisplayId').setAttribute('rows',this.textareaHeightInRows);this.shadowRoot.getElementById('panelMessageInputId').setAttribute('rows','1')}
@@ -1775,10 +1777,10 @@ const bodyEl=document.querySelector('body');const headerBarEl=document.getElemen
 ;const bottomCollapseDivEl=this.shadowRoot.getElementById('bottomCollapseDivId');const channelTopicDivEl=this.shadowRoot.getElementById('channelTopicDivId')
 ;if(bodyEl.hasAttribute('zoomId')&&bodyEl.getAttribute('zoomId')==='channel:'+this.channelName.toLowerCase()){bodyEl.removeAttribute('zoomId');headerBarEl.removeAttribute('zoomicon')
 ;zoomButtonEl.textContent='Zoom';zoomButtonEl.classList.remove('channel-panel-zoomed');channelTopicDivEl.removeAttribute('hidden');bottomCollapseDivEl.setAttribute('hidden','')
-;this._handleNormalButton();this._scrollChannelTextAreaToRecent();this._handleResizeCustomElements()}else{bodyEl.setAttribute('zoomId','channel:'+this.channelName.toLowerCase())
+;this._handleNormalButton();this._scrollTextAreaToRecent();this._handleResizeCustomElements()}else{bodyEl.setAttribute('zoomId','channel:'+this.channelName.toLowerCase())
 ;headerBarEl.setAttribute('zoomicon','');zoomButtonEl.textContent='UnZoom';zoomButtonEl.classList.add('channel-panel-zoomed');document.dispatchEvent(new CustomEvent('hide-all-panels',{detail:{
 except:['channel:'+this.channelName.toLowerCase(),'debugPanel']}}));channelTopicDivEl.setAttribute('hidden','');bottomCollapseDivEl.setAttribute('hidden','')
-;this.shadowRoot.getElementById('noScrollCheckboxId').checked=false;this._scrollChannelTextAreaToRecent();this._handleResizeCustomElements()}};_handleCancelZoomEvent=()=>{
+;this.shadowRoot.getElementById('noScrollCheckboxId').checked=false;this._scrollTextAreaToRecent();this._handleResizeCustomElements()}};_handleCancelZoomEvent=()=>{
 const bodyEl=document.querySelector('body');const headerBarEl=document.getElementById('headerBar');const zoomButtonEl=this.shadowRoot.getElementById('zoomButtonId')
 ;const bottomCollapseDivEl=this.shadowRoot.getElementById('bottomCollapseDivId');const channelTopicDivEl=this.shadowRoot.getElementById('channelTopicDivId')
 ;if(bodyEl.hasAttribute('zoomId')&&bodyEl.getAttribute('zoomId')==='channel:'+this.channelName.toLowerCase()){bodyEl.removeAttribute('zoomId');headerBarEl.removeAttribute('zoomicon')
@@ -1864,7 +1866,7 @@ const panelDivEl=this.shadowRoot.getElementById('panelDivId');const panelMessage
 ;const nickChannelSpacer=document.getElementById('globVars').constants('nickChannelSpacer');const _addText=(timestamp,nick,text)=>{let out='';if(panelDivEl.hasAttribute('brief-enabled')){
 out=timestamp+' ';if('*'===nick)out+=nick+nickChannelSpacer;else out+=nick+nickChannelSpacer+'\n';out+=document.getElementById('displayUtils').cleanFormatting(text)+'\n\n'
 }else out=timestamp+' '+nick.padStart(this.maxNickLength,' ')+nickChannelSpacer+document.getElementById('displayUtils').cleanFormatting(text)+'\n';panelMessageDisplayEl.value+=out
-;if(!window.globals.webState.cacheReloadInProgress&&false===this.shadowRoot.getElementById('noScrollCheckboxId').checked)this._scrollChannelTextAreaToRecent()}
+;if(!window.globals.webState.cacheReloadInProgress&&false===this.shadowRoot.getElementById('noScrollCheckboxId').checked)this._scrollTextAreaToRecent()}
 ;if(parsedMessage.params[0].toLowerCase()===this.channelName.toLowerCase())if(panelDivEl.getAttribute('lastDate')!==parsedMessage.datestamp){panelDivEl.setAttribute('lastDate',parsedMessage.datestamp)
 ;panelMessageDisplayEl.value+='\n=== '+parsedMessage.datestamp+' ===\n\n'}switch(parsedMessage.command){case'KICK':if(parsedMessage.params[0].toLowerCase()===this.channelName.toLowerCase()){
 let reason=' ';if(parsedMessage.params[2])reason=parsedMessage.params[2]
@@ -1880,16 +1882,18 @@ if(parsedMessage.params[0].toLowerCase()===this.channelName.toLowerCase())if(par
 ;if(present)_addText(parsedMessage.timestamp,'*',parsedMessage.nick+' is now known as '+parsedMessage.params[0])}break;case'NOTICE':
 if(parsedMessage.params[0].toLowerCase()===this.channelName.toLowerCase()){
 _addText(parsedMessage.timestamp,'*','Notice('+parsedMessage.nick+' to '+parsedMessage.params[0]+') '+parsedMessage.params[1])
-;if(!window.globals.webState.cacheReloadInProgress&&!document.querySelector('body').hasAttribute('zoomId'))this.showPanel();this._updateVisibility()
-;if(document.activeElement!==document.getElementById('channel:'+this.channelName.toLowerCase())&&!window.globals.webState.cacheReloadInProgress&&0===this.activityIconInhibitTimer)this._incrementMessageCount()
+;if(!window.globals.webState.cacheReloadInProgress&&!this.shadowRoot.getElementById('panelVisibilityDivId').hasAttribute('visible')&&!document.querySelector('body').hasAttribute('zoomId')){
+this.showPanel();this._updateVisibility()}
+if((document.activeElement.id!==this.id||!this.shadowRoot.getElementById('panelVisibilityDivId').hasAttribute('visible')||!this.shadowRoot.getElementById('panelCollapsedDivId').hasAttribute('visible'))&&!window.globals.webState.cacheReloadInProgress&&0===this.activityIconInhibitTimer)this._incrementMessageCount()
 }break;case'PART':if(parsedMessage.params[0].toLowerCase()===this.channelName.toLowerCase()){let reason=' ';if(parsedMessage.params[1])reason=parsedMessage.params[1]
 ;if(panelDivEl.hasAttribute('brief-enabled'))_addText(parsedMessage.timestamp,'*',parsedMessage.nick+' has left');else _addText(parsedMessage.timestamp,'*',parsedMessage.nick+' ('+parsedMessage.host+') has left '+'('+reason+')')
 }break;case'PRIVMSG':if(parsedMessage.params[0].toLowerCase()===this.channelName.toLowerCase()){_addText(parsedMessage.timestamp,parsedMessage.nick,parsedMessage.params[1])
 ;if(panelDivEl.hasAttribute('beep1-enabled')&&!window.globals.webState.cacheReloadInProgress)document.getElementById('beepSounds').playBeep1Sound();if(panelDivEl.hasAttribute('beep3-enabled')){
 const checkLine=parsedMessage.params[1].toLowerCase()
 ;if(checkLine.indexOf(window.globals.ircState.nickName.toLowerCase())>=0&&!window.globals.webState.cacheReloadInProgress)setTimeout(document.getElementById('beepSounds').playBeep2Sound,250)}
-if(!window.globals.webState.cacheReloadInProgress&&!document.querySelector('body').hasAttribute('zoomId'))this.showPanel()
-;if(document.activeElement!==document.getElementById('channel:'+this.channelName.toLowerCase())&&!window.globals.webState.cacheReloadInProgress&&0===this.activityIconInhibitTimer)this._incrementMessageCount()
+if(!window.globals.webState.cacheReloadInProgress&&!this.shadowRoot.getElementById('panelVisibilityDivId').hasAttribute('visible')&&!document.querySelector('body').hasAttribute('zoomId')){
+this.showPanel();this._updateVisibility()}
+if((document.activeElement.id!==this.id||!this.shadowRoot.getElementById('panelVisibilityDivId').hasAttribute('visible')||!this.shadowRoot.getElementById('panelCollapsedDivId').hasAttribute('visible'))&&!window.globals.webState.cacheReloadInProgress&&0===this.activityIconInhibitTimer)this._incrementMessageCount()
 }break;case'cachedQUIT':if(parsedMessage.params[0].toLowerCase()===this.channelName.toLowerCase()){let reason=' ';if(parsedMessage.params[1])reason=parsedMessage.params[1]
 ;if(panelDivEl.hasAttribute('brief-enabled'))_addText(parsedMessage.timestamp,'*',parsedMessage.nick+' has quit');else _addText(parsedMessage.timestamp,'*',parsedMessage.nick+' ('+parsedMessage.host+') has quit '+'('+reason+')')
 }break;case'QUIT':if(this._isNickInChannel(parsedMessage.nick,this.channelName.toLowerCase())){let reason=' ';if(parsedMessage.params[0])reason=parsedMessage.params[0]
@@ -1897,10 +1901,10 @@ if(!window.globals.webState.cacheReloadInProgress&&!document.querySelector('body
 }break;case'TOPIC':if(parsedMessage.params[0].toLowerCase()===this.channelName.toLowerCase()){const newTopic=parsedMessage.params[1]
 ;if(null==newTopic)_addText(parsedMessage.timestamp,'*','Topic for '+parsedMessage.params[0]+' has been unset by "'+parsedMessage.nick);else _addText(parsedMessage.timestamp,'*','Topic for '+parsedMessage.params[0]+' changed to "'+newTopic+'" by '+parsedMessage.nick)
 }break;default:}};_handleEraseBeforeReload=()=>{this.shadowRoot.getElementById('panelMessageDisplayId').value='';this.shadowRoot.getElementById('panelMessageInputId').value=''
-;this.shadowRoot.getElementById('panelDivId').setAttribute('lastDate','0000-00-00');this._resetMessageCount()};_handleCacheReloadDone=event=>{let markerString='';let timestampString=''
+;this.shadowRoot.getElementById('panelDivId').setAttribute('lastDate','0000-00-00')};_handleCacheReloadDone=event=>{let markerString='';let timestampString=''
 ;if('detail'in event&&'timestamp'in event.detail)timestampString=document.getElementById('displayUtils').unixTimestampToHMS(event.detail.timestamp);if(timestampString)markerString+=timestampString
 ;markerString+=' '+document.getElementById('globVars').constants('cacheReloadString')+'\n';if(this.shadowRoot.getElementById('panelDivId').hasAttribute('brief-enabled'))markerString+='\n'
-;this.shadowRoot.getElementById('panelMessageDisplayId').value+=markerString;if(false===this.shadowRoot.getElementById('noScrollCheckboxId').checked)this._scrollChannelTextAreaToRecent()
+;this.shadowRoot.getElementById('panelMessageDisplayId').value+=markerString;if(false===this.shadowRoot.getElementById('noScrollCheckboxId').checked)this._scrollTextAreaToRecent()
 ;if(this.webSocketFirstConnect){this.webConnectedLast=false;this.collapsePanel()}else{const now=Math.floor(Date.now()/1e3);const websocketConnectTime=now-window.globals.webState.times.webConnect
 ;if(websocketConnectTime<5&&this.shadowRoot.getElementById('panelVisibilityDivId').hasAttribute('visible'))this.collapsePanel()}};_handleWebConnectChanged=()=>{
 if(window.globals.webState.webConnected!==this.webConnectedLast){this.webConnectedLast=window.globals.webState.webConnected;if(!window.globals.webState.webConnected)this.webSocketFirstConnect=true}}
@@ -2056,6 +2060,8 @@ method:'GET',redirect:'error',signal:fetchController.signal,headers:{Accept:'app
 if('#DEBUG'===document.location.hash){this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible','');console.log('Debug: Detected URL hash=#DEBUG. Opened Debug panel at page load.')
 }this.shadowRoot.getElementById('closePanelButtonId').addEventListener('click',()=>{this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible')})
 ;this.shadowRoot.getElementById('forceDisconnectButtonId').addEventListener('click',()=>{document.getElementById('ircControlsPanel').forceDisconnectHandler().catch(err=>{console.log(err)
+;let message=err.message||err.toString()||'Error occurred calling /irc/connect';message=message.split('\n')[0];document.getElementById('errorPanel').showError(message)})})
+;this.shadowRoot.getElementById('eraseCacheButtonId').addEventListener('click',()=>{document.getElementById('ircControlsPanel').eraseIrcCache('CACHE').catch(err=>{console.log(err)
 ;let message=err.message||err.toString()||'Error occurred calling /irc/connect';message=message.split('\n')[0];document.getElementById('errorPanel').showError(message)})})
 ;this.shadowRoot.getElementById('serverTerminateButtonId').addEventListener('click',()=>{document.getElementById('ircControlsPanel').webServerTerminate().catch(err=>{console.log(err)
 ;let message=err.message||err.toString()||'Error occurred calling /irc/connect';message=message.split('\n')[0];document.getElementById('errorPanel').showError(message)})})

@@ -771,17 +771,6 @@ window.customElements.define('irc-server-panel', class extends HTMLElement {
       document.dispatchEvent(new CustomEvent('update-from-cache'));
     });
 
-    this.shadowRoot.getElementById('eraseCacheButtonId').addEventListener('click', () => {
-      document.getElementById('ircControlsPanel').eraseIrcCache('CACHE')
-        .catch((err) => {
-          console.log(err);
-          let message = err.message || err.toString() || 'Error occurred calling /irc/connect';
-          // show only 1 line
-          message = message.split('\n')[0];
-          document.getElementById('errorPanel').showError(message);
-        });
-    });
-
     // -----------------------------------------------
     // Send IRC server textarea send button pressed
     // -----------------------------------------------

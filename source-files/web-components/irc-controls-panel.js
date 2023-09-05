@@ -1194,7 +1194,7 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
     });
 
     // updateFromCache with 1 second debounce
-    window.addEventListener('debounced-update-from-cache', (event) => {
+    document.addEventListener('debounced-update-from-cache', (event) => {
       if (!this.updateCacheDebounceActive) {
         this.updateCacheDebounceActive = true;
         setTimeout(() => {
@@ -1354,6 +1354,11 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
         this.ircConnectedLast = window.globals.ircState.ircConnected;
         if (window.globals.ircState.ircConnected) {
           this.collapsePanel();
+
+          // Reload cache for purpose of picking up private message panels.
+          if (!window.globals.webState.cacheReloadInProgress) {
+            document.dispatchEvent(new CustomEvent('debounced-update-from-cache'));
+          }
         } else {
           this.showPanel();
         }
