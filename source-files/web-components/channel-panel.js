@@ -176,6 +176,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     this.lastAutoCompleteMatch = '';
     this.webConnectedLast = true;
     this.webSocketFirstConnect = false;
+    this.inhibitDynamicResize = false;
 
     // sized for iPhone screen
     this.mobileBreakpointPx = 600;
@@ -773,6 +774,8 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     const channelTopicDivEl = this.shadowRoot.getElementById('channelTopicDivId');
     if ((bodyEl.hasAttribute('zoomId')) &&
       (bodyEl.getAttribute('zoomId') === 'channel:' + this.channelName.toLowerCase())) {
+      // re-enable dynamic sscreen resizing
+      this.inhibitDynamicResize = false;
       // Turn off channel zoom
       bodyEl.removeAttribute('zoomId');
       headerBarEl.removeAttribute('zoomicon');
@@ -815,6 +818,9 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     const zoomButtonEl = this.shadowRoot.getElementById('zoomButtonId');
     const bottomCollapseDivEl = this.shadowRoot.getElementById('bottomCollapseDivId');
     const channelTopicDivEl = this.shadowRoot.getElementById('channelTopicDivId');
+    // re-enable dynamic sscreen resizing
+    this.inhibitDynamicResize = false;
+    // Un-zoom panel
     if ((bodyEl.hasAttribute('zoomId')) &&
       (bodyEl.getAttribute('zoomId') === 'channel:' + this.channelName.toLowerCase())) {
       // Turn off channel zoom
@@ -1732,9 +1738,13 @@ window.customElements.define('channel-panel', class extends HTMLElement {
   }; // _handleCacheReloadError()
 
   /**
-   * Dynamically set textarea column attributes to fit window size
+   * Dynamically set textarea column and row attributes to fit window size
    */
   _adjustTextareaWidthDynamically = () => {
+    if (this.inhibitDynamicResize) return;
+    // -------------
+    // Horizontal
+    // -------------
     const panelNickListEl = this.shadowRoot.getElementById('panelNickListId');
     const panelMessageDisplayEl = this.shadowRoot.getElementById('panelMessageDisplayId');
     // pixel width mar1 is reserved space on edges of input area at full screen width
@@ -1768,15 +1778,25 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     }
     this.shadowRoot.getElementById('panelMessageInputId')
       .setAttribute('cols', document.getElementById('displayUtils').calcInputAreaColSize(mar2));
-  }; // _adjustTextareaWidthDynamically()
-
-  /**
-   * Dynamically set textarea row attributes to fit window size
-   */
-  _adjustTextareaHeightDynamically = () => {
+    //
+    // Vertical
+    //
     const bodyEl = document.querySelector('body');
     if ((bodyEl.hasAttribute('zoomId')) &&
       (bodyEl.getAttribute('zoomId') === 'channel:' + this.channelName.toLowerCase())) {
+      // ------------------------------------------------------
+      // Zoom mode conflicts with the iPhone popup keyboard
+      // As the focus of the input textarea receives focus, the browser fires a resize event.
+      // this causes the dynamic resize in a series of recursive
+      // resize events, jittering the screen.
+      //
+      // The solution for now for zoom mode is to perform a dynamic resize
+      // one time, then inhibit dynamic zoom until the zoom is cancelled.
+      //
+      // Most likely this can and will be improved on in the future.
+      // ------------------------------------------------------
+      // Set flag to inhibit zoom after zoom one time.
+      this.inhibitDynamicResize = true;
       const panelNickListEl = this.shadowRoot.getElementById('panelNickListId');
       const panelMessageDisplayEl = this.shadowRoot.getElementById('panelMessageDisplayId');
 
@@ -1804,8 +1824,8 @@ window.customElements.define('channel-panel', class extends HTMLElement {
         panelMessageDisplayEl.setAttribute('rows', rows);
         panelNickListEl.setAttribute('rows', rows);
       }
-    } // is zoomed
-  }; // _adjustTextareaHeightDynamically()
+    }
+  }; // _adjustTextareaWidthDynamically()
 
   /**
    * Event listener fired when user resizes browser on desktop.
@@ -1813,7 +1833,6 @@ window.customElements.define('channel-panel', class extends HTMLElement {
   _handleResizeCustomElements = () => {
     if (window.globals.webState.dynamic.testAreaColumnPxWidth) {
       this._adjustTextareaWidthDynamically();
-      this._adjustTextareaHeightDynamically();
     }
   };
 

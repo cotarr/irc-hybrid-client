@@ -6,11 +6,31 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Next v2.0.0-dev.4 2023-09-05 (Draft)
+## Next v2.0.0-dev.5 2023-09-05 (Draft)
 
 Work in progress, see top of README.md
 
 Commit
+
+Issue - iPhone with channel-panel zoom 
+
+When viewing an IRC channel on an iPhone and the zoom is activate for the panel,
+each time the input textarea is touched and the textarea element grabs the focus, 
+the Apple screen keyboard pops up covering the lower half of the page.
+The triggers the browser resize event, which in turn causes the web page to 
+recalculate the proper number of col and row attribute integer values for
+the main channel textarea elements. THe result is a jittering of the page in a
+recursive series of resize events as the screen is scrolled.
+
+Fix (for now)
+
+For now, the dynamic resize of the textarea elements is disabled after
+one initial dynamic resize. When the zoom is cancelled, the dynamic resize is re-enabled.
+This seem workable for now. Therefore, if the browser is resized while zoom is active,
+it will be necessary to un-zoom, then zoom again to fit the new viewport dimensions.
+Otherwise dynamic resize is always active on all panels when not zoom mode active on a channel-panel element.
+
+Commit 6cb3d57
 
 - Hotkey Alt-I will cycle show, collapse, and hide for the irc-controls-panel. (collapse is new)
 - Added link to /docs/ folder in help panel, includes test if /docs/ is enabled on remote server.
