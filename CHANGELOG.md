@@ -6,9 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Next v2.0.0-dev.2 2023-09-04 (Draft)
+## Next v2.0.0-dev.3 2023-09-05 (Draft)
 
 Work in progress, see top of README.md
+
+- Mute header bar status icons, (IRC message related only) when disconnected
+- Comments
 
 Commit
 

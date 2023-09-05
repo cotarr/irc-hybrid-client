@@ -97,6 +97,9 @@
 //   make the panel visible and scroll it to the top of the viewport,
 //   unless any other panel is zoom or unless a cache reload is in progress.
 //
+// Hotkey Alt-B will make all private message panels visible collapsed as bar.
+// Hotkey Alt-P will make all private message panels visible collapsed as bar.
+//
 // Scroll - Upon showPanel() a pm-panel element is scrolled to the top of the viewport.
 //
 // ------------------------------------------------------------------------------

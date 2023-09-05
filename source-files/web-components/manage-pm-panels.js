@@ -57,7 +57,7 @@
 //
 //    HTML template is hidden by default.
 //    There are no auto-open capabilities, the manage-pm-channels panel
-//        will open only from the dropdown menu
+//        will open only from the dropdown menu or hotkey Alt-C command
 //
 //    Scroll, the panel scrolls to the top of the viewport when opened.
 //

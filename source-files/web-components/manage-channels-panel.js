@@ -57,6 +57,8 @@
 //      Check if an IRC auto-reconnect is in progress
 //      if not, then then show manage-channels-panel, clear flags
 //
+// The dropdown menu and hotkey Alt-P will open panel.
+//
 // Events;
 //   ircState.ircConnected true to false:  set flag ircFirstConnect=true
 //   webState.webConnected true to false:  set flag ircFirstConnect=true

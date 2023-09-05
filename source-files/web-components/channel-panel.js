@@ -78,7 +78,7 @@
 // Issue:
 //   The remote web server manages channel membership.
 //   Upon successful JOIN command with remote IRC server, the #channelName
-//   is added to the ircState.channels array.
+//   is added to the ircState.channels array by the backend server and UPDATE sent to browsers.
 //   The web browser receives a getIrcState() response, detects the new array element
 //   and creates a new channel-panel web component dynamically.
 //   The issue is: there is no way to distinguish the difference between:
@@ -148,6 +148,10 @@
 //    New NOTICE message to channel,then show channel-panel, scroll to bottom
 //    New PRIVMSG message to channel, then show channel-panel, scroll to bottom
 //    This also opens panel with other messages like JOIN
+//
+//    Hotkey Alt-B will show all channel panels in collapsed mode (as bar)
+//    Hotkey Alt-C will show all channel panels in collapsed mode
+//    Hotkey Alt-N (Next) will cycle through all channels in sequence
 //
 // Scroll: channel panel scrolls to bottom of viewport when showPanel() is called.
 //

@@ -514,9 +514,11 @@ noticeUnread:false,wallopsUnread:false,nickRecovery:false,enableAudio:false};if(
 ;if(window.globals.ircState.ircConnected){if(window.globals.ircState.ircRegistered)state.ircConnect='connected';else state.ircConnect='connecting';if(window.globals.ircState.ircIsAway)state.away=true
 }else{if(window.globals.webState.ircConnecting||window.globals.ircState.ircConnecting)state.ircConnect='connecting';else state.ircConnect='disconnected'
 ;if(window.globals.ircState.ircAutoReconnect&&window.globals.ircState.ircConnectOn&&!window.globals.ircState.ircConnected&&!window.globals.ircState.ircConnecting)state.wait=true}}else{
-state.hideNavMenu=true;if(window.globals.webState.webConnecting)state.webConnect='connecting';state.ircConnect='unavailable'}this.setHeaderBarIcons(state);this._updateDynamicElementTitles()}
-;initializePlugin=()=>{this.updateStatusIcons();this._setFixedElementTitles();this._updateDynamicElementTitles();const timerFlashingDivEl=this.shadowRoot.getElementById('timerFlashingDivId')
-;setInterval(()=>{if(timerFlashingDivEl.hasAttribute('hidden'))timerFlashingDivEl.removeAttribute('hidden');else timerFlashingDivEl.setAttribute('hidden','')},500)};connectedCallback(){
+state.hideNavMenu=true;if(window.globals.webState.webConnecting)state.webConnect='connecting';state.ircConnect='unavailable'}
+if(!window.globals.webState.webConnected||!window.globals.ircState.ircConnected){state.away=false;state.zoom=false;state.serverUnread=false;state.channelUnread=false;state.privMsgUnread=false
+;state.noticeUnread=false;state.wallopsUnread=false;state.nickRecovery=false}this.setHeaderBarIcons(state);this._updateDynamicElementTitles()};initializePlugin=()=>{this.updateStatusIcons()
+;this._setFixedElementTitles();this._updateDynamicElementTitles();const timerFlashingDivEl=this.shadowRoot.getElementById('timerFlashingDivId');setInterval(()=>{
+if(timerFlashingDivEl.hasAttribute('hidden'))timerFlashingDivEl.removeAttribute('hidden');else timerFlashingDivEl.setAttribute('hidden','')},500)};connectedCallback(){
 this.shadowRoot.getElementById('navDropdownButtonId').addEventListener('click',event=>{event.stopPropagation();document.getElementById('navMenu').toggleDropdownMenu()})
 ;this.shadowRoot.getElementById('enableAudioButtonId').addEventListener('click',()=>{document.getElementById('beepSounds').userInitiatedAudioPlay()})
 ;this.shadowRoot.getElementById('webConnectIconId').addEventListener('click',()=>{document.getElementById('websocketPanel').webConnectHeaderBarIconHandler()})

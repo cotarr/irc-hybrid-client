@@ -419,6 +419,19 @@ customElements.define('header-bar', class extends HTMLElement {
       }
       state.ircConnect = 'unavailable';
     }
+    // Mute IRC message related status icons when not connected
+    // except state.wait (used in reconnect) and state.enableAudio
+    if ((!window.globals.webState.webConnected) || (!window.globals.ircState.ircConnected)) {
+      state.away = false;
+      state.zoom = false;
+      state.serverUnread = false;
+      state.channelUnread = false;
+      state.privMsgUnread = false;
+      state.noticeUnread = false;
+      state.wallopsUnread = false;
+      state.nickRecovery = false;
+    }
+
     this.setHeaderBarIcons(state);
     this._updateDynamicElementTitles();
   };
