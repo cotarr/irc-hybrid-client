@@ -39,6 +39,7 @@ window.customElements.define('help-panel', class extends HTMLElement {
     const templateContent = template.content;
     this.attachShadow({ mode: 'open' })
       .appendChild(templateContent.cloneNode(true));
+    this.docsFolderTestComplete = false;
   }
 
   /**
@@ -55,6 +56,7 @@ window.customElements.define('help-panel', class extends HTMLElement {
    */
   showPanel = () => {
     this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
+    this._setDocsFolderLinkVisibility();
     document.dispatchEvent(new CustomEvent('cancel-zoom'));
     this._scrollToTop();
   };
@@ -84,25 +86,42 @@ window.customElements.define('help-panel', class extends HTMLElement {
     }
   };
 
-  // //
-  // // The /docs folder is optional, enabled in the configuration
-  // // If /docs is available, then un-hide a button providing a link to the documentation pages.
-  // //
-  // const docsTestUrl = '/irc/docs/index.html';
-  // const fetchOptions = {
-  //   method: 'HEAD',
-  //   headers: {
-  //     Accept: 'text/html'
-  //   }
-  // };
-  // fetch(docsTestUrl, fetchOptions)
-  //   .then((response) => {
-  //     if (response.ok) {
-  //       // Make the irc-hybrid-client documentation link button visible
-  //       document.getElementById('viewDocsButtonDiv').removeAttribute('hidden');
-  //     }
-  //   })
-  //   .catch(() => {});
+  //
+  // The /docs folder is optional, enabled in the configuration
+  // If /docs is available, then un-hide a button providing a link to the documentation pages.
+  //
+  _setDocsFolderLinkVisibility = () => {
+    if (this.docsFolderTestComplete) return;
+    this.docsFolderTestComplete = true;
+    const fetchController = new AbortController();
+    const fetchTimeout = document.getElementById('globVars').constants('fetchTimeout');
+    const activitySpinnerEl = document.getElementById('activitySpinner');
+    const fetchOptions = {
+      method: 'HEAD',
+      headers: {
+        redirect: 'error',
+        signal: fetchController.signal,
+        Accept: 'text/html'
+      }
+    };
+    const fetchURL = '/irc/docs/index.html';
+    activitySpinnerEl.requestActivitySpinner();
+    const fetchTimerId = setTimeout(() => fetchController.abort(), fetchTimeout);
+    fetch(fetchURL, fetchOptions)
+      .then((response) => {
+        if (response.ok) {
+          // Make the irc-hybrid-client documentation link button visible
+          this.shadowRoot.getElementById('viewDocsButtonDivId').removeAttribute('hidden');
+        }
+        if (fetchTimerId) clearTimeout(fetchTimerId);
+        activitySpinnerEl.cancelActivitySpinner();
+      })
+      .catch(() => {
+        // Error fail silently, failure === not configured in server
+        if (fetchTimerId) clearTimeout(fetchTimerId);
+        activitySpinnerEl.cancelActivitySpinner();
+      });
+  };
 
   // ------------------
   // Main entry point
@@ -153,16 +172,21 @@ window.customElements.define('help-panel', class extends HTMLElement {
     document.addEventListener('color-theme-changed', (event) => {
       const panelDivEl = this.shadowRoot.getElementById('panelDivId');
       const infoDivEl = this.shadowRoot.getElementById('infoDivId');
+      const viewDocsButtonDivEl = this.shadowRoot.getElementById('viewDocsButtonDivId');
       if (event.detail.theme === 'light') {
         panelDivEl.classList.remove('help-panel-theme-dark');
         panelDivEl.classList.add('help-panel-theme-light');
         infoDivEl.classList.remove('global-text-theme-dark');
         infoDivEl.classList.add('global-text-theme-light');
+        viewDocsButtonDivEl.classList.remove('help-panel-docs-div-dark');
+        viewDocsButtonDivEl.classList.add('help-panel-docs-div-light');
       } else {
         panelDivEl.classList.remove('help-panel-theme-light');
         panelDivEl.classList.add('help-panel-theme-dark');
         infoDivEl.classList.remove('global-text-theme-light');
         infoDivEl.classList.add('global-text-theme-dark');
+        viewDocsButtonDivEl.classList.remove('help-panel-docs-div-light');
+        viewDocsButtonDivEl.classList.add('help-panel-docs-div-dark');
       }
     });
 

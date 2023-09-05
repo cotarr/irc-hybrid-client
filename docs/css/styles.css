@@ -182,3 +182,12 @@ blue-example {
 yellow-example {
   background-color: yellow;
 }
+
+.upgrade-info {
+  background-color: #ffd18c;
+  color: black;
+  border: 1px solid black;
+  border-radius: 8px;
+  margin: 20px;
+  padding: 0px 10px 10px 10px;
+}

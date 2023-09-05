@@ -118,7 +118,11 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
    * Handle keydown event to show/hide panel, called from local-command-parser.
    */
   handleHotKey = () => {
-    if (this.shadowRoot.getElementById('panelVisibilityDivId').hasAttribute('visible')) {
+    if ((this.shadowRoot.getElementById('panelVisibilityDivId').hasAttribute('visible')) &&
+      (this.shadowRoot.getElementById('panelCollapsedDivId').hasAttribute('visible'))) {
+      this.collapsePanel();
+    } else if ((this.shadowRoot.getElementById('panelVisibilityDivId').hasAttribute('visible')) &&
+      (!this.shadowRoot.getElementById('panelCollapsedDivId').hasAttribute('visible'))) {
       this.hidePanel();
     } else {
       this.showPanel();

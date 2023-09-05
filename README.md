@@ -4,8 +4,9 @@ Git branch: web-components
 
 ### Work In Progress
 
-Due to major code changes, ***THIS BRANCH IS NOT OPERATIONAL*** as an IRC client
-until additional coding has been completed.
+Status update: The web-components GitHub branch is now operational for testing. Debugging is in progress, expect rapid changes.
+
+### Description
 
 Description: This is a reorganization of the frontend web browser HTML and JavaScript into multiple web components.
 
@@ -33,50 +34,54 @@ are isolated inside the web component.
 - In the prod build, all JavaScript will be bundled into a single file and minified.
 - The gulp script will modify HTML source files in both dev and prod to match the bundling configuration.
 - The previous frontend web browser code and folders will be deleted at the start of the edit. This is to avoid text editor global text search hits on the old version.
+- To avoid duplication of source files, the "build-dev" folder will not be committed to git.
+- Step by step notes of changes recorded into the CHANGELOG.md file.
 
 ### Approach
 
 As much as possible, existing IRC client code will be used as-is. Some variable name substitutions 
 will be necessary to accommodate namespace constraints within web components.
 
-The primary changes will be in the user interface panels. For example, in the case where all panels
-have a "close" button, the previous version required a unique element ID name assignment 
-for each button in each panel. Inside the shadowDOM of individual web components, each close 
-button can use a standardized ID name within each panel's shadow DOM. 
+To simplify things, no changes to the backend NodeJs server are anticipated except for 
+file location of web server root directory location to accommodate the build-dev and build-prod folders.
 
-To simplify things, no changes to the backend NodeJs server are anticipated.
+New features:
+
+- Dropdown navigation menu with IRC channels dynamically inserted into the menu and count of unread messages in menu.
+- New integrated IRC server list capable to JOIN an IRC server directly from buttons in the server list.
+- IRC server definition editor panel that can be invoked from the server list.
+- Keyboard Hotkeys to show or hide various panels and step through IRC channels. The list of hotkeys is in the help panel.
+- New status bar at top of page with improved icons. The "Web" and "Irc" buttons still functional to connect and disconnect.
+- New "Zoom" mode in channel panel sets rows and cols of textarea to fill screen. (iPhone popup keyboard may be an issue)
 
 ### Project File Structure
 
 Before (V0.2.53)
 
-```
-Source Files                -->          Minified files (3 files)
-
-secure/webclient.html  (single file)     secure-minify/webclient.html
-secure/css/styles.css  (single file)     secure-minify/css/styles.css
-secure/js/*.js    (multiple --> single)  secure-minify/js/webclient.js
-```
+| Source Files                            | Minified files (3 files)           |
+| --------------------------------------- | ---------------------------------- |
+| secure/webclient.html  (single file)    | secure-minify/webclient.html       |
+| secure/css/styles.css  (single file)    | secure-minify/css/styles.css       |
+| secure/js/*.js    (multiple --> single) | secure-minify/js/webclient.js      |
 
 After (V2.0.0-dev)
 
-```
-Source Files                      -->         Development Build (multiple js) --> Bundled, Minified (3 files)
+| Source Files                                  | Development Build (multiple js)    |Bundled, Minified (3 files) |
+| --------------------------------------------- | ---------------------------------- | -------------------------- |
+| source-files/html/*.html                      | build-dev/webclient.html           | build-prod/webclient.html  |
+| source-files/css/*.css (shared css)           | build-dev/css/styles.css           | build-prod/css/styles.css  |
+| source-files/js/*.js (loads page)             | build-dev/js/(*multiple files*).js | build-prod/js/webclient.js |
+| source-files/web-components/*.html,*.css,*.js |                                    |                            |
 
-source-files/html/*.html                      build-dev/webclient.html            build-prod/webclient.html
-source-files/css/*.css (shared css)           build-dev/css/styles.css            build-prod/css/styles.css
-source-files/js/*.js (loads page)             build-dev/js/(*multiple files*).js  build-prod/js/webclient.js
-source-files/web-components/*.html,*.css,*.js
-```
 ---
 
 End of branch notes
 
 ---
 
-# irc-hybrid-client (v0.2.53)
+# irc-hybrid-client (DRAFT)
 
-***TBD - Not updated for Version 2***
+***TBD - Update for Version 2 in progress ***
 
 Single user hybrid IRC client using JavaScript frontend and Node.js/Express backend.
 
@@ -86,22 +91,49 @@ Screen capture images are available in the [documentation](https://cotarr.github
 
 [ChangeLog.md](https://github.com/cotarr/irc-hybrid-client/blob/master/CHANGELOG.md)
 
+
+## Upgrade Notes
+
+The frontend browser code was completely rewritten and issued as Version V2.0.0 
+approximately Sept 2023. For a detail description of the changes see
+the CHANGELOG.md file (reference TBD).
+
+The new version is intended be fully backward compatible. 
+Performing a `git pull` on irc-hybrid-client master branch (after v2 is merged to master, TBD)
+will update both frontend and backend NodeJs files.
+
+There are no changes to the configuration files on the backend server, so previous 
+configuration should work as-is. There are no changes to the format of the
+"servers.json" database of IRC server definitions. However, the file location
+of the root directory of the web server has changed (see CHANGELOG.md).
+Version 2 contains a bundled and minified version in the repository.
+
+The previous version v0.2.53 of the web browser frontend will no longer be maintained.
+It has been tagged as v1.0.0 to place a clean version boundary to the new version.
+If any problems are experienced with Version 2, you can revert the 
+previous version from GitHub (instructions TBD)
+
 ### Project Status
 
-This IRC client is functional and mostly stable, but still evolving. 
-New features are still being added from time to time.
+The upgrade of the web browser frontend to Version v2 has brought the 
+project back into a period of rapid changes to optimize the user interface.
+The backend core IRC client and web server did not change in the v2 upgrade
+and is mostly stable.
 
 ### Repository Contents
 
 HTML content is available in both the minified-bundled version and
-the commented development version. HTML content is located in 
-folders `secure-minify/` and `secure/`. Selection is determined by 
-the NODE_ENV environment variable. The browser download is about 
-37 kB for minify-bundled version with server compression, 
-compared to about 338 kB serving from development folders without compression.
+the commented development version. HTML source files are located in the 
+folder `source-files/`. The production minified build is located 
+in the folder `build-prod/`. Selection is determined by 
+the NODE_ENV environment variable. A development folder `build-dev`
+will not be committed to avoid duplication of source files.
 
 The server files are located in the `server/` folder. The server is launched
 from the socket server in the `bin/` folder.
+
+The repository contains a /docs/ folder with HTML help documentation for the project.
+(Not updated for V2 TBD)
 
 # Installation
 
@@ -275,11 +307,14 @@ The first time the web server is started, an empty IRC server list will be creat
 automatically as "servers.json" in the base folder of the repository.
 
 Upon the first login to the web page at `/irc/webclient.html`, the 
-browser will be automatically redirected to the server list editor page.
-The IRC server edit form includes instructions showing how to add 
-new IRC servers.
+browser will automatically display an IRC server edit form. 
+The form is used to define the first IRC server.
+Instruction related to the form's fields is located in the form itself using help buttons.
 
-After creating at least 1 IRC server definition, the user may return to the IRC client page.
+After at least one IRC server has been created, the user may initiate a "Connect"
+to the IRC network using buttons on the web page. To anyone familiar with IRC, 
+the interface should be familiar. Additionally, there is a server list panel
+capable to show and edit IRC server definitions.
 
 Optionally, you may edit the IRC server list manually. A file "example-servers.json" 
 can act as a template. The IRC Config section of the documentation (/docs/) includes 

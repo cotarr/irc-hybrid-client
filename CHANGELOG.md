@@ -6,14 +6,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Next v2.0.0-dev.3 2023-09-05 (Draft)
+## Next v2.0.0-dev.4 2023-09-05 (Draft)
 
 Work in progress, see top of README.md
+
+Commit
+
+- Hotkey Alt-I will cycle show, collapse, and hide for the irc-controls-panel. (collapse is new)
+- Added link to /docs/ folder in help panel, includes test if /docs/ is enabled on remote server.
+- Updated README.md to show status of the new version, with drift README changes.
+- Added upgrade disclaimer to /docs/ folder warning of legacy screenshots.
+
+Commit 2e69648
 
 - Mute header bar status icons, (IRC message related only) when disconnected
 - Comments
 
-Commit
+Commit 61a2e7b
 
 - Fixed: disconnect from IRC, then reconnect, open channel, message cache was not loading.
 - Fixed: disconnect from IRC, then reconnect, private chat message cache not loading from cache.
