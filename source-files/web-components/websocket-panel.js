@@ -595,7 +595,7 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
     if ((persistedWebsocketState) && (persistedWebsocketState.disabled)) {
       window.globals.webState.webConnectOn = false;
       this.shadowRoot.getElementById('reconnectStatusDivId').textContent =
-        'Previous session disconnected at user request';
+        'Auto-reconnect disabled';
       this.showPanel();
       document.getElementById('activitySpinner').cancelActivitySpinner();
     } else {
@@ -863,7 +863,7 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
           window.globals.webState.webConnecting = false;
           this._updateWebsocketStatus();
           this.shadowRoot.getElementById('reconnectStatusDivId').textContent =
-            'Reconnect disabled\n';
+            'Auto-reconnect disabled\n';
           // persist websocket disabled auto-reconnect on next page load
           const persist = this.shadowRoot.getElementById('persistCheckBoxId').checked;
           if (persist) {

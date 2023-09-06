@@ -332,7 +332,7 @@ let errMessage=err.message||err.toString()||'Websocket Authorization Error';cons
 ;window.globals.webState.webConnected=false;window.globals.webState.webConnecting=false;this._updateWebsocketStatus()})};firstWebSocketConnectOnPageLoad=()=>{
 const persistedWebsocketState=JSON.parse(window.localStorage.getItem('persistedWebsocketState'))
 ;if(persistedWebsocketState&&persistedWebsocketState.persist)this.shadowRoot.getElementById('persistCheckBoxId').checked=true;if(persistedWebsocketState&&persistedWebsocketState.disabled){
-window.globals.webState.webConnectOn=false;this.shadowRoot.getElementById('reconnectStatusDivId').textContent='Previous session disconnected at user request';this.showPanel()
+window.globals.webState.webConnectOn=false;this.shadowRoot.getElementById('reconnectStatusDivId').textContent='Auto-reconnect disabled';this.showPanel()
 ;document.getElementById('activitySpinner').cancelActivitySpinner()}else{window.globals.webState.webConnectOn=true;window.globals.webState.webConnecting=true;this._initWebSocketAuth().then(()=>{
 this.shadowRoot.getElementById('reconnectStatusDivId').textContent+='Authorizing websocket....\n';setTimeout(()=>{this._connectWebSocket()},100)}).catch(err=>{this.showPanel()
 ;let errMessage=err.message||err.toString()||'Unknown error';console.log(errMessage);errMessage=errMessage.split('\n')[0]
@@ -369,7 +369,7 @@ window.globals.webState.webConnectOn=true;window.globals.webState.webConnecting=
 const persist=this.shadowRoot.getElementById('persistCheckBoxId').checked;if(persist){const persistedWebsocketStateObj={persist:true,disabled:false}
 ;window.localStorage.setItem('persistedWebsocketState',JSON.stringify(persistedWebsocketStateObj))}});this.shadowRoot.getElementById('stopWebSocketReconnectButtonId').addEventListener('click',()=>{
 if(!window.globals.webState.webConnected){window.globals.webState.webConnectOn=false;window.globals.webState.webConnecting=false;this._updateWebsocketStatus()
-;this.shadowRoot.getElementById('reconnectStatusDivId').textContent='Reconnect disabled\n';const persist=this.shadowRoot.getElementById('persistCheckBoxId').checked;if(persist){
+;this.shadowRoot.getElementById('reconnectStatusDivId').textContent='Auto-reconnect disabled\n';const persist=this.shadowRoot.getElementById('persistCheckBoxId').checked;if(persist){
 const persistedWebsocketStateObj={persist:true,disabled:true};window.localStorage.setItem('persistedWebsocketState',JSON.stringify(persistedWebsocketStateObj))}}})
 ;this.shadowRoot.getElementById('persistCheckBoxId').addEventListener('click',()=>{if(this.shadowRoot.getElementById('persistCheckBoxId').checked){const disabled=!window.globals.webState.webConnectOn
 ;const persistedWebsocketStateObj={persist:true,disabled:disabled};window.localStorage.setItem('persistedWebsocketState',JSON.stringify(persistedWebsocketStateObj))

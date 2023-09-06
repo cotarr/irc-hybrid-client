@@ -6,11 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Next v2.0.0-dev.6 2023-09-06 (Draft)
+## Next v2.0.0-dev.7 2023-09-06 (Draft)
 
 Work in progress, see top of README.md
 
-Commit
+- Shorten message to fit smartphone screen
+
+Commit de71534
 
 - header-bar, the hamburger icon for dropdown menu is always visible, no longer hide on websocket disconnect
 - nav-menu listens to web-connect-changed event and hides various menu items when websocket is disconnected.
