@@ -413,7 +413,6 @@ customElements.define('header-bar', class extends HTMLElement {
       } // ircConnected
     } else {
       // Web not connected
-      state.hideNavMenu = true;
       if (window.globals.webState.webConnecting) {
         state.webConnect = 'connecting';
       }

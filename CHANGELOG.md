@@ -6,11 +6,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Next v2.0.0-dev.5 2023-09-05 (Draft)
+## Next v2.0.0-dev.6 2023-09-06 (Draft)
 
 Work in progress, see top of README.md
 
 Commit
+
+- header-bar, the hamburger icon for dropdown menu is always visible, no longer hide on websocket disconnect
+- nav-menu listens to web-connect-changed event and hides various menu items when websocket is disconnected.
+- websocket-panel, added checkbox to persist websocket auto-reconnect disabled in future page loads using localStorage.
+- websocket-panel, added help info button and some collapsible information section.
+- irc-controls-panel added some title attributes to buttons as popup tooltip messages
+- Various HTML/CSS adjustments.
+
+Commit d70d73e
 
 Issue - iPhone with channel-panel zoom 
 

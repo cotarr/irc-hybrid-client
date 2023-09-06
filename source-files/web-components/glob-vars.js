@@ -143,7 +143,7 @@ window.customElements.define('glob-vars', class extends HTMLElement {
     // ---------------------------------------------------
     window.globals.webState = {};
     window.globals.webState.loginUser = {};
-    window.globals.webState.webConnectOn = true;
+    window.globals.webState.webConnectOn = false;
     window.globals.webState.webConnected = false;
     window.globals.webState.webConnecting = false;
     window.globals.webState.ircConnecting = false;

@@ -1060,6 +1060,10 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
   // ------------------
   initializePlugin = () => {
     // Set descriptive button titles
+    this.shadowRoot.getElementById('showServerListButtonId').setAttribute('title',
+      'Open panel with list of IRC servers');
+    this.shadowRoot.getElementById('showServerPanelButtonId').setAttribute('title',
+      'Open panel showing messages from IRC server');
     this.shadowRoot.getElementById('editServerButtonId').setAttribute('title',
       'Opens form to edit IRC server configuration');
     this.shadowRoot.getElementById('forceUnlockButtonId').setAttribute('title',
@@ -1069,6 +1073,14 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
       'Connect to the IRC network');
     this.shadowRoot.getElementById('quitButtonId').setAttribute('title',
       'Disconnect (/QUIT) from the IRC network.');
+    this.shadowRoot.getElementById('setAwayButtonId').setAttribute('title',
+      'Set your status to AWAY on the IRC network with optional away message');
+    this.shadowRoot.getElementById('setBackButtonId').setAttribute('title',
+      'Cancel your AWAY status on the IRC network.');
+    this.shadowRoot.getElementById('nickNameInputId').setAttribute('title',
+      'Nickname to be used for next IRC connect');
+    this.shadowRoot.getElementById('userAwayMessageId').setAttribute('title',
+      'IRC user AWAY message');
   }; // initializePlugin()
 
   // add event listeners to connected callback

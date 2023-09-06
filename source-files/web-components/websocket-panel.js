@@ -292,7 +292,8 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
           if (window.globals.webState.webConnected) {
             if (('code' in event) && (event.code === 3001)) {
               this.shadowRoot.getElementById('reconnectStatusDivId').textContent +=
-                'Web page disconnected at user request\n';
+                'Web page disconnected at user request\n' +
+                'Auto-reconnect disabled\n';
             } else {
               this.shadowRoot.getElementById('reconnectStatusDivId').textContent +=
               'Web socket connection closed, count: ' +
@@ -581,9 +582,25 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
 
   /**
    * Function (called externally) to initiate a new websocket connection at page load.
+   * This is called from js/_afterLoad.js after all panels have been loaded and initialized.
    */
   firstWebSocketConnectOnPageLoad = () => {
-    if ((!window.globals.webState.webConnected) && (!window.globals.webState.webConnecting)) {
+    // If a user had previously disconnected from the web server
+    // the auto-connect of the web socket is persisted in future page loads
+    const persistedWebsocketState =
+      JSON.parse(window.localStorage.getItem('persistedWebsocketState'));
+    if ((persistedWebsocketState) && (persistedWebsocketState.persist)) {
+      this.shadowRoot.getElementById('persistCheckBoxId').checked = true;
+    }
+    if ((persistedWebsocketState) && (persistedWebsocketState.disabled)) {
+      window.globals.webState.webConnectOn = false;
+      this.shadowRoot.getElementById('reconnectStatusDivId').textContent =
+        'Previous session disconnected at user request';
+      this.showPanel();
+      document.getElementById('activitySpinner').cancelActivitySpinner();
+    } else {
+      // Else not disabled, establish a new websocket connection on page load.
+      window.globals.webState.webConnectOn = true;
       window.globals.webState.webConnecting = true;
       this._initWebSocketAuth()
         .then(() => {
@@ -627,15 +644,38 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
       this.shadowRoot.getElementById('reconnectStatusDivId').textContent +=
         'Reconnect to web server initiated (Manual)\n';
       this._reConnectWebSocketAfterDisconnect();
+      // persist websocket disabled auto-reconnect on next page load
+      const persist = this.shadowRoot.getElementById('persistCheckBoxId').checked;
+      if (persist) {
+        const persistedWebsocketStateObj = {
+          persist: true,
+          disabled: false
+        };
+        window.localStorage.setItem('persistedWebsocketState',
+          JSON.stringify(persistedWebsocketStateObj));
+      }
       return;
     }
     //
     // Disconnect
     //
     if (window.globals.webState.webConnected) {
+      this.shadowRoot.getElementById('reconnectStatusDivId').textContent =
+        'Header bar "Web" icon activated by user\n' +
+        'Closing websocket to remote IRC client\n';
       window.globals.webState.webConnectOn = false;
       if (window.globals.wsocket) {
         window.globals.wsocket.close(3001, 'Disconnect on request');
+      }
+      // persist websocket disabled auto-reconnect on next page load
+      const persist = this.shadowRoot.getElementById('persistCheckBoxId').checked;
+      if (persist) {
+        const persistedWebsocketStateObj = {
+          persist: true,
+          disabled: true
+        };
+        window.localStorage.setItem('persistedWebsocketState',
+          JSON.stringify(persistedWebsocketStateObj));
       }
     }
   };
@@ -692,7 +732,7 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
       if (this.wsReconnectCounter === 11) {
         // only do the message one time
         this.shadowRoot.getElementById('reconnectStatusDivId').textContent +=
-          'Reconnect disabled\n';
+          'Auto-reconnect disabled\n';
       }
     } else {
       if (this.wsReconnectTimer > 15) {
@@ -774,6 +814,13 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
   };
 
   initializePlugin () {
+    // set descriptions to title attribute of buttons in panel
+    this.shadowRoot.getElementById('manualWebSocketReconnectButtonId').setAttribute('title',
+      'Connect or disconnect web browser from remote IRC client');
+    this.shadowRoot.getElementById('stopWebSocketReconnectButtonId').setAttribute('title',
+      'Disable auto-reconnect to remote IRC client');
+    this.shadowRoot.getElementById('persistCheckBoxId').setAttribute('title',
+      'Remember websocket disabled state in future page load/refresh');
   }
 
   connectedCallback () {
@@ -794,6 +841,16 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
             'Reconnect to web server initiated (Manual)\n';
           this._reConnectWebSocketAfterDisconnect();
         }
+        // persist websocket disabled auto-reconnect on next page load
+        const persist = this.shadowRoot.getElementById('persistCheckBoxId').checked;
+        if (persist) {
+          const persistedWebsocketStateObj = {
+            persist: true,
+            disabled: false
+          };
+          window.localStorage.setItem('persistedWebsocketState',
+            JSON.stringify(persistedWebsocketStateObj));
+        }
       });
 
     /**
@@ -807,6 +864,47 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
           this._updateWebsocketStatus();
           this.shadowRoot.getElementById('reconnectStatusDivId').textContent =
             'Reconnect disabled\n';
+          // persist websocket disabled auto-reconnect on next page load
+          const persist = this.shadowRoot.getElementById('persistCheckBoxId').checked;
+          if (persist) {
+            const persistedWebsocketStateObj = {
+              persist: true,
+              disabled: true
+            };
+            window.localStorage.setItem('persistedWebsocketState',
+              JSON.stringify(persistedWebsocketStateObj));
+          }
+        }
+      });
+
+    /**
+     * Checkbox to persist disabled websocket to localStorage
+     */
+    this.shadowRoot.getElementById('persistCheckBoxId')
+      .addEventListener('click', () => {
+        if (this.shadowRoot.getElementById('persistCheckBoxId').checked) {
+          // Invert...
+          const disabled = !window.globals.webState.webConnectOn;
+          const persistedWebsocketStateObj = {
+            persist: true,
+            disabled: disabled
+          };
+          window.localStorage.setItem('persistedWebsocketState',
+            JSON.stringify(persistedWebsocketStateObj));
+        } else {
+          window.localStorage.removeItem('persistedWebsocketState');
+        }
+      });
+
+    /**
+     * Button to show help information on websocket panel
+     */
+    this.shadowRoot.getElementById('websocketInfoButtonId')
+      .addEventListener('click', () => {
+        if (this.shadowRoot.getElementById('websocketInfoDivId').hasAttribute('hidden')) {
+          this.shadowRoot.getElementById('websocketInfoDivId').removeAttribute('hidden');
+        } else {
+          this.shadowRoot.getElementById('websocketInfoDivId').setAttribute('hidden', '');
         }
       });
 

@@ -9,8 +9,37 @@
       <div class="button-div">
         <button id="manualWebSocketReconnectButtonId">Reconnect to Web Site</button>
         <button id="stopWebSocketReconnectButtonId">Stop</button>
+        <button id="websocketInfoButtonId">?</button>
       </div>
+      <div class="vh10"></div>
+      <div class="mb5">
+        <input id="persistCheckBoxId" class="global-valign-middle" type="checkbox">
+        <span class="global-valign-middle">Remember disabled state</span>
+      </div>  
       <pre id="reconnectStatusDivId" class="websocket-panel-status-div"></pre>
+      <div id="websocketInfoDivId" hidden>
+        <p>
+          Two independent connections are used to connect to the IRC network.
+          One is between the web browser and the web server.
+          The web server is acting as a remote IRC client.
+          A second connection will exist between the web server and the IRC network.
+          The connection on this panel refers to the websocket connection 
+          between the web browser and web server.
+        </p>
+        <div class="vh20"></div>
+<pre>
+         (here)
+            |
+  Web       |     Web            IRC            
+Browser  ------- Server ------- Server
+</pre>
+        <div class="vh20"></div>
+        <ul>
+          <li>Web page user account is not logged out.</li>
+          <li>Your nickname will remain present on IRC.</li>
+        </ul>
+
+      </div>
     </div>
   </div>
 </template>

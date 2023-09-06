@@ -53,6 +53,7 @@ customElements.define('nav-menu', class extends HTMLElement {
     this.previousPmPanels = [];
     this.arrayOfMenuElements = [];
     this.ircConnectedLast = null;
+    this.webConnectedLast = null;
   }
 
   /**
@@ -206,18 +207,18 @@ customElements.define('nav-menu', class extends HTMLElement {
     this.closeDropdownMenu();
   };
 
-  /**
-   * Event handler called when irc-state-changed fires
-   */
-  _handleIrcStateChanged = () => {
-    // console.log('navMenu irc-state-changed event');
+  _showHideItemsInMenu = () => {
     // Detect state change for IRC server connection. if changed, close the dropdown
-    if (window.globals.ircState.ircConnected !== this.ircConnectedLast) {
+    if ((window.globals.ircState.ircConnected !== this.ircConnectedLast) ||
+      (window.globals.webState.webConnected !== this.webConnectedLast)) {
       this.ircConnectedLast = window.globals.ircState.ircConnected;
+      this.webConnectedLast = window.globals.webState.webConnected;
+
       // visible menu items will change so close the menu
       this.closeDropdownMenu();
+
       // List of menu items to be hidden when not connected to IRC
-      const menuIdList = [
+      const ircMenuIdList = [
         'group01ButtonId',
         'group02ButtonId',
         'item3_4_Id',
@@ -226,12 +227,31 @@ customElements.define('nav-menu', class extends HTMLElement {
         'item4_3_Id',
         'item4_4_Id'
       ];
-      if (window.globals.ircState.ircConnected) {
-        menuIdList.forEach((menuId) => {
-          this.shadowRoot.getElementById(menuId).removeAttribute('unavailable');
+      const webMenuIdList = [
+        'group01ButtonId',
+        'group02ButtonId',
+        'group03ButtonId',
+        'item4_1_Id',
+        'item4_2_Id',
+        'item4_3_Id',
+        'item4_4_Id'
+      ];
+      // remove previous values
+      webMenuIdList.forEach((menuId) => {
+        this.shadowRoot.getElementById(menuId).removeAttribute('unavailable');
+      });
+      ircMenuIdList.forEach((menuId) => {
+        this.shadowRoot.getElementById(menuId).removeAttribute('unavailable');
+      });
+      // Hide this if websocket disconnected from web server
+      if (!window.globals.webState.webConnected) {
+        webMenuIdList.forEach((menuId) => {
+          this.shadowRoot.getElementById(menuId).setAttribute('unavailable', '');
         });
-      } else {
-        menuIdList.forEach((menuId) => {
+      }
+      // hide these items if backend disconnected from IRC
+      if (!window.globals.ircState.ircConnected) {
+        ircMenuIdList.forEach((menuId) => {
           this.shadowRoot.getElementById(menuId).setAttribute('unavailable', '');
         });
       }
@@ -240,6 +260,21 @@ customElements.define('nav-menu', class extends HTMLElement {
         itemId.setAttribute('collapsed', '');
       });
     }
+  };
+
+  /**
+   * Event handler called when web-connect-changed fires
+   */
+  _handleWebConnectChanged = () => {
+    this._showHideItemsInMenu();
+  };
+
+  /**
+   * Event handler called when irc-state-changed fires
+   */
+  _handleIrcStateChanged = () => {
+    // console.log('navMenu irc-state-changed event');
+    this._showHideItemsInMenu();
 
     // Channel list
     const channels = Array.from(window.globals.ircState.channels);
@@ -364,7 +399,7 @@ customElements.define('nav-menu', class extends HTMLElement {
       }
     });
 
-    document.addEventListener('irc-state-changed', this._handleIrcStateChanged.bind(this));
+    document.addEventListener('irc-state-changed', this._handleIrcStateChanged);
 
     document.addEventListener('update-channel-count', (event) => {
       const channelMenuItemElements =
@@ -401,6 +436,8 @@ customElements.define('nav-menu', class extends HTMLElement {
         }
       });
     }); // addEventListener('update-channel-count
+
+    document.addEventListener('web-connect-changed', this._handleWebConnectChanged);
 
     //
     // Build arrays of page elements
