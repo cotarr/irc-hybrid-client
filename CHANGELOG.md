@@ -6,9 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Next v2.0.0-dev.7 2023-09-06 (Draft)
+## Next v2.0.0-dev.8 2023-09-06 (Draft)
 
 Work in progress, see top of README.md
+
+Commit
+
+- Fixed button on server list form call wrong function (copy/paste error)
+
+Commit ae3f665
 
 - Shorten message to fit smartphone screen
 

@@ -755,7 +755,7 @@ window.customElements.define('server-form-panel', class extends HTMLElement {
       this.hidePanel();
     });
     /**
-     * Save Modified Button Event Handler
+     * Save Modified IRC Server Button Event Handler
      */
     this.shadowRoot.getElementById('saveModifiedButtonId').addEventListener('click',
       this._saveModifiedButtonHandler);
@@ -763,10 +763,10 @@ window.customElements.define('server-form-panel', class extends HTMLElement {
       this._saveModifiedButtonHandler);
 
     /**
-     * Save Modified Button Event Handler
+     * Save New IRC Server Button Event Handler
      */
     this.shadowRoot.getElementById('saveNewButtonId').addEventListener('click',
-      this._saveModifiedButtonHandler);
+      this._saveNewButtonHandler);
     this.shadowRoot.getElementById('saveNewButtonId2').addEventListener('click',
       this._saveNewButtonHandler);
 

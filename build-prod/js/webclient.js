@@ -772,7 +772,7 @@ this.shadowRoot.getElementById('closePanelButtonId').addEventListener('click',()
 this.hidePanel()});this.shadowRoot.getElementById('cancelEditButtonId2').addEventListener('click',()=>{this.hidePanel()})
 ;this.shadowRoot.getElementById('saveModifiedButtonId').addEventListener('click',this._saveModifiedButtonHandler)
 ;this.shadowRoot.getElementById('saveModifiedButtonId2').addEventListener('click',this._saveModifiedButtonHandler)
-;this.shadowRoot.getElementById('saveNewButtonId').addEventListener('click',this._saveModifiedButtonHandler)
+;this.shadowRoot.getElementById('saveNewButtonId').addEventListener('click',this._saveNewButtonHandler)
 ;this.shadowRoot.getElementById('saveNewButtonId2').addEventListener('click',this._saveNewButtonHandler);this.shadowRoot.getElementById('replacePasswordButton').addEventListener('click',()=>{
 this.shadowRoot.getElementById('passwordInputId').removeAttribute('disabled');this.shadowRoot.getElementById('passwordInputId').value=''
 ;this.shadowRoot.getElementById('replacePasswordButton').setAttribute('hidden','');this.shadowRoot.getElementById('serverPasswordWarningDiv').removeAttribute('hidden')})
