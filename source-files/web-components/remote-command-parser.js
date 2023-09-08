@@ -358,6 +358,7 @@ window.customElements.define('remote-command-parser', class extends HTMLElement 
       // Show parsed message for debug
       // ---------------------------
       // console.log('parsedMessage' + JSON.stringify(parsedMessage, null, 2));
+      document.getElementById('showRaw').displayParsedServerMessage(parsedMessage);
 
       //
       // Send message to IRC server panel for display of formatted IRC messages

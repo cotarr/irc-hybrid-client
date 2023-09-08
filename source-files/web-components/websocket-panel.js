@@ -376,8 +376,8 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
           if (count > 0) {
             const message = data.slice(index, index + count);
             // console.log('websocketPanel:', message);
-            document.getElementById('remoteCommandParser').parseBufferMessage(message);
             document.getElementById('showRaw').displayRawIrcServerMessage(message);
+            document.getElementById('remoteCommandParser').parseBufferMessage(message);
           }
           index = i + 1;
           count = 0;

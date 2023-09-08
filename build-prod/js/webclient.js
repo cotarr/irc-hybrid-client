@@ -220,7 +220,7 @@ if(pingFloat&&'number'===typeof pingFloat){window.globals.webState.lag.last=ping
 ;const timeMessageSeconds=document.getElementById('displayUtils').timestampToUnixSeconds(message.split(' ')[0])
 ;if(timeNowSeconds-timeMessageSeconds<errorPanelEl.errorExpireSeconds)errorPanelEl.showError(errStr)};if('--\x3e'===message.split(' ')[0])return;if('webServer:'===message.split(' ')[0])return
 ;if('webError:'===message.split(' ')[0]){if(message.length>10)errorPanelEl.showError(message.slice(10));return}const parsedMessage=this._parseIrcMessage(message)
-;ircServerPanelEl.displayFormattedServerMessage(parsedMessage,message)
+;document.getElementById('showRaw').displayParsedServerMessage(parsedMessage);ircServerPanelEl.displayFormattedServerMessage(parsedMessage,message)
 ;if(parseInt(parsedMessage.command)>=400&&parseInt(parsedMessage.command)<500)_showNotExpiredError(message.slice(12,message.length));switch(parsedMessage.command){case'ERROR':
 if(!window.globals.ircState.ircRegistered&&1===parsedMessage.params.length)if(!window.globals.webState.cacheReloadInProgress)document.getElementById('errorPanel').showError('ERROR '+parsedMessage.params[0])
 ;break;case'KICK':document.getElementById('manageChannelsPanel').displayChannelMessage(parsedMessage);break;case'JOIN':
@@ -302,7 +302,7 @@ let errMessage=error.message||error.toString()||'Websocket error event occurred'
 ;this.shadowRoot.getElementById('reconnectStatusDivId').textContent+='Websocket Error \n'}window.globals.webState.webConnected=false;window.globals.webState.webConnecting=false
 ;this._updateWebsocketStatus()});let previousBufferFragment='';const parseStreamBuffer=inBuffer=>{if(!inBuffer)return;const data=previousBufferFragment.concat(inBuffer);previousBufferFragment=''
 ;const len=data.length;if(0===len)return;let index=0;let count=0;for(let i=0;i<len;i++){const charCode=data.charCodeAt(i);if(10!==charCode&&13!==charCode)count+=1;else{if(count>0){
-const message=data.slice(index,index+count);document.getElementById('remoteCommandParser').parseBufferMessage(message);document.getElementById('showRaw').displayRawIrcServerMessage(message)}index=i+1
+const message=data.slice(index,index+count);document.getElementById('showRaw').displayRawIrcServerMessage(message);document.getElementById('remoteCommandParser').parseBufferMessage(message)}index=i+1
 ;count=0}}if(count>0)previousBufferFragment=data.slice(index,index+count)};window.globals.wsocket.addEventListener('message',event=>{parseStreamBuffer(event.data)})}
 ;_testWebServerRunning=()=>new Promise((resolve,reject)=>{const fetchController=new AbortController;const fetchTimeout=document.getElementById('globVars').constants('fetchTimeout')
 ;const activitySpinnerEl=document.getElementById('activitySpinner');const fetchOptions={method:'GET',redirect:'error',signal:fetchController.signal,headers:{Accept:'application/json'}}
@@ -2130,20 +2130,27 @@ document.getElementById('showEvents').showPanel()});this.shadowRoot.getElementBy
 ;this.appendDebugResult('Adhoc function not defined\n')})}});window.customElements.define('show-raw',class extends HTMLElement{constructor(){super()
 ;const template=document.getElementById('showRawTemplate');const templateContent=template.content;this.attachShadow({mode:'open'}).appendChild(templateContent.cloneNode(true))}
 _startCollectingRawMessages=()=>{this.shadowRoot.getElementById('pauseButtonId').textContent='Pause';this.shadowRoot.getElementById('titleDivId').textContent='Raw Server Messages'
-;this.shadowRoot.getElementById('panelDivId').setAttribute('collecting','')};_pauseCollectingRawMessages=()=>{this.shadowRoot.getElementById('pauseButtonId').textContent='Start'
-;this.shadowRoot.getElementById('titleDivId').textContent='Raw Server Messages (Paused)';this.shadowRoot.getElementById('panelDivId').removeAttribute('collecting')};_scrollToTop=()=>{this.focus()
+;this.shadowRoot.getElementById('panelDivId').setAttribute('collecting','');this.shadowRoot.getElementById('panelMessageDisplayId').value+='----- Active -----\n'};_pauseCollectingRawMessages=()=>{
+this.shadowRoot.getElementById('pauseButtonId').textContent='Start';this.shadowRoot.getElementById('titleDivId').textContent='Raw Server Messages (Paused)'
+;this.shadowRoot.getElementById('panelDivId').removeAttribute('collecting');this.shadowRoot.getElementById('panelMessageDisplayId').value+='----- Paused -----\n'};_scrollToTop=()=>{this.focus()
 ;const newVertPos=window.scrollY+this.getBoundingClientRect().top-50;window.scrollTo({top:newVertPos,behavior:'smooth'})};showPanel=()=>{
 this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible','');this._scrollToTop()};collapsePanel=()=>{
 this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible')};hidePanel=()=>{this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible')}
 ;displayRawIrcServerMessage=rawMessage=>{if(!window.globals.webState.cacheReloadInProgress)if(this.shadowRoot.getElementById('panelDivId').hasAttribute('collecting')){
-this.shadowRoot.getElementById('panelMessageDisplayId').value+=rawMessage+'\n';if(this.shadowRoot.getElementById('panelDivId').hasAttribute('hex')){
+this.shadowRoot.getElementById('panelMessageDisplayId').value+=rawMessage+'\n';if(this.shadowRoot.getElementById('showRawInHexCheckboxId').checked){
 const uint8String=new TextEncoder('utf8').encode(rawMessage);let hexString='';for(let i=0;i<uint8String.length;i++)hexString+=uint8String[i].toString(16).padStart(2,'0')+' '
 ;this.shadowRoot.getElementById('panelMessageDisplayId').value+=hexString+'\n'}
-this.shadowRoot.getElementById('panelMessageDisplayId').scrollTop=this.shadowRoot.getElementById('panelMessageDisplayId').scrollHeight}};connectedCallback(){if('#LOG_RAW'===document.location.hash){
-this._startCollectingRawMessages();this.showPanel();document.getElementById('debugPanel').showPanel();console.log('Debug: Detected URL hash=#LOG_RAW. Enabled raw log before page initialization.')}
-this.shadowRoot.getElementById('closePanelButtonId').addEventListener('click',()=>{this.hidePanel()});this.shadowRoot.getElementById('clearButtonId').addEventListener('click',()=>{
-this.shadowRoot.getElementById('panelMessageDisplayId').value=''});this.shadowRoot.getElementById('showHelpButtonId').addEventListener('click',()=>{
-this.shadowRoot.getElementById('helpPanelId').removeAttribute('hidden')});this.shadowRoot.getElementById('pauseButtonId').addEventListener('click',()=>{
+this.shadowRoot.getElementById('panelMessageDisplayId').scrollTop=this.shadowRoot.getElementById('panelMessageDisplayId').scrollHeight}};displayParsedServerMessage=parsedMessage=>{
+if(!window.globals.webState.cacheReloadInProgress&&this.shadowRoot.getElementById('panelDivId').hasAttribute('collecting')&&this.shadowRoot.getElementById('appendParsedMessageCheckboxId').checked)this.shadowRoot.getElementById('panelMessageDisplayId').value+=JSON.stringify(parsedMessage,null,2)
+};connectedCallback(){if('#LOG_RAW'===document.location.hash){this._startCollectingRawMessages();this.showPanel();document.getElementById('debugPanel').showPanel()
+;console.log('Debug: Detected URL hash=#LOG_RAW. Enabled raw log before page initialization.')}this.shadowRoot.getElementById('closePanelButtonId').addEventListener('click',()=>{this.hidePanel()})
+;this.shadowRoot.getElementById('clearButtonId').addEventListener('click',()=>{this.shadowRoot.getElementById('panelMessageDisplayId').value=''})
+;this.shadowRoot.getElementById('showHelpButtonId').addEventListener('click',()=>{const helpPanelEl=this.shadowRoot.getElementById('helpPanelId')
+;const helpPanel2El=this.shadowRoot.getElementById('helpPanel2Id');if(helpPanelEl.hasAttribute('hidden')){helpPanelEl.removeAttribute('hidden');helpPanel2El.removeAttribute('hidden')
+;this._scrollToTop()}else{helpPanelEl.setAttribute('hidden','');helpPanel2El.setAttribute('hidden','')}});this.shadowRoot.getElementById('showHelpButton2Id').addEventListener('click',()=>{
+const helpPanelEl=this.shadowRoot.getElementById('helpPanelId');const helpPanel2El=this.shadowRoot.getElementById('helpPanel2Id');if(helpPanelEl.hasAttribute('hidden')){
+helpPanelEl.removeAttribute('hidden');helpPanel2El.removeAttribute('hidden');this._scrollToTop()}else{helpPanelEl.setAttribute('hidden','');helpPanel2El.setAttribute('hidden','')}})
+;this.shadowRoot.getElementById('pauseButtonId').addEventListener('click',()=>{
 if(this.shadowRoot.getElementById('panelDivId').hasAttribute('collecting'))this._pauseCollectingRawMessages();else this._startCollectingRawMessages()})
 ;this.shadowRoot.getElementById('cacheButtonId').addEventListener('click',()=>{const panelMessageDisplayEl=this.shadowRoot.getElementById('panelMessageDisplayId');this._pauseCollectingRawMessages()
 ;panelMessageDisplayEl.value='';const fetchTimeout=document.getElementById('globVars').constants('fetchTimeout');const activitySpinnerEl=document.getElementById('activitySpinner')
@@ -2155,17 +2162,25 @@ if(this.shadowRoot.getElementById('panelDivId').hasAttribute('collecting'))this.
 ;for(let i=0;i<responseArray.length;i++)index.push(i);for(let i=0;i<responseArray.length;i++){let inOrder=true;for(let j=0;j<responseArray.length-1;j++){
 const date1=new Date(responseArray[index[j]].split(' ')[0].replace('@time=',''));const date2=new Date(responseArray[index[j+1]].split(' ')[0].replace('@time=',''));if(date1>date2){inOrder=false
 ;const tempIndex=index[j+1];index[j+1]=index[j];index[j]=tempIndex}}if(inOrder)break}for(let i=0;i<responseArray.length;i++){panelMessageDisplayEl.value+=responseArray[index[i]].toString()+'\n'
-;lineCount++;charCount+=responseArray[index[i]].toString().length;if(this.shadowRoot.getElementById('panelDivId').hasAttribute('hex')){
-const uint8String=new TextEncoder('utf8').encode(responseArray[index[i]].toString());let hexString='';for(let i=0;i<uint8String.length;i++)hexString+=uint8String[i].toString(16).padStart(2,'0')+' '
-;this.shadowRoot.getElementById('panelMessageDisplayId').value+=hexString+'\n'}}
+;lineCount++;charCount+=responseArray[index[i]].toString().length}
 const statsStr='----------------------------\n'+charCount.toString()+' characters, '+lineCount.toString()+' lines\n'+'----------------------------\n'
 ;this.shadowRoot.getElementById('panelMessageDisplayId').value+=statsStr}else if(1===responseArray.length)panelMessageDisplayEl.value=responseArray[0]
 ;panelMessageDisplayEl.scrollTop=panelMessageDisplayEl.scrollHeight}}).catch(err=>{console.log(err);if(fetchTimerId)clearTimeout(fetchTimerId);activitySpinnerEl.cancelActivitySpinner()
 ;let message='Fetch error, '+fetchOptions.method+' '+fetchURL+', '+(err.message||err.toString()||'Error')
 ;if(err.status)message='HTTP status error, '+err.status.toString()+' '+err.statusText+', '+fetchOptions.method+' '+fetchURL;if(err.remoteErrorText)message+=', '+err.remoteErrorText
-;message=message.split('\n')[0];document.getElementById('errorPanel').showError(message)})});this.shadowRoot.getElementById('showRawInHexCheckboxId').addEventListener('click',()=>{
-if(this.shadowRoot.getElementById('showRawInHexCheckboxId').checked)this.shadowRoot.getElementById('panelDivId').setAttribute('hex','');else this.shadowRoot.getElementById('panelDivId').removeAttribute('hex')
-});document.addEventListener('collapse-all-panels',event=>{if(event.detail&&event.detail.except){if('string'===typeof event.detail.except){if(event.detail.except!==this.id)this.collapsePanel()
+;message=message.split('\n')[0];document.getElementById('errorPanel').showError(message)})});this.shadowRoot.getElementById('exampleSampleMessageButtonId').addEventListener('click',()=>{
+this.shadowRoot.getElementById('panelMessageInputId').value='@time=2023-09-08T14:53:41.504Z ERROR :This is example RFC-2812 formatted IRC '+'error message for display in IRC Server panel'})
+;this.shadowRoot.getElementById('parseSampleMessageButtonId').addEventListener('click',()=>{const errorPanelEl=document.getElementById('errorPanel')
+;const panelMessageInputEl=this.shadowRoot.getElementById('panelMessageInputId');if(!window.globals.ircState.ircConnected){
+errorPanelEl.showError('Sample message parsing requires connection to IRC server');return}if(!panelMessageInputEl.value||panelMessageInputEl.value.length<1){
+errorPanelEl.showError('Sample IRC message was empty string');return}if(1!==panelMessageInputEl.value.split('\n').length){
+errorPanelEl.showError('Multi-line input not allowed. Omit end-of-line characters');return}document.getElementById('remoteCommandParser').parseBufferMessage(panelMessageInputEl.value)})
+;this.shadowRoot.getElementById('saveSampleMessageButtonId').addEventListener('click',()=>{const panelMessageInputEl=this.shadowRoot.getElementById('panelMessageInputId')
+;if(!panelMessageInputEl||panelMessageInputEl.value.length<1)window.localStorage.removeItem('savedExampleIrcMessage');else{const message=panelMessageInputEl.value
+;window.localStorage.setItem('savedExampleIrcMessage',JSON.stringify({message:message}))}});this.shadowRoot.getElementById('loadSampleMessageButtonId').addEventListener('click',()=>{
+let savedMessage=null;try{const savedObject=window.localStorage.getItem('savedExampleIrcMessage');if(savedObject)savedMessage=JSON.parse(savedObject).message}catch(error){console.log(error)}
+if(savedMessage)this.shadowRoot.getElementById('panelMessageInputId').value=savedMessage});document.addEventListener('collapse-all-panels',event=>{if(event.detail&&event.detail.except){
+if('string'===typeof event.detail.except){if(event.detail.except!==this.id)this.collapsePanel()
 }else if(Array.isArray(event.detail.except))if(event.detail.except.indexOf(this.id)<0)this.collapsePanel()}else this.collapsePanel()});document.addEventListener('color-theme-changed',event=>{
 const panelDivEl=this.shadowRoot.getElementById('panelDivId');const panelMessageDisplayEd=this.shadowRoot.getElementById('panelMessageDisplayId');if('light'===event.detail.theme){
 panelDivEl.classList.remove('show-raw-theme-dark');panelDivEl.classList.add('show-raw-theme-light');panelMessageDisplayEd.classList.remove('global-text-theme-dark')
@@ -2174,12 +2189,13 @@ panelDivEl.classList.remove('show-raw-theme-dark');panelDivEl.classList.add('sho
 if(event.detail&&event.detail.except){if('string'===typeof event.detail.except){if(event.detail.except!==this.id)this.hidePanel()
 }else if(Array.isArray(event.detail.except))if(event.detail.except.indexOf(this.id)<0)this.hidePanel()}else this.hidePanel()});document.addEventListener('resize-custom-elements',()=>{
 if(window.globals.webState.dynamic.testAreaColumnPxWidth){const calcInputAreaColSize=document.getElementById('displayUtils').calcInputAreaColSize
-;const mar1=window.globals.webState.dynamic.commonMarginRightPx;this.shadowRoot.getElementById('panelMessageDisplayId').setAttribute('cols',calcInputAreaColSize(mar1))}})
-;document.addEventListener('show-all-panels',event=>{if(event.detail&&event.detail.except){if('string'===typeof event.detail.except){
-if(event.detail.except!==this.id&&event.detail.debug)this.showPanel()}else if(Array.isArray(event.detail.except))if(event.detail.except.indexOf(this.id)<0&&event.detail.debug)this.showPanel()
-}else if(event.detail&&event.detail.debug)this.showPanel()})}});window.customElements.define('show-events',class extends HTMLElement{constructor(){super()
-;const template=document.getElementById('showEventsTemplate');const templateContent=template.content;this.attachShadow({mode:'open'}).appendChild(templateContent.cloneNode(true))
-;this.loggingGlobalEvents=false}_scrollToTop=()=>{this.focus();const newVertPos=window.scrollY+this.getBoundingClientRect().top-50;window.scrollTo({top:newVertPos,behavior:'smooth'})};showPanel=()=>{
+;const mar1=window.globals.webState.dynamic.commonMarginRightPx;this.shadowRoot.getElementById('panelMessageDisplayId').setAttribute('cols',calcInputAreaColSize(mar1))
+;this.shadowRoot.getElementById('panelMessageInputId').setAttribute('cols',calcInputAreaColSize(mar1))}});document.addEventListener('show-all-panels',event=>{if(event.detail&&event.detail.except){
+if('string'===typeof event.detail.except){if(event.detail.except!==this.id&&event.detail.debug)this.showPanel()
+}else if(Array.isArray(event.detail.except))if(event.detail.except.indexOf(this.id)<0&&event.detail.debug)this.showPanel()}else if(event.detail&&event.detail.debug)this.showPanel()})}})
+;window.customElements.define('show-events',class extends HTMLElement{constructor(){super();const template=document.getElementById('showEventsTemplate');const templateContent=template.content
+;this.attachShadow({mode:'open'}).appendChild(templateContent.cloneNode(true));this.loggingGlobalEvents=false}_scrollToTop=()=>{this.focus()
+;const newVertPos=window.scrollY+this.getBoundingClientRect().top-50;window.scrollTo({top:newVertPos,behavior:'smooth'})};showPanel=()=>{
 this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible','');this._scrollToTop()};collapsePanel=()=>{
 this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible')};hidePanel=()=>{this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible')}
 ;_startLogGlobalEvents=()=>{const panelMessageDisplayEl=this.shadowRoot.getElementById('panelMessageDisplayId');if(!this.loggingGlobalEvents){this.loggingGlobalEvents=true

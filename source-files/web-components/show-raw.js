@@ -38,12 +38,14 @@ window.customElements.define('show-raw', class extends HTMLElement {
     this.shadowRoot.getElementById('pauseButtonId').textContent = 'Pause';
     this.shadowRoot.getElementById('titleDivId').textContent = 'Raw Server Messages';
     this.shadowRoot.getElementById('panelDivId').setAttribute('collecting', '');
+    this.shadowRoot.getElementById('panelMessageDisplayId').value += '----- Active -----\n';
   };
 
   _pauseCollectingRawMessages = () => {
     this.shadowRoot.getElementById('pauseButtonId').textContent = 'Start';
     this.shadowRoot.getElementById('titleDivId').textContent = 'Raw Server Messages (Paused)';
     this.shadowRoot.getElementById('panelDivId').removeAttribute('collecting');
+    this.shadowRoot.getElementById('panelMessageDisplayId').value += '----- Paused -----\n';
   };
 
   /**
@@ -83,7 +85,7 @@ window.customElements.define('show-raw', class extends HTMLElement {
         // Insert a text string into the server window and scroll to bottom
         this.shadowRoot.getElementById('panelMessageDisplayId').value += rawMessage + '\n';
         // Option to show raw messages in hexadecimal
-        if (this.shadowRoot.getElementById('panelDivId').hasAttribute('hex')) {
+        if (this.shadowRoot.getElementById('showRawInHexCheckboxId').checked) {
           // Option to convert the message to hexadecimal format an append the message in hex
           const uint8String = new TextEncoder('utf8').encode(rawMessage);
           let hexString = '';
@@ -96,6 +98,15 @@ window.customElements.define('show-raw', class extends HTMLElement {
         this.shadowRoot.getElementById('panelMessageDisplayId').scrollTop =
         this.shadowRoot.getElementById('panelMessageDisplayId').scrollHeight;
       }
+    }
+  };
+
+  displayParsedServerMessage = (parsedMessage) => {
+    if ((!window.globals.webState.cacheReloadInProgress) &&
+      (this.shadowRoot.getElementById('panelDivId').hasAttribute('collecting')) &&
+      (this.shadowRoot.getElementById('appendParsedMessageCheckboxId').checked)) {
+      this.shadowRoot.getElementById('panelMessageDisplayId').value +=
+        JSON.stringify(parsedMessage, null, 2);
     }
   };
 
@@ -130,7 +141,29 @@ window.customElements.define('show-raw', class extends HTMLElement {
     });
 
     this.shadowRoot.getElementById('showHelpButtonId').addEventListener('click', () => {
-      this.shadowRoot.getElementById('helpPanelId').removeAttribute('hidden');
+      const helpPanelEl = this.shadowRoot.getElementById('helpPanelId');
+      const helpPanel2El = this.shadowRoot.getElementById('helpPanel2Id');
+      if (helpPanelEl.hasAttribute('hidden')) {
+        helpPanelEl.removeAttribute('hidden');
+        helpPanel2El.removeAttribute('hidden');
+        this._scrollToTop();
+      } else {
+        helpPanelEl.setAttribute('hidden', '');
+        helpPanel2El.setAttribute('hidden', '');
+      }
+    });
+
+    this.shadowRoot.getElementById('showHelpButton2Id').addEventListener('click', () => {
+      const helpPanelEl = this.shadowRoot.getElementById('helpPanelId');
+      const helpPanel2El = this.shadowRoot.getElementById('helpPanel2Id');
+      if (helpPanelEl.hasAttribute('hidden')) {
+        helpPanelEl.removeAttribute('hidden');
+        helpPanel2El.removeAttribute('hidden');
+        this._scrollToTop();
+      } else {
+        helpPanelEl.setAttribute('hidden', '');
+        helpPanel2El.setAttribute('hidden', '');
+      }
     });
 
     this.shadowRoot.getElementById('pauseButtonId').addEventListener('click', () => {
@@ -213,16 +246,6 @@ window.customElements.define('show-raw', class extends HTMLElement {
                 panelMessageDisplayEl.value += responseArray[index[i]].toString() + '\n';
                 lineCount++;
                 charCount += responseArray[index[i]].toString().length;
-                // Optional append hexadecimal
-                if (this.shadowRoot.getElementById('panelDivId').hasAttribute('hex')) {
-                  const uint8String =
-                    new TextEncoder('utf8').encode(responseArray[index[i]].toString());
-                  let hexString = '';
-                  for (let i = 0; i < uint8String.length; i++) {
-                    hexString += uint8String[i].toString(16).padStart(2, '0') + ' ';
-                  }
-                  this.shadowRoot.getElementById('panelMessageDisplayId').value += hexString + '\n';
-                }
               }
               const statsStr =
                 '----------------------------\n' +
@@ -258,11 +281,53 @@ window.customElements.define('show-raw', class extends HTMLElement {
         });
     });
 
-    this.shadowRoot.getElementById('showRawInHexCheckboxId').addEventListener('click', () => {
-      if (this.shadowRoot.getElementById('showRawInHexCheckboxId').checked) {
-        this.shadowRoot.getElementById('panelDivId').setAttribute('hex', '');
+    this.shadowRoot.getElementById('exampleSampleMessageButtonId').addEventListener('click', () => {
+      this.shadowRoot.getElementById('panelMessageInputId').value =
+        '@time=2023-09-08T14:53:41.504Z ERROR :This is example RFC-2812 formatted IRC ' +
+        'error message for display in IRC Server panel';
+    });
+
+    this.shadowRoot.getElementById('parseSampleMessageButtonId').addEventListener('click', () => {
+      const errorPanelEl = document.getElementById('errorPanel');
+      const panelMessageInputEl = this.shadowRoot.getElementById('panelMessageInputId');
+      if (!window.globals.ircState.ircConnected) {
+        errorPanelEl.showError('Sample message parsing requires connection to IRC server');
+        return;
+      }
+      if ((!(panelMessageInputEl.value)) || (panelMessageInputEl.value.length < 1)) {
+        errorPanelEl.showError('Sample IRC message was empty string');
+        return;
+      };
+      if (panelMessageInputEl.value.split('\n').length !== 1) {
+        errorPanelEl.showError('Multi-line input not allowed. Omit end-of-line characters');
+        return;
+      }
+      document.getElementById('remoteCommandParser').parseBufferMessage(panelMessageInputEl.value);
+    });
+
+    this.shadowRoot.getElementById('saveSampleMessageButtonId').addEventListener('click', () => {
+      const panelMessageInputEl = this.shadowRoot.getElementById('panelMessageInputId');
+      if ((!(panelMessageInputEl)) || (panelMessageInputEl.value.length < 1)) {
+        window.localStorage.removeItem('savedExampleIrcMessage');
       } else {
-        this.shadowRoot.getElementById('panelDivId').removeAttribute('hex');
+        const message = panelMessageInputEl.value;
+        window.localStorage.setItem('savedExampleIrcMessage',
+          JSON.stringify({ message: message }));
+      }
+    });
+
+    this.shadowRoot.getElementById('loadSampleMessageButtonId').addEventListener('click', () => {
+      let savedMessage = null;
+      try {
+        const savedObject = window.localStorage.getItem('savedExampleIrcMessage');
+        if (savedObject) {
+          savedMessage = JSON.parse(savedObject).message;
+        }
+      } catch (error) {
+        console.log(error);
+      }
+      if (savedMessage) {
+        this.shadowRoot.getElementById('panelMessageInputId').value = savedMessage;
       }
     });
 
@@ -345,6 +410,8 @@ window.customElements.define('show-raw', class extends HTMLElement {
         const mar1 = window.globals.webState.dynamic.commonMarginRightPx;
         // set width of input area elements
         this.shadowRoot.getElementById('panelMessageDisplayId')
+          .setAttribute('cols', calcInputAreaColSize(mar1));
+        this.shadowRoot.getElementById('panelMessageInputId')
           .setAttribute('cols', calcInputAreaColSize(mar1));
       }
     });
