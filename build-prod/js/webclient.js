@@ -208,7 +208,7 @@ if(inText)if(inText.indexOf('!')>=0&&inText.indexOf('@')>=0&&inText.indexOf('!')
 temp=_isColonString(temp.nextIndex,messageString);if(temp.isColonStr){temp=_extractFinalString(temp.nextIndex,end,messageString);params.push(temp.data);done=true}else{
 temp=_extractMidString(temp.nextIndex,end,messageString);if(temp.data&&temp.data.length>0)params.push(temp.data);else done=true}}return{timestamp:timestamp,datestamp:datestamp,prefix:prefix,
 nick:extNick,host:extHost,command:command,params:params}};parseBufferMessage=message=>{const errorPanelEl=document.getElementById('errorPanel')
-;const ircServerPanelEl=document.getElementById('ircServerPanel')
+;const displayUtilsEl=document.getElementById('displayUtils');const ircServerPanelEl=document.getElementById('ircServerPanel')
 ;if('HEARTBEAT'===message)document.getElementById('websocketPanel').onHeartbeatReceived();else if('UPDATE'===message)document.getElementById('ircControlsPanel').getIrcState().catch(err=>{
 console.log(err);let message=err.message||err.toString()||'Error occurred calling /irc/connect';message=message.split('\n')[0];errorPanelEl.showError(message)
 });else if('CACHERESET'===message)document.dispatchEvent(new CustomEvent('erase-before-reload'));else if('CACHEPULL'===message)document.dispatchEvent(new CustomEvent('update-from-cache'));else if('DEBUGPONG'===message){
@@ -229,8 +229,9 @@ if(parsedMessage.params[0]===window.globals.ircState.nickName)ircServerPanelEl.d
 ;break;case'cachedNICK':document.getElementById('manageChannelsPanel').displayChannelMessage(parsedMessage);ircServerPanelEl.displayFormattedServerMessage(parsedMessage,message);break;case'NICK':
 document.getElementById('manageChannelsPanel').displayChannelMessage(parsedMessage);ircServerPanelEl.displayFormattedServerMessage(parsedMessage,message);break;case'PART':
 document.getElementById('manageChannelsPanel').displayChannelMessage(parsedMessage);break;case'NOTICE':
-if(!parsedMessage.nick||0===parsedMessage.nick.length)ircServerPanelEl.displayFormattedServerMessage(parsedMessage,message);else{const ctcpDelim=1
-;if(null===parsedMessage.params[1])parsedMessage.params[1]='';if(parsedMessage.params[1].charCodeAt(0)===ctcpDelim)document.getElementById('ctcpParser').parseCtcpMessage(parsedMessage,message);else{
+if(!parsedMessage.nick||0===parsedMessage.nick.length)ircServerPanelEl.displayPlainServerMessage(displayUtilsEl.cleanFormatting(displayUtilsEl.cleanCtcpDelimiter(parsedMessage.timestamp+' '+parsedMessage.prefix+' '+parsedMessage.params[1])));else{
+const ctcpDelim=1;if(null===parsedMessage.params[1])parsedMessage.params[1]=''
+;if(parsedMessage.params[1].charCodeAt(0)===ctcpDelim)document.getElementById('ctcpParser').parseCtcpMessage(parsedMessage,message);else{
 document.getElementById('noticePanel').displayNoticeMessage(parsedMessage);document.getElementById('manageChannelsPanel').displayChannelNoticeMessage(parsedMessage)}}break;case'PRIVMSG':{
 const ctcpDelim=1;if(parsedMessage.params[1].charCodeAt(0)===ctcpDelim)document.getElementById('ctcpParser').parseCtcpMessage(parsedMessage,message);else{
 const chanPrefixIndex=document.getElementById('globVars').constants('channelPrefixChars').indexOf(parsedMessage.params[0].charAt(0))
@@ -2141,16 +2142,17 @@ this.shadowRoot.getElementById('panelMessageDisplayId').value+=rawMessage+'\n';i
 const uint8String=new TextEncoder('utf8').encode(rawMessage);let hexString='';for(let i=0;i<uint8String.length;i++)hexString+=uint8String[i].toString(16).padStart(2,'0')+' '
 ;this.shadowRoot.getElementById('panelMessageDisplayId').value+=hexString+'\n'}
 this.shadowRoot.getElementById('panelMessageDisplayId').scrollTop=this.shadowRoot.getElementById('panelMessageDisplayId').scrollHeight}};displayParsedServerMessage=parsedMessage=>{
-if(!window.globals.webState.cacheReloadInProgress&&this.shadowRoot.getElementById('panelDivId').hasAttribute('collecting')&&this.shadowRoot.getElementById('appendParsedMessageCheckboxId').checked)this.shadowRoot.getElementById('panelMessageDisplayId').value+=JSON.stringify(parsedMessage,null,2)
-};connectedCallback(){if('#LOG_RAW'===document.location.hash){this._startCollectingRawMessages();this.showPanel();document.getElementById('debugPanel').showPanel()
-;console.log('Debug: Detected URL hash=#LOG_RAW. Enabled raw log before page initialization.')}this.shadowRoot.getElementById('closePanelButtonId').addEventListener('click',()=>{this.hidePanel()})
-;this.shadowRoot.getElementById('clearButtonId').addEventListener('click',()=>{this.shadowRoot.getElementById('panelMessageDisplayId').value=''})
-;this.shadowRoot.getElementById('showHelpButtonId').addEventListener('click',()=>{const helpPanelEl=this.shadowRoot.getElementById('helpPanelId')
-;const helpPanel2El=this.shadowRoot.getElementById('helpPanel2Id');if(helpPanelEl.hasAttribute('hidden')){helpPanelEl.removeAttribute('hidden');helpPanel2El.removeAttribute('hidden')
-;this._scrollToTop()}else{helpPanelEl.setAttribute('hidden','');helpPanel2El.setAttribute('hidden','')}});this.shadowRoot.getElementById('showHelpButton2Id').addEventListener('click',()=>{
+if(!window.globals.webState.cacheReloadInProgress&&this.shadowRoot.getElementById('panelDivId').hasAttribute('collecting')&&this.shadowRoot.getElementById('appendParsedMessageCheckboxId').checked){
+this.shadowRoot.getElementById('panelMessageDisplayId').value+=JSON.stringify(parsedMessage,null,2)+'\n'
+;this.shadowRoot.getElementById('panelMessageDisplayId').scrollTop=this.shadowRoot.getElementById('panelMessageDisplayId').scrollHeight}};connectedCallback(){if('#LOG_RAW'===document.location.hash){
+this._startCollectingRawMessages();this.showPanel();document.getElementById('debugPanel').showPanel();console.log('Debug: Detected URL hash=#LOG_RAW. Enabled raw log before page initialization.')}
+this.shadowRoot.getElementById('closePanelButtonId').addEventListener('click',()=>{this.hidePanel()});this.shadowRoot.getElementById('clearButtonId').addEventListener('click',()=>{
+this.shadowRoot.getElementById('panelMessageDisplayId').value=''});this.shadowRoot.getElementById('showHelpButtonId').addEventListener('click',()=>{
 const helpPanelEl=this.shadowRoot.getElementById('helpPanelId');const helpPanel2El=this.shadowRoot.getElementById('helpPanel2Id');if(helpPanelEl.hasAttribute('hidden')){
 helpPanelEl.removeAttribute('hidden');helpPanel2El.removeAttribute('hidden');this._scrollToTop()}else{helpPanelEl.setAttribute('hidden','');helpPanel2El.setAttribute('hidden','')}})
-;this.shadowRoot.getElementById('pauseButtonId').addEventListener('click',()=>{
+;this.shadowRoot.getElementById('showHelpButton2Id').addEventListener('click',()=>{const helpPanelEl=this.shadowRoot.getElementById('helpPanelId')
+;const helpPanel2El=this.shadowRoot.getElementById('helpPanel2Id');if(helpPanelEl.hasAttribute('hidden')){helpPanelEl.removeAttribute('hidden');helpPanel2El.removeAttribute('hidden')
+;this._scrollToTop()}else{helpPanelEl.setAttribute('hidden','');helpPanel2El.setAttribute('hidden','')}});this.shadowRoot.getElementById('pauseButtonId').addEventListener('click',()=>{
 if(this.shadowRoot.getElementById('panelDivId').hasAttribute('collecting'))this._pauseCollectingRawMessages();else this._startCollectingRawMessages()})
 ;this.shadowRoot.getElementById('cacheButtonId').addEventListener('click',()=>{const panelMessageDisplayEl=this.shadowRoot.getElementById('panelMessageDisplayId');this._pauseCollectingRawMessages()
 ;panelMessageDisplayEl.value='';const fetchTimeout=document.getElementById('globVars').constants('fetchTimeout');const activitySpinnerEl=document.getElementById('activitySpinner')
@@ -2174,8 +2176,11 @@ this.shadowRoot.getElementById('panelMessageInputId').value='@time=2023-09-08T14
 ;const panelMessageInputEl=this.shadowRoot.getElementById('panelMessageInputId');if(!window.globals.ircState.ircConnected){
 errorPanelEl.showError('Sample message parsing requires connection to IRC server');return}if(!panelMessageInputEl.value||panelMessageInputEl.value.length<1){
 errorPanelEl.showError('Sample IRC message was empty string');return}if(1!==panelMessageInputEl.value.split('\n').length){
-errorPanelEl.showError('Multi-line input not allowed. Omit end-of-line characters');return}document.getElementById('remoteCommandParser').parseBufferMessage(panelMessageInputEl.value)})
-;this.shadowRoot.getElementById('saveSampleMessageButtonId').addEventListener('click',()=>{const panelMessageInputEl=this.shadowRoot.getElementById('panelMessageInputId')
+errorPanelEl.showError('Multi-line input not allowed. Omit end-of-line characters');return}if(this.shadowRoot.getElementById('panelDivId').hasAttribute('collecting')){
+this.shadowRoot.getElementById('panelMessageDisplayId').value+=panelMessageInputEl.value+'\n'
+;this.shadowRoot.getElementById('panelMessageDisplayId').scrollTop=this.shadowRoot.getElementById('panelMessageDisplayId').scrollHeight}
+document.getElementById('remoteCommandParser').parseBufferMessage(panelMessageInputEl.value)});this.shadowRoot.getElementById('saveSampleMessageButtonId').addEventListener('click',()=>{
+const panelMessageInputEl=this.shadowRoot.getElementById('panelMessageInputId')
 ;if(!panelMessageInputEl||panelMessageInputEl.value.length<1)window.localStorage.removeItem('savedExampleIrcMessage');else{const message=panelMessageInputEl.value
 ;window.localStorage.setItem('savedExampleIrcMessage',JSON.stringify({message:message}))}});this.shadowRoot.getElementById('loadSampleMessageButtonId').addEventListener('click',()=>{
 let savedMessage=null;try{const savedObject=window.localStorage.getItem('savedExampleIrcMessage');if(savedObject)savedMessage=JSON.parse(savedObject).message}catch(error){console.log(error)}

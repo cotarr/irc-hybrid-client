@@ -256,6 +256,7 @@ window.customElements.define('remote-command-parser', class extends HTMLElement 
    */
   parseBufferMessage = (message) => {
     const errorPanelEl = document.getElementById('errorPanel');
+    const displayUtilsEl = document.getElementById('displayUtils');
     const ircServerPanelEl = document.getElementById('ircServerPanel');
     if (message === 'HEARTBEAT') {
       // 1) Check if websocket heartbeat
@@ -415,9 +416,18 @@ window.customElements.define('remote-command-parser', class extends HTMLElement 
             .displayChannelMessage(parsedMessage);
           break;
         case 'NOTICE':
+          // NOTICE is special case because it can be sent to an IRC channel,
+          // a nickname, a CTCP message or received as a server message.
+          // Therefore, irc-server-panel filters NOTICE and hides it.
+          // This is to show the edge case of a server message
+          // without an origin nickname
           if ((!parsedMessage.nick) || (parsedMessage.nick.length === 0)) {
-            // case of server messages, check raw disply to avoid duplication in server window
-            ircServerPanelEl.displayFormattedServerMessage(parsedMessage, message);
+            ircServerPanelEl.displayPlainServerMessage(
+              displayUtilsEl.cleanFormatting(
+                displayUtilsEl.cleanCtcpDelimiter(
+                  parsedMessage.timestamp + ' ' +
+                  parsedMessage.prefix + ' ' +
+                  parsedMessage.params[1])));
           } else {
             const ctcpDelim = 1;
             if (parsedMessage.params[1] === null) parsedMessage.params[1] = '';

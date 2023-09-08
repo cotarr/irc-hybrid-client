@@ -346,8 +346,8 @@ id="panelDivId" class="global-panel-style-div show-raw-theme-dark"><div class="g
 class="global-show-hide-button mr5">x</button> <span id="titleDivId">Raw Server Messages (Paused)</span></div><div class="global-head-center"></div><div class="global-head-right"><button 
 id="pauseButtonId" class="mb5">Start</button> <button id="clearButtonId" class="mb5">Clear</button> <button id="cacheButtonId" class="mb5">Fetch Cache</button></div></div><div><textarea 
 id="panelMessageDisplayId" class="global-text-theme-dark" cols="80" rows="18" spellcheck="false" readonly="readonly">----- Paused -----&#13;&#10</textarea></div><div><input 
-id="showRawInHexCheckboxId" class="global-valign-middle ml10" type="checkbox"> <span class="global-valign-middle">Append-hexadecimal</span> <input id="appendParsedMessageCheckboxId" 
-class="global-valign-middle ml10" type="checkbox"> <span class="global-valign-middle">Append-parsed-message</span> <button id="showHelpButtonId" class="ml20">Show Help</button></div><div 
+id="appendParsedMessageCheckboxId" class="global-valign-middle ml10" type="checkbox"> <span class="global-valign-middle">Append-parsed-message</span> <input id="showRawInHexCheckboxId" 
+class="global-valign-middle ml10" type="checkbox"> <span class="global-valign-middle">Append-hexadecimal</span> <button id="showHelpButtonId" class="ml20">Show Help</button></div><div 
 id="helpPanelId" hidden><ul><li>The raw message cache is disabled by default and must be started with the [Start] button.</li><li>
 Log is limited to incoming websocket stream messages (IRC server messages)</li><li>Messages prefixed with &quot;-->&quot; are outgoing IRC commands echoed back by the web server.</li><li>
 Messages like HEARTBEAT and UPDATE are web server to browser commands (see Documentation web page)</li><li>During logging, message cache reloads via HTTP fetch request are omitted.</li><li>

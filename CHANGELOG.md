@@ -6,11 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Next v2.0.0-dev.9 2023-09-08 (Draft)
+## Next v2.0.0-dev.10 2023-09-08 (Draft)
 
 Work in progress, see top of README.md
 
-Commit
+Commit 
+
+- Fixed DALnet server originated NOTICE message was not showing
+
+Commit b605e36
 
 Added more debug tools
 

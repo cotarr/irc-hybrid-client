@@ -106,7 +106,10 @@ window.customElements.define('show-raw', class extends HTMLElement {
       (this.shadowRoot.getElementById('panelDivId').hasAttribute('collecting')) &&
       (this.shadowRoot.getElementById('appendParsedMessageCheckboxId').checked)) {
       this.shadowRoot.getElementById('panelMessageDisplayId').value +=
-        JSON.stringify(parsedMessage, null, 2);
+        JSON.stringify(parsedMessage, null, 2) + '\n';
+      // scroll to view new text
+      this.shadowRoot.getElementById('panelMessageDisplayId').scrollTop =
+      this.shadowRoot.getElementById('panelMessageDisplayId').scrollHeight;
     }
   };
 
@@ -301,6 +304,13 @@ window.customElements.define('show-raw', class extends HTMLElement {
       if (panelMessageInputEl.value.split('\n').length !== 1) {
         errorPanelEl.showError('Multi-line input not allowed. Omit end-of-line characters');
         return;
+      }
+      if (this.shadowRoot.getElementById('panelDivId').hasAttribute('collecting')) {
+        this.shadowRoot.getElementById('panelMessageDisplayId').value +=
+          panelMessageInputEl.value + '\n';
+        // scroll to view new text
+        this.shadowRoot.getElementById('panelMessageDisplayId').scrollTop =
+        this.shadowRoot.getElementById('panelMessageDisplayId').scrollHeight;
       }
       document.getElementById('remoteCommandParser').parseBufferMessage(panelMessageInputEl.value);
     });
