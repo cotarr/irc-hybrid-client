@@ -28,6 +28,7 @@
 //  by instantiating instance of channel-panel.
 //
 // Global Event listeners
+//   cancel-beep-enable
 //   collapse-all-panels
 //   color-theme-changed
 //   erase-before-reload
@@ -303,6 +304,75 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
     }
   };
 
+  _updateVisibility = () => {
+    const beep1CheckBoxEl = this.shadowRoot.getElementById('beep1CheckBoxId');
+    const beep2CheckBoxEl = this.shadowRoot.getElementById('beep2CheckBoxId');
+    const beep3CheckBoxEl = this.shadowRoot.getElementById('beep3CheckBoxId');
+    if (this.hasAttribute('beep1-enabled')) {
+      beep1CheckBoxEl.checked = true;
+    } else {
+      beep1CheckBoxEl.checked = false;
+    }
+    if (this.hasAttribute('beep2-enabled')) {
+      beep2CheckBoxEl.checked = true;
+    } else {
+      beep2CheckBoxEl.checked = false;
+    }
+    if (this.hasAttribute('beep3-enabled')) {
+      beep3CheckBoxEl.checked = true;
+    } else {
+      beep3CheckBoxEl.checked = false;
+    }
+  };
+
+  /**
+   * Function to update window.localStorage with IRC
+   * channel beep enabled checkbox state.
+   * Called when checkbox is clicked to enable/disable
+   */
+  _updateLocalStorageBeepEnable = () => {
+    // new object for channel beep enable status
+    const now = Math.floor(Date.now() / 1000);
+    const defaultChannelBeepsObj = {
+      timestamp: now,
+      beep1: this.hasAttribute('beep1-enabled'),
+      beep2: this.hasAttribute('beep2-enabled'),
+      beep3: this.hasAttribute('beep3-enabled')
+    };
+    window.localStorage.setItem('defaultChannelBeepEnable', JSON.stringify(defaultChannelBeepsObj));
+  }; // _updateLocalStorageBeepEnable()
+
+  /**
+   * For this channel, load web browser local storage beep enable state.
+   */
+  _loadBeepEnable = () => {
+    let defaultChannelBeepsObj = null;
+    try {
+      defaultChannelBeepsObj = JSON.parse(window.localStorage.getItem('defaultChannelBeepEnable'));
+    } catch (error) {
+      // Ignore errors
+      // console.log(error);
+    }
+    if (defaultChannelBeepsObj) {
+      if (defaultChannelBeepsObj.beep1) {
+        this.setAttribute('beep1-enabled', '');
+      } else {
+        this.removeAttribute('beep1-enabled');
+      }
+      if (defaultChannelBeepsObj.beep2) {
+        this.setAttribute('beep2-enabled', '');
+      } else {
+        this.removeAttribute('beep2-enabled');
+      }
+      if (defaultChannelBeepsObj.beep3) {
+        this.setAttribute('beep3-enabled', '');
+      } else {
+        this.removeAttribute('beep3-enabled');
+      }
+      this._updateVisibility();
+    }
+  };
+
   /**
    * Called once per second as task scheduler, called from js/_afterLoad.js
    */
@@ -317,8 +387,10 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
   // ------------------
   // Main entry point
   // ------------------
-  // initializePlugin = () => {
-  // }; // initializePlugin()
+  initializePlugin = () => {
+    // Load beep sound configuration from local storage
+    this._loadBeepEnable();
+  }; // initializePlugin()
 
   // add event listeners to connected callback
   // -------------------------------------------
@@ -351,9 +423,54 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
         }
       });
 
+    /**
+     * Enable or disable audile beep sounds when checkbox is clicked
+     */
+    this.shadowRoot.getElementById('beep1CheckBoxId').addEventListener('click', () => {
+      if (this.hasAttribute('beep1-enabled')) {
+        this.removeAttribute('beep1-enabled');
+      } else {
+        this.setAttribute('beep1-enabled', '');
+        document.getElementById('beepSounds').playBeep1Sound();
+      }
+      this._updateLocalStorageBeepEnable();
+      this._updateVisibility();
+    });
+
+    this.shadowRoot.getElementById('beep2CheckBoxId').addEventListener('click', () => {
+      if (this.hasAttribute('beep2-enabled')) {
+        this.removeAttribute('beep2-enabled');
+      } else {
+        this.setAttribute('beep2-enabled', '');
+        document.getElementById('beepSounds').playBeep2Sound();
+      }
+      this._updateLocalStorageBeepEnable();
+      this._updateVisibility();
+    });
+
+    this.shadowRoot.getElementById('beep3CheckBoxId').addEventListener('click', () => {
+      if (this.hasAttribute('beep3-enabled')) {
+        this.removeAttribute('beep3-enabled');
+      } else {
+        this.setAttribute('beep3-enabled', '');
+        document.getElementById('beepSounds').playBeep3Sound();
+      }
+      this._updateLocalStorageBeepEnable();
+      this._updateVisibility();
+    });
+
     // -------------------------------------
     // 2 of 2 Listeners on global events
     // -------------------------------------
+
+    /**
+     * Event handler to cancel (remove checkbox check) for audio beeps
+     */
+    document.addEventListener('cancel-beep-sounds', () => {
+      this.removeAttribute('beep1-enabled');
+      this.removeAttribute('beep2-enabled');
+      this.removeAttribute('beep3-enabled');
+    });
 
     /**
      * Event to collapse all panels. This panel does not collapse so it is hidden
@@ -497,7 +614,7 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
               //
               // ------------------------------
               setTimeout(() => {
-                this._scrollToBottom();
+                this._scrollToTop();
               }, 750);
             } // reconnect flag
           } // no channels

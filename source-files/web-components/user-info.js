@@ -90,12 +90,20 @@ window.customElements.define('user-info', class extends HTMLElement {
           // Note: userid is an integer number assigned in credentials.js
           // ------------------------------------------------------------
           let lastLoginUser = null;
-          lastLoginUser = JSON.parse(window.localStorage.getItem('lastLoginUser'));
-          if ((lastLoginUser) &&
-            (lastLoginUser.userid) &&
-            (lastLoginUser.userid !== responseJson.userid)) {
-            console.log('User id changed, clearing local storage');
+          try {
+            lastLoginUser = JSON.parse(window.localStorage.getItem('lastLoginUser'));
+          } catch (error) {
+            // Ignore error
+          }
+          if (!lastLoginUser) {
+            // console.log('No persisted user id, clearing local storage');
             window.localStorage.clear();
+          } else {
+            if (('userid' in lastLoginUser) &&
+              (lastLoginUser.userid !== responseJson.userid)) {
+              // console.log('User id changed, clearing local storage');
+              window.localStorage.clear();
+            }
           }
           const newLoginTimestamp = Math.floor(Date.now() / 1000);
           const newLoginUser = {

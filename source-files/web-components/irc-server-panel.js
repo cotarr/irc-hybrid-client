@@ -818,7 +818,7 @@ window.customElements.define('irc-server-panel', class extends HTMLElement {
     // Normal button handler
     // -------------------------
     this.shadowRoot.getElementById('normalButtonId').addEventListener('click', () => {
-      this.shadowRoot.getElementById('panelMessageDisplayId').setAttribute('rows', '5');
+      this.shadowRoot.getElementById('panelMessageDisplayId').setAttribute('rows', '15');
     });
 
     // -------------------------------------

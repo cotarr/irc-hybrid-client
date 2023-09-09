@@ -374,7 +374,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       hideWithCollapseEl.removeAttribute('hidden');
       this.shadowRoot.getElementById('noScrollCheckboxId').checked = false;
       this._scrollTextAreaToRecent();
-      this._scrollToBottom();
+      this._scrollToTop();
       panelMessageInputEl.focus();
     } else if (!panelVisibilityDivEl.hasAttribute('visible')) {
       // Else switching between hidden and full panel
@@ -384,7 +384,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       this.shadowRoot.getElementById('noScrollCheckboxId').checked = false;
       bottomCollapseDivEl.setAttribute('hidden', '');
       this._scrollTextAreaToRecent();
-      this._scrollToBottom();
+      this._scrollToTop();
       panelMessageInputEl.focus();
     } else {
       // Case of called when visible
@@ -883,9 +883,14 @@ window.customElements.define('channel-panel', class extends HTMLElement {
    * For this channel, load web browser local storage beep enable state.
    */
   _loadBeepEnable = () => {
+    const panelDivEl = this.shadowRoot.getElementById('panelDivId');
     let beepChannelIndex = -1;
     let beepEnableChanArray = null;
-    beepEnableChanArray = JSON.parse(window.localStorage.getItem('beepEnableChanArray'));
+    try {
+      beepEnableChanArray = JSON.parse(window.localStorage.getItem('beepEnableChanArray'));
+    } catch (error) {
+      // ignore error
+    }
     if ((beepEnableChanArray) &&
       (Array.isArray(beepEnableChanArray))) {
       if (beepEnableChanArray.length > 0) {
@@ -897,14 +902,37 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       }
     }
     if (beepChannelIndex >= 0) {
+      // Case of specific channel has previous setting from localStorage
+      // console.log(JSON.stringify(beepEnableChanArray[beepChannelIndex], null, 2));
       if (beepEnableChanArray[beepChannelIndex].beep1) {
-        this.shadowRoot.getElementById('panelDivId').setAttribute('beep1-enabled', '');
+        panelDivEl.setAttribute('beep1-enabled', '');
       }
       if (beepEnableChanArray[beepChannelIndex].beep2) {
-        this.shadowRoot.getElementById('panelDivId').setAttribute('beep2-enabled', '');
+        panelDivEl.setAttribute('beep2-enabled', '');
       }
       if (beepEnableChanArray[beepChannelIndex].beep3) {
-        this.shadowRoot.getElementById('panelDivId').setAttribute('beep3-enabled', '');
+        panelDivEl.setAttribute('beep3-enabled', '');
+      }
+    } else {
+      // This is a new channel and there is no local storage, use preset from manage-channels-panel
+      // console.log('inheriting beep preset from manageChannelsPanel');
+      let oneIsEnabled = false;
+      const manageChannelsPanelEl = document.getElementById('manageChannelsPanel');
+      if (manageChannelsPanelEl.hasAttribute('beep1-enabled')) {
+        panelDivEl.setAttribute('beep1-enabled', '');
+        oneIsEnabled = true;
+      }
+      if (manageChannelsPanelEl.hasAttribute('beep2-enabled')) {
+        panelDivEl.setAttribute('beep2-enabled', '');
+        oneIsEnabled = true;
+      }
+      if (manageChannelsPanelEl.hasAttribute('beep3-enabled')) {
+        panelDivEl.setAttribute('beep3-enabled', '');
+        oneIsEnabled = true;
+      }
+      // Remember for this channel
+      if (oneIsEnabled) {
+        this._updateLocalStorageBeepEnable();
       }
     }
     this._updateVisibility();
@@ -1322,6 +1350,34 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     this._resetMessageCount();
   };
 
+  /**
+   * Called by displayChannelMessage() increment unread message counter for channel
+   * If panel is hidden, or collapsed, increment message counter to display unread icon
+   * If panel is visible, but the panel is not the active element, increment the counter
+   */
+  _incUnreadWhenOther = () => {
+    if (((document.activeElement.id !== this.id) ||
+    (!this.shadowRoot.getElementById('panelVisibilityDivId').hasAttribute('visible')) ||
+    (!this.shadowRoot.getElementById('panelCollapsedDivId').hasAttribute('visible'))) &&
+    (!window.globals.webState.cacheReloadInProgress) &&
+    (this.activityIconInhibitTimer === 0)) {
+      this._incrementMessageCount();
+    }
+  };
+
+  /**
+   * Called by displayChannelMessage() to make screen visible and scroll into position.
+   * If panel is hidden, show panel, scroll to position
+   * If collapsed, do nothing, if visible, do nothing
+   */
+  _displayWhenHidden = () => {
+    if ((!window.globals.webState.cacheReloadInProgress) &&
+    (!this.shadowRoot.getElementById('panelVisibilityDivId').hasAttribute('visible')) &&
+    (!document.querySelector('body').hasAttribute('zoomId'))) {
+      this.showPanel();
+    }
+  };
+
   // Example channel message (parsedMessage)
   //   "parsedMessage": {
   //     "timestamp": "10:23:34",
@@ -1402,6 +1458,12 @@ window.customElements.define('channel-panel', class extends HTMLElement {
               parsedMessage.nick + ' has kicked ' + parsedMessage.params[1] +
               ' (' + reason + ')');
           }
+          if (panelDivEl.hasAttribute('beep1-enabled') &&
+            (!window.globals.webState.cacheReloadInProgress)) {
+            document.getElementById('beepSounds').playBeep1Sound();
+          }
+          this._incUnreadWhenOther();
+          this._displayWhenHidden();
         }
         break;
       case 'JOIN':
@@ -1420,11 +1482,8 @@ window.customElements.define('channel-panel', class extends HTMLElement {
             document.getElementById('beepSounds').playBeep1Sound();
           }
           // If channel panel is closed, open it up when a new person joins
-          if ((!window.globals.webState.cacheReloadInProgress) &&
-            (!document.querySelector('body').hasAttribute('zoomId'))) {
-            this.showPanel();
-          }
-          this._updateVisibility();
+          this._incUnreadWhenOther();
+          this._displayWhenHidden();
         }
         break;
       case 'MODE':
@@ -1480,24 +1539,14 @@ window.customElements.define('channel-panel', class extends HTMLElement {
             '*',
             'Notice(' +
             parsedMessage.nick + ' to ' + parsedMessage.params[0] + ') ' + parsedMessage.params[1]);
-
+          if (panelDivEl.hasAttribute('beep1-enabled') &&
+            (!window.globals.webState.cacheReloadInProgress)) {
+            document.getElementById('beepSounds').playBeep1Sound();
+          }
           // Upon channel notice, make section visible.
           // If channel panel is closed, open it up when a new person joins
-          if ((!window.globals.webState.cacheReloadInProgress) &&
-            (!this.shadowRoot.getElementById('panelVisibilityDivId').hasAttribute('visible')) &&
-            (!document.querySelector('body').hasAttribute('zoomId'))) {
-            this.showPanel();
-            this._updateVisibility();
-          }
-          // Message activity Icon
-          // Basically increment counter if other areas of page are selected
-          if (((document.activeElement.id !== this.id) ||
-            (!this.shadowRoot.getElementById('panelVisibilityDivId').hasAttribute('visible')) ||
-            (!this.shadowRoot.getElementById('panelCollapsedDivId').hasAttribute('visible'))) &&
-            (!window.globals.webState.cacheReloadInProgress) &&
-            (this.activityIconInhibitTimer === 0)) {
-            this._incrementMessageCount();
-          }
+          this._incUnreadWhenOther();
+          this._displayWhenHidden();
         }
         break;
 
@@ -1537,22 +1586,9 @@ window.customElements.define('channel-panel', class extends HTMLElement {
           // Case 5 of 5 - Incoming PRIVMSG
           // -----------------------------------
           // console.log('cache refresh - Websocket auto-reconnect (set visibility 5 of 5)');
-          // If channel panel is closed, open it up receiving new message
-          if ((!window.globals.webState.cacheReloadInProgress) &&
-            (!this.shadowRoot.getElementById('panelVisibilityDivId').hasAttribute('visible')) &&
-            (!document.querySelector('body').hasAttribute('zoomId'))) {
-            this.showPanel();
-            this._updateVisibility();
-          }
-          // Message activity Icon
-          // Basically increment counter if other areas of page are selected
-          if (((document.activeElement.id !== this.id) ||
-            (!this.shadowRoot.getElementById('panelVisibilityDivId').hasAttribute('visible')) ||
-            (!this.shadowRoot.getElementById('panelCollapsedDivId').hasAttribute('visible'))) &&
-            (!window.globals.webState.cacheReloadInProgress) &&
-            (this.activityIconInhibitTimer === 0)) {
-            this._incrementMessageCount();
-          }
+          // If channel panel is closed, inc unread counter and open panel on new message
+          this._incUnreadWhenOther();
+          this._displayWhenHidden();
         }
         break;
       //
@@ -1632,6 +1668,12 @@ window.customElements.define('channel-panel', class extends HTMLElement {
               'Topic for ' + parsedMessage.params[0] + ' changed to "' +
               newTopic + '" by ' + parsedMessage.nick);
           }
+          if (panelDivEl.hasAttribute('beep1-enabled') &&
+            (!window.globals.webState.cacheReloadInProgress)) {
+            document.getElementById('beepSounds').playBeep1Sound();
+          }
+          this._incUnreadWhenOther();
+          this._displayWhenHidden();
         }
         break;
       default:

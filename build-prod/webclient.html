@@ -82,6 +82,23 @@ Alt-P - Private Message Panels (Show/Hide)
 Alt-S - Server Messages (Show/Hide)
 Alt-X - Hide all panels.
 Alt-Z - Zoom, (Channel panel only)
+
+Panel Behavior on New Channel Message
+
+Panel Hidden:
+  - Make Visible, scroll to viewport
+  - Set focus (cursor) to input
+Collapsed:
+  - Remain collapsed
+  - Set unread message icons
+Visible, but not active panel:
+  - No scroll, no focus change
+  - Set unread message icons
+Active Panel:
+  - No Actions
+Zoom:
+  - No panels will open
+  - Set unread message icons
 </pre></div><div id="viewDocsButtonDivId" class="help-panel-docs-div-dark" hidden><a href="/irc/docs/index.html"><button>View /docs/</button></a> <span>
 The /docs/ folder is available as a web page on this server.</span></div></div></div></template><template id="licensePanelTemplate"><link rel="stylesheet" href="css/styles.css"><div 
 id="panelVisibilityDivId" class="global-visibility-div"><div id="panelDivId" class="global-panel-style-div license-panel-theme-dark"><div class="global-head-flex"><div class="global-head-left"><button
@@ -259,7 +276,7 @@ This will execute the IRC command /AWAY command providing a custom message if pr
 </template><template id="ircServerPanelTemplate"><link rel="stylesheet" href="css/styles.css"><div id="panelVisibilityDivId" class="global-visibility-div"><div id="panelDivId" 
 class="global-panel-style-div irc-server-panel-theme-dark" lastdate="0000-00-00"><div class="global-head-flex"><div class="global-head-left"><button id="closePanelButtonId" title="Hide Panel" 
 class="global-show-hide-button mr5">x</button> <span>IRC Server</span></div><div class="global-head-center"></div><div class="global-head-right"><button id="tallerButtonId">Taller</button> <button 
-id="normalButtonId">Normal</button> <button id="clearButtonId">Clear</button></div></div><div><textarea id="panelMessageDisplayId" class="global-text-theme-dark" cols="84" rows="20" 
+id="normalButtonId">Normal</button> <button id="clearButtonId">Clear</button></div></div><div><textarea id="panelMessageDisplayId" class="global-text-theme-dark" cols="84" rows="15" 
 spellcheck="false" readonly="readonly"></textarea></div><div class="mb5"><textarea id="panelMessageInputId" class="global-valign-middle rm5 global-text-theme-dark" cols="77" rows="1"></textarea> 
 <button id="sendButtonId" class="global-valign-middle">Send</button></div><div class="vh7"></div><div class="global-head-flex"><div class="global-head-left"><button id="loadFromCacheButtonId">Refresh
 </button></div><div class="global-head-right"><span id="programVersionDiv" class="fs80p mr40"></span></div></div><div id="elapsedTimeOuterDivId" 
@@ -267,70 +284,72 @@ class="irc-server-panel-div-time global-text-theme-dark"><div><pre id="elapsedTi
 <link rel="stylesheet" href="css/styles.css"><div id="panelVisibilityDivId" class="global-visibility-div"><div id="panelDivId" class="global-panel-style-div wallops-panel-theme-dark" 
 lastdate="0000-00-00"><div class="global-head-flex"><div class="global-head-left"><button id="closePanelButtonId" title="Hide Panel" class="global-show-hide-button mr5">x</button> <span>Wallops</span>
 </div><div class="global-head-center"></div><div class="global-head-right"><button id="tallerButtonId">Taller</button> <button id="normalButtonId">Normal</button> <button id="eraseButtonId">Erase
-</button></div></div><textarea id="panelMessageDisplayId" class="global-text-theme-dark" cols="84" rows="5" spellcheck="false" readonly="readonly"></textarea></div></div></template><template 
-id="noticePanelTemplate"><link rel="stylesheet" href="css/styles.css"><div id="panelVisibilityDivId" class="global-visibility-div"><div id="panelDivId" 
+</button></div></div><textarea id="panelMessageDisplayId" class="global-text-theme-dark" cols="84" rows="10" spellcheck="false" readonly="readonly"></textarea><div class="vh10"></div></div></div>
+</template><template id="noticePanelTemplate"><link rel="stylesheet" href="css/styles.css"><div id="panelVisibilityDivId" class="global-visibility-div"><div id="panelDivId" 
 class="global-panel-style-div notice-panel-theme-dark" lastdate="0000-00-00"><div class="global-head-flex"><div class="global-head-left"><button id="closePanelButtonId" title="Hide Panel" 
 class="global-show-hide-button mr5">x</button> <span>Notice</span></div><div class="global-head-center"></div><div class="global-head-right"><button id="tallerButtonId">Taller</button> <button 
-id="normalButtonId">Normal</button> <button id="eraseButtonId">Erase</button></div></div><textarea id="panelMessageDisplayId" class="global-text-theme-dark" cols="84" rows="5" spellcheck="false" 
-readonly="readonly"></textarea></div></div></template><template id="managePmPanelsTemplate"><link rel="stylesheet" href="css/styles.css"><div id="panelVisibilityDivId" class="global-visibility-div">
-<div id="panelDivId" class="global-panel-style-div pm-panel-theme-dark"><div class="global-head-flex"><div class="global-head-left"><button id="closePanelButtonId" title="Hide Panel" 
-class="global-show-hide-button">x</button> <button id="collapsePanelButtonId" title="Collapse Panel to Bar" class="global-show-hide-button mr5">&#8645;</button> <span>Private Messages</span><div 
-id="activePmCountIconId" title="Count of Open PM Panels" class="global-count global-border-theme-dark">0</div><div id="pmUnreadCountIconId" title="Unread Message Count, All PM Panels" 
-class="global-message-count global-text-theme-inv-dark global-border-theme-dark" hidden>0</div></div><div class="global-head-center"></div><div class="global-head-right"><div id="hideWithCollapseId">
-<button id="eraseButtonId">Erase All PM</button></div></div></div><div id="panelCollapsedDivId" class="global-visibility-div"><div class="vh10"></div><div class="mb5"><span class="mr5">Private Msg To
-</span> <textarea id="pmNickNameInputId" class="global-valign-middle global-text-theme-dark" cols="20" rows="1" spellcheck="false"></textarea> <button id="whoisButtonId" 
-class="ml5 global-valign-middle">Whois</button></div><div class="vh10"></div><div class="mb5"><textarea id="panelMessageInputId" class="global-valign-middle rm5 global-text-theme-dark" cols="77" 
-rows="1"></textarea> <button id="sendButtonId" class="global-valign-middle">Send</button></div><div class="mb5"><input id="openPmWithBeepCheckBoxId" class="global-valign-middle" type="checkbox"> <span
- class="global-valign-middle">Open/Refresh with line-beep enabled</span></div></div></div></div></template><template id="pmPanelTemplate"><link rel="stylesheet" href="css/styles.css"><div 
-id="panelVisibilityDivId" class="global-visibility-div"><div id="panelDivId" class="global-panel-style-div pm-panel-theme-dark" lastdate="0000-00-00"><div class="global-head-flex"><div 
-class="global-head-left"><button id="closePanelButtonId" title="Hide Panel" class="global-show-hide-button">x</button> <button id="collapsePanelButtonId" title="Collapse Panel to Bar" 
-class="global-show-hide-button mr5">&#8645;</button><div id="pmNameDivId" class="pm-panel-name-div"></div><div id="messageCountIconId" title="Unread Message Count" 
-class="global-message-count global-text-theme-inv-dark global-border-theme-dark" hidden>0</div></div><div class="global-head-center"></div><div class="global-head-right"></div></div><div 
-id="panelCollapsedDivId" class="global-visibility-div"><textarea id="panelMessageDisplayId" class="global-text-theme-dark" id="chan0TextAreaId" cols="61" rows="10" spellcheck="false" 
+id="normalButtonId">Normal</button> <button id="eraseButtonId">Erase</button></div></div><textarea id="panelMessageDisplayId" class="global-text-theme-dark" cols="84" rows="10" spellcheck="false" 
+readonly="readonly"></textarea><div class="vh10"></div></div></div></template><template id="managePmPanelsTemplate"><link rel="stylesheet" href="css/styles.css"><div id="panelVisibilityDivId" 
+class="global-visibility-div"><div id="panelDivId" class="global-panel-style-div pm-panel-theme-dark"><div class="global-head-flex"><div class="global-head-left"><button id="closePanelButtonId" 
+title="Hide Panel" class="global-show-hide-button">x</button> <button id="collapsePanelButtonId" title="Collapse Panel to Bar" class="global-show-hide-button mr5">&#8645;</button> <span>
+Private Messages</span><div id="activePmCountIconId" title="Count of Open PM Panels" class="global-count global-border-theme-dark">0</div><div id="pmUnreadCountIconId" 
+title="Unread Message Count, All PM Panels" class="global-message-count global-text-theme-inv-dark global-border-theme-dark" hidden>0</div></div><div class="global-head-center"></div><div 
+class="global-head-right"><div id="hideWithCollapseId"><button id="eraseButtonId">Erase All PM</button></div></div></div><div id="panelCollapsedDivId" class="global-visibility-div"><div class="vh10">
+</div><div class="mb5"><span class="mr5">Private Msg To</span> <textarea id="pmNickNameInputId" class="global-valign-middle global-text-theme-dark" cols="20" rows="1" spellcheck="false"></textarea> 
+<button id="whoisButtonId" class="ml5 global-valign-middle">Whois</button></div><div class="vh10"></div><div class="mb5"><textarea id="panelMessageInputId" 
+class="global-valign-middle rm5 global-text-theme-dark" cols="77" rows="1"></textarea> <button id="sendButtonId" class="global-valign-middle">Send</button></div><div class="mb5"><input 
+id="openPmWithBeepCheckBoxId" class="global-valign-middle" type="checkbox"> <span class="global-valign-middle">Open/Refresh with line-beep enabled</span></div></div></div></div></template><template 
+id="pmPanelTemplate"><link rel="stylesheet" href="css/styles.css"><div id="panelVisibilityDivId" class="global-visibility-div"><div id="panelDivId" class="global-panel-style-div pm-panel-theme-dark" 
+lastdate="0000-00-00"><div class="global-head-flex"><div class="global-head-left"><button id="closePanelButtonId" title="Hide Panel" class="global-show-hide-button">x</button> <button 
+id="collapsePanelButtonId" title="Collapse Panel to Bar" class="global-show-hide-button mr5">&#8645;</button><div id="pmNameDivId" class="pm-panel-name-div"></div><div id="messageCountIconId" 
+title="Unread Message Count" class="global-message-count global-text-theme-inv-dark global-border-theme-dark" hidden>0</div></div><div class="global-head-center"></div><div class="global-head-right">
+</div></div><div id="panelCollapsedDivId" class="global-visibility-div"><textarea id="panelMessageDisplayId" class="global-text-theme-dark" id="chan0TextAreaId" cols="61" rows="10" spellcheck="false" 
 readonly="readonly"></textarea><div class="mb5"><textarea id="panelMessageInputId" class="global-valign-middle rm5 global-text-theme-dark" cols="77" rows="1"></textarea> <button id="sendButtonId" 
 class="global-valign-middle">Send</button> <button id="bottomCollapseButtonId" class="global-valign-middle">&#8645;</button></div><div id="multiLineActionDivId" hidden class="mb5"><span 
 id="multiLineSendSpanId" class="mr7">Clipboard (0 lines)</span> <button id="multiLineSendButtonId" class="mr7">Send as multi-line</button></div><div id="bottomCollapseDivId" hidden><div class="mb5">
 <button id="tallerButtonId" title="Enlarge PM Text Area Vertically" class="rm7">Taller</button> <button id="normalButtonId" title="Restore PM Area to default size" class="rm7">Normal</button> <button 
 id="eraseButtonId">Erase ALL PM panels</button></div><div class="mb5"><input id="beepCheckBoxId" class="global-valign-middle" type="checkbox"><span class="channel-cb-span">Line-beep</span></div></div>
-</div></div></div></template><template id="manageChannelsPanelTemplate"><link rel="stylesheet" href="css/styles.css"><div id="panelVisibilityDivId" class="global-visibility-div"><div id="panelDivId" 
-class="global-panel-style-div channel-panel-theme-dark"><div><button id="closePanelButtonId" title="Hide Panel" class="global-show-hide-button">x</button> <button id="collapsePanelButtonId" 
-title="Collapse Panel to Bar" class="global-show-hide-button mr5">&#8645;</button> <span>Join IRC Channels</span><div id="activeChannelCountIconId" title="Count of Open Channels" 
-class="global-count global-border-theme-dark">0</div><div id="channelUnreadCountIconId" title="Unread Message Count, All Channels" 
+<div class="vh7"></div></div></div></div></template><template id="manageChannelsPanelTemplate"><link rel="stylesheet" href="css/styles.css"><div id="panelVisibilityDivId" 
+class="global-visibility-div"><div id="panelDivId" class="global-panel-style-div channel-panel-theme-dark"><div><button id="closePanelButtonId" title="Hide Panel" class="global-show-hide-button">x
+</button> <button id="collapsePanelButtonId" title="Collapse Panel to Bar" class="global-show-hide-button mr5">&#8645;</button> <span>Join IRC Channels</span><div id="activeChannelCountIconId" 
+title="Count of Open Channels" class="global-count global-border-theme-dark">0</div><div id="channelUnreadCountIconId" title="Unread Message Count, All Channels" 
 class="global-message-count global-text-theme-inv-dark global-border-theme-dark" hidden>0</div></div><div id="panelCollapsedDivId" class="global-visibility-div"><div class="vh10"></div><div 
 class="mb5"><textarea id="newChannelNameInputId" class="global-valign-middle global-text-theme-dark" cols="20" rows="1"></textarea> <button id="newChannelButtonId" class="global-valign-middle">
-Join Channel</button></div><div class="vh10"></div><div class="mr10 global-border-theme-dark channel-panel-presets-div"><div>Click to /JOIN the IRC channel</div><div class="vh7"></div><div 
-id="channelJoinButtonContainerId" class="mb5"></div></div><div class="vh10"></div></div></div></div></template><template id="channelPanelTemplate"><link rel="stylesheet" href="css/styles.css"><div 
-id="panelVisibilityDivId" class="global-visibility-div"><div id="panelDivId" class="global-panel-style-div channel-panel-theme-dark" lastdate="0000-00-00"><div class="global-head-flex"><div 
-class="global-head-left"><button id="closePanelButtonId" title="Hide Panel" class="global-show-hide-button">x</button> <button id="collapsePanelButtonId" title="Collapse Panel to Bar" 
-class="global-show-hide-button mr5">&#8645;</button><div id="channelNameDivId" class="channel-panel-name-div"></div><div id="beenKickedIconId" class="channel-panel-been-kicked-icon" hidden>Kicked
-</div><div id="notInChannelIconId" class="channel-panel-not-in-channel-icon" hidden>Not In Channel</div><div id="nickCountIconId" title="Count of Channel Nicknames" 
-class="global-count global-border-theme-dark">0</div><div id="messageCountIconId" title="Channel Unread Message Count" class="global-message-count global-text-theme-inv-dark global-border-theme-dark" 
-hidden>0</div></div><div class="global-head-center"></div><div class="global-head-right"><div id="hideWithCollapseId"><button id="joinButtonId" class="mr7" hidden>Join</button> <button 
-id="pruneButtonId" class="mr7" hidden>Prune</button> <button id="partButtonId" class="mr7">Leave</button> <button id="zoomButtonId" class="mr7">Zoom</button></div></div></div><div 
-id="panelCollapsedDivId" class="global-visibility-div" visible><div id="channelTopicDivId" class="channel-panel-topic-div"></div><textarea id="panelNickListId" class="mr6 global-text-theme-dark" 
-cols="20" rows="5" spellcheck="false" readonly="readonly"></textarea> <textarea id="panelMessageDisplayId" class="global-text-theme-dark" id="chan0TextAreaId" cols="61" rows="5" spellcheck="false" 
-readonly="readonly"></textarea><div class="mb5"><textarea id="panelMessageInputId" class="global-valign-middle rm5 global-text-theme-dark" cols="77" rows="1"></textarea> <button id="sendButtonId" 
-class="global-valign-middle">Send</button> <button id="bottomCollapseButtonId" class="global-valign-middle">&#8645;</button></div><div id="multiLineActionDivId" hidden class="mb5"><span 
-id="multiLineSendSpanId" class="mr7">Clipboard (0 lines)</span> <button id="multiLineSendButtonId" class="mr7">Send as multi-line</button></div><div id="bottomCollapseDivId" hidden><div class="mb5">
-<button id="refreshButtonId" title="Refresh from IRC message cache" class="mr7">Refresh</button> <button id="clearButtonId" title="Clear Text Area (Does not clear cache)" class="rm7">Clear</button> 
-<button id="tallerButtonId" title="Enlarge Channel Text Area Vertically" class="rm7">Taller</button> <button id="normalButtonId" title="Restore Channel Area to default size" class="rm7">Normal
-</button></div><div class="mb5"><input id="noScrollCheckboxId" class="global-valign-middle" type="checkbox"> <span class="channel-cb-span">Inhibit-auto-scroll (clipboard use)</span></div><div 
-class="mb5"><input id="briefCheckboxId" class="global-valign-middle" type="checkbox"><span class="channel-cb-span">Brief</span> <input id="autocompleteCheckboxId" class="global-valign-middle" 
-type="checkbox"><span id="autoCompleteTitle" class="channel-cb-span">Auto-complete (tab)</span></div><div><input id="beep1CheckBoxId" class="global-valign-middle" type="checkbox"><span 
-class="channel-cb-span">Line-beep</span> <input id="beep2CheckBoxId" class="global-valign-middle" type="checkbox"><span class="channel-cb-span">Join-beep</span> <input id="beep3CheckBoxId" 
-class="global-valign-middle" type="checkbox"><span class="channel-cb-span">Name-beep</span></div></div><div class="vh7"></div></div></div></div></template><template id="debugPanelTemplate"><link 
-rel="stylesheet" href="css/styles.css"><div id="panelVisibilityDivId" class="global-visibility-div"><div id="panelDivId" class="global-panel-style-div debug-panel-theme-dark"><div 
-class="global-head-flex"><div class="global-head-left"><button id="closePanelButtonId" title="Hide Panel" class="global-show-hide-button">x</button> <span>Debug Panel</span></div><div 
-class="global-head-center"></div><div class="global-head-right"></div></div><div><div class="vh20"></div><div><div class="fs120p">Admin Functions</div><div class="vh10"></div><button 
-id="eraseCacheButtonId" class="mr5">Erase Cache</button> <button id="forceDisconnectButtonId" class="mr5">Force Disconnect</button> <button id="serverTerminateButtonId" class="mr5">Die Web Server
-</button></div><div class="vh10"></div><div><div class="fs120p">Debug Functions</div></div><div class="vh10"></div><div class="debug-panel-section-div"><div class="fs120p">Remote Server Functions
-</div><div class="mt10"><button id="button_1_1" class="mr10">Button 1-2</button> <span>Server: Emulate IRC ping timeout<span></span></span></div><div class="mt10"><button id="button_1_2" class="mr10">
-Button 1-3</button> <span>Local: Emulate websocket timeout</span></div><div class="vh10"></div><div class="fs80p">Results at bottom of debug panel.</div><div class="mt10"><button id="button_1_3" 
-class="mr10">Button 1-1</button> <span>Server: Memory usage</span></div><div class="mt10"><button id="button_1_4" class="mr10">Button 1-4</button> <span>Server: Websocket ping</span></div></div><div 
-class="debug-panel-section-div"><div class="fs120p">Browser Display Functions</div><div class="mt10"><button id="button_2_1" class="mr10">Button 2-1</button> <span>Force all panels visible</span>
-</div><div class="mt10"><button id="button_2_2" class="mr10">Button 2-2</button> <span>Force status icons visible</span></div><div class="mt10"><button id="button_2_3" class="mr10">Button 2-3</button>
- <span>Toggle Theme Light/Dark</span></div><div class="mt10"><button id="button_2_4" class="mr10">Button 2-4</button> <span>Recalculate page size</span></div></div><div 
-class="debug-panel-section-div"><div class="fs120p">Show data and variables</div><div class="fs80p">New panels open at bottom</div><div class="mt10"><button id="button_3_1" class="mr10">Button 3-1
+Join Channel</button></div><div class="vh10"></div><div class="mr10 global-border-theme-dark channel-panel-presets-div"><div>Channel presets, click to /JOIN</div><div class="vh7"></div><div 
+id="channelJoinButtonContainerId" class="mb5"></div></div><div class="vh10"></div><div>Create new IRC channel with:</div><div><input id="beep1CheckBoxId" class="global-valign-middle" type="checkbox">
+<span class="channel-cb-span">Line-beep</span> <input id="beep2CheckBoxId" class="global-valign-middle" type="checkbox"><span class="channel-cb-span">Join-beep</span> <input id="beep3CheckBoxId" 
+class="global-valign-middle" type="checkbox"><span class="channel-cb-span">Name-beep</span></div><div class="vh10"></div></div></div></div></template><template id="channelPanelTemplate"><link 
+rel="stylesheet" href="css/styles.css"><div id="panelVisibilityDivId" class="global-visibility-div"><div id="panelDivId" class="global-panel-style-div channel-panel-theme-dark" lastdate="0000-00-00">
+<div class="global-head-flex"><div class="global-head-left"><button id="closePanelButtonId" title="Hide Panel" class="global-show-hide-button">x</button> <button id="collapsePanelButtonId" 
+title="Collapse Panel to Bar" class="global-show-hide-button mr5">&#8645;</button><div id="channelNameDivId" class="channel-panel-name-div"></div><div id="beenKickedIconId" 
+class="channel-panel-been-kicked-icon" hidden>Kicked</div><div id="notInChannelIconId" class="channel-panel-not-in-channel-icon" hidden>Not In Channel</div><div id="nickCountIconId" 
+title="Count of Channel Nicknames" class="global-count global-border-theme-dark">0</div><div id="messageCountIconId" title="Channel Unread Message Count" 
+class="global-message-count global-text-theme-inv-dark global-border-theme-dark" hidden>0</div></div><div class="global-head-center"></div><div class="global-head-right"><div id="hideWithCollapseId">
+<button id="joinButtonId" class="mr7" hidden>Join</button> <button id="pruneButtonId" class="mr7" hidden>Prune</button> <button id="partButtonId" class="mr7">Leave</button> <button id="zoomButtonId" 
+class="mr7">Zoom</button></div></div></div><div id="panelCollapsedDivId" class="global-visibility-div" visible><div id="channelTopicDivId" class="channel-panel-topic-div"></div><textarea 
+id="panelNickListId" class="mr6 global-text-theme-dark" cols="20" rows="15" spellcheck="false" readonly="readonly"></textarea> <textarea id="panelMessageDisplayId" class="global-text-theme-dark" 
+id="chan0TextAreaId" cols="61" rows="15" spellcheck="false" readonly="readonly"></textarea><div class="mb5"><textarea id="panelMessageInputId" class="global-valign-middle rm5 global-text-theme-dark" 
+cols="77" rows="1"></textarea> <button id="sendButtonId" class="global-valign-middle">Send</button> <button id="bottomCollapseButtonId" class="global-valign-middle">&#8645;</button></div><div 
+id="multiLineActionDivId" hidden class="mb5"><span id="multiLineSendSpanId" class="mr7">Clipboard (0 lines)</span> <button id="multiLineSendButtonId" class="mr7">Send as multi-line</button></div><div 
+id="bottomCollapseDivId" hidden><div class="mb5"><button id="refreshButtonId" title="Refresh from IRC message cache" class="mr7">Refresh</button> <button id="clearButtonId" 
+title="Clear Text Area (Does not clear cache)" class="rm7">Clear</button> <button id="tallerButtonId" title="Enlarge Channel Text Area Vertically" class="rm7">Taller</button> <button 
+id="normalButtonId" title="Restore Channel Area to default size" class="rm7">Normal</button></div><div class="mb5"><input id="noScrollCheckboxId" class="global-valign-middle" type="checkbox"> <span 
+class="channel-cb-span">Inhibit-auto-scroll (clipboard use)</span></div><div class="mb5"><input id="briefCheckboxId" class="global-valign-middle" type="checkbox"><span class="channel-cb-span">Brief
+</span> <input id="autocompleteCheckboxId" class="global-valign-middle" type="checkbox"><span id="autoCompleteTitle" class="channel-cb-span">Auto-complete (tab)</span></div><div><input 
+id="beep1CheckBoxId" class="global-valign-middle" type="checkbox"><span class="channel-cb-span">Line-beep</span> <input id="beep2CheckBoxId" class="global-valign-middle" type="checkbox"><span 
+class="channel-cb-span">Join-beep</span> <input id="beep3CheckBoxId" class="global-valign-middle" type="checkbox"><span class="channel-cb-span">Name-beep</span></div></div><div class="vh7"></div>
+</div></div></div></template><template id="debugPanelTemplate"><link rel="stylesheet" href="css/styles.css"><div id="panelVisibilityDivId" class="global-visibility-div"><div id="panelDivId" 
+class="global-panel-style-div debug-panel-theme-dark"><div class="global-head-flex"><div class="global-head-left"><button id="closePanelButtonId" title="Hide Panel" class="global-show-hide-button">x
+</button> <span>Debug Panel</span></div><div class="global-head-center"></div><div class="global-head-right"></div></div><div><div class="vh20"></div><div><div class="fs120p">Admin Functions</div><div
+ class="vh10"></div><button id="eraseCacheButtonId" class="mr5">Erase Cache</button> <button id="forceDisconnectButtonId" class="mr5">Force Disconnect</button> <button id="serverTerminateButtonId" 
+class="mr5">Die Web Server</button></div><div class="vh10"></div><div><div class="fs120p">Debug Functions</div></div><div class="vh10"></div><div class="debug-panel-section-div"><div class="fs120p">
+Remote Server Functions</div><div class="mt10"><button id="button_1_1" class="mr10">Button 1-2</button> <span>Server: Emulate IRC ping timeout<span></span></span></div><div class="mt10"><button 
+id="button_1_2" class="mr10">Button 1-3</button> <span>Local: Emulate websocket timeout</span></div><div class="vh10"></div><div class="fs80p">Results at bottom of debug panel.</div><div class="mt10">
+<button id="button_1_3" class="mr10">Button 1-1</button> <span>Server: Memory usage</span></div><div class="mt10"><button id="button_1_4" class="mr10">Button 1-4</button> <span>Server: Websocket ping
+</span></div></div><div class="debug-panel-section-div"><div class="fs120p">Browser Display Functions</div><div class="mt10"><button id="button_2_1" class="mr10">Button 2-1</button> <span>
+Force all panels visible</span></div><div class="mt10"><button id="button_2_2" class="mr10">Button 2-2</button> <span>Force status icons visible</span></div><div class="mt10"><button id="button_2_3" 
+class="mr10">Button 2-3</button> <span>Toggle Theme Light/Dark</span></div><div class="mt10"><button id="button_2_4" class="mr10">Button 2-4</button> <span>Recalculate page size</span></div></div><div
+ class="debug-panel-section-div"><div class="fs120p">Show data and variables</div><div class="fs80p">New panels open at bottom</div><div class="mt10"><button id="button_3_1" class="mr10">Button 3-1
 </button> <span>Open: Remote variables (ircState)</span></div><div class="mt10"><button id="button_3_2" class="mr10">Button 3-2</button> <span>Open: Local variables (webState)</span></div><div 
 class="mt10"><button id="button_3_3" class="mr10">Button 3-3</button> <span>Open: IRC raw message log</span></div><div class="mt10"><button id="button_3_4" class="mr10">Button 3-4</button> <span>
 Open: Global event log</span></div></div><div class="debug-panel-section-div"><div class="fs120p">State and event functions</div><div class="mt10"><button id="button_4_1" class="mr10">Button 4-1

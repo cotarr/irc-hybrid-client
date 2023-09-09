@@ -6,11 +6,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Next v2.0.0-dev.11 2023-09-08 (Draft)
+## Next v2.0.0-dev.12 2023-09-09 (Draft)
 
 Work in progress, see top of README.md
 
 Commit
+
+- Fixed server-list-panel was not showing mobile screen width after page refresh on iPhone
+- CSS/HTML adjust height of several panels using textarea and margins
+- manage-channels-panel: added 3 checkboxes for default media beep sounds
+- manage-channels-panel: default media beep setting persisted to local storage
+- When creating new channel, use preset media beep sound enable flags from manage-channel-panel
+- channel-panel: hidden panel becomes visible for KICK, JOIN, NOTICE, PRIVMSG, and TOPIC
+- channel-panel: media beep sounds for KICK, JOIN, NOTICE, PRIVMSG, TOPIC
+- Add panel behavior description to help panel
+- channel-panel and manage-channels-panel scroll to top of viewport instead of bottom
+
+Commit 45914df
 
 - Remove temporary visibility attribute from show-raw.
 

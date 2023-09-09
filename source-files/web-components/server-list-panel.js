@@ -106,12 +106,12 @@ window.customElements.define('server-list-panel', class extends HTMLElement {
       if (!window.globals.ircState.ircConnected) {
         // Case of panel visible, just disconnected from IRC
         this.editable = true;
-        this.fullWidth = false;
-        this.mobileWidth = false;
-        if (window.globals.webState.dynamic.panelPxWidth <
-          this.mobileWedthBreakpointPixels) {
-          this.mobileWidth = true;
-        }
+      }
+      this.fullWidth = false;
+      this.mobileWidth = false;
+      if (window.globals.webState.dynamic.panelPxWidth <
+        this.mobileWedthBreakpointPixels) {
+        this.mobileWidth = true;
       }
     }
     this._updateVisibility();
