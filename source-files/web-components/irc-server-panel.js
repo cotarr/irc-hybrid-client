@@ -338,16 +338,18 @@ window.customElements.define('irc-server-panel', class extends HTMLElement {
   // Format: simple Array of strings
   // -------------------------------------------------------------
   ircMessageCommandDisplayFilter = [
+    '324', // Channel mode
+    '329', // Channel creation time
     '331', // Topic
     '332', // Topic
     '333', // Topic
     '353', // Names
     '366', // End Names
+    '367', // Channel ban list item
+    '368', // End channel ban list
     'JOIN',
     'KICK',
     'MODE',
-    'cachedNICK'.toUpperCase(),
-    'NICK',
     'NOTICE',
     'PART',
     'PING',
@@ -585,15 +587,6 @@ window.customElements.define('irc-server-panel', class extends HTMLElement {
         _showAfterParamZero(parsedMessage, null);
         break;
 
-      case 'MODE':
-        displayMessage(
-          displayUtilsEl.cleanFormatting(
-            displayUtilsEl.cleanCtcpDelimiter(
-              parsedMessage.timestamp + ' ' +
-              'MODE ' +
-              parsedMessage.params[0] + ' ' +
-              parsedMessage.params[1])));
-        break;
       case 'cachedNICK':
         // Own nickname changes will be cached as channel = default
         if (parsedMessage.params[0] === 'default') {
@@ -616,16 +609,6 @@ window.customElements.define('irc-server-panel', class extends HTMLElement {
                 parsedMessage.params[0])));
         }
         break;
-      case 'NOTICE':
-        displayMessage(
-          displayUtilsEl.cleanFormatting(
-            displayUtilsEl.cleanCtcpDelimiter(
-              parsedMessage.timestamp + ' ' +
-              'NOTICE ' +
-              parsedMessage.params[0] + ' ' +
-              parsedMessage.params[1])));
-
-        break;
       // none match, use default
       default:
         // this is catch-all, if no formatted case, then display here
@@ -637,31 +620,6 @@ window.customElements.define('irc-server-panel', class extends HTMLElement {
     //
     // If closed, open the server window to display the server message
     //
-
-    // Don't show panel, unexpected popup was annoying, rely on flashing icon
-    //
-    // if ((!window.globals.webState.cacheReloadInProgress) &&
-    //   (!document.querySelector('body').hasAttribute('zoomId'))) {
-    //   //
-    //   // Do not open and display server window for these commands.
-    //   //
-    //   // 'NICK' (users changing nickname in channel is opening the server window
-    //   //
-    //   const inhibitCommandList = [
-    //     'NICK',
-    //     'PRIVMSG'
-    //   ];
-    //   if (('command' in parsedMessage) &&
-    //     (typeof parsedMessage.command === 'string') &&
-    //     (parsedMessage.command.length > 0)) {
-    //     if (inhibitCommandList.indexOf(parsedMessage.command.toUpperCase()) < 0) {
-    //       // Not in inhibit list, go ahead and open server window, else leave closed
-    //       this.showPanel();
-    //     }
-    //   } else {
-    //     this.showPanel();
-    //   }
-    // }
 
     //
     // This must come after showPanel(), since showPanel() cancels the icons

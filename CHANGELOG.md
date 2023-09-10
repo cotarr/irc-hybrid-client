@@ -6,9 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Next v2.0.0-dev.13 2023-09-10 (Draft)
+## Next v2.0.0-dev.14 2023-09-10 (Draft)
 
 Work in progress, see top of README.md
+
+Commit
+
+- Rewrite of message routing function in manage-channels-panel for channel messages.
+- New: Added 324, 329 routing to channel-panel to display channel modes
+- New: Added 367, 368 routing to channel-panel to display channel ban list
+- Fixed MODE response for user not routing to server panel.
+- Fixed QUIT response not routing to channel-panel
+- Fixed NICK response not routing to channel-panel (channel modes)
+- Fixed NICK response not routing to irc-server-panel (user modes)
+- Fixed HotKey Alt-N not scrolling to channel panel if already visible
+- Fixed activity icon for CTCP request shown as notice.
 
 Commit
 

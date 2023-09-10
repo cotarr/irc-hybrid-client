@@ -1444,6 +1444,57 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       //
       // TODO cases for channel closed for other error
       //
+
+      //  Channel mode list RPL_CHANNELMODEIS
+      case '324':
+        if (('params' in parsedMessage) && (parsedMessage.params.length > 0) &&
+        (parsedMessage.params[1].toLowerCase() === this.channelName.toLowerCase())) {
+          let modeList = 'Mode ';
+          modeList += parsedMessage.params[1];
+          if (parsedMessage.params.length > 1) modeList += ' ' + parsedMessage.params[2];
+          _addText(parsedMessage.timestamp, '*', modeList);
+        }
+        break;
+
+      // Channel creation time RPL_CREATIONTIME
+      case '329':
+        if (('params' in parsedMessage) && (parsedMessage.params.length > 0) &&
+        (parsedMessage.params[1].toLowerCase() === this.channelName.toLowerCase())) {
+          let created = 'Channel ';
+          created += parsedMessage.params[1] + ' created on ';
+          if (parsedMessage.params.length > 1) {
+            const createdDate = new Date(parseInt(parsedMessage.params[2]) * 1000);
+            created += createdDate.toLocaleString();
+          }
+          _addText(parsedMessage.timestamp, '*', created);
+        }
+        break;
+
+        // Channel ban list item RPL_BANLIST
+      case '367':
+        if (('params' in parsedMessage) && (parsedMessage.params.length > 0) &&
+        (parsedMessage.params[1].toLowerCase() === this.channelName.toLowerCase())) {
+          let banList = '';
+          if (parsedMessage.params.length > 1) banList += ' ' + parsedMessage.params[2];
+          if (parsedMessage.params.length > 2) banList += ' banned by ' + parsedMessage.params[3];
+          if (parsedMessage.params.length > 3) {
+            const banDate = new Date(parseInt(parsedMessage.params[4]) * 1000);
+            banList += ' on ' + banDate.toLocaleString();
+          }
+          _addText(parsedMessage.timestamp, '*', banList);
+        }
+        break;
+
+        // End of channel ban list RPL_ENDOFBANLIST
+      case '368':
+        if (('params' in parsedMessage) && (parsedMessage.params.length > 0) &&
+        (parsedMessage.params[1].toLowerCase() === this.channelName.toLowerCase())) {
+          let banList = '';
+          if (parsedMessage.params.length > 1) banList += ' ' + parsedMessage.params[2];
+          _addText(parsedMessage.timestamp, '*', banList);
+        }
+        break;
+
       case 'KICK':
         if (parsedMessage.params[0].toLowerCase() === this.channelName.toLowerCase()) {
           let reason = ' ';

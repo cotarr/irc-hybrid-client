@@ -221,19 +221,22 @@ if(pingFloat&&'number'===typeof pingFloat){window.globals.webState.lag.last=ping
 ;if(timeNowSeconds-timeMessageSeconds<errorPanelEl.errorExpireSeconds)errorPanelEl.showError(errStr)};if('--\x3e'===message.split(' ')[0])return;if('webServer:'===message.split(' ')[0])return
 ;if('webError:'===message.split(' ')[0]){if(message.length>10)errorPanelEl.showError(message.slice(10));return}const parsedMessage=this._parseIrcMessage(message)
 ;document.getElementById('showRaw').displayParsedServerMessage(parsedMessage);ircServerPanelEl.displayFormattedServerMessage(parsedMessage,message)
-;if(parseInt(parsedMessage.command)>=400&&parseInt(parsedMessage.command)<500)_showNotExpiredError(message.slice(12,message.length));switch(parsedMessage.command){case'ERROR':
+;if(parseInt(parsedMessage.command)>=400&&parseInt(parsedMessage.command)<500)_showNotExpiredError(message.slice(12,message.length));switch(parsedMessage.command){case'324':
+document.getElementById('manageChannelsPanel').displayChannelMessage(parsedMessage);break;case'329':document.getElementById('manageChannelsPanel').displayChannelMessage(parsedMessage);break;case'367':
+document.getElementById('manageChannelsPanel').displayChannelMessage(parsedMessage);break;case'368':document.getElementById('manageChannelsPanel').displayChannelMessage(parsedMessage);break
+;case'ERROR':
 if(!window.globals.ircState.ircRegistered&&1===parsedMessage.params.length)if(!window.globals.webState.cacheReloadInProgress)document.getElementById('errorPanel').showError('ERROR '+parsedMessage.params[0])
 ;break;case'KICK':document.getElementById('manageChannelsPanel').displayChannelMessage(parsedMessage);break;case'JOIN':
 document.getElementById('manageChannelsPanel').displayChannelMessage(parsedMessage);break;case'MODE':
-if(parsedMessage.params[0]===window.globals.ircState.nickName)ircServerPanelEl.displayFormattedServerMessage(parsedMessage,message);else if(document.getElementById('globVars').constants('channelPrefixChars').indexOf(parsedMessage.params[0].charAt(0))>=0)document.getElementById('manageChannelsPanel').displayChannelMessage(parsedMessage);else console.log('Error message MODE to unknown recipient')
-;break;case'cachedNICK':document.getElementById('manageChannelsPanel').displayChannelMessage(parsedMessage);ircServerPanelEl.displayFormattedServerMessage(parsedMessage,message);break;case'NICK':
-document.getElementById('manageChannelsPanel').displayChannelMessage(parsedMessage);ircServerPanelEl.displayFormattedServerMessage(parsedMessage,message);break;case'PART':
+if(parsedMessage.params[0].toLowerCase()===window.globals.ircState.nickName.toLowerCase())ircServerPanelEl.displayPlainServerMessage(displayUtilsEl.cleanFormatting(displayUtilsEl.cleanCtcpDelimiter(parsedMessage.timestamp+' Mode ['+parsedMessage.params[1]+'] '+parsedMessage.params[0])));else if(document.getElementById('globVars').constants('channelPrefixChars').indexOf(parsedMessage.params[0].charAt(0))>=0)document.getElementById('manageChannelsPanel').displayChannelMessage(parsedMessage);else console.log('Error message MODE to unknown recipient')
+;break;case'cachedNICK':document.getElementById('manageChannelsPanel').displayChannelMessage(parsedMessage);break;case'NICK':
 document.getElementById('manageChannelsPanel').displayChannelMessage(parsedMessage);break;case'NOTICE':
 if(!parsedMessage.nick||0===parsedMessage.nick.length)ircServerPanelEl.displayPlainServerMessage(displayUtilsEl.cleanFormatting(displayUtilsEl.cleanCtcpDelimiter(parsedMessage.timestamp+' '+parsedMessage.prefix+' '+parsedMessage.params[1])));else{
 const ctcpDelim=1;if(null===parsedMessage.params[1])parsedMessage.params[1]=''
 ;if(parsedMessage.params[1].charCodeAt(0)===ctcpDelim)document.getElementById('ctcpParser').parseCtcpMessage(parsedMessage,message);else{
-document.getElementById('noticePanel').displayNoticeMessage(parsedMessage);document.getElementById('manageChannelsPanel').displayChannelNoticeMessage(parsedMessage)}}break;case'PRIVMSG':{
-const ctcpDelim=1;if(parsedMessage.params[1].charCodeAt(0)===ctcpDelim)document.getElementById('ctcpParser').parseCtcpMessage(parsedMessage,message);else{
+document.getElementById('noticePanel').displayNoticeMessage(parsedMessage);document.getElementById('manageChannelsPanel').displayChannelNoticeMessage(parsedMessage)}}break;case'PART':
+document.getElementById('manageChannelsPanel').displayChannelMessage(parsedMessage);break;case'PRIVMSG':{const ctcpDelim=1
+;if(parsedMessage.params[1].charCodeAt(0)===ctcpDelim)document.getElementById('ctcpParser').parseCtcpMessage(parsedMessage,message);else{
 const chanPrefixIndex=document.getElementById('globVars').constants('channelPrefixChars').indexOf(parsedMessage.params[0].charAt(0))
 ;const channelIndex=window.globals.ircState.channels.indexOf(parsedMessage.params[0].toLowerCase())
 ;if(channelIndex>=0)document.getElementById('manageChannelsPanel').displayChannelMessage(parsedMessage);else if(chanPrefixIndex>=0)ircServerPanelEl.displayFormattedServerMessage(parsedMessage,message);else document.getElementById('managePmPanels').displayPrivateMessage(parsedMessage)
@@ -1236,7 +1239,7 @@ serverInputAreaEl.value=serverInputAreaEl.value.slice(0,serverInputAreaEl.value.
 ;const snippetArray=serverInputAreaEl.value.split(' ');if(snippetArray.length>0)snippet=snippetArray[snippetArray.length-1];if(snippet.length>0){
 const matchStr=this._autoCompleteServInputElement(snippet);if(this.lastServAutoCompleteMatch!==matchStr){this.lastServAutoCompleteMatch=matchStr;e.preventDefault()}
 }else serverInputAreaEl.value+=String.fromCharCode(autoCompleteSpaceKey)}}
-;ircMessageCommandDisplayFilter=['331','332','333','353','366','JOIN','KICK','MODE','cachedNICK'.toUpperCase(),'NICK','NOTICE','PART','PING','PONG','PRIVMSG','cachedQUIT'.toUpperCase(),'QUIT','TOPIC','WALLOPS']
+;ircMessageCommandDisplayFilter=['324','329','331','332','333','353','366','367','368','JOIN','KICK','MODE','NOTICE','PART','PING','PONG','PRIVMSG','cachedQUIT'.toUpperCase(),'QUIT','TOPIC','WALLOPS']
 ;displayPlainServerMessage=message=>{const panelMessageDisplayEl=this.shadowRoot.getElementById('panelMessageDisplayId');panelMessageDisplayEl.value+=message+'\n'
 ;panelMessageDisplayEl.scrollTop=panelMessageDisplayEl.scrollHeight;const now=Math.floor(Date.now()/1e3);const ircConnectTime=now-window.globals.ircState.times.ircConnect
 ;if(ircConnectTime>5&&document.activeElement!==document.getElementById('ircServerPanel')&&!window.globals.webState.cacheReloadInProgress){
@@ -1256,13 +1259,12 @@ if(3!==parsedMessage.params.length)_showAfterParamZero(parsedMessage,'WHOIS');el
 ;displayMessage(displayUtilsEl.cleanFormatting(displayUtilsEl.cleanCtcpDelimiter(outMessage)))}break;case'318':displayMessage('WHOIS --End--');break;case'322':if(4===parsedMessage.params.length){
 let outMessage='LIST '+parsedMessage.params[1]+' '+parsedMessage.params[2];if(parsedMessage.params[3])outMessage+=' '+parsedMessage.params[3]
 ;displayMessage(displayUtilsEl.cleanFormatting(displayUtilsEl.cleanCtcpDelimiter(outMessage)))}else console.log('Error Msg 322 not have 4 parsed parameters');break;case'321':break;case'323':
-displayMessage('LIST --End--');break;case'372':_showAfterParamZero(parsedMessage,null);break;case'375':case'376':break;case'900':case'903':_showAfterParamZero(parsedMessage,null);break;case'MODE':
-displayMessage(displayUtilsEl.cleanFormatting(displayUtilsEl.cleanCtcpDelimiter(parsedMessage.timestamp+' '+'MODE '+parsedMessage.params[0]+' '+parsedMessage.params[1])));break;case'cachedNICK':
+displayMessage('LIST --End--');break;case'372':_showAfterParamZero(parsedMessage,null);break;case'375':case'376':break;case'900':case'903':_showAfterParamZero(parsedMessage,null);break
+;case'cachedNICK':
 if('default'===parsedMessage.params[0])displayMessage(displayUtilsEl.cleanFormatting(displayUtilsEl.cleanCtcpDelimiter(parsedMessage.timestamp+' '+parsedMessage.nick+' is now known as '+parsedMessage.params[1])))
 ;break;case'NICK':
 if(window.globals.ircState.nickName.toLowerCase()===parsedMessage.nick.toLowerCase())displayMessage(displayUtilsEl.cleanFormatting(displayUtilsEl.cleanCtcpDelimiter(parsedMessage.timestamp+' '+parsedMessage.nick+' is now known as '+parsedMessage.params[0])))
-;break;case'NOTICE':displayMessage(displayUtilsEl.cleanFormatting(displayUtilsEl.cleanCtcpDelimiter(parsedMessage.timestamp+' '+'NOTICE '+parsedMessage.params[0]+' '+parsedMessage.params[1])));break
-;default:displayMessage(displayUtilsEl.cleanFormatting(displayUtilsEl.cleanCtcpDelimiter(_substituteHmsTime(message))))}const now=Math.floor(Date.now()/1e3)
+;break;default:displayMessage(displayUtilsEl.cleanFormatting(displayUtilsEl.cleanCtcpDelimiter(_substituteHmsTime(message))))}const now=Math.floor(Date.now()/1e3)
 ;const ircConnectTime=now-window.globals.ircState.times.ircConnect
 ;if(ircConnectTime>5&&document.activeElement!==document.getElementById('ircServerPanel')&&!window.globals.webState.cacheReloadInProgress){
 document.getElementById('headerBar').setAttribute('servericon','');document.getElementById('navMenu').handleServerUnreadUpdate(true)}};_updateElapsedTimeDisplay=()=>{const toTimeString=seconds=>{
@@ -1370,8 +1372,9 @@ this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible',''
 ;document.getElementById('navMenu').handleNoticeUnreadUpdate(false);this._scrollToTop()};collapsePanel=()=>{this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible')}
 ;hidePanel=()=>{this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible')};displayCtcpNoticeMessage=ctcpMessage=>{
 const panelMessageDisplayEl=this.shadowRoot.getElementById('panelMessageDisplayId');panelMessageDisplayEl.value+=document.getElementById('displayUtils').cleanFormatting(ctcpMessage)+'\n'
-;if(!window.globals.webState.cacheReloadInProgress&&!document.querySelector('body').hasAttribute('zoomId'))this.showPanel()
-;if(!window.globals.webState.cacheReloadInProgress)panelMessageDisplayEl.scrollTop=panelMessageDisplayEl.scrollHeight};displayNoticeMessage=parsedMessage=>{
+;if(!window.globals.webState.cacheReloadInProgress&&!document.querySelector('body').hasAttribute('zoomId'))this.showPanel();if(!window.globals.webState.cacheReloadInProgress){
+document.getElementById('headerBar').setAttribute('noticeicon','');document.getElementById('navMenu').handleNoticeUnreadUpdate(true)}
+if(!window.globals.webState.cacheReloadInProgress)panelMessageDisplayEl.scrollTop=panelMessageDisplayEl.scrollHeight};displayNoticeMessage=parsedMessage=>{
 const panelDivEl=this.shadowRoot.getElementById('panelDivId');const panelMessageDisplayEl=this.shadowRoot.getElementById('panelMessageDisplayId');const _addText=text=>{
 panelMessageDisplayEl.value+=document.getElementById('displayUtils').cleanFormatting(text)+'\n'
 ;if(!window.globals.webState.cacheReloadInProgress)panelMessageDisplayEl.scrollTop=panelMessageDisplayEl.scrollHeight};if('NOTICE'!==parsedMessage.command)return;const ctcpDelim=1
@@ -1658,10 +1661,17 @@ panelEl.hidePanel()});this.hidePanel()}else{const panelEls=Array.from(document.g
 ;handleHotKeyNextChannel=()=>{if(!window.globals.ircState.ircConnected)return;if(!window.globals.webState.webConnected)return;if(0===window.globals.ircState.channels.length)return
 ;this.hotKeyCycleIndex+=1;if(this.hotKeyCycleIndex>=window.globals.ircState.channels.length)this.hotKeyCycleIndex=0
 ;const channelPanelId='channel:'+window.globals.ircState.channels[this.hotKeyCycleIndex];const panelEls=Array.from(document.getElementById('channelsContainerId').children);panelEls.forEach(panelEl=>{
-if(panelEl.id.toLowerCase()===channelPanelId)panelEl.showPanel();else panelEl.hidePanel()});this.hidePanel()};displayChannelMessage=parsedMessage=>{
-const channelElements=Array.from(document.getElementById('channelsContainerId').children);channelElements.forEach(el=>{
-if('params'in parsedMessage&&'channelName'in el&&parsedMessage.params[0].toLowerCase()===el.channelName.toLowerCase())el.displayChannelMessage(parsedMessage)})}
-;displayChannelNoticeMessage=parsedMessage=>{if('NOTICE'!==parsedMessage.command)return;const ctcpDelim=1
+if(panelEl.id.toLowerCase()===channelPanelId){panelEl.showPanel();panelEl._scrollToTop()}else panelEl.hidePanel()});this.hidePanel()};displayChannelMessage=parsedMessage=>{
+if(!('command'in parsedMessage)){console.log('Expected command property not found in manage-channels-panel');return}
+const channelElements=Array.from(document.getElementById('channelsContainerId').children);const channelNone=['NICK','QUIT']
+;const channelFirst=['KICK','JOIN','MODE','cachedNICK','NOTICE','PART','PRIVMSG','TOPIC','cachedQUIT'];const channelSecond=['324','329','367','368']
+;if(channelNone.indexOf(parsedMessage.command)>=0)channelElements.forEach(el=>{el.displayChannelMessage(parsedMessage)
+});else if(channelFirst.indexOf(parsedMessage.command)>=0)channelElements.forEach(el=>{
+if('params'in parsedMessage&&parsedMessage.params.length>0&&'channelName'in el&&parsedMessage.params[0].toLowerCase()===el.channelName.toLowerCase())el.displayChannelMessage(parsedMessage)
+});else if(channelSecond.indexOf(parsedMessage.command)>=0)channelElements.forEach(el=>{
+if('params'in parsedMessage&&parsedMessage.params.length>1&&'channelName'in el&&parsedMessage.params[1].toLowerCase()===el.channelName.toLowerCase())el.displayChannelMessage(parsedMessage)
+});else console.log('Error, manage-channels-panel can not route unmatched message\n',JSON.stringify(parsedMessage,null,2))};displayChannelNoticeMessage=parsedMessage=>{
+if('NOTICE'!==parsedMessage.command)return;const ctcpDelim=1
 ;if(2===parsedMessage.params.length&&parsedMessage.params[1].charCodeAt(0)===ctcpDelim||3===parsedMessage.params.length&&parsedMessage.params[2].charCodeAt(0)===ctcpDelim)return
 ;if(parsedMessage.params[0]!==window.globals.ircState.nickName&&window.globals.ircState.channels.indexOf(parsedMessage.params[0].toLowerCase())>=0){
 const channelElements=Array.from(document.getElementById('channelsContainerId').children);channelElements.forEach(el=>{
@@ -1928,8 +1938,17 @@ out=timestamp+' ';if('*'===nick)out+=nick+nickChannelSpacer;else out+=nick+nickC
 }else out=timestamp+' '+nick.padStart(this.maxNickLength,' ')+nickChannelSpacer+document.getElementById('displayUtils').cleanFormatting(text)+'\n';panelMessageDisplayEl.value+=out
 ;if(!window.globals.webState.cacheReloadInProgress&&false===this.shadowRoot.getElementById('noScrollCheckboxId').checked)this._scrollTextAreaToRecent()}
 ;if(parsedMessage.params[0].toLowerCase()===this.channelName.toLowerCase())if(panelDivEl.getAttribute('lastDate')!==parsedMessage.datestamp){panelDivEl.setAttribute('lastDate',parsedMessage.datestamp)
-;panelMessageDisplayEl.value+='\n=== '+parsedMessage.datestamp+' ===\n\n'}switch(parsedMessage.command){case'KICK':if(parsedMessage.params[0].toLowerCase()===this.channelName.toLowerCase()){
-let reason=' ';if(parsedMessage.params[2])reason=parsedMessage.params[2]
+;panelMessageDisplayEl.value+='\n=== '+parsedMessage.datestamp+' ===\n\n'}switch(parsedMessage.command){case'324':
+if('params'in parsedMessage&&parsedMessage.params.length>0&&parsedMessage.params[1].toLowerCase()===this.channelName.toLowerCase()){let modeList='Mode ';modeList+=parsedMessage.params[1]
+;if(parsedMessage.params.length>1)modeList+=' '+parsedMessage.params[2];_addText(parsedMessage.timestamp,'*',modeList)}break;case'329':
+if('params'in parsedMessage&&parsedMessage.params.length>0&&parsedMessage.params[1].toLowerCase()===this.channelName.toLowerCase()){let created='Channel '
+;created+=parsedMessage.params[1]+' created on ';if(parsedMessage.params.length>1){const createdDate=new Date(1e3*parseInt(parsedMessage.params[2]));created+=createdDate.toLocaleString()}
+_addText(parsedMessage.timestamp,'*',created)}break;case'367':if('params'in parsedMessage&&parsedMessage.params.length>0&&parsedMessage.params[1].toLowerCase()===this.channelName.toLowerCase()){
+let banList='';if(parsedMessage.params.length>1)banList+=' '+parsedMessage.params[2];if(parsedMessage.params.length>2)banList+=' banned by '+parsedMessage.params[3];if(parsedMessage.params.length>3){
+const banDate=new Date(1e3*parseInt(parsedMessage.params[4]));banList+=' on '+banDate.toLocaleString()}_addText(parsedMessage.timestamp,'*',banList)}break;case'368':
+if('params'in parsedMessage&&parsedMessage.params.length>0&&parsedMessage.params[1].toLowerCase()===this.channelName.toLowerCase()){let banList=''
+;if(parsedMessage.params.length>1)banList+=' '+parsedMessage.params[2];_addText(parsedMessage.timestamp,'*',banList)}break;case'KICK':
+if(parsedMessage.params[0].toLowerCase()===this.channelName.toLowerCase()){let reason=' ';if(parsedMessage.params[2])reason=parsedMessage.params[2]
 ;if(panelDivEl.hasAttribute('brief-enabled'))_addText(parsedMessage.timestamp,'*',parsedMessage.nick+' has kicked '+parsedMessage.params[1]);else _addText(parsedMessage.timestamp,'*',parsedMessage.nick+' has kicked '+parsedMessage.params[1]+' ('+reason+')')
 ;if(panelDivEl.hasAttribute('beep1-enabled')&&!window.globals.webState.cacheReloadInProgress)document.getElementById('beepSounds').playBeep1Sound();this._incUnreadWhenOther();this._displayWhenHidden()
 }break;case'JOIN':if(parsedMessage.params[0].toLowerCase()===this.channelName.toLowerCase()){

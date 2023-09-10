@@ -103,6 +103,14 @@ window.customElements.define('notice-panel', class extends HTMLElement {
       this.showPanel();
     }
 
+    // Message activity Icon
+    // If NOT reload from cache in progress (timer not zero)
+    // then display incoming message activity icon
+    if (!window.globals.webState.cacheReloadInProgress) {
+      document.getElementById('headerBar').setAttribute('noticeicon', '');
+      document.getElementById('navMenu').handleNoticeUnreadUpdate(true);
+    }
+
     if (!window.globals.webState.cacheReloadInProgress) {
       panelMessageDisplayEl.scrollTop = panelMessageDisplayEl.scrollHeight;
     }

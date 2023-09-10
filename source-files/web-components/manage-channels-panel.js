@@ -178,6 +178,8 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
     panelEls.forEach((panelEl) => {
       if (panelEl.id.toLowerCase() === channelPanelId) {
         panelEl.showPanel();
+        // special case if already open
+        panelEl._scrollToTop();
       } else {
         panelEl.hidePanel();
       }
@@ -193,16 +195,73 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
    * @param {Object} parsedMessage - Object containing IRC message
    */
   displayChannelMessage = (parsedMessage) => {
+    if (!('command' in parsedMessage)) {
+      console.log('Expected command property not found in manage-channels-panel');
+      return;
+    }
     // console.log('manageChannelsPanel', JSON.stringify(parsedMessage, null, 2));
     const channelElements =
       Array.from(document.getElementById('channelsContainerId').children);
-    channelElements.forEach((el) => {
-      if (('params' in parsedMessage) &&
-        ('channelName' in el) &&
-        (parsedMessage.params[0].toLowerCase() === el.channelName.toLowerCase())) {
+
+    // Case of IRC messages relevant to a channel, but channel name is not in message
+    const channelNone = [
+      'NICK',
+      'QUIT'
+    ];
+
+    // Case of IRC message with channel name as first params (params[0])
+    const channelFirst = [
+      'KICK',
+      'JOIN',
+      'MODE',
+      'cachedNICK',
+      'NOTICE',
+      'PART',
+      'PRIVMSG',
+      'TOPIC',
+      'cachedQUIT'
+    ];
+
+    // Case of IRC message with channel name as second params (params[1])
+    const channelSecond = [
+      '324', // Channel mode list RPL_CHANNELMODEIS
+      '329', // Channel creation time RPL_CREATIONTIME
+      '367', // Channel ban list item RPL_BANLIST
+      '368' // 368 End of channel ban list RPL_ENDOFBANLIST
+    ];
+    if (channelNone.indexOf(parsedMessage.command) >= 0) {
+      //
+      // Case of IRC messages relevant to a channel, but channel name is not in message
+      //
+      channelElements.forEach((el) => {
         el.displayChannelMessage(parsedMessage);
-      }
-    });
+      });
+    } else if (channelFirst.indexOf(parsedMessage.command) >= 0) {
+      //
+      // Case of IRC message with channel name as first params (params[0])
+      //
+      channelElements.forEach((el) => {
+        if (('params' in parsedMessage) && (parsedMessage.params.length > 0) &&
+          ('channelName' in el) &&
+          (parsedMessage.params[0].toLowerCase() === el.channelName.toLowerCase())) {
+          el.displayChannelMessage(parsedMessage);
+        }
+      });
+    } else if (channelSecond.indexOf(parsedMessage.command) >= 0) {
+      //
+      // Case of IRC message with channel name as second params (params[1])
+      //
+      channelElements.forEach((el) => {
+        if (('params' in parsedMessage) && (parsedMessage.params.length > 1) &&
+          ('channelName' in el) &&
+          (parsedMessage.params[1].toLowerCase() === el.channelName.toLowerCase())) {
+          el.displayChannelMessage(parsedMessage);
+        }
+      });
+    } else {
+      console.log('Error, manage-channels-panel can not route unmatched message\n',
+        JSON.stringify(parsedMessage, null, 2));
+    }
   }; // displayChannelMessage()
 
   /**

@@ -376,6 +376,22 @@ window.customElements.define('remote-command-parser', class extends HTMLElement 
       // Decoding complete, Parse commands
       //
       switch (parsedMessage.command) {
+        // Channel mode list RPL_CHANNELMODEIS
+        case '324':
+          document.getElementById('manageChannelsPanel').displayChannelMessage(parsedMessage);
+          break;
+        // Channel creation time RPL_CREATIONTIME
+        case '329':
+          document.getElementById('manageChannelsPanel').displayChannelMessage(parsedMessage);
+          break;
+        // Channel ban list item RPL_BANLIST
+        case '367':
+          document.getElementById('manageChannelsPanel').displayChannelMessage(parsedMessage);
+          break;
+        // End of channel ban list RPL_ENDOFBANLIST
+        case '368':
+          document.getElementById('manageChannelsPanel').displayChannelMessage(parsedMessage);
+          break;
         case 'ERROR':
           // console.log(message.toString());
           // This is to popup error before registration, Bad server Password error
@@ -392,9 +408,16 @@ window.customElements.define('remote-command-parser', class extends HTMLElement 
           document.getElementById('manageChannelsPanel').displayChannelMessage(parsedMessage);
           break;
         case 'MODE':
-          if (parsedMessage.params[0] === window.globals.ircState.nickName) {
+          if (parsedMessage.params[0].toLowerCase() ===
+            window.globals.ircState.nickName.toLowerCase()) {
             // Case of me, my MODE has changed
-            ircServerPanelEl.displayFormattedServerMessage(parsedMessage, message);
+            // In irc-server-panel, NOTICE is filtered, so it must generated manually
+            ircServerPanelEl.displayPlainServerMessage(
+              displayUtilsEl.cleanFormatting(
+                displayUtilsEl.cleanCtcpDelimiter(
+                  parsedMessage.timestamp + ' Mode [' +
+                  parsedMessage.params[1] + '] ' +
+                  parsedMessage.params[0])));
           } else if (document.getElementById('globVars').constants('channelPrefixChars')
             .indexOf(parsedMessage.params[0].charAt(0)) >= 0) {
             // Case of channel name
@@ -404,16 +427,20 @@ window.customElements.define('remote-command-parser', class extends HTMLElement 
           }
           break;
         case 'cachedNICK':
+          // manage-channels-panel duplicates and sends to each channel panel
+          // channel-panel parses message and only shows in channel if it is in the list
           document.getElementById('manageChannelsPanel').displayChannelMessage(parsedMessage);
-          ircServerPanelEl.displayFormattedServerMessage(parsedMessage, message);
+          // Code above sends it to the irc-server-panel
+          // irc-server-panel only shows if nickname matches
+          // ircServerPanelEl.displayFormattedServerMessage(parsedMessage, message);
           break;
         case 'NICK':
+          // manage-channels-panel duplicates and sends to each channel panel
+          // channel-panel parses message and only shows in channel if it is in the list
           document.getElementById('manageChannelsPanel').displayChannelMessage(parsedMessage);
-          ircServerPanelEl.displayFormattedServerMessage(parsedMessage, message);
-          break;
-        case 'PART':
-          document.getElementById('manageChannelsPanel')
-            .displayChannelMessage(parsedMessage);
+          // Code above sends it to the irc-server-panel
+          // irc-server-panel only shows if nickname matches
+          // ircServerPanelEl.displayFormattedServerMessage(parsedMessage, message);
           break;
         case 'NOTICE':
           // NOTICE is special case because it can be sent to an IRC channel,
@@ -442,6 +469,10 @@ window.customElements.define('remote-command-parser', class extends HTMLElement 
                 .displayChannelNoticeMessage(parsedMessage);
             }
           }
+          break;
+        case 'PART':
+          document.getElementById('manageChannelsPanel')
+            .displayChannelMessage(parsedMessage);
           break;
         case 'PRIVMSG':
           {
