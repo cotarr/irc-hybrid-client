@@ -6,11 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Next v2.0.0-dev.14 2023-09-10 (Draft)
+## Next v2.0.0-dev.15 2023-09-10 (Draft)
 
 Work in progress, see top of README.md
 
-Commit
+- Fixed, user MODE not display correctly, with multiple different nickname in cache.
+
+Commit 25ef608
 
 - Rewrite of message routing function in manage-channels-panel for channel messages.
 - New: Added 324, 329 routing to channel-panel to display channel modes
@@ -22,7 +24,7 @@ Commit
 - Fixed HotKey Alt-N not scrolling to channel panel if already visible
 - Fixed activity icon for CTCP request shown as notice.
 
-Commit
+Commit 0bdb8e1
 
 - Clean up typing errors on page text (no code change)
 

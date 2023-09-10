@@ -408,22 +408,20 @@ window.customElements.define('remote-command-parser', class extends HTMLElement 
           document.getElementById('manageChannelsPanel').displayChannelMessage(parsedMessage);
           break;
         case 'MODE':
-          if (parsedMessage.params[0].toLowerCase() ===
-            window.globals.ircState.nickName.toLowerCase()) {
-            // Case of me, my MODE has changed
-            // In irc-server-panel, NOTICE is filtered, so it must generated manually
+          // Examine the first character to see if it the name of an IRC channel
+          // and forward to channel for processing channel mode command
+          if (document.getElementById('globVars').constants('channelPrefixChars')
+            .indexOf(parsedMessage.params[0].charAt(0)) >= 0) {
+            document.getElementById('manageChannelsPanel').displayChannelMessage(parsedMessage);
+          } else {
+            // Else it is not a channel so it must be a user mode command.
+            // In irc-server-panel, MODE is filtered, so it must generated manually
             ircServerPanelEl.displayPlainServerMessage(
               displayUtilsEl.cleanFormatting(
                 displayUtilsEl.cleanCtcpDelimiter(
                   parsedMessage.timestamp + ' Mode [' +
                   parsedMessage.params[1] + '] ' +
                   parsedMessage.params[0])));
-          } else if (document.getElementById('globVars').constants('channelPrefixChars')
-            .indexOf(parsedMessage.params[0].charAt(0)) >= 0) {
-            // Case of channel name
-            document.getElementById('manageChannelsPanel').displayChannelMessage(parsedMessage);
-          } else {
-            console.log('Error message MODE to unknown recipient');
           }
           break;
         case 'cachedNICK':
