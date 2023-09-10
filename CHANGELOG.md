@@ -6,11 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Next v2.0.0-dev.12 2023-09-09 (Draft)
+## Next v2.0.0-dev.13 2023-09-10 (Draft)
 
 Work in progress, see top of README.md
 
 Commit
+
+- Clean up typing errors on page text (no code change)
+
+Commit 2c3fdda
 
 - Fixed server-list-panel was not showing mobile screen width after page refresh on iPhone
 - CSS/HTML adjust height of several panels using textarea and margins
