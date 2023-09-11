@@ -267,6 +267,11 @@ customElements.define('nav-menu', class extends HTMLElement {
    */
   _handleWebConnectChanged = () => {
     this._showHideItemsInMenu();
+    if ((window.globals.webState.webConnected) || (window.globals.webState.webConnecting)) {
+      this.shadowRoot.getElementById('item4_6_Id').textContent = 'Place web page in Standby';
+    } else {
+      this.shadowRoot.getElementById('item4_6_Id').textContent = 'Re-connect web page.';
+    }
   };
 
   /**
@@ -545,6 +550,15 @@ customElements.define('nav-menu', class extends HTMLElement {
     this.shadowRoot.getElementById('item4_5_Id').addEventListener('click', (event) => {
       event.stopPropagation();
       document.getElementById('debugPanel').showPanel();
+      this.closeDropdownMenu();
+    });
+    this.shadowRoot.getElementById('item4_6_Id').addEventListener('click', (event) => {
+      event.stopPropagation();
+      if ((window.globals.webState.webConnected) || (window.globals.webState.webConnecting)) {
+        document.getElementById('websocketPanel').webConnectNavBarMenuHandler('disconnect');
+      } else {
+        document.getElementById('websocketPanel').webConnectNavBarMenuHandler('connect');
+      }
       this.closeDropdownMenu();
     });
     this.shadowRoot.getElementById('item5_0_Id').addEventListener('click', (event) => {

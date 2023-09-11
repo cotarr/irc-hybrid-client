@@ -2,10 +2,10 @@
 <link rel="stylesheet" href="css/styles.css"><script src="./js/webclient.js" defer="defer"></script><title>irc-hybrid-client</title></head><body class="global-body-theme-dark" theme="dark"><noscript>
 <br><h1>JavaScript is required to load this page.</h1></noscript><template id="websocketPanelTemplate"><link rel="stylesheet" href="css/styles.css"><div id="panelVisibilityDivId" 
 class="global-visibility-div"><div id="panelDivId" class="global-panel-style-div websocket-panel-theme"><h2 class="mt5">Web Server Connection</h2><div class="button-div"><button 
-id="manualWebSocketReconnectButtonId">Reconnect to Web Site</button> <button id="stopWebSocketReconnectButtonId">Stop</button> <button id="websocketInfoButtonId">?</button></div><div class="vh10">
-</div><div class="mb5"><input id="persistCheckBoxId" class="global-valign-middle" type="checkbox"> <span class="global-valign-middle">Remember disabled state</span></div><pre 
+id="manualWebSocketReconnectButtonId">Reconnect to Web Site</button> <button id="stopWebSocketReconnectButtonId">Stop</button> <button id="websocketInfoButtonId">Show Help</button></div><div 
+class="vh10"></div><div class="mb5"><input id="persistCheckBoxId" class="global-valign-middle" type="checkbox"> <span class="global-valign-middle">Remember disabled state</span></div><pre 
 id="reconnectStatusDivId" class="websocket-panel-status-div"></pre><div id="websocketInfoDivId" hidden><p>
-Two independent connections are used to connect to the IRC network. One is between the web browser and the web server. The web server is acting as a remote IRC client. A second connection will exist between the web server and the IRC network. The connection on this panel refers to the websocket connection between the web browser and web server.
+Two independent connections are used to connect to the IRC network. One is between the web browser and the web server. A second connection will exist between the web server and the IRC network. The web server is acting as a remote IRC client. Placing the web page in &quot;Standby&quot; closes the websocket connection between the web browser and web server.
 </p><div class="vh20"></div><pre>
          (here)
             |
@@ -20,24 +20,25 @@ class="nav-group03 nav-level1" collapsed>IRC Server</div><div id="item3_4_Id" cl
 Notices</div><div id="item3_6_Id" class="nav-group03 nav-level1" collapsed>Help, Commands and Hotkeys</div><div id="group04ButtonId" class="nav-group">+ More...</div><div id="item4_1_Id" 
 class="nav-group04 nav-level1" collapsed>Toggle Light/Dark Theme</div><div id="item4_2_Id" class="nav-group04 nav-level1" collapsed>Show All Panels</div><div id="item4_3_Id" 
 class="nav-group04 nav-level1" collapsed>Collapsed Panels</div><div id="item4_4_Id" class="nav-group04 nav-level1" collapsed>Hide All Panels</div><div id="item4_5_Id" class="nav-group04 nav-level1" 
-collapsed>Debug Tools</div><div id="item5_0_Id" class="nav-level0">MIT License</div><div id="item5_1_Id" class="nav-level0">Logout...</div></div></template><template id="activitySpinnerTemplate"><link
- rel="stylesheet" href="css/styles.css"><div id="activitySpinner"><div class="activity-spinner-div"></div></div></template><template id="hamburgerIconTemplate"><link rel="stylesheet" 
-href="css/styles.css"><div id="hamburgerBorderId" class="hamburger-icon hamburger-icon-theme-dark"><div id="hamburgerLine1Id" class="hamburger-line hamburger-line-theme-dark"></div><div 
-id="hamburgerLine2Id" class="hamburger-line hamburger-line-theme-dark"></div><div id="hamburgerLine3Id" class="hamburger-line hamburger-line-theme-dark"></div></div></template><template 
-id="headerBarTemplate"><link rel="stylesheet" href="css/styles.css"><div><div id="headerBarDivId" class="hbar-panel-div header-bar-theme-dark"><div id="wholeBarId" class="global-head-flex"><div 
-class="global-head-left"><div id="navDropdownButtonId"><hamburger-icon id="hamburgerIconId"></hamburger-icon></div></div><div class="global-head-center"><div id="titleDivId" class="hbar-title-div">
-irc-hybrid-client</div></div><div class="global-head-right"><button id="enableAudioButtonId" class="hbar-enable-audio" hidden>+Audio</button> <button id="collapseAllButtonId" 
-class="global-show-hide-button mr5">&#8722;</button></div></div></div><div id="annunciatiorDivId" class="hbar-annunciator-div"><div id="webConnectIconId" class="hbar-connect-icon">Web</div><div 
-id="ircConnectIconId" class="hbar-connect-icon">IRC</div><div id="waitConnectIconId" class="hbar-wait-icon" hidden>Wait...</div><div id="ircIsAwayIconId" class="hbar-away-icon" hidden>Away</div><div 
-id="panelZoomIconId" class="global-message-icon channel-panel-zoomed" hidden>Zoom</div><div id="nickRecovIconId" class="global-message-icon hbar-recovery-theme-dark" hidden>R</div><div 
-id="timerFlashingDivId" class="hbar-panel-flashing-div"><div id="serverUnreadExistIconId" class="global-message-icon irc-server-panel-theme-dark" hidden>S</div><div id="wallopsUnreadExistIconId" 
-class="global-message-icon wallops-panel-theme-dark" hidden>W</div><div id="noticeUnreadExistIconId" class="global-message-icon notice-panel-theme-dark" hidden>N</div><div 
-id="privMsgUnreadExistIconId" class="global-message-icon pm-panel-theme-dark" hidden>P</div><div id="channelUnreadExistIconId" class="global-message-icon channel-panel-theme-dark" hidden>C</div></div>
-</div></div></template><template id="errorPanelTemplate"><link rel="stylesheet" href="css/styles.css"><div id="panelVisibilityDivId" class="global-visibility-div"><div id="panelDivId" 
-class="global-panel-style-div error-panel-div"><div id="errorContentDivId"></div><div id="errorTitleId" class="error-panel-title">Tap to Close</div></div></div></template><template 
-id="helpPanelTemplate"><link rel="stylesheet" href="css/styles.css"><div id="panelVisibilityDivId" class="global-visibility-div"><div id="panelDivId" 
-class="global-panel-style-div help-panel-theme-dark"><div class="global-head-flex"><div class="global-head-left"><button id="closePanelButtonId" title="Hide Panel" class="global-show-hide-button mr5">
-x</button> <span>IRC Command List and Hotkeys</span></div></div><div id="infoDivId" class="help-panel-help-div global-text-theme-dark"><pre class="pd10">
+collapsed>Debug Tools</div><div id="item4_6_Id" class="nav-group04 nav-level1" collapsed>Connect browser</div><div id="item5_0_Id" class="nav-level0">MIT License</div><div id="item5_1_Id" 
+class="nav-level0">Logout...</div></div></template><template id="activitySpinnerTemplate"><link rel="stylesheet" href="css/styles.css"><div id="activitySpinner"><div class="activity-spinner-div">
+</div></div></template><template id="hamburgerIconTemplate"><link rel="stylesheet" href="css/styles.css"><div id="hamburgerBorderId" class="hamburger-icon hamburger-icon-theme-dark"><div 
+id="hamburgerLine1Id" class="hamburger-line hamburger-line-theme-dark"></div><div id="hamburgerLine2Id" class="hamburger-line hamburger-line-theme-dark"></div><div id="hamburgerLine3Id" 
+class="hamburger-line hamburger-line-theme-dark"></div></div></template><template id="headerBarTemplate"><link rel="stylesheet" href="css/styles.css"><div><div id="headerBarDivId" 
+class="hbar-panel-div header-bar-theme-dark"><div id="wholeBarId" class="global-head-flex"><div class="global-head-left"><div id="navDropdownButtonId"><hamburger-icon id="hamburgerIconId">
+</hamburger-icon></div></div><div class="global-head-center"><div id="titleDivId" class="hbar-title-div">irc-hybrid-client</div></div><div class="global-head-right"><button id="enableAudioButtonId" 
+class="hbar-enable-audio" hidden>+Audio</button> <button id="collapseAllButtonId" class="global-show-hide-button mr5">&#8722;</button></div></div></div><div id="annunciatiorDivId" 
+class="hbar-annunciator-div"><div id="webConnectIconId" class="hbar-connect-icon">Web</div><div id="ircConnectIconId" class="hbar-connect-icon">IRC</div><div id="waitConnectIconId" 
+class="hbar-wait-icon" hidden>Wait...</div><div id="ircIsAwayIconId" class="hbar-away-icon" hidden>Away</div><div id="panelZoomIconId" class="global-message-icon channel-panel-zoomed" hidden>Zoom
+</div><div id="nickRecovIconId" class="global-message-icon hbar-recovery-theme-dark" hidden>R</div><div id="timerFlashingDivId" class="hbar-panel-flashing-div"><div id="serverUnreadExistIconId" 
+class="global-message-icon irc-server-panel-theme-dark" hidden>S</div><div id="wallopsUnreadExistIconId" class="global-message-icon wallops-panel-theme-dark" hidden>W</div><div 
+id="noticeUnreadExistIconId" class="global-message-icon notice-panel-theme-dark" hidden>N</div><div id="privMsgUnreadExistIconId" class="global-message-icon pm-panel-theme-dark" hidden>P</div><div 
+id="channelUnreadExistIconId" class="global-message-icon channel-panel-theme-dark" hidden>C</div></div></div></div></template><template id="errorPanelTemplate"><link rel="stylesheet" 
+href="css/styles.css"><div id="panelVisibilityDivId" class="global-visibility-div"><div id="panelDivId" class="global-panel-style-div error-panel-div"><div id="errorContentDivId"></div><div 
+id="errorTitleId" class="error-panel-title">Tap to Close</div></div></div></template><template id="helpPanelTemplate"><link rel="stylesheet" href="css/styles.css"><div id="panelVisibilityDivId" 
+class="global-visibility-div"><div id="panelDivId" class="global-panel-style-div help-panel-theme-dark"><div class="global-head-flex"><div class="global-head-left"><button id="closePanelButtonId" 
+title="Hide Panel" class="global-show-hide-button mr5">x</button> <span>IRC Command List and Hotkeys</span></div></div><div id="infoDivId" class="help-panel-help-div global-text-theme-dark"><pre 
+class="pd10">
 Available IRC Text Commands
 
 /ADMIN [server]

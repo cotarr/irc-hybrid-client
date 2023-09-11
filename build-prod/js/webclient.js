@@ -300,7 +300,7 @@ console.log(err);let message=err.message||err.toString()||'Error calling getIrcS
 ;if(window.globals.wsocket)window.globals.wsocket.close(3002,'Closed due to getIrcState() error.');this.showPanel();document.dispatchEvent(new CustomEvent('hide-all-panels',{detail:{
 except:['websocketPanel']}}))})});window.globals.wsocket.addEventListener('close',event=>{if(window.globals.webState.websocketCount>0){window.globals.webState.websocketCount--
 ;console.log('Websocket closed, count: '+window.globals.webState.websocketCount+' code: '+event.code+' '+event.reason);if(0===window.globals.webState.websocketCount){
-if(window.globals.webState.webConnected)if('code'in event&&3001===event.code)this.shadowRoot.getElementById('reconnectStatusDivId').textContent+='Web page disconnected at user request\n'+'Auto-reconnect disabled\n';else{
+if(window.globals.webState.webConnected)if('code'in event&&3001===event.code)this.shadowRoot.getElementById('reconnectStatusDivId').textContent+='Web page disconnected at user request.\n'+'Auto-reconnect disabled\n';else{
 this.shadowRoot.getElementById('reconnectStatusDivId').textContent+='Web socket connection closed, count: '+window.globals.webState.websocketCount+'\n'+'Code: '+event.code+' '+event.reason+'\n'
 ;if(!window.globals.webState.webConnectOn)window.shadowRoot.getElementById('reconnectStatusDivId').textContent+='Automatic web reconnect is disabled. \nPlease reconnect manually.\n'}
 window.globals.webState.webConnected=false;window.globals.webState.webConnecting=false;this._updateWebsocketStatus()}}});window.globals.wsocket.addEventListener('error',error=>{if(error){
@@ -342,15 +342,17 @@ window.globals.webState.webConnectOn=false;this.shadowRoot.getElementById('recon
 ;document.getElementById('activitySpinner').cancelActivitySpinner()}else{window.globals.webState.webConnectOn=true;window.globals.webState.webConnecting=true;this._initWebSocketAuth().then(()=>{
 this.shadowRoot.getElementById('reconnectStatusDivId').textContent+='Authorizing websocket....\n';setTimeout(()=>{this._connectWebSocket()},100)}).catch(err=>{this.showPanel()
 ;let errMessage=err.message||err.toString()||'Unknown error';console.log(errMessage);errMessage=errMessage.split('\n')[0]
-;document.getElementById('errorPanel').showError('Error connecting web socket '+errMessage)})}};_webStatusIconTouchDebounce=false;webConnectHeaderBarIconHandler=()=>{
-if(this._webStatusIconTouchDebounce)return;this._webStatusIconTouchDebounce=true;setTimeout(()=>{this._webStatusIconTouchDebounce=false},1e3)
-;if(!window.globals.webState.webConnected&&!window.globals.webState.webConnecting){window.globals.webState.webConnectOn=true;window.globals.webState.webConnecting=true;this._updateWebsocketStatus()
+;document.getElementById('errorPanel').showError('Error connecting web socket '+errMessage)})}};_connectHandler=()=>{if(!window.globals.webState.webConnected&&!window.globals.webState.webConnecting){
+window.globals.webState.webConnectOn=true;window.globals.webState.webConnecting=true;this._updateWebsocketStatus()
 ;this.shadowRoot.getElementById('reconnectStatusDivId').textContent+='Reconnect to web server initiated (Manual)\n';this._reConnectWebSocketAfterDisconnect()
 ;const persist=this.shadowRoot.getElementById('persistCheckBoxId').checked;if(persist){const persistedWebsocketStateObj={persist:true,disabled:false}
-;window.localStorage.setItem('persistedWebsocketState',JSON.stringify(persistedWebsocketStateObj))}return}if(window.globals.webState.webConnected){
-this.shadowRoot.getElementById('reconnectStatusDivId').textContent='Header bar "Web" icon activated by user\n'+'Closing websocket to remote IRC client\n';window.globals.webState.webConnectOn=false
+;window.localStorage.setItem('persistedWebsocketState',JSON.stringify(persistedWebsocketStateObj))}}};_disconnectHandler=()=>{if(window.globals.webState.webConnected){
+this.shadowRoot.getElementById('reconnectStatusDivId').textContent='Placing web browser in "standby".\n'+'Closing websocket to remote IRC client.\n';window.globals.webState.webConnectOn=false
 ;if(window.globals.wsocket)window.globals.wsocket.close(3001,'Disconnect on request');const persist=this.shadowRoot.getElementById('persistCheckBoxId').checked;if(persist){
-const persistedWebsocketStateObj={persist:true,disabled:true};window.localStorage.setItem('persistedWebsocketState',JSON.stringify(persistedWebsocketStateObj))}}};wsReconnectCounter=0
+const persistedWebsocketStateObj={persist:true,disabled:true};window.localStorage.setItem('persistedWebsocketState',JSON.stringify(persistedWebsocketStateObj))}}};webConnectNavBarMenuHandler=action=>{
+if('connect'===action)this._connectHandler();else if('disconnect'===action)this._disconnectHandler()};_webStatusIconTouchDebounce=false;webConnectHeaderBarIconHandler=()=>{
+if(this._webStatusIconTouchDebounce)return;this._webStatusIconTouchDebounce=true;setTimeout(()=>{this._webStatusIconTouchDebounce=false},1e3)
+;if(!window.globals.webState.webConnected&&!window.globals.webState.webConnecting)this._connectHandler();else if(window.globals.webState.webConnected)this._disconnectHandler()};wsReconnectCounter=0
 ;wsReconnectTimer=0;_reconnectTimerTickHandler=()=>{if(!window.globals.webState.webConnectOn||window.globals.webState.webConnected){this.wsReconnectCounter=0;this.wsReconnectTimer=0;return}
 if(window.globals.webState.webConnecting)return;this.wsReconnectTimer++;if(0===this.wsReconnectCounter){if(this.wsReconnectTimer>0){window.globals.webState.webConnecting=true
 ;this._updateWebsocketStatus();this.wsReconnectTimer=0;this.wsReconnectCounter++;this.shadowRoot.getElementById('reconnectStatusDivId').textContent+='Reconnect to web server initiated (Timer-1)\n'
@@ -417,8 +419,9 @@ if(window.globals.ircState.ircConnected!==this.ircConnectedLast||window.globals.
 this.shadowRoot.getElementById(menuId).removeAttribute('unavailable')});ircMenuIdList.forEach(menuId=>{this.shadowRoot.getElementById(menuId).removeAttribute('unavailable')})
 ;if(!window.globals.webState.webConnected)webMenuIdList.forEach(menuId=>{this.shadowRoot.getElementById(menuId).setAttribute('unavailable','')})
 ;if(!window.globals.ircState.ircConnected)ircMenuIdList.forEach(menuId=>{this.shadowRoot.getElementById(menuId).setAttribute('unavailable','')});this.arrayOfMenuElements.forEach(itemId=>{
-itemId.setAttribute('collapsed','')})}};_handleWebConnectChanged=()=>{this._showHideItemsInMenu()};_handleIrcStateChanged=()=>{this._showHideItemsInMenu()
-;const channels=Array.from(window.globals.ircState.channels);let changed=false
+itemId.setAttribute('collapsed','')})}};_handleWebConnectChanged=()=>{this._showHideItemsInMenu()
+;if(window.globals.webState.webConnected||window.globals.webState.webConnecting)this.shadowRoot.getElementById('item4_6_Id').textContent='Place web page in Standby';else this.shadowRoot.getElementById('item4_6_Id').textContent='Re-connect web page.'
+};_handleIrcStateChanged=()=>{this._showHideItemsInMenu();const channels=Array.from(window.globals.ircState.channels);let changed=false
 ;if(channels.length!==this.previousChannels.length)changed=true;else if(channels.length>0)for(let i=0;i<channels.length;i++)if(channels[i].toLowerCase()!==this.previousChannels[i].toLowerCase())changed=true
 ;if(changed){const parentEl=this.shadowRoot.getElementById('dropdownMenuChannelContainerId');while(parentEl.firstChild){parentEl.firstChild.removeEventListener('click',this.handleChannelClick)
 ;parentEl.removeChild(parentEl.firstChild)}this.previousChannels=[];if(channels.length>0)for(let i=0;i<channels.length;i++){const channelMenuItem=document.createElement('div')
@@ -466,12 +469,14 @@ if(this.arrayOfMenuElements.length>0)for(let i=0;i<this.arrayOfMenuElements.leng
 ;this.shadowRoot.getElementById('item4_3_Id').addEventListener('click',event=>{event.stopPropagation();document.dispatchEvent(new CustomEvent('collapse-all-panels'))
 ;document.dispatchEvent(new CustomEvent('cancel-zoom'));this.closeDropdownMenu()});this.shadowRoot.getElementById('item4_4_Id').addEventListener('click',event=>{event.stopPropagation()
 ;document.dispatchEvent(new CustomEvent('hide-all-panels'));this.closeDropdownMenu()});this.shadowRoot.getElementById('item4_5_Id').addEventListener('click',event=>{event.stopPropagation()
-;document.getElementById('debugPanel').showPanel();this.closeDropdownMenu()});this.shadowRoot.getElementById('item5_0_Id').addEventListener('click',event=>{event.stopPropagation()
-;document.getElementById('licensePanel').showPanel();this.closeDropdownMenu()});this.shadowRoot.getElementById('item5_1_Id').addEventListener('click',event=>{event.stopPropagation()
-;document.getElementById('logoutPanel').handleLogoutRequest();this.closeDropdownMenu()})}});customElements.define('activity-spinner',class extends HTMLElement{constructor(){super()
-;const template=document.getElementById('activitySpinnerTemplate');const templateContent=template.content;this.attachShadow({mode:'open'}).appendChild(templateContent.cloneNode(true))
-;this.activitySpinnerCounter=0}requestActivitySpinner=()=>{this.activitySpinnerCounter+=1;this.shadowRoot.getElementById('activitySpinner').removeAttribute('hidden')};cancelActivitySpinner=()=>{
-this.activitySpinnerCounter-=1;if(this.activitySpinnerCounter<0)this.activitySpinnerCounter=0
+;document.getElementById('debugPanel').showPanel();this.closeDropdownMenu()});this.shadowRoot.getElementById('item4_6_Id').addEventListener('click',event=>{event.stopPropagation()
+;if(window.globals.webState.webConnected||window.globals.webState.webConnecting)document.getElementById('websocketPanel').webConnectNavBarMenuHandler('disconnect');else document.getElementById('websocketPanel').webConnectNavBarMenuHandler('connect')
+;this.closeDropdownMenu()});this.shadowRoot.getElementById('item5_0_Id').addEventListener('click',event=>{event.stopPropagation();document.getElementById('licensePanel').showPanel()
+;this.closeDropdownMenu()});this.shadowRoot.getElementById('item5_1_Id').addEventListener('click',event=>{event.stopPropagation();document.getElementById('logoutPanel').handleLogoutRequest()
+;this.closeDropdownMenu()})}});customElements.define('activity-spinner',class extends HTMLElement{constructor(){super();const template=document.getElementById('activitySpinnerTemplate')
+;const templateContent=template.content;this.attachShadow({mode:'open'}).appendChild(templateContent.cloneNode(true));this.activitySpinnerCounter=0}requestActivitySpinner=()=>{
+this.activitySpinnerCounter+=1;this.shadowRoot.getElementById('activitySpinner').removeAttribute('hidden')};cancelActivitySpinner=()=>{this.activitySpinnerCounter-=1
+;if(this.activitySpinnerCounter<0)this.activitySpinnerCounter=0
 ;if(this.activitySpinnerCounter>0)this.shadowRoot.getElementById('activitySpinner').removeAttribute('hidden');else this.shadowRoot.getElementById('activitySpinner').setAttribute('hidden','')}
 ;resetActivitySpinner=()=>{this.activitySpinnerCounter=0;this.shadowRoot.getElementById('activitySpinner').setAttribute('hidden','')};connectedCallback(){
 if(this.hasAttribute('default')&&'show'===this.getAttribute('default'))this.requestActivitySpinner();else this.resetActivitySpinner()}})
@@ -530,7 +535,7 @@ if(window.globals.ircState.ircConnected&&window.globals.webState.webConnected)th
 ;this.shadowRoot.getElementById('enableAudioButtonId').title='Browser had disabled media playback. Click to enable beep sounds'
 ;this.shadowRoot.getElementById('collapseAllButtonId').title='Show all available panels as collapsed bar elements'};_updateDynamicElementTitles=()=>{
 const webConnectIconEl=this.shadowRoot.getElementById('webConnectIconId')
-;if(webConnectIconEl.hasAttribute('connected'))webConnectIconEl.title='Disconnect web browser from remote IRC client';else webConnectIconEl.title='Re-connect web browser to remote IRC client'
+;if(webConnectIconEl.hasAttribute('connected'))webConnectIconEl.title='Place web page in Standby (Remote IRC stays active)';else webConnectIconEl.title='Re-connect web page to remote IRC client'
 ;const ircConnectIconEl=this.shadowRoot.getElementById('ircConnectIconId')
 ;if(ircConnectIconEl.hasAttribute('connected'))ircConnectIconEl.title='Disconnect IRC server from remote IRC client (/QUIT)';else ircConnectIconEl.title='Connect to the currently selected IRC server'
 ;const titleDivEl=this.shadowRoot.getElementById('titleDivId')

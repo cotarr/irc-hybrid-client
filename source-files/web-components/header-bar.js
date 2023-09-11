@@ -340,9 +340,9 @@ customElements.define('header-bar', class extends HTMLElement {
   _updateDynamicElementTitles = () => {
     const webConnectIconEl = this.shadowRoot.getElementById('webConnectIconId');
     if (webConnectIconEl.hasAttribute('connected')) {
-      webConnectIconEl.title = 'Disconnect web browser from remote IRC client';
+      webConnectIconEl.title = 'Place web page in Standby (Remote IRC stays active)';
     } else {
-      webConnectIconEl.title = 'Re-connect web browser to remote IRC client';
+      webConnectIconEl.title = 'Re-connect web page to remote IRC client';
     }
     const ircConnectIconEl = this.shadowRoot.getElementById('ircConnectIconId');
     if (ircConnectIconEl.hasAttribute('connected')) {

@@ -6,11 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Next v2.0.0-dev.16 2023-09-11 (Draft)
+## Next v2.0.0-dev.17 2023-09-11 (Draft)
 
 Work in progress, see top of README.md
 
 Commit
+
+- Change description of websocket disconnect to "Web page Standby"
+- Add web socket connection (Standby) to dropdown menu (Already a header bar icon)
+
+Commit 9c76d4f
 
 HTML Browser side changes
 - Update button 'title' attributes for buttons on many panels to serve as mouse-over tooltips.

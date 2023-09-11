@@ -47,6 +47,7 @@
 //   collapsePanel()
 //   hidePanel()
 //   firstWebSocketConnectOnPageLoad()
+//   webConnectNavBarMenuHandler(action)
 //   webConnectHeaderBarIconHandler()
 //   onHeartbeatReceived()
 //
@@ -302,7 +303,7 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
           if (window.globals.webState.webConnected) {
             if (('code' in event) && (event.code === 3001)) {
               this.shadowRoot.getElementById('reconnectStatusDivId').textContent +=
-                'Web page disconnected at user request\n' +
+                'Web page disconnected at user request.\n' +
                 'Auto-reconnect disabled\n';
             } else {
               this.shadowRoot.getElementById('reconnectStatusDivId').textContent +=
@@ -632,21 +633,10 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
     }
   };
 
-  _webStatusIconTouchDebounce = false;
   /**
-   * Click event handler called from headerBar panel when web status icon is clicked
-   * to disconnect or reconnect websocket at user's request.
+   * Internal function to initiate a websocket connection on user request
    */
-  webConnectHeaderBarIconHandler = () => {
-    // debounce button
-    if (this._webStatusIconTouchDebounce) return;
-    this._webStatusIconTouchDebounce = true;
-    setTimeout(() => {
-      this._webStatusIconTouchDebounce = false;
-    }, 1000);
-    //
-    // Connect
-    //
+  _connectHandler = () => {
     if ((!window.globals.webState.webConnected) && (!window.globals.webState.webConnecting)) {
       window.globals.webState.webConnectOn = true;
       window.globals.webState.webConnecting = true;
@@ -664,15 +654,17 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
         window.localStorage.setItem('persistedWebsocketState',
           JSON.stringify(persistedWebsocketStateObj));
       }
-      return;
     }
-    //
-    // Disconnect
-    //
+  };
+
+  /**
+   * Internal function to disconnect a websocket connection on user request
+   */
+  _disconnectHandler = () => {
     if (window.globals.webState.webConnected) {
       this.shadowRoot.getElementById('reconnectStatusDivId').textContent =
-        'Header bar "Web" icon activated by user\n' +
-        'Closing websocket to remote IRC client\n';
+        'Placing web browser in "standby".\n' +
+        'Closing websocket to remote IRC client.\n';
       window.globals.webState.webConnectOn = false;
       if (window.globals.wsocket) {
         window.globals.wsocket.close(3001, 'Disconnect on request');
@@ -687,6 +679,38 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
         window.localStorage.setItem('persistedWebsocketState',
           JSON.stringify(persistedWebsocketStateObj));
       }
+    }
+  };
+
+  /**
+   * Menu event handler called from nav-ban panel dropdown menu
+   * @param {string} action - Values: 'connect', 'disconnect'
+   */
+  webConnectNavBarMenuHandler = (action) => {
+    if (action === 'connect') {
+      this._connectHandler();
+    } else if (action === 'disconnect') {
+      this._disconnectHandler();
+    };
+  };
+
+  _webStatusIconTouchDebounce = false;
+  /**
+   * Click event handler called from header-bar panel when web status icon is clicked
+   * to disconnect or reconnect websocket at user's request.
+   */
+  webConnectHeaderBarIconHandler = () => {
+    // debounce button
+    if (this._webStatusIconTouchDebounce) return;
+    this._webStatusIconTouchDebounce = true;
+    setTimeout(() => {
+      this._webStatusIconTouchDebounce = false;
+    }, 1000);
+    // Toggle
+    if ((!window.globals.webState.webConnected) && (!window.globals.webState.webConnecting)) {
+      this._connectHandler();
+    } else if (window.globals.webState.webConnected) {
+      this._disconnectHandler();
     }
   };
 
