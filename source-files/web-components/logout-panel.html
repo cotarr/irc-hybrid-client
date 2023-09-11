@@ -13,17 +13,31 @@
         <div class="global-head-center">
         </div>
         <div class="global-head-right">
-          <button id="cancelButtonId">Cancel</button>
-          <button id="webLogoutButtonId">Web Logout</button>
+          <button id="cancelButtonId" title="Cancel logout and close this logout panel">Cancel</button>
+          <button id="webLogoutButtonId" title="Logout user from web server">Web Logout</button>
         </div>
     </div>
     <div class="vh10"></div>
-    <div>
-      You are receiving this message because
-      your nickname is still present on IRC, or the
-      status of your IRC connection is unknown.
-      Your nickname may remain present on IRC.
-      Web page login is independent of IRC login.
-    </div>
+    <p>
+      You are receiving this message because your nickname is still present on IRC, or the
+      status of your IRC connection is unknown. Your nickname may remain present on IRC.
+    </p>
+    <div class="vh10"></div>
+<pre>
+           (here)
+              |
+  Web         |    Web            IRC            
+  Browser  ------- Server ------- Server
+</pre>
+    <div class="vh10"></div>
+    <p>
+      Two independent connections are used to connect to the IRC network.
+      One is between the web browser and the web server.
+      The web server is acting as a remote IRC client.
+      A second connection will exist between the web server and the IRC network.
+      The user logout of the web page will only impact the browser, not the IRC network.
+    </p>
+
+
   </div>
 </template>

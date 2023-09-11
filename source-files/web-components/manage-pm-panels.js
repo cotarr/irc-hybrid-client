@@ -404,6 +404,28 @@ window.customElements.define('manage-pm-panels', class extends HTMLElement {
   };
 
   /**
+   * Add "title" attribute for mouse hover tool-tips.
+   */
+  _setFixedElementTitles = () => {
+    this.shadowRoot.getElementById('activePmCountIconId').title =
+      'Count of the number of active private message panels';
+    this.shadowRoot.getElementById('pmUnreadCountIconId').title =
+      'Count of the total number unread private messages';
+    this.shadowRoot.getElementById('eraseButtonId').title =
+      'Erase all private message from remote message cache';
+    this.shadowRoot.getElementById('pmNickNameInputId').title =
+      'The IRC nickname to be recipient of private message or /whois query';
+    this.shadowRoot.getElementById('whoisButtonId').title =
+      'Perform irc /WHOIS query on entered nickname, results in server panel';
+    this.shadowRoot.getElementById('panelMessageInputId').title =
+      'Private message input area';
+    this.shadowRoot.getElementById('sendButtonId').title =
+      'Send private message (PM)';
+    this.shadowRoot.getElementById('openPmWithBeepCheckBoxId').title =
+      'If checked, open new PM panels with audio beep enabled';
+  };
+
+  /**
    * Called once per second as task scheduler, called from js/_afterLoad.js
    */
   timerTickHandler = () => {
@@ -419,6 +441,7 @@ window.customElements.define('manage-pm-panels', class extends HTMLElement {
   // ------------------
   initializePlugin = () => {
     this._loadBeepEnable();
+    this._setFixedElementTitles();
   };
 
   // add event listeners to connected callback

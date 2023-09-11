@@ -928,6 +928,30 @@ window.customElements.define('pm-panel', class extends HTMLElement {
   }; // panel erase button
 
   /**
+   * Add "title" attribute for mouse hover tool-tips.
+   */
+  _setFixedElementTitles = () => {
+    this.shadowRoot.getElementById('messageCountIconId').title =
+      'Unread Message Count';
+    this.shadowRoot.getElementById('panelMessageInputId').title =
+      'Private message input area. IRC commands starting with / are accepted';
+    this.shadowRoot.getElementById('sendButtonId').title =
+      'Send primate message or IRC command to IRC server';
+    this.shadowRoot.getElementById('bottomCollapseButtonId').title =
+      'Show more options for this panel';
+    this.shadowRoot.getElementById('multiLineSendButtonId').title =
+      'Using timer, send multi-line message one line at a time';
+    this.shadowRoot.getElementById('tallerButtonId').title =
+      'Enlarge PM Text Area Vertically';
+    this.shadowRoot.getElementById('normalButtonId').title =
+      'Restore PM Area to default size';
+    this.shadowRoot.getElementById('eraseButtonId').title =
+      'Remove all private messages from remote message cache';
+    this.shadowRoot.getElementById('beepCheckBoxId').title =
+      'When checked emit audio beep sound for each message';
+  };
+
+  /**
    * Called once per second as task scheduler, called from js/_afterLoad.js
    */
   timerTickHandler = () => {
@@ -944,6 +968,8 @@ window.customElements.define('pm-panel', class extends HTMLElement {
       .indexOf(this.privmsgName.toLowerCase()) >= 0) {
       throw new Error('_createPrivateMessageEl: PP panel already exist');
     }
+
+    this._setFixedElementTitles();
 
     // Add to local browser list of open channels
     window.globals.webState.activePrivateMessageNicks.push(this.privmsgName.toLowerCase());

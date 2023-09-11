@@ -433,6 +433,26 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
   };
 
   /**
+   * Add "title" attribute for mouse hover tool-tips.
+   */
+  _setFixedElementTitles = () => {
+    this.shadowRoot.getElementById('activeChannelCountIconId').title =
+      'Count of the number of active IRC channel panels';
+    this.shadowRoot.getElementById('channelUnreadCountIconId').title =
+      'Count of the total number unread channel messages';
+    this.shadowRoot.getElementById('newChannelNameInputId').title =
+      'Channel name input area';
+    this.shadowRoot.getElementById('newChannelButtonId').title =
+      'Create new IRC channel panel using entered channel name';
+    this.shadowRoot.getElementById('beep1CheckBoxId').title =
+      'When checked, open new channel panels with audio beep enabled';
+    this.shadowRoot.getElementById('beep2CheckBoxId').title =
+      'When checked, open new channel panels with audio beep enabled';
+    this.shadowRoot.getElementById('beep3CheckBoxId').title =
+      'When checked, open new channel panels with audio beep enabled';
+  };
+
+  /**
    * Called once per second as task scheduler, called from js/_afterLoad.js
    */
   timerTickHandler = () => {
@@ -449,6 +469,7 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
   initializePlugin = () => {
     // Load beep sound configuration from local storage
     this._loadBeepEnable();
+    this._setFixedElementTitles();
   }; // initializePlugin()
 
   // add event listeners to connected callback
@@ -777,7 +798,7 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
               // console.log('adding ' + window.globals.ircState.channelList[i]);
               const joinButtonEl = document.createElement('button');
               joinButtonEl.textContent = window.globals.ircState.channelList[i];
-              joinButtonEl.setAttribute('title', 'Join IRC Channel');
+              joinButtonEl.setAttribute('title', '/JOIN this preset IRC Channel');
               joinButtonEl.classList.add('mr7');
               joinButtonEl.id = 'joinButton' + i.toString();
               channelJoinButtonContainerEl.appendChild(joinButtonEl);

@@ -6,9 +6,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Next v2.0.0-dev.15 2023-09-10 (Draft)
+## Next v2.0.0-dev.16 2023-09-11 (Draft)
 
 Work in progress, see top of README.md
+
+Commit
+
+HTML Browser side changes
+- Update button 'title' attributes for buttons on many panels to serve as mouse-over tooltips.
+- Fix channel panel continuing to show nicknames in list after being kicked or /part command
+- Additional description added to web logout panel
+
+Backend server changes
+
+- Backend, upgrade packages: express-rate-limit@6.11.1, ws@8.14.1, redis@4.6.8
+- Upgrade dev dependency eslint@8.49.0 and it'd dependencies to latest
+
+Commit 6a4b062
 
 - Fixed, user MODE not display correctly, with multiple different nickname in cache.
 

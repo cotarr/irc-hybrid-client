@@ -487,8 +487,9 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       this.shadowRoot.getElementById('notInChannelIconId').removeAttribute('hidden');
       this.shadowRoot.getElementById('sendButtonId').setAttribute('disabled', '');
       this.shadowRoot.getElementById('panelMessageInputId').setAttribute('disabled', '');
+      this.shadowRoot.getElementById('panelNickListId').value = '';
     }
-  };
+  }; // updateVisibility
 
   /**
    * Button event handler to hide panel
@@ -2154,6 +2155,58 @@ window.customElements.define('channel-panel', class extends HTMLElement {
   };
 
   /**
+   * Add "title" attribute for mouse hover tool-tips.
+   */
+  _setFixedElementTitles = () => {
+    this.shadowRoot.getElementById('beenKickedIconId').title =
+      'Your nickname has been kicked from this IRC channel, use Join button to return';
+    this.shadowRoot.getElementById('notInChannelIconId').title =
+      'Your nickname is not present thin this IRC channel, use Join button to return';
+    this.shadowRoot.getElementById('nickCountIconId').title =
+      'Count of nicknames present in this channel';
+    this.shadowRoot.getElementById('messageCountIconId').title =
+      'Count of unread messages for this channel';
+    this.shadowRoot.getElementById('joinButtonId').title =
+      'Send /JOIN command to IRC server to re-join this channel';
+    this.shadowRoot.getElementById('pruneButtonId').title =
+      'Delete this panel and remove all related messages from remote message cache';
+    this.shadowRoot.getElementById('partButtonId').title =
+      'Send /PART command to IRC server to leave this channel. Panel remains visible';
+    this.shadowRoot.getElementById('zoomButtonId').title =
+      'Block other panels from opening. Expand textarea to fill browser viewport.';
+    this.shadowRoot.getElementById('panelMessageInputId').title =
+      'Channel message input area. IRC commands starting with / are accepted';
+    this.shadowRoot.getElementById('sendButtonId').title =
+      'Send channel message or IRC command to IRC server';
+    this.shadowRoot.getElementById('bottomCollapseButtonId').title =
+      'Show more options for this panel';
+    this.shadowRoot.getElementById('multiLineSendButtonId').title =
+      'Using timer, send multi-line message one line at a time';
+    this.shadowRoot.getElementById('refreshButtonId').title =
+      'Refresh from IRC message cache';
+    this.shadowRoot.getElementById('clearButtonId').title =
+      'Clear Text Area (Does not clear cache)';
+    this.shadowRoot.getElementById('tallerButtonId').title =
+      'Enlarge Channel Text Area Vertically';
+    this.shadowRoot.getElementById('normalButtonId').title =
+      'Restore Channel Area to default size';
+    this.shadowRoot.getElementById('noScrollCheckboxId').title =
+      'To allow scroll back to copy older messages to clipboard. ' +
+      'Scroll textarea to new messages is inhibited.';
+    this.shadowRoot.getElementById('briefCheckboxId').title =
+      'Optimize message format to fit mobile device narrow screen';
+    this.shadowRoot.getElementById('autocompleteCheckboxId').title =
+      'Enable with trigger (tab) or (space-space) on mobile, ' +
+      'disable if space character conflict with input';
+    this.shadowRoot.getElementById('beep1CheckBoxId').title =
+      'Enable audio beep sound for each incoming message';
+    this.shadowRoot.getElementById('beep2CheckBoxId').title =
+      'Enable audio beep sound when new nickname joins channel';
+    this.shadowRoot.getElementById('beep3CheckBoxId').title =
+      'Enable audio beep sound when your own nickname is identified in text';
+  };
+
+  /**
    * Called once per second as task scheduler, called from js/_afterLoad.js
    */
   timerTickHandler = () => {
@@ -2184,6 +2237,8 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     );
 
     this.channelIndex = window.globals.ircState.channels.indexOf(this.channelName.toLowerCase());
+
+    this._setFixedElementTitles();
 
     this.shadowRoot.getElementById('panelDivId').setAttribute('lastDate', '0000-00-00');
 

@@ -271,8 +271,9 @@ if(!lastLoginUser)window.localStorage.clear();else if('userid'in lastLoginUser&&
 ;if(err.status)message='HTTP status error, '+err.status.toString()+' '+err.statusText+', '+fetchOptions.method+' '+fetchURL;if(err.remoteErrorText)message+=', '+err.remoteErrorText
 ;const error=new Error(message);message=message.split('\n')[0];document.getElementById('errorPanel').showError('Error retrieving user info: '+message);reject(error)})})})
 ;window.customElements.define('websocket-panel',class extends HTMLElement{constructor(){super();const template=document.getElementById('websocketPanelTemplate');const templateContent=template.content
-;this.attachShadow({mode:'open'}).appendChild(templateContent.cloneNode(true));this.firstConnect=true}showPanel=()=>{this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible','')}
-;collapsePanel=()=>{this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible')};hidePanel=()=>{this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible')}
+;this.attachShadow({mode:'open'}).appendChild(templateContent.cloneNode(true));this.firstConnect=true}_scrollToTop=()=>{this.focus();const newVertPos=window.scrollY+this.getBoundingClientRect().top-50
+;window.scrollTo({top:newVertPos,behavior:'smooth'})};showPanel=()=>{this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible','');this._scrollToTop()};collapsePanel=()=>{
+this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible')};hidePanel=()=>{this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible')}
 ;_updateWebsocketStatus=()=>{if(!window.globals.webState.webConnected){document.dispatchEvent(new CustomEvent('web-connect-changed'));this.showPanel()
 ;document.dispatchEvent(new CustomEvent('hide-all-panels',{detail:{except:['websocketPanel']}}))}else if(window.globals.webState.webConnecting){
 document.dispatchEvent(new CustomEvent('web-connect-changed'));this.showPanel();document.dispatchEvent(new CustomEvent('hide-all-panels',{detail:{except:['websocketPanel']}}))
@@ -1458,9 +1459,16 @@ const targetNickname=pmNickNameInputEl.value;const message='PRIVMSG '+targetNick
 this.shadowRoot.getElementById('openPmWithBeepCheckBoxId').checked=false;this.removeAttribute('beep-enabled');let beepEnableObj=null
 ;beepEnableObj=JSON.parse(window.localStorage.getItem('privMsgBeep'));if(beepEnableObj&&'object'===typeof beepEnableObj)if(beepEnableObj.beep){
 this.shadowRoot.getElementById('openPmWithBeepCheckBoxId').checked=true;this.setAttribute('beep-enabled','')}else{this.shadowRoot.getElementById('openPmWithBeepCheckBoxId').checked=false
-;this.removeAttribute('beep-enabled')}};timerTickHandler=()=>{const privmsgElements=document.getElementById('pmContainerId');const privmsgEls=Array.from(privmsgElements.children)
-;privmsgEls.forEach(pmEl=>{pmEl.timerTickHandler()})};initializePlugin=()=>{this._loadBeepEnable()};connectedCallback(){
-this.shadowRoot.getElementById('closePanelButtonId').addEventListener('click',()=>{this.hidePanel()});this.shadowRoot.getElementById('collapsePanelButtonId').addEventListener('click',()=>{
+;this.removeAttribute('beep-enabled')}};_setFixedElementTitles=()=>{this.shadowRoot.getElementById('activePmCountIconId').title='Count of the number of active private message panels'
+;this.shadowRoot.getElementById('pmUnreadCountIconId').title='Count of the total number unread private messages'
+;this.shadowRoot.getElementById('eraseButtonId').title='Erase all private message from remote message cache'
+;this.shadowRoot.getElementById('pmNickNameInputId').title='The IRC nickname to be recipient of private message or /whois query'
+;this.shadowRoot.getElementById('whoisButtonId').title='Perform irc /WHOIS query on entered nickname, results in server panel'
+;this.shadowRoot.getElementById('panelMessageInputId').title='Private message input area';this.shadowRoot.getElementById('sendButtonId').title='Send private message (PM)'
+;this.shadowRoot.getElementById('openPmWithBeepCheckBoxId').title='If checked, open new PM panels with audio beep enabled'};timerTickHandler=()=>{
+const privmsgElements=document.getElementById('pmContainerId');const privmsgEls=Array.from(privmsgElements.children);privmsgEls.forEach(pmEl=>{pmEl.timerTickHandler()})};initializePlugin=()=>{
+this._loadBeepEnable();this._setFixedElementTitles()};connectedCallback(){this.shadowRoot.getElementById('closePanelButtonId').addEventListener('click',()=>{this.hidePanel()})
+;this.shadowRoot.getElementById('collapsePanelButtonId').addEventListener('click',()=>{
 if(this.shadowRoot.getElementById('panelCollapsedDivId').hasAttribute('visible'))this.collapsePanel();else this.showPanel()})
 ;this.shadowRoot.getElementById('panelMessageInputId').addEventListener('input',event=>{const displayUtilsEl=document.getElementById('displayUtils')
 ;if('insertText'===event.inputType&&null===event.data){displayUtilsEl.stripOneCrLfFromElement(this.shadowRoot.getElementById('panelMessageInputId'));this._buildPrivateMessageText()}
@@ -1619,9 +1627,17 @@ const panelMessageDisplayEl=this.shadowRoot.getElementById('panelMessageDisplayI
 ;errorString+=' '+document.getElementById('globVar').constants('cacheErrorString')+'\n\n';this.shadowRoot.getElementById('panelMessageDisplayId').value=errorString};_handleEraseBeforeReload=()=>{
 this._removeSelfFromDOM()};_handleEraseAllButton=()=>{document.getElementById('ircControlsPanel').eraseIrcCache('PRIVMSG').then(()=>{
 if(!window.globals.webState.cacheReloadInProgress)document.dispatchEvent(new CustomEvent('update-from-cache'))}).catch(err=>{console.log(err)
-;let message=err.message||err.toString()||'Error occurred calling /irc/connect';message=message.split('\n')[0];document.getElementById('errorPanel').showError(message)})};timerTickHandler=()=>{
-if(this.activityIconInhibitTimer>0)this.activityIconInhibitTimer--};initializePlugin=parsedMessage=>{const managePmPanelsEl=document.getElementById('managePmPanels')
-;if(window.globals.webState.activePrivateMessageNicks.indexOf(this.privmsgName.toLowerCase())>=0)throw new Error('_createPrivateMessageEl: PP panel already exist')
+;let message=err.message||err.toString()||'Error occurred calling /irc/connect';message=message.split('\n')[0];document.getElementById('errorPanel').showError(message)})};_setFixedElementTitles=()=>{
+this.shadowRoot.getElementById('messageCountIconId').title='Unread Message Count'
+;this.shadowRoot.getElementById('panelMessageInputId').title='Private message input area. IRC commands starting with / are accepted'
+;this.shadowRoot.getElementById('sendButtonId').title='Send primate message or IRC command to IRC server'
+;this.shadowRoot.getElementById('bottomCollapseButtonId').title='Show more options for this panel'
+;this.shadowRoot.getElementById('multiLineSendButtonId').title='Using timer, send multi-line message one line at a time'
+;this.shadowRoot.getElementById('tallerButtonId').title='Enlarge PM Text Area Vertically';this.shadowRoot.getElementById('normalButtonId').title='Restore PM Area to default size'
+;this.shadowRoot.getElementById('eraseButtonId').title='Remove all private messages from remote message cache'
+;this.shadowRoot.getElementById('beepCheckBoxId').title='When checked emit audio beep sound for each message'};timerTickHandler=()=>{if(this.activityIconInhibitTimer>0)this.activityIconInhibitTimer--}
+;initializePlugin=parsedMessage=>{const managePmPanelsEl=document.getElementById('managePmPanels')
+;if(window.globals.webState.activePrivateMessageNicks.indexOf(this.privmsgName.toLowerCase())>=0)throw new Error('_createPrivateMessageEl: PP panel already exist');this._setFixedElementTitles()
 ;window.globals.webState.activePrivateMessageNicks.push(this.privmsgName.toLowerCase());window.globals.webState.activePrivateMessageCsNicks.push(this.privmsgCsName)
 ;document.getElementById('navMenu').handlePmListUpdate();this.shadowRoot.getElementById('pmNameDivId').textContent=this.privmsgCsName;this._handleColorThemeChanged({detail:{
 theme:document.querySelector('body').getAttribute('theme')}});const panelDivEl=this.shadowRoot.getElementById('panelDivId');if(panelDivEl.getAttribute('lastDate')!==parsedMessage.datestamp){
@@ -1694,9 +1710,16 @@ const beep1CheckBoxEl=this.shadowRoot.getElementById('beep1CheckBoxId');const be
 defaultChannelBeepsObj=JSON.parse(window.localStorage.getItem('defaultChannelBeepEnable'))}catch(error){}if(defaultChannelBeepsObj){
 if(defaultChannelBeepsObj.beep1)this.setAttribute('beep1-enabled','');else this.removeAttribute('beep1-enabled')
 ;if(defaultChannelBeepsObj.beep2)this.setAttribute('beep2-enabled','');else this.removeAttribute('beep2-enabled')
-;if(defaultChannelBeepsObj.beep3)this.setAttribute('beep3-enabled','');else this.removeAttribute('beep3-enabled');this._updateVisibility()}};timerTickHandler=()=>{
+;if(defaultChannelBeepsObj.beep3)this.setAttribute('beep3-enabled','');else this.removeAttribute('beep3-enabled');this._updateVisibility()}};_setFixedElementTitles=()=>{
+this.shadowRoot.getElementById('activeChannelCountIconId').title='Count of the number of active IRC channel panels'
+;this.shadowRoot.getElementById('channelUnreadCountIconId').title='Count of the total number unread channel messages'
+;this.shadowRoot.getElementById('newChannelNameInputId').title='Channel name input area'
+;this.shadowRoot.getElementById('newChannelButtonId').title='Create new IRC channel panel using entered channel name'
+;this.shadowRoot.getElementById('beep1CheckBoxId').title='When checked, open new channel panels with audio beep enabled'
+;this.shadowRoot.getElementById('beep2CheckBoxId').title='When checked, open new channel panels with audio beep enabled'
+;this.shadowRoot.getElementById('beep3CheckBoxId').title='When checked, open new channel panels with audio beep enabled'};timerTickHandler=()=>{
 const channelsElements=document.getElementById('channelsContainerId');const channelEls=Array.from(channelsElements.children);channelEls.forEach(chanEl=>{chanEl.timerTickHandler()})}
-;initializePlugin=()=>{this._loadBeepEnable()};connectedCallback(){this.shadowRoot.getElementById('closePanelButtonId').addEventListener('click',()=>{this.hidePanel()})
+;initializePlugin=()=>{this._loadBeepEnable();this._setFixedElementTitles()};connectedCallback(){this.shadowRoot.getElementById('closePanelButtonId').addEventListener('click',()=>{this.hidePanel()})
 ;this.shadowRoot.getElementById('collapsePanelButtonId').addEventListener('click',()=>{
 if(this.shadowRoot.getElementById('panelCollapsedDivId').hasAttribute('visible'))this.collapsePanel();else this.showPanel()})
 ;this.shadowRoot.getElementById('newChannelButtonId').addEventListener('click',()=>{this._joinNewChannel()});this.shadowRoot.getElementById('newChannelNameInputId').addEventListener('input',event=>{
@@ -1739,7 +1762,7 @@ const channelJoinButtonContainerEl=this.shadowRoot.getElementById('channelJoinBu
 channelJoinButtonContainerEl.firstChild.removeEventListener('click',this._handleChannelButtonClick);channelJoinButtonContainerEl.removeChild(channelJoinButtonContainerEl.firstChild)}
 if(window.globals.ircState.channelList.length>0)for(let i=0;i<window.globals.ircState.channelList.length;i++){
 const channelIndex=window.globals.ircState.channels.indexOf(window.globals.ircState.channelList[i].toLowerCase());if(channelIndex<0||!window.globals.ircState.channelStates[channelIndex].joined){
-const joinButtonEl=document.createElement('button');joinButtonEl.textContent=window.globals.ircState.channelList[i];joinButtonEl.setAttribute('title','Join IRC Channel')
+const joinButtonEl=document.createElement('button');joinButtonEl.textContent=window.globals.ircState.channelList[i];joinButtonEl.setAttribute('title','/JOIN this preset IRC Channel')
 ;joinButtonEl.classList.add('mr7');joinButtonEl.id='joinButton'+i.toString();channelJoinButtonContainerEl.appendChild(joinButtonEl)
 ;joinButtonEl.addEventListener('click',this._handleChannelButtonClick)}}else{const noPresetsWarningDivEl=document.createElement('div')
 ;noPresetsWarningDivEl.textContent='(No IRC channel presets defined)';channelJoinButtonContainerEl.appendChild(noPresetsWarningDivEl)}}});document.addEventListener('show-all-panels',event=>{
@@ -1799,8 +1822,9 @@ this.shadowRoot.getElementById('joinButtonId').removeAttribute('hidden');this.sh
 ;this.shadowRoot.getElementById('partButtonId').setAttribute('hidden','')}if(window.globals.ircState.channelStates[ircStateIndex].joined){
 this.shadowRoot.getElementById('notInChannelIconId').setAttribute('hidden','');this.shadowRoot.getElementById('sendButtonId').removeAttribute('disabled')
 ;this.shadowRoot.getElementById('panelMessageInputId').removeAttribute('disabled')}else{this.shadowRoot.getElementById('notInChannelIconId').removeAttribute('hidden')
-;this.shadowRoot.getElementById('sendButtonId').setAttribute('disabled','');this.shadowRoot.getElementById('panelMessageInputId').setAttribute('disabled','')}};_handleCloseButton=()=>{this.hidePanel()
-};_handleCollapseButton=()=>{if(this.shadowRoot.getElementById('panelCollapsedDivId').hasAttribute('visible'))this.collapsePanel();else{this.showPanel();this._scrollTextAreaToRecent()
+;this.shadowRoot.getElementById('sendButtonId').setAttribute('disabled','');this.shadowRoot.getElementById('panelMessageInputId').setAttribute('disabled','')
+;this.shadowRoot.getElementById('panelNickListId').value=''}};_handleCloseButton=()=>{this.hidePanel()};_handleCollapseButton=()=>{
+if(this.shadowRoot.getElementById('panelCollapsedDivId').hasAttribute('visible'))this.collapsePanel();else{this.showPanel();this._scrollTextAreaToRecent()
 ;this.shadowRoot.getElementById('noScrollCheckboxId').checked=false}};_handleClearButton=()=>{this.shadowRoot.getElementById('panelMessageDisplayId').value=''
 ;this.shadowRoot.getElementById('panelDivId').setAttribute('lastDate','0000-00-00');this.shadowRoot.getElementById('panelNickListId').setAttribute('rows',this.textareaHeightInRows)
 ;this.shadowRoot.getElementById('panelMessageDisplayId').setAttribute('rows',this.textareaHeightInRows);this.shadowRoot.getElementById('panelMessageInputId').setAttribute('rows','1')}
@@ -2051,13 +2075,32 @@ if(event.detail.except!==this.id)this.collapsePanel()}else if(Array.isArray(even
 ;_handleHideAllPanels=event=>{if(event.detail&&event.detail.except){if('string'===typeof event.detail.except){if(event.detail.except!==this.id)this.hidePanel()
 }else if(Array.isArray(event.detail.except))if(event.detail.except.indexOf(this.id)<0)this.hidePanel()}else this.hidePanel()};_handleShowAllPanels=event=>{if(event.detail&&event.detail.except){
 if('string'===typeof event.detail.except){if(event.detail.except!==this.id)this.showPanel()}else if(Array.isArray(event.detail.except))if(event.detail.except.indexOf(this.id)<0)this.showPanel()
-}else this.showPanel()};timerTickHandler=()=>{if(this.activityIconInhibitTimer>0)this.activityIconInhibitTimer--};initializePlugin=()=>{
-const manageChannelsPanelEl=document.getElementById('manageChannelsPanel')
+}else this.showPanel()};_setFixedElementTitles=()=>{this.shadowRoot.getElementById('beenKickedIconId').title='Your nickname has been kicked from this IRC channel, use Join button to return'
+;this.shadowRoot.getElementById('notInChannelIconId').title='Your nickname is not present thin this IRC channel, use Join button to return'
+;this.shadowRoot.getElementById('nickCountIconId').title='Count of nicknames present in this channel'
+;this.shadowRoot.getElementById('messageCountIconId').title='Count of unread messages for this channel'
+;this.shadowRoot.getElementById('joinButtonId').title='Send /JOIN command to IRC server to re-join this channel'
+;this.shadowRoot.getElementById('pruneButtonId').title='Delete this panel and remove all related messages from remote message cache'
+;this.shadowRoot.getElementById('partButtonId').title='Send /PART command to IRC server to leave this channel. Panel remains visible'
+;this.shadowRoot.getElementById('zoomButtonId').title='Block other panels from opening. Expand textarea to fill browser viewport.'
+;this.shadowRoot.getElementById('panelMessageInputId').title='Channel message input area. IRC commands starting with / are accepted'
+;this.shadowRoot.getElementById('sendButtonId').title='Send channel message or IRC command to IRC server'
+;this.shadowRoot.getElementById('bottomCollapseButtonId').title='Show more options for this panel'
+;this.shadowRoot.getElementById('multiLineSendButtonId').title='Using timer, send multi-line message one line at a time'
+;this.shadowRoot.getElementById('refreshButtonId').title='Refresh from IRC message cache';this.shadowRoot.getElementById('clearButtonId').title='Clear Text Area (Does not clear cache)'
+;this.shadowRoot.getElementById('tallerButtonId').title='Enlarge Channel Text Area Vertically';this.shadowRoot.getElementById('normalButtonId').title='Restore Channel Area to default size'
+;this.shadowRoot.getElementById('noScrollCheckboxId').title='To allow scroll back to copy older messages to clipboard. '+'Scroll textarea to new messages is inhibited.'
+;this.shadowRoot.getElementById('briefCheckboxId').title='Optimize message format to fit mobile device narrow screen'
+;this.shadowRoot.getElementById('autocompleteCheckboxId').title='Enable with trigger (tab) or (space-space) on mobile, '+'disable if space character conflict with input'
+;this.shadowRoot.getElementById('beep1CheckBoxId').title='Enable audio beep sound for each incoming message'
+;this.shadowRoot.getElementById('beep2CheckBoxId').title='Enable audio beep sound when new nickname joins channel'
+;this.shadowRoot.getElementById('beep3CheckBoxId').title='Enable audio beep sound when your own nickname is identified in text'};timerTickHandler=()=>{
+if(this.activityIconInhibitTimer>0)this.activityIconInhibitTimer--};initializePlugin=()=>{const manageChannelsPanelEl=document.getElementById('manageChannelsPanel')
 ;if(window.globals.webState.channels.indexOf(this.channelName.toLowerCase())>=0)throw new Error('createChannelEl: channel already exist')
 ;window.globals.webState.channels.push(this.channelName.toLowerCase());this.initIrcStateIndex=window.globals.ircState.channels.indexOf(this.channelName.toLowerCase())
 ;window.globals.webState.channelStates.push({lastJoined:window.globals.ircState.channelStates[this.initIrcStateIndex].joined})
-;this.channelIndex=window.globals.ircState.channels.indexOf(this.channelName.toLowerCase());this.shadowRoot.getElementById('panelDivId').setAttribute('lastDate','0000-00-00')
-;this.shadowRoot.getElementById('channelNameDivId').textContent=this.channelCsName
+;this.channelIndex=window.globals.ircState.channels.indexOf(this.channelName.toLowerCase());this._setFixedElementTitles()
+;this.shadowRoot.getElementById('panelDivId').setAttribute('lastDate','0000-00-00');this.shadowRoot.getElementById('channelNameDivId').textContent=this.channelCsName
 ;this.shadowRoot.getElementById('channelTopicDivId').textContent=document.getElementById('displayUtils').cleanFormatting(window.globals.ircState.channelStates[this.channelIndex].topic)
 ;this._loadBeepEnable();if(window.globals.webState.dynamic.panelPxWidth<this.mobileBreakpointPx){this.shadowRoot.getElementById('panelDivId').setAttribute('brief-enabled','')
 ;this.shadowRoot.getElementById('briefCheckboxId').checked=true}else{this.shadowRoot.getElementById('panelDivId').removeAttribute('brief-enabled')
