@@ -6,11 +6,89 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Next v2.0.0-dev.18 2023-09-11 (Draft)
+## [v2.0.0](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.0.0) 2023-09-12
 
-Work in progress, see top of README.md
+- Major upgrade: version v2.0.0 merged into master branch to replace v0.2.53 2023-09-12
 
-Commit
+### Version v2 Description
+
+This is a reorganization of the frontend web browser HTML and JavaScript into multiple web components.
+
+Motivation: The previous web browser code consisted of a web page based on
+a single block of HTML code and a single block of JavaScript.
+As the program evolved and increased in size, it has become difficult to maintain. 
+The HTML code was within a single scope with all HTML element id, class, 
+and css style declarations inside one single web page DOM. 
+Although the web browser JavaScript was split to 11 files, this was simply 
+an editing convenience. All the JavaScript files were concatenated together 
+for execution as a single script with one namespace. Splitting the web 
+browser into separate web component files will allow each panel in the user interface to 
+have it's own shadow DOM where the scope of element tags, classes, styles and JavaScript 
+are isolated inside the shadow DOM of the web component.
+
+### Post upgrade user actions:
+
+- After pulling changes from GitHub, a fresh `npm install` or `npm ci` is required.
+- Installations that use custom mp3 sound files will need to move the custom sound files to the build-prod/sounds/ folder.
+
+### Coding notes
+
+- No web component framework has been used. Chrome supports v1 web components using native code.
+- The build process will continue to use gulp to bundle and minify, similar to the previous version.
+- The gulp build tools are located in a separate repository "irc-hybrid-client-dev-tools".
+- Web component HTML template files will be concatenated into a single HTML file in both dev and prod builds.
+- CSS style names inside each web component will be prefixed with a unique string identifier. All CSS will be concatenated into a single css style file.
+- In the dev build, all JavaScript files will remain separate to allow js error message line numbers to match in both editor and web browser.
+- In the prod build, all JavaScript will be bundled into a single file and minified.
+- The gulp script will modify javascript file URLs in the HTML source files in both dev and prod to match the bundling configuration.
+- The previous frontend web browser code and folders was deleted at the start of the edit. This is to avoid text editor global text search hits on the old version.
+- To avoid duplication of source files, the "build-dev" folder will be cleaned during build and build-dev files will not be committed to git.
+- Step by step notes of changes recorded into the CHANGELOG.md file.
+
+### Approach
+
+As much as possible, existing IRC client code will be used as-is. Extensive variable name substitutions 
+were necessary to reference functions, variables and attributes across different web components.
+
+To simplify things, no significant changes were made to the backend NodeJs server except for file location of 
+web server root directory location to accommodate the build-dev and build-prod folders.
+A few other minor backend edits were not significant and they are listed in the changelog.
+
+New features:
+
+- New integrated IRC server list capable to /JOIN an IRC server directly from buttons in the table of server definitions.
+- New IRC server definition editor panel that can be invoked from the server list.
+- New Keyboard Hotkeys to show or hide various panels and step through IRC channels. The list of hotkeys is in the help panel.
+- New status bar at top of page with improved icons. Unread message icons will auto-open panels when clicked or tapped.
+- New "Zoom" mode in channel panel sets rows and cols of textarea to fill screen and blocks other panels from opening when zoom is active.
+- The web browser websocket connection has been redefined as 'web page Standby'.
+- Added a new dropdown navigation menu with IRC channel panels and PM panels dynamically inserted into the dropdown menu.
+- Unread message indicators displayed in the drop down menu.
+
+### Project File Structure
+
+Before (V0.2.53)
+
+| Source Files                            | Minified files (3 files)           |
+| --------------------------------------- | ---------------------------------- |
+| secure/webclient.html  (single file)    | secure-minify/webclient.html       |
+| secure/css/styles.css  (single file)    | secure-minify/css/styles.css       |
+| secure/js/*.js    (multiple --> single) | secure-minify/js/webclient.js      |
+
+After (V2.0.0-dev)
+
+| Source Files                                  | Development Build (multiple js)    |Bundled, Minified (3 files) |
+| --------------------------------------------- | ---------------------------------- | -------------------------- |
+| source-files/html/*.html                      | build-dev/webclient.html           | build-prod/webclient.html  |
+| source-files/css/*.css (shared css)           | build-dev/css/styles.css           | build-prod/css/styles.css  |
+| source-files/js/*.js (loads page)             | build-dev/js/(*multiple files*).js | build-prod/js/webclient.js |
+| source-files/web-components/*.html,*.css,*.js |                                    |                            |
+
+---
+
+### Changelog of Version v2 upgrade commit history
+
+Commit ec1d225 
 
 - Add handlers so header bar unread message icons now open the associated panel to view message when clicked
 - Change CSS styles of flashing unread message icons detect clicks when flash is transparent.

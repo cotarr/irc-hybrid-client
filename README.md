@@ -1,87 +1,4 @@
-# Branch Notes (Development v2.0.0-dev)
-
-Git branch: web-components
-
-### Work In Progress
-
-Status update: The web-components GitHub branch is now operational for testing. Debugging is in progress, expect rapid changes.
-
-### Description
-
-Description: This is a reorganization of the frontend web browser HTML and JavaScript into multiple web components.
-
-Motivation: The previous web browser code consisted of a web page based on
-a single block of HTML code and a single block of JavaScript.
-As the program evolved and increased in size, it has become difficult to maintain. 
-The HTML code was within a single scope with all HTML element id, class, 
-and css style declarations inside one single web page DOM. 
-Although the web browser JavaScript was split to 11 files, this was simply 
-an editing convenience. All the JavaScript files were concatenated together 
-for execution as a single script with one namespace. Splitting the web 
-browser into web components will allow each separate panel in the user interface to 
-have it's own shadowDOM where the scope of element tags, classes, styles and JavaScript 
-are isolated inside the web component.
-
-### Coding notes
-
-- No web component framework will be used. Chrome supports v1 web components using native code.
-- A dedicated git branch `web-components` has been created for development and debug. It will not be merged to master until it is operational.
-- The build process will continue to use gulp to bundle and minify, similar to the previous version.
-- The gulp build tools are located in a separate repository "irc-hybrid-client-dev-tools" also using development branch `web-components`.
-- Web component HTML template files will be concatenated into a single HTML file in both dev and prod builds.
-- CSS style names inside each web component will be prefixed with a unique string identifier. All CSS will be concatenated into a single css style file.
-- In the dev build, all JavaScript files will remain separate to allow js error message line numbers to match in both editor and web browser.
-- In the prod build, all JavaScript will be bundled into a single file and minified.
-- The gulp script will modify HTML source files in both dev and prod to match the bundling configuration.
-- The previous frontend web browser code and folders will be deleted at the start of the edit. This is to avoid text editor global text search hits on the old version.
-- To avoid duplication of source files, the "build-dev" folder will not be committed to git.
-- Step by step notes of changes recorded into the CHANGELOG.md file.
-
-### Approach
-
-As much as possible, existing IRC client code will be used as-is. Some variable name substitutions 
-will be necessary to accommodate namespace constraints within web components.
-
-To simplify things, no changes to the backend NodeJs server are anticipated except for 
-file location of web server root directory location to accommodate the build-dev and build-prod folders.
-
-New features:
-
-- Dropdown navigation menu with IRC channels dynamically inserted into the menu and count of unread messages in menu.
-- New integrated IRC server list capable to JOIN an IRC server directly from buttons in the server list.
-- IRC server definition editor panel that can be invoked from the server list.
-- Keyboard Hotkeys to show or hide various panels and step through IRC channels. The list of hotkeys is in the help panel.
-- New status bar at top of page with improved icons. The "Web" and "Irc" buttons still functional to connect and disconnect.
-- New "Zoom" mode in channel panel sets rows and cols of textarea to fill screen. (iPhone popup keyboard may be an issue)
-
-### Project File Structure
-
-Before (V0.2.53)
-
-| Source Files                            | Minified files (3 files)           |
-| --------------------------------------- | ---------------------------------- |
-| secure/webclient.html  (single file)    | secure-minify/webclient.html       |
-| secure/css/styles.css  (single file)    | secure-minify/css/styles.css       |
-| secure/js/*.js    (multiple --> single) | secure-minify/js/webclient.js      |
-
-After (V2.0.0-dev)
-
-| Source Files                                  | Development Build (multiple js)    |Bundled, Minified (3 files) |
-| --------------------------------------------- | ---------------------------------- | -------------------------- |
-| source-files/html/*.html                      | build-dev/webclient.html           | build-prod/webclient.html  |
-| source-files/css/*.css (shared css)           | build-dev/css/styles.css           | build-prod/css/styles.css  |
-| source-files/js/*.js (loads page)             | build-dev/js/(*multiple files*).js | build-prod/js/webclient.js |
-| source-files/web-components/*.html,*.css,*.js |                                    |                            |
-
----
-
-End of branch notes
-
----
-
-# irc-hybrid-client (DRAFT)
-
-***TBD - Update for Version 2 in progress ***
+# irc-hybrid-client
 
 Single user hybrid IRC client using JavaScript frontend and Node.js/Express backend.
 
@@ -91,16 +8,15 @@ Screen capture images are available in the [documentation](https://cotarr.github
 
 [ChangeLog.md](https://github.com/cotarr/irc-hybrid-client/blob/master/CHANGELOG.md)
 
+## Version v2 Upgrade Notes
 
-## Upgrade Notes
-
-The frontend browser code was completely rewritten and issued as Version V2.0.0 
-approximately Sept 2023. For a detail description of the changes see
-the CHANGELOG.md file (reference TBD).
+The frontend browser code was completely rewritten and merged into the 
+master branch as Version V2.0.0 on Sept 12, 2023. 
+For a detail description of the changes see the CHANGELOG.md file.
 
 The new version is intended be fully backward compatible. 
-Performing a `git pull` on irc-hybrid-client master branch (after v2 is merged to master, TBD)
-will update both frontend and backend NodeJs files.
+Performing a `git pull` on irc-hybrid-client master branch will update both 
+frontend and backend NodeJs files.
 
 There are no changes to the configuration files on the backend server, so previous 
 configuration should work as-is. There are no changes to the format of the
@@ -108,10 +24,17 @@ configuration should work as-is. There are no changes to the format of the
 of the root directory of the web server has changed (see CHANGELOG.md).
 Version 2 contains a bundled and minified version in the repository.
 
+Installations that use custom mp3 sound files will need to move the sound 
+files to the build-prod/sounds/ folder.
+
 The previous version v0.2.53 of the web browser frontend will no longer be maintained.
 It has been tagged as v1.0.0 to place a clean version boundary to the new version.
+The upgraded version will begin at Version v2.0.0.
+
 If any problems are experienced with Version 2, you can revert the 
-previous version from GitHub (instructions TBD)
+GitHub master branch to the last Version 0.2.53 commit from Aug 07, 2023 commit hash f87c3d4.
+If the Gulp bundler is used, the irc-hybrid-client-dev-tools repository must 
+also be rolled back as described in it's README.md file.
 
 ### Project Status
 
@@ -120,9 +43,14 @@ project back into a period of rapid changes to optimize the user interface.
 The backend core IRC client and web server did not change in the v2 upgrade
 and is mostly stable.
 
+The /docs/ folder has not been upgraded and it still contains Version 0.2.53
+screen capture images. New screen captures are deferred until last minute
+user interface adjustments have been comleted. In general, the /docs/ instructions 
+mostly refer to the backend web server and are still applicable to the new version.
+
 ### Repository Contents
 
-HTML content is available in both the minified-bundled version and
+HTML, CSS, and JavaScript content is available in both the minified-bundled version and
 the commented development version. HTML source files are located in the 
 folder `source-files/`. The production minified build is located 
 in the folder `build-prod/`. Selection is determined by 
@@ -133,13 +61,14 @@ The server files are located in the `server/` folder. The server is launched
 from the socket server in the `bin/` folder.
 
 The repository contains a /docs/ folder with HTML help documentation for the project.
-(Not updated for V2 TBD)
+The /docs/ web pages can be enabled in the web server configuration.
+(The /docs/ are not updated for V2 TBD)
 
 # Installation
 
 There are complete step by step installation instructions in the
 [docmentation](https://cotarr.github.io/irc-hybrid-client).
-The steps listed here are a minimal installation guide for
+The steps listed here in the README.md are a minimal installation guide for
 people very familiar with deploying Node.js/Express servers.
 It is recommended to follow the documentation installation instructions instead.
 
@@ -275,7 +204,7 @@ chmod 600 .env
 It is necessary to assign one web page username and password.
 There is a detailed example in the documentation.
 
-When using credentials.json file as configuration, this must be done after copying 
+When using credentials.json file or .env file as configuration, this must be done after copying 
 the example-credentials.json into the project folder
 
 The user account used for web page login may be created using one of two 
@@ -309,6 +238,7 @@ automatically as "servers.json" in the base folder of the repository.
 Upon the first login to the web page at `/irc/webclient.html`, the 
 browser will automatically display an IRC server edit form. 
 The form is used to define the first IRC server.
+Required fields are marked with a colored dot.
 Instruction related to the form's fields is located in the form itself using help buttons.
 
 After at least one IRC server has been created, the user may initiate a "Connect"
