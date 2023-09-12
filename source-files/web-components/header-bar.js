@@ -316,15 +316,15 @@ customElements.define('header-bar', class extends HTMLElement {
     this.shadowRoot.getElementById('panelZoomIconId').title =
       'Un-zoom panels';
     this.shadowRoot.getElementById('serverUnreadExistIconId').title =
-      'Unread IRC server message';
+      'Unread IRC server message, click to view panel';
     this.shadowRoot.getElementById('channelUnreadExistIconId').title =
-      'Unread IRC channel message';
+      'Unread IRC channel message, click to view panel';
     this.shadowRoot.getElementById('privMsgUnreadExistIconId').title =
-      'Unread Private Message (PM)';
+      'Unread Private Message (PM), click to view panel';
     this.shadowRoot.getElementById('noticeUnreadExistIconId').title =
-      'Unread IRC Notice';
+      'Unread IRC Notice, click to view panel';
     this.shadowRoot.getElementById('wallopsUnreadExistIconId').title =
-      'Unread IRC Wallops';
+      'Unread IRC Wallops, click to view panel';
     this.shadowRoot.getElementById('nickRecovIconId').title =
       'Waiting to recover main nickname';
     this.shadowRoot.getElementById('enableAudioButtonId').title =
@@ -442,12 +442,27 @@ customElements.define('header-bar', class extends HTMLElement {
     this.updateStatusIcons();
     this._setFixedElementTitles();
     this._updateDynamicElementTitles();
-    const timerFlashingDivEl = this.shadowRoot.getElementById('timerFlashingDivId');
     setInterval(() => {
-      if (timerFlashingDivEl.hasAttribute('hidden')) {
-        timerFlashingDivEl.removeAttribute('hidden');
+      const serverIconEl = this.shadowRoot.getElementById('serverUnreadExistIconId');
+      const wallopsIconEl = this.shadowRoot.getElementById('wallopsUnreadExistIconId');
+      const noticeIconEl = this.shadowRoot.getElementById('noticeUnreadExistIconId');
+      const privMsgIconEl = this.shadowRoot.getElementById('privMsgUnreadExistIconId');
+      const channelIconEl = this.shadowRoot.getElementById('channelUnreadExistIconId');
+      const audioIconEl = this.shadowRoot.getElementById('enableAudioButtonId');
+      if (serverIconEl.hasAttribute('flash')) {
+        serverIconEl.removeAttribute('flash');
+        wallopsIconEl.removeAttribute('flash');
+        noticeIconEl.removeAttribute('flash');
+        privMsgIconEl.removeAttribute('flash');
+        channelIconEl.removeAttribute('flash');
+        audioIconEl.removeAttribute('flash');
       } else {
-        timerFlashingDivEl.setAttribute('hidden', '');
+        serverIconEl.setAttribute('flash', '');
+        wallopsIconEl.setAttribute('flash', '');
+        noticeIconEl.setAttribute('flash', '');
+        privMsgIconEl.setAttribute('flash', '');
+        channelIconEl.setAttribute('flash', '');
+        audioIconEl.setAttribute('flash', '');
       }
     }, 500);
   };
@@ -480,31 +495,20 @@ customElements.define('header-bar', class extends HTMLElement {
       document.dispatchEvent(new CustomEvent('cancel-zoom'));
     });
 
-    const _cancelFlashingIcons = () => {
-      this.removeAttribute('servericon');
-      this.removeAttribute('channelicon');
-      this.removeAttribute('privmsgicon');
-      this.removeAttribute('noticeicon');
-      this.removeAttribute('wallopsicon');
-    };
-
-    this.shadowRoot.getElementById('wholeBarId').addEventListener('click', () => {
-      _cancelFlashingIcons();
-    });
     this.shadowRoot.getElementById('serverUnreadExistIconId').addEventListener('click', () => {
-      _cancelFlashingIcons();
+      document.getElementById('ircServerPanel').showPanel();
     });
     this.shadowRoot.getElementById('channelUnreadExistIconId').addEventListener('click', () => {
-      _cancelFlashingIcons();
+      document.getElementById('manageChannelsPanel').handleHeaderBarActivityIconClick();
     });
     this.shadowRoot.getElementById('privMsgUnreadExistIconId').addEventListener('click', () => {
-      _cancelFlashingIcons();
+      document.getElementById('managePmPanels').handleHeaderBarActivityIconClick();
     });
     this.shadowRoot.getElementById('noticeUnreadExistIconId').addEventListener('click', () => {
-      _cancelFlashingIcons();
+      document.getElementById('noticePanel').showPanel();
     });
     this.shadowRoot.getElementById('wallopsUnreadExistIconId').addEventListener('click', () => {
-      _cancelFlashingIcons();
+      document.getElementById('wallopsPanel').showPanel();
     });
 
     this.shadowRoot.getElementById('collapseAllButtonId').addEventListener('click', () => {

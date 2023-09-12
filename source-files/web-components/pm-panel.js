@@ -47,6 +47,7 @@
 //
 // Public Methods
 //   showPanel()
+//   showAndScrollPanel()
 //   collapsePanel()
 //   hidePanel()
 //   displayPmMessage(parsedMessage)
@@ -284,6 +285,18 @@ window.customElements.define('pm-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('bottomCollapseDivId').setAttribute('hidden', '');
     this._updateVisibility();
     document.dispatchEvent(new CustomEvent('cancel-zoom'));
+    this._scrollTextAreaToRecent();
+    this._scrollToTop();
+    this.shadowRoot.getElementById('panelMessageInputId').focus();
+  };
+
+  /**
+   * Intended for use with dropdown menu and unread message icon click.
+   * This bypasses logic to inhibit scroll and visibility
+   */
+  showAndScrollPanel = () => {
+    this._resetMessageCount();
+    this.showPanel();
     this._scrollTextAreaToRecent();
     this._scrollToTop();
     this.shadowRoot.getElementById('panelMessageInputId').focus();

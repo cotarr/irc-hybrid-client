@@ -45,6 +45,9 @@
 //    showPanel()
 //    collapsePanel()
 //    hidePanel()
+//    handleHotKey()
+//    handleHotKeyNextChannel()
+//    handleHeaderBarActivityIconClick()
 //    displayChannelMessage(parsedMessage)   Open panel if needed, route messages to channel panels
 //    displayChannelNoticeMessage(ParsedMessage)  Notices to channel
 //
@@ -186,6 +189,21 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
     });
     // hide the manage-channels-panel when viewing cycled channels
     this.hidePanel();
+  };
+
+  /**
+   * Open one channel panel each time called when UnreadMessageCount is greater than 0
+   * This is called from the header bar unread message activity icon click event
+   */
+  handleHeaderBarActivityIconClick = () => {
+    const panelEls = Array.from(document.getElementById('channelsContainerId').children);
+    let once = true;
+    panelEls.forEach((panelEl) => {
+      if ((once) && (panelEl.unreadMessageCount > 0)) {
+        once = false;
+        panelEl.showAndScrollPanel();
+      }
+    });
   };
 
   /**

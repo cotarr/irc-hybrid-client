@@ -102,6 +102,7 @@ window.customElements.define('wallops-panel', class extends HTMLElement {
     };
 
     if ((!window.globals.webState.cacheReloadInProgress) &&
+      (!this.shadowRoot.getElementById('panelVisibilityDivId').hasAttribute('visible')) &&
       (!document.querySelector('body').hasAttribute('zoomId'))) {
       this.showPanel();
     }

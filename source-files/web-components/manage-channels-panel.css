@@ -6,13 +6,19 @@
   border: 1px solid black;
   color: black;
 }
+.channel-panel-theme-light[flash] {
+  background-color: rgba(0,0,0,0);
+  color: rgba(0,0,0,0);
+}
 .channel-panel-theme-dark {
   background-color: #005e03;
   border: 1px solid #99dd9b;
   color: white;
 }
-
-
+.channel-panel-theme-dark[flash] {
+  background-color: rgba(0,0,0,0);
+  color: rgba(0,0,0,0);
+}
 .channel-panel-name-div {
   display: inline-block;
   font-size: 120%;

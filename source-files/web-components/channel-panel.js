@@ -55,6 +55,7 @@
 //
 // Public Methods:
 //   showPanel()
+//   showAndScrollPanel()
 //   collapsePanel()
 //   hidePanel()
 //   displayChannelMessage(parsedMessage)
@@ -394,6 +395,18 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     if (document.querySelector('body').hasAttribute('zoomId')) {
       document.dispatchEvent(new CustomEvent('cancel-zoom'));
     }
+  };
+
+  /**
+   * Intended for use with dropdown menu and unread message icon click.
+   * This bypasses logic to inhibit scroll and visibility
+   */
+  showAndScrollPanel = () => {
+    this._resetMessageCount();
+    this.showPanel();
+    this._scrollTextAreaToRecent();
+    this._scrollToTop();
+    this.shadowRoot.getElementById('panelMessageInputId').focus();
   };
 
   /**

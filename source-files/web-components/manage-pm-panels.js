@@ -31,6 +31,7 @@
 //   showPanel()
 //   collapsePanel()
 //   hidePanel()
+//   handleHeaderBarActivityIconClick()
 //   setLastPmPanel(pmPanelName, state)
 //   displayPrivateMessage(parsedMessage)
 //
@@ -112,6 +113,21 @@ window.customElements.define('manage-pm-panels', class extends HTMLElement {
   hidePanel = () => {
     this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible');
     this.shadowRoot.getElementById('panelCollapsedDivId').removeAttribute('visible');
+  };
+
+  /**
+   * Open one channel panel each time called when UnreadMessageCount is greater than 0
+   * This is called from the header bar unread message activity icon click event
+   */
+  handleHeaderBarActivityIconClick = () => {
+    const panelEls = Array.from(document.getElementById('pmContainerId').children);
+    let once = true;
+    panelEls.forEach((panelEl) => {
+      if ((once) && (panelEl.unreadMessageCount > 0)) {
+        once = false;
+        panelEl.showAndScrollPanel();
+      }
+    });
   };
 
   /**

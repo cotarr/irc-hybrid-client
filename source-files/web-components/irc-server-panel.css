@@ -6,10 +6,18 @@
   border: 1px solid black;
   color: black;
 }
+.irc-server-panel-theme-light[flash] {
+  background-color: rgba(0,0,0,0);
+  color: rgba(0,0,0,0);
+}
 .irc-server-panel-theme-dark {
   background-color: #6f449c;
   border: 1px solid #ae8ed1;
   color: white;
+}
+.irc-server-panel-theme-dark[flash] {
+  background-color: rgba(0,0,0,0);
+  color: rgba(0,0,0,0);
 }
 
 .irc-server-panel-div-time {

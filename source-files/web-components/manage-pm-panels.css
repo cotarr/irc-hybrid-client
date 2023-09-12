@@ -6,12 +6,19 @@
   border: 1px solid black;
   color: black;
 }
+.pm-panel-theme-light[flash] {
+  background-color: rgba(0,0,0,0);
+  color: rgba(0,0,0,0);
+}
 .pm-panel-theme-dark {
   background-color: #075181;
   border: 1px solid #abd2ec;
   color: white;
 }
-
+.pm-panel-theme-dark[flash] {
+  background-color: rgba(0,0,0,0);
+  color: rgba(0,0,0,0);
+}
 .pm-panel-name-div {
   display: inline-block;
   font-size: 120%;

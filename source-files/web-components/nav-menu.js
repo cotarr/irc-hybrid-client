@@ -203,7 +203,7 @@ customElements.define('nav-menu', class extends HTMLElement {
   handlePmPanelClick = (event) => {
     event.stopPropagation();
     const privmsgName = event.target.pmPanelName.toLowerCase();
-    document.getElementById('privmsg:' + privmsgName).showPanel();
+    document.getElementById('privmsg:' + privmsgName).showAndScrollPanel();
     this.closeDropdownMenu();
   };
 
@@ -361,7 +361,7 @@ customElements.define('nav-menu', class extends HTMLElement {
   handleChannelClick = (event) => {
     event.stopPropagation();
     const channelNameId = event.target.channelName;
-    document.getElementById('channel:' + channelNameId).showPanel();
+    document.getElementById('channel:' + channelNameId).showAndScrollPanel();
     this.closeDropdownMenu();
   };
 

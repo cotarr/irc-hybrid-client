@@ -99,7 +99,8 @@ window.customElements.define('notice-panel', class extends HTMLElement {
       document.getElementById('displayUtils').cleanFormatting(ctcpMessage) + '\n';
 
     if ((!window.globals.webState.cacheReloadInProgress) &&
-      (!document.querySelector('body').hasAttribute('zoomId'))) {
+    (!this.shadowRoot.getElementById('panelVisibilityDivId').hasAttribute('visible')) &&
+    (!document.querySelector('body').hasAttribute('zoomId'))) {
       this.showPanel();
     }
 
@@ -174,6 +175,7 @@ window.customElements.define('notice-panel', class extends HTMLElement {
     };
 
     if ((!window.globals.webState.cacheReloadInProgress) &&
+      (!this.shadowRoot.getElementById('panelVisibilityDivId').hasAttribute('visible')) &&
       (!document.querySelector('body').hasAttribute('zoomId'))) {
       this.showPanel();
     }

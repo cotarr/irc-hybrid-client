@@ -6,11 +6,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Next v2.0.0-dev.17 2023-09-11 (Draft)
+## Next v2.0.0-dev.18 2023-09-11 (Draft)
 
 Work in progress, see top of README.md
 
 Commit
+
+- Add handlers so header bar unread message icons now open the associated panel to view message when clicked
+- Change CSS styles of flashing unread message icons detect clicks when flash is transparent.
+- If multiple channel panels each have unread messages, show 1 panel for each icon click
+- If multiple PM panels each have unread messages, show 1 panel for each icon click
+- Fixed dropdown menu not scroll channel panel, or cancel unread, if already open when clicked.
+- Fixed dropdown menu not scroll pm panel, or cancel unread, if already open when clicked.
+- On new wallops message, open panel only if closed, else set unread message icon
+- On new notice message, open panel only if closed, else set unread message icon
+
+Commit 0386e81
 
 - Change description of websocket disconnect to "Web page Standby"
 - Add web socket connection (Standby) to dropdown menu (Already a header bar icon)

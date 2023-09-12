@@ -68,14 +68,12 @@
 }
 
 .hbar-enable-audio {
-  background-color: #bbe3fc;
+  background-color: #80bde4;
   color: #000000;
 }
-.hbar-panel-flashing-div {
-  display: inline-block;
-}
-.hbar-panel-flashing-div[hidden] {
-  display: none;
+.hbar-enable-audio[flash] {
+  background-color: rgba(0,0,0,0);
+  color: rgba(0,0,0,0);
 }
 .hbar-panel-div {
   border-radius: 6px;
