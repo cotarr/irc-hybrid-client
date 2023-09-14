@@ -130,7 +130,7 @@ document.getElementById('headerBar').removeAttribute('beepicon');if(this._areBee
 if(this._areBeepsConfigured())document.getElementById('headerBar').setAttribute('beepicon','')}});window.customElements.define('local-command-parser',class extends HTMLElement{
 autoCompleteCommandList=['/ADMIN','/AWAY','/CTCP','/DEOP','/DEVOICE','/JOIN','/LIST','/ME','/MODE','/MOTD','/MSG','/NICK','/NOP','/NOTICE','/OP','/PART','/QUERY','/QUIT','/QUOTE','/TOPIC','/VERSION','/VOICE','/WHO','/WHOIS']
 ;autoCompleteRawCommandList=['ADMIN','AWAY','CAP','CONNECT','DIE','DISCONNECT','ERROR','GLINE','HELP','INFO','INVITE','ISON','JOIN','KICK','KILL','KLINE','LINKS','LIST','LUSERS','MODE','MOTD','NAMES','NICK','NOTICE','OPER','PART','PASS','PING','PONG','PRIVMSG','QUIT','REHASH','RESTART','SERVLIST','SQUERY','SQUIT','STATS','SUMMON','TIME','TOPIC','TRACE','USER','USERHOST','USERS','VERSION','WALLOPS','WHO','WHOIS','WHOWAS']
-;textCommandParser=inputObj=>{const channelPrefixChars=document.getElementById('globVars').constants('channelPrefixChars');const _showRawMessageWindow=()=>{
+;textCommandParser=inputObj=>{const channelPrefixChars=document.getElementById('globVars').constants('channelPrefixChars');const _showIrcServerPanel=()=>{
 document.getElementById('ircServerPanel').showPanel();document.dispatchEvent(new CustomEvent('cancel-zoom'))};const _isWS=inChar=>{if(' '===inChar.charAt(0))return true
 ;if(9===inChar.charCodeAt(0))return true;return false};const _isEOL=inChar=>{if('\n'===inChar.charAt(0))return true;if('\r'===inChar.charAt(0))return true;return false};let inStr=inputObj.inputString
 ;if(inStr.length>0&&_isEOL(inStr.charAt(inStr.length-1)))inStr=inStr.slice(0,inStr.length-1);if(inStr.length>0&&_isEOL(inStr.charAt(inStr.length-1)))inStr=inStr.slice(0,inStr.length-1)
@@ -152,25 +152,30 @@ if('channel'!==inputObj.originType)return{error:true,message:ircCommand+' must b
 };else if(channelPrefixChars.indexOf(nameArray[0].charAt(0))>=0)return{error:true,message:ircCommand+' command does not accept the channel name.',ircMessage:null};else{const returnObj={error:false,
 message:'',ircMessage:null};returnObj.ircMessage='MODE ';returnObj.ircMessage+=inputObj.originName+' '+modeValue;for(let i=0;i<nameArray.length;i++)returnObj.ircMessage+=chanUserMode
 ;for(let i=0;i<nameArray.length;i++)returnObj.ircMessage+=' '+nameArray[i];return returnObj}}else return{error:true,message:'Expect: /'+ircCommand+' <nick1> ... [nick5]',ircMessage:null}}
-;let ircMessage=null;switch(parsedCommand.command){case'ADMIN':_showRawMessageWindow();ircMessage='ADMIN';if(1===parsedCommand.restOf.length)ircMessage='ADMIN '+parsedCommand.restOf[0];break
-;case'AWAY':ircMessage='AWAY';if(parsedCommand.restOf.length>0)ircMessage='AWAY :'+parsedCommand.restOf[0];break;case'CTCP':{const ctcpDelim=1;if(2!==parsedCommand.params.length)return{error:true,
-message:'Expect: /CTCP <nickname> <ctcp_command>',ircMessage:null}
+;let ircMessage=null;switch(parsedCommand.command){case'ADMIN':_showIrcServerPanel();ircMessage='ADMIN';if(1===parsedCommand.restOf.length)ircMessage='ADMIN '+parsedCommand.restOf[0];break;case'AWAY':
+_showIrcServerPanel();ircMessage='AWAY';if(parsedCommand.restOf.length>0)ircMessage='AWAY :'+parsedCommand.restOf[0];break;case'CTCP':{const ctcpDelim=1;if(2!==parsedCommand.params.length)return{
+error:true,message:'Expect: /CTCP <nickname> <ctcp_command>',ircMessage:null}
 ;ircMessage='PRIVMSG '+parsedCommand.params[1]+' :'+String.fromCharCode(ctcpDelim)+parsedCommand.restOf[1].toUpperCase()+String.fromCharCode(ctcpDelim)}break;case'DEOP':{
 const ro=_parseChannelModes('-','o','DEOP',parsedCommand,inputObj);if(ro.error)return ro;else ircMessage=ro.ircMessage}break;case'DEVOICE':{
 const ro=_parseChannelModes('-','v','DEVOICE',parsedCommand,inputObj);if(ro.error)return ro;else ircMessage=ro.ircMessage}break;case'JOIN':if(parsedCommand.params.length<1)return{error:true,
 message:'Expect: /JOIN <#channel>',ircMessage:null};if(1===parsedCommand.params.length){ircMessage='JOIN '+parsedCommand.restOf[0]
 ;document.getElementById('manageChannelsPanel').ircChannelsPendingJoin.push(parsedCommand.restOf[0].toLowerCase())}if(2===parsedCommand.params.length){
 ircMessage='JOIN '+parsedCommand.params[1]+' '+parsedCommand.restOf[1];document.getElementById('manageChannelsPanel').ircChannelsPendingJoin.push(parsedCommand.params[1].toLowerCase())}break
-;case'LIST':_showRawMessageWindow();if(0===parsedCommand.params.length)ircMessage='LIST';else ircMessage='LIST '+parsedCommand.restOf[0];break;case'ME':{if(parsedCommand.params.length<1)return{
+;case'LIST':_showIrcServerPanel();if(0===parsedCommand.params.length)ircMessage='LIST';else ircMessage='LIST '+parsedCommand.restOf[0];break;case'ME':{if(parsedCommand.params.length<1)return{
 error:true,message:'Expect: /ME <action-message>',ircMessage:null};const ctcpDelim=1
 ;if('channel'===inputObj.originType)ircMessage='PRIVMSG '+inputObj.originName+' :'+String.fromCharCode(ctcpDelim)+'ACTION '+parsedCommand.restOf[0]+String.fromCharCode(ctcpDelim)
 ;if('private'===inputObj.originType)ircMessage='PRIVMSG '+inputObj.originName+' :'+String.fromCharCode(ctcpDelim)+'ACTION '+parsedCommand.restOf[0]+String.fromCharCode(ctcpDelim)}break;case'MODE':
-if(0===parsedCommand.restOf.length&&'channel'!==inputObj.originType)ircMessage='MODE '+window.globals.ircState.nickName;else if(1===parsedCommand.restOf.length&&parsedCommand.restOf[0].toLowerCase()===window.globals.ircState.nickName.toLowerCase())ircMessage='MODE '+window.globals.ircState.nickName;else if(2===parsedCommand.restOf.length&&parsedCommand.params[1].toLowerCase()===window.globals.ircState.nickName.toLowerCase()&&parsedCommand.restOf[1].length>0)ircMessage='MODE '+window.globals.ircState.nickName+' '+parsedCommand.restOf[1];else if(0===parsedCommand.restOf.length&&'channel'===inputObj.originType)ircMessage='MODE '+inputObj.originName;else if(1===parsedCommand.restOf.length&&window.globals.ircState.channels.indexOf(parsedCommand.restOf[0].toLowerCase())>=0)ircMessage='MODE '+parsedCommand.restOf[0];else if(parsedCommand.restOf.length>0&&'channel'===inputObj.originType&&('+'===parsedCommand.restOf[0].charAt(0)||'-'===parsedCommand.restOf[0].charAt(0)||'b'===parsedCommand.restOf[0].charAt(0)))ircMessage='MODE '+inputObj.originName+' '+parsedCommand.restOf[0];else if(parsedCommand.restOf.length>1&&window.globals.ircState.channels.indexOf(parsedCommand.params[1].toLowerCase())>=0)ircMessage='MODE '+parsedCommand.params[1]+' '+parsedCommand.restOf[1];else return{
-error:true,message:'Expect: /MODE <nickname> [user-mode] or /MODE <#channel> <channel-mode>',ircMessage:null};break;case'MOTD':_showRawMessageWindow();ircMessage='MOTD'
+if(0===parsedCommand.restOf.length&&'channel'!==inputObj.originType){_showIrcServerPanel();ircMessage='MODE '+window.globals.ircState.nickName
+}else if(1===parsedCommand.restOf.length&&parsedCommand.restOf[0].toLowerCase()===window.globals.ircState.nickName.toLowerCase()){_showIrcServerPanel()
+;ircMessage='MODE '+window.globals.ircState.nickName
+}else if(2===parsedCommand.restOf.length&&parsedCommand.params[1].toLowerCase()===window.globals.ircState.nickName.toLowerCase()&&parsedCommand.restOf[1].length>0){_showIrcServerPanel()
+;ircMessage='MODE '+window.globals.ircState.nickName+' '+parsedCommand.restOf[1]
+}else if(0===parsedCommand.restOf.length&&'channel'===inputObj.originType)ircMessage='MODE '+inputObj.originName;else if(1===parsedCommand.restOf.length&&window.globals.ircState.channels.indexOf(parsedCommand.restOf[0].toLowerCase())>=0)ircMessage='MODE '+parsedCommand.restOf[0];else if(parsedCommand.restOf.length>0&&'channel'===inputObj.originType&&('+'===parsedCommand.restOf[0].charAt(0)||'-'===parsedCommand.restOf[0].charAt(0)||'b'===parsedCommand.restOf[0].charAt(0)))ircMessage='MODE '+inputObj.originName+' '+parsedCommand.restOf[0];else if(parsedCommand.restOf.length>1&&window.globals.ircState.channels.indexOf(parsedCommand.params[1].toLowerCase())>=0)ircMessage='MODE '+parsedCommand.params[1]+' '+parsedCommand.restOf[1];else return{
+error:true,message:'Expect: /MODE <nickname> [user-mode] or /MODE <#channel> <channel-mode>',ircMessage:null};break;case'MOTD':_showIrcServerPanel();ircMessage='MOTD'
 ;if(1===parsedCommand.restOf.length)ircMessage='MOTD '+parsedCommand.restOf[0];break;case'MSG':
 if(parsedCommand.params.length>1&&channelPrefixChars.indexOf(parsedCommand.params[1].charAt(0))<0)ircMessage='PRIVMSG '+parsedCommand.params[1]+' :'+parsedCommand.restOf[1];else return{error:true,
 message:'Expect: /MSG <nickname> <message-text>',ircMessage:null};break;case'NICK':if(parsedCommand.params.length<1)return{error:true,message:'Expect: /NICK <new-nickname>',ircMessage:null}
-;_showRawMessageWindow();ircMessage='NICK '+parsedCommand.restOf[0];break;case'NOP':console.log('textCommandParser inputObj:'+JSON.stringify(inputObj,null,2))
+;_showIrcServerPanel();ircMessage='NICK '+parsedCommand.restOf[0];break;case'NOP':console.log('textCommandParser inputObj:'+JSON.stringify(inputObj,null,2))
 ;console.log('parsedCommand '+JSON.stringify(parsedCommand,null,2));return{error:false,message:null,ircMessage:null};case'NOTICE':
 if(parsedCommand.params.length>1&&parsedCommand.restOf[1].length>0)ircMessage='NOTICE '+parsedCommand.params[1]+' :'+parsedCommand.restOf[1];else return{error:true,
 message:'Expect: /NOTICE <nickname> <message-text>',ircMessage:null};break;case'OP':{const ro=_parseChannelModes('+','o','OP',parsedCommand,inputObj)
@@ -179,12 +184,12 @@ message:'Expect: /PART #channel [Optional message]',ircMessage:null
 };else if(1===parsedCommand.params.length)ircMessage='PART '+parsedCommand.restOf[0];else ircMessage='PART '+parsedCommand.params[1]+' :'+parsedCommand.restOf[1];break;case'QUERY':
 if(parsedCommand.params.length>1&&channelPrefixChars.indexOf(parsedCommand.params[1].charAt(0))<0)ircMessage='PRIVMSG '+parsedCommand.params[1]+' :'+parsedCommand.restOf[1];else return{error:true,
 message:'Expect: /QUERY <nickname> <message-text>',ircMessage:null};break;case'QUIT':ircMessage='QUIT';if(parsedCommand.restOf.length>0)ircMessage='QUIT :'+parsedCommand.restOf[0];break;case'QUOTE':
-if(parsedCommand.restOf.length>0){_showRawMessageWindow();ircMessage=parsedCommand.restOf[0]}else return{error:true,message:'Expect: /QUOTE RAWCOMMAND [arguments]',ircMessage:null};break;case'TOPIC':
+if(parsedCommand.restOf.length>0){_showIrcServerPanel();ircMessage=parsedCommand.restOf[0]}else return{error:true,message:'Expect: /QUOTE RAWCOMMAND [arguments]',ircMessage:null};break;case'TOPIC':
 if(parsedCommand.params.length>1&&window.globals.ircState.channels.indexOf(parsedCommand.params[1].toLowerCase())>=0)ircMessage='TOPIC '+parsedCommand.params[1]+' :'+parsedCommand.restOf[1];else if(parsedCommand.params.length>0&&channelPrefixChars.indexOf(parsedCommand.restOf[0].charAt(0))<0&&'channel'===inputObj.originType)ircMessage='TOPIC '+inputObj.originName+' :'+parsedCommand.restOf[0];else return{
-error:true,message:'Expect: /TOPIC <#channel> <New-channel-topic-message>',ircMessage:null};break;case'VERSION':_showRawMessageWindow();ircMessage='VERSION'
+error:true,message:'Expect: /TOPIC <#channel> <New-channel-topic-message>',ircMessage:null};break;case'VERSION':_showIrcServerPanel();ircMessage='VERSION'
 ;if(1===parsedCommand.restOf.length)ircMessage='VERSION '+parsedCommand.restOf[0];break;case'VOICE':{const ro=_parseChannelModes('+','v','VOICE',parsedCommand,inputObj)
-;if(ro.error)return ro;else ircMessage=ro.ircMessage}break;case'WHO':if(0===parsedCommand.params.length){_showRawMessageWindow();ircMessage='WHO'}else{_showRawMessageWindow()
-;ircMessage='WHO '+parsedCommand.restOf[0]}break;case'WHOIS':if(parsedCommand.params.length<1)return{error:true,message:'Expect: /WHOIS <nickname>',ircMessage:null};_showRawMessageWindow()
+;if(ro.error)return ro;else ircMessage=ro.ircMessage}break;case'WHO':if(0===parsedCommand.params.length){_showIrcServerPanel();ircMessage='WHO'}else{_showIrcServerPanel()
+;ircMessage='WHO '+parsedCommand.restOf[0]}break;case'WHOIS':if(parsedCommand.params.length<1)return{error:true,message:'Expect: /WHOIS <nickname>',ircMessage:null};_showIrcServerPanel()
 ;ircMessage='WHOIS '+parsedCommand.restOf[0];break;default:}if(ircMessage)return{error:false,message:null,ircMessage:ircMessage};return{error:true,
 message:'Command "/'+parsedCommand.command+'" unknown command.',ircMessage:null}};connectedCallback(){window.addEventListener('keydown',e=>{if(!window.globals.webState.webConnected)return
 ;if(e.altKey&&!e.ctrlKey&&!e.shiftKey){if(window.globals.ircState.ircConnected){if('KeyB'===e.code){document.dispatchEvent(new CustomEvent('collapse-all-panels'))
@@ -491,7 +496,7 @@ hamburgerIconEl.classList.remove('hamburger-icon-theme-light');hamburgerLine1El.
 ;hamburgerLine3El.classList.remove('hamburger-line-theme-light');hamburgerIconEl.classList.add('hamburger-icon-theme-dark');hamburgerLine1El.classList.add('hamburger-line-theme-dark')
 ;hamburgerLine2El.classList.add('hamburger-line-theme-dark');hamburgerLine3El.classList.add('hamburger-line-theme-dark')}else throw new Error('Invalid color theme, allowed: light, dark')}})
 ;customElements.define('header-bar',class extends HTMLElement{constructor(){super();const template=document.getElementById('headerBarTemplate');const templateContent=template.content
-;this.attachShadow({mode:'open'}).appendChild(templateContent.cloneNode(true));this.privmsgicon=false}static get observedAttributes(){
+;this.attachShadow({mode:'open'}).appendChild(templateContent.cloneNode(true));this.privmsgicon=false;this.collapseAllToggle=0;this.collapseAllTimeout=0}static get observedAttributes(){
 return['beepicon','channelicon','noticeicon','privmsgicon','servericon','wallopsicon','zoomicon']}get beepicon(){return this.hasAttribute('beepicon')}set beepicon(val){
 if(val)this.setAttribute('beepicon','');else this.removeAttribute('beepicon')}get channelicon(){return this.hasAttribute('channelicon')}set channelicon(val){
 if(val)this.setAttribute('channelicon','');else this.removeAttribute('channelicon')}get noticeicon(){return this.hasAttribute('noticeicon')}set noticeicon(val){
@@ -534,7 +539,7 @@ if(window.globals.ircState.ircConnected&&window.globals.webState.webConnected)th
 ;this.shadowRoot.getElementById('noticeUnreadExistIconId').title='Unread IRC Notice, click to view panel'
 ;this.shadowRoot.getElementById('wallopsUnreadExistIconId').title='Unread IRC Wallops, click to view panel';this.shadowRoot.getElementById('nickRecovIconId').title='Waiting to recover main nickname'
 ;this.shadowRoot.getElementById('enableAudioButtonId').title='Browser had disabled media playback. Click to enable beep sounds'
-;this.shadowRoot.getElementById('collapseAllButtonId').title='Show all available panels as collapsed bar elements'};_updateDynamicElementTitles=()=>{
+;this.shadowRoot.getElementById('collapseAllButtonId').title='Toggle: Collapse active panels to bar, Hide all panels'};_updateDynamicElementTitles=()=>{
 const webConnectIconEl=this.shadowRoot.getElementById('webConnectIconId')
 ;if(webConnectIconEl.hasAttribute('connected'))webConnectIconEl.title='Place web page in Standby (Remote IRC stays active)';else webConnectIconEl.title='Re-connect web page to remote IRC client'
 ;const ircConnectIconEl=this.shadowRoot.getElementById('ircConnectIconId')
@@ -550,36 +555,38 @@ noticeUnread:false,wallopsUnread:false,nickRecovery:false,enableAudio:false};if(
 ;if(window.globals.ircState.ircAutoReconnect&&window.globals.ircState.ircConnectOn&&!window.globals.ircState.ircConnected&&!window.globals.ircState.ircConnecting)state.wait=true}}else{
 if(window.globals.webState.webConnecting)state.webConnect='connecting';state.ircConnect='unavailable'}if(!window.globals.webState.webConnected||!window.globals.ircState.ircConnected){state.away=false
 ;state.zoom=false;state.serverUnread=false;state.channelUnread=false;state.privMsgUnread=false;state.noticeUnread=false;state.wallopsUnread=false;state.nickRecovery=false}this.setHeaderBarIcons(state)
-;this._updateDynamicElementTitles()};initializePlugin=()=>{this.updateStatusIcons();this._setFixedElementTitles();this._updateDynamicElementTitles();setInterval(()=>{
-const serverIconEl=this.shadowRoot.getElementById('serverUnreadExistIconId');const wallopsIconEl=this.shadowRoot.getElementById('wallopsUnreadExistIconId')
-;const noticeIconEl=this.shadowRoot.getElementById('noticeUnreadExistIconId');const privMsgIconEl=this.shadowRoot.getElementById('privMsgUnreadExistIconId')
-;const channelIconEl=this.shadowRoot.getElementById('channelUnreadExistIconId');const audioIconEl=this.shadowRoot.getElementById('enableAudioButtonId');if(serverIconEl.hasAttribute('flash')){
-serverIconEl.removeAttribute('flash');wallopsIconEl.removeAttribute('flash');noticeIconEl.removeAttribute('flash');privMsgIconEl.removeAttribute('flash');channelIconEl.removeAttribute('flash')
-;audioIconEl.removeAttribute('flash')}else{serverIconEl.setAttribute('flash','');wallopsIconEl.setAttribute('flash','');noticeIconEl.setAttribute('flash','');privMsgIconEl.setAttribute('flash','')
-;channelIconEl.setAttribute('flash','');audioIconEl.setAttribute('flash','')}},500)};connectedCallback(){this.shadowRoot.getElementById('navDropdownButtonId').addEventListener('click',event=>{
-event.stopPropagation();document.getElementById('navMenu').toggleDropdownMenu()});this.shadowRoot.getElementById('enableAudioButtonId').addEventListener('click',()=>{
-document.getElementById('beepSounds').userInitiatedAudioPlay()});this.shadowRoot.getElementById('webConnectIconId').addEventListener('click',()=>{
-document.getElementById('websocketPanel').webConnectHeaderBarIconHandler()});this.shadowRoot.getElementById('ircConnectIconId').addEventListener('click',()=>{
-document.getElementById('ircControlsPanel').webConnectHeaderBarIconHandler()});this.shadowRoot.getElementById('ircIsAwayIconId').addEventListener('click',()=>{
-document.getElementById('ircControlsPanel').awayButtonHeaderBarIconHandler()});this.shadowRoot.getElementById('panelZoomIconId').addEventListener('click',()=>{
-document.dispatchEvent(new CustomEvent('cancel-zoom'))});this.shadowRoot.getElementById('serverUnreadExistIconId').addEventListener('click',()=>{document.getElementById('ircServerPanel').showPanel()})
+;this._updateDynamicElementTitles()};timerTickHandler=()=>{if(this.collapseAllTimeout>0){this.collapseAllTimeout--;if(0===this.collapseAllTimeout)this.collapseAllToggle=0}};initializePlugin=()=>{
+this.updateStatusIcons();this._setFixedElementTitles();this._updateDynamicElementTitles();setInterval(()=>{const serverIconEl=this.shadowRoot.getElementById('serverUnreadExistIconId')
+;const wallopsIconEl=this.shadowRoot.getElementById('wallopsUnreadExistIconId');const noticeIconEl=this.shadowRoot.getElementById('noticeUnreadExistIconId')
+;const privMsgIconEl=this.shadowRoot.getElementById('privMsgUnreadExistIconId');const channelIconEl=this.shadowRoot.getElementById('channelUnreadExistIconId')
+;const audioIconEl=this.shadowRoot.getElementById('enableAudioButtonId');if(serverIconEl.hasAttribute('flash')){serverIconEl.removeAttribute('flash');wallopsIconEl.removeAttribute('flash')
+;noticeIconEl.removeAttribute('flash');privMsgIconEl.removeAttribute('flash');channelIconEl.removeAttribute('flash');audioIconEl.removeAttribute('flash')}else{serverIconEl.setAttribute('flash','')
+;wallopsIconEl.setAttribute('flash','');noticeIconEl.setAttribute('flash','');privMsgIconEl.setAttribute('flash','');channelIconEl.setAttribute('flash','');audioIconEl.setAttribute('flash','')}},500)}
+;connectedCallback(){this.shadowRoot.getElementById('navDropdownButtonId').addEventListener('click',event=>{event.stopPropagation();document.getElementById('navMenu').toggleDropdownMenu()})
+;this.shadowRoot.getElementById('enableAudioButtonId').addEventListener('click',()=>{document.getElementById('beepSounds').userInitiatedAudioPlay()})
+;this.shadowRoot.getElementById('webConnectIconId').addEventListener('click',()=>{document.getElementById('websocketPanel').webConnectHeaderBarIconHandler()})
+;this.shadowRoot.getElementById('ircConnectIconId').addEventListener('click',()=>{document.getElementById('ircControlsPanel').webConnectHeaderBarIconHandler()})
+;this.shadowRoot.getElementById('ircIsAwayIconId').addEventListener('click',()=>{document.getElementById('ircControlsPanel').awayButtonHeaderBarIconHandler()})
+;this.shadowRoot.getElementById('panelZoomIconId').addEventListener('click',()=>{document.dispatchEvent(new CustomEvent('cancel-zoom'))})
+;this.shadowRoot.getElementById('serverUnreadExistIconId').addEventListener('click',()=>{document.getElementById('ircServerPanel').showPanel()})
 ;this.shadowRoot.getElementById('channelUnreadExistIconId').addEventListener('click',()=>{document.getElementById('manageChannelsPanel').handleHeaderBarActivityIconClick()})
 ;this.shadowRoot.getElementById('privMsgUnreadExistIconId').addEventListener('click',()=>{document.getElementById('managePmPanels').handleHeaderBarActivityIconClick()})
 ;this.shadowRoot.getElementById('noticeUnreadExistIconId').addEventListener('click',()=>{document.getElementById('noticePanel').showPanel()})
 ;this.shadowRoot.getElementById('wallopsUnreadExistIconId').addEventListener('click',()=>{document.getElementById('wallopsPanel').showPanel()})
-;this.shadowRoot.getElementById('collapseAllButtonId').addEventListener('click',()=>{document.dispatchEvent(new CustomEvent('collapse-all-panels'))
-;document.dispatchEvent(new CustomEvent('cancel-zoom'))});document.addEventListener('color-theme-changed',event=>{const hamburgerIconEl=this.shadowRoot.getElementById('hamburgerIconId')
-;const headerBarDivEl=this.shadowRoot.getElementById('headerBarDivId');const serverUnreadExistIconEl=this.shadowRoot.getElementById('serverUnreadExistIconId')
-;const channelUnreadExistIconEl=this.shadowRoot.getElementById('channelUnreadExistIconId');const privMsgUnreadExistIconEl=this.shadowRoot.getElementById('privMsgUnreadExistIconId')
-;const noticeUnreadExistIconEl=this.shadowRoot.getElementById('noticeUnreadExistIconId');const wallopsUnreadExistIconEl=this.shadowRoot.getElementById('wallopsUnreadExistIconId')
-;const nickRecovIconEl=this.shadowRoot.getElementById('nickRecovIconId');if('light'===event.detail.theme){hamburgerIconEl.setColorTheme('light')
-;headerBarDivEl.classList.remove('header-bar-theme-dark');headerBarDivEl.classList.add('header-bar-theme-light');serverUnreadExistIconEl.classList.remove('irc-server-panel-theme-dark')
-;serverUnreadExistIconEl.classList.add('irc-server-panel-theme-light');channelUnreadExistIconEl.classList.remove('channel-panel-theme-dark')
-;channelUnreadExistIconEl.classList.add('channel-panel-theme-light');privMsgUnreadExistIconEl.classList.remove('pm-panel-theme-dark');privMsgUnreadExistIconEl.classList.add('pm-panel-theme-light')
-;noticeUnreadExistIconEl.classList.remove('notice-panel-theme-dark');noticeUnreadExistIconEl.classList.add('notice-panel-theme-light')
-;wallopsUnreadExistIconEl.classList.remove('wallops-panel-theme-dark');wallopsUnreadExistIconEl.classList.add('wallops-panel-theme-light');nickRecovIconEl.classList.remove('hbar-recovery-theme-dark')
-;nickRecovIconEl.classList.add('hbar-recovery-theme-light')}else{hamburgerIconEl.setColorTheme('dark');headerBarDivEl.classList.remove('header-bar-theme-light')
-;headerBarDivEl.classList.add('header-bar-theme-dark');serverUnreadExistIconEl.classList.remove('irc-server-panel-theme-light');serverUnreadExistIconEl.classList.add('irc-server-panel-theme-dark')
+;this.shadowRoot.getElementById('collapseAllButtonId').addEventListener('click',()=>{this.collapseAllTimeout=3;document.dispatchEvent(new CustomEvent('cancel-zoom'));if(0===this.collapseAllToggle){
+this.collapseAllToggle=1;document.dispatchEvent(new CustomEvent('collapse-all-panels'))}else{this.collapseAllToggle=0;document.dispatchEvent(new CustomEvent('hide-all-panels'))}})
+;document.addEventListener('color-theme-changed',event=>{const hamburgerIconEl=this.shadowRoot.getElementById('hamburgerIconId');const headerBarDivEl=this.shadowRoot.getElementById('headerBarDivId')
+;const serverUnreadExistIconEl=this.shadowRoot.getElementById('serverUnreadExistIconId');const channelUnreadExistIconEl=this.shadowRoot.getElementById('channelUnreadExistIconId')
+;const privMsgUnreadExistIconEl=this.shadowRoot.getElementById('privMsgUnreadExistIconId');const noticeUnreadExistIconEl=this.shadowRoot.getElementById('noticeUnreadExistIconId')
+;const wallopsUnreadExistIconEl=this.shadowRoot.getElementById('wallopsUnreadExistIconId');const nickRecovIconEl=this.shadowRoot.getElementById('nickRecovIconId');if('light'===event.detail.theme){
+hamburgerIconEl.setColorTheme('light');headerBarDivEl.classList.remove('header-bar-theme-dark');headerBarDivEl.classList.add('header-bar-theme-light')
+;serverUnreadExistIconEl.classList.remove('irc-server-panel-theme-dark');serverUnreadExistIconEl.classList.add('irc-server-panel-theme-light')
+;channelUnreadExistIconEl.classList.remove('channel-panel-theme-dark');channelUnreadExistIconEl.classList.add('channel-panel-theme-light')
+;privMsgUnreadExistIconEl.classList.remove('pm-panel-theme-dark');privMsgUnreadExistIconEl.classList.add('pm-panel-theme-light');noticeUnreadExistIconEl.classList.remove('notice-panel-theme-dark')
+;noticeUnreadExistIconEl.classList.add('notice-panel-theme-light');wallopsUnreadExistIconEl.classList.remove('wallops-panel-theme-dark')
+;wallopsUnreadExistIconEl.classList.add('wallops-panel-theme-light');nickRecovIconEl.classList.remove('hbar-recovery-theme-dark');nickRecovIconEl.classList.add('hbar-recovery-theme-light')}else{
+hamburgerIconEl.setColorTheme('dark');headerBarDivEl.classList.remove('header-bar-theme-light');headerBarDivEl.classList.add('header-bar-theme-dark')
+;serverUnreadExistIconEl.classList.remove('irc-server-panel-theme-light');serverUnreadExistIconEl.classList.add('irc-server-panel-theme-dark')
 ;privMsgUnreadExistIconEl.classList.remove('pm-panel-theme-light');privMsgUnreadExistIconEl.classList.add('pm-panel-theme-dark');noticeUnreadExistIconEl.classList.remove('notice-panel-theme-light')
 ;noticeUnreadExistIconEl.classList.add('notice-panel-theme-dark');wallopsUnreadExistIconEl.classList.remove('wallops-panel-theme-light')
 ;wallopsUnreadExistIconEl.classList.add('wallops-panel-theme-dark');nickRecovIconEl.classList.remove('hbar-recovery-theme-light');nickRecovIconEl.classList.add('hbar-recovery-theme-dark')}})
@@ -1147,7 +1154,8 @@ window.globals.webState.ircConnecting=false;this.forceDisconnectHandler().catch(
 ;message=message.split('\n')[0];document.getElementById('errorPanel').showError(message)})
 }else document.getElementById('ircControlsPanel').sendIrcServerMessage('QUIT :'+window.globals.ircState.progName+' '+window.globals.ircState.progVersion);else this.connectHandler().catch(err=>{
 console.log(err);let message=err.message||err.toString()||'Error occurred calling /irc/connect';message=message.split('\n')[0];document.getElementById('errorPanel').showError(message)})}
-;awayButtonHeaderBarIconHandler=()=>{if(window.globals.ircState.ircConnected&&window.globals.ircState.ircIsAway)this.sendIrcServerMessage('AWAY')};initializePlugin=()=>{
+;awayButtonHeaderBarIconHandler=()=>{if(window.globals.ircState.ircConnected&&window.globals.ircState.ircIsAway){document.getElementById('ircServerPanel').showPanel()
+;document.dispatchEvent(new CustomEvent('cancel-zoom'));this.sendIrcServerMessage('AWAY')}};initializePlugin=()=>{
 this.shadowRoot.getElementById('showServerListButtonId').setAttribute('title','Open panel with list of IRC servers')
 ;this.shadowRoot.getElementById('showServerPanelButtonId').setAttribute('title','Open panel showing messages from IRC server')
 ;this.shadowRoot.getElementById('editServerButtonId').setAttribute('title','Opens form to edit IRC server configuration')
@@ -1174,8 +1182,10 @@ console.log('Database: unlock successful');window.globals.webState.ircServerEdit
 document.getElementById('errorPanel').showError('Invalid nick name.');return}this.connectHandler().catch(err=>{console.log(err)
 ;let message=err.message||err.toString()||'Error occurred calling /irc/connect';message=message.split('\n')[0];document.getElementById('errorPanel').showError(message)})})
 ;this.shadowRoot.getElementById('quitButtonId').addEventListener('click',()=>{this.disconnectHandler()});this.shadowRoot.getElementById('setAwayButtonId').addEventListener('click',()=>{
-if(window.globals.ircState.ircConnected&&this.shadowRoot.getElementById('userAwayMessageId').value.length>0)this.sendIrcServerMessage('AWAY '+this.shadowRoot.getElementById('userAwayMessageId').value)
-});this.shadowRoot.getElementById('setBackButtonId').addEventListener('click',()=>{if(window.globals.ircState.ircConnected&&window.globals.ircState.ircIsAway)this.sendIrcServerMessage('AWAY')})
+if(window.globals.ircState.ircConnected&&this.shadowRoot.getElementById('userAwayMessageId').value.length>0){document.getElementById('ircServerPanel').showPanel()
+;document.dispatchEvent(new CustomEvent('cancel-zoom'));this.sendIrcServerMessage('AWAY '+this.shadowRoot.getElementById('userAwayMessageId').value)}})
+;this.shadowRoot.getElementById('setBackButtonId').addEventListener('click',()=>{if(window.globals.ircState.ircConnected&&window.globals.ircState.ircIsAway){
+document.getElementById('ircServerPanel').showPanel();document.dispatchEvent(new CustomEvent('cancel-zoom'));this.sendIrcServerMessage('AWAY')}})
 ;this.shadowRoot.getElementById('setAwayInfoBtnId').addEventListener('click',()=>{this.shadowRoot.getElementById('setAwayInfoId').removeAttribute('hidden')})
 ;document.addEventListener('cache-reload-done',event=>{window.globals.webState.cacheReloadInProgress=false});document.addEventListener('cache-reload-error',event=>{
 window.globals.webState.cacheReloadInProgress=false});document.addEventListener('debounced-update-from-cache',event=>{if(!this.updateCacheDebounceActive){this.updateCacheDebounceActive=true
@@ -1261,15 +1271,16 @@ const displayUtilsEl=document.getElementById('displayUtils');const displayMessag
 ;const hmsString=displayUtilsEl.timestampToHMS(timeString);return hmsString+' '+restOfMessage};if(this.ircMessageCommandDisplayFilter.indexOf(parsedMessage.command.toUpperCase())>=0)return
 ;if(this.shadowRoot.getElementById('panelDivId').getAttribute('lastDate')!==parsedMessage.datestamp){this.shadowRoot.getElementById('panelDivId').setAttribute('lastDate',parsedMessage.datestamp)
 ;this.shadowRoot.getElementById('panelMessageDisplayId').value+='\n=== '+parsedMessage.datestamp+' ===\n\n'}switch(parsedMessage.command){case'001':case'002':case'003':case'004':
-_showAfterParamZero(parsedMessage,null);break;case'005':break;case'250':case'251':case'252':case'254':case'255':case'265':_showAfterParamZero(parsedMessage,null);break;case'256':case'257':case'258':
-case'259':_showAfterParamZero(parsedMessage,null);break;case'315':displayMessage('WHO --End--');break;case'352':_showAfterParamZero(parsedMessage,'WHO');break;case'275':case'307':case'311':case'312':
-case'313':case'317':case'319':case'330':case'338':case'378':case'379':case'671':_showAfterParamZero(parsedMessage,'WHOIS');break;case'301':
-if(3!==parsedMessage.params.length)_showAfterParamZero(parsedMessage,'WHOIS');else{const outMessage='WHOIS '+parsedMessage.params[1]+' is away: '+parsedMessage.params[2]
-;displayMessage(displayUtilsEl.cleanFormatting(displayUtilsEl.cleanCtcpDelimiter(outMessage)))}break;case'318':displayMessage('WHOIS --End--');break;case'322':if(4===parsedMessage.params.length){
-let outMessage='LIST '+parsedMessage.params[1]+' '+parsedMessage.params[2];if(parsedMessage.params[3])outMessage+=' '+parsedMessage.params[3]
-;displayMessage(displayUtilsEl.cleanFormatting(displayUtilsEl.cleanCtcpDelimiter(outMessage)))}else console.log('Error Msg 322 not have 4 parsed parameters');break;case'321':break;case'323':
-displayMessage('LIST --End--');break;case'372':_showAfterParamZero(parsedMessage,null);break;case'375':case'376':break;case'900':case'903':_showAfterParamZero(parsedMessage,null);break
-;case'cachedNICK':
+_showAfterParamZero(parsedMessage,null);break;case'005':break;case'221':if('params'in parsedMessage&&parsedMessage.params.length>0){
+const outMessage=parsedMessage.timestamp+' Mode '+parsedMessage.params[0]+' '+parsedMessage.params[1];displayMessage(displayUtilsEl.cleanFormatting(displayUtilsEl.cleanCtcpDelimiter(outMessage)))}
+break;case'250':case'251':case'252':case'254':case'255':case'265':_showAfterParamZero(parsedMessage,null);break;case'256':case'257':case'258':case'259':_showAfterParamZero(parsedMessage,null);break
+;case'315':displayMessage('WHO --End--');break;case'352':_showAfterParamZero(parsedMessage,'WHO');break;case'275':case'307':case'311':case'312':case'313':case'317':case'319':case'330':case'338':
+case'378':case'379':case'671':_showAfterParamZero(parsedMessage,'WHOIS');break;case'301':if(3!==parsedMessage.params.length)_showAfterParamZero(parsedMessage,'WHOIS');else{
+const outMessage='WHOIS '+parsedMessage.params[1]+' is away: '+parsedMessage.params[2];displayMessage(displayUtilsEl.cleanFormatting(displayUtilsEl.cleanCtcpDelimiter(outMessage)))}break;case'318':
+displayMessage('WHOIS --End--');break;case'322':if(4===parsedMessage.params.length){let outMessage='LIST '+parsedMessage.params[1]+' '+parsedMessage.params[2]
+;if(parsedMessage.params[3])outMessage+=' '+parsedMessage.params[3];displayMessage(displayUtilsEl.cleanFormatting(displayUtilsEl.cleanCtcpDelimiter(outMessage)))
+}else console.log('Error Msg 322 not have 4 parsed parameters');break;case'321':break;case'323':displayMessage('LIST --End--');break;case'372':_showAfterParamZero(parsedMessage,null);break;case'375':
+case'376':break;case'900':case'903':_showAfterParamZero(parsedMessage,null);break;case'cachedNICK':
 if('default'===parsedMessage.params[0])displayMessage(displayUtilsEl.cleanFormatting(displayUtilsEl.cleanCtcpDelimiter(parsedMessage.timestamp+' '+parsedMessage.nick+' is now known as '+parsedMessage.params[1])))
 ;break;case'NICK':
 if(window.globals.ircState.nickName.toLowerCase()===parsedMessage.nick.toLowerCase())displayMessage(displayUtilsEl.cleanFormatting(displayUtilsEl.cleanCtcpDelimiter(parsedMessage.timestamp+' '+parsedMessage.nick+' is now known as '+parsedMessage.params[0])))
@@ -1978,7 +1989,7 @@ out=timestamp+' ';if('*'===nick)out+=nick+nickChannelSpacer;else out+=nick+nickC
 ;if(parsedMessage.params[0].toLowerCase()===this.channelName.toLowerCase())if(panelDivEl.getAttribute('lastDate')!==parsedMessage.datestamp){panelDivEl.setAttribute('lastDate',parsedMessage.datestamp)
 ;panelMessageDisplayEl.value+='\n=== '+parsedMessage.datestamp+' ===\n\n'}switch(parsedMessage.command){case'324':
 if('params'in parsedMessage&&parsedMessage.params.length>0&&parsedMessage.params[1].toLowerCase()===this.channelName.toLowerCase()){let modeList='Mode ';modeList+=parsedMessage.params[1]
-;if(parsedMessage.params.length>1)modeList+=' '+parsedMessage.params[2];_addText(parsedMessage.timestamp,'*',modeList)}break;case'329':
+;if(parsedMessage.params.length>1)modeList+=' '+parsedMessage.params[2];_addText(parsedMessage.timestamp,'*',modeList);this.showAndScrollPanel()}break;case'329':
 if('params'in parsedMessage&&parsedMessage.params.length>0&&parsedMessage.params[1].toLowerCase()===this.channelName.toLowerCase()){let created='Channel '
 ;created+=parsedMessage.params[1]+' created on ';if(parsedMessage.params.length>1){const createdDate=new Date(1e3*parseInt(parsedMessage.params[2]));created+=createdDate.toLocaleString()}
 _addText(parsedMessage.timestamp,'*',created)}break;case'367':if('params'in parsedMessage&&parsedMessage.params.length>0&&parsedMessage.params[1].toLowerCase()===this.channelName.toLowerCase()){
@@ -1992,11 +2003,11 @@ if(parsedMessage.params[0].toLowerCase()===this.channelName.toLowerCase()){let r
 }break;case'JOIN':if(parsedMessage.params[0].toLowerCase()===this.channelName.toLowerCase()){
 if(panelDivEl.hasAttribute('brief-enabled'))_addText(parsedMessage.timestamp,'*',parsedMessage.nick+' has joined');else _addText(parsedMessage.timestamp,'*',parsedMessage.nick+' ('+parsedMessage.host+') has joined')
 ;if(panelDivEl.hasAttribute('beep2-enabled')&&!window.globals.webState.cacheReloadInProgress)document.getElementById('beepSounds').playBeep1Sound();this._incUnreadWhenOther();this._displayWhenHidden()
-}break;case'MODE':
-if(parsedMessage.params[0].toLowerCase()===this.channelName.toLowerCase())if(parsedMessage.nick)_addText(parsedMessage.timestamp,'*','Mode '+JSON.stringify(parsedMessage.params)+' by '+parsedMessage.nick);else _addText(parsedMessage.timestamp,'*','Mode '+JSON.stringify(parsedMessage.params)+' by '+parsedMessage.prefix)
-;break;case'cachedNICK':if(this.channelName.toLowerCase()===parsedMessage.params[0].toLowerCase())_addText(parsedMessage.timestamp,'*',parsedMessage.nick+' is now known as '+parsedMessage.params[1])
-;break;case'NICK':{let present=false;if(this._isNickInChannel(parsedMessage.nick,this.channelName.toLowerCase()))present=true
-;if(this._isNickInChannel(parsedMessage.params[0],this.channelName.toLowerCase()))present=true
+}break;case'MODE':if(parsedMessage.params[0].toLowerCase()===this.channelName.toLowerCase())if(parsedMessage.nick){
+_addText(parsedMessage.timestamp,'*','Mode '+JSON.stringify(parsedMessage.params)+' by '+parsedMessage.nick);this.showAndScrollPanel()
+}else _addText(parsedMessage.timestamp,'*','Mode '+JSON.stringify(parsedMessage.params)+' by '+parsedMessage.prefix);break;case'cachedNICK':
+if(this.channelName.toLowerCase()===parsedMessage.params[0].toLowerCase())_addText(parsedMessage.timestamp,'*',parsedMessage.nick+' is now known as '+parsedMessage.params[1]);break;case'NICK':{
+let present=false;if(this._isNickInChannel(parsedMessage.nick,this.channelName.toLowerCase()))present=true;if(this._isNickInChannel(parsedMessage.params[0],this.channelName.toLowerCase()))present=true
 ;if(present)_addText(parsedMessage.timestamp,'*',parsedMessage.nick+' is now known as '+parsedMessage.params[0])}break;case'NOTICE':
 if(parsedMessage.params[0].toLowerCase()===this.channelName.toLowerCase()){
 _addText(parsedMessage.timestamp,'*','Notice('+parsedMessage.nick+' to '+parsedMessage.params[0]+') '+parsedMessage.params[1])
@@ -2367,6 +2378,6 @@ document.getElementById('globVars').initializePlugin();document.getElementById('
 ;document.getElementById('manageChannelsPanel').initializePlugin();document.getElementById('managePmPanels').initializePlugin();document.addEventListener('global-scroll-to-top',(function(e){
 window.scrollTo(0,0)}));window.addEventListener('resize',event=>{document.getElementById('displayUtils').handleExternalWindowResizeEvent(event)
 ;document.dispatchEvent(new CustomEvent('resize-custom-elements'))});setInterval(()=>{document.getElementById('errorPanel').timerTickHandler()
-;document.getElementById('displayUtils').timerTickHandler();document.getElementById('beepSounds').timerTickHandler();document.getElementById('websocketPanel').timerTickHandler()
-;document.getElementById('ircServerPanel').timerTickHandler();document.getElementById('managePmPanels').timerTickHandler();document.getElementById('manageChannelsPanel').timerTickHandler()},1e3)
-;document.getElementById('websocketPanel').firstWebSocketConnectOnPageLoad()}
+;document.getElementById('displayUtils').timerTickHandler();document.getElementById('beepSounds').timerTickHandler();document.getElementById('headerBar').timerTickHandler()
+;document.getElementById('websocketPanel').timerTickHandler();document.getElementById('ircServerPanel').timerTickHandler();document.getElementById('managePmPanels').timerTickHandler()
+;document.getElementById('manageChannelsPanel').timerTickHandler()},1e3);document.getElementById('websocketPanel').firstWebSocketConnectOnPageLoad()}

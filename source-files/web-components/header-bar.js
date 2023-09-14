@@ -63,6 +63,8 @@ customElements.define('header-bar', class extends HTMLElement {
     this.attachShadow({ mode: 'open' })
       .appendChild(templateContent.cloneNode(true));
     this.privmsgicon = false;
+    this.collapseAllToggle = 0;
+    this.collapseAllTimeout = 0;
   }
 
   //
@@ -330,7 +332,7 @@ customElements.define('header-bar', class extends HTMLElement {
     this.shadowRoot.getElementById('enableAudioButtonId').title =
       'Browser had disabled media playback. Click to enable beep sounds';
     this.shadowRoot.getElementById('collapseAllButtonId').title =
-      'Show all available panels as collapsed bar elements';
+      'Toggle: Collapse active panels to bar, Hide all panels';
   }; // _setFixedElementTitles()
 
   /**
@@ -436,6 +438,19 @@ customElements.define('header-bar', class extends HTMLElement {
   };
 
   /**
+   * Called once per second as task scheduler, called from js/_afterLoad.js
+   */
+  timerTickHandler = () => {
+    if (this.collapseAllTimeout > 0) {
+      this.collapseAllTimeout--;
+      if (this.collapseAllTimeout === 0) {
+        // Timer expired, next button click will use collapse all
+        this.collapseAllToggle = 0;
+      }
+    }
+  };
+
+  /**
    * Initialize header-bar functionality, called by "js/_afterLoad.js"
    */
   initializePlugin = () => {
@@ -512,8 +527,17 @@ customElements.define('header-bar', class extends HTMLElement {
     });
 
     this.shadowRoot.getElementById('collapseAllButtonId').addEventListener('click', () => {
-      document.dispatchEvent(new CustomEvent('collapse-all-panels'));
+      // allow toggle between collapse all panels, and hide all panels for 3 seconds
+      // then revert to collapse all panels on future click as default.
+      this.collapseAllTimeout = 3;
       document.dispatchEvent(new CustomEvent('cancel-zoom'));
+      if (this.collapseAllToggle === 0) {
+        this.collapseAllToggle = 1;
+        document.dispatchEvent(new CustomEvent('collapse-all-panels'));
+      } else {
+        this.collapseAllToggle = 0;
+        document.dispatchEvent(new CustomEvent('hide-all-panels'));
+      }
     });
 
     // -------------------------------------

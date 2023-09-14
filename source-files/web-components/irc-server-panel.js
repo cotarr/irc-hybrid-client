@@ -474,7 +474,21 @@ window.customElements.define('irc-server-panel', class extends HTMLElement {
       case '004':
         _showAfterParamZero(parsedMessage, null);
         break;
+
+      // 005 is not displayed on server panel, empty case
       case '005':
+        break;
+
+      // RPL_UMODEIS User's current Mode, response from /MODE <nickName>
+      case '221':
+        if (('params' in parsedMessage) && (parsedMessage.params.length > 0)) {
+          const outMessage = parsedMessage.timestamp + ' Mode ' +
+          parsedMessage.params[0] + ' ' +
+          parsedMessage.params[1];
+          displayMessage(
+            displayUtilsEl.cleanFormatting(
+              displayUtilsEl.cleanCtcpDelimiter(outMessage)));
+        }
         break;
       case '250':
       case '251':

@@ -1467,6 +1467,8 @@ window.customElements.define('channel-panel', class extends HTMLElement {
           modeList += parsedMessage.params[1];
           if (parsedMessage.params.length > 1) modeList += ' ' + parsedMessage.params[2];
           _addText(parsedMessage.timestamp, '*', modeList);
+          // case of mode type in other panel, example: /MODE #channel
+          this.showAndScrollPanel();
         }
         break;
 
@@ -1559,6 +1561,8 @@ window.customElements.define('channel-panel', class extends HTMLElement {
             _addText(parsedMessage.timestamp,
               '*',
               'Mode ' + JSON.stringify(parsedMessage.params) + ' by ' + parsedMessage.nick);
+            // Case of mode typed in other panel as text command, example: /MODE #channel +tn
+            this.showAndScrollPanel();
           } else {
             // case of mode by netsplit
             _addText(parsedMessage.timestamp,

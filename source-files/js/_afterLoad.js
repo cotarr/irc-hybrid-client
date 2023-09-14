@@ -95,6 +95,7 @@ if (!(window.customElements && document.body.attachShadow)) {
     // document.getElementById('localCommandParser').timerTickHandler();
     // document.getElementById('remoteCommandParser').timerTickHandler();
     // document.getElementById('ctcpCommandParser').timerTickHandler();
+    document.getElementById('headerBar').timerTickHandler();
     document.getElementById('websocketPanel').timerTickHandler();
     // document.getElementById('ircControlsPanel').timerTickHandler();
     document.getElementById('ircServerPanel').timerTickHandler();

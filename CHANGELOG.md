@@ -6,6 +6,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+- To view notes on v2 major upgrade, scroll to Version v2.0.0 2023-09-12
+
+## Next v2.0.1-dev 2023-09-14
+
+Changed behavior of header-bar collapse all button "[-]" at upper right. 
+First click will show active panels as collapsed bars, further clicks 
+within 3 seconds will toggle between hide all panels and collapsed bars.
+
+Other changes;
+
+- Added user's mode IRC message 221 formatted response to irc-server-panel. Was showing raw IRC server message.
+- User entry of text /MODE command will show either channel-panel or irc-server-panel to view response, if panel is hidden or collapsed.
+- User entry of text /AWAY command or AWAY buttons will show irc-server-panel to view response to away request.
+
 ## [v2.0.0](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.0.0) 2023-09-12
 
 - Major upgrade: version v2.0.0 merged into master branch to replace v0.2.53 2023-09-12

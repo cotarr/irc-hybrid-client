@@ -1045,6 +1045,8 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
 
   awayButtonHeaderBarIconHandler = () => {
     if ((window.globals.ircState.ircConnected) && (window.globals.ircState.ircIsAway)) {
+      document.getElementById('ircServerPanel').showPanel();
+      document.dispatchEvent(new CustomEvent('cancel-zoom'));
       this.sendIrcServerMessage('AWAY');
     }
   };
@@ -1181,12 +1183,16 @@ window.customElements.define('irc-controls-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('setAwayButtonId').addEventListener('click', () => {
       if ((window.globals.ircState.ircConnected) &&
         (this.shadowRoot.getElementById('userAwayMessageId').value.length > 0)) {
+        document.getElementById('ircServerPanel').showPanel();
+        document.dispatchEvent(new CustomEvent('cancel-zoom'));
         this.sendIrcServerMessage(
           'AWAY ' + this.shadowRoot.getElementById('userAwayMessageId').value);
       }
     });
     this.shadowRoot.getElementById('setBackButtonId').addEventListener('click', () => {
       if ((window.globals.ircState.ircConnected) && (window.globals.ircState.ircIsAway)) {
+        document.getElementById('ircServerPanel').showPanel();
+        document.dispatchEvent(new CustomEvent('cancel-zoom'));
         this.sendIrcServerMessage('AWAY');
       }
     });
