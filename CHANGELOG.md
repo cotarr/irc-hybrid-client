@@ -8,7 +8,7 @@ and this project adheres to
 
 - To view notes on v2 major upgrade, scroll to Version v2.0.0 2023-09-12
 
-## Next v2.0.1-dev 2023-09-14
+## [v2.0.1](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.0.1) 2023-09-14
 
 Changed behavior of header-bar collapse all button "[-]" at upper right. 
 First click will show active panels as collapsed bars, further clicks 
