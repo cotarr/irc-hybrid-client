@@ -2091,9 +2091,13 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     } else if (window.globals.ircState.ircConnected) {
       // console.log('connected, no DOM changes');
       // Update channel topic from channel state
-      this.shadowRoot.getElementById('channelTopicDivId').textContent =
-        document.getElementById('displayUtils')
-          .cleanFormatting(window.globals.ircState.channelStates[this.channelIndex].topic);
+      if (window.globals.ircState.channelStates[this.channelIndex].topic == null) {
+        this.shadowRoot.getElementById('channelTopicDivId').textContent = '';
+      } else {
+        this.shadowRoot.getElementById('channelTopicDivId').textContent =
+          document.getElementById('displayUtils')
+            .cleanFormatting(window.globals.ircState.channelStates[this.channelIndex].topic);
+      }
       // state object includes up to date list of nicks in a channel
       this._updateNickList();
       // Update title string to include some data
@@ -2262,9 +2266,13 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     // Set Channel Name
     this.shadowRoot.getElementById('channelNameDivId').textContent = this.channelCsName;
 
-    this.shadowRoot.getElementById('channelTopicDivId').textContent =
-      document.getElementById('displayUtils')
-        .cleanFormatting(window.globals.ircState.channelStates[this.channelIndex].topic);
+    if (window.globals.ircState.channelStates[this.channelIndex].topic == null) {
+      this.shadowRoot.getElementById('channelTopicDivId').textContent = '';
+    } else {
+      this.shadowRoot.getElementById('channelTopicDivId').textContent =
+        document.getElementById('displayUtils')
+          .cleanFormatting(window.globals.ircState.channelStates[this.channelIndex].topic);
+    }
 
     // Load beep sound configuration from local storage
     this._loadBeepEnable();

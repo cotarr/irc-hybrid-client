@@ -1078,7 +1078,7 @@ window.customElements.define('pm-panel', class extends HTMLElement {
         this.collapsePanel();
       }
     } else {
-      console.log('initialize, not cache reload, calling showPanel()');
+      // console.log('initialize, not cache reload, calling showPanel()');
       this.showPanel();
     }
 

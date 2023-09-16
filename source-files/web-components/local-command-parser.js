@@ -722,11 +722,19 @@ window.customElements.define('local-command-parser', class extends HTMLElement {
       case 'TOPIC':
         if ((parsedCommand.params.length > 1) &&
           (window.globals.ircState.channels.indexOf(parsedCommand.params[1].toLowerCase()) >= 0)) {
-          ircMessage = 'TOPIC ' + parsedCommand.params[1] + ' :' + parsedCommand.restOf[1];
+          if (parsedCommand.restOf[1] === '-delete') {
+            ircMessage = 'TOPIC ' + parsedCommand.params[1] + ' :';
+          } else {
+            ircMessage = 'TOPIC ' + parsedCommand.params[1] + ' :' + parsedCommand.restOf[1];
+          }
         } else if ((parsedCommand.params.length > 0) &&
           (channelPrefixChars.indexOf(parsedCommand.restOf[0].charAt(0)) < 0) &&
           (inputObj.originType === 'channel')) {
-          ircMessage = 'TOPIC ' + inputObj.originName + ' :' + parsedCommand.restOf[0];
+          if (parsedCommand.restOf[0] === '-delete') {
+            ircMessage = 'TOPIC ' + inputObj.originName + ' :';
+          } else {
+            ircMessage = 'TOPIC ' + inputObj.originName + ' :' + parsedCommand.restOf[0];
+          }
         } else {
           return {
             error: true,

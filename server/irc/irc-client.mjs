@@ -2277,7 +2277,7 @@ const test1Handler = function (req, res, next) {
   } else {
     res.json({
       error: true,
-      message: 'To debug garbage collection run: node --expose-gc bin/www'
+      message: 'To debug garbage collection run: node --expose-gc bin/www.mjs'
     });
   }
   // -----------------------------------------

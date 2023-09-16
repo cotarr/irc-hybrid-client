@@ -1,4 +1,4 @@
-# Changelog
+`# Changelog
 
 All notable changes to this project will be documented in this file.
 
@@ -7,6 +7,11 @@ and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - To view notes on v2 major upgrade, scroll to Version v2.0.0 2023-09-12
+
+- In channel-panel.js, fixed TypeError when channel topic is un-set, causing old topic to remain.
+- In local-command-parser.js, Added -delete argument to TOPIC command to un-set the channel topic, example: `/TOPIC #channel -delete`
+- server/irc-client.mjs correction of error message.
+- In pm-panel, remove extraneous console.log
 
 ## [v2.0.2](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.0.2) 2023-09-16
 
@@ -2483,3 +2488,4 @@ making repository public.
 ## (no version) 2021-03-25
 
 * Start concept repository.
+`
