@@ -173,6 +173,9 @@ th, td {
 .websocket-table {
   margin-left: 60px;
 }
+.vh-10 {
+  height: 10px;
+}
 .vh-20 {
   height: 20px;
 }

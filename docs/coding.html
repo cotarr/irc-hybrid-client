@@ -20,6 +20,7 @@
           <li><a href="login-config.html">Login Config</a></li>
           <li><a href="server-config.html">IRC Config</a></li>
           <li><a href="text-commands.html">Text Commands</a></li>
+          <li><a href="hotkeys.html">Keyboard Shortcuts</a></li>
           <li><a href="faq.html">FAQ</a></li>
           <li><a class="active" href="coding.html">Coding Notes</a></li>
           <li><a href="api.html">API Examples</a></li>
@@ -36,8 +37,8 @@
 
         <h3>Project Goals</h3>
         <ul>
-          <li>Stuck at home during Covid-19 lockdown. Find an interesting project.</li>
-          <li>Web IRC client for iPhone Plus (375 px) using Chrome IOS browser.</li>
+          <li>March 2021, stuck at home during Covid-19 government lock-down, looking for an interesting project.</li>
+          <li>Wanted an IRC webclient for for iPhone Plus (375 px) using Chrome IOS browser.</li>
         </ul>
         <h3>Program Structure</h3>
         <p>
@@ -93,10 +94,10 @@
           <li>Backend: HTTP Username/password login and session cookies.</li>
           <li>Frontend: Displays IRC messages, touch controls, and IRC text commands.</li>
           <li>Frontend: Compatible with voice dictation on smartphone (IOS).</li>
-          <li>Frontend is native JavaScript using only browser APIs</li>
+          <li>Frontend is native JavaScript using only browser APIs (No web frameworks)</li>
           <li>Browser Content Security Policy (CSP) enforced</li>
           <li>Implementation of CSRF tokens.</li>
-          <li>TLS support for both Web Server and IRC server. Works with Lets Encrypt certificates.</li>
+          <li>TLS support for both Web Server and IRC server. Compatible with Lets Encrypt certificates.</li>
           <li>IRC server configuration JSON files are remotely configurable from the web interface.</li>
           <li>Capability to fall back to alternate nickname, option to auto-recover primary nickname</li>
           <li>Capability to auto-reconnect and/or rotate servers after disconnect</li>
@@ -112,6 +113,19 @@
           <li>Development performed on DALnet, other IRC networks not tested.</li>
           <li>No automated tests are included.</li>
         </ul>
+        <h3>Version v2.0.0 Upgrade (Sept 2023)</h3>
+        <ul>
+          <li>Scope: Rewrite web browser HTML, JavaScript, CSS</li>
+          <li>Reason: After 2.5 years of use, frustrating UI issues were identified.</li>
+          <li>Previous browser code was difficult to edit. It was one very large JavaScript file, one HTML file.</li>
+          <li>Coding goal: Split into modular web components, custom elements, shadow DOM</li>
+          <li>Limits: No changes to backend API, or remote IRC client (Browser only change)</li>
+          <li>Result: approximately 30 custom web components written, no framework used.</li>
+          <li>General look and feel of the UI was maintained.</li>
+          <li>More Info: See CHANGELOG.md v2.0.0 2023-09-12</li>
+        </ul>
+
+
       </div> <!-- /text-div -->
 
     </div> <!-- outer-div -->

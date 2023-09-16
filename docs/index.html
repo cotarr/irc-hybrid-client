@@ -5,12 +5,12 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
 
 		<title>Irc hybrid-client /docs/</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/styles-dark.css">
 	</head>
-	<body>
+	<body class="body">
     <div class="header-div">
       Documentation for
-      <a href="https://github.com/cotarr/irc-hybrid-client">irc-hybrid-client</a>
+      <a href="https://github.com/cotarr/irc-hybrid-client" class="light-theme">irc-hybrid-client</a>
     </div>
     <div class="menu-div-fixed">
       <div class="menu-div">
@@ -20,6 +20,7 @@
           <li><a href="login-config.html">Login Config</a></li>
           <li><a href="server-config.html">IRC Config</a></li>
           <li><a href="text-commands.html">Text Commands</a></li>
+          <li><a href="hotkeys.html">Keyboard Shortcuts</a></li>
           <li><a href="faq.html">FAQ</a></li>
           <li><a href="coding.html">Coding Notes</a></li>
           <li><a href="api.html">API Examples</a></li>
@@ -31,17 +32,6 @@
     <div class="outer-div">
       <div class="text-div">
 
-        <div class="upgrade-info">
-          <div class="install-section-title">
-            Upgrade Note
-          </div>
-          <p>
-            The HTML web frontend is being upgraded from v0.2.53 to Version 2.0.0 in approximately September 2023.
-            This &quot;/docs/&quot; folder still contains legacy screen capture images from the previous version.
-            An upgrade of the /docs/ folder is underway. See CHANGELOG.md file.
-          </p>
-        </div>
-
         <div class="desc-title">
           Home
         </div>
@@ -49,7 +39,10 @@
           Irc-hybrid-client is an IRC web client that uses a JavaScript frontend and Node.js/Express backend.
         </p>
         <p>
-          This project is still under development and new features may be added in the future.
+          The irc-hybrid-client supports both a light mode and dark mode. 
+          This page was done with a black background to better show the screen capture images
+          using the dark mode color scheme. The other pages are light background to 
+          match various diagrams in the help pages.
         </p>
         <p>
           The development and debugging were done using an iPhone and IOS Chrome Browser.
@@ -66,7 +59,7 @@
               <a href="installation.html">installation</a> section,
               a single user private web server can be deployed in a Linux shell.
             </p><p>
-              Using a smartphone, you can enter your web server
+              Using a smartphone, laptop, or full size desktop display you can enter your web server
               login credentials to gain access to your private IRC client web server.
             </p>
           </div>
@@ -80,110 +73,122 @@
             <p>
               The green [Web] icon at the top indicates that your browser is
               successfully connected to the backend web server.
-              You should see familiar IRC configuration settings 
-              showing your IRC nickname.
-            </p><p>
+            </p>
+            <p>
               In this application, the web server manages
               the IRC server connection independently of the
               web browser. In this type of hybrid client, if
               you are temporarily disconnected, such as the smartphone
               screen lock, your nickname will remain present on IRC.
-            </p><p>
-              The web server maintains a predefined list of IRC servers.
-              A server list editor is available by pressing the [Edit-Server-List] button.
-              This will open an independent web page that can be used to create, 
-              modify, or delete IRC server definitions from the list. 
-              These are described in the <a href="server-config.html">Server-config</a> tab.
-            </p><p>
-              The [Next] and [Prev] buttons are used to cycle through the 
-              list of available IRC server definitions.
-            </p><p>
-              The buttons [light] and [dark] can be used to switch between color themes.
-              
-            </p><p>
-              After selecting a server, the next step is to connect to IRC with 
-              your nickname using either the [Connect-IRC] button or 
-              you can tap on the red [IRC] status icon at the top.
+              The red [IRC] icon indicates you are disconnected from the IRC network.
+            </p>
+            <p>
+              The IRC Controls panel will show information to identify the currently
+              selected IRC server configuration.
+              Press the [Connect] button to instruct the backend web server 
+              to make a connection to the IRC network. If desired, an 
+              alternate nickname may be specified for this connection.
+            </p>
+            <p>
+              The Server List panel and the IRC Server edit form panel are explained
+              with screen captures and instructions in 
+              the <a href="server-config.html">IRC Config</a> page of the /docs/.
             </p>
           </div>
           <div class="image-photo">
-            <img src=images/irc-login.png width="394" height="475"alt="IRC login form image">
+            <img src=images/irc-login.png width="412" height="378"alt="IRC Controls panel">
           </div>
         </div>
 
         <div class="home-detail">
+          <p>
+            
+          </p>
           <div class="image-text">
             <p>
-              A yellow [IRC] icon indicates the connection process is in progress.
+              A yellow [IRC] icon indicates a connection request is in progress.
               The [IRC] icon will change to green to indicate that the backend web
               server is logged into the IRC network.
+              The IRC Server panel may open briefly to display IRC connection 
+              status, but it will close when IRC connects.
             </p>
+              The Join IRC Channels panel contains configurable buttons
+              used to /JOIN IRC channels what were configured in the IRC server configuration.
+              In this case, the &quot;#myChannel&quot; button will be clicked to 
+              join the #myChannel IRC channel.
             <p>
-              Up on successful connection to the IRC server, a lot of content
-              will scroll within the server window.
-              This includes information about the server and the IRC server message
-              of the day (motd).
-            </p>
-            <p>
-              At any time you can disconnect from the IRC server by tapping the
-              green [IRC] status indicator at the top.  You can also disconnect
-              from the web page, leaving your nickname present on IRC by
-              tapping the green [Web] icon at the top.
+              On this panel, the (0) icon at the top indicates the number of active IRC 
+              channel panels. Other IRC channel names may be entered ad-hoc in the input field
+              to the left of the [Join Channel] button.
+              At the bottom of the panel, check boxes indicate if new channel panels should be created 
+              with audio beep sounds enabled by default. The beep sounds are configurable 
+              in each channel.
             </p>
           </div>
           <div class="image-photo">
-            <img src=images/irc-connected.png width="386" height="646" alt="IRC connected image">
-          </div>
-        </div>
-
-        <div class="home-detail">
-          <div class="image-text">
-            <p>
-              The user interface for this program is divided into
-              collapsible sections that can be expanded with the [+]
-              buttons located on the left. The interface can be returned
-              to this configuration with all sections collapsed by tapping the [-all]
-              button in the status bar at the top.
-            </p>
-            <p>
-              In this case, server window was closed with the [-] Server button.
-            </p>
-            <p>
-              The green window at the bottom is where you can join IRC channels.
-              If you defined some favorite IRC channel names in the configuration
-              file, buttons will be added to allow easy navigation
-              to join channels while using a smartphone. In this example
-              we will tap the "#myChannel" button.
-            </p>
-          </div>
-          <div class="image-photo">
-            <img src=images/collapsed.png width="392" height="427"alt="Main view collapsed image">
+            <img src=images/channel-join.png width="401" height="322" alt="Join IRC Channel">
           </div>
         </div>
 
 
         <div class="home-detail">
           <div class="image-text">
+            <p>
+              This screen capture image shows an IRC Channel panel viewed as it would look on an iPhone 
+              in vertical orientation.
+            </p>
             <p>
               The channel name and topic are displayed at the top of the channel window.
-              The green icon with the digit (2) indicates there are 2 people present in the channel.
-              The white icon with the digit (1) indicates 1 unread message has been received in the channel.
-              Below the title is a list of nicknames for users present in the channel,
-              followed by a text area where messages are displayed.
-            </p><p>
-              Text messages can be entered using a keyboard, smartphone popup text editor
-              or using smartphone voice dictation. The send button is useful during
-              voice dictation, but pressing [Enter] or [Return] will also send messages.
-            </p><p>
+              The circle icon with transparent background and 
+              digit (2) indicates there are 2 people present in the channel.
+              The circle icon with solid background and digit (1) indicates 1 unread message has been 
+              received in the channel while the channel panel was not the active panel.
+              Below the title is a scrollable list of nicknames showing users present in the channel,
+              followed by a scrollable text area where channel messages are displayed.
+            </p>
+            <p>
+              Multiple panels may be open simultaneously for different IRC channels.
+              Multiple panels may be scrolled vertically. Each panel may be
+              hidden from view using the [X] icon in the upper left.
+              Next to this is a button with two arrows, one up and one down, 
+              which is used to collapse the channel panel to a bar.
+            </p>
+            <p>
+              The [Leave] button is used to issue a &quot;/PART&quot; command to leave the IRC channel.
+              After leaving a new [JOIN] will become visible which may be used to re-enter the IRC channel.
+              If there is no intention to return, a [Prune] button will become visible and it may be clicked to 
+              remove the panel and purge all channel related content from the message cache.
+            </p>
+            <p>
+              Should your nickname be kicked from the IRC channel, a colored &quot;Kicked&quot; icon will 
+              appear at the top of the channel panel. A Join button will be displayed 
+              on the channel panel which may be used to rejoin the channel, unless banned.
+            </p>
+
+          </div>
+          <div class="image-photo">
+            <img src=images/channel-vertical.png width="385" height="653"alt="Channel Vertical image">
+          </div>
+        </div>
+
+
+
+        <div class="home-detail">
+          <div class="image-text">
+            <p>
+              Clicking the text input area on an iPhone will trigger the phone to 
+              open a touch keyboard. The IRC Channel panel will scroll upwards to 
+              make room for the keyboard.
+              On an iPhone, the microphone button on the Apple touch keyboard 
+              may be used to engage the phone voice to text features.
+              The send button is useful during voice dictation, but 
+              pressing [Enter] or [Return] will also send messages.
+            </p>
+            <p>
               A primitive auto-complete function has been added to the channel window that will
               include channel name and nicknames present on the channel list.
               The auto-complete trigger is tab character, or double space
               (space-space) on mobile devices. Double tab or triple space fills channel name.
-            </p><p>
-              Checkboxes can be selected to enable an audible beep tone to
-              trigger when messages are typed in the channel, or when your
-              nickname is mentioned on the channel. Custom audio file selection is
-              not available.
             </p>
             <p>
               Multi-line clipboard content can be sent. Paste the clipboard into the input 
@@ -192,9 +197,11 @@
             </p>
           </div>
           <div class="image-photo">
-            <img src=images/channel-vertical.png width="386" height="686"alt="Channel Vertical image">
+            <img src=images/channel-keyboard.png width="375" height="718"alt="Channel panel popup keyboard">
           </div>
         </div>
+
+
 
         <div class="home-detail">
           <div class="image-text">
@@ -203,69 +210,96 @@
               will select channel zoom mode.
             </p>
             <p>
-              Zoom mode will collapse all other windows.
+              Zoom mode will hide all other panels.
+            </p>
+            <p>  
+              The number of columns and rows in the 
+              textarea elements will be adjusted to allow the channel panel 
+              to fill the screen. However, dynamic resizing is disabled during zoom due to 
+              conflicts with the popup touch keyboard. If the browser size is changed on the 
+              desktop while zoomed, un-zoom, then re-zoom again to fit the page. 
+              When not zoomed, all panels will auto-resize dynamically as needed. 
             </p>
             <p>
-              While in channel zoom mode, the buttons and checkboxes at the
-              bottom of the channel window will be hidden.
-              If the screen width is below a minimum value, the nickname list is also hidden.
-              The hidden items can be toggled to visible by clicking the [Zoom] / [Un-Zoom] button.
+              If the screen width is below a minimum value, the nickname list 
+              is also hidden in zoom mode. To view the nickname list, unzoom, the re-zoom the panel.
             </p>
             <p>
-              In this case there are no unread messages so 
-              the white unread message icon has been removed from the channel window.
+              When a channel window is in zoom mode, all other channel panels 
+              and private message panels are blocked from opening while zoom is active. 
+              Icons in the header bar will indicate the presence of unread messages in other 
+              panels as described further on at the bottom of this help page.
+              Manually opening any other panel will cancel the zoom.
+            </p>
+            <p>
+              When in zoom mode, a [Zoom] icon will appear in the header bar at the top of the page.
+              Clicking the [Zoom] icon in the header bar will also cancel the zoom.
             </p>
           </div>
           <div class="image-photo">
-            <img src=images/channel-zoom.png width="385" height="689"alt="Channel Zoom mode image">
+            <img src=images/channel-zoom.png width="385" height="684"alt="Channel Zoom mode">
           </div>
         </div>
+
+
+        <div class="home-detail">
+          <div class="image-text">
+            <p>
+              Clicking the button with the double up/down arrows will 
+              expose a hidden section of the channel panel with additional settings.
+            </p>
+            <p>
+              The Inhibit-auto-scroll checkbox, when checked, will temporarily prevent
+              the textarea element from auto-scrolling when a new message arrives.
+              The intent of auto-scroll is position the most recent 
+              message to the bottom so it will be visible.
+              However, auto-scrolling clears text highlighting, and this makes copying text 
+              or URL to the clipboard almost impossible during a busy conversation.
+            </p>
+            <p>
+              The brief checkbox changes the text format so that the message 
+              timestamp and nickname will be positioned on separate lines separated by a space.
+              When not selected, each message will be a single line of text as shown in the next screen capture 
+              immediately below. This is intended for use on a larger display, such as a desktop monitor.
+            </p>
+            <p>
+              The auto-complete can be disabled if it is conflicting with the user input, such as 
+              entering multiple space characters intentionally.
+            </p>
+            <p>
+              The 3 checkboxes at the bottom will enable the browser to play a brief audio &quot;beep&quot;
+              sound when a new message arrives, a new person joins the IRC channel, or your 
+              current nickname is mentioned in conversation.
+              There are instruction for configuration of custom sounds in the
+              <a href="login-config.html">Login Config</a> section.
+            </p>
+          </div>
+          <div class="image-photo">
+            <img src=images/channel-settings.png width="385" height="732"alt="Channel panel settings">
+          </div>
+        </div>
+
+
 
         <div class="home-detail">
           <div class="image-text">
             <p>
               When the smartphone is flipped on it's side, the screen layout
               will adapt to the new screen width.
-              In this case the channel is still enabled.
+              When irc-hybrid-client is used on a desktop monitor, the 
+              format will be the same, except the display is larger.
             </p>
             <p>
-              There are two different text format schemes that are selected
-              automatically when the page loads. These can be toggled at any
-              time by selecting the checkbox marked: [X] Brief.
-              The Brief checkbox is not visible here because the Zoom was enabled.
+              Here you can see the alternate text format when the Brief checkbox is not checked.
+              The two different text format schemes are selected
+              automatically when the page loads. 
+            </p>
+            <p>
+              The channel panel may be zoomed and un-zoomed in horizontal configuration.
             </p>
           </div>
           <div class="image-photo">
-            <img src=images/channel-horizontal.png width="702" height="336"alt="Channel Horizontal image">
-          </div>
-        </div>
-
-        <div class="home-detail">
-          <div class="image-text">
-            <p>
-              The horizontal phone position is also a good way to view
-              server messages that are sent by the IRC server.
-            </p>
-            <p>
-              A limited set of IRC text commands are supported.
-              Text commands start with a slash / character and
-              text commands can be entered in any of the windows.
-              If you scroll to the top, the Info/License window
-              includes a list of supported IRC text commands.
-            </p>
-            <p>
-              Buttons marked [Refresh] are located on several windows.
-              The refresh feature will refresh all windows from a
-              message buffer stored in the web server. The cache is
-              currently 100 IRC server messages per IRC channel up to 5 channels.
-              The message buffer is primarily intended to refresh after short disconnects,
-              such as smartphone screen lock. Refreshing after
-              a longer period of time may cause the cache buffer
-              to exceed size limit and some older messages may be discarded.
-            </p>
-          </div>
-          <div class="image-photo">
-            <img src=images/server-message.png width="686" height="331"alt="IRC Server message image">
+            <img src=images/channel-horizontal.png width="738" height="382"alt="Channel Horizontal image">
           </div>
         </div>
 
@@ -275,159 +309,362 @@
             <p>
               The application is also capable of exchanging private messages with
               other users.
-              A separate window is used for each separate nickname.
+              A separate window is used for each separate private message nickname.
             </p>
             <p>
-              The white icon with the number (1) indicates 1 unread message has been received.
+              In this case, the (P) icon in the header bar shows an unread message has arrived.
+              The circle icon with solid background and number (1) indicates 1 unread message has been received
+              in the private message panel when the panel was not the active panel.
             </p>
             <p>
-              The checkbox in the Private Messages window marked &quot;Open/Refresh with line-beep enabled&quot;
-              will set a global default value that is used to enable audio beep sound when a new private message is received.
-              This global setting is persisted in the browser localStorage.
-              Each nickname specific private message window can control the audio beep sounds independently.
-              However, reloading messages from cache will revert all PM windows to the global value.
-            </p>
-            <p>
+              Private message panels will remain active as long as the corresponding 
+              messages are present in the message cache.
+              The double arrow button may be used to expose additional private message 
+              settings where a [Erase All PM Panels] button can clear the cache.
+              Clearing the cache will remove all private message panels and their messages.
+             </p>
+             <p>
               DCC CHAT messaging is not supported.
             </p>
           </div>
           <div class="image-photo">
-            <img src=images/private-message.png width="389" height="624"alt="Private Message image">
+            <img src=images/private-message.png width="387" height="344"alt="Private Message image">
           </div>
         </div>
 
         <div class="home-detail">
           <div class="image-text">
             <p>
-              Notice and Wallops messages can also be viewed. These sections
-              will become hidden when collapsed, but can be re-opened at
-              any time using the [+all] button at the top.
+              The hamburger icon at the top will activate a drop down menu.
+              Active private message panels and active IRC channel panels are 
+              dynamically added to the dropdown menu. If there are any 
+              unread messages, a number will appear inside a circle icon located 
+              to the right of the panel name showing the unread message count.
+            </p>
+            <p>
+              Selecting the names of the panels in the dropdown will open the panel.
+              The panel will vertically scroll into position and the cursor will be placed in the text 
+              input area.
+            </p>
+            <p>
+              If multiple IRC channels are open, the Alt-N (Next) HotKey can be 
+              used to cycle between IRC channel panels. (Private message panels are not included in Alt-N.)
             </p>
           </div>
           <div class="image-photo">
-            <img src=images/notice-vert.png width="386" height="627"alt="Notice and Wallops image">
+            <img src=images/dropdown-count.png width="389" height="424"alt="Private Message image">
+          </div>
+        </div>
+
+
+        <div class="home-detail">
+          <div class="image-text">
+            <p>
+              IRC channel panels and private message panels can be collapsed to bars 
+              using the button in each panel with the double arrow.
+            </p>
+            <p>
+              The [-] button at the right of the header bar will collapse all 
+              active IRC channels and private message panels to bars. If clicked a second time 
+              within 3 seconds, the active panels will toggle between hidden and collapsed bar.
+            </p>
+            <p>
+              HotKeys are also available for this function. Alt-B will collapse all active 
+              panels to collapsed bars. Alt-X will hide all panels.
+            </p>
+            <p>
+              A panel that has been collapsed into a bar will increment unread 
+              message icons when new messages arrive.
+              Hidden panels will open and scroll into position.
+              This behavior is summarized in the help panel.
+            </p>
+
+          </div>
+          <div class="image-photo">
+            <img src=images/collapsed-panels.png width="389" height="280"alt="Main view collapsed image">
           </div>
         </div>
 
         <div class="home-detail">
           <div class="image-text">
             <p>
-              The status bar at the top will display various status icons
-              to show the status of the program. In this case, the green [Web] icon
-              indicates the web server is connected. The [Web] icon can be tapped
-              as an alternate way to connect and disconnect the browser.
-              The green [IRC] icon indicates the IRC server is also connected.
+              New private message conversations can be initiated using the 
+              Private Message panel which can be opened from the dropdown 
+              menu or by using the Alt-P HotKey.
+              From this panel, the recipient nickname and private message text can be entered. 
+              Upon submitting the message a new private message panel will be created.
+              Optionally, there is a /WHOIS button that can be optionally used to 
+              check if the recipient is online in the IRC network before sending the message.
             </p>
-          </div>
-          <div class="image-photo">
-            <img src=images/icons-1.png width="389" height="56"alt="Icon-1">
-          </div>
-        </div>
-        <div class="home-detail">
-          <div class="image-text">
             <p>
-              The red [Web] icon indicates the browser is disconnected from the web server.
-              The black [IRC] icon indicates the status of the IRC server is unknown.
+              The round circle icon with transparent background show here with &quot;0&quot; indicates the count 
+              of active private message panels. In this case it is zero because 
+              no panels have been created yet. If there are any unread private messages, 
+              a second circle icon will appear with a solid background indicating 
+              the sum all all unread private messages over all private message panels.
             </p>
-          </div>
-          <div class="image-photo">
-            <img src=images/icons-2.png width="390" height="55"alt="Icon-1">
-          </div>
-        </div>
-        <div class="home-detail">
-          <div class="image-text">
             <p>
-              The red [IRC] icon indicates the IRC server is disconnected.
-              A yellow [IRC] icon indicates a new connection attempt has started.
-              The [IRC] icon can be tapped as an alternate way to
-              connect and disconnect the web server.
+              New IRC channels may be created using the Join IRC Channels panel as 
+              described previously. This panel may be opened from the dropdown menu 
+              or using the Alt-C HotKey.
             </p>
-          </div>
-          <div class="image-photo">
-            <img src=images/icons-4.png width="393" height="56"alt="Icon-1">
-          </div>
-        </div>
-        <div class="home-detail">
-          <div class="image-text">
             <p>
-              The pink [Wait] icon indicates that auto-reconnect is active.
-              When the timer reaches the limit, the IRC server will attempt to
-              reconnect to IRC.
+              Similarly, the round circle icon with transparent background 
+              show here with &quot;0&quot; indicates the count 
+              of active IRC channel panels. In this case it is zero because 
+              no panels have been created yet. If there are any unread channel messages, 
+              a second circle icon will appear with a solid background indicating 
+              the sum all all unread channel messages over all channel panels.
             </p>
           </div>
           <div class="image-photo">
-            <img src=images/icons-5.png width="391" height="55"alt="Icon-1">
+            <img src=images/new-messages.png width="386" height="481"alt="Private Message image">
           </div>
         </div>
-        <div class="home-detail">
-          <div class="image-text">
-            <p>
-              Icons for C, P, and N will appear to indicate
-              recent activity in a C=Channel P=Private message and N=Notice windows.
-              The activity icons can be cleared by tapping the activity
-              icon or typing a message from the associated window.
-            </p>
-          </div>
-          <div class="image-photo">
-            <img src=images/icons-6.png width="390" height="53"alt="Icon-1">
-          </div>
-        </div>
-        <div class="home-detail">
-          <div class="image-text">
-            <p>
-              There is also an Away indicator that can be tapped to clear your away status.
-            </p>
-          </div>
-          <div class="image-photo">
-            <img src=images/icons-7.png width="389" height="53"alt="Icon-1">
-          </div>
-        </div>
+
+
 
         <div class="home-detail">
           <div class="image-text">
             <p>
-              When loading a new web page for the first time, or reloading a page,
-              web browser security policies block play of media files until a 
-              user interaction is detected. Configurable beep sounds for arriving IRC messages
-              may be blocked by this policy. If media playback appears to be blocked, 
-              a button labeled [+Audio] will be shown.
-              Activate the [+Audio] button to unblock beep sounds for incoming IRC messages.
+              Notice and Wallops messages are viewed in dedicated panels.
+              These panels will remain hidden until a message arrives.
+              The panels may be opened from the dropdown menu.
+              Clicking activity icons in the header bar will also display the 
+              corresponding panel.
+            </p>
+            <p>
+              The [Erase] buttons will send a request to the web server 
+              to remove all wallops or notice messages from the 
+              wallops message cache or notice message cache.
+            </p>
+            <p>
+              The notice panel is used to display incoming and outgoing CTCP.
+            </p>
+            <p>
+              The irc-hybrid-client web server will respond to 
+              other users who submit a CTCP request for:
+              CLIENTINFO, PING, TIME, and VERSION.
             </p>
           </div>
           <div class="image-photo">
-            <img src=images/audio.png width="386" height="52"alt="Enable audio sounds">
+            <img src=images/notice-vert.png width="388" height="476"alt="Notice and Wallops image">
           </div>
         </div>
+
 
         <div class="home-detail">
           <div class="image-text">
             <p>
-              When all windows are collapsed using the [-all] button, 
-              various counter icons will show status as follows.
+              The IRC Server panel may be used to view IRC server messages. 
+              User generated channel messages and private messages will 
+              have been removed by filters and they are not shown on  this panel.
+              The IRC server panel may be opened from the dropdown menu, 
+              the Alt-S HotKey, or the (S) activity icon in the header bar.
             </p>
-            <ul>
-              <li>Private message, (1) window exists (blue) with (1) unread message (white)</li>
-              <li>The (P) icon in the top bar indicates the unread PM count is greater than zero.</li>
-              <li>IRC Channels, (1) channel has been joined (green) and there is a total of (5) unread message from all IRC channels</li>
-              <li>The (C) icon in the top bar indicates the channel unread count is greater than zero.</li>
-              <li>In #myChannel, (2) people have joined the channel (light green) and there are (5) unread messages (white).</li>
-            </ul>
+            <p>
+              A limited set of IRC text commands are supported.
+              Text commands start with a slash / character.
+              The channel panel and private message panels also support 
+              IRC text commands.
+              The help panel (Alt-H) includes a list of supported IRC text commands.
+            </p>
+            <p>
+              In this example, the IRC command &quot;/MOTD&quot; was sent to the IRC server 
+              and the panel shows the IRC server's &quot;Message of the day&quot; response.
+            </p>
+            <p>
+              Buttons marked [Refresh] are located on several panels.
+              The refresh feature will refresh all panels from an IRC
+              message buffer stored in the web server. The cache is
+              currently 100 IRC server messages per IRC channel up to 5 channels.
+              The message buffer is primarily intended to refresh after short disconnects,
+              such as smartphone screen lock. Refreshing after
+              a longer period of time may cause the cache buffer
+              to exceed size limit and some older messages may be discarded.
+            </p>
+            <p>
+              The IRC &quot;Lag&quot; times displayed here represent PING measurements
+              between the remote IRC client, located inside the web server, and the remote 
+              IRC server. Packet delay between the web browser and web server would not 
+              be included in this time measurement.
+
+            </p>
           </div>
           <div class="image-photo">
-            <img src=images/unread-counters.png width="388" height="416"alt="Icon-1">
+            <img src=images/server-message.png width="748" height="496"alt="IRC Server message image">
           </div>
         </div>
 
-        <div class="home-detail">
-          <div class="image-text">
-            <p>
-              An R icon is shown to indicate when automatic nickname recovery is active.
-            </p>
-          </div>
-          <div class="image-photo">
-            <img src=images/icons-8.png width="384" height="48"alt="Icon-1">
-          </div>
+
+
+        <div class="vh-20"></div>
+        <div class="header-bar-color-div">
+          <h2>Header Bar Status Icons</h2>
         </div>
+        <div class="vh-20"></div>
+        <div class="ml-20">
+          <img src=images/header-icons.png width="616" height="123"alt="Header Bar Icons">
+        </div>
+        <div class="vh-7"></div>
+        <div class="header-bar-color-div">
+  
+          <div class="vh-20"></div>
+
+          <div>
+            <div>
+              The &quot;Web&quot; icon is a mouse clickable button that can be
+              used to temporarily place the web page in a &quot;Standby&quot; mode.
+              This will disconnect the websocket connection between the web browser
+              and the web server. The web page login remains active.
+              If IRC is connected your nickname will remain active on IRC.
+            </div>
+            <div class="vh-7"></div>
+            <div>
+              <div id="webConnectIconId" class="hbar-connect-icon">Web</div>
+              <span>Red - Web page is in Standby, websocket disconnected</span>
+              
+            </div>
+            <div>
+              <div id="webConnectIconId" class="hbar-connect-icon" connected>Web</div>
+              <span>Red - Web page connected to web server.</span>
+            </div>
+          </div>
+          <div class="vh-20"></div>
+
+          <div>
+            <div>
+              The &quot;IRC&quot; icon is a mouse clickable button that controls
+              the remote IRC network connection. When a green icon is clicked,
+              it is equivalent to the IRC command &quot;/QUIT&quot;.
+              Clicking a red icon is equivalent to clicking the [Connect] button
+              on the IRC Controls panel, or the server list.
+            </div>
+            <div class="vh-7"></div>
+            <div>
+              <div id="ircConnectIconId" class="hbar-connect-icon">IRC</div>
+              <span>Red - Disconnected from IRC</span>
+            </div>
+            <div>
+              <div id="ircConnectIconId" class="hbar-connect-icon" connecting>IRC</div>
+              <span>Yellow - Connect or Re-connect in progress</span>
+            </div>
+            <div>
+              <div id="ircConnectIconId" class="hbar-connect-icon" connected>IRC</div>
+              <span>Green - Connected to IRC network</span>
+            </div>
+          </div>
+          <div class="vh-20"></div>
+
+
+          <div>
+            <div>
+              The Wait icon is applicable for the case where Auto-Reconnect has been enabled in the IRC server configuration 
+              for this IRC server. When an IRC disconnect occurs, logic and timers in the remote web server will 
+              attempt to reconnect to the IRC network. This icon indicates a reconnect is in progress and the 
+              user should avoid initiating a new connection. The reconnect may be aborted by using the Disconnect 
+              button on the IRC controls panel.
+            </div>
+            <div id="waitConnectIconId" class="hbar-wait-icon">Wait...</div>
+          </div>
+
+          <div class="vh-20"></div>
+          <div>
+            <div>
+              Nickname recovery mode occurs after a network error causes the IRC network to disconnect.
+              After reconnecting, the previous nickname is still present on the IRC network, so an 
+              alternate nickname is used. The (R) icon indicated that nickname recovery is active 
+              and the previous nickname will be recovered after the previous connection times out.
+            </div>
+            <div id="nickRecovIconId" class="global-message-icon hbar-recovery-theme-dark">R</div>
+          </div>
+
+          <div class="vh-20"></div>
+          <div class="icon-row">
+            <div id="ircIsAwayIconId" class="hbar-away-icon">Away</div>
+            <span>Your nickname is marked &quot;Away&quot; on the IRC network</span>
+          </div>
+          <div class="vh-10"></div>
+          <div class="icon-row">
+            <div id="panelZoomIconId" class="global-message-icon channel-panel-zoomed">Zoom</div>
+            <span>IRC channel Zoom mode is active</span>
+          </div>
+
+          <div class="vh-20"></div>
+          <div>
+            The following are a series of unread message icons. Clicking the icons will 
+            open the associated panel, If multiple channel panels have unread messages,
+            each click will open the subsequent channel panel.
+          </div>
+          <div class="vh-7"></div>
+          <div class="icon-row">
+            <div id="serverUnreadExistIconId" class="global-message-icon irc-server-panel-theme-dark">S</div>
+            <span>Unread server messages exist.</span>
+          </div>
+          <div class="icon-row">
+            <div id="wallopsUnreadExistIconId" class="global-message-icon wallops-panel-theme-dark">W</div>
+            <span>Unread wallops messages exist.</span>
+          </div>
+          <div class="icon-row">
+            <div id="noticeUnreadExistIconId" class="global-message-icon notice-panel-theme-dark">N</div>
+            <span>Unread notice messages exist.</span>
+          </div>
+          <div class="icon-row">
+            <div id="privMsgUnreadExistIconId" class="global-message-icon pm-panel-theme-dark">P</div>
+            <span>Unread private messages exist.</span>
+          </div>
+          <div class="icon-row">
+            <div id="channelUnreadExistIconId" class="global-message-icon channel-panel-theme-dark" hidden>C</div>
+            <span>Unread channel messages exist.</span>
+          </div>
+          <div class="vh-20"></div>
+
+          <div>
+            When opening a web page, for security and privacy reasons, the browser will disable playing of media content
+            until the user takes an intentional action, such as clicking a &quot;Play&quot; button.
+            In the case where audio beep sounds are enabled, the Un-Mute button must be clicked to 
+            provide a user initiated action to enable playing of media in the browser.
+            Typically, refreshing the page in Chrome will require Un-Mute.
+          </div>
+          <div class="vh-7"></div>
+          <div class="icon-row">
+            <button id="enableAudioButtonId" class="hbar-enable-audio">Un-Mute</button>
+          </div>
+          <div class="vh-20"></div>
+
+          <div>
+            <div>
+              The activity spinner appears at the top center of the page just below
+              the header bar. The icon appears during an HTTP GET or POST request to the 
+              IRC related API routes on the web server. 
+              The spinner will be hidden when all concurrent HTTP requests are complete.
+              The IRC network returning text based messages return over a different channel using a socket 
+              connection as a stream. The spinner is limited to activity for the HTTP request 
+              to the web server API. Delays over TCP socket connections or from the remote IRC network 
+              are not indicated by the spinner.
+            </div>
+            <div id="activitySpinner">
+              <div class="activity-spinner-div"></div>
+            </div>
+            <div class="vh-20"></div>
+          </div>
+
+        </div>
+
+        <div class="vh-20"></div>
+        <div class="channel-panel-color-div">
+          <h2>Channel Panel Status Icons</h2>
+          <div class="icon-row">
+            <div id="beenKickedIconId" class="channel-panel-been-kicked-icon">Kicked</div>
+            <span>Your nickname has been kicked out of the IRC channel</span>
+          </div>          
+          <div class="icon-row">
+            <div id="notInChannelIconId" class="channel-panel-not-in-channel-icon" hidden>Not In Channel</div>
+            <span>The channel exists, but your nickname is not present in the channel</span>
+          </div>   
+          <div class="vh-20"></div>
+        </div>
+        <div class="vh-20"></div>
 
       </div> <!-- /text-div -->
 
@@ -435,7 +672,7 @@
 
     <div class="footer-div">
       Repository:
-      <a href="https://github.com/cotarr/irc-hybrid-client">
+      <a href="https://github.com/cotarr/irc-hybrid-client" class="light-theme">
         https://github.com/cotarr/irc-hybrid-client</a>
     </div> <!-- /footer-div -->
 	</body>

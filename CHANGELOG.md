@@ -8,6 +8,10 @@ and this project adheres to
 
 - To view notes on v2 major upgrade, scroll to Version v2.0.0 2023-09-12
 
+## [v2.0.2](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.0.2) 2023-09-16
+
+- Updated /docs/ folder using new screen captures and other content from the v2.0.0 upgrade (no code changes)
+
 ## [v2.0.1](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.0.1) 2023-09-14
 
 Changed behavior of header-bar collapse all button "[-]" at upper right. 

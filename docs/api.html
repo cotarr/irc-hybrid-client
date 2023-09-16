@@ -20,6 +20,7 @@
           <li><a href="login-config.html">Login Config</a></li>
           <li><a href="server-config.html">IRC Config</a></li>
           <li><a href="text-commands.html">Text Commands</a></li>
+          <li><a href="hotkeys.html">Keyboard Shortcuts</a></li>
           <li><a href="faq.html">FAQ</a></li>
           <li><a href="coding.html">Coding Notes</a></li>
           <li><a class="active" href="api.html">API Examples</a></li>
@@ -1268,6 +1269,19 @@ Cached message with 2 IRC channels.
               </td>
             </tr>
             <tr>
+              <td>DEBUGPONG</td>
+              <td>
+                DEBUGPONG is a diagnostic command used to measure network latency 
+                between the web browser and the web server. The test is triggered 
+                when the browser performs a GET request to the &quot;/irc/test3&quot; route.
+                The HTTP connection will return a Status 201 response which may be 
+                used to measure the API delay time of the HTTP response. Concurrently, the web server will 
+                return the text command &quot;DEBUGPONG&quot; through the web socket stream.
+                The browser can then measure the latency of commands sent to the API and returned
+                by websocket stream. There is a button in the Debug panel to perform this.
+              </td>
+            </tr>
+            <tr>
               <td>LAG=0.001</td>
               <td>
                 Each time the backend IRC client sends a PING command to the IRC server, 
@@ -1726,6 +1740,63 @@ http://localhost:3000/testws/test-websocket.html
         </p>
 
         <img src=images/websocket-trace.png width="874" height="464"alt="Websocket Example">
+
+
+        <div class="vh-20"></div>
+        <div class="vh-20"></div>
+        <div class="desc-title">
+          Web page Debug Panel
+        </div>
+        <p>
+          The Debug Panel is a general toolbox of diagnostic and software development functions.
+          These are intended for use in writing software changes and tracing software errors.
+          This panel is NOT intended for general use in operating the IRC client.
+        </p>
+        <p>
+          When using irc-hybrid-client on an iPhone, security features on mobile devices 
+          make it difficult to debug software. The debug panel allows in-app 
+          information that would typically be available in the browser development tools console
+          to be viewed directly in the application.
+        </p>
+        <p>
+          For users interested in learning how the RFC-2812 IRC protocol works, 
+          debug tools allow display of RAW IRC messages as they pass to and from the IRC network from your IRC client.
+        </p>
+        <p>
+          The Debug panel can be invoked from the dropdown navigation menu.
+        </p>
+        <p>
+          Appending &quot;#DEBUG&quot; to web page URL will show the debug panel when the page loads.
+        </p>
+
+        <h3>Admin Functions</h3>
+        <ul>
+          <li>Erase Cache - Sends command to web server to erase all IRC messages in the web server message cache.</li>
+          <li>Force Disconnect - To be used in the case where /QUIT does not disconnect from the IRC network.</li>
+          <li>Die Web Server - Send command to the web server to shut down.</li>
+        </ul>
+        <h3>Debug Functions</h3>
+        <ul>
+          <li>Button 1-1 Emulate IRC ping timeout</li>
+          <li>Button 1-2 Emulate websocket timeout</li>
+          <li>Button 1-3 Command NodeJs to perform garbage collection, report memory before and after (Requires backend started with &quot; node --expose-gc&quot;)</li>
+          <li>Button 1-4 Websocket ping, shows response time for both HTTP response and websocket stream response. Results shown at bottom of debug panel.</li>
+          <li>Button 2-1 Force all panels to be visible (Use care not to activate buttons in panels intended to be hidden)</li>
+          <li>Button 2-2 Force all status icons in the header bar to be visible (To cancel refresh page)</li>
+          <li>Button 2-3 Toggle Light/Dark theme</li>
+          <li>Button 3-1 Open show-ircstate debugging panel showing current values of IRC server state variables in NodeJs backend</li>
+          <li>Button 3-2 Open show-webstate debugging panel showing current values of local browser state variables</li>
+          <li>Button 3-3 Open show-raw debugging panel. Display incoming IRC server messages in raw format. Show current message cache</li>
+          <li>Button 3-4 Open show-events debugging panel. Activate eventListeners to track and display global javascript custom events (To cancel refresh page)</li>
+          <li>Button 4-1 Force ircState reload: API call, GET request to /irc/getircstate, fire global event for irc-state-changed</li>
+          <li>Button 4-2 Force message cache reload (Triggers multiple global events triggering API request and re-parsing cached messages)</li>
+          <li>Button 4-3 Emit: irc-state-changed event</li>
+          <li>Button 4-4 Emit: web-connect-changed event</li>
+          <li>Button 5-1 Play Beep Sound 1</li>
+          <li>Button 5-2 Play Beep Sound 2</li>
+          <li>Button 5-3 Play Beep Sound 3</li>
+        </ul>
+        <div class="vh-20"></div>
 
       </div> <!-- /text-div -->
 

@@ -20,6 +20,7 @@
           <li><a href="login-config.html">Login Config</a></li>
           <li><a href="server-config.html">IRC Config</a></li>
           <li><a href="text-commands.html">Text Commands</a></li>
+          <li><a href="hotkeys.html">Keyboard Shortcuts</a></li>
           <li><a class="active" href="faq.html">FAQ</a></li>
           <li><a href="coding.html">Coding Notes</a></li>
           <li><a href="api.html">API Examples</a></li>
@@ -42,6 +43,7 @@
         <a href="#tracking">Are there any tracking beacons in the code?</a><br>
         <a href="#cookies">Does the program use cookies?</a><br>
         <a href="#localstorage">What data is stored locally in the web browser?</a><br>
+        <a href="#refresh">What are &quot;IRC Cache Reload&quot; messages?</a><br>
         <div class="faq-spacer"></div>
         <table class="table-generic">
 
@@ -60,7 +62,7 @@
             to exchange IRC messages with the IRC server. It was really fun and I learned a lot.
             <br><br>
             As a second inspiration, I have tried several options to use IRC on my iPhone.
-            I really didn't like any of them. Given the Covid-19 pandemic lockdown,
+            I really didn't like any of them. Given the Covid-19 pandemic lock-down,
             I've been primarily stuck at home with nothing to do. Over the
             period of about a month, this slowly evolved into an IRC client. I started to use it
             as my regular IRC smartphone client. This started the endless process of
@@ -101,7 +103,8 @@
               Q: Are multiple IRC networks supported?<br>
             </p>
             A: No. The application is limited to one IRC network connection at a time.
-            You can sign out of IRC and switch between different IRC networks using the [Next] button.
+            You can sign out of IRC and switch between different IRC networks using
+            different configurations in the IRC server list.
             <br><br>
             However, a single user can be present on multiple IRC network by 
             running multiple instances of the irc-hybrid-client program concurrently.
@@ -149,26 +152,51 @@
             Local storage should not be preserved when a browser is in incognito mode.
             <br><br>
             1) Web userid - The web userid and timestamp are saved to localStorage.
-            The userid is an integer number starting at 1 that is assigned in the credentials.js file.
+            The userid is an integer number starting at 1 that is assigned 
+            in the .env file, environment variables, or credentials.js file.
             The userid number is used to delete localStorage when a change in userid is detected.
             The string value of the username is not saved.
             <br><br>
-            2) IRC channel name - The IRC channel name and time stamp are saved to localStorage
-            when an IRC channel &quotZoom&quot view mode is activated. This data is used
-            to automatically select IRC channel view mode as zoomed when re-opening the web page.
-            <br><br>
-            3) IRC channel audio beep - A string value for the IRC channel name and a boolean flag
+            2) IRC channel audio beep - A string value for the IRC channel name and a boolean flag
             for enable audio beep for an IRC channel are saved to localStorage when the checkboxes
             are selected. The data is used to select previous checkbox state when reloading the page.
+            The default audio beep configuration used as checkbox preset when creating new channel 
+            panels is also saved to localStorage in a different record limited to boolean flags and timestamp.
             <br><br>
-            4) Private message audio beep - A boolean flag used to enable audio beep 
+            3) Private message audio beep - A boolean flag used to enable audio beep 
             when new private message windows are created.
             The data is used to select previous checkbox state when reloading the page.
-            5) Color Theme - A string value of "light" or "dark" is saved to the localStorage 
+            <br><br>
+            4) Color Theme - A string value of "light" or "dark" is saved to the localStorage 
             property colorTheme.
+            <br><br>
+            5) Persisted Websocket State - Two boolean flags are stored to indicate if the websocket should 
+            automatically connect on the next page load or reload. By default, the websocket will reconnect automatically 
+            if the record is not present. This is referred to as Standby state.
+            <br><br>
+            6) Saved Example IRC Command - In the show-raw panel used to display raw IRC server message,
+            there is an input field used to submit example IRC server messages to the remote IRC command parser.
+            Should an error occur when the browser receives a message from the IRC server, 
+            the problematic message can be copy/paste from the raw message log and debugged while observing 
+            the browser console. There is an option to save the example string to localStorage so that
+            debugging can be repeated as code is modified. No data is saved to localStorage 
+            unless buttons on the show-raw panel are manually activated by the user.
+          </a></td></tr>
+          <tr><td><a name="refresh">
+            <p>
+              Q: What are &quot;IRC Cache Reload&quot; messages?<br>
+            </p>
+            A: The &quot;--- IRC Cache Reload messages ---&quot; are intended to distinguish between
+            live IRC messages, displayed real time, and cached messages.
+            <br><br>
+            Due to various technical reasons, occasionally it is necessary to clear the text 
+            content of a specific panel, re-parse the RFC-2812 server messages, and 
+            regenerate the text content of the panel. Examples are reloading the browser page,
+            reconnecting to IRC, kick and re-join a channel, mobile device power save mode turns off radio to save battery.
+            Refreshing panels from the message cache is a global action, clearing and refreshing all panels.
           </a></td></tr>
         </table>
-
+        <div class="vh-10"></div>
       </div> <!-- /text-div -->
 
     </div> <!-- outer-div -->
