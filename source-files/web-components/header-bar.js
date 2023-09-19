@@ -433,6 +433,14 @@ customElements.define('header-bar', class extends HTMLElement {
       state.nickRecovery = false;
     }
 
+    if (window.globals.ircState.ircConnected) {
+      if (window.globals.ircState.nickRecoveryActive) {
+        state.nickRecovery = true;
+      } else {
+        state.nickRecovery = false;
+      }
+    }
+
     this.setHeaderBarIcons(state);
     this._updateDynamicElementTitles();
   };

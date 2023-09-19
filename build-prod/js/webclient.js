@@ -554,7 +554,8 @@ noticeUnread:false,wallopsUnread:false,nickRecovery:false,enableAudio:false};if(
 }else{if(window.globals.webState.ircConnecting||window.globals.ircState.ircConnecting)state.ircConnect='connecting';else state.ircConnect='disconnected'
 ;if(window.globals.ircState.ircAutoReconnect&&window.globals.ircState.ircConnectOn&&!window.globals.ircState.ircConnected&&!window.globals.ircState.ircConnecting)state.wait=true}}else{
 if(window.globals.webState.webConnecting)state.webConnect='connecting';state.ircConnect='unavailable'}if(!window.globals.webState.webConnected||!window.globals.ircState.ircConnected){state.away=false
-;state.zoom=false;state.serverUnread=false;state.channelUnread=false;state.privMsgUnread=false;state.noticeUnread=false;state.wallopsUnread=false;state.nickRecovery=false}this.setHeaderBarIcons(state)
+;state.zoom=false;state.serverUnread=false;state.channelUnread=false;state.privMsgUnread=false;state.noticeUnread=false;state.wallopsUnread=false;state.nickRecovery=false}
+if(window.globals.ircState.ircConnected)if(window.globals.ircState.nickRecoveryActive)state.nickRecovery=true;else state.nickRecovery=false;this.setHeaderBarIcons(state)
 ;this._updateDynamicElementTitles()};timerTickHandler=()=>{if(this.collapseAllTimeout>0){this.collapseAllTimeout--;if(0===this.collapseAllTimeout)this.collapseAllToggle=0}};initializePlugin=()=>{
 this.updateStatusIcons();this._setFixedElementTitles();this._updateDynamicElementTitles();setInterval(()=>{const serverIconEl=this.shadowRoot.getElementById('serverUnreadExistIconId')
 ;const wallopsIconEl=this.shadowRoot.getElementById('wallopsUnreadExistIconId');const noticeIconEl=this.shadowRoot.getElementById('noticeUnreadExistIconId')

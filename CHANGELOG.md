@@ -8,6 +8,10 @@ and this project adheres to
 
 - To view notes on v2 major upgrade, scroll to Version v2.0.0 2023-09-12
 
+## [v2.0.4](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.0.4) 2023-09-19
+
+- Fixed header bar status R icon for nickname recovery not activating during recovery.
+
 ## [v2.0.3](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.0.3) 2023-09-16
 
 - In channel-panel.js, fixed TypeError when channel topic is un-set, causing old topic to remain.
