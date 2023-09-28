@@ -27,55 +27,58 @@
         <span class="global-valign-middle">Append-parsed-message</span>
         <input id="showRawInHexCheckboxId" class="global-valign-middle ml10" type="checkbox" >
         <span class="global-valign-middle">Append-hexadecimal</span>
-        <button id="showHelpButtonId" class="ml20">Show Help</button>
+        <button id="showHelpButtonId" class="ml20" title="Display help info for this panel">Show Help</button>
+        <button id="bottomCollapseButtonId" class="global-valign-middle" title="Show more options for this panel">&#8645;</button>
       </div>
-      <div id="helpPanelId" hidden>
-        <ul>
-          <li>The raw message cache is disabled by default and must be started with the [Start] button.</li>
-          <li>Log is limited to incoming websocket stream messages (IRC server messages)</li>
-          <li>Messages prefixed with &quot;-->&quot; are outgoing IRC commands echoed back by the web server.</li>
-          <li>Messages like HEARTBEAT and UPDATE are web server to browser commands (see Documentation web page)</li>
-          <li>During logging, message cache reloads via HTTP fetch request are omitted.</li>
-          <li>The server's message cache can be viewed separately using the [Fetch cache] button.</li>
-          <li>Optional hexadecimal to view non-printable characters (Not available with Fetch Cache)</li>
-          <li>Optional append parsedMessage in JSON format (Not available with Fetch Cache)</li>
-          <li>To start raw log before page initialization, append the hash &quot;#LOG_RAW&quot; to page URL.</li>
-        </ul>
-      </div>
-      <div class="vh20"></div>
-      <div>
-        Debug IRC Message Parser
-      </div>
-      <div class="vh10"></div>
-      <div>
-        <textarea id="panelMessageInputId" class="global-valign-middle rm5 global-text-theme-dark"
-          spellcheck="false" cols="80" rows="3"></textarea>
-      </div>
-      <div class="vh10"></div>
-      <div>
-        <button id="exampleSampleMessageButtonId" class="mr5 mb5">Example</button>
-        <button id="parseSampleMessageButtonId" class="mr5 mb5">Submit to Message Parser</button>
-        <button id="saveSampleMessageButtonId" class="mr5 mb5">Save to localStorage</button>
-        <button id="loadSampleMessageButtonId" class="mr5 mb5">Load from localStorage</button>
-        <button id="showHelpButton2Id" class="mr5 mb5">Show Help</button>
-      </div>
-      <div id="helpPanel2Id" hidden>
-        <p>
-          This feature is intended for use debugging the IRC message parser.
-          There are some slight differences in message format between different IRC networks.
-          In the case where an IRC message causes an error, the problematic message can be copy/pasted from the log
-          and submitted directly to the internal message parser while observing the dev tools console.
-        </p>
-        <ul>
-          <li>This utility is used for incoming messages from remote IRC network, not outgoing user messages</li>
-          <li>The parser expects a RFC-2812 properly formatted IRC message.</li>
-          <li>Each message should be a single line without end-of-line characters.</li>
-          <li>The IRCv3 timestamp prefix is required (added by web server)</li>
-          <li>Web server to browser commands such as HEARTBEAT and UPDATE will be accepted and parsed.</li>
-          <li>Optionally, a sample message may be saved to the web browser localStorage.</li>
-          <li>Privacy note: Data saved to localStorage will persist until web page user logout.</li>
+      <div id="bottomCollapseDivId" hidden>
+        <div id="helpPanelId" hidden>
+          <ul>
+            <li>The raw message cache is disabled by default and must be started with the [Start] button.</li>
+            <li>Log is limited to incoming websocket stream messages (IRC server messages)</li>
+            <li>Messages prefixed with &quot;-->&quot; are outgoing IRC commands echoed back by the web server.</li>
+            <li>Messages like HEARTBEAT and UPDATE are web server to browser commands (see Documentation web page)</li>
+            <li>During logging, message cache reloads via HTTP fetch request are omitted.</li>
+            <li>The server's message cache can be viewed separately using the [Fetch cache] button.</li>
+            <li>Optional hexadecimal to view non-printable characters (Not available with Fetch Cache)</li>
+            <li>Optional append parsedMessage in JSON format (Not available with Fetch Cache)</li>
+            <li>To start raw log before page initialization, append the hash &quot;#LOG_RAW&quot; to page URL.</li>
+          </ul>
+        </div>
+        <div class="vh20"></div>
+        <div>
+          Debug IRC Message Parser
+        </div>
+        <div class="vh10"></div>
+        <div>
+          <textarea id="panelMessageInputId" class="global-valign-middle rm5 global-text-theme-dark"
+            spellcheck="false" cols="80" rows="3"></textarea>
+        </div>
+        <div class="vh10"></div>
+        <div>
+          <button id="exampleSampleMessageButtonId" class="mr5 mb5">Example</button>
+          <button id="parseSampleMessageButtonId" class="mr5 mb5">Submit to Message Parser</button>
+          <button id="saveSampleMessageButtonId" class="mr5 mb5">Save to localStorage</button>
+          <button id="loadSampleMessageButtonId" class="mr5 mb5">Load from localStorage</button>
+          <button id="showHelpButton2Id" class="mr5 mb5">Show Help</button>
+        </div>
+        <div id="helpPanel2Id" hidden>
+          <p>
+            This feature is intended for use debugging the IRC message parser.
+            There are some slight differences in message format between different IRC networks.
+            In the case where an IRC message causes an error, the problematic message can be copy/pasted from the log
+            and submitted directly to the internal message parser while observing the dev tools console.
+          </p>
+          <ul>
+            <li>This utility is used for incoming messages from remote IRC network, not outgoing user messages</li>
+            <li>The parser expects a RFC-2812 properly formatted IRC message.</li>
+            <li>Each message should be a single line without end-of-line characters.</li>
+            <li>The IRCv3 timestamp prefix is required (added by web server)</li>
+            <li>Web server to browser commands such as HEARTBEAT and UPDATE will be accepted and parsed.</li>
+            <li>Optionally, a sample message may be saved to the web browser localStorage.</li>
+            <li>Privacy note: Data saved to localStorage will persist until web page user logout.</li>
 
-        </ul>
+          </ul>
+        </div>
       </div>
       <div class="vh10"></div>
     </div>

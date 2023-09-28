@@ -143,10 +143,22 @@ window.customElements.define('show-raw', class extends HTMLElement {
       this.shadowRoot.getElementById('panelMessageDisplayId').value = '';
     });
 
+    this.shadowRoot.getElementById('bottomCollapseButtonId').addEventListener('click', () => {
+      const bottomCollapseDivEl = this.shadowRoot.getElementById('bottomCollapseDivId');
+      if (bottomCollapseDivEl.hasAttribute('hidden')) {
+        bottomCollapseDivEl.removeAttribute('hidden');
+        this._scrollToTop();
+      } else {
+        bottomCollapseDivEl.setAttribute('hidden', '');
+      }
+    });
+
     this.shadowRoot.getElementById('showHelpButtonId').addEventListener('click', () => {
+      const bottomCollapseDivEl = this.shadowRoot.getElementById('bottomCollapseDivId');
       const helpPanelEl = this.shadowRoot.getElementById('helpPanelId');
       const helpPanel2El = this.shadowRoot.getElementById('helpPanel2Id');
       if (helpPanelEl.hasAttribute('hidden')) {
+        bottomCollapseDivEl.removeAttribute('hidden');
         helpPanelEl.removeAttribute('hidden');
         helpPanel2El.removeAttribute('hidden');
         this._scrollToTop();
@@ -157,9 +169,11 @@ window.customElements.define('show-raw', class extends HTMLElement {
     });
 
     this.shadowRoot.getElementById('showHelpButton2Id').addEventListener('click', () => {
+      const bottomCollapseDivEl = this.shadowRoot.getElementById('bottomCollapseDivId');
       const helpPanelEl = this.shadowRoot.getElementById('helpPanelId');
       const helpPanel2El = this.shadowRoot.getElementById('helpPanel2Id');
       if (helpPanelEl.hasAttribute('hidden')) {
+        bottomCollapseDivEl.removeAttribute('hidden');
         helpPanelEl.removeAttribute('hidden');
         helpPanel2El.removeAttribute('hidden');
         this._scrollToTop();

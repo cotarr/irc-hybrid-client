@@ -1147,12 +1147,17 @@ window.customElements.define('channel-panel', class extends HTMLElement {
    * @param {string} e - Keyboard character pressed by user
    */
   _channelAutoComplete = (e) => {
-    // Before auto-complete, check for Alt-Z zoom hotkey
+    // Before auto-complete, check for hotkeys
     if ((e.altKey) &&
       (!e.ctrlKey) &&
       (!e.shiftKey)) {
       if (e.code === 'KeyZ') {
+        // Channel panel zoom: Alt-Z
         this._handleChannelZoomButtonElClick();
+      }
+      if (e.code === 'KeyV') {
+        // Show/hide bottom of panel Alt-V
+        this._handleBottomCollapseButton();
       }
     }
     const autoCompleteSpaceKey = 32;

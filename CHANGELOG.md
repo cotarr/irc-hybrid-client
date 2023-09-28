@@ -10,6 +10,11 @@ and this project adheres to
 
 ## v2.0.5-dev
 
+- Added HotKey Alt-V used to show bottom area of Channel panel and PM panel. Cursor must be in text input area for Alt-V to function.
+- Update /docs/ and help panel for Alt-V
+
+- Added show/collapse button to show-raw panel, hides bottom section containing message parser debug tools.
+
 Issue: Due to filters on the server, IRC server PING and PONG commands were not echoed to the browser and were not visible in the raw message display.
 
 - In server/irc-client-parse.mjs, reconfigured PING and PONG handlers so the messages are sent to browser for use in raw message display, but PING and PONG are not logged to log file nor added to IRC message cache.

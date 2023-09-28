@@ -82,7 +82,14 @@ ALT-N - Next, Cycle IRC channel panels
 Alt-P - Private Message Panels (Show/Hide)
 Alt-S - Server Messages (Show/Hide)
 Alt-X - Hide all panels.
-Alt-Z - Zoom, (Channel panel only)
+Alt-V - Show panel bottom area (Note-1)  
+Alt-Z - Zoom panel (Note-2)
+
+Note-1 - Channel panel or PM panel only,
+cursor must be in text input area for Alt-V
+
+Note-2 -  Channel panel only, cursor must be 
+in text input area for Alt-Z
 
 Panel Behavior on New Channel Message
 
@@ -374,7 +381,8 @@ class="global-panel-style-div show-raw-theme-dark"><div class="global-head-flex"
 <button id="clearButtonId" class="mb5">Clear</button> <button id="cacheButtonId" class="mb5">Fetch Cache</button></div></div><div><textarea id="panelMessageDisplayId" class="global-text-theme-dark" 
 cols="80" rows="18" spellcheck="false" readonly="readonly">----- Paused -----&#13;&#10</textarea></div><div><input id="appendParsedMessageCheckboxId" class="global-valign-middle ml10" type="checkbox">
  <span class="global-valign-middle">Append-parsed-message</span> <input id="showRawInHexCheckboxId" class="global-valign-middle ml10" type="checkbox"> <span class="global-valign-middle">
-Append-hexadecimal</span> <button id="showHelpButtonId" class="ml20">Show Help</button></div><div id="helpPanelId" hidden><ul><li>
+Append-hexadecimal</span> <button id="showHelpButtonId" class="ml20" title="Display help info for this panel">Show Help</button> <button id="bottomCollapseButtonId" class="global-valign-middle" 
+title="Show more options for this panel">&#8645;</button></div><div id="bottomCollapseDivId" hidden><div id="helpPanelId" hidden><ul><li>
 The raw message cache is disabled by default and must be started with the [Start] button.</li><li>Log is limited to incoming websocket stream messages (IRC server messages)</li><li>
 Messages prefixed with &quot;-->&quot; are outgoing IRC commands echoed back by the web server.</li><li>
 Messages like HEARTBEAT and UPDATE are web server to browser commands (see Documentation web page)</li><li>During logging, message cache reloads via HTTP fetch request are omitted.</li><li>
@@ -388,7 +396,7 @@ This feature is intended for use debugging the IRC message parser. There are som
 </p><ul><li>This utility is used for incoming messages from remote IRC network, not outgoing user messages</li><li>The parser expects a RFC-2812 properly formatted IRC message.</li><li>
 Each message should be a single line without end-of-line characters.</li><li>The IRCv3 timestamp prefix is required (added by web server)</li><li>
 Web server to browser commands such as HEARTBEAT and UPDATE will be accepted and parsed.</li><li>Optionally, a sample message may be saved to the web browser localStorage.</li><li>
-Privacy note: Data saved to localStorage will persist until web page user logout.</li></ul></div><div class="vh10"></div></div></div></template><template id="showEventsTemplate"><link 
+Privacy note: Data saved to localStorage will persist until web page user logout.</li></ul></div></div><div class="vh10"></div></div></div></template><template id="showEventsTemplate"><link 
 rel="stylesheet" href="css/styles.css"><div id="panelVisibilityDivId" class="global-visibility-div"><div id="panelDivId" class="global-panel-style-div show-events-theme-dark"><div 
 class="global-head-flex"><div class="global-head-left"><button id="closePanelButtonId" title="Hide Panel" class="global-show-hide-button mr5">x</button> <span id="titleDivId">
 Display global javascript browser events</span></div><div class="global-head-center"></div><div class="global-head-right"><button id="startButtonId">Start Global Event Log</button></div></div><div>

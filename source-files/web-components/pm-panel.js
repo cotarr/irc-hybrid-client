@@ -101,6 +101,8 @@
 // Hotkey Alt-B will make all private message panels visible collapsed as bar.
 // Hotkey Alt-P will make all private message panels visible collapsed as bar.
 //
+// If cursor is in text input element, HotKey Alt-V will show, hide bottom section of panel.
+//
 // Scroll - Upon showPanel() a pm-panel element is scrolled to the top of the viewport.
 //
 // ------------------------------------------------------------------------------
@@ -217,6 +219,17 @@ window.customElements.define('pm-panel', class extends HTMLElement {
     }
     return outArray;
   }; // _splitMultiLinePaste
+
+  _handleHotKeyPressed = (e) => {
+    if ((e.altKey) &&
+      (!e.ctrlKey) &&
+      (!e.shiftKey)) {
+      if (e.code === 'KeyV') {
+        // Show/hide bottom of panel Alt-V
+        this._handleBottomCollapseButton();
+      }
+    }
+  };
 
   /**
    * Increment channel message counter and make visible
@@ -811,6 +824,7 @@ window.customElements.define('pm-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('normalButtonId').removeEventListener('click', this._handleNormalButton);
     this.shadowRoot.getElementById('panelDivId').removeEventListener('click', this._handlePanelClick);
     this.shadowRoot.getElementById('panelMessageInputId').removeEventListener('input', this._handlePrivmsgInputAreaElInput);
+    this.shadowRoot.getElementById('panelMessageInputId').removeEventListener('keydown', this._handleHotKeyPressed, false);
     this.shadowRoot.getElementById('panelMessageInputId').removeEventListener('paste', this._handlePrivmsgInputAreaElPaste);
     this.shadowRoot.getElementById('sendButtonId').removeEventListener('click', this._handlePrivMsgSendButtonElClick);
     this.shadowRoot.getElementById('tallerButtonId').removeEventListener('click', this._handleTallerButton);
@@ -1114,6 +1128,7 @@ window.customElements.define('pm-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('normalButtonId').addEventListener('click', this._handleNormalButton);
     this.shadowRoot.getElementById('panelDivId').addEventListener('click', this._handlePanelClick);
     this.shadowRoot.getElementById('panelMessageInputId').addEventListener('input', this._handlePrivmsgInputAreaElInput);
+    this.shadowRoot.getElementById('panelMessageInputId').addEventListener('keydown', this._handleHotKeyPressed, false);
     this.shadowRoot.getElementById('panelMessageInputId').addEventListener('paste', this._handlePrivmsgInputAreaElPaste);
     this.shadowRoot.getElementById('sendButtonId').addEventListener('click', this._handlePrivMsgSendButtonElClick);
     this.shadowRoot.getElementById('tallerButtonId').addEventListener('click', this._handleTallerButton);

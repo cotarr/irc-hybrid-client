@@ -1542,9 +1542,10 @@ if(window.globals.ircState.ircConnected&&window.globals.ircState.ircIsAway)ircCo
 ;ircControlsPanelEl.sendIrcServerMessage(message);textAreaEl.value=''}textAreaEl.value=''};_splitMultiLinePaste=multiLineContent=>{if('string'!==typeof multiLineContent)return[]
 ;if(0===multiLineContent.length)return[];const outArray=[];const inArray=multiLineContent.split('\n');if(inArray.length>0)for(let i=0;i<inArray.length;i++){let nextLine=inArray[i]
 ;if(nextLine.length>0){if(13===nextLine.charCodeAt(nextLine.length-1))nextLine=nextLine.slice(0,nextLine.length-1);if(nextLine.length>0)outArray.push(nextLine)}}return outArray}
-;_incrementMessageCount=()=>{this.unreadMessageCount++;this.shadowRoot.getElementById('messageCountIconId').textContent=this.unreadMessageCount.toString()
-;this.shadowRoot.getElementById('messageCountIconId').removeAttribute('hidden');document.dispatchEvent(new CustomEvent('update-privmsg-count',{detail:{channel:this.privmsgName.toLowerCase(),
-unreadMessageCount:this.unreadMessageCount}}))};_resetMessageCount=()=>{this.unreadMessageCount=0;this.shadowRoot.getElementById('messageCountIconId').textContent=this.unreadMessageCount.toString()
+;_handleHotKeyPressed=e=>{if(e.altKey&&!e.ctrlKey&&!e.shiftKey)if('KeyV'===e.code)this._handleBottomCollapseButton()};_incrementMessageCount=()=>{this.unreadMessageCount++
+;this.shadowRoot.getElementById('messageCountIconId').textContent=this.unreadMessageCount.toString();this.shadowRoot.getElementById('messageCountIconId').removeAttribute('hidden')
+;document.dispatchEvent(new CustomEvent('update-privmsg-count',{detail:{channel:this.privmsgName.toLowerCase(),unreadMessageCount:this.unreadMessageCount}}))};_resetMessageCount=()=>{
+this.unreadMessageCount=0;this.shadowRoot.getElementById('messageCountIconId').textContent=this.unreadMessageCount.toString()
 ;this.shadowRoot.getElementById('messageCountIconId').setAttribute('hidden','');document.dispatchEvent(new CustomEvent('update-privmsg-count',{detail:{channel:this.privmsgName.toLowerCase(),
 unreadMessageCount:this.unreadMessageCount}}))};_scrollTextAreaToRecent=()=>{const panelMessageDisplayEl=this.shadowRoot.getElementById('panelMessageDisplayId')
 ;panelMessageDisplayEl.scrollTop=panelMessageDisplayEl.scrollHeight};_scrollToTop=()=>{this.focus();const newVertPos=window.scrollY+this.getBoundingClientRect().top-50;window.scrollTo({top:newVertPos,
@@ -1631,6 +1632,7 @@ if(!this.elementExistsInDom)throw new Error('Error, Request to remove self from 
 ;this.shadowRoot.getElementById('multiLineSendButtonId').removeEventListener('click',this._handleMultiLineSendButtonClick)
 ;this.shadowRoot.getElementById('normalButtonId').removeEventListener('click',this._handleNormalButton);this.shadowRoot.getElementById('panelDivId').removeEventListener('click',this._handlePanelClick)
 ;this.shadowRoot.getElementById('panelMessageInputId').removeEventListener('input',this._handlePrivmsgInputAreaElInput)
+;this.shadowRoot.getElementById('panelMessageInputId').removeEventListener('keydown',this._handleHotKeyPressed,false)
 ;this.shadowRoot.getElementById('panelMessageInputId').removeEventListener('paste',this._handlePrivmsgInputAreaElPaste)
 ;this.shadowRoot.getElementById('sendButtonId').removeEventListener('click',this._handlePrivMsgSendButtonElClick)
 ;this.shadowRoot.getElementById('tallerButtonId').removeEventListener('click',this._handleTallerButton);document.removeEventListener('cache-reload-done',this._handleCacheReloadDone)
@@ -1679,6 +1681,7 @@ this.shadowRoot.getElementById('beepCheckBoxId').addEventListener('click',this._
 ;this.shadowRoot.getElementById('multiLineSendButtonId').addEventListener('click',this._handleMultiLineSendButtonClick)
 ;this.shadowRoot.getElementById('normalButtonId').addEventListener('click',this._handleNormalButton);this.shadowRoot.getElementById('panelDivId').addEventListener('click',this._handlePanelClick)
 ;this.shadowRoot.getElementById('panelMessageInputId').addEventListener('input',this._handlePrivmsgInputAreaElInput)
+;this.shadowRoot.getElementById('panelMessageInputId').addEventListener('keydown',this._handleHotKeyPressed,false)
 ;this.shadowRoot.getElementById('panelMessageInputId').addEventListener('paste',this._handlePrivmsgInputAreaElPaste)
 ;this.shadowRoot.getElementById('sendButtonId').addEventListener('click',this._handlePrivMsgSendButtonElClick)
 ;this.shadowRoot.getElementById('tallerButtonId').addEventListener('click',this._handleTallerButton);document.addEventListener('cache-reload-done',this._handleCacheReloadDone)
@@ -1947,8 +1950,8 @@ let matchNick=window.globals.ircState.channelStates[chanIndex].names[i];if(nickn
 ;if(0===matchNick.toLowerCase().indexOf(snippet.toLowerCase()))completeNick=matchNick}if(completeNick.length>0){
 panelMessageInputEl.value=panelMessageInputEl.value.slice(0,panelMessageInputEl.value.length-snippet.length);panelMessageInputEl.value+=completeNick
 ;panelMessageInputEl.value+=String.fromCharCode(trailingSpaceKey);last=completeNick}else panelMessageInputEl.value+=String.fromCharCode(trailingSpaceKey)}return last};_channelAutoComplete=e=>{
-if(e.altKey&&!e.ctrlKey&&!e.shiftKey)if('KeyZ'===e.code)this._handleChannelZoomButtonElClick();const autoCompleteSpaceKey=32;const trailingSpaceKey=32
-;const panelMessageInputEl=this.shadowRoot.getElementById('panelMessageInputId');if(this.shadowRoot.getElementById('autocompleteCheckboxId').hasAttribute('disabled'))return
+if(e.altKey&&!e.ctrlKey&&!e.shiftKey){if('KeyZ'===e.code)this._handleChannelZoomButtonElClick();if('KeyV'===e.code)this._handleBottomCollapseButton()}const autoCompleteSpaceKey=32
+;const trailingSpaceKey=32;const panelMessageInputEl=this.shadowRoot.getElementById('panelMessageInputId');if(this.shadowRoot.getElementById('autocompleteCheckboxId').hasAttribute('disabled'))return
 ;if(!this.shadowRoot.getElementById('panelDivId').hasAttribute('auto-comp-enabled'))return;if(!e.code)return;if(e.code&&'Tab'===e.code){if(panelMessageInputEl.value.length<2){e.preventDefault();return
 }let snippet='';const snippetArray=panelMessageInputEl.value.split(' ');if(snippetArray.length>0)snippet=snippetArray[snippetArray.length-1];if(snippet.length>0){
 if('Tab'===e.code&&snippet.length>0)this._autoCompleteInputElement(snippet)}else{
@@ -2255,12 +2258,16 @@ this.shadowRoot.getElementById('panelMessageDisplayId').value+=JSON.stringify(pa
 ;this.shadowRoot.getElementById('panelMessageDisplayId').scrollTop=this.shadowRoot.getElementById('panelMessageDisplayId').scrollHeight}};connectedCallback(){if('#LOG_RAW'===document.location.hash){
 this._startCollectingRawMessages();this.showPanel();document.getElementById('debugPanel').showPanel();console.log('Debug: Detected URL hash=#LOG_RAW. Enabled raw log before page initialization.')}
 this.shadowRoot.getElementById('closePanelButtonId').addEventListener('click',()=>{this.hidePanel()});this.shadowRoot.getElementById('clearButtonId').addEventListener('click',()=>{
-this.shadowRoot.getElementById('panelMessageDisplayId').value=''});this.shadowRoot.getElementById('showHelpButtonId').addEventListener('click',()=>{
-const helpPanelEl=this.shadowRoot.getElementById('helpPanelId');const helpPanel2El=this.shadowRoot.getElementById('helpPanel2Id');if(helpPanelEl.hasAttribute('hidden')){
-helpPanelEl.removeAttribute('hidden');helpPanel2El.removeAttribute('hidden');this._scrollToTop()}else{helpPanelEl.setAttribute('hidden','');helpPanel2El.setAttribute('hidden','')}})
-;this.shadowRoot.getElementById('showHelpButton2Id').addEventListener('click',()=>{const helpPanelEl=this.shadowRoot.getElementById('helpPanelId')
-;const helpPanel2El=this.shadowRoot.getElementById('helpPanel2Id');if(helpPanelEl.hasAttribute('hidden')){helpPanelEl.removeAttribute('hidden');helpPanel2El.removeAttribute('hidden')
-;this._scrollToTop()}else{helpPanelEl.setAttribute('hidden','');helpPanel2El.setAttribute('hidden','')}});this.shadowRoot.getElementById('pauseButtonId').addEventListener('click',()=>{
+this.shadowRoot.getElementById('panelMessageDisplayId').value=''});this.shadowRoot.getElementById('bottomCollapseButtonId').addEventListener('click',()=>{
+const bottomCollapseDivEl=this.shadowRoot.getElementById('bottomCollapseDivId');if(bottomCollapseDivEl.hasAttribute('hidden')){bottomCollapseDivEl.removeAttribute('hidden');this._scrollToTop()
+}else bottomCollapseDivEl.setAttribute('hidden','')});this.shadowRoot.getElementById('showHelpButtonId').addEventListener('click',()=>{
+const bottomCollapseDivEl=this.shadowRoot.getElementById('bottomCollapseDivId');const helpPanelEl=this.shadowRoot.getElementById('helpPanelId')
+;const helpPanel2El=this.shadowRoot.getElementById('helpPanel2Id');if(helpPanelEl.hasAttribute('hidden')){bottomCollapseDivEl.removeAttribute('hidden');helpPanelEl.removeAttribute('hidden')
+;helpPanel2El.removeAttribute('hidden');this._scrollToTop()}else{helpPanelEl.setAttribute('hidden','');helpPanel2El.setAttribute('hidden','')}})
+;this.shadowRoot.getElementById('showHelpButton2Id').addEventListener('click',()=>{const bottomCollapseDivEl=this.shadowRoot.getElementById('bottomCollapseDivId')
+;const helpPanelEl=this.shadowRoot.getElementById('helpPanelId');const helpPanel2El=this.shadowRoot.getElementById('helpPanel2Id');if(helpPanelEl.hasAttribute('hidden')){
+bottomCollapseDivEl.removeAttribute('hidden');helpPanelEl.removeAttribute('hidden');helpPanel2El.removeAttribute('hidden');this._scrollToTop()}else{helpPanelEl.setAttribute('hidden','')
+;helpPanel2El.setAttribute('hidden','')}});this.shadowRoot.getElementById('pauseButtonId').addEventListener('click',()=>{
 if(this.shadowRoot.getElementById('panelDivId').hasAttribute('collecting'))this._pauseCollectingRawMessages();else this._startCollectingRawMessages()})
 ;this.shadowRoot.getElementById('cacheButtonId').addEventListener('click',()=>{const panelMessageDisplayEl=this.shadowRoot.getElementById('panelMessageDisplayId');this._pauseCollectingRawMessages()
 ;panelMessageDisplayEl.value='';const fetchTimeout=document.getElementById('globVars').constants('fetchTimeout');const activitySpinnerEl=document.getElementById('activitySpinner')
