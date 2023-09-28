@@ -30,17 +30,6 @@
 
 /* eslint-disable prefer-const */
 
-// Excluded command list.
-// The purpose is to avoid filling the message cache up with PING, PONG
-// traffic which would cause unseen messages to scroll out of the buffer.
-//
-// These are still processed by the backend, but invisible to cache and browser.
-//
-const excludedCommands = [
-  'PING',
-  'PONG'
-];
-
 // Replaced when loaded from file
 const servers = {
   configVersion: -1,
@@ -170,7 +159,6 @@ const unixTimestamp = function () {
 };
 
 export default {
-  excludedCommands,
   servers,
   ircState,
   ircServerPassword,

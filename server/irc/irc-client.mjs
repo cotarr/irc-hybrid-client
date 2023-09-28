@@ -1525,18 +1525,14 @@ const clientToServerPingTimerTick = function () {
     //
     // PING and PONG are special cases.
     // To avoid overflow of the message cache, the PING, PONG are sent to raw socket
-    // Unless for debug when PING, PONG removed from excludedCommands array
-    // which makes PING and PONG visible to browser and inserted into message cache
     //
     const outBuffer = Buffer.from('PING ' + vars.ircState.ircServerPrefix + '\r\n', 'utf8');
     // console.log(outBuffer.toString());
     // 512 btye maximum size from RFC 2812 2.3 Messages
     if (outBuffer.length <= 512) {
       ircSocket.write(outBuffer, 'utf8');
-      // Show PING in browser unless client-to-server PING is filtered.
-      if (vars.excludedCommands.indexOf('PING') < 0) {
-        global.sendToBrowser(vars.commandMsgPrefix + outBuffer.toString('utf8'));
-      }
+      // Send PING request to web browser for use in raw message display
+      global.sendToBrowser(vars.commandMsgPrefix + outBuffer.toString('utf8'));
     }
   }
 }; // clientToServerPingTimerTick()

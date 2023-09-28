@@ -430,10 +430,17 @@ export const processIrcMessage = function (socket, socks5Socket, messageBuffer) 
   // console.log('(IRC-->) parsedMessage ' + JSON.stringify(parsedMessage, null, 2));
 
   //
+  // Send RFC-2812 message to browser for parsing locally in the browser.
+  //
+  global.sendToBrowser(Buffer.concat([
+    Buffer.from(vars.timestamp() + ' '),
+    messageBuffer,
+    Buffer.from('\r\n')
+  ]));
+
+  //
   // PING and PONG are special cases.
   // To avoid overflow of the message cache, the PING, PONG are sent to raw socket
-  // Unless for debug when PING, PONG removed from excludedCommands array
-  // which makes PING and PONG visible to browser and inserted into message cache
   //
   // Server-to-client PING command
   //
@@ -442,24 +449,12 @@ export const processIrcMessage = function (socket, socks5Socket, messageBuffer) 
     // 512 btye maximum size from RFC 2812 2.3 Messages
     if (outBuffer.length <= 512) {
       socket.write(outBuffer, 'utf8');
-      if (vars.excludedCommands.indexOf('PING') < 0) {
-        ircMessageCache.addMessage(Buffer.concat([
-          Buffer.from(vars.timestamp() + ' '),
-          messageBuffer
-        ]));
-        global.sendToBrowser(Buffer.concat([
-          Buffer.from(vars.timestamp() + ' '),
-          messageBuffer,
-          Buffer.from('\r\n')
-        ]));
-      }
-      // Show PONG in browser unless server-to-client PONG is filtered
-      if (vars.excludedCommands.indexOf('PONG') < 0) {
-        global.sendToBrowser(vars.commandMsgPrefix + outBuffer.toString('utf8'));
-      }
+      // SEND PING reply (PONG) to the browser for use in the raw message display
+      global.sendToBrowser(vars.commandMsgPrefix + outBuffer.toString('utf8'));
     } else {
       console.log('Error, send buffer exceeds 512 character limit.');
     }
+    // No further processing, not logged, not added to message cache
     return;
   }
   //
@@ -479,33 +474,25 @@ export const processIrcMessage = function (socket, socks5Socket, messageBuffer) 
     } else {
       vars.ircState.lastPing = '0.000';
     }
+    // No further processing, not logged, not added to message cache
+    return;
   }
-  //
-  // Filter...
-  //
-  // Do not parse or act on commands that are listed in this array
-  //
-  if (vars.excludedCommands.indexOf(parsedMessage.command) >= 0) return;
 
   //
-  // For display in browser, and cache for browser refresh
+  // Add to IRC message cache to persist messages
   //
   ircMessageCache.addMessage(Buffer.concat([
     Buffer.from(vars.timestamp() + ' '),
     messageBuffer
   ]));
-  global.sendToBrowser(Buffer.concat([
-    Buffer.from(vars.timestamp() + ' '),
-    messageBuffer,
-    Buffer.from('\r\n')
-  ]));
+
   //
   // Send to log file (send message as utf8 Buffer)
   //
   ircLog.writeIrcLog(messageBuffer);
 
   // -------------------------------------------------
-  // Individual ommands from IRC server are parsed here
+  // Individual commands from IRC server are parsed here
   // -------------------------------------------------
   switch (parsedMessage.command) {
     //
@@ -1198,7 +1185,7 @@ export const processIrcMessage = function (socket, socks5Socket, messageBuffer) 
             tellBrowserToRequestState();
           }
         } else {
-          console.log('Error message PART for non-existant channel');
+          console.log('Error message PART for non-existent channel');
         }
       }
       break;
@@ -1267,14 +1254,14 @@ export const processIrcMessage = function (socket, socks5Socket, messageBuffer) 
           vars.ircState.channelStates[index].topic = parsedMessage.params[1];
           tellBrowserToRequestState();
         } else {
-          console.log('Error message TOPIC for non-existant channel');
+          console.log('Error message TOPIC for non-existent channel');
         }
       }
       break;
     //
     default:
   }
-}; // _processIrcMessage
+}; // processIrcMessage
 
 // --------------------------------------------------
 // Alternate Nickname and Nickname Auto-recovery

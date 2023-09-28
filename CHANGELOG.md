@@ -8,6 +8,13 @@ and this project adheres to
 
 - To view notes on v2 major upgrade, scroll to Version v2.0.0 2023-09-12
 
+## v2.0.5-dev
+
+Issue: Due to filters on the server, IRC server PING and PONG commands were not echoed to the browser and were not visible in the raw message display.
+
+- In server/irc-client-parse.mjs, reconfigured PING and PONG handlers so the messages are sent to browser for use in raw message display, but PING and PONG are not logged to log file nor added to IRC message cache.
+- In server/irc-client-vars.mjs, removed excludedCommands array. It had contained only PING and PONG and is no longer needed.
+
 ## [v2.0.4](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.0.4) 2023-09-19
 
 - Fixed header bar status R icon for nickname recovery not activating during recovery.

@@ -1201,11 +1201,6 @@ Cached message with 2 IRC channels.
           other IRC users. User text messages are then displayed as text content in the appropriate windows.
         </p>
         <p>
-          The backend contains list of excluded commands in an array &quot;excludedCommands = [&quot;PING&quot;, &quot;PONG&quot;].
-          Messages between the backend and the IRC server that contain PING or PONG commands are not sent to the browser.
-          This is to avoid scrolling valid messages out of the IRC message cache buffer.
-        </p>
-        <p>
           The websocket stream also contain command messages intended to initiate browser actions.
           There are 6 types of command defined in the following table.
           Each message type begins with a specific prefix string as shown in the first table column.
