@@ -8,7 +8,7 @@ and this project adheres to
 
 - To view notes on v2 major upgrade, scroll to Version v2.0.0 2023-09-12
 
-## v2.0.5-dev
+## [v2.0.5](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.0.5) 2023-09-28
 
 - Added HotKey Alt-V used to show bottom area of Channel panel and PM panel. Cursor must be in text input area for Alt-V to function.
 - Update /docs/ and help panel for Alt-V
