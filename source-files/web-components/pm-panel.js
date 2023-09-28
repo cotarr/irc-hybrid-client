@@ -374,6 +374,7 @@ window.customElements.define('pm-panel', class extends HTMLElement {
     const bottomCollapseDivEl = this.shadowRoot.getElementById('bottomCollapseDivId');
     if (bottomCollapseDivEl.hasAttribute('hidden')) {
       bottomCollapseDivEl.removeAttribute('hidden');
+      this._scrollToTop();
     } else {
       bottomCollapseDivEl.setAttribute('hidden', '');
     }

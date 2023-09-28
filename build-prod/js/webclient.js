@@ -1561,10 +1561,9 @@ document.getElementById('managePmPanels').setLastPmPanel(this.privmsgName.toLoca
 const beepCheckBoxEl=this.shadowRoot.getElementById('beepCheckBoxId')
 ;if(this.shadowRoot.getElementById('panelDivId').hasAttribute('beep3-enabled'))beepCheckBoxEl.checked=true;else beepCheckBoxEl.checked=false};_handleCloseButton=()=>{this.hidePanel()}
 ;_handleCollapseButton=()=>{if(this.shadowRoot.getElementById('panelCollapsedDivId').hasAttribute('visible'))this.collapsePanel();else this.showPanel()};_handleBottomCollapseButton=()=>{
-const bottomCollapseDivEl=this.shadowRoot.getElementById('bottomCollapseDivId')
-;if(bottomCollapseDivEl.hasAttribute('hidden'))bottomCollapseDivEl.removeAttribute('hidden');else bottomCollapseDivEl.setAttribute('hidden','')};_handleTallerButton=()=>{
-const newRows=parseInt(this.shadowRoot.getElementById('panelMessageDisplayId').getAttribute('rows'))+10;this.shadowRoot.getElementById('panelMessageDisplayId').setAttribute('rows',newRows)
-;this.shadowRoot.getElementById('panelMessageInputId').setAttribute('rows','3')};_handleNormalButton=()=>{
+const bottomCollapseDivEl=this.shadowRoot.getElementById('bottomCollapseDivId');if(bottomCollapseDivEl.hasAttribute('hidden')){bottomCollapseDivEl.removeAttribute('hidden');this._scrollToTop()
+}else bottomCollapseDivEl.setAttribute('hidden','')};_handleTallerButton=()=>{const newRows=parseInt(this.shadowRoot.getElementById('panelMessageDisplayId').getAttribute('rows'))+10
+;this.shadowRoot.getElementById('panelMessageDisplayId').setAttribute('rows',newRows);this.shadowRoot.getElementById('panelMessageInputId').setAttribute('rows','3')};_handleNormalButton=()=>{
 this.shadowRoot.getElementById('panelMessageDisplayId').setAttribute('rows',this.defaultHeightInRows);this.shadowRoot.getElementById('panelMessageInputId').setAttribute('rows','1')}
 ;_handlePrivmsgInputAreaElPaste=event=>{if(this._splitMultiLinePaste(event.clipboardData.getData('text')).length>1){
 this.shadowRoot.getElementById('multiLineSendSpanId').textContent='Clipboard ('+this._splitMultiLinePaste(event.clipboardData.getData('text')).length+' lines)'
@@ -1889,13 +1888,12 @@ const panelMessageInputEl=this.shadowRoot.getElementById('panelMessageInputId');
 ;if('insertText'===event.inputType&&null===event.data||'insertLineBreak'===event.inputType){document.getElementById('displayUtils').stripOneCrLfFromElement(panelMessageInputEl)
 ;this._sendTextToChannel(this.channelIndex,panelMessageInputEl);this._resetMessageCount();this.activityIconInhibitTimer=document.getElementById('globVars').constants('activityIconInhibitTimerValue')
 ;this.shadowRoot.getElementById('multiLineActionDivId').setAttribute('hidden','')}};_handleBottomCollapseButton=()=>{this._handleCancelZoomEvent()
-;const bottomCollapseDivEl=this.shadowRoot.getElementById('bottomCollapseDivId')
-;if(bottomCollapseDivEl.hasAttribute('hidden'))bottomCollapseDivEl.removeAttribute('hidden');else bottomCollapseDivEl.setAttribute('hidden','')};_handleChannelZoomButtonElClick=()=>{
-const bodyEl=document.querySelector('body');const headerBarEl=document.getElementById('headerBar');const zoomButtonEl=this.shadowRoot.getElementById('zoomButtonId')
-;const bottomCollapseDivEl=this.shadowRoot.getElementById('bottomCollapseDivId');const channelTopicDivEl=this.shadowRoot.getElementById('channelTopicDivId')
-;if(bodyEl.hasAttribute('zoomId')&&bodyEl.getAttribute('zoomId')==='channel:'+this.channelName.toLowerCase()){this.inhibitDynamicResize=false;bodyEl.removeAttribute('zoomId')
-;headerBarEl.removeAttribute('zoomicon');zoomButtonEl.textContent='Zoom';zoomButtonEl.classList.remove('channel-panel-zoomed');channelTopicDivEl.removeAttribute('hidden')
-;bottomCollapseDivEl.setAttribute('hidden','');this._handleNormalButton();this._scrollTextAreaToRecent();this._handleResizeCustomElements()}else{
+;const bottomCollapseDivEl=this.shadowRoot.getElementById('bottomCollapseDivId');if(bottomCollapseDivEl.hasAttribute('hidden')){bottomCollapseDivEl.removeAttribute('hidden');this._scrollToTop()
+}else bottomCollapseDivEl.setAttribute('hidden','')};_handleChannelZoomButtonElClick=()=>{const bodyEl=document.querySelector('body');const headerBarEl=document.getElementById('headerBar')
+;const zoomButtonEl=this.shadowRoot.getElementById('zoomButtonId');const bottomCollapseDivEl=this.shadowRoot.getElementById('bottomCollapseDivId')
+;const channelTopicDivEl=this.shadowRoot.getElementById('channelTopicDivId');if(bodyEl.hasAttribute('zoomId')&&bodyEl.getAttribute('zoomId')==='channel:'+this.channelName.toLowerCase()){
+this.inhibitDynamicResize=false;bodyEl.removeAttribute('zoomId');headerBarEl.removeAttribute('zoomicon');zoomButtonEl.textContent='Zoom';zoomButtonEl.classList.remove('channel-panel-zoomed')
+;channelTopicDivEl.removeAttribute('hidden');bottomCollapseDivEl.setAttribute('hidden','');this._handleNormalButton();this._scrollTextAreaToRecent();this._handleResizeCustomElements()}else{
 bodyEl.setAttribute('zoomId','channel:'+this.channelName.toLowerCase());headerBarEl.setAttribute('zoomicon','');zoomButtonEl.textContent='UnZoom';zoomButtonEl.classList.add('channel-panel-zoomed')
 ;document.dispatchEvent(new CustomEvent('hide-all-panels',{detail:{except:['channel:'+this.channelName.toLowerCase(),'debugPanel']}}));channelTopicDivEl.setAttribute('hidden','')
 ;bottomCollapseDivEl.setAttribute('hidden','');this.shadowRoot.getElementById('noScrollCheckboxId').checked=false;this._scrollTextAreaToRecent();this._handleResizeCustomElements()}}
