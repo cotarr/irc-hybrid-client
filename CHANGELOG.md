@@ -8,7 +8,7 @@ and this project adheres to
 
 - To view notes on v2 major upgrade, scroll to Version v2.0.0 2023-09-12
 
-## Next
+## [v2.0.6](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.0.6) 2023-11-07
 
 ### Fixed
 
@@ -17,6 +17,10 @@ with indent block using space characters, the PM Erase button did not remove the
 IRC message cache.
 
 Fix: In server/irc/irc-client-cache.mjs, update function eraseCacheUserPM() to include this edge case.
+
+### Changed
+
+GitHub CodeQL convert .github/workflows/codeql-analysis.yml from v1 to v2
 
 ## [v2.0.5](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.0.5) 2023-09-28
 
