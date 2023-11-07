@@ -8,6 +8,16 @@ and this project adheres to
 
 - To view notes on v2 major upgrade, scroll to Version v2.0.0 2023-09-12
 
+## Next
+
+### Fixed
+
+Issue: In the case where private messages start with blank spaces, such as copy paste computer code
+with indent block using space characters, the PM Erase button did not remove the PM lines from the 
+IRC message cache.
+
+Fix: In server/irc/irc-client-cache.mjs, update function eraseCacheUserPM() to include this edge case.
+
 ## [v2.0.5](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.0.5) 2023-09-28
 
 - Added HotKey Alt-V used to show bottom area of Channel panel and PM panel. Cursor must be in text input area for Alt-V to function.

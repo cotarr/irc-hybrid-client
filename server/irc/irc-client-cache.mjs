@@ -158,27 +158,47 @@ const eraseCacheUserPM = function () {
     for (let i = 0; i < cacheSize; i++) {
       if (!(cachedArrays.default[i] == null)) {
         // Line is stored in array as type utf-8 encoded Buffer
+        //
         const lineWords = cachedArrays.default[i].toString('utf8').split(' ');
+        //
+        // Example Private Message "This is a PM"
+        // [
+        //   "@time=2023-11-07T13:37:11.630Z",
+        //   ":other-nick!other-user@192.168.0.100",
+        //   "PRIVMSG",
+        //   "my-nick",
+        //   ":This",
+        //   "is",
+        //   "a",
+        //   "PM"
+        // ]
+        //
         if ((lineWords.length > 4) && (lineWords[2].toUpperCase() === 'PRIVMSG')) {
           // Check that this user PRIVMSG (private message),
           // and it is not a channel PRIVMSG command (public message)
-          if ((vars.channelPrefixChars.indexOf(lineWords[3].charAt(0)) < 0) &&
-            (lineWords[4].length > 1) &&
-            (
-              // ... check if it is not CTCP request sent as PRIVMSG
-              (
-                (lineWords[4].charCodeAt(0) === 58) &&
-                (lineWords[4].charCodeAt(1) !== 1)
-              ) ||
-              // ... or ... check if it a CTCP request that is an ACTION
-              (
-                (lineWords[4].charCodeAt(0) === 58) &&
+          if (vars.channelPrefixChars.indexOf(lineWords[3].charAt(0)) < 0) {
+            // Check if message string starts with colon ":" (code 58)
+            if ((lineWords[4].length > 0) && (lineWords[4].charCodeAt(0) === 58)) {
+              // check case of ":" only colon, this is a PM with blank spaces at start of line
+              // Example [":", "", "", "", "Message", "starts", "here"]
+              // colon checked as first character in previous if statement
+              if (lineWords[4].length === 1) {
+                // erase the array element
+                cachedArrays.default[i] = null;
+              }
+              // ... or ... check if it is not CTCP request sent as PRIVMSG
+              if ((lineWords[4].length > 1) && (lineWords[4].charCodeAt(1) !== 1)) {
+                // erase the array element
+                cachedArrays.default[i] = null;
+              }
+              // ... or ... check if it a CTCP request that is an ACTION as PM message
+              if ((lineWords[4].length > 2) &&
                 (lineWords[4].charCodeAt(1) === 1) &&
-                (lineWords[4].toUpperCase().indexOf('ACTION') >= 0)
-              )
-            )) {
-            // erase the array element
-            cachedArrays.default[i] = null;
+                (lineWords[4].toUpperCase().indexOf('ACTION') >= 0)) {
+                // erase the array element
+                cachedArrays.default[i] = null;
+              }
+            }
           }
         }
       }
