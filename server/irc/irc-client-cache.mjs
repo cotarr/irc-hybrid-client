@@ -57,6 +57,9 @@ const __dirname = path.dirname(__filename);
 //     'server message',
 //     'server message'
 //   ]
+//   pmcache: [
+//     'server message',
+//   ]
 //   '#mychannel': [
 //     'channel message',
 //     'channel message'
@@ -64,6 +67,7 @@ const __dirname = path.dirname(__filename);
 // };
 // cachedInPointers = {
 //   default: 3,
+//   pmcache: 1,
 //   '#mychannel': 2
 // };
 
@@ -83,9 +87,12 @@ const eraseCache = function () {
   // console.log('Cache Erased');
   cachedInPointers = Object.create(null);
   cachedInPointers.default = 0;
+  cachedInPointers.pmcache = 0;
   cachedArrays = Object.create(null);
+  cachedArrays.pmcache = [];
   cachedArrays.default = [];
   for (let i = 0; i < cacheSize; i++) {
+    cachedArrays.pmcache.push(null);
     cachedArrays.default.push(null);
   }
 };
@@ -147,64 +154,18 @@ const eraseCacheNotices = function () {
 };
 
 /**
- * Find all PRIVMSG messages in cache, then...
- * A) Determine if they are channel or user PM, erase if user PM
- * B) Determine if it is a CTCP request that an not an ACTION and erase
+ * Delete all private messages from PM cache array
  *
  * This is an external API method for this module
  */
 const eraseCacheUserPM = function () {
   if (cachedArrays.default.length === cacheSize) {
+    cachedInPointers.pmcache = 0;
     for (let i = 0; i < cacheSize; i++) {
-      if (!(cachedArrays.default[i] == null)) {
-        // Line is stored in array as type utf-8 encoded Buffer
-        //
-        const lineWords = cachedArrays.default[i].toString('utf8').split(' ');
-        //
-        // Example Private Message "This is a PM"
-        // [
-        //   "@time=2023-11-07T13:37:11.630Z",
-        //   ":other-nick!other-user@192.168.0.100",
-        //   "PRIVMSG",
-        //   "my-nick",
-        //   ":This",
-        //   "is",
-        //   "a",
-        //   "PM"
-        // ]
-        //
-        if ((lineWords.length > 4) && (lineWords[2].toUpperCase() === 'PRIVMSG')) {
-          // Check that this user PRIVMSG (private message),
-          // and it is not a channel PRIVMSG command (public message)
-          if (vars.channelPrefixChars.indexOf(lineWords[3].charAt(0)) < 0) {
-            // Check if message string starts with colon ":" (code 58)
-            if ((lineWords[4].length > 0) && (lineWords[4].charCodeAt(0) === 58)) {
-              // check case of ":" only colon, this is a PM with blank spaces at start of line
-              // Example [":", "", "", "", "Message", "starts", "here"]
-              // colon checked as first character in previous if statement
-              if (lineWords[4].length === 1) {
-                // erase the array element
-                cachedArrays.default[i] = null;
-              }
-              // ... or ... check if it is not CTCP request sent as PRIVMSG
-              if ((lineWords[4].length > 1) && (lineWords[4].charCodeAt(1) !== 1)) {
-                // erase the array element
-                cachedArrays.default[i] = null;
-              }
-              // ... or ... check if it a CTCP request that is an ACTION as PM message
-              if ((lineWords[4].length > 2) &&
-                (lineWords[4].charCodeAt(1) === 1) &&
-                (lineWords[4].toUpperCase().indexOf('ACTION') >= 0)) {
-                // erase the array element
-                cachedArrays.default[i] = null;
-              }
-            }
-          }
-        }
-      }
+      cachedArrays.pmcache[i] = null;
     }
   }
-};
+}; // eraseCacheUserPM()
 
 // ----------------------
 // Notes on QUIT messages
@@ -379,6 +340,71 @@ function _parseNickChannels (message) {
   }
 } // _parseNickChannels()
 
+/**
+ * _parseIsMessagePM is a function to parse one raw message from IRC server
+ * and determine if it is private message (PM) or a private message /ME action.
+ *
+ * @param {Buffer} message - NodeJs buffer containing 1 IRC message string
+ * @returns {Boolean} - True if Private Message (PM) else return false
+ */
+const _parseIsMessagePm = function (message) {
+  // Default return value
+  let isPm = false;
+  if (!(message == null)) {
+    //
+    // Line is stored in array as type utf-8 encoded Buffer
+    //
+    // First convert to a UTF-8 string
+    let messageUtf8 = null;
+    if (Buffer.isBuffer(message)) messageUtf8 = message.toString('utf8');
+    if (typeof message === 'string') messageUtf8 = message;
+    // then separate the string into an array of words
+    const messageWords = messageUtf8.split(' ');
+    //
+    // Example Private Message "This is a PM"
+    // [
+    //   "@time=2023-11-07T13:37:11.630Z",
+    //   ":other-nick!other-user@192.168.0.100",
+    //   "PRIVMSG",
+    //   "my-nick",
+    //   ":This",
+    //   "is",
+    //   "a",
+    //   "PM"
+    // ]
+    //
+    if ((messageWords.length > 4) && (messageWords[2].toUpperCase() === 'PRIVMSG')) {
+      // Check that this user PRIVMSG (private message),
+      // and it is NOT a channel PRIVMSG command (public message)
+      if (vars.channelPrefixChars.indexOf(messageWords[3].charAt(0)) < 0) {
+        // Check if message string starts with colon ":" (code 58)
+        if ((messageWords[4].length > 0) && (messageWords[4].charCodeAt(0) === 58)) {
+          // check case of ":" only colon, this is a PM with blank spaces at start of line
+          // Example [":", "", "", "", "Message", "starts", "here"]
+          // colon checked as first character in previous if statement
+          if (messageWords[4].length === 1) {
+            // erase the array element
+            isPm = true;
+          }
+          // ... or ... check if it is not CTCP request sent as PRIVMSG
+          if ((messageWords[4].length > 1) && (messageWords[4].charCodeAt(1) !== 1)) {
+            // erase the array element
+            isPm = true;
+          }
+          // ... or ... check if it a CTCP request that is an ACTION as PM message
+          if ((messageWords[4].length > 2) &&
+            (messageWords[4].charCodeAt(1) === 1) &&
+            (messageWords[4].toUpperCase().indexOf('ACTION') >= 0)) {
+            // erase the array element
+            isPm = true;
+          }
+        }
+      }
+    }
+  }
+  return isPm;
+}; // _parseIsMessagePm()
+
 //
 // _channelCommands is a list of IRC server commands
 // that should be segregated to a dedicated channel cache buffer.
@@ -450,7 +476,7 @@ function _extractChannel (message) {
   }
   // return string with channel name or else return null
   return channel;
-}
+} // _extractChannel()
 
 const excludedMessageList = [
   // Body of MOTD
@@ -534,12 +560,13 @@ function _checkExclusionFilter (message) {
  */
 function _addMessageToCacheBuffer (indexIn, messageAsBuf) {
   let indexStr = indexIn.toLowerCase();
-  if ((!(indexStr == null)) && (indexStr !== 'default')) {
+  if ((!(indexStr == null)) && (indexStr !== 'pmcache') && (indexStr !== 'default')) {
     // Check if a cache buffer exists, if not, create it and fill with null
     if ((indexStr) &&
       (Object.keys(cachedArrays).indexOf(indexStr) < 0) &&
       // check if maximum number of channels is exceeded.
-      (Object.keys(cachedArrays).length < maximumChannelCaches + 1)) {
+      // Offset by 2 due to default and pmcache cache buffer
+      (Object.keys(cachedArrays).length < maximumChannelCaches + 2)) {
       cachedInPointers[indexStr] = 0;
       cachedArrays[indexStr] = [];
       for (let i = 0; i < cacheSize; i++) {
@@ -571,6 +598,8 @@ const addMessage = function (message) {
   // parsedNickChannels contains an array of IRC channel names
   // where the nickname has channel membership
   const parsedNickChannels = _parseNickChannels(message);
+
+  const isMessagePm = _parseIsMessagePm(message);
 
   // Is IRC message a QUIT message?
   if (parsedQuitChannels.isQuit) {
@@ -651,6 +680,12 @@ const addMessage = function (message) {
         _addMessageToCacheBuffer('default', messageAsBuf);
       }
     });
+  } else if (isMessagePm) {
+    // Type conversion to UTF-8 encoded Buffer
+    let messageAsBuf = null;
+    if (Buffer.isBuffer(message)) messageAsBuf = Buffer.from(message);
+    if (typeof message === 'string') messageAsBuf = Buffer.from(message, 'utf8');
+    _addMessageToCacheBuffer('pmcache', messageAsBuf);
   } else {
     // Case of not a QUIT or NICK message, this is a simple case.
 
@@ -734,6 +769,7 @@ const allMessages = function () {
     // If a channel is pruned, removed from ircState.channels
     // then filter the list by skipping the buffer for the pruned channel.
     if ((vars.ircState.channels.indexOf(indexStr) >= 0) ||
+      (indexStr === 'pmcache') ||
       (indexStr === 'default')) {
       let cacheOutPointer = cachedInPointers[indexStr];
       for (let i = 0; i < cacheSize; i++) {
@@ -774,7 +810,8 @@ const cacheInfo = function () {
   info.sizeCache = cacheSize;
   info.buffers = Object.keys(cachedArrays).length;
   // maxBuffers = channel buffers + 1 default buffer
-  info.maxBuffers = maximumChannelCaches + 1;
+  // Offset by 2 due to default and pmcache cache buffer
+  info.maxBuffers = maximumChannelCaches + 2;
   info.usedLines = lines;
   info.sizeInBytes = size;
   return info;

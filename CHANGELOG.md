@@ -8,6 +8,21 @@ and this project adheres to
 
 - To view notes on v2 major upgrade, scroll to Version v2.0.0 2023-09-12
 
+## v2.0.7-Dev 2023-11/14
+
+### Feature
+
+In the backend web server, upgrade the message cache so that private messages (PM)
+have a dedicated message array. The purpose of this change is to prevent private messages
+that are received in the web server (from IRC network) from being scrolled out of the 
+default message buffer by multiple IRC server disconnects. In other words, if you are 
+away and receive a PM, you could miss the message if the default buffer turns over.
+
+- Default buffer: 100 lines
+- PM Cache buffer: 100 lines
+- Each IRC channel up to 5 channels: 100 lines each
+- IRC channel 6 or higher, share default cache buffer of 100 lines.
+
 ## [v2.0.6](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.0.6) 2023-11-07
 
 ### Fixed
