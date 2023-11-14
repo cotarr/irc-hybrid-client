@@ -10,6 +10,25 @@ and this project adheres to
 
 ## v2.0.7-Dev 2023-11/14
 
+### Critical Bug Fix
+
+IRC channel messages can be sent to wrong channel after 
+pruning unused channels from the message cache.
+
+Example:  
+
+- Join 4 IRC channels, "#Chan0", "#Chan1", "#Chan2", "#Chan3".
+- Select the panel for Chan1, press buttons [Leave] followed by [Prune].
+- Type a message in #Chan2, the message is sent to #Chan3 (Wrong channel)
+
+Change:
+
+source-files/web-components/channel-panel.js
+
+For each channel-panel web component that is inserted into the DOM,
+upon receipt of a global "irc-state-changed" event, 
+reset local index variables to the proper values.
+
 ### Feature
 
 In the backend web server, upgrade the message cache so that private messages (PM)

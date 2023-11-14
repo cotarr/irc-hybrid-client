@@ -2093,7 +2093,7 @@ let newTextTheme='global-text-theme-dark';let oldTextTheme='global-text-theme-li
 ;document.removeEventListener('resize-custom-elements',this._handleResizeCustomElements);document.removeEventListener('show-all-panels',this._handleShowAllPanels)
 ;document.removeEventListener('web-connect-changed',this._handleWebConnectChanged);const parentEl=document.getElementById('channelsContainerId')
 ;const childEl=document.getElementById('channel:'+this.channelName.toLowerCase());if(parentEl.contains(childEl))parentEl.removeChild(childEl)};_handleIrcStateChanged=()=>{
-if(!this.elementExistsInDom)throw new Error('Calling irc-state-changed after channel element was destroyed.')
+if(!this.elementExistsInDom)throw new Error('Calling irc-state-changed after channel element was destroyed.');this.channelIndex=window.globals.ircState.channels.indexOf(this.channelName.toLowerCase())
 ;const ircStateIndex=window.globals.ircState.channels.indexOf(this.channelName.toLowerCase());const webStateIndex=window.globals.webState.channels.indexOf(this.channelName.toLowerCase())
 ;if(window.globals.ircState.ircConnected&&ircStateIndex<0&&webStateIndex>=0)this._removeSelfFromDOM();else if(!window.globals.ircState.ircConnected)this._removeSelfFromDOM();else if(window.globals.ircState.ircConnected){
 if(null==window.globals.ircState.channelStates[this.channelIndex].topic)this.shadowRoot.getElementById('channelTopicDivId').textContent='';else this.shadowRoot.getElementById('channelTopicDivId').textContent=document.getElementById('displayUtils').cleanFormatting(window.globals.ircState.channelStates[this.channelIndex].topic)

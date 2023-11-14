@@ -2079,6 +2079,8 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       throw new Error('Calling irc-state-changed after channel element was destroyed.');
     }
 
+    // For the case where channels may have been pruned, reset index to proper values.
+    this.channelIndex = window.globals.ircState.channels.indexOf(this.channelName.toLowerCase());
     const ircStateIndex = window.globals.ircState.channels.indexOf(this.channelName.toLowerCase());
     const webStateIndex = window.globals.webState.channels.indexOf(this.channelName.toLowerCase());
 
