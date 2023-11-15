@@ -398,7 +398,7 @@ if(event.detail&&event.detail.except){if('string'===typeof event.detail.except){
 mode:'open'}).appendChild(templateContent.cloneNode(true));this.previousChannels=[];this.previousPmPanels=[];this.arrayOfMenuElements=[];this.ircConnectedLast=null;this.webConnectedLast=null}
 toggleDropdownMenu=()=>{this.shadowRoot.getElementById('navDropdownDivId').classList.toggle('nav-dropdown-div-show')};closeDropdownMenu=()=>{
 this.shadowRoot.getElementById('navDropdownDivId').classList.remove('nav-dropdown-div-show')};handleServerUnreadUpdate=status=>{const itemEl=this.shadowRoot.getElementById('item3_3_Id')
-;if(status)itemEl.textContent='IRC Server (New Messages)';else itemEl.textContent='IRC Server'};handleNoticeUnreadUpdate=status=>{const itemEl=this.shadowRoot.getElementById('item3_5_Id')
+;if(status)itemEl.textContent='IRC Server (New Messages)';else itemEl.textContent='IRC Server (Alt-S)'};handleNoticeUnreadUpdate=status=>{const itemEl=this.shadowRoot.getElementById('item3_5_Id')
 ;if(status)itemEl.textContent='Notices (New Messages)';else itemEl.textContent='Notices'};handleWallopsUnreadUpdate=status=>{const itemEl=this.shadowRoot.getElementById('item3_4_Id')
 ;if(status)itemEl.textContent='Wallops (New Messages)';else itemEl.textContent='Wallops'};handlePmListUpdate=()=>{const pmPanels=Array.from(window.globals.webState.activePrivateMessageNicks)
 ;let changed=false

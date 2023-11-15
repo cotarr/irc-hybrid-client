@@ -8,6 +8,11 @@ and this project adheres to
 
 - To view notes on v2 major upgrade, scroll to Version v2.0.0 2023-09-12
 
+## v2.0.8-Dev
+
+- Added:  Display some hotkey values in main dropdown menu
+- Minor update to /docs
+
 ## [v2.0.7](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.0.7) 2023-11-15
 
 ### Critical Bug Fix

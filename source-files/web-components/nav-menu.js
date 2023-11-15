@@ -84,7 +84,7 @@ customElements.define('nav-menu', class extends HTMLElement {
     if (status) {
       itemEl.textContent = 'IRC Server (New Messages)';
     } else {
-      itemEl.textContent = 'IRC Server';
+      itemEl.textContent = 'IRC Server (Alt-S)';
     }
   };
 
