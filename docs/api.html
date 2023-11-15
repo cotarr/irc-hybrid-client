@@ -629,8 +629,8 @@ Cached message with 2 IRC channels.
             the entire message cache and update textarea elements accordingly.
           </li>
           <li>
-            PRIVMSG - This will identify and erase all user PRIVMSG messages 
-            in the default message cache. Channel PRIVMSG message will not be erased.
+            PRIVMSG - This will erase all user PRIVMSG messages that were stored
+            in the private message cache (pmcache). Channel PRIVMSG message will not be erased.
             The web server then sends a &quot;CACHEPULL&quot; command to all 
             connected web browsers over the websocket connection.
             The CACHEPULL command will cause all connected web browsers to reload 
