@@ -201,6 +201,22 @@ if (oauth2.enableRemoteLogin) {
 }
 
 //
+// Returns random generated nonce of type string
+//
+const generateRandomNonce = function (nonceLength) {
+  if ((typeof nonceLength !== 'number') || (nonceLength < 3)) {
+    throw new Error('generateRandomNonce() length too short');
+  }
+  const intNonceLength = parseInt(nonceLength);
+  let nonce = '';
+  const charSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  for (let i = 0; i < intNonceLength; i++) {
+    nonce += charSet.charAt(parseInt(Math.random() * charSet.length));
+  }
+  return nonce;
+};
+
+//
 // Setup authentication variables inside session
 //
 const _initSession = function (req) {
@@ -214,6 +230,7 @@ const _initSession = function (req) {
 
 //
 // Check session authorized flag and return true/false
+// authorized returns true, unauthorized returns false.
 //
 const _checkIfAuthorized = function (req) {
   // console.log('req.session.sessionAuth ' + JSON.stringify(req.session.sessionAuth, null, 2));
@@ -242,7 +259,6 @@ const _checkIfAuthorized = function (req) {
       }
     }
   }
-  // authorized = true = authorized.
   return authorized;
 };
 
@@ -300,8 +316,8 @@ export const authorizeOrFail = function (req, res, next) {
 // There, the user will be presented with login form
 //
 // Example of part part of redirect (line wrapped):
-// /dialog/authorize?redirect_uri=http://localhost:3003/login/callback&
-//     response_type=code&client_id=irc_client&scope=irc.scope1%20irc.scope2
+// /dialog/authorize?redirect_uri=http://localhost:3003/login/callback&response_type=code&
+//     client_id=irc_client&scope=irc.scope1%20irc.scope2&state=xxxxxxxx
 // ---------------------------
 export const loginRedirect = function (req, res, next) {
   // Modification of the session by _initSession() will trigger express-session
@@ -326,13 +342,16 @@ export const loginRedirect = function (req, res, next) {
       }
     }
   }
+  const randomStateNonce = generateRandomNonce(8);
+  req.session.stateNonce = randomStateNonce;
   res.redirect(encodeURI(
     oauth2.remoteAuthHost +
     '/dialog/authorize?' +
     'redirect_uri=' + oauth2.remoteCallbackHost + '/login/callback' + '&' +
     'response_type=code&' +
     'client_id=' + oauth2.remoteClientId + '&' +
-    'scope=' + scopeString));
+    'scope=' + scopeString) + '&' +
+    'state=' + randomStateNonce);
 };
 
 //
@@ -355,6 +374,84 @@ const _checkCookieExists = (req, res, chain) => {
   });
 };
 
+// Authorization callback query parameter input validation
+//
+// Expect: // GET /login/callback?code=xxxxxxxx&state=xxxxxxxx
+//
+const _callbackQueryParamsInputValidation = (req, chain) => {
+  return new Promise(function (resolve, reject) {
+    if ((Object.hasOwn(req, 'query')) &&
+      (typeof req.query === 'object')) {
+      if (!Object.hasOwn(req.query, 'code')) {
+        const err = new Error('Input validation: code is a required URL query parameter');
+        err.status = 400;
+        reject(err);
+      } else if (!Object.hasOwn(req.query, 'state')) {
+        const err = new Error('Input validation: state is a required URL query parameter');
+        err.status = 400;
+        reject(err);
+      } else if (Object.keys(req.query).length !== 2) {
+        const err = new Error('Input validation: unrecognized URL query parameter');
+        err.status = 400;
+        reject(err);
+      } else {
+        resolve(chain);
+      }
+    } else {
+      const err = new Error('Authorization callback input validation error');
+      err.status = 400;
+      reject(err);
+    }
+  }); // Promise
+}; // _callbackQueryParamsInputValidation()
+
+// Function will check that the authorization code callback
+// query parameter 'state' matches the previous value
+// stored in the user's session.
+//
+// GET /login/callback?code=xxxxxxxx&state=xxxxxxxx
+//
+// Success: returns promise resolving to cain object
+// Validation failure: reject promise with status 401 unauthorized or 400 bad request
+
+const _validateCallbackStateNonce = (req, chain) => {
+  return new Promise(function (resolve, reject) {
+    // Callback URL query parameter: state
+    if ((Object.hasOwn(req.query, 'state')) &&
+      (typeof req.query.state === 'string') &&
+      (req.query.state.length > 0) &&
+      (req.query.state.length < 80)) {
+      // User's session storage previously stored property: stateNonce
+      if ((Object.hasOwn(req, 'session')) &&
+        (Object.hasOwn(req.session, 'stateNonce'))) {
+        // Validate that values match
+        if ((req.session.stateNonce.length > 0) &&
+          (req.query.state === req.session.stateNonce)) {
+          // Case of success: nonce values match
+          delete req.session.stateNonce;
+          resolve(chain);
+        } else {
+          // Case of state nonce does not match value previously stored in user's session
+          delete req.session.stateNonce;
+          const err = new Error('Authorization callback has invalid state parameter');
+          err.status = 401;
+          reject(err);
+        }
+      } else {
+        // Case of no previously saved value stored in user's session
+        const err = new Error('Authorization callback has invalid state parameter');
+        err.status = 401;
+        reject(err);
+      }
+    } else {
+      // Case of state nonce string length out of range
+      const err = new Error('Authorization callback input validation error');
+      err.status = 400;
+      reject(err);
+    }
+  }); // Promise
+}; // _validateCallbackStateNonce()
+
 // Function will regenerate a new session and cookie
 // Returns Promise resolving to null
 // Throws error if unable to regenerate and rejects promise
@@ -375,38 +472,28 @@ const _regenerateSessionCookie = function (req, chain) {
 };
 
 // ---------------------------------------------------------
-// Validate input for url query parameters
-// and extract Oauth 2.0 authorization code
+// Extract Oauth 2.0 authorization code
 //
-// GET /login/callback?code=xxxxxxxx
+// GET /login/callback?code=xxxxxxxx&state=xxxxxxxx
 //
-// Success: returns promise resolving to authorization code
-// Validation failure: generate response status 400 bad request
-// Otherwise internal server error.
+// Success: returns promise resolving to chain object with authorization code
+// Validation failure: reject promise with status 400 bad request
 // ---------------------------------------------------------
 const _extractCallbackAuthCode = function (req, chain) {
   return new Promise(function (resolve, reject) {
-    if (Object.hasOwn(req, 'query')) {
-      // query input validation
-      if ((typeof req.query === 'object') &&
-        (Object.keys(req.query).length === 1) &&
-        ('code' in req.query) &&
-        (typeof req.query.code === 'string') &&
-        (req.query.code.length > 0) &&
-        (req.query.code.length < 80)) {
-        // Extract Oauth 2.0 authorization code
-        chain.code = req.query.code;
-        // return chain object with result
-        resolve(chain);
-      } else {
-        console.log('Error: _extractCallbackAuthCode() req.query failed input validation');
-        const err = new Error('Authorization code validation error');
-        err.status = 400;
-        reject(err);
-      }
+    if ((Object.hasOwn(req, 'query')) &&
+      (Object.hasOwn(req.query, 'code')) &&
+      (typeof req.query.code === 'string') &&
+      (req.query.code.length > 0) &&
+      (req.query.code.length < 80)) {
+      // Extract Oauth 2.0 authorization code
+      chain.code = req.query.code;
+      // return chain object with result
+      resolve(chain);
     } else {
-      const err = new Error('query param not found in req object');
-      console.log(err.message);
+      // Case of authorization code string length out of range
+      const err = new Error('Authorization callback input validation error');
+      err.status = 400;
       reject(err);
     }
   });
@@ -415,6 +502,9 @@ const _extractCallbackAuthCode = function (req, chain) {
 // ------------------------------------------------------
 // Validate that required properties exist after
 // exchanging authorization code for new access token
+//
+// Success: resolves to chain object
+// Failure: reject promise with error
 // ------------------------------------------------------
 const _validateTokenResponse = function (chain) {
   return new Promise(function (resolve, reject) {
@@ -432,7 +522,7 @@ const _validateTokenResponse = function (chain) {
       resolve(chain);
     } else {
       const err = new Error('Error parsing authorization_code response');
-      console.log(err.message);
+      err.status = 400;
       reject(err);
     }
   });
@@ -471,14 +561,14 @@ const _authorizeTokenScope = function (chain) {
       if (scopeFound) {
         resolve(chain);
       } else {
-        console.log('User access token insufficient scope');
+        // console.log('User access token insufficient scope');
         const err = new Error('User access token insufficient scope');
         err.status = 403;
         reject(err);
       }
     } else {
       const err = new Error('Error parsing introspect response meta-data');
-      console.log(err.message);
+      err.status = 400;
       reject(err);
     }
   });
@@ -671,6 +761,11 @@ const _fetchNewAccessToken = function (chain) {
           message += ', ' + err.oauthHeaderText;
         }
         const error = new Error(message);
+        // By default error will be status 500, use 401,403 if status code
+        // supplied from the authorization server is 401 or 403.
+        if ((err.status) && ((err.status === 401) || (err.status === 403))) {
+          error.status = err.status;
+        }
         reject(error);
       });
   }); // new Promise()
@@ -680,21 +775,43 @@ const _fetchNewAccessToken = function (chain) {
 // Route handler for GET /login/callback
 //
 // The browser will redirect to here with the Oauth 2.0 authorization code
-// as a query parameter in the url. (Example: /login/callback?code=xxxxxxx)
+// as a query parameter in the url.
+// Example: /login/callback?code=xxxxxxx&state=xxxxxxxx
+//
+// The authorization code is sent by the IRC client web server to the authorization server
+// as an OAuth 2.0 authorization code grant request to obtain an access token.
+//
+// The access token is then sent by the IRC client web server to the authorization server
+// to obtain the token meta-data which contains the users rule.
+// The user's role must be in the list of allowed scopes for the IRC client web server.
+//
+// The 'state' property is a random nonce generated by the web server /login route.
+// The nonce is stored in the users session by the /login route handler.
+// The state property is appended to the 301 redirect to the authorization server.
+// After the user authenticates their identity by password, user's browser returns
+// to the IRC client web server with a second 302 redirect containing both
+// an authorization code and the previous value of the state nonce.
+// The state nonce in the callback redirect must match the previously stored. value.
+//
+// Promise chain:
 //
 // 1) Check cookie exists (Cookies not disabled in browser)
-// 2) Regenerate a new session and cookie (security)
-// 3) Input validation on GET /login/callback, then extract authorization code
-// 4) Perform fetch request to exchange authorization code for a new access_token
-// 5) Validate the token request response object required parameters
-// 6) Perform fetch request to validate token and obtain user's token meta-data
-// 7) Validate that user's token scope is sufficient to use irc-hybrid-client
-// 8) Redirect to single page application at /irc/webclient.html
+// 2) Perform input validation checks on URL query parameters
+// 3) Extract state nonce and compare to previously stored value in user's session
+// 4) Regenerate a new session and cookie (security). Must be after state nonce check
+// 5) Extract authorization code from URL query parameters
+// 6) Perform fetch request to exchange authorization code for a new access_token
+// 7) Validate the token request response object required parameters
+// 8) Perform fetch request to validate token and obtain user's token meta-data
+// 9) Validate that user's role (token scope) is sufficient to use irc-hybrid-client
+// 10) Redirect to single page application at /irc/webclient.html (IRC client page)
 // -------------------------------------------------------------------------------
 export const exchangeAuthCode = function (req, res, next) {
   const chainObj = Object.create(null);
   // Calling _regenerateSessionCookie returns promise
   _checkCookieExists(req, res, chainObj)
+    .then((chain) => _callbackQueryParamsInputValidation(req, chain))
+    .then((chain) => _validateCallbackStateNonce(req, chain))
     .then((chain) => _regenerateSessionCookie(req, chain))
     .then((chain) => _extractCallbackAuthCode(req, chain))
     .then((chain) => _fetchNewAccessToken(chain))

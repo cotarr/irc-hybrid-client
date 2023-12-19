@@ -10,8 +10,47 @@ and this project adheres to
 
 ## v2.0.8-Dev
 
+### Changes
+
 - Added:  Display some hotkey values in main dropdown menu
 - Minor update to /docs
+
+### Security improvement
+
+This applies only to the optional use of the remote authentication server for web page login.
+There are no changes to the default internal password login involved in this update.
+
+An additional URL query parameter 'state' was added to 
+the OAuth 2.0 authorization code grant workflow. 
+The intent is to reduce CSRF risks during browser redirects back and 
+forth between the main web server and the remote authorization server.
+If using collab-auth as referenced in the /docs/, the change
+requires collab-auth v0.0.20 or later pushed 2023-11-05.
+
+Use of the "state" value is referenced in RFC-6749.
+A simple explanation of this implementation is as follows:
+
+The "state" URL query parameter is a random nonce that is generated
+by the irc-hybrid-client web server when handling the /login route.
+The nonce is stored in the users session by the /login route handler.
+The web server adds the state parameter to the 302 redirect going 
+to the authorization server as a OAuth 2.0 URL query parameter. 
+After the user authenticates their identity by password, user's browser is 
+returned back to the IRC client web server with a second 302 redirect.
+The returning 302 redirect URL query parameters contain both an 
+authorization code and the previous value of the state nonce. 
+The value of the state nonce previously stored in the user's session 
+from the first 302 redirect to the authorization server must match 
+the value in the returning 302 redirect back to the irc-hybrid-client web server.
+
+All changes are in in the file "server/middlewares/remote-authentication.mjs".
+
+- Added code in the /login route handler to generate nonce, save in user's session, and append to the 302 redirect.
+- Added new function for input validation of GET /login/callback URL query parameters.
+- Added new function to extract and compare the state nonce for the GET /login/callback handler.
+- Improved code related to extraction of authorization code for the GET /login/callback handler.
+- Update and improve some error status codes and error messages
+- Update comments and remove some console.log
 
 ## [v2.0.7](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.0.7) 2023-11-15
 
