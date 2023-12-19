@@ -52,6 +52,9 @@ All changes are in in the file "server/middlewares/remote-authentication.mjs".
 - Update and improve some error status codes and error messages
 - Update comments and remove some console.log
 
+Updated ThunderClient collection for testing remote authorization to accommodate 
+the state parameter implemented with this change. Updated README in ThunderClient folder.
+
 ## [v2.0.7](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.0.7) 2023-11-15
 
 ### Critical Bug Fix

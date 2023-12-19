@@ -128,14 +128,48 @@ Open a separate terminal window for collab-auth. Start collab-auth using `npm st
 
 Open a separate terminal window for irc-hybrid-client. Start irc-hybrid-client using `npm start`
 
-The entire remote-login collection may then be run in Thunder Client as a collection or run step by step.
-
 The servers may be stopped in each terminal window by using Ctrl-C.
 
 
-# Tests
+# Request Descriptions
 
-- The first two tests delete cookies on both servers and clear environment variables
+The authorization server client account provides credentials for the web server 
+to interact directly with the authorization server, independent of any user's permissions.
+For the case where a client account is configured with `trustedClient": false`, 
+the authorization server will present the user with a access decision form in 10.6 and accept 
+a POST request in 10.7 for the user to "Accept" or "Deny" the permission to access the resource.
+In this case 10.7 will redirect back to the web server with an authorization code.
+In the case of `trustedClient: true`, the decision form is skipped, and 10.6 will 
+redirect browser immediately back to the web server with an authorization code.
+
+The login process involves two different browser cookies, one for the IRC client web server
+and the other for the authorization server login/password form.
+During normal login with no valid cookies, first the browser obtains a cookie from 
+the web server, then after redirect to the authorization server, a second cookie is obtained.
+It is possible to be logged out (no cookie) of the IRC client web server, but still
+have an unexpired cookie for the authorization server. In this case, password entry
+is not required, and the authorization code grant workflow will return immediately
+with an authorization code. For the case where the web server is logged out (invalid cookie), 
+but the user still has a valid cookie to the authorization server, 
+steps 10.3, 10.4 adn 10.5 will be skipped.
+
+To accommodate all 4 of these situations, there are some differences in the way values 
+are parsed from each response and saved into local variables for use in subsequent 
+requests. The ThunderClient "irc-hybrid-client Remote Auth" collection contains
+duplicate requests in 4 different folders. Each folder may be selected run depending on the 
+configuration. Running the entire collection will generate errors where configuration 
+does not match some folders.
+
+| Folder Name                         | Trusted | Auth Cookie | Skipped Requests       |
+| ----------------------------------- | ------- | ----------- | ---------------------- |
+| Untrusted Client Login              | False   |             | None skipped           |
+| Untrusted Client (with auth cookie) | False   | Valid       | 10.3 to 10.5           | 
+| Trusted Client Login                | True    |             | 10.7                   |
+| Trusted Client (with auth cookie)   | True    | Valid       | 10.3 to 10.5, and 10.7 |
+
+Description of ThunderClient requests for remote authentication
+
+- The first two tests logout sessions on both servers and clear environment variables
 - 10.1 Main page at /irc/webclient.html is not authorized, redirects to /login on web server
 - 10.2 The /login route redirects the browser to the authorization server /dialog/authorize route with OAuth2 values as URL query parameters.
 - 10.3 The authorization server does not recognize a cookie. The query parameters are remembered. A redirect 302 sends the browser to the login form.
