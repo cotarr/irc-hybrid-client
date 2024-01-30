@@ -374,6 +374,21 @@ const _checkCookieExists = (req, res, chain) => {
   });
 };
 
+const sanitizeErrorInput = function (inString) {
+  let sanitizedString = '';
+  const allowedChars =
+    'abcdefghijklmnoqprstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 -_.,:';
+  if ((typeof inString === 'string') && (inString.length > 0)) {
+    for (let i = 0; i < inString.length; i++) {
+      const allowedCharIndex = allowedChars.indexOf(inString[i]);
+      if (allowedCharIndex > -1) {
+        sanitizedString += allowedChars[allowedCharIndex];
+      }
+    }
+  }
+  return sanitizedString;
+};
+
 // Authorization callback query parameter input validation
 //
 // Expect: // GET /login/callback?code=xxxxxxxx&state=xxxxxxxx
@@ -382,7 +397,19 @@ const _callbackQueryParamsInputValidation = (req, chain) => {
   return new Promise(function (resolve, reject) {
     if ((Object.hasOwn(req, 'query')) &&
       (typeof req.query === 'object')) {
-      if (!Object.hasOwn(req.query, 'code')) {
+      // Error detection...
+      if ((Object.hasOwn(req.query, 'error')) ||
+        (Object.hasOwn(req.query, 'error_description'))) {
+        let errorMessage = 'Authorization callback returned error';
+        if ((Object.hasOwn(req.query, 'error_description')) &&
+          (typeof req.query.error_description === 'string')) {
+          errorMessage = sanitizeErrorInput(req.query.error_description);
+        }
+        const err = new Error(errorMessage);
+        err.status = 502;
+        reject(err);
+      // Input validation...
+      } else if (!Object.hasOwn(req.query, 'code')) {
         const err = new Error('Input validation: code is a required URL query parameter');
         err.status = 400;
         reject(err);

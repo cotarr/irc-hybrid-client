@@ -8,6 +8,25 @@ and this project adheres to
 
 - To view notes on v2 major upgrade, scroll to Version v2.0.0 2023-09-12
 
+## v2.0.9-Dev
+
+### Fixed
+
+This applies only to the optional use of the remote authentication server for web page login.
+There are no changes to the default internal password login involved in this update.
+
+In the case where the authorization server callback redirect includes an 
+error message as a URL query parameter, such as "Client account disabled" 
+as the URL query parameter "error_description=Client%20account%20disabled", 
+irc-hybrid-client blocked the error response as an input validation error.
+
+Fixed: Parse the login callback redirect to see if includes an error message.
+If present, log the error and forward to the browser for display. Example:
+
+```
+502 Bad Gateway, Client account disabled
+```
+
 ## [v2.0.8](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.0.8) 2023-12-19
 
 ### Changes
