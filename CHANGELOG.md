@@ -8,6 +8,12 @@ and this project adheres to
 
 - To view notes on v2 major upgrade, scroll to Version v2.0.0 2023-09-12
 
+## v2.0.10-Dev 2024-03-16
+
+- Update dependencies for minor versions: connect-redis@7.1.1, cookie@0.6.0, dotenv@16.4.5, express#4.18.3, express-session@1.18.0, helmet@7.1.0, redis@4.6.13, rotating-file-stream@3.2.1, ws@8.16.0
+- Update dependency for major version: express-rate-limit 6.11.2 to 7.2.0.
+- Update eslint development dependency
+
 ## [v2.0.9](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.0.9) 2024-01-30
 
 ### Fixed
