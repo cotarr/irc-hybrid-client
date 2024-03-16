@@ -10,6 +10,13 @@ and this project adheres to
 
 ## v2.0.10-Dev 2024-03-16
 
+### Added
+
+- In server/middlewares/user-authentication, added rate limiter for invalid password attempts when configured for internal password login. 
+- Initial configuration hard coded to allow 5 invalid password attempts per IP address per hour.
+
+### Npm updates
+
 - Update dependencies for minor versions: connect-redis@7.1.1, cookie@0.6.0, dotenv@16.4.5, express#4.18.3, express-session@1.18.0, helmet@7.1.0, redis@4.6.13, rotating-file-stream@3.2.1, ws@8.16.0
 - Update dependency for major version: express-rate-limit 6.11.2 to 7.2.0.
 - Update eslint development dependency

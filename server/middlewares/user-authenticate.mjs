@@ -55,6 +55,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
+import rateLimit from 'express-rate-limit';
 import config, { loginUsers as userArray } from '../config/index.mjs';
 
 const nodeEnv = process.env.NODE_ENV || 'development';
@@ -291,11 +292,26 @@ const safeCompare = function (userInput, secret) {
   return !!(crypto.timingSafeEqual(userInputBuffer, secretBuffer)) &
     userInputLength === secretLength;
 };
+
+// --------------------------------------------
+// Rate limit bad password POST requests
+// Allow 5 invalid password attempt per hour per IP address
+// ---------------------------------------------
+const loginRateLimiter = rateLimit({
+  windowMs: 3600000,
+  max: 5,
+  statusCode: 429,
+  message: 'Too many login requests',
+  standardHeaders: false,
+  legacyHeaders: false
+});
+
 //
 // -------------------------------------
 // Route: POST /login-authorize
 // -------------------------------------
-export const loginAuthorize = function (req, res, next) {
+// Returns array containing 2 middleware functions.
+export const loginAuthorize = [loginRateLimiter, function (req, res, next) {
   // console.log('sessionAuth ' + JSON.stringify(req.session.sessionAuth, null, 2));
   // console.log('body ' + JSON.stringify(req.body, null, 2));
   // console.log('query ' + JSON.stringify(req.query));
@@ -397,6 +413,13 @@ export const loginAuthorize = function (req, res, next) {
             // Check bcrypt salted hash to see if it matches
             //
             if (bcrypt.compareSync(inputPassword, userArray[userIndex].hash)) {
+              // Case of login is successful
+
+              // ---------------------------
+              // Reset the rate limiter for this IP address
+              // ---------------------------
+              loginRateLimiter.resetKey(req.ip);
+
               // ------------------------
               // Authorize the user
               // ------------------------
@@ -448,7 +471,7 @@ export const loginAuthorize = function (req, res, next) {
       }
     } // !err
   }); // regenerate session
-}; // loginAuthorize()
+}]; // loginAuthorize()
 
 const loginFormFragment1 =
   '<div>\n' +
