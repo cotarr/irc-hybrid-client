@@ -78,15 +78,38 @@ export const writeSocket = function (socket, message) {
       }
     }
 
-    // Looking for: 'PRIVMSG NickServ :IDENTIFY <passowrd>'
+    // NickServ private message log filter
+    // Looking for: 'PRIVMSG nickserv :IDENTIFY <password>'
+    // Also case when 'nickserv@' are first 9 characters of nickname
+    //     example: PRIVMSG nickserv@services.dal.net :IDENTIFY <password>'
     if (message.split(' ')[0].toUpperCase() === 'PRIVMSG') {
       if ((message.split(' ').length > 3) &&
-        (message.split(' ')[1].toLowerCase() === 'nickserv') &&
+        (
+          (message.split(' ')[1].toLowerCase() === 'nickserv') ||
+          (message.split(' ')[1].toLowerCase().indexOf('nickserv@') === 0)
+        ) &&
         (message.split(' ')[2].toUpperCase() === ':IDENTIFY')) {
         filtered = 'PRIVMSG ' +
           message.split(' ')[1] + ' ' + message.split(' ')[2] + ' ********';
       }
     }
+
+    // Undernet filter for channel services bot X
+    // Looking for: 'PRIVMSG x :LOGIN <username> <password> [<totp>]'
+    // Also case when 'x@' are first 2 characters of nickname
+    //     example: PRIVMSG x@channels.undernet.org :LOGIN <username> <password>'
+    if (message.split(' ')[0].toUpperCase() === 'PRIVMSG') {
+      if ((message.split(' ').length > 3) &&
+        (
+          (message.split(' ')[1].toLowerCase() === 'x') ||
+          (message.split(' ')[1].toLowerCase().indexOf('x@') === 0)
+        ) &&
+        (message.split(' ')[2].toUpperCase() === ':LOGIN')) {
+        filtered = 'PRIVMSG ' +
+          message.split(' ')[1] + ' ' + message.split(' ')[2] + ' ********';
+      }
+    }
+
     // echo the outgoing IRC server message to the browser
     global.sendToBrowser(vars.commandMsgPrefix + filtered + '\n');
 

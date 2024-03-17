@@ -8,6 +8,27 @@ and this project adheres to
 
 - To view notes on v2 major upgrade, scroll to Version v2.0.0 2023-09-12
 
+## v2.0.11-Dev 2024-03-17 (Draft)
+
+### Changed
+
+Added 3 additional log file filters to block logging of passwords in the irc message log.
+The purpose of this change is to add support for the Undernet channel services bot X.
+These filters only apply to the IRC message log contents in "logs/irc.log" if logging enabled.
+
+- Added new log filter for nickname "x" used with "LOGIN" command
+- Added new log filter for nickname starting with "x@" used with "LOGIN" command
+- Added new log filter for nickname starting with "nickserv@" used with "IDENTIFY" command
+
+Example showing filtered log entries into log/irc.log.
+
+```
+PRIVMSG NickServ :IDENTIFY ********
+PRIVMSG NickServ@services.dal.net :IDENTIFY ********
+PRIVMSG x :LOGIN ********
+PRIVMSG x@channels.undernet.org :LOGIN ********
+```
+
 ## [v2.0.10](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.0.10) 2024-03-17
 
 ### Added (Security improvement)
