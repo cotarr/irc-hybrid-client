@@ -8,9 +8,9 @@ and this project adheres to
 
 - To view notes on v2 major upgrade, scroll to Version v2.0.0 2023-09-12
 
-## v2.0.10-Dev 2024-03-16
+## [v2.0.10](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.0.10) 2024-03-17
 
-### Added
+### Added (Security improvement)
 
 - In server/middlewares/user-authentication, added rate limiter for invalid password attempts when configured for internal password login. 
 - Initial configuration hard coded to allow 5 invalid password attempts per IP address per hour.
