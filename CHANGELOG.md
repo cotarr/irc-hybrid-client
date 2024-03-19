@@ -29,6 +29,8 @@ PRIVMSG x :LOGIN ********
 PRIVMSG x@channels.undernet.org :LOGIN ********
 ```
 
+- Update /docs/ related to log file filtering and summarize data stored in web server instance.
+
 ## [v2.0.10](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.0.10) 2024-03-17
 
 ### Added (Security improvement)

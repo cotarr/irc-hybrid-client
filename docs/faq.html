@@ -42,7 +42,8 @@
         <a href="#concurrent">Are concurrent connections supported?</a><br>
         <a href="#tracking">Are there any tracking beacons in the code?</a><br>
         <a href="#cookies">Does the program use cookies?</a><br>
-        <a href="#localstorage">What data is stored locally in the web browser?</a><br>
+        <a href="#localstorage">What data is stored locally in the IRC users's web browser?</a><br>
+        <a href="#serverstorage">What data is stored in the remote instance of a irc-hybrid-client web server?</a><br>
         <a href="#refresh">What are &quot;IRC Cache Reload&quot; messages?</a><br>
         <div class="faq-spacer"></div>
         <table class="table-generic">
@@ -141,7 +142,7 @@
           </a></td></tr>
           <tr><td><a name="localstorage">
             <p>
-              Q: What data is stored locally in the web browser?<br>
+              Q: What data is stored locally in the IRC users's web browser?<br>
             </p>
             A: The web page uses the web browsers window.localStorage API.
             The browser localStorage is cleared when the &quotWeb Logout&quot button is
@@ -181,6 +182,82 @@
             the browser console. There is an option to save the example string to localStorage so that
             debugging can be repeated as code is modified. No data is saved to localStorage 
             unless buttons on the show-raw panel are manually activated by the user.
+          </a></td></tr>
+          <tr><td><a name="serverstorage">
+            <p>
+              Q: What data is stored in the remote instance of a irc-hybrid-client web server?<br>
+            </p>
+            A: The web server fulfills 2 roles, an IRC client and a web server. Therefore the 
+            web server may contain both web server related data and IRC client related data.
+            <br><br>
+            It should be noted that irc-hybrid-client is a server based application that was developed
+            in a Linux server environment. Ideally, irc-hybrid-client should be implemented as a single user 
+            IRC client running in a linux server controlled by the same person. This could be a home 
+            server or a dedicated cloud based virtual private server. If this application is 
+            run as a shell account in a multi-user environment, Linux server 
+            administrators with root access would potentially have permissions 
+            allowing administrators to read all server files, including configuration 
+            files for this application.
+            <br><br>
+            The configuration files are not encrypted.
+            <br><br>
+            1) Web server configuration files include data used to control access to the web server including 
+            credentials used for cookie digital signatures and cookie names.
+            <br><br>
+            2) Optionally, the web server may be configured to use Redis as a database 
+            to persist user login state across web server shutdown and restart. 
+            In this case, configuration files may include data used 
+            to connect irc-hybrid-client to the Redis server. 
+            The Redis database itself would include the session store as extracted from 
+            the express-session module. Basically this includes server side data 
+            needed to authorize HTTP web requests based on user login state. 
+            A Redis server installation is independent of irc-hybrid-client instance.
+            In the case of a multi-user system or cases where other users may 
+            have access to the Redis database contents, it is recommended 
+            to disable Redis by setting 'SESSION_ENABLE_REDIS=false'. 
+            The default session store (Memorystore) is RAM based and does not 
+            save any session related data to file. However, without Redis, the web browser would be 
+            logged out each time the server is shutdown and restarted.
+            <br><br>
+            3) When configured for local password authentication, configuration will include 
+            the username and bcrypt hashed password that would be entered by the user 
+            for the web browser to login to the web server.
+            <br><br>
+            4) When configured for remote password authentication, configuration will include the 
+            web server's client id, client secret and other data used to obtain 
+            and validate an OAuth 2.0 access token.
+            <br><br>
+            5) Optionally, irc-hybrid-client may be configured to use a remote socks5 proxy
+            to establish a proxy network connection to an IRC server.
+            In this case, configuration files may include data used 
+            to connect irc-hybrid-client to a remote socks5 proxy server.
+            <br><br>
+            6) The IRC server configuration file 'servers.json' includes data used by 
+            irc-hybrid-client to connect to various different IRC networks.
+            This may include IRC server password, IRC server SASL username/password, 
+            and NickServ services IDENTIFY command. This configuration is not encrypted 
+            and stored in plain text in the servers.json file.
+            <br><br>
+            7) Optionally, irc-hybrid-client may be configured to save IRC message to an IRC log file.
+            If enabled, logging will include both incoming and outgoing IRC server messages in raw format.
+            This was intended primarily for use in debugging the program.
+            The logging software includes a limited password filter 
+            to redact passwords from common commands, such as 'OPER' and NickServ IDENTIFY
+            commands. The filter may be reviewed in file 'server/irc/irc-client-write.mjs'.
+            The filter was primarily developed using DALnet. 
+            When users send passwords through IRC, they should 
+            review the 'logs/irc.log' to better understand the limitations of 
+            password filtering.
+            <br><br>
+            8) The web server includes an internal IRC message cache used to
+            keep the IRC windows in the web browser synchronized with the backend IRC client.
+            Refreshing the web page will pull content from the message cache.
+            The message cache is RAM based. Optionally, the server may be configured 
+            to persist the message cache across web server restarts. If the 
+            optional setting 'IRC_PERSIST_MESSAGE_CACHE=true', upon server shutdown, 
+            the IRC message cache will be saved to a temporary file in the /logs/ folder.
+            The contents of this temporary file are cleared after the server is restarted.
+            The IRC message cache does not include password filtering.
           </a></td></tr>
           <tr><td><a name="refresh">
             <p>

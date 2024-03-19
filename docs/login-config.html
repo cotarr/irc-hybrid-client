@@ -605,8 +605,16 @@ LOGIN_USER_HASH="$2a$10$0pr9Q21L7CFoSw5.FjbW0.izOzQtBTqQjOGbZJabM2MMNdSxKyfpO"
           this instance of redis.
         </p>
         <p>
+          As a security note, generally session storage includes server side data 
+          needed to authorize HTTP web requests based on user login state. 
+          A Redis server installation is independent of the irc-hybrid-client instance.
+          In the case of a multi-user system or cases where other users may 
+          have access to the Redis database contents, it is recommended 
+          to disable Redis and use Memorystore.
+        </p>
+        <p>
           If you are not familiar with redis, it is recommended to use the
-          default configuration to use memorystore for session storage.
+          default configuration to use Memorystore for session storage.
         </p>
         <ul>
           <li>Install redis from OS package manager, Debian: `apt-get install redis-server`.</li>
