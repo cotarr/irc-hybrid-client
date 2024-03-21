@@ -482,6 +482,12 @@ Enter new password:<blue-example>zuwa79xoJxLJ</blue-example>
 }
 </pre></div>
         <p>
+          Failed login attempts will increment a counter of failed attempts by IP address.
+          The limit is set to allow 5 failed password attempts per hour for each IP address.
+          Exceeding this limit will temporarily disable login for 1 hour.
+          The may be reset at any time by shutdown and restart of the web server.
+        </p>
+        <p>
           Privacy Caution:
           The web userid numeric value (userid: 1) and web login timestamp are saved in the web browsers's
           localStorage API. See:
@@ -562,6 +568,12 @@ LOGIN_USER_HASH="$2a$10$0pr9Q21L7CFoSw5.FjbW0.izOzQtBTqQjOGbZJabM2MMNdSxKyfpO"
           Only 1 user account can be defined when using environment variables for configuration.
           If you want to add a second login password, you will need to use the credentials.json or
           configure the program to use the remote login feature.
+        </p>
+        <p>
+          Failed login attempts will increment a counter of failed attempts by IP address.
+          The limit is set to allow 5 failed password attempts per hour for each IP address.
+          Exceeding this limit will temporarily disable login for 1 hour.
+          The may be reset at any time by shutdown and restart of the web server.
         </p>
         <p>
           Privacy Caution:
