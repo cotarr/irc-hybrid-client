@@ -10,6 +10,10 @@ and this project adheres to
 
 ## v2.0.11-Dev 2024-03-17 (Draft)
 
+### Upgrade
+
+- Upgrade express from v4.18.2 to v4.19.1
+
 ### Changed
 
 Added 3 additional log file filters to block logging of passwords in the irc message log.
