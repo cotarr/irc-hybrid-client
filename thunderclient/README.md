@@ -217,7 +217,7 @@ auth_scopes:         "irc.all"
 
 ## Thunder Client Collections
 
-In the Thunder Client extension in VSCode, there are 4 test collections.
+In the Thunder Client extension in VSCode, there are 5 test collections.
 These test collections can be imported into VSCode ThunderClient as needed.
 
 ```
@@ -225,6 +225,7 @@ thunder-collection_irc-hybrid-client-tests-1.json (Folder: Auth tests)
 thunder-collection_irc-hybrid-client-tests-2.json (Folder: Websocket Auth Test)
 thunder-collection_irc-hybrid-client-tests-3.json (Folder: Message Debug)
 thunder-collection_irc-hybrid-client-tests-4.json (Folders: Server Config, Response Headers) 
+thunder-collection_irc-hybrid-client-tests-5.json (Folders: Password Rate Limit) 
 ```
 
 There is a separate collection in the thunderclient/remote-login/ folder 
@@ -247,6 +248,9 @@ List of tests
 * 3.1 Request the login HTML form. Extract the login nonce and CSRF token.
 * 3.2 Use POST request to submit username and password. The login nonce will timeout after a short delay.
 * 4.1-4.20 Logout, then confirm authorization blocks access to each API route.
+
+This collection needs to be run with NODE_ENV=development because
+in production the module express-rate-limit will conflict with tests.
 
 # Websocket Auth Test 5.1 to 5.16
 
@@ -355,6 +359,17 @@ not access control which is tested in another sequence.
 The web server uses the NPM middleware "helmet" to insert some security headers and 
 a Content Security Policy (CSP). Occasionally helmet is upgraded. This is a 
 quick check to look for changes.
+
+## Password Rate Limit (NODE_NEV=production) 11.1 to 11.14
+
+This test will issue multiple requests to the password submission 
+route at POST /login-authorize to generate a condition where
+the count of bad login attempts exceeds the limit and 
+further attempts are restricted by IP address.
+This applies only when configured for local login.
+
+This collection needs to be run with NODE_ENV=production
+because the limit is disabled in development.
 
 # Remote Login Collection
 
