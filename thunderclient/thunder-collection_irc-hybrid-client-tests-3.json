@@ -1,0 +1,895 @@
+{
+    "client": "Thunder Client",
+    "collectionName": "irc-hybrid-client-tests-3",
+    "dateExported": "2024-03-21T11:17:39.566Z",
+    "version": "1.1",
+    "folders": [
+        {
+            "_id": "045d19c7-f0b7-4d85-b02e-95f39a86576a",
+            "name": "Message Debug",
+            "containerId": "",
+            "created": "2024-01-18T21:25:22.581Z",
+            "sortNum": 20000
+        }
+    ],
+    "requests": [
+        {
+            "_id": "33cd7ba7-bd8a-4841-b3a8-887e42b5fd7e",
+            "colId": "791f5afb-dd21-4ce0-b809-a8946da10fe5",
+            "containerId": "045d19c7-f0b7-4d85-b02e-95f39a86576a",
+            "name": "7.1 /logout Clear Cookie and Variables",
+            "url": "{{server_URL}}/logout",
+            "method": "GET",
+            "sortNum": 10000,
+            "created": "2024-01-18T21:25:22.581Z",
+            "modified": "2024-01-18T21:25:22.581Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{login_nonce, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{first_csrf_token, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{irc_server_index, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{transaction_id, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{auth_code, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "50a62814-dc7e-4132-a947-467204c54cbd",
+            "colId": "791f5afb-dd21-4ce0-b809-a8946da10fe5",
+            "containerId": "045d19c7-f0b7-4d85-b02e-95f39a86576a",
+            "name": "7.2 /login (get nonce, csrfToken)",
+            "url": "{{server_URL}}/login",
+            "method": "GET",
+            "sortNum": 20000,
+            "created": "2024-01-18T21:25:22.582Z",
+            "modified": "2024-01-18T21:25:22.582Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "_csrf"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "nonce="
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"nonce=\") | last | split(\" \") | first",
+                    "action": "setto",
+                    "value": "{{login_nonce, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"_csrf\") | at(1) | split(\"value=\") | at(1) | split(\" \") | first",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "780a9234-2511-4532-b680-b3373a3bec9c",
+            "colId": "791f5afb-dd21-4ce0-b809-a8946da10fe5",
+            "containerId": "045d19c7-f0b7-4d85-b02e-95f39a86576a",
+            "name": "7.3 /login-authorize success, receive cookie",
+            "url": "{{server_URL}}/login-authorize?nonce={{login_nonce}}",
+            "method": "POST",
+            "sortNum": 30000,
+            "created": "2024-01-18T21:25:22.583Z",
+            "modified": "2024-01-18T21:25:22.583Z",
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/x-www-form-urlencoded"
+                },
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [
+                {
+                    "name": "nonce",
+                    "value": "{{login_nonce}}",
+                    "isPath": false
+                }
+            ],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "user",
+                        "value": "{{server_user1}}"
+                    },
+                    {
+                        "name": "password",
+                        "value": "{{server_password1}}"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    }
+                ]
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "Location",
+                    "action": "equal",
+                    "value": "/irc/webclient.html"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "Set-Cookie",
+                    "action": "contains",
+                    "value": "irc-hybrid-client-0"
+                }
+            ]
+        },
+        {
+            "_id": "21fe109f-2a93-4c56-af69-760413c699a6",
+            "colId": "791f5afb-dd21-4ce0-b809-a8946da10fe5",
+            "containerId": "045d19c7-f0b7-4d85-b02e-95f39a86576a",
+            "name": "8.1 Debug  /irc/server",
+            "url": "{{server_URL}}/irc/server",
+            "method": "POST",
+            "sortNum": 40000,
+            "created": "2024-01-18T21:25:22.584Z",
+            "modified": "2024-01-18T21:25:22.584Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"index\": 0\n}\n",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.index",
+                    "action": "equal",
+                    "value": "0"
+                }
+            ]
+        },
+        {
+            "_id": "318ebf75-a435-4180-add5-07dfb026f834",
+            "colId": "791f5afb-dd21-4ce0-b809-a8946da10fe5",
+            "containerId": "045d19c7-f0b7-4d85-b02e-95f39a86576a",
+            "name": "8.2 Debug  /irc/getircstate 1",
+            "url": "{{server_URL}}/irc/getircstate",
+            "method": "GET",
+            "sortNum": 50000,
+            "created": "2024-01-18T21:25:22.585Z",
+            "modified": "2024-01-18T21:25:22.585Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.ircConnected",
+                    "action": "equal",
+                    "value": "false"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.ircServerIndex",
+                    "action": "equal",
+                    "value": "0"
+                }
+            ]
+        },
+        {
+            "_id": "f3ec2597-27c2-4810-836c-8ef53226cc91",
+            "colId": "791f5afb-dd21-4ce0-b809-a8946da10fe5",
+            "containerId": "045d19c7-f0b7-4d85-b02e-95f39a86576a",
+            "name": "8.3 Debug  /irc/connect",
+            "url": "{{server_URL}}/irc/connect",
+            "method": "POST",
+            "sortNum": 60000,
+            "created": "2024-01-18T21:25:22.586Z",
+            "modified": "2024-01-18T21:25:22.586Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"nickName\": \"{{irc_nickname}}\",\n  \"realName\": \"{{irc_nickname}}\",\n  \"userMode\": \"\"\n}",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.error",
+                    "action": "equal",
+                    "value": "false"
+                }
+            ]
+        },
+        {
+            "_id": "49dc81dd-b2a9-499f-8e3a-d31410d2ade3",
+            "colId": "791f5afb-dd21-4ce0-b809-a8946da10fe5",
+            "containerId": "045d19c7-f0b7-4d85-b02e-95f39a86576a",
+            "name": "Delay Timer --> exec(\"sleep 5\")",
+            "url": "{{server_URL}}/status",
+            "method": "GET",
+            "sortNum": 65000,
+            "created": "2024-01-18T21:25:22.601Z",
+            "modified": "2024-01-18T21:25:22.601Z",
+            "headers": [],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "notequal",
+                    "value": "{{@ | exec(\"sleep 5\")}}"
+                }
+            ]
+        },
+        {
+            "_id": "87050236-7d2e-4440-89e9-43d90a8a81ee",
+            "colId": "791f5afb-dd21-4ce0-b809-a8946da10fe5",
+            "containerId": "045d19c7-f0b7-4d85-b02e-95f39a86576a",
+            "name": "8.4 Debug  /irc/getircstate 2",
+            "url": "{{server_URL}}/irc/getircstate",
+            "method": "GET",
+            "sortNum": 70000,
+            "created": "2024-01-18T21:25:22.587Z",
+            "modified": "2024-01-18T21:25:22.587Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.ircConnecting",
+                    "action": "equal",
+                    "value": "false"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.ircConnected",
+                    "action": "equal",
+                    "value": "true"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.ircRegistered",
+                    "action": "equal",
+                    "value": "true"
+                }
+            ]
+        },
+        {
+            "_id": "42f1e327-2f53-4374-a272-8f19a5fcf68b",
+            "colId": "791f5afb-dd21-4ce0-b809-a8946da10fe5",
+            "containerId": "045d19c7-f0b7-4d85-b02e-95f39a86576a",
+            "name": "8.5 Debug  /irc/message JOIN",
+            "url": "{{server_URL}}/irc/message",
+            "method": "POST",
+            "sortNum": 80000,
+            "created": "2024-01-18T21:25:22.588Z",
+            "modified": "2024-01-18T21:25:22.588Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"message\": \"JOIN {{irc_channel}}\"\n}\n",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.error",
+                    "action": "equal",
+                    "value": "false"
+                }
+            ]
+        },
+        {
+            "_id": "aed2db42-57e5-4a3b-a09b-ca7d856b2a25",
+            "colId": "791f5afb-dd21-4ce0-b809-a8946da10fe5",
+            "containerId": "045d19c7-f0b7-4d85-b02e-95f39a86576a",
+            "name": "Delay Timer --> exec(\"sleep 1\")",
+            "url": "{{server_URL}}/status",
+            "method": "GET",
+            "sortNum": 85000,
+            "created": "2024-01-18T21:25:22.602Z",
+            "modified": "2024-01-18T21:25:22.602Z",
+            "headers": [],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "notequal",
+                    "value": "{{@ | exec(\"sleep 1\")}}"
+                }
+            ]
+        },
+        {
+            "_id": "7c608f58-572d-45ec-bb0d-b73be890aa33",
+            "colId": "791f5afb-dd21-4ce0-b809-a8946da10fe5",
+            "containerId": "045d19c7-f0b7-4d85-b02e-95f39a86576a",
+            "name": "8.6 Debug /irc/getircstate 3",
+            "url": "{{server_URL}}/irc/getircstate",
+            "method": "GET",
+            "sortNum": 90000,
+            "created": "2024-01-18T21:25:22.589Z",
+            "modified": "2024-01-18T21:25:22.589Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.channels | length",
+                    "action": ">",
+                    "value": "0"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.channels | first",
+                    "action": "equal",
+                    "value": "{{irc_channel}}"
+                }
+            ]
+        },
+        {
+            "_id": "e73094da-6996-4baa-b422-70c8132ff222",
+            "colId": "791f5afb-dd21-4ce0-b809-a8946da10fe5",
+            "containerId": "045d19c7-f0b7-4d85-b02e-95f39a86576a",
+            "name": "8.7. Debug  /irc/message PRIVMSG",
+            "url": "{{server_URL}}/irc/message",
+            "method": "POST",
+            "sortNum": 100000,
+            "created": "2024-01-18T21:25:22.590Z",
+            "modified": "2024-01-18T21:25:22.590Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"message\": \"PRIVMSG {{irc_channel}} :This is a test message (irc-hybrid-client)\"\n}\n",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.error",
+                    "action": "equal",
+                    "value": "false"
+                }
+            ]
+        },
+        {
+            "_id": "a2d17fb5-2cb1-49c7-b520-6fed30483e81",
+            "colId": "791f5afb-dd21-4ce0-b809-a8946da10fe5",
+            "containerId": "045d19c7-f0b7-4d85-b02e-95f39a86576a",
+            "name": "8.8 Debug  /irc/message PART",
+            "url": "{{server_URL}}/irc/message",
+            "method": "POST",
+            "sortNum": 110000,
+            "created": "2024-01-18T21:25:22.591Z",
+            "modified": "2024-01-18T21:25:22.591Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"message\": \"PART {{irc_channel}}\"\n}\n",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.error",
+                    "action": "equal",
+                    "value": "false"
+                }
+            ]
+        },
+        {
+            "_id": "9dd720c3-6f14-4b50-9f6a-33bddc25602e",
+            "colId": "791f5afb-dd21-4ce0-b809-a8946da10fe5",
+            "containerId": "045d19c7-f0b7-4d85-b02e-95f39a86576a",
+            "name": "Delay Timer --> exec(\"sleep 1\")",
+            "url": "{{server_URL}}/status",
+            "method": "GET",
+            "sortNum": 115000,
+            "created": "2024-01-18T21:25:22.603Z",
+            "modified": "2024-01-18T21:25:22.603Z",
+            "headers": [],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "notequal",
+                    "value": "{{@ | exec(\"sleep 1\")}}"
+                }
+            ]
+        },
+        {
+            "_id": "3a81de2e-2b1f-4fdc-8e82-3a4a10c7130e",
+            "colId": "791f5afb-dd21-4ce0-b809-a8946da10fe5",
+            "containerId": "045d19c7-f0b7-4d85-b02e-95f39a86576a",
+            "name": "8.9 Debug  /irc/getircstate 4",
+            "url": "{{server_URL}}/irc/getircstate",
+            "method": "GET",
+            "sortNum": 130000,
+            "created": "2024-01-18T21:25:22.592Z",
+            "modified": "2024-01-18T21:25:22.592Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.channelStates[0].joined",
+                    "action": "equal",
+                    "value": "false"
+                }
+            ]
+        },
+        {
+            "_id": "ce169f79-916a-44bb-acbc-7b00dc27b5f9",
+            "colId": "791f5afb-dd21-4ce0-b809-a8946da10fe5",
+            "containerId": "045d19c7-f0b7-4d85-b02e-95f39a86576a",
+            "name": "8.10 Debug  /irc/prune",
+            "url": "{{server_URL}}/irc/prune",
+            "method": "POST",
+            "sortNum": 140000,
+            "created": "2024-01-18T21:25:22.593Z",
+            "modified": "2024-01-18T21:25:22.593Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"channel\": \"{{irc_channel}}\"\n}\n",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.error",
+                    "action": "equal",
+                    "value": "false"
+                }
+            ]
+        },
+        {
+            "_id": "475650a0-aefc-40b5-9891-93a0deb209b5",
+            "colId": "791f5afb-dd21-4ce0-b809-a8946da10fe5",
+            "containerId": "045d19c7-f0b7-4d85-b02e-95f39a86576a",
+            "name": "8.11 Debug  /irc/getircstate 5",
+            "url": "{{server_URL}}/irc/getircstate",
+            "method": "GET",
+            "sortNum": 150000,
+            "created": "2024-01-18T21:25:22.594Z",
+            "modified": "2024-01-18T21:25:22.594Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.channels | length",
+                    "action": "equal",
+                    "value": "0"
+                }
+            ]
+        },
+        {
+            "_id": "af29cbe9-3ff2-4ace-bd88-d218790967b9",
+            "colId": "791f5afb-dd21-4ce0-b809-a8946da10fe5",
+            "containerId": "045d19c7-f0b7-4d85-b02e-95f39a86576a",
+            "name": "8.12 Debug  /irc/cache 1",
+            "url": "{{server_URL}}/irc/cache",
+            "method": "GET",
+            "sortNum": 160000,
+            "created": "2024-01-18T21:25:22.595Z",
+            "modified": "2024-01-18T21:25:22.595Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                }
+            ]
+        },
+        {
+            "_id": "b87998ea-70d9-430c-963a-a27c47899bcf",
+            "colId": "791f5afb-dd21-4ce0-b809-a8946da10fe5",
+            "containerId": "045d19c7-f0b7-4d85-b02e-95f39a86576a",
+            "name": "8.13 Debug  /irc/disconnect",
+            "url": "{{server_URL}}/irc/disconnect",
+            "method": "POST",
+            "sortNum": 170000,
+            "created": "2024-01-18T21:25:22.596Z",
+            "modified": "2024-01-18T21:25:22.596Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{}\n",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.error",
+                    "action": "equal",
+                    "value": "false"
+                }
+            ]
+        },
+        {
+            "_id": "4ee0bf24-a2c9-4ed0-b055-39f32d43d6ea",
+            "colId": "791f5afb-dd21-4ce0-b809-a8946da10fe5",
+            "containerId": "045d19c7-f0b7-4d85-b02e-95f39a86576a",
+            "name": "8.14 Debug  /irc/erase",
+            "url": "{{server_URL}}/irc/erase",
+            "method": "POST",
+            "sortNum": 180000,
+            "created": "2024-01-18T21:25:22.597Z",
+            "modified": "2024-01-18T21:25:22.597Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"erase\": \"CACHE\"\n}\n",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.error",
+                    "action": "equal",
+                    "value": "false"
+                }
+            ]
+        },
+        {
+            "_id": "748e5c34-4325-4ef4-bad8-b3447194f261",
+            "colId": "791f5afb-dd21-4ce0-b809-a8946da10fe5",
+            "containerId": "045d19c7-f0b7-4d85-b02e-95f39a86576a",
+            "name": "8.15 Debug  /irc/cache 2",
+            "url": "{{server_URL}}/irc/cache",
+            "method": "GET",
+            "sortNum": 190000,
+            "created": "2024-01-18T21:25:22.599Z",
+            "modified": "2024-01-18T21:25:22.599Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "[]"
+                }
+            ]
+        },
+        {
+            "_id": "22339502-6f0c-49bc-88a8-2b18c8a0a1c8",
+            "colId": "791f5afb-dd21-4ce0-b809-a8946da10fe5",
+            "containerId": "045d19c7-f0b7-4d85-b02e-95f39a86576a",
+            "name": "8.16Debug  /terminate (die)",
+            "url": "{{server_URL}}/terminate",
+            "method": "POST",
+            "sortNum": 200000,
+            "created": "2024-01-18T21:25:22.600Z",
+            "modified": "2024-01-18T21:25:22.600Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"terminate\": \"{{server_die}}\"\n}\n",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                }
+            ]
+        }
+    ]
+}

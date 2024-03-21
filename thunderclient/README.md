@@ -215,12 +215,17 @@ auth_client_secret:  "ssh-secret"
 auth_scopes:         "irc.all"
 ```
 
-## Thunder Client Collection
+## Thunder Client Collections
 
-In the Thunder Client extension in VSCode, 
-import the **irc-hybrid-client** collection from `thunderclient/thunder-collection_irc-hybrid-client.json`. This collection 
-is divided into 5 folders that can be run as individual sequences or
-collectively the entire collection can be run as a single sequence.
+In the Thunder Client extension in VSCode, there are 4 test collections.
+These test collections can be imported into VSCode ThunderClient as needed.
+
+```
+thunder-collection_irc-hybrid-client-tests-1.json (Folder: Auth tests)
+thunder-collection_irc-hybrid-client-tests-2.json (Folder: Websocket Auth Test)
+thunder-collection_irc-hybrid-client-tests-3.json (Folder: Message Debug)
+thunder-collection_irc-hybrid-client-tests-4.json (Folders: Server Config, Response Headers) 
+```
 
 There is a separate collection in the thunderclient/remote-login/ folder 
 that is only used with remote authentication. A README file in that folder
@@ -228,7 +233,7 @@ includes instructions for use of that collection.
 
 # Tests 
 
-## Auth Tests
+## Auth Tests 1.1 to 4.20
 
 This is a general demonstration of the user password login process
 and route authorization.
@@ -243,7 +248,7 @@ List of tests
 * 3.2 Use POST request to submit username and password. The login nonce will timeout after a short delay.
 * 4.1-4.20 Logout, then confirm authorization blocks access to each API route.
 
-# Websocket Auth Test
+# Websocket Auth Test 5.1 to 5.16
 
 The irc-hybrid-client web server includes 2 different TCP socket servers.
 A standard HTTP web server is used to load the web page and javascript to the web browser.
@@ -293,7 +298,7 @@ List of tests
 * 5.15 Attempt to enable websocket using initial CSRF token (first_csrf_token) from step 5.2, now invalid, expect fail 403
 * 5.16 Attempt to open websocket upgrade request, no auth scheduled due to 5.15, expect fail 401.
 
-## Message Debug
+## Message Debug 7.1 to 8.16
 
 These requests were used during manual debugging to exercise different POST 
 requests for the purpose of manually checking API function and data validation.
@@ -333,7 +338,7 @@ If the tests are executed in order, the follow will be exercised:
 * 8.15 Confirm empty cache.
 * 8.16 Terminate (Die) the backend web server (This will show a message, but not die unless environment variable server_die is set to "YES").
 
-## Server Config
+## Server Config 9.1 to 9.19
 
 This is a series of tests that will use the /irc/serverlist API to edit
 the list of available IRC servers. The server list is stored in the base 
@@ -345,7 +350,7 @@ When run in sequence a new server will be created (POST), modified (PATCH),
 removed (DELETE), and duplicated (COPY). These are intended test functionality, 
 not access control which is tested in another sequence.
 
-## Response Headers
+## Response Headers (not numbered)
 
 The web server uses the NPM middleware "helmet" to insert some security headers and 
 a Content Security Policy (CSP). Occasionally helmet is upgraded. This is a 

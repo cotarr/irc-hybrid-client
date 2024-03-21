@@ -1,0 +1,786 @@
+{
+    "client": "Thunder Client",
+    "collectionName": "irc-hybrid-client-tests-2",
+    "dateExported": "2024-03-21T11:17:19.813Z",
+    "version": "1.1",
+    "folders": [
+        {
+            "_id": "2dd9b947-254e-4d62-99ac-25feea7893f0",
+            "name": "Websocket Auth Test",
+            "containerId": "",
+            "created": "2024-01-18T21:25:22.571Z",
+            "sortNum": 15000
+        }
+    ],
+    "requests": [
+        {
+            "_id": "73a8dacd-5b7c-4119-8f6a-1a6333a3464a",
+            "colId": "2fc6778d-4097-43f5-94b8-c9909acb9819",
+            "containerId": "2dd9b947-254e-4d62-99ac-25feea7893f0",
+            "name": "5.1 /logout Clear Cookie and Variable",
+            "url": "{{server_URL}}/logout",
+            "method": "GET",
+            "sortNum": 10000,
+            "created": "2024-01-18T21:25:22.571Z",
+            "modified": "2024-01-18T21:25:22.571Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{login_nonce, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{first_csrf_token, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{irc_server_index, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{transaction_id, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{auth_code, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "c08a4452-600d-4d10-ae57-0fe25d26d19e",
+            "colId": "2fc6778d-4097-43f5-94b8-c9909acb9819",
+            "containerId": "2dd9b947-254e-4d62-99ac-25feea7893f0",
+            "name": "5.2 /login (get nonce, csrf_token, first_csrf_token)",
+            "url": "{{server_URL}}/login",
+            "method": "GET",
+            "sortNum": 20000,
+            "created": "2024-01-18T21:25:22.572Z",
+            "modified": "2024-01-18T21:25:22.572Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "_csrf"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "nonce="
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"nonce=\") | last | split(\" \") | first",
+                    "action": "setto",
+                    "value": "{{login_nonce, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"_csrf\") | at(1) | split(\"value=\") | at(1) | split(\" \") | first",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"_csrf\") | at(1) | split(\"value=\") | at(1) | split(\" \") | first",
+                    "action": "setto",
+                    "value": "{{first_csrf_token, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "1dccae0b-7c0e-4bcb-895e-d1c0a927cb8d",
+            "colId": "2fc6778d-4097-43f5-94b8-c9909acb9819",
+            "containerId": "2dd9b947-254e-4d62-99ac-25feea7893f0",
+            "name": "5.3 /login-authorize success, receive cookie",
+            "url": "{{server_URL}}/login-authorize?nonce={{login_nonce}}",
+            "method": "POST",
+            "sortNum": 30000,
+            "created": "2024-01-18T21:25:22.573Z",
+            "modified": "2024-01-18T21:25:22.573Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [
+                {
+                    "name": "nonce",
+                    "value": "{{login_nonce}}",
+                    "isPath": false
+                }
+            ],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "user",
+                        "value": "{{server_user1}}"
+                    },
+                    {
+                        "name": "password",
+                        "value": "{{server_password1}}"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    }
+                ]
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "Location",
+                    "action": "equal",
+                    "value": "/irc/webclient.html"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "Set-Cookie",
+                    "action": "contains",
+                    "value": "irc-hybrid-client-0"
+                }
+            ]
+        },
+        {
+            "_id": "4ae42f22-b124-4b74-88ff-76ea4670762d",
+            "colId": "2fc6778d-4097-43f5-94b8-c9909acb9819",
+            "containerId": "2dd9b947-254e-4d62-99ac-25feea7893f0",
+            "name": "5.4 /irc/wsauth enable websocket requests for 10 seconds",
+            "url": "{{server_URL}}/irc/wsauth",
+            "method": "POST",
+            "sortNum": 420000,
+            "created": "2024-01-18T21:25:22.574Z",
+            "modified": "2024-01-18T21:25:22.574Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"purpose\": \"websocket-auth\"\n}",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.error",
+                    "action": "equal",
+                    "value": "false"
+                }
+            ]
+        },
+        {
+            "_id": "9f8882ba-644e-4afb-a826-28e1b277be78",
+            "colId": "2fc6778d-4097-43f5-94b8-c9909acb9819",
+            "containerId": "2dd9b947-254e-4d62-99ac-25feea7893f0",
+            "name": "5.5 Delay Timer --> exec(\"sleep 12\")",
+            "url": "{{server_URL}}/status",
+            "method": "GET",
+            "sortNum": 422500,
+            "created": "2024-01-18T21:25:22.575Z",
+            "modified": "2024-01-18T21:25:22.575Z",
+            "headers": [],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "notequal",
+                    "value": "{{@ | exec(\"sleep 12\")}}"
+                },
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                }
+            ]
+        },
+        {
+            "_id": "0987030b-1133-4691-9bde-180cbbd77820",
+            "colId": "2fc6778d-4097-43f5-94b8-c9909acb9819",
+            "containerId": "2dd9b947-254e-4d62-99ac-25feea7893f0",
+            "name": "5.6 /irc/ws websocket request (Fail 401) Copy",
+            "url": "{{server_URL}}/irc/ws",
+            "method": "GET",
+            "sortNum": 423789.1,
+            "created": "2024-01-18T21:25:22.584Z",
+            "modified": "2024-01-18T21:25:22.584Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Connection",
+                    "value": "upgrade"
+                },
+                {
+                    "name": "upgrade",
+                    "value": "websocket"
+                },
+                {
+                    "name": "Sec-WebSocket-Key",
+                    "value": "expect-to-fail"
+                },
+                {
+                    "name": "Sec-WebSocket-Version",
+                    "value": "13"
+                },
+                {
+                    "name": "Sec-WebSocket-Extensions",
+                    "value": "permessage-deflate; client_max_window_bits"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "401"
+                }
+            ]
+        },
+        {
+            "_id": "e27176ec-c770-40a7-9afd-bb266ccc780f",
+            "colId": "2fc6778d-4097-43f5-94b8-c9909acb9819",
+            "containerId": "2dd9b947-254e-4d62-99ac-25feea7893f0",
+            "name": "5.7 /irc/wsauth enable websocket requests for 10 seconds",
+            "url": "{{server_URL}}/irc/wsauth",
+            "method": "POST",
+            "sortNum": 423906.3,
+            "created": "2024-01-18T21:25:22.579Z",
+            "modified": "2024-01-18T21:25:22.579Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"purpose\": \"websocket-auth\"\n}",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.error",
+                    "action": "equal",
+                    "value": "false"
+                }
+            ]
+        },
+        {
+            "_id": "362d99bc-a5f3-455e-bc63-f385c7118b0c",
+            "colId": "2fc6778d-4097-43f5-94b8-c9909acb9819",
+            "containerId": "2dd9b947-254e-4d62-99ac-25feea7893f0",
+            "name": "5.8 /irc/not-found websocket request to wrong path (Fail 404)",
+            "url": "{{server_URL}}/irc/not-found",
+            "method": "GET",
+            "sortNum": 426953.2,
+            "created": "2024-01-18T21:25:22.582Z",
+            "modified": "2024-01-18T21:25:22.582Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Connection",
+                    "value": "upgrade"
+                },
+                {
+                    "name": "upgrade",
+                    "value": "websocket"
+                },
+                {
+                    "name": "Sec-WebSocket-Key",
+                    "value": "expect-to-fail"
+                },
+                {
+                    "name": "Sec-WebSocket-Version",
+                    "value": "13"
+                },
+                {
+                    "name": "Sec-WebSocket-Extensions",
+                    "value": "permessage-deflate; client_max_window_bits"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "404"
+                }
+            ]
+        },
+        {
+            "_id": "c4262410-bf00-445e-bc4e-80183392e830",
+            "colId": "2fc6778d-4097-43f5-94b8-c9909acb9819",
+            "containerId": "2dd9b947-254e-4d62-99ac-25feea7893f0",
+            "name": "5.9 /irc/ws websocket request (SUCCESS)",
+            "url": "{{server_URL}}/irc/ws",
+            "method": "GET",
+            "sortNum": 435000,
+            "created": "2024-01-18T21:25:22.576Z",
+            "modified": "2024-01-18T21:25:22.576Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Connection",
+                    "value": "upgrade"
+                },
+                {
+                    "name": "upgrade",
+                    "value": "websocket"
+                },
+                {
+                    "name": "Sec-WebSocket-Key",
+                    "value": "expect-to-fail"
+                },
+                {
+                    "name": "Sec-WebSocket-Version",
+                    "value": "13"
+                },
+                {
+                    "name": "Sec-WebSocket-Extensions",
+                    "value": "permessage-deflate; client_max_window_bits"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "400"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "Missing or invalid Sec-WebSocket-Key header"
+                }
+            ]
+        },
+        {
+            "_id": "8987e5bc-6bbb-4c4f-aab8-e7c9a03b9f5c",
+            "colId": "2fc6778d-4097-43f5-94b8-c9909acb9819",
+            "containerId": "2dd9b947-254e-4d62-99ac-25feea7893f0",
+            "name": "5.10 /irc/ws Repeat, request valid only one time (Fail 401)",
+            "url": "{{server_URL}}/irc/ws",
+            "method": "GET",
+            "sortNum": 439687.5,
+            "created": "2024-01-18T21:25:22.583Z",
+            "modified": "2024-01-18T21:25:22.583Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Connection",
+                    "value": "upgrade"
+                },
+                {
+                    "name": "upgrade",
+                    "value": "websocket"
+                },
+                {
+                    "name": "Sec-WebSocket-Key",
+                    "value": "expect-to-fail"
+                },
+                {
+                    "name": "Sec-WebSocket-Version",
+                    "value": "13"
+                },
+                {
+                    "name": "Sec-WebSocket-Extensions",
+                    "value": "permessage-deflate; client_max_window_bits"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "401"
+                }
+            ]
+        },
+        {
+            "_id": "33bccfa9-5ada-4c11-92b4-3b95f85e0721",
+            "colId": "2fc6778d-4097-43f5-94b8-c9909acb9819",
+            "containerId": "2dd9b947-254e-4d62-99ac-25feea7893f0",
+            "name": "5.11 /irc/wsauth enable websocket requests for 10 seconds",
+            "url": "{{server_URL}}/irc/wsauth",
+            "method": "POST",
+            "sortNum": 440625,
+            "created": "2024-01-18T21:25:22.580Z",
+            "modified": "2024-01-18T21:25:22.580Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"purpose\": \"websocket-auth\"\n}",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.error",
+                    "action": "equal",
+                    "value": "false"
+                }
+            ]
+        },
+        {
+            "_id": "917b32d1-1225-491e-825a-62bff559285f",
+            "colId": "2fc6778d-4097-43f5-94b8-c9909acb9819",
+            "containerId": "2dd9b947-254e-4d62-99ac-25feea7893f0",
+            "name": "5.12 /login (pre-run delete cookie, get new CSRF nonce)",
+            "url": "{{server_URL}}/login",
+            "method": "GET",
+            "sortNum": 452500,
+            "created": "2024-01-18T21:25:22.577Z",
+            "modified": "2024-01-18T21:25:22.577Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "_csrf"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "nonce="
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"nonce=\") | last | split(\" \") | first",
+                    "action": "setto",
+                    "value": "{{login_nonce, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"_csrf\") | at(1) | split(\"value=\") | at(1) | split(\" \") | first",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                }
+            ],
+            "preReq": {
+                "options": {
+                    "clearCookies": true
+                }
+            }
+        },
+        {
+            "_id": "956cd436-034c-4bb8-9cbd-d793481ce15d",
+            "colId": "2fc6778d-4097-43f5-94b8-c9909acb9819",
+            "containerId": "2dd9b947-254e-4d62-99ac-25feea7893f0",
+            "name": "5.13 /login-authorize success, receive cookie",
+            "url": "{{server_URL}}/login-authorize?nonce={{login_nonce}}",
+            "method": "POST",
+            "sortNum": 462500,
+            "created": "2024-01-18T21:25:22.578Z",
+            "modified": "2024-01-18T21:25:22.578Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [
+                {
+                    "name": "nonce",
+                    "value": "{{login_nonce}}",
+                    "isPath": false
+                }
+            ],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "user",
+                        "value": "{{server_user1}}"
+                    },
+                    {
+                        "name": "password",
+                        "value": "{{server_password1}}"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    }
+                ]
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "Location",
+                    "action": "equal",
+                    "value": "/irc/webclient.html"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "Set-Cookie",
+                    "action": "contains",
+                    "value": "irc-hybrid-client-0"
+                }
+            ]
+        },
+        {
+            "_id": "f788695b-52b9-4a14-8c5d-c3c41bee8641",
+            "colId": "2fc6778d-4097-43f5-94b8-c9909acb9819",
+            "containerId": "2dd9b947-254e-4d62-99ac-25feea7893f0",
+            "name": "5.14 /irc/ws Different cookie (Fail 401)",
+            "url": "{{server_URL}}/irc/ws",
+            "method": "GET",
+            "sortNum": 467500,
+            "created": "2024-01-18T21:25:22.581Z",
+            "modified": "2024-01-18T21:25:22.581Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Connection",
+                    "value": "upgrade"
+                },
+                {
+                    "name": "upgrade",
+                    "value": "websocket"
+                },
+                {
+                    "name": "Sec-WebSocket-Key",
+                    "value": "expect-to-fail"
+                },
+                {
+                    "name": "Sec-WebSocket-Version",
+                    "value": "13"
+                },
+                {
+                    "name": "Sec-WebSocket-Extensions",
+                    "value": "permessage-deflate; client_max_window_bits"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "401"
+                }
+            ]
+        },
+        {
+            "_id": "9d424afe-98b1-45cb-a91a-c46b83049dbf",
+            "colId": "2fc6778d-4097-43f5-94b8-c9909acb9819",
+            "containerId": "2dd9b947-254e-4d62-99ac-25feea7893f0",
+            "name": "5.15 /irc/wsauth expired first_csrf_token from 5.2 (Fail 403)",
+            "url": "{{server_URL}}/irc/wsauth",
+            "method": "POST",
+            "sortNum": 477500,
+            "created": "2024-01-18T21:25:22.585Z",
+            "modified": "2024-01-18T21:25:22.585Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{csrf_token}}",
+                    "isDisabled": true
+                },
+                {
+                    "name": "CSRF-Token",
+                    "value": "{{first_csrf_token}}"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"purpose\": \"websocket-auth\"\n}",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "403"
+                }
+            ]
+        },
+        {
+            "_id": "82bfae3b-8e99-46b6-b178-bfd8cf26d330",
+            "colId": "2fc6778d-4097-43f5-94b8-c9909acb9819",
+            "containerId": "2dd9b947-254e-4d62-99ac-25feea7893f0",
+            "name": "5.16 /irc/ws Not scheduled, no CSRF token (Fail 401)",
+            "url": "{{server_URL}}/irc/ws",
+            "method": "GET",
+            "sortNum": 487500,
+            "created": "2024-01-18T21:25:22.586Z",
+            "modified": "2024-01-18T21:25:22.586Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Connection",
+                    "value": "upgrade"
+                },
+                {
+                    "name": "upgrade",
+                    "value": "websocket"
+                },
+                {
+                    "name": "Sec-WebSocket-Key",
+                    "value": "expect-to-fail"
+                },
+                {
+                    "name": "Sec-WebSocket-Version",
+                    "value": "13"
+                },
+                {
+                    "name": "Sec-WebSocket-Extensions",
+                    "value": "permessage-deflate; client_max_window_bits"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "401"
+                }
+            ]
+        }
+    ]
+}
