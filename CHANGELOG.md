@@ -50,6 +50,15 @@ Summary of IP address tracking for password login attempts.
 - Duration, Counter resets in 1 hour allowing password logins. 
 - NODE_ENV = 'development', Login rate limit disabled
 
+## Changed (Thunder Client Tests)
+
+The VSCode extension Thunder Client has added a limit of 50 requests per test collection for 
+the free version. The existing collection thunderclient/thunder-collection_irc-hybrid-client.json 
+has been split into 4 collections to stay withing the limit. See: thunderclient/README.md
+
+A new collection "thunder-collection_irc-hybrid-client-tests-5.json" has been added
+to support test of the password request rate limit.
+
 ## [v2.0.10](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.0.10) 2024-03-17
 
 ### Added (Security improvement)
