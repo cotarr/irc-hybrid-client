@@ -357,6 +357,7 @@ if (config.oauth2.enableRemoteLogin) {
   app.post('/login-authorize', userAuth.cookieExists, csrfProtection, userAuth.loginAuthorize);
   app.get('/logout', userAuth.logout);
   app.get('/blocked', userAuth.blockedCookies);
+  app.get('/disabled', userAuth.overRateLimit);
 }
 
 //

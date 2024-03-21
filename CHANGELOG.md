@@ -28,8 +28,27 @@ PRIVMSG NickServ@services.dal.net :IDENTIFY ********
 PRIVMSG x :LOGIN ********
 PRIVMSG x@channels.undernet.org :LOGIN ********
 ```
-
 - Update /docs/ related to log file filtering and summarize data stored in web server instance.
+
+## Changed
+
+In commit 10bd19b from v2.0.10, for the case of internal password login,
+a password rate limiter was added using express-rate-limit. This expands on that change.
+In v2.0.10, exceeding the password limit would generate a status 429 (Too many requests) response.
+A courtesy page was created at route "/disabled" to provide the user with an explanation 
+of password login failures with direction of how to reset the condition.
+
+The login rate limit in v2.0.10 broke some of the API tests written in ThunderClient.
+To address this, in the case of NODE_ENV=development the password rate limit is now disabled.
+
+Summary of IP address tracking for password login attempts.
+
+- Count <= 5, Accept login requests on POST /login-authenticate
+- Count > 5, Redirect to /disabled page to show courtesy error message
+- Count > 10, Return status 429 (Too many requests)
+- Login success, reset counter
+- Duration, Counter resets in 1 hour allowing password logins. 
+- NODE_ENV = 'development', Login rate limit disabled
 
 ## [v2.0.10](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.0.10) 2024-03-17
 

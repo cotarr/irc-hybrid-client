@@ -69,6 +69,7 @@ const __dirname = path.dirname(__filename);
 const loginHtmlTop = fs.readFileSync('./server/fragments/login-top.html', 'utf8');
 const loginHtmlBottom = fs.readFileSync('./server/fragments/login-bottom.html', 'utf8');
 const blockedCookieFragment = fs.readFileSync('./server/fragments/blocked-cookies.html', 'utf8');
+const rateLimitFragment = fs.readFileSync('./server/fragments/disabled-login.html', 'utf8');
 const logoutHtmlTop = fs.readFileSync('./server/fragments/logout-top.html', 'utf8');
 const logoutHtmlBottom = fs.readFileSync('./server/fragments/logout-bottom.html', 'utf8');
 
@@ -214,6 +215,15 @@ export const blockedCookies = function (req, res, next) {
   res.send(blockedCookieFragment);
 };
 
+// ----------------------
+// Route: GET /disabled
+// ----------------------
+export const overRateLimit = function (req, res, next) {
+  // Set response status 403 to prevent password managers
+  // from offering to save a failed login password.
+  res.status(403).send(rateLimitFragment);
+};
+
 // --------------------------------------------
 // Middleware to check if request has at
 // leasts 1 signed cookie. If not, user's
@@ -241,7 +251,7 @@ export const cookieExists = (req, res, next) => {
 };
 
 // ---------------------------------------------
-// If not authorized, return 401 Unauthorized
+// If not authorized, return 403 Unauthorized
 // ---------------------------------------------
 export const authorizeOrFail = function (req, res, next) {
   if (_checkIfAuthorized(req)) {
@@ -294,16 +304,23 @@ const safeCompare = function (userInput, secret) {
 };
 
 // --------------------------------------------
-// Rate limit bad password POST requests
+// Rate limit bad password requests to POST /login-authorize
 // Allow 5 invalid password attempt per hour per IP address
-// ---------------------------------------------
+// If > 5, load courtesy message at /disabled (uses express-rate-limit request API)
+// If > 10, then status 429 by express-rate-limit middleware
+// --------------------------------------------
+let loginRateLimitCount = 10;
+// In development, extend password rate limit for compatibility with API tests
+if (nodeEnv === 'development') loginRateLimitCount = 100;
+
 const loginRateLimiter = rateLimit({
   windowMs: 3600000,
-  max: 5,
+  max: loginRateLimitCount,
   statusCode: 429,
-  message: 'Too many login requests',
+  message: 'Too many requests',
   standardHeaders: false,
-  legacyHeaders: false
+  legacyHeaders: false,
+  requestPropertyName: 'loginRateLimit'
 });
 
 //
@@ -316,6 +333,22 @@ export const loginAuthorize = [loginRateLimiter, function (req, res, next) {
   // console.log('body ' + JSON.stringify(req.body, null, 2));
   // console.log('query ' + JSON.stringify(req.query));
   // console.log('auth cookies ' + JSON.stringify(req.signedCookies, null, 2));
+
+  //
+  // Login rate limit for route POST /login-authorize
+  // Using express-rate-limit to track requests per IP address
+  //
+  // This is independent of session storage. The rate limiter is applied as the first step.
+  // In the case that failed attempts exceeds 5 per hour redirect to /disabled
+  // This loads an explanation page to inform the user of the disabled state.
+  //
+  // The express-rate-limit middleware will preempt this check with status 429 when attempts > 10
+  //
+  if (Object.hasOwn(req, 'loginRateLimit')) {
+    if ((nodeEnv === 'production') && (req.loginRateLimit.used > 5)) {
+      return res.redirect('/disabled');
+    }
+  }
   //
   // It is a general security practice to update session upon change in permission.
   // Copy existing session properties to new session
@@ -612,6 +645,7 @@ export const loginStyleSheet = function (req, res, next) {
 export default {
   authorizeOrLogin,
   blockedCookies,
+  overRateLimit,
   cookieExists,
   authorizeOrFail,
   loginAuthorize,
