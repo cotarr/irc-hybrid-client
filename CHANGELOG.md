@@ -1,4 +1,4 @@
-`# Changelog
+# Changelog
 
 All notable changes to this project will be documented in this file.
 
@@ -8,7 +8,7 @@ and this project adheres to
 
 - To view notes on v2 major upgrade, scroll to Version v2.0.0 2023-09-12
 
-## Changed
+## [v2.0.13](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.0.13) 2024-04-24
 
 The contents of the "build-prod" folder have been 
 re-minified using alternate development tools. 
