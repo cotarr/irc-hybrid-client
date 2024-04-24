@@ -8,6 +8,31 @@ and this project adheres to
 
 - To view notes on v2 major upgrade, scroll to Version v2.0.0 2023-09-12
 
+## Changed
+
+The contents of the "build-prod" folder have been 
+re-minified using alternate development tools. 
+There were no source code changes associated with this commit.
+
+The development tools for this project are located in 
+a separate repository irc-hybrid-client-dev-tools.
+The Gulp project has released a major upgrade to Gulp v5.
+See the irc-hybrid-client-dev-tools CHANGELOG.md for details.
+As part of the upgrade, the JavaScript minify package "gulp-minify" has been
+replaced with an alternate package "gulp-uglify".
+
+Impact of change
+
+This has caused the contents of bundled javascript files 
+show minor variations due to replacement of the minify library.
+The changes appear to be limited to minor optimization variations, 
+such as optimization of extraneous parenthesis () and braces {}.
+The goal of the configuration is to remove white space and comments.
+Deeper minify capabilities involving mangling and compressing are disabled 
+in the options, so no major variations were expected.
+
+The HTML and CSS files appear to generate the previous minified content without any deviations.
+
 ## [v2.0.12](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.0.12) 2024-03-26
 
 - Upgrade express from v4.19.1 to v4.19.2 to address npm audit security warning
