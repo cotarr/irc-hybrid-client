@@ -8,6 +8,115 @@ and this project adheres to
 
 - To view notes on v2 major upgrade, scroll to Version v2.0.0 2023-09-12
 
+## v2.0.14-Dev
+
+### Security Patch
+
+Changed: 
+
+- Updated the npm package 'ws' from v8.16.0 to 8.17.1 to address GitHub security notification.
+
+What happened? GitHub sent a notification by email that irc-hybrid-client contains a NPM dependency that may be affected by a DoS (server crash) when handling a request with too many HTTP headers as described in CVE-2024-37890.
+
+What is the potential impact? There was a possibility that a malformed request could shutdown the irc-hybrid-client server, which in turn could cause the current IRC user to be disconnected from the IRC network.
+
+Evaluation Summary: Testing and code review shows that network requests that do NOT include a valid login session cookie were NOT able trigger the crash. This is because the cookie signature and session hash are validated before passing the incoming request to the "ws" websocket module. Therefore exploit by unauthenticated third parties is unlikely.
+
+However, testing showed that requests that DID include a valid cookie were able to trigger a JavaScript TypeError in the "ws" module which caused the server to crash (shutdown). Any authenticated user who is currently signed into the web server will already have access to the "Die Web Server" button in the Debug Panel. Therefore, anyone with a valid cookie already has the ability to shutdown the server without needing to exploit, possibly making the issue moot. 
+
+It is recommended to upgrade irc-hybrid-client to v2.0.14 to remove the vulnerability in the ws module.
+
+Background
+
+The program includes 2 different servers. First, there is a web server that is used to handle normal web page http/https protocol requests. Concurrently, there is a second websocket server that listens for ws/wss protocol requests. It is used to establish a socket as a stream connection between the browser and the web server.
+
+In the irc-hybrid-client, new websocket connections are established as follows: First, the web browser will authenticate the user's identity by username and password to obtain a authorized session cookie. Next, a POST request is made to the "/irc/wsauth/" path submitting the cookie as an HTTP header. After validation of the cookie in the POST request, a 10 second timer is started. Websocket upgrade requests are allowed for 10 seconds. Next, the browser issues a ws/wss websocket upgrade request to the "/irc/ws/" path. If the 10 second timer is not expired and the cookie validation is successful, the request is passed to the "wc" websocket module. The ws module issues a status 101 response to the browser to change protocol from https to wss. This is the step where headers are passed to a potentially unpatched "ws" module.
+
+Testing
+
+The repository includes a debug utility that can be used to perform the websocket workflow as described in the previous paragraph. This debug utility is explained in detail in the [Irc-hybrid-client Documentation](https://cotarr.github.io/irc-hybrid-client/api.html), in the "API Examples" tab and the  "API Manual Testing" section. The utility was temporary enabled by uncommenting lines 471-475 in /server/irc/web-server.mjs. The debug utility has the capability to login as a user to get a valid cookie. The cookie can be harvested for use in testing. During testing, the debug utility can be used to submit POST requests to "/irc/wsauth/" to enable the websocket authorization timer.
+
+I used a separate ad-hoc JavaScript web-client to generate requests with custom headers. The ad-hoc client can open a raw TCP socket on the web server. It can then send unformatted text characters into the raw TCP socket as stream content. The ad-hoc client will listen for socket events and log them. It also displays the contents of the stream as text is returned to the ad-hoc client from the server.
+
+Opening a web socket requires 8 HTTP headers as shown below. A loop was written to insert an arbitrary number of dummy headers as shown below. Experiments showed that in order to cause the crash it is necessary for the cookie header to be located in front of the dummy headers and the websocket headers to be located after the dummy headers.
+
+The next section includes content sent into the raw TCP socket with end of line characters shown as `\r\n`. (Some `xxxx` has bee substituted for secrets to avoid GitHub warnings)
+
+```
+"GET /irc/ws HTTP/1.1\r\n"
+"Host: localhost:3003\r\n"
+"cookie: irc-hybrid-client-0=s%3Axxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\r\n"
+"Origin: http://localhost:3003\r\n"
+"aa:x\r\n"
+"ab:x\r\n"
+"ac:x\r\n"
+   ...
+"cr:x\r\n"
+"cs:x\r\n"
+"ct:x\r\n"
+"Connection: Upgrade\r\n"
+"Upgrade: websocket\r\n"
+"Sec-WebSocket-Key: xxxxxxxxxxxxxxxxx==\r\n"
+"Sec-WebSocket-Version: 13\r\n"
+```
+
+Testing procedure:
+
+- Use the debug utility to perform login and harvest a valid cookie.
+- Add cookie to ad-hoc web client as a cookie header.
+- Set desired count for generation of dummy headers in the ad-hoc client.
+- Use debug utility to start websocket authorization timer.
+- Run the ad-hoc client to submit the intended headers.
+- Observe responses.
+
+Observed Response:
+
+```
+HTTP/1.1 101 Switching Protocols
+Upgrade: websocket
+Connection: Upgrade
+Sec-WebSocket-Accept: xxxxxxxxxxxxxxxxx==
+HEARTBEAT
+HEARTBEAT
+```
+
+This was the expected response. The "HEARTBEAT" indicates that the ad-hoc client has successfully connected a websocket to the irc-hybrid-client server.
+
+Summary of Test Results:
+
+- Sending a request with an excessively large number of dummy headers (>5000) results in a response `HTTP/1.1 431 Request Header Fields Too Large`. The socket is immediately closed by NodeJs. There is no crash.
+- Sending a request with less than 900 dummy headers returns a response equivalent to the same request without addition of dummy headers.
+
+The dummy header count was set to 1000 in the temporary ad-hoc client.
+
+- Sending a request without a cookie header returned the response `HTTP/1.1 401 Unauthorized`.
+- Sending a request with an expired or invalid cookie returned the response `HTTP/1.1 401 Unauthorized`.
+- Sending a request with a valid cookie but expired timer returned the response `HTTP/1.1 401 Unauthorized`.
+- Sending a request with a valid cookie and timer not expired results in a server crash `TypeError: Cannot read properties of undefined (reading 'toLowerCase')`
+
+Environments
+
+- Tests were repeated with NODE_ENV=development and NODE_ENV=production with the same results.
+
+Mitigation: 
+
+- Upgraded NPM package "ws" from v8.16.0 to v8.17.1 
+
+Retest:
+
+- Sending a request with a valid cookie and timer not expired returned the response `HTTP/1.1 400 Bad Request`, the expected result.
+
+Relevant code:
+
+- `/package.json` Line 46 (NPM ws module package dependency version)
+- `/bin/www.mjs` Line 97 (Socket listener for ws/wss upgrade requests)
+- `/server/irc/ws-server.mjs` Lines 123-148 (Handle ws/wss upgrade request, error handlers)
+- `/server/irc/middlewares/ws-authorize.mjs` Lines 118-176 (Authorize request using cookie header)
+
+Conclusion
+
+It is recommended to upgrade irc-hybrid-client to v2.0.14 to remove the vulnerability in the ws module. However, earlier unpatched versions are most likely low risk as the "ws" module does not appear to be accessible without a valid cookie.
+
 ## [v2.0.13](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.0.13) 2024-04-24
 
 The contents of the "build-prod" folder have been 
