@@ -1725,14 +1725,24 @@ const channelsContainerEl=document.getElementById('channelsContainerId');const n
 throw new Error('Attempt to create channel that already exists')}};_handleChannelButtonClick=event=>{const channelName=this.shadowRoot.getElementById(event.target.id).textContent
 ;if(channelName.length>0){document.getElementById('ircControlsPanel').sendIrcServerMessage('JOIN '+channelName);this.ircChannelsPendingJoin.push(channelName.toLowerCase())}};_updateVisibility=()=>{
 const beep1CheckBoxEl=this.shadowRoot.getElementById('beep1CheckBoxId');const beep2CheckBoxEl=this.shadowRoot.getElementById('beep2CheckBoxId')
-;const beep3CheckBoxEl=this.shadowRoot.getElementById('beep3CheckBoxId');if(this.hasAttribute('beep1-enabled')){beep1CheckBoxEl.checked=true}else{beep1CheckBoxEl.checked=false}
-if(this.hasAttribute('beep2-enabled')){beep2CheckBoxEl.checked=true}else{beep2CheckBoxEl.checked=false}if(this.hasAttribute('beep3-enabled')){beep3CheckBoxEl.checked=true}else{
-beep3CheckBoxEl.checked=false}};_updateLocalStorageBeepEnable=()=>{const now=Math.floor(Date.now()/1000);const defaultChannelBeepsObj={timestamp:now,beep1:this.hasAttribute('beep1-enabled'),
-beep2:this.hasAttribute('beep2-enabled'),beep3:this.hasAttribute('beep3-enabled')};window.localStorage.setItem('defaultChannelBeepEnable',JSON.stringify(defaultChannelBeepsObj))};_loadBeepEnable=()=>{
-let defaultChannelBeepsObj=null;try{defaultChannelBeepsObj=JSON.parse(window.localStorage.getItem('defaultChannelBeepEnable'))}catch(error){}if(defaultChannelBeepsObj){
-if(defaultChannelBeepsObj.beep1){this.setAttribute('beep1-enabled','')}else{this.removeAttribute('beep1-enabled')}if(defaultChannelBeepsObj.beep2){this.setAttribute('beep2-enabled','')}else{
-this.removeAttribute('beep2-enabled')}if(defaultChannelBeepsObj.beep3){this.setAttribute('beep3-enabled','')}else{this.removeAttribute('beep3-enabled')}this._updateVisibility()}}
-;_setFixedElementTitles=()=>{this.shadowRoot.getElementById('activeChannelCountIconId').title='Count of the number of active IRC channel panels'
+;const beep3CheckBoxEl=this.shadowRoot.getElementById('beep3CheckBoxId');const noOpenOnJoinCheckBoxEl=this.shadowRoot.getElementById('noOpenOnJoinCheckBoxId')
+;const noOpenOnMessageCheckBoxEl=this.shadowRoot.getElementById('noOpenOnMessageCheckBoxId');const noOpenOnModeCheckBoxEl=this.shadowRoot.getElementById('noOpenOnModeCheckBoxId')
+;if(this.hasAttribute('beep1-enabled')){beep1CheckBoxEl.checked=true}else{beep1CheckBoxEl.checked=false}if(this.hasAttribute('beep2-enabled')){beep2CheckBoxEl.checked=true}else{
+beep2CheckBoxEl.checked=false}if(this.hasAttribute('beep3-enabled')){beep3CheckBoxEl.checked=true}else{beep3CheckBoxEl.checked=false}if(this.hasAttribute('no-open-on-join')){
+noOpenOnJoinCheckBoxEl.checked=true}else{noOpenOnJoinCheckBoxEl.checked=false}if(this.hasAttribute('no-open-on-message')){noOpenOnMessageCheckBoxEl.checked=true}else{
+noOpenOnMessageCheckBoxEl.checked=false}if(this.hasAttribute('no-open-on-mode')){noOpenOnModeCheckBoxEl.checked=true}else{noOpenOnModeCheckBoxEl.checked=false}};_updateLocalStorageBeepEnable=()=>{
+const now=Math.floor(Date.now()/1000);const defaultChannelBeepsObj={timestamp:now,beep1:this.hasAttribute('beep1-enabled'),beep2:this.hasAttribute('beep2-enabled'),
+beep3:this.hasAttribute('beep3-enabled')};window.localStorage.setItem('defaultChannelBeepEnable',JSON.stringify(defaultChannelBeepsObj))};_loadBeepEnable=()=>{let defaultChannelBeepsObj=null;try{
+defaultChannelBeepsObj=JSON.parse(window.localStorage.getItem('defaultChannelBeepEnable'))}catch(error){}if(defaultChannelBeepsObj){if(defaultChannelBeepsObj.beep1){
+this.setAttribute('beep1-enabled','')}else{this.removeAttribute('beep1-enabled')}if(defaultChannelBeepsObj.beep2){this.setAttribute('beep2-enabled','')}else{this.removeAttribute('beep2-enabled')}
+if(defaultChannelBeepsObj.beep3){this.setAttribute('beep3-enabled','')}else{this.removeAttribute('beep3-enabled')}this._updateVisibility()}};_updateLocalNoAutoOpen=()=>{
+const now=Math.floor(Date.now()/1000);const defaultChannelNoAutoOpenObj={timestamp:now,onJoin:this.hasAttribute('no-open-on-join'),onMessage:this.hasAttribute('no-open-on-message'),
+onMode:this.hasAttribute('no-open-on-mode')};window.localStorage.setItem('defaultChannelNoAutoOpen',JSON.stringify(defaultChannelNoAutoOpenObj))};_loadNoAutoOpen=()=>{
+let defaultChannelNoAutoOpenObj=null;try{defaultChannelNoAutoOpenObj=JSON.parse(window.localStorage.getItem('defaultChannelNoAutoOpen'))}catch(error){}if(defaultChannelNoAutoOpenObj){
+if(defaultChannelNoAutoOpenObj.onJoin){this.setAttribute('no-open-on-join','')}else{this.removeAttribute('no-open-on-join')}if(defaultChannelNoAutoOpenObj.onMessage){
+this.setAttribute('no-open-on-message','')}else{this.removeAttribute('no-open-on-message')}if(defaultChannelNoAutoOpenObj.onMode){this.setAttribute('no-open-on-mode','')}else{
+this.removeAttribute('no-open-on-mode')}this._updateVisibility()}};_setFixedElementTitles=()=>{
+this.shadowRoot.getElementById('activeChannelCountIconId').title='Count of the number of active IRC channel panels'
 ;this.shadowRoot.getElementById('channelUnreadCountIconId').title='Count of the total number unread channel messages'
 ;this.shadowRoot.getElementById('newChannelNameInputId').title='Channel name input area'
 ;this.shadowRoot.getElementById('newChannelButtonId').title='Create new IRC channel panel using entered channel name'
@@ -1740,9 +1750,10 @@ this.removeAttribute('beep2-enabled')}if(defaultChannelBeepsObj.beep3){this.setA
 ;this.shadowRoot.getElementById('beep2CheckBoxId').title='When checked, open new channel panels with audio beep enabled'
 ;this.shadowRoot.getElementById('beep3CheckBoxId').title='When checked, open new channel panels with audio beep enabled'};timerTickHandler=()=>{
 const channelsElements=document.getElementById('channelsContainerId');const channelEls=Array.from(channelsElements.children);channelEls.forEach((chanEl=>{chanEl.timerTickHandler()}))}
-;initializePlugin=()=>{this._loadBeepEnable();this._setFixedElementTitles()};connectedCallback(){this.shadowRoot.getElementById('closePanelButtonId').addEventListener('click',(()=>{this.hidePanel()}))
-;this.shadowRoot.getElementById('collapsePanelButtonId').addEventListener('click',(()=>{if(this.shadowRoot.getElementById('panelCollapsedDivId').hasAttribute('visible')){this.collapsePanel()}else{
-this.showPanel()}}));this.shadowRoot.getElementById('newChannelButtonId').addEventListener('click',(()=>{this._joinNewChannel()}))
+;initializePlugin=()=>{this._loadBeepEnable();this._loadNoAutoOpen();this._setFixedElementTitles()};connectedCallback(){
+this.shadowRoot.getElementById('closePanelButtonId').addEventListener('click',(()=>{this.hidePanel()}));this.shadowRoot.getElementById('collapsePanelButtonId').addEventListener('click',(()=>{
+if(this.shadowRoot.getElementById('panelCollapsedDivId').hasAttribute('visible')){this.collapsePanel()}else{this.showPanel()}}))
+;this.shadowRoot.getElementById('newChannelButtonId').addEventListener('click',(()=>{this._joinNewChannel()}))
 ;this.shadowRoot.getElementById('newChannelNameInputId').addEventListener('input',(event=>{if(event.inputType==='insertText'&&event.data===null||event.inputType==='insertLineBreak'){
 this._joinNewChannel()}}));this.shadowRoot.getElementById('beep1CheckBoxId').addEventListener('click',(()=>{if(this.hasAttribute('beep1-enabled')){this.removeAttribute('beep1-enabled')}else{
 this.setAttribute('beep1-enabled','');document.getElementById('beepSounds').playBeep1Sound()}this._updateLocalStorageBeepEnable();this._updateVisibility()}))
@@ -1750,13 +1761,17 @@ this.setAttribute('beep1-enabled','');document.getElementById('beepSounds').play
 this.setAttribute('beep2-enabled','');document.getElementById('beepSounds').playBeep2Sound()}this._updateLocalStorageBeepEnable();this._updateVisibility()}))
 ;this.shadowRoot.getElementById('beep3CheckBoxId').addEventListener('click',(()=>{if(this.hasAttribute('beep3-enabled')){this.removeAttribute('beep3-enabled')}else{
 this.setAttribute('beep3-enabled','');document.getElementById('beepSounds').playBeep3Sound()}this._updateLocalStorageBeepEnable();this._updateVisibility()}))
-;document.addEventListener('cancel-beep-sounds',(()=>{this.removeAttribute('beep1-enabled');this.removeAttribute('beep2-enabled');this.removeAttribute('beep3-enabled')}))
-;document.addEventListener('collapse-all-panels',(event=>{if(event.detail&&event.detail.except){if(typeof event.detail.except==='string'){if(event.detail.except!==this.id){this.collapsePanel()}
-}else if(Array.isArray(event.detail.except)){if(event.detail.except.indexOf(this.id)<0){this.collapsePanel()}}}else{this.collapsePanel()}}));document.addEventListener('color-theme-changed',(event=>{
-const panelDivEl=this.shadowRoot.getElementById('panelDivId');const activeChannelCountIconEl=this.shadowRoot.getElementById('activeChannelCountIconId')
-;const channelUnreadCountIconEl=this.shadowRoot.getElementById('channelUnreadCountIconId');const newChannelNameInputEl=this.shadowRoot.getElementById('newChannelNameInputId')
-;if(event.detail.theme==='light'){panelDivEl.classList.remove('channel-panel-theme-dark');panelDivEl.classList.add('channel-panel-theme-light')
-;activeChannelCountIconEl.classList.remove('global-border-theme-dark');activeChannelCountIconEl.classList.add('global-border-theme-light')
+;this.shadowRoot.getElementById('noOpenOnJoinCheckBoxId').addEventListener('click',(()=>{if(this.hasAttribute('no-open-on-join')){this.removeAttribute('no-open-on-join')}else{
+this.setAttribute('no-open-on-join','')}this._updateLocalNoAutoOpen();this._updateVisibility()}));this.shadowRoot.getElementById('noOpenOnMessageCheckBoxId').addEventListener('click',(()=>{
+if(this.hasAttribute('no-open-on-message')){this.removeAttribute('no-open-on-message')}else{this.setAttribute('no-open-on-message','')}this._updateLocalNoAutoOpen();this._updateVisibility()}))
+;this.shadowRoot.getElementById('noOpenOnModeCheckBoxId').addEventListener('click',(()=>{if(this.hasAttribute('no-open-on-mode')){this.removeAttribute('no-open-on-mode')}else{
+this.setAttribute('no-open-on-mode','')}this._updateLocalNoAutoOpen();this._updateVisibility()}));document.addEventListener('cancel-beep-sounds',(()=>{this.removeAttribute('beep1-enabled')
+;this.removeAttribute('beep2-enabled');this.removeAttribute('beep3-enabled')}));document.addEventListener('collapse-all-panels',(event=>{if(event.detail&&event.detail.except){
+if(typeof event.detail.except==='string'){if(event.detail.except!==this.id){this.collapsePanel()}}else if(Array.isArray(event.detail.except)){if(event.detail.except.indexOf(this.id)<0){
+this.collapsePanel()}}}else{this.collapsePanel()}}));document.addEventListener('color-theme-changed',(event=>{const panelDivEl=this.shadowRoot.getElementById('panelDivId')
+;const activeChannelCountIconEl=this.shadowRoot.getElementById('activeChannelCountIconId');const channelUnreadCountIconEl=this.shadowRoot.getElementById('channelUnreadCountIconId')
+;const newChannelNameInputEl=this.shadowRoot.getElementById('newChannelNameInputId');if(event.detail.theme==='light'){panelDivEl.classList.remove('channel-panel-theme-dark')
+;panelDivEl.classList.add('channel-panel-theme-light');activeChannelCountIconEl.classList.remove('global-border-theme-dark');activeChannelCountIconEl.classList.add('global-border-theme-light')
 ;channelUnreadCountIconEl.classList.remove('global-border-theme-dark');channelUnreadCountIconEl.classList.add('global-border-theme-light')
 ;newChannelNameInputEl.classList.remove('global-text-theme-dark');newChannelNameInputEl.classList.add('global-text-theme-light')}else{panelDivEl.classList.remove('channel-panel-theme-light')
 ;panelDivEl.classList.add('channel-panel-theme-dark');activeChannelCountIconEl.classList.remove('global-border-theme-light');activeChannelCountIconEl.classList.add('global-border-theme-dark')
@@ -1829,11 +1844,15 @@ this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible'
 ;this.shadowRoot.getElementById('hideWithCollapseId').removeAttribute('hidden');this._handleCancelZoomEvent()};_updateVisibility=()=>{const panelDivEl=this.shadowRoot.getElementById('panelDivId')
 ;const beep1CheckBoxEl=this.shadowRoot.getElementById('beep1CheckBoxId');const beep2CheckBoxEl=this.shadowRoot.getElementById('beep2CheckBoxId')
 ;const beep3CheckBoxEl=this.shadowRoot.getElementById('beep3CheckBoxId');const briefCheckboxEl=this.shadowRoot.getElementById('briefCheckboxId')
-;const autocompleteCheckboxEl=this.shadowRoot.getElementById('autocompleteCheckboxId');const autoCompleteTitleEl=this.shadowRoot.getElementById('autoCompleteTitle')
-;const ircStateIndex=window.globals.ircState.channels.indexOf(this.channelName.toLowerCase());const webStateIndex=window.globals.webState.channels.indexOf(this.channelName.toLowerCase())
-;if(panelDivEl.hasAttribute('beep1-enabled')){beep1CheckBoxEl.checked=true}else{beep1CheckBoxEl.checked=false}if(panelDivEl.hasAttribute('beep2-enabled')){beep2CheckBoxEl.checked=true}else{
-beep2CheckBoxEl.checked=false}if(panelDivEl.hasAttribute('beep3-enabled')){beep3CheckBoxEl.checked=true}else{beep3CheckBoxEl.checked=false}if(panelDivEl.hasAttribute('brief-enabled')){
-briefCheckboxEl.checked=true;autoCompleteTitleEl.textContent='Auto-complete (tab, space-space)'}else{briefCheckboxEl.checked=false;autoCompleteTitleEl.textContent='Auto-complete (tab)'}
+;const noOpenOnJoinCheckBoxEl=this.shadowRoot.getElementById('noOpenOnJoinCheckBoxId');const noOpenOnMessageCheckBoxEl=this.shadowRoot.getElementById('noOpenOnMessageCheckBoxId')
+;const noOpenOnModeCheckBoxEl=this.shadowRoot.getElementById('noOpenOnModeCheckBoxId');const autocompleteCheckboxEl=this.shadowRoot.getElementById('autocompleteCheckboxId')
+;const autoCompleteTitleEl=this.shadowRoot.getElementById('autoCompleteTitle');const ircStateIndex=window.globals.ircState.channels.indexOf(this.channelName.toLowerCase())
+;const webStateIndex=window.globals.webState.channels.indexOf(this.channelName.toLowerCase());if(panelDivEl.hasAttribute('beep1-enabled')){beep1CheckBoxEl.checked=true}else{
+beep1CheckBoxEl.checked=false}if(panelDivEl.hasAttribute('beep2-enabled')){beep2CheckBoxEl.checked=true}else{beep2CheckBoxEl.checked=false}if(panelDivEl.hasAttribute('beep3-enabled')){
+beep3CheckBoxEl.checked=true}else{beep3CheckBoxEl.checked=false}if(panelDivEl.hasAttribute('no-open-on-join')){noOpenOnJoinCheckBoxEl.checked=true}else{noOpenOnJoinCheckBoxEl.checked=false}
+if(panelDivEl.hasAttribute('no-open-on-message')){noOpenOnMessageCheckBoxEl.checked=true}else{noOpenOnMessageCheckBoxEl.checked=false}if(panelDivEl.hasAttribute('no-open-on-mode')){
+noOpenOnModeCheckBoxEl.checked=true}else{noOpenOnModeCheckBoxEl.checked=false}if(panelDivEl.hasAttribute('brief-enabled')){briefCheckboxEl.checked=true
+;autoCompleteTitleEl.textContent='Auto-complete (tab, space-space)'}else{briefCheckboxEl.checked=false;autoCompleteTitleEl.textContent='Auto-complete (tab)'}
 if(panelDivEl.hasAttribute('auto-comp-enabled')){autocompleteCheckboxEl.checked=true}else{autocompleteCheckboxEl.checked=false}if(ircStateIndex>=0&&webStateIndex>=0){
 if(window.globals.ircState.channelStates[ircStateIndex].joined){this.shadowRoot.getElementById('joinButtonId').setAttribute('hidden','')
 ;this.shadowRoot.getElementById('pruneButtonId').setAttribute('hidden','');this.shadowRoot.getElementById('partButtonId').removeAttribute('hidden')}else{
@@ -1911,7 +1930,25 @@ this._updateLocalStorageBeepEnable();this._updateVisibility()};_handleChannelBee
 this._updateLocalStorageBeepEnable();this._updateVisibility()};_handleChannelBeep3CBInputElClick=event=>{const panelDivEl=this.shadowRoot.getElementById('panelDivId')
 ;if(panelDivEl.hasAttribute('beep3-enabled')){panelDivEl.removeAttribute('beep3-enabled')}else{panelDivEl.setAttribute('beep3-enabled','');document.getElementById('beepSounds').playBeep1Sound()}
 this._updateLocalStorageBeepEnable();this._updateVisibility()};_handleCancelBeepSounds=()=>{const panelDivEl=this.shadowRoot.getElementById('panelDivId');panelDivEl.removeAttribute('beep1-enabled')
-;panelDivEl.removeAttribute('beep2-enabled');panelDivEl.removeAttribute('beep3-enabled')};_handleBriefCheckboxClick=()=>{const panelDivEl=this.shadowRoot.getElementById('panelDivId')
+;panelDivEl.removeAttribute('beep2-enabled');panelDivEl.removeAttribute('beep3-enabled')};_updateLocalNoAutoOpen=()=>{const now=Math.floor(Date.now()/1000);const channelNoAutoOpenObj={timestamp:now,
+channel:this.channelName.toLowerCase(),onJoin:this.shadowRoot.getElementById('panelDivId').hasAttribute('no-open-on-join'),
+onMessage:this.shadowRoot.getElementById('panelDivId').hasAttribute('no-open-on-message'),onMode:this.shadowRoot.getElementById('panelDivId').hasAttribute('no-open-on-mode')};let noOpenChannelIndex=-1
+;let noOpenChanArray=null;noOpenChanArray=JSON.parse(window.localStorage.getItem('channelNoAutoOpenArray'));if(noOpenChanArray&&Array.isArray(noOpenChanArray)){if(noOpenChanArray.length>0){
+for(let i=0;i<noOpenChanArray.length;i++){if(noOpenChanArray[i].channel===this.channelName.toLowerCase()){noOpenChannelIndex=i}}}}else{noOpenChanArray=[]}if(noOpenChannelIndex>=0){
+noOpenChanArray[noOpenChannelIndex]=channelNoAutoOpenObj}else{noOpenChanArray.push(channelNoAutoOpenObj)}window.localStorage.setItem('channelNoAutoOpenArray',JSON.stringify(noOpenChanArray))}
+;_loadNoAutoOpen=()=>{const panelDivEl=this.shadowRoot.getElementById('panelDivId');let noOpenChannelIndex=-1;let noOpenChannelArray=null;try{
+noOpenChannelArray=JSON.parse(window.localStorage.getItem('channelNoAutoOpenArray'))}catch(error){}if(noOpenChannelArray&&Array.isArray(noOpenChannelArray)){if(noOpenChannelArray.length>0){
+for(let i=0;i<noOpenChannelArray.length;i++){if(noOpenChannelArray[i].channel===this.channelName.toLowerCase()){noOpenChannelIndex=i}}}}if(noOpenChannelIndex>=0){
+if(noOpenChannelArray[noOpenChannelIndex].onJoin){panelDivEl.setAttribute('no-open-on-join','')}if(noOpenChannelArray[noOpenChannelIndex].onMessage){panelDivEl.setAttribute('no-open-on-message','')}
+if(noOpenChannelArray[noOpenChannelIndex].onMode){panelDivEl.setAttribute('no-open-on-mode','')}}else{let oneIsEnabled=false;const manageChannelsPanelEl=document.getElementById('manageChannelsPanel')
+;if(manageChannelsPanelEl.hasAttribute('no-open-on-join')){panelDivEl.setAttribute('no-open-on-join','');oneIsEnabled=true}if(manageChannelsPanelEl.hasAttribute('no-open-on-message')){
+panelDivEl.setAttribute('no-open-on-message','');oneIsEnabled=true}if(manageChannelsPanelEl.hasAttribute('no-open-on-mode')){panelDivEl.setAttribute('no-open-on-mode','');oneIsEnabled=true}
+if(oneIsEnabled){this._updateLocalNoAutoOpen()}}this._updateVisibility()};_handleChannelOpenOnJoinCBInputElClick=()=>{const panelDivEl=this.shadowRoot.getElementById('panelDivId')
+;if(panelDivEl.hasAttribute('no-open-on-join')){panelDivEl.removeAttribute('no-open-on-join')}else{panelDivEl.setAttribute('no-open-on-join','')}this._updateLocalNoAutoOpen();this._updateVisibility()}
+;_handleChannelOpenOnMessageCBInputElClick=()=>{const panelDivEl=this.shadowRoot.getElementById('panelDivId');if(panelDivEl.hasAttribute('no-open-on-message')){
+panelDivEl.removeAttribute('no-open-on-message')}else{panelDivEl.setAttribute('no-open-on-message','')}this._updateLocalNoAutoOpen();this._updateVisibility()}
+;_handleChannelOpenOnModeCBInputElClick=()=>{const panelDivEl=this.shadowRoot.getElementById('panelDivId');if(panelDivEl.hasAttribute('no-open-on-mode')){panelDivEl.removeAttribute('no-open-on-mode')
+}else{panelDivEl.setAttribute('no-open-on-mode','')}this._updateLocalNoAutoOpen();this._updateVisibility()};_handleBriefCheckboxClick=()=>{const panelDivEl=this.shadowRoot.getElementById('panelDivId')
 ;if(panelDivEl.hasAttribute('brief-enabled')){panelDivEl.removeAttribute('brief-enabled')}else{panelDivEl.setAttribute('brief-enabled','')}this._updateVisibility()
 ;document.dispatchEvent(new CustomEvent('update-from-cache'))};_handleAutoCompleteCheckboxClick=()=>{const panelDivEl=this.shadowRoot.getElementById('panelDivId')
 ;if(panelDivEl.hasAttribute('auto-comp-enabled')){panelDivEl.removeAttribute('auto-comp-enabled')}else{panelDivEl.setAttribute('auto-comp-enabled','')}this._updateVisibility()}
@@ -1992,26 +2029,27 @@ if('params'in parsedMessage&&parsedMessage.params.length>0&&parsedMessage.params
 banList+=' '+parsedMessage.params[2]}_addText(parsedMessage.timestamp,'*',banList)}break;case'KICK':if(parsedMessage.params[0].toLowerCase()===this.channelName.toLowerCase()){let reason=' '
 ;if(parsedMessage.params[2]){reason=parsedMessage.params[2]}if(panelDivEl.hasAttribute('brief-enabled')){_addText(parsedMessage.timestamp,'*',parsedMessage.nick+' has kicked '+parsedMessage.params[1])
 }else{_addText(parsedMessage.timestamp,'*',parsedMessage.nick+' has kicked '+parsedMessage.params[1]+' ('+reason+')')}
-if(panelDivEl.hasAttribute('beep1-enabled')&&!window.globals.webState.cacheReloadInProgress){document.getElementById('beepSounds').playBeep1Sound()}this._incUnreadWhenOther();this._displayWhenHidden()
+if(panelDivEl.hasAttribute('beep1-enabled')&&!window.globals.webState.cacheReloadInProgress){document.getElementById('beepSounds').playBeep1Sound()}this._incUnreadWhenOther();this.showAndScrollPanel()
 }break;case'JOIN':if(parsedMessage.params[0].toLowerCase()===this.channelName.toLowerCase()){if(panelDivEl.hasAttribute('brief-enabled')){
 _addText(parsedMessage.timestamp,'*',parsedMessage.nick+' has joined')}else{_addText(parsedMessage.timestamp,'*',parsedMessage.nick+' ('+parsedMessage.host+') has joined')}
-if(panelDivEl.hasAttribute('beep2-enabled')&&!window.globals.webState.cacheReloadInProgress){document.getElementById('beepSounds').playBeep1Sound()}this._incUnreadWhenOther();this._displayWhenHidden()
-}break;case'MODE':if(parsedMessage.params[0].toLowerCase()===this.channelName.toLowerCase()){if(parsedMessage.nick){
-_addText(parsedMessage.timestamp,'*','Mode '+JSON.stringify(parsedMessage.params)+' by '+parsedMessage.nick);this.showAndScrollPanel()}else{
-_addText(parsedMessage.timestamp,'*','Mode '+JSON.stringify(parsedMessage.params)+' by '+parsedMessage.prefix)}}break;case'cachedNICK':
-if(this.channelName.toLowerCase()===parsedMessage.params[0].toLowerCase()){_addText(parsedMessage.timestamp,'*',parsedMessage.nick+' is now known as '+parsedMessage.params[1])}break;case'NICK':{
-let present=false;if(this._isNickInChannel(parsedMessage.nick,this.channelName.toLowerCase())){present=true}if(this._isNickInChannel(parsedMessage.params[0],this.channelName.toLowerCase())){
-present=true}if(present){_addText(parsedMessage.timestamp,'*',parsedMessage.nick+' is now known as '+parsedMessage.params[0])}}break;case'NOTICE':
-if(parsedMessage.params[0].toLowerCase()===this.channelName.toLowerCase()){
-_addText(parsedMessage.timestamp,'*','Notice('+parsedMessage.nick+' to '+parsedMessage.params[0]+') '+parsedMessage.params[1])
-;if(panelDivEl.hasAttribute('beep1-enabled')&&!window.globals.webState.cacheReloadInProgress){document.getElementById('beepSounds').playBeep1Sound()}this._incUnreadWhenOther()
-;this._displayWhenHidden()}break;case'PART':if(parsedMessage.params[0].toLowerCase()===this.channelName.toLowerCase()){let reason=' ';if(parsedMessage.params[1]){reason=parsedMessage.params[1]}
+if(panelDivEl.hasAttribute('beep2-enabled')&&!window.globals.webState.cacheReloadInProgress){document.getElementById('beepSounds').playBeep1Sound()}this._incUnreadWhenOther()
+;if(!panelDivEl.hasAttribute('no-open-on-join')){this._displayWhenHidden()}}break;case'MODE':if(parsedMessage.params[0].toLowerCase()===this.channelName.toLowerCase()){if(parsedMessage.nick){
+this._incUnreadWhenOther();_addText(parsedMessage.timestamp,'*','Mode '+JSON.stringify(parsedMessage.params)+' by '+parsedMessage.nick);if(!panelDivEl.hasAttribute('no-open-on-mode')){
+this._displayWhenHidden()}}else{_addText(parsedMessage.timestamp,'*','Mode '+JSON.stringify(parsedMessage.params)+' by '+parsedMessage.prefix)}}break;case'cachedNICK':
+if(this.channelName.toLowerCase()===parsedMessage.params[0].toLowerCase()){this._incUnreadWhenOther()
+;_addText(parsedMessage.timestamp,'*',parsedMessage.nick+' is now known as '+parsedMessage.params[1])}break;case'NICK':{let present=false
+;if(this._isNickInChannel(parsedMessage.nick,this.channelName.toLowerCase())){present=true}if(this._isNickInChannel(parsedMessage.params[0],this.channelName.toLowerCase())){present=true}if(present){
+this._incUnreadWhenOther();_addText(parsedMessage.timestamp,'*',parsedMessage.nick+' is now known as '+parsedMessage.params[0])}}break;case'NOTICE':
+if(parsedMessage.params[0].toLowerCase()===this.channelName.toLowerCase()){this._incUnreadWhenOther()
+;_addText(parsedMessage.timestamp,'*','Notice('+parsedMessage.nick+' to '+parsedMessage.params[0]+') '+parsedMessage.params[1])
+;if(panelDivEl.hasAttribute('beep1-enabled')&&!window.globals.webState.cacheReloadInProgress){document.getElementById('beepSounds').playBeep1Sound()}if(!panelDivEl.hasAttribute('no-open-on-message')){
+this._displayWhenHidden()}}break;case'PART':if(parsedMessage.params[0].toLowerCase()===this.channelName.toLowerCase()){let reason=' ';if(parsedMessage.params[1]){reason=parsedMessage.params[1]}
 if(panelDivEl.hasAttribute('brief-enabled')){_addText(parsedMessage.timestamp,'*',parsedMessage.nick+' has left')}else{
 _addText(parsedMessage.timestamp,'*',parsedMessage.nick+' ('+parsedMessage.host+') has left '+'('+reason+')')}}break;case'PRIVMSG':
 if(parsedMessage.params[0].toLowerCase()===this.channelName.toLowerCase()){_addText(parsedMessage.timestamp,parsedMessage.nick,parsedMessage.params[1])
 ;if(panelDivEl.hasAttribute('beep1-enabled')&&!window.globals.webState.cacheReloadInProgress){document.getElementById('beepSounds').playBeep1Sound()}if(panelDivEl.hasAttribute('beep3-enabled')){
 const checkLine=parsedMessage.params[1].toLowerCase();if(checkLine.indexOf(window.globals.ircState.nickName.toLowerCase())>=0&&!window.globals.webState.cacheReloadInProgress){
-setTimeout(document.getElementById('beepSounds').playBeep2Sound,250)}}this._incUnreadWhenOther();this._displayWhenHidden()}break;case'cachedQUIT':
+setTimeout(document.getElementById('beepSounds').playBeep2Sound,250)}}this._incUnreadWhenOther();if(!panelDivEl.hasAttribute('no-open-on-message')){this._displayWhenHidden()}}break;case'cachedQUIT':
 if(parsedMessage.params[0].toLowerCase()===this.channelName.toLowerCase()){let reason=' ';if(parsedMessage.params[1]){reason=parsedMessage.params[1]}if(panelDivEl.hasAttribute('brief-enabled')){
 _addText(parsedMessage.timestamp,'*',parsedMessage.nick+' has quit')}else{_addText(parsedMessage.timestamp,'*',parsedMessage.nick+' ('+parsedMessage.host+') has quit '+'('+reason+')')}}break
 ;case'QUIT':if(this._isNickInChannel(parsedMessage.nick,this.channelName.toLowerCase())){let reason=' ';if(parsedMessage.params[0]){reason=parsedMessage.params[0]}
@@ -2020,12 +2058,12 @@ _addText(parsedMessage.timestamp,'*',parsedMessage.nick+' ('+parsedMessage.host+
 if(parsedMessage.params[0].toLowerCase()===this.channelName.toLowerCase()){const newTopic=parsedMessage.params[1];if(newTopic==null){
 _addText(parsedMessage.timestamp,'*','Topic for '+parsedMessage.params[0]+' has been unset by "'+parsedMessage.nick)}else{
 _addText(parsedMessage.timestamp,'*','Topic for '+parsedMessage.params[0]+' changed to "'+newTopic+'" by '+parsedMessage.nick)}
-if(panelDivEl.hasAttribute('beep1-enabled')&&!window.globals.webState.cacheReloadInProgress){document.getElementById('beepSounds').playBeep1Sound()}this._incUnreadWhenOther();this._displayWhenHidden()
-}break;default:}};_handleEraseBeforeReload=()=>{this.shadowRoot.getElementById('panelMessageDisplayId').value='';this.shadowRoot.getElementById('panelMessageInputId').value=''
-;this.shadowRoot.getElementById('panelDivId').setAttribute('lastDate','0000-00-00')};_handleCacheReloadDone=event=>{let markerString='';let timestampString=''
-;if('detail'in event&&'timestamp'in event.detail){timestampString=document.getElementById('displayUtils').unixTimestampToHMS(event.detail.timestamp)}if(timestampString){markerString+=timestampString}
-markerString+=' '+document.getElementById('globVars').constants('cacheReloadString')+'\n';if(this.shadowRoot.getElementById('panelDivId').hasAttribute('brief-enabled')){markerString+='\n'}
-this.shadowRoot.getElementById('panelMessageDisplayId').value+=markerString;if(this.shadowRoot.getElementById('noScrollCheckboxId').checked===false){this._scrollTextAreaToRecent()}
+if(panelDivEl.hasAttribute('beep1-enabled')&&!window.globals.webState.cacheReloadInProgress){document.getElementById('beepSounds').playBeep1Sound()}this._incUnreadWhenOther()
+;if(!panelDivEl.hasAttribute('no-open-on-mode')){this._displayWhenHidden()}}break;default:}};_handleEraseBeforeReload=()=>{this.shadowRoot.getElementById('panelMessageDisplayId').value=''
+;this.shadowRoot.getElementById('panelMessageInputId').value='';this.shadowRoot.getElementById('panelDivId').setAttribute('lastDate','0000-00-00')};_handleCacheReloadDone=event=>{let markerString=''
+;let timestampString='';if('detail'in event&&'timestamp'in event.detail){timestampString=document.getElementById('displayUtils').unixTimestampToHMS(event.detail.timestamp)}if(timestampString){
+markerString+=timestampString}markerString+=' '+document.getElementById('globVars').constants('cacheReloadString')+'\n';if(this.shadowRoot.getElementById('panelDivId').hasAttribute('brief-enabled')){
+markerString+='\n'}this.shadowRoot.getElementById('panelMessageDisplayId').value+=markerString;if(this.shadowRoot.getElementById('noScrollCheckboxId').checked===false){this._scrollTextAreaToRecent()}
 if(this.webSocketFirstConnect){this.webConnectedLast=false;this.collapsePanel()}else{const now=Math.floor(Date.now()/1000);const websocketConnectTime=now-window.globals.webState.times.webConnect
 ;if(websocketConnectTime<5&&this.shadowRoot.getElementById('panelVisibilityDivId').hasAttribute('visible')){this.collapsePanel()}}};_handleWebConnectChanged=()=>{
 if(window.globals.webState.webConnected!==this.webConnectedLast){this.webConnectedLast=window.globals.webState.webConnected;if(!window.globals.webState.webConnected){this.webSocketFirstConnect=true}}}
@@ -2061,6 +2099,9 @@ let newTextTheme='global-text-theme-dark';let oldTextTheme='global-text-theme-li
 ;this.shadowRoot.getElementById('beep1CheckBoxId').removeEventListener('click',this._handleChannelBeep1CBInputElClick)
 ;this.shadowRoot.getElementById('beep2CheckBoxId').removeEventListener('click',this._handleChannelBeep2CBInputElClick)
 ;this.shadowRoot.getElementById('beep3CheckBoxId').removeEventListener('click',this._handleChannelBeep3CBInputElClick)
+;this.shadowRoot.getElementById('noOpenOnJoinCheckBoxId').removeEventListener('click',this._handleChannelOpenOnJoinCBInputElClick)
+;this.shadowRoot.getElementById('noOpenOnMessageCheckBoxId').removeEventListener('click',this._handleChannelOpenOnMessageCBInputElClick)
+;this.shadowRoot.getElementById('noOpenOnModeCheckBoxId').removeEventListener('click',this._handleChannelOpenOnModeCBInputElClick)
 ;this.shadowRoot.getElementById('bottomCollapseButtonId').removeEventListener('click',this._handleBottomCollapseButton)
 ;this.shadowRoot.getElementById('briefCheckboxId').removeEventListener('click',this._handleBriefCheckboxClick)
 ;this.shadowRoot.getElementById('clearButtonId').removeEventListener('click',this._handleClearButton)
@@ -2124,7 +2165,7 @@ window.globals.webState.channels.push(this.channelName.toLowerCase());this.initI
 ;this.shadowRoot.getElementById('panelDivId').setAttribute('lastDate','0000-00-00');this.shadowRoot.getElementById('channelNameDivId').textContent=this.channelCsName
 ;if(window.globals.ircState.channelStates[this.channelIndex].topic==null){this.shadowRoot.getElementById('channelTopicDivId').textContent=''}else{
 this.shadowRoot.getElementById('channelTopicDivId').textContent=document.getElementById('displayUtils').cleanFormatting(window.globals.ircState.channelStates[this.channelIndex].topic)}
-this._loadBeepEnable();if(window.globals.webState.dynamic.panelPxWidth<this.mobileBreakpointPx){this.shadowRoot.getElementById('panelDivId').setAttribute('brief-enabled','')
+this._loadBeepEnable();this._loadNoAutoOpen();if(window.globals.webState.dynamic.panelPxWidth<this.mobileBreakpointPx){this.shadowRoot.getElementById('panelDivId').setAttribute('brief-enabled','')
 ;this.shadowRoot.getElementById('briefCheckboxId').checked=true}else{this.shadowRoot.getElementById('panelDivId').removeAttribute('brief-enabled')
 ;this.shadowRoot.getElementById('briefCheckboxId').checked=false}if(window.InputEvent&&typeof InputEvent.prototype.getTargetRanges==='function'){
 this.shadowRoot.getElementById('panelDivId').setAttribute('auto-comp-enabled','')}else{this.shadowRoot.getElementById('panelDivId').setAttribute('auto-comp-enabled','')
@@ -2144,6 +2185,9 @@ this.shadowRoot.getElementById('autocompleteCheckboxId').addEventListener('click
 ;this.shadowRoot.getElementById('beep1CheckBoxId').addEventListener('click',this._handleChannelBeep1CBInputElClick)
 ;this.shadowRoot.getElementById('beep2CheckBoxId').addEventListener('click',this._handleChannelBeep2CBInputElClick)
 ;this.shadowRoot.getElementById('beep3CheckBoxId').addEventListener('click',this._handleChannelBeep3CBInputElClick)
+;this.shadowRoot.getElementById('noOpenOnJoinCheckBoxId').addEventListener('click',this._handleChannelOpenOnJoinCBInputElClick)
+;this.shadowRoot.getElementById('noOpenOnMessageCheckBoxId').addEventListener('click',this._handleChannelOpenOnMessageCBInputElClick)
+;this.shadowRoot.getElementById('noOpenOnModeCheckBoxId').addEventListener('click',this._handleChannelOpenOnModeCBInputElClick)
 ;this.shadowRoot.getElementById('bottomCollapseButtonId').addEventListener('click',this._handleBottomCollapseButton)
 ;this.shadowRoot.getElementById('briefCheckboxId').addEventListener('click',this._handleBriefCheckboxClick)
 ;this.shadowRoot.getElementById('clearButtonId').addEventListener('click',this._handleClearButton)

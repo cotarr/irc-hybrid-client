@@ -8,6 +8,35 @@ and this project adheres to
 
 - To view notes on v2 major upgrade, scroll to Version v2.0.0 2023-09-12
 
+## Next v2.0.15-Dev (Draft)
+
+This is a general improvement for management of visibility when multiple channels are open at the same time.
+The existing concept was to designate channels that were collapsed into a bar to stay 
+collapsed during activity and use the displayed message counter to show activity.
+By contrast, hidden channel panels would auto-open when a channel message occurs 
+and a new nick JOIN's the channel. There were problems with the this approach 
+because /MODE changes, like +v, were always opening the window from collapsed.
+Channel with auto-voice therefore are always popping open.
+To improve this, checkboxes for inhibit auto-open of the panel is added for Join, Message, and Mode.
+These are handled same as audible sound beep configuration, saved in the browser local storage until logout.
+Each channel has it's own settings. The channel management window has checkboxes to set 
+the default auto-open configuration for new channels that have no setting in the local storage.
+
+With their commit, when auto-open is not inhibited, behavior is same as before, 
+collapsed panel stays collapsed but increment counter, hidden will auto-open when not inhibited.
+
+### Change
+
+- In channel management panel, added 3 checkboxes for default behavior of inhibit auto-open for Join, Message and Mode.
+- In channel panel, added 3 checkboxes for inhibit auto-open for Join, Message and Mode.
+- Added code to save checkbox status to local storage, same as audio beep configuration. 
+
+- In channel panel incoming MODE, NICK, NOTICE,  will increment message counter (in addition to PRIVMSG)
+- In channel panel incoming KICK will always open both hidden or collapsed panel
+- In channel panel incoming JOIN may be inhibited from auto-open panel, using Join inhibit checkbox
+- In channel panel incoming MODE and TOPIC may be inhibited from auto-open panel, using Mode inhibit checkbox
+- In channel panel incoming NOTICE, PRIVMSG may be inhibited from auto-open panel, using Message inhibit checkbox
+
 ## [v2.0.14](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.0.14) 2024-06-22
 
 ### Security Patch

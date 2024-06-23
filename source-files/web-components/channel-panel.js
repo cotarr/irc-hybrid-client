@@ -441,6 +441,12 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     const beep2CheckBoxEl = this.shadowRoot.getElementById('beep2CheckBoxId');
     const beep3CheckBoxEl = this.shadowRoot.getElementById('beep3CheckBoxId');
     const briefCheckboxEl = this.shadowRoot.getElementById('briefCheckboxId');
+    const noOpenOnJoinCheckBoxEl =
+      this.shadowRoot.getElementById('noOpenOnJoinCheckBoxId');
+    const noOpenOnMessageCheckBoxEl =
+      this.shadowRoot.getElementById('noOpenOnMessageCheckBoxId');
+    const noOpenOnModeCheckBoxEl =
+      this.shadowRoot.getElementById('noOpenOnModeCheckBoxId');
     const autocompleteCheckboxEl = this.shadowRoot.getElementById('autocompleteCheckboxId');
     const autoCompleteTitleEl = this.shadowRoot.getElementById('autoCompleteTitle');
 
@@ -461,6 +467,21 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       beep3CheckBoxEl.checked = true;
     } else {
       beep3CheckBoxEl.checked = false;
+    }
+    if (panelDivEl.hasAttribute('no-open-on-join')) {
+      noOpenOnJoinCheckBoxEl.checked = true;
+    } else {
+      noOpenOnJoinCheckBoxEl.checked = false;
+    }
+    if (panelDivEl.hasAttribute('no-open-on-message')) {
+      noOpenOnMessageCheckBoxEl.checked = true;
+    } else {
+      noOpenOnMessageCheckBoxEl.checked = false;
+    }
+    if (panelDivEl.hasAttribute('no-open-on-mode')) {
+      noOpenOnModeCheckBoxEl.checked = true;
+    } else {
+      noOpenOnModeCheckBoxEl.checked = false;
     }
 
     if (panelDivEl.hasAttribute('brief-enabled')) {
@@ -951,7 +972,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       }
     }
     this._updateVisibility();
-  };
+  }; // _loadBeepEnable()
 
   /**
    * Enable or disable audile beep sounds when checkbox is clicked
@@ -1006,6 +1027,144 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     panelDivEl.removeAttribute('beep1-enabled');
     panelDivEl.removeAttribute('beep2-enabled');
     panelDivEl.removeAttribute('beep3-enabled');
+  };
+
+  /**
+   * Function to update window.localStorage with IRC
+   * channel inhibit auto-open panel on events.
+   * Called when checkbox is clicked to enable/disable
+   */
+  _updateLocalNoAutoOpen = () => {
+    // new object for channel inhibit panel auto-open status
+    const now = Math.floor(Date.now() / 1000);
+    const channelNoAutoOpenObj = {
+      timestamp: now,
+      channel: this.channelName.toLowerCase(),
+      onJoin: this.shadowRoot.getElementById('panelDivId').hasAttribute('no-open-on-join'),
+      onMessage: this.shadowRoot.getElementById('panelDivId').hasAttribute('no-open-on-message'),
+      onMode: this.shadowRoot.getElementById('panelDivId').hasAttribute('no-open-on-mode')
+    };
+
+    // Get array of previous IRC channel, each with status object
+    let noOpenChannelIndex = -1;
+    let noOpenChanArray = null;
+    noOpenChanArray = JSON.parse(window.localStorage.getItem('channelNoAutoOpenArray'));
+    if ((noOpenChanArray) &&
+      (Array.isArray(noOpenChanArray))) {
+      if (noOpenChanArray.length > 0) {
+        for (let i = 0; i < noOpenChanArray.length; i++) {
+          if (noOpenChanArray[i].channel === this.channelName.toLowerCase()) {
+            noOpenChannelIndex = i;
+          }
+        }
+      }
+    } else {
+      // Array did not exist, create it
+      noOpenChanArray = [];
+    }
+    if (noOpenChannelIndex >= 0) {
+      // update previous element
+      noOpenChanArray[noOpenChannelIndex] = channelNoAutoOpenObj;
+    } else {
+      // create new element
+      noOpenChanArray.push(channelNoAutoOpenObj);
+    }
+    window.localStorage.setItem('channelNoAutoOpenArray', JSON.stringify(noOpenChanArray));
+  }; // _updateLocalNoAutoOpen()
+
+  /**
+   * For this channel, load web browser local storage auto-open panel on events.
+   */
+  _loadNoAutoOpen = () => {
+    const panelDivEl = this.shadowRoot.getElementById('panelDivId');
+    let noOpenChannelIndex = -1;
+    let noOpenChannelArray = null;
+    try {
+      noOpenChannelArray = JSON.parse(window.localStorage.getItem('channelNoAutoOpenArray'));
+    } catch (error) {
+      // ignore error
+    }
+    if ((noOpenChannelArray) &&
+      (Array.isArray(noOpenChannelArray))) {
+      if (noOpenChannelArray.length > 0) {
+        for (let i = 0; i < noOpenChannelArray.length; i++) {
+          if (noOpenChannelArray[i].channel === this.channelName.toLowerCase()) {
+            noOpenChannelIndex = i;
+          }
+        }
+      }
+    }
+    if (noOpenChannelIndex >= 0) {
+      // Case of specific channel has previous setting from localStorage
+      // console.log(JSON.stringify(noOpenChannelArray[noOpenChannelIndex], null, 2));
+      if (noOpenChannelArray[noOpenChannelIndex].onJoin) {
+        panelDivEl.setAttribute('no-open-on-join', '');
+      }
+      if (noOpenChannelArray[noOpenChannelIndex].onMessage) {
+        panelDivEl.setAttribute('no-open-on-message', '');
+      }
+      if (noOpenChannelArray[noOpenChannelIndex].onMode) {
+        panelDivEl.setAttribute('no-open-on-mode', '');
+      }
+    } else {
+      // This is a new channel and there is no local storage, use preset from manage-channels-panel
+      // console.log('inheriting inhibit auto-open panel preset from manageChannelsPanel');
+      let oneIsEnabled = false;
+      const manageChannelsPanelEl = document.getElementById('manageChannelsPanel');
+      if (manageChannelsPanelEl.hasAttribute('no-open-on-join')) {
+        panelDivEl.setAttribute('no-open-on-join', '');
+        oneIsEnabled = true;
+      }
+      if (manageChannelsPanelEl.hasAttribute('no-open-on-message')) {
+        panelDivEl.setAttribute('no-open-on-message', '');
+        oneIsEnabled = true;
+      }
+      if (manageChannelsPanelEl.hasAttribute('no-open-on-mode')) {
+        panelDivEl.setAttribute('no-open-on-mode', '');
+        oneIsEnabled = true;
+      }
+      // Remember for this channel
+      if (oneIsEnabled) {
+        this._updateLocalNoAutoOpen();
+      }
+    }
+    this._updateVisibility();
+  }; // _loadNoAutoOpen()
+
+  /**
+   * For this channel, inhibit (enabled by default) auto open channel panel on events
+   */
+  _handleChannelOpenOnJoinCBInputElClick = () => {
+    const panelDivEl = this.shadowRoot.getElementById('panelDivId');
+    if (panelDivEl.hasAttribute('no-open-on-join')) {
+      panelDivEl.removeAttribute('no-open-on-join');
+    } else {
+      panelDivEl.setAttribute('no-open-on-join', '');
+    }
+    this._updateLocalNoAutoOpen();
+    this._updateVisibility();
+  };
+
+  _handleChannelOpenOnMessageCBInputElClick = () => {
+    const panelDivEl = this.shadowRoot.getElementById('panelDivId');
+    if (panelDivEl.hasAttribute('no-open-on-message')) {
+      panelDivEl.removeAttribute('no-open-on-message');
+    } else {
+      panelDivEl.setAttribute('no-open-on-message', '');
+    }
+    this._updateLocalNoAutoOpen();
+    this._updateVisibility();
+  };
+
+  _handleChannelOpenOnModeCBInputElClick = () => {
+    const panelDivEl = this.shadowRoot.getElementById('panelDivId');
+    if (panelDivEl.hasAttribute('no-open-on-mode')) {
+      panelDivEl.removeAttribute('no-open-on-mode');
+    } else {
+      panelDivEl.setAttribute('no-open-on-mode', '');
+    }
+    this._updateLocalNoAutoOpen();
+    this._updateVisibility();
   };
 
   /**
@@ -1536,7 +1695,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
             document.getElementById('beepSounds').playBeep1Sound();
           }
           this._incUnreadWhenOther();
-          this._displayWhenHidden();
+          this.showAndScrollPanel();
         }
         break;
       case 'JOIN':
@@ -1556,7 +1715,9 @@ window.customElements.define('channel-panel', class extends HTMLElement {
           }
           // If channel panel is closed, open it up when a new person joins
           this._incUnreadWhenOther();
-          this._displayWhenHidden();
+          if (!panelDivEl.hasAttribute('no-open-on-join')) {
+            this._displayWhenHidden();
+          }
         }
         break;
       case 'MODE':
@@ -1564,11 +1725,14 @@ window.customElements.define('channel-panel', class extends HTMLElement {
           // this could be more elegant than stringify.
           if (parsedMessage.nick) {
             // case of mode by user
+            this._incUnreadWhenOther();
             _addText(parsedMessage.timestamp,
               '*',
               'Mode ' + JSON.stringify(parsedMessage.params) + ' by ' + parsedMessage.nick);
             // Case of mode typed in other panel as text command, example: /MODE #channel +tn
-            this.showAndScrollPanel();
+            if (!panelDivEl.hasAttribute('no-open-on-mode')) {
+              this._displayWhenHidden();
+            }
           } else {
             // case of mode by netsplit
             _addText(parsedMessage.timestamp,
@@ -1582,6 +1746,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
         // Is previous nick or new nick in ANY active channel?
         // -----------
         if (this.channelName.toLowerCase() === parsedMessage.params[0].toLowerCase()) {
+          this._incUnreadWhenOther();
           _addText(parsedMessage.timestamp,
             '*',
             parsedMessage.nick + ' is now known as ' + parsedMessage.params[1]);
@@ -1602,6 +1767,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
             present = true;
           }
           if (present) {
+            this._incUnreadWhenOther();
             _addText(parsedMessage.timestamp,
               '*',
               parsedMessage.nick + ' is now known as ' + parsedMessage.params[0]);
@@ -1610,6 +1776,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
         break;
       case 'NOTICE':
         if (parsedMessage.params[0].toLowerCase() === this.channelName.toLowerCase()) {
+          this._incUnreadWhenOther();
           _addText(parsedMessage.timestamp,
             '*',
             'Notice(' +
@@ -1619,9 +1786,9 @@ window.customElements.define('channel-panel', class extends HTMLElement {
             document.getElementById('beepSounds').playBeep1Sound();
           }
           // Upon channel notice, make section visible.
-          // If channel panel is closed, open it up when a new person joins
-          this._incUnreadWhenOther();
-          this._displayWhenHidden();
+          if (!panelDivEl.hasAttribute('no-open-on-message')) {
+            this._displayWhenHidden();
+          }
         }
         break;
 
@@ -1663,7 +1830,9 @@ window.customElements.define('channel-panel', class extends HTMLElement {
           // console.log('cache refresh - Websocket auto-reconnect (set visibility 5 of 5)');
           // If channel panel is closed, inc unread counter and open panel on new message
           this._incUnreadWhenOther();
-          this._displayWhenHidden();
+          if (!panelDivEl.hasAttribute('no-open-on-message')) {
+            this._displayWhenHidden();
+          }
         }
         break;
       //
@@ -1748,7 +1917,9 @@ window.customElements.define('channel-panel', class extends HTMLElement {
             document.getElementById('beepSounds').playBeep1Sound();
           }
           this._incUnreadWhenOther();
-          this._displayWhenHidden();
+          if (!panelDivEl.hasAttribute('no-open-on-mode')) {
+            this._displayWhenHidden();
+          }
         }
         break;
       default:
@@ -2018,6 +2189,9 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('beep1CheckBoxId').removeEventListener('click', this._handleChannelBeep1CBInputElClick);
     this.shadowRoot.getElementById('beep2CheckBoxId').removeEventListener('click', this._handleChannelBeep2CBInputElClick);
     this.shadowRoot.getElementById('beep3CheckBoxId').removeEventListener('click', this._handleChannelBeep3CBInputElClick);
+    this.shadowRoot.getElementById('noOpenOnJoinCheckBoxId').removeEventListener('click', this._handleChannelOpenOnJoinCBInputElClick);
+    this.shadowRoot.getElementById('noOpenOnMessageCheckBoxId').removeEventListener('click', this._handleChannelOpenOnMessageCBInputElClick);
+    this.shadowRoot.getElementById('noOpenOnModeCheckBoxId').removeEventListener('click', this._handleChannelOpenOnModeCBInputElClick);
     this.shadowRoot.getElementById('bottomCollapseButtonId').removeEventListener('click', this._handleBottomCollapseButton);
     this.shadowRoot.getElementById('briefCheckboxId').removeEventListener('click', this._handleBriefCheckboxClick);
     this.shadowRoot.getElementById('clearButtonId').removeEventListener('click', this._handleClearButton);
@@ -2284,6 +2458,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
 
     // Load beep sound configuration from local storage
     this._loadBeepEnable();
+    this._loadNoAutoOpen();
 
     // enable brief mode on narrow screens
     if (window.globals.webState.dynamic.panelPxWidth < this.mobileBreakpointPx) {
@@ -2406,6 +2581,9 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('beep1CheckBoxId').addEventListener('click', this._handleChannelBeep1CBInputElClick);
     this.shadowRoot.getElementById('beep2CheckBoxId').addEventListener('click', this._handleChannelBeep2CBInputElClick);
     this.shadowRoot.getElementById('beep3CheckBoxId').addEventListener('click', this._handleChannelBeep3CBInputElClick);
+    this.shadowRoot.getElementById('noOpenOnJoinCheckBoxId').addEventListener('click', this._handleChannelOpenOnJoinCBInputElClick);
+    this.shadowRoot.getElementById('noOpenOnMessageCheckBoxId').addEventListener('click', this._handleChannelOpenOnMessageCBInputElClick);
+    this.shadowRoot.getElementById('noOpenOnModeCheckBoxId').addEventListener('click', this._handleChannelOpenOnModeCBInputElClick);
     this.shadowRoot.getElementById('bottomCollapseButtonId').addEventListener('click', this._handleBottomCollapseButton);
     this.shadowRoot.getElementById('briefCheckboxId').addEventListener('click', this._handleBriefCheckboxClick);
     this.shadowRoot.getElementById('clearButtonId').addEventListener('click', this._handleClearButton);

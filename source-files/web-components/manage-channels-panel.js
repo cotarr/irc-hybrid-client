@@ -381,10 +381,21 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
     }
   };
 
+  /**
+   * Internal function to set checkboxes attribute values
+   */
   _updateVisibility = () => {
     const beep1CheckBoxEl = this.shadowRoot.getElementById('beep1CheckBoxId');
     const beep2CheckBoxEl = this.shadowRoot.getElementById('beep2CheckBoxId');
     const beep3CheckBoxEl = this.shadowRoot.getElementById('beep3CheckBoxId');
+
+    const noOpenOnJoinCheckBoxEl =
+      this.shadowRoot.getElementById('noOpenOnJoinCheckBoxId');
+    const noOpenOnMessageCheckBoxEl =
+      this.shadowRoot.getElementById('noOpenOnMessageCheckBoxId');
+    const noOpenOnModeCheckBoxEl =
+      this.shadowRoot.getElementById('noOpenOnModeCheckBoxId');
+
     if (this.hasAttribute('beep1-enabled')) {
       beep1CheckBoxEl.checked = true;
     } else {
@@ -399,6 +410,22 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
       beep3CheckBoxEl.checked = true;
     } else {
       beep3CheckBoxEl.checked = false;
+    }
+
+    if (this.hasAttribute('no-open-on-join')) {
+      noOpenOnJoinCheckBoxEl.checked = true;
+    } else {
+      noOpenOnJoinCheckBoxEl.checked = false;
+    }
+    if (this.hasAttribute('no-open-on-message')) {
+      noOpenOnMessageCheckBoxEl.checked = true;
+    } else {
+      noOpenOnMessageCheckBoxEl.checked = false;
+    }
+    if (this.hasAttribute('no-open-on-mode')) {
+      noOpenOnModeCheckBoxEl.checked = true;
+    } else {
+      noOpenOnModeCheckBoxEl.checked = false;
     }
   };
 
@@ -420,7 +447,7 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
   }; // _updateLocalStorageBeepEnable()
 
   /**
-   * For this channel, load web browser local storage beep enable state.
+   * Load web browser local storage default beep enable state.
    */
   _loadBeepEnable = () => {
     let defaultChannelBeepsObj = null;
@@ -448,7 +475,57 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
       }
       this._updateVisibility();
     }
-  };
+  }; // _loadBeepEnable()
+
+  /**
+   * Function to update window.localStorage with IRC
+   * channel inhibit auto-open panel on events.
+   * Called when checkbox is clicked to enable/disable
+   */
+  _updateLocalNoAutoOpen = () => {
+    // new object for channel beep enable status
+    const now = Math.floor(Date.now() / 1000);
+    const defaultChannelNoAutoOpenObj = {
+      timestamp: now,
+      onJoin: this.hasAttribute('no-open-on-join'),
+      onMessage: this.hasAttribute('no-open-on-message'),
+      onMode: this.hasAttribute('no-open-on-mode')
+    };
+    window.localStorage.setItem('defaultChannelNoAutoOpen',
+      JSON.stringify(defaultChannelNoAutoOpenObj));
+  }; // _updateLocalNoAutoOpen()
+
+  /**
+   * Load web browser default local storage auto-open panel on events.
+   */
+  _loadNoAutoOpen = () => {
+    let defaultChannelNoAutoOpenObj = null;
+    try {
+      defaultChannelNoAutoOpenObj =
+        JSON.parse(window.localStorage.getItem('defaultChannelNoAutoOpen'));
+    } catch (error) {
+      // Ignore errors
+      // console.log(error);
+    }
+    if (defaultChannelNoAutoOpenObj) {
+      if (defaultChannelNoAutoOpenObj.onJoin) {
+        this.setAttribute('no-open-on-join', '');
+      } else {
+        this.removeAttribute('no-open-on-join');
+      }
+      if (defaultChannelNoAutoOpenObj.onMessage) {
+        this.setAttribute('no-open-on-message', '');
+      } else {
+        this.removeAttribute('no-open-on-message');
+      }
+      if (defaultChannelNoAutoOpenObj.onMode) {
+        this.setAttribute('no-open-on-mode', '');
+      } else {
+        this.removeAttribute('no-open-on-mode');
+      }
+      this._updateVisibility();
+    }
+  }; // _loadNoAutoOpen()
 
   /**
    * Add "title" attribute for mouse hover tool-tips.
@@ -487,6 +564,7 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
   initializePlugin = () => {
     // Load beep sound configuration from local storage
     this._loadBeepEnable();
+    this._loadNoAutoOpen();
     this._setFixedElementTitles();
   }; // initializePlugin()
 
@@ -554,6 +632,37 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
         document.getElementById('beepSounds').playBeep3Sound();
       }
       this._updateLocalStorageBeepEnable();
+      this._updateVisibility();
+    });
+
+    /**
+     * Inhibit (enabled by default) auto open channel panel on events
+     */
+    this.shadowRoot.getElementById('noOpenOnJoinCheckBoxId').addEventListener('click', () => {
+      if (this.hasAttribute('no-open-on-join')) {
+        this.removeAttribute('no-open-on-join');
+      } else {
+        this.setAttribute('no-open-on-join', '');
+      }
+      this._updateLocalNoAutoOpen();
+      this._updateVisibility();
+    });
+    this.shadowRoot.getElementById('noOpenOnMessageCheckBoxId').addEventListener('click', () => {
+      if (this.hasAttribute('no-open-on-message')) {
+        this.removeAttribute('no-open-on-message');
+      } else {
+        this.setAttribute('no-open-on-message', '');
+      }
+      this._updateLocalNoAutoOpen();
+      this._updateVisibility();
+    });
+    this.shadowRoot.getElementById('noOpenOnModeCheckBoxId').addEventListener('click', () => {
+      if (this.hasAttribute('no-open-on-mode')) {
+        this.removeAttribute('no-open-on-mode');
+      } else {
+        this.setAttribute('no-open-on-mode', '');
+      }
+      this._updateLocalNoAutoOpen();
       this._updateVisibility();
     });
 

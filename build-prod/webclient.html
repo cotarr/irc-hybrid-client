@@ -335,12 +335,14 @@ class="global-visibility-div"><div class="vh10"></div><div class="mb5"><textarea
 id="newChannelButtonId" class="global-valign-middle">Join Channel</button></div><div class="vh10"></div><div class="mr10 global-border-theme-dark channel-panel-presets-div"><div>
 Channel presets, click to /JOIN</div><div class="vh7"></div><div id="channelJoinButtonContainerId" class="mb5"></div></div><div class="vh10"></div><div>Create new IRC channel with:</div><div><input 
 id="beep1CheckBoxId" class="global-valign-middle" type="checkbox"><span class="channel-cb-span">Line-beep</span> <input id="beep2CheckBoxId" class="global-valign-middle" type="checkbox"><span 
-class="channel-cb-span">Join-beep</span> <input id="beep3CheckBoxId" class="global-valign-middle" type="checkbox"><span class="channel-cb-span">Name-beep</span></div><div class="vh10"></div></div>
-</div></div></template><template id="channelPanelTemplate"><link rel="stylesheet" href="css/styles.css"><div id="panelVisibilityDivId" class="global-visibility-div"><div id="panelDivId" 
-class="global-panel-style-div channel-panel-theme-dark" lastdate="0000-00-00"><div class="global-head-flex"><div class="global-head-left"><button id="closePanelButtonId" title="Hide Panel" 
-class="global-show-hide-button">x</button> <button id="collapsePanelButtonId" title="Collapse Panel to Bar" class="global-show-hide-button mr5">&#8645;</button><div id="channelNameDivId" 
-class="channel-panel-name-div"></div><div id="beenKickedIconId" class="channel-panel-been-kicked-icon" hidden>Kicked</div><div id="notInChannelIconId" class="channel-panel-not-in-channel-icon" hidden>
-Not In Channel</div><div id="nickCountIconId" class="global-count global-border-theme-dark">0</div><div id="messageCountIconId" 
+class="channel-cb-span">Join-beep</span> <input id="beep3CheckBoxId" class="global-valign-middle" type="checkbox"><span class="channel-cb-span">Name-beep</span></div><div><span>No auto-open:</span> 
+<input id="noOpenOnJoinCheckBoxId" class="global-valign-middle" type="checkbox"><span class="channel-cb-span">Join</span> <input id="noOpenOnMessageCheckBoxId" class="global-valign-middle" 
+type="checkbox"><span class="channel-cb-span">Message</span> <input id="noOpenOnModeCheckBoxId" class="global-valign-middle" type="checkbox"><span class="channel-cb-span">Mode</span></div><div 
+class="vh10"></div></div></div></div></template><template id="channelPanelTemplate"><link rel="stylesheet" href="css/styles.css"><div id="panelVisibilityDivId" class="global-visibility-div"><div 
+id="panelDivId" class="global-panel-style-div channel-panel-theme-dark" lastdate="0000-00-00"><div class="global-head-flex"><div class="global-head-left"><button id="closePanelButtonId" 
+title="Hide Panel" class="global-show-hide-button">x</button> <button id="collapsePanelButtonId" title="Collapse Panel to Bar" class="global-show-hide-button mr5">&#8645;</button><div 
+id="channelNameDivId" class="channel-panel-name-div"></div><div id="beenKickedIconId" class="channel-panel-been-kicked-icon" hidden>Kicked</div><div id="notInChannelIconId" 
+class="channel-panel-not-in-channel-icon" hidden>Not In Channel</div><div id="nickCountIconId" class="global-count global-border-theme-dark">0</div><div id="messageCountIconId" 
 class="global-message-count global-text-theme-inv-dark global-border-theme-dark" hidden>0</div></div><div class="global-head-center"></div><div class="global-head-right"><div id="hideWithCollapseId">
 <button id="joinButtonId" class="mr7" hidden>Join</button> <button id="pruneButtonId" class="mr7" hidden>Prune</button> <button id="partButtonId" class="mr7">Leave</button> <button id="zoomButtonId" 
 class="mr7">Zoom</button></div></div></div><div id="panelCollapsedDivId" class="global-visibility-div" visible><div id="channelTopicDivId" class="channel-panel-topic-div"></div><textarea 
@@ -353,39 +355,41 @@ class="rm7">Taller</button> <button id="normalButtonId" class="rm7">Normal</butt
 class="channel-cb-span">Inhibit-auto-scroll (clipboard use)</span></div><div class="mb5"><input id="briefCheckboxId" class="global-valign-middle" type="checkbox"><span class="channel-cb-span">Brief
 </span> <input id="autocompleteCheckboxId" class="global-valign-middle" type="checkbox"><span id="autoCompleteTitle" class="channel-cb-span">Auto-complete (tab)</span></div><div><input 
 id="beep1CheckBoxId" class="global-valign-middle" type="checkbox"><span class="channel-cb-span">Line-beep</span> <input id="beep2CheckBoxId" class="global-valign-middle" type="checkbox"><span 
-class="channel-cb-span">Join-beep</span> <input id="beep3CheckBoxId" class="global-valign-middle" type="checkbox"><span class="channel-cb-span">Name-beep</span></div></div><div class="vh7"></div>
-</div></div></div></template><template id="debugPanelTemplate"><link rel="stylesheet" href="css/styles.css"><div id="panelVisibilityDivId" class="global-visibility-div"><div id="panelDivId" 
-class="global-panel-style-div debug-panel-theme-dark"><div class="global-head-flex"><div class="global-head-left"><button id="closePanelButtonId" title="Hide Panel" class="global-show-hide-button">x
-</button> <span>Debug Panel</span></div><div class="global-head-center"></div><div class="global-head-right"></div></div><div><div class="vh20"></div><div><div class="fs120p">Admin Functions</div><div
- class="vh10"></div><button id="eraseCacheButtonId" class="mr5">Erase Cache</button> <button id="forceDisconnectButtonId" class="mr5">Force Disconnect</button> <button id="serverTerminateButtonId" 
-class="mr5">Die Web Server</button></div><div class="vh10"></div><div><div class="fs120p">Debug Functions</div></div><div class="vh10"></div><div class="debug-panel-section-div"><div class="fs120p">
-Remote Server Functions</div><div class="mt10"><button id="button_1_1" class="mr10">Button 1-1</button> <span>Server: Emulate IRC ping timeout<span></span></span></div><div class="mt10"><button 
-id="button_1_2" class="mr10">Button 1-2</button> <span>Local: Emulate websocket timeout</span></div><div class="vh10"></div><div class="fs80p">Results at bottom of debug panel.</div><div class="mt10">
-<button id="button_1_3" class="mr10">Button 1-3</button> <span>Server: Memory usage</span></div><div class="mt10"><button id="button_1_4" class="mr10">Button 1-4</button> <span>Server: Websocket ping
-</span></div></div><div class="debug-panel-section-div"><div class="fs120p">Browser Display Functions</div><div class="mt10"><button id="button_2_1" class="mr10">Button 2-1</button> <span>
-Force all panels visible</span></div><div class="mt10"><button id="button_2_2" class="mr10">Button 2-2</button> <span>Force status icons visible</span></div><div class="mt10"><button id="button_2_3" 
-class="mr10">Button 2-3</button> <span>Toggle Theme Light/Dark</span></div><div class="mt10"><button id="button_2_4" class="mr10">Button 2-4</button> <span>Recalculate page size</span></div></div><div
- class="debug-panel-section-div"><div class="fs120p">Show data and variables</div><div class="fs80p">New panels open at bottom</div><div class="mt10"><button id="button_3_1" class="mr10">Button 3-1
-</button> <span>Open: Remote variables (ircState)</span></div><div class="mt10"><button id="button_3_2" class="mr10">Button 3-2</button> <span>Open: Local variables (webState)</span></div><div 
-class="mt10"><button id="button_3_3" class="mr10">Button 3-3</button> <span>Open: IRC raw message log</span></div><div class="mt10"><button id="button_3_4" class="mr10">Button 3-4</button> <span>
-Open: Global event log</span></div></div><div class="debug-panel-section-div"><div class="fs120p">State and event functions</div><div class="mt10"><button id="button_4_1" class="mr10">Button 4-1
-</button> <span>Force ircState reload</span></div><div class="mt10"><button id="button_4_2" class="mr10">Button 4-2</button> <span>Force message cache reload</span></div><div class="mt10"><button 
-id="button_4_3" class="mr10">Button 4-3</button> <span>Emit: &quot;irc-state-changed&quot; event</span></div><div class="mt10"><button id="button_4_4" class="mr10">Button 4-4</button> <span>
-Emit: &quot;web-connect-changed&quot;</span></div></div><div class="debug-panel-section-div"><div class="fs120p">Audio media functions</div><div class="mt10"><button id="button_5_1" class="mr10">
-Button 5-1</button> <span>Play Beep Sound 1</span></div><div class="mt10"><button id="button_5_2" class="mr10">Button 5-2</button> <span>Play Beep Sound 2</span></div><div class="mt10"><button 
-id="button_5_3" class="mr10">Button 5-3</button> <span>Play Beep Sound 3</span></div></div><div class="debug-panel-section-div"><div class="fs120p">Miscellaneous</div><div class="mt10"><button 
-id="button_6_1" class="mr10">Button 6-1</button> <span>AdHoc function (not defined)</span></div></div><div id="debugResponseSectionId" class="debug-panel-section-div" hidden><div class="fs120p">
-Debug Response</div><div class="mt10"><pre id="debugResponsePreId"></pre></div></div><div><ul><li>To open debug panel at page load append hash &quot;#DEBUG&quot; to page URL</li></ul></div></div><div 
-class="vh10"></div></div></div></template><template id="showRawTemplate"><link rel="stylesheet" href="css/styles.css"><div id="panelVisibilityDivId" class="global-visibility-div"><div id="panelDivId" 
-class="global-panel-style-div show-raw-theme-dark"><div class="global-head-flex"><div class="global-head-left"><button id="closePanelButtonId" title="Hide Panel" class="global-show-hide-button mr5">x
-</button> <span id="titleDivId">Raw Server Messages (Paused)</span></div><div class="global-head-center"></div><div class="global-head-right"><button id="pauseButtonId" class="mb5">Start</button> 
-<button id="clearButtonId" class="mb5">Clear</button> <button id="cacheButtonId" class="mb5">Fetch Cache</button></div></div><div><textarea id="panelMessageDisplayId" class="global-text-theme-dark" 
-cols="80" rows="18" spellcheck="false" readonly="readonly">----- Paused -----&#13;&#10</textarea></div><div><input id="appendParsedMessageCheckboxId" class="global-valign-middle ml10" type="checkbox">
- <span class="global-valign-middle">Append-parsed-message</span> <input id="showRawInHexCheckboxId" class="global-valign-middle ml10" type="checkbox"> <span class="global-valign-middle">
-Append-hexadecimal</span> <button id="showHelpButtonId" class="ml20" title="Display help info for this panel">Show Help</button> <button id="bottomCollapseButtonId" class="global-valign-middle" 
-title="Show more options for this panel">&#8645;</button></div><div id="bottomCollapseDivId" hidden><div id="helpPanelId" hidden><ul><li>
-The raw message cache is disabled by default and must be started with the [Start] button.</li><li>Log is limited to incoming websocket stream messages (IRC server messages)</li><li>
-Messages prefixed with &quot;-->&quot; are outgoing IRC commands echoed back by the web server.</li><li>
+class="channel-cb-span">Join-beep</span> <input id="beep3CheckBoxId" class="global-valign-middle" type="checkbox"><span class="channel-cb-span">Name-beep</span></div><div><span>No auto-open:</span> 
+<input id="noOpenOnJoinCheckBoxId" class="global-valign-middle" type="checkbox"><span class="channel-cb-span">Join</span> <input id="noOpenOnMessageCheckBoxId" class="global-valign-middle" 
+type="checkbox"><span class="channel-cb-span">Message</span> <input id="noOpenOnModeCheckBoxId" class="global-valign-middle" type="checkbox"><span class="channel-cb-span">Mode</span></div></div><div 
+class="vh7"></div></div></div></div></template><template id="debugPanelTemplate"><link rel="stylesheet" href="css/styles.css"><div id="panelVisibilityDivId" class="global-visibility-div"><div 
+id="panelDivId" class="global-panel-style-div debug-panel-theme-dark"><div class="global-head-flex"><div class="global-head-left"><button id="closePanelButtonId" title="Hide Panel" 
+class="global-show-hide-button">x</button> <span>Debug Panel</span></div><div class="global-head-center"></div><div class="global-head-right"></div></div><div><div class="vh20"></div><div><div 
+class="fs120p">Admin Functions</div><div class="vh10"></div><button id="eraseCacheButtonId" class="mr5">Erase Cache</button> <button id="forceDisconnectButtonId" class="mr5">Force Disconnect</button> 
+<button id="serverTerminateButtonId" class="mr5">Die Web Server</button></div><div class="vh10"></div><div><div class="fs120p">Debug Functions</div></div><div class="vh10"></div><div 
+class="debug-panel-section-div"><div class="fs120p">Remote Server Functions</div><div class="mt10"><button id="button_1_1" class="mr10">Button 1-1</button> <span>Server: Emulate IRC ping timeout<span>
+</span></span></div><div class="mt10"><button id="button_1_2" class="mr10">Button 1-2</button> <span>Local: Emulate websocket timeout</span></div><div class="vh10"></div><div class="fs80p">
+Results at bottom of debug panel.</div><div class="mt10"><button id="button_1_3" class="mr10">Button 1-3</button> <span>Server: Memory usage</span></div><div class="mt10"><button id="button_1_4" 
+class="mr10">Button 1-4</button> <span>Server: Websocket ping</span></div></div><div class="debug-panel-section-div"><div class="fs120p">Browser Display Functions</div><div class="mt10"><button 
+id="button_2_1" class="mr10">Button 2-1</button> <span>Force all panels visible</span></div><div class="mt10"><button id="button_2_2" class="mr10">Button 2-2</button> <span>Force status icons visible
+</span></div><div class="mt10"><button id="button_2_3" class="mr10">Button 2-3</button> <span>Toggle Theme Light/Dark</span></div><div class="mt10"><button id="button_2_4" class="mr10">Button 2-4
+</button> <span>Recalculate page size</span></div></div><div class="debug-panel-section-div"><div class="fs120p">Show data and variables</div><div class="fs80p">New panels open at bottom</div><div 
+class="mt10"><button id="button_3_1" class="mr10">Button 3-1</button> <span>Open: Remote variables (ircState)</span></div><div class="mt10"><button id="button_3_2" class="mr10">Button 3-2</button> 
+<span>Open: Local variables (webState)</span></div><div class="mt10"><button id="button_3_3" class="mr10">Button 3-3</button> <span>Open: IRC raw message log</span></div><div class="mt10"><button 
+id="button_3_4" class="mr10">Button 3-4</button> <span>Open: Global event log</span></div></div><div class="debug-panel-section-div"><div class="fs120p">State and event functions</div><div 
+class="mt10"><button id="button_4_1" class="mr10">Button 4-1</button> <span>Force ircState reload</span></div><div class="mt10"><button id="button_4_2" class="mr10">Button 4-2</button> <span>
+Force message cache reload</span></div><div class="mt10"><button id="button_4_3" class="mr10">Button 4-3</button> <span>Emit: &quot;irc-state-changed&quot; event</span></div><div class="mt10"><button 
+id="button_4_4" class="mr10">Button 4-4</button> <span>Emit: &quot;web-connect-changed&quot;</span></div></div><div class="debug-panel-section-div"><div class="fs120p">Audio media functions</div><div 
+class="mt10"><button id="button_5_1" class="mr10">Button 5-1</button> <span>Play Beep Sound 1</span></div><div class="mt10"><button id="button_5_2" class="mr10">Button 5-2</button> <span>
+Play Beep Sound 2</span></div><div class="mt10"><button id="button_5_3" class="mr10">Button 5-3</button> <span>Play Beep Sound 3</span></div></div><div class="debug-panel-section-div"><div 
+class="fs120p">Miscellaneous</div><div class="mt10"><button id="button_6_1" class="mr10">Button 6-1</button> <span>AdHoc function (not defined)</span></div></div><div id="debugResponseSectionId" 
+class="debug-panel-section-div" hidden><div class="fs120p">Debug Response</div><div class="mt10"><pre id="debugResponsePreId"></pre></div></div><div><ul><li>
+To open debug panel at page load append hash &quot;#DEBUG&quot; to page URL</li></ul></div></div><div class="vh10"></div></div></div></template><template id="showRawTemplate"><link rel="stylesheet" 
+href="css/styles.css"><div id="panelVisibilityDivId" class="global-visibility-div"><div id="panelDivId" class="global-panel-style-div show-raw-theme-dark"><div class="global-head-flex"><div 
+class="global-head-left"><button id="closePanelButtonId" title="Hide Panel" class="global-show-hide-button mr5">x</button> <span id="titleDivId">Raw Server Messages (Paused)</span></div><div 
+class="global-head-center"></div><div class="global-head-right"><button id="pauseButtonId" class="mb5">Start</button> <button id="clearButtonId" class="mb5">Clear</button> <button id="cacheButtonId" 
+class="mb5">Fetch Cache</button></div></div><div><textarea id="panelMessageDisplayId" class="global-text-theme-dark" cols="80" rows="18" spellcheck="false" readonly="readonly">
+----- Paused -----&#13;&#10</textarea></div><div><input id="appendParsedMessageCheckboxId" class="global-valign-middle ml10" type="checkbox"> <span class="global-valign-middle">Append-parsed-message
+</span> <input id="showRawInHexCheckboxId" class="global-valign-middle ml10" type="checkbox"> <span class="global-valign-middle">Append-hexadecimal</span> <button id="showHelpButtonId" class="ml20" 
+title="Display help info for this panel">Show Help</button> <button id="bottomCollapseButtonId" class="global-valign-middle" title="Show more options for this panel">&#8645;</button></div><div 
+id="bottomCollapseDivId" hidden><div id="helpPanelId" hidden><ul><li>The raw message cache is disabled by default and must be started with the [Start] button.</li><li>
+Log is limited to incoming websocket stream messages (IRC server messages)</li><li>Messages prefixed with &quot;-->&quot; are outgoing IRC commands echoed back by the web server.</li><li>
 Messages like HEARTBEAT and UPDATE are web server to browser commands (see Documentation web page)</li><li>During logging, message cache reloads via HTTP fetch request are omitted.</li><li>
 The server's message cache can be viewed separately using the [Fetch cache] button.</li><li>Optional hexadecimal to view non-printable characters (Not available with Fetch Cache)</li><li>
 Optional append parsedMessage in JSON format (Not available with Fetch Cache)</li><li>To start raw log before page initialization, append the hash &quot;#LOG_RAW&quot; to page URL.</li></ul></div><div
