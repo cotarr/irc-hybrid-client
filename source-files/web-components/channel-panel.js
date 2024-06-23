@@ -2407,6 +2407,12 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       'Enable audio beep sound when new nickname joins channel';
     this.shadowRoot.getElementById('beep3CheckBoxId').title =
       'Enable audio beep sound when your own nickname is identified in text';
+    this.shadowRoot.getElementById('noOpenOnJoinCheckBoxId').title =
+      'Disable auto-open of hidden channel panel when new nickname enters';
+    this.shadowRoot.getElementById('noOpenOnMessageCheckBoxId').title =
+      'Disable auto-open of hidden channel panel for channel messages';
+    this.shadowRoot.getElementById('noOpenOnModeCheckBoxId').title =
+      'Disable auto-open of hidden channel panel for channel mode changes';
   };
 
   /**

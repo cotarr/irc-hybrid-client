@@ -1748,7 +1748,10 @@ this.shadowRoot.getElementById('activeChannelCountIconId').title='Count of the n
 ;this.shadowRoot.getElementById('newChannelButtonId').title='Create new IRC channel panel using entered channel name'
 ;this.shadowRoot.getElementById('beep1CheckBoxId').title='When checked, open new channel panels with audio beep enabled'
 ;this.shadowRoot.getElementById('beep2CheckBoxId').title='When checked, open new channel panels with audio beep enabled'
-;this.shadowRoot.getElementById('beep3CheckBoxId').title='When checked, open new channel panels with audio beep enabled'};timerTickHandler=()=>{
+;this.shadowRoot.getElementById('beep3CheckBoxId').title='When checked, open new channel panels with audio beep enabled'
+;this.shadowRoot.getElementById('noOpenOnJoinCheckBoxId').title='Disable auto-open of hidden channel panel when new nickname enters'
+;this.shadowRoot.getElementById('noOpenOnMessageCheckBoxId').title='Disable auto-open of hidden channel panel for channel messages'
+;this.shadowRoot.getElementById('noOpenOnModeCheckBoxId').title='Disable auto-open of hidden channel panel for channel mode changes'};timerTickHandler=()=>{
 const channelsElements=document.getElementById('channelsContainerId');const channelEls=Array.from(channelsElements.children);channelEls.forEach((chanEl=>{chanEl.timerTickHandler()}))}
 ;initializePlugin=()=>{this._loadBeepEnable();this._loadNoAutoOpen();this._setFixedElementTitles()};connectedCallback(){
 this.shadowRoot.getElementById('closePanelButtonId').addEventListener('click',(()=>{this.hidePanel()}));this.shadowRoot.getElementById('collapsePanelButtonId').addEventListener('click',(()=>{
@@ -2156,7 +2159,10 @@ if(typeof event.detail.except==='string'){if(event.detail.except!==this.id){this
 ;this.shadowRoot.getElementById('autocompleteCheckboxId').title='Enable with trigger (tab) or (space-space) on mobile, '+'disable if space character conflict with input'
 ;this.shadowRoot.getElementById('beep1CheckBoxId').title='Enable audio beep sound for each incoming message'
 ;this.shadowRoot.getElementById('beep2CheckBoxId').title='Enable audio beep sound when new nickname joins channel'
-;this.shadowRoot.getElementById('beep3CheckBoxId').title='Enable audio beep sound when your own nickname is identified in text'};timerTickHandler=()=>{if(this.activityIconInhibitTimer>0){
+;this.shadowRoot.getElementById('beep3CheckBoxId').title='Enable audio beep sound when your own nickname is identified in text'
+;this.shadowRoot.getElementById('noOpenOnJoinCheckBoxId').title='Disable auto-open of hidden channel panel when new nickname enters'
+;this.shadowRoot.getElementById('noOpenOnMessageCheckBoxId').title='Disable auto-open of hidden channel panel for channel messages'
+;this.shadowRoot.getElementById('noOpenOnModeCheckBoxId').title='Disable auto-open of hidden channel panel for channel mode changes'};timerTickHandler=()=>{if(this.activityIconInhibitTimer>0){
 this.activityIconInhibitTimer--}};initializePlugin=()=>{const manageChannelsPanelEl=document.getElementById('manageChannelsPanel')
 ;if(window.globals.webState.channels.indexOf(this.channelName.toLowerCase())>=0){throw new Error('createChannelEl: channel already exist')}
 window.globals.webState.channels.push(this.channelName.toLowerCase());this.initIrcStateIndex=window.globals.ircState.channels.indexOf(this.channelName.toLowerCase())

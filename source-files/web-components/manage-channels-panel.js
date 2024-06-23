@@ -545,6 +545,12 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
       'When checked, open new channel panels with audio beep enabled';
     this.shadowRoot.getElementById('beep3CheckBoxId').title =
       'When checked, open new channel panels with audio beep enabled';
+    this.shadowRoot.getElementById('noOpenOnJoinCheckBoxId').title =
+      'Disable auto-open of hidden channel panel when new nickname enters';
+    this.shadowRoot.getElementById('noOpenOnMessageCheckBoxId').title =
+      'Disable auto-open of hidden channel panel for channel messages';
+    this.shadowRoot.getElementById('noOpenOnModeCheckBoxId').title =
+      'Disable auto-open of hidden channel panel for channel mode changes';
   };
 
   /**

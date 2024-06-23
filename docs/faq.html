@@ -168,14 +168,18 @@
             when new private message windows are created.
             The data is used to select previous checkbox state when reloading the page.
             <br><br>
-            4) Color Theme - A string value of "light" or "dark" is saved to the localStorage 
+            4) Disable auto-open of channel panels - A boolean flag used to inhibit auto-open of channel 
+            panels for channel messages, mode changes, and when a new nickname enters.
+            The data is used to select previous checkbox state when reloading the page.
+            <br><br>
+            5) Color Theme - A string value of "light" or "dark" is saved to the localStorage 
             property colorTheme.
             <br><br>
-            5) Persisted Websocket State - Two boolean flags are stored to indicate if the websocket should 
+            6) Persisted Websocket State - Two boolean flags are stored to indicate if the websocket should 
             automatically connect on the next page load or reload. By default, the websocket will reconnect automatically 
             if the record is not present. This is referred to as Standby state.
             <br><br>
-            6) Saved Example IRC Command - In the show-raw panel used to display raw IRC server message,
+            7) Saved Example IRC Command - In the show-raw panel used to display raw IRC server message,
             there is an input field used to submit example IRC server messages to the remote IRC command parser.
             Should an error occur when the browser receives a message from the IRC server, 
             the problematic message can be copy/paste from the raw message log and debugged while observing 

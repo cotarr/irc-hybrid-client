@@ -120,9 +120,17 @@
               On this panel, the (0) icon at the top indicates the number of active IRC 
               channel panels. Other IRC channel names may be entered ad-hoc in the input field
               to the left of the [Join Channel] button.
+            </p><p>
               At the bottom of the panel, check boxes indicate if new channel panels should be created 
               with audio beep sounds enabled by default. The beep sounds are configurable 
               in each channel.
+            </p><p>
+              By default, hidden channel panels will auto-open themselves when a new nickname 
+              joins, the channel mode changes, or a new channel message is received.
+              The auto-open feature of hidden panels may disabled as the default when 
+              creating new channels. The checkboxes used to disable auto-open are 
+              not shown in the image. This is configurable in each channel.
+              Channels displayed as a collapsed bar will not auto-open, only hidden panels.
             </p>
           </div>
           <div class="image-photo">
@@ -273,6 +281,12 @@
               There are instruction for configuration of custom sounds in the
               <a href="login-config.html">Login Config</a> section.
             </p>
+            <p>
+              By default, hidden channel panels will auto-open when a new nickname 
+              joins, the channel mode changes, or a new channel message is received.
+              Three checkboxes may be used to disable auto-open of hidden panels.  
+              The checkboxes are not not shown in the current image image.
+            </p>
           </div>
           <div class="image-photo">
             <img src=images/channel-settings.png width="385" height="732"alt="Channel panel settings">
@@ -374,9 +388,11 @@
             </p>
             <p>
               A panel that has been collapsed into a bar will increment unread 
-              message icons when new messages arrive.
-              Hidden panels will open and scroll into position.
+              message icons when new messages arrive, but collapsed channel will not auto-open.
+              Hidden panels will open and scroll into position when channel events occur.              
               This behavior is summarized in the help panel.
+              Hidden panels may be inhibited from auto-open using checkboxes in the 
+              bottom section of the channel panel.
             </p>
 
           </div>

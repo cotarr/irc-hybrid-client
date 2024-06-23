@@ -37,6 +37,10 @@ collapsed panel stays collapsed but increment counter, hidden will auto-open whe
 - In channel panel incoming MODE and TOPIC may be inhibited from auto-open panel, using Mode inhibit checkbox
 - In channel panel incoming NOTICE, PRIVMSG may be inhibited from auto-open panel, using Message inhibit checkbox
 
+- Added title to checkboxes for popup tooltips.
+- Update help panel with auto-open disable instructions.
+- Updated /docs/ with auto-open inhibit checkboxes.
+
 ## [v2.0.14](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.0.14) 2024-06-22
 
 ### Security Patch
