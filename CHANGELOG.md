@@ -11,31 +11,37 @@ and this project adheres to
 ## Next v2.0.15-Dev (Draft)
 
 This is a general improvement for management of visibility when multiple channels are open at the same time.
-The existing concept was to designate channels that were collapsed into a bar to stay 
-collapsed during activity and use the displayed message counter to show activity.
-By contrast, hidden channel panels would auto-open when a channel message occurs 
-and a new nick JOIN's the channel. There were problems with the this approach 
-because /MODE changes, like +v, were always opening the window from collapsed.
-Channel with auto-voice therefore are always popping open.
-To improve this, checkboxes for inhibit auto-open of the panel is added for Join, Message, and Mode.
-These are handled same as audible sound beep configuration, saved in the browser local storage until logout.
+
+Channel Panel Behavior:
+
+Hidden panels may auto-open in response to channel events. Channel panels that have been collapsed to a bar should never open, but show counter values in the bar.
+
+Issue 1 - Cannel /MODE changes had been configured to always open a channel upon mode changes.
+Channels with auto-voice therefore are always popping open from collapsed bars.
+
+Issue 2 - Users with poor network connections cause channel panels to open frequently from repeated JOIN events.
+
+Solution: Add configuration to allow auto-open for messages, independent of join and mode events.
+This will allow hidden panels to auto-open upon channel messages, but remain closed for join and mode events.
+
+Checkboxes for inhibit auto-open of the panel have added for Join, Message, and Mode.
+These are saved in the browser local storage until logout.
 Each channel has it's own settings. The channel management window has checkboxes to set 
 the default auto-open configuration for new channels that have no setting in the local storage.
 
-With their commit, when auto-open is not inhibited, behavior is same as before, 
-collapsed panel stays collapsed but increment counter, hidden will auto-open when not inhibited.
+Backwards compatibility: By default, hidden panels will always auto-open unless disabled by the user.
 
 ### Change
 
-- In channel management panel, added 3 checkboxes for default behavior of inhibit auto-open for Join, Message and Mode.
-- In channel panel, added 3 checkboxes for inhibit auto-open for Join, Message and Mode.
-- Added code to save checkbox status to local storage, same as audio beep configuration. 
+- In channel management panel, added 3 checkboxes for default behavior of auto-open for Join, Message and Mode.
+- In channel panel, added 3 checkboxes to enable auto-open for Join, Message and Mode.
+- Added code to save and load checkbox status using local storage. 
 
-- In channel panel incoming MODE, NICK, NOTICE,  will increment message counter (in addition to PRIVMSG)
-- In channel panel incoming KICK will always open both hidden or collapsed panel
-- In channel panel incoming JOIN may be inhibited from auto-open panel, using Join inhibit checkbox
-- In channel panel incoming MODE and TOPIC may be inhibited from auto-open panel, using Mode inhibit checkbox
-- In channel panel incoming NOTICE, PRIVMSG may be inhibited from auto-open panel, using Message inhibit checkbox
+- Counter change: incoming MODE, NICK, NOTICE,  will increment message counter (in addition to PRIVMSG)
+
+- In channel panel incoming JOIN may be inhibited from auto-open panel, using Join auto-open checkbox
+- In channel panel incoming MODE, KICK and TOPIC may be inhibited from auto-open panel, using Mode auto-open checkbox
+- In channel panel incoming NOTICE and PRIVMSG may be inhibited from auto-open panel, using Message auto-open checkbox
 
 - Added title to checkboxes for popup tooltips.
 - Update help panel with auto-open disable instructions.

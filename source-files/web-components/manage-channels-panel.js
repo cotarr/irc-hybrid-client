@@ -389,13 +389,6 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
     const beep2CheckBoxEl = this.shadowRoot.getElementById('beep2CheckBoxId');
     const beep3CheckBoxEl = this.shadowRoot.getElementById('beep3CheckBoxId');
 
-    const noOpenOnJoinCheckBoxEl =
-      this.shadowRoot.getElementById('noOpenOnJoinCheckBoxId');
-    const noOpenOnMessageCheckBoxEl =
-      this.shadowRoot.getElementById('noOpenOnMessageCheckBoxId');
-    const noOpenOnModeCheckBoxEl =
-      this.shadowRoot.getElementById('noOpenOnModeCheckBoxId');
-
     if (this.hasAttribute('beep1-enabled')) {
       beep1CheckBoxEl.checked = true;
     } else {
@@ -412,20 +405,28 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
       beep3CheckBoxEl.checked = false;
     }
 
-    if (this.hasAttribute('no-open-on-join')) {
-      noOpenOnJoinCheckBoxEl.checked = true;
+    const autoOpenOnMessageCheckBoxEl =
+      this.shadowRoot.getElementById('autoOpenOnMessageCheckBoxId');
+    const autoOpenOnJoinCheckBoxEl =
+      this.shadowRoot.getElementById('autoOpenOnJoinCheckBoxId');
+    const autoOpenOnModeCheckBoxEl =
+      this.shadowRoot.getElementById('autoOpenOnModeCheckBoxId');
+
+    // Enabled = NOT disabled, inverted
+    if (this.hasAttribute('disable-open-on-message')) {
+      autoOpenOnMessageCheckBoxEl.checked = false;
     } else {
-      noOpenOnJoinCheckBoxEl.checked = false;
+      autoOpenOnMessageCheckBoxEl.checked = true;
     }
-    if (this.hasAttribute('no-open-on-message')) {
-      noOpenOnMessageCheckBoxEl.checked = true;
+    if (this.hasAttribute('disable-open-on-join')) {
+      autoOpenOnJoinCheckBoxEl.checked = false;
     } else {
-      noOpenOnMessageCheckBoxEl.checked = false;
+      autoOpenOnJoinCheckBoxEl.checked = true;
     }
-    if (this.hasAttribute('no-open-on-mode')) {
-      noOpenOnModeCheckBoxEl.checked = true;
+    if (this.hasAttribute('disable-open-on-mode')) {
+      autoOpenOnModeCheckBoxEl.checked = false;
     } else {
-      noOpenOnModeCheckBoxEl.checked = false;
+      autoOpenOnModeCheckBoxEl.checked = true;
     }
   };
 
@@ -434,7 +435,7 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
    * channel beep enabled checkbox state.
    * Called when checkbox is clicked to enable/disable
    */
-  _updateLocalStorageBeepEnable = () => {
+  _saveBeepEnableToLocalStorage = () => {
     // new object for channel beep enable status
     const now = Math.floor(Date.now() / 1000);
     const defaultChannelBeepsObj = {
@@ -444,12 +445,12 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
       beep3: this.hasAttribute('beep3-enabled')
     };
     window.localStorage.setItem('defaultChannelBeepEnable', JSON.stringify(defaultChannelBeepsObj));
-  }; // _updateLocalStorageBeepEnable()
+  }; // _saveBeepEnableToLocalStorage()
 
   /**
    * Load web browser local storage default beep enable state.
    */
-  _loadBeepEnable = () => {
+  _loadBeepEnableFromLocalStorage = () => {
     let defaultChannelBeepsObj = null;
     try {
       defaultChannelBeepsObj = JSON.parse(window.localStorage.getItem('defaultChannelBeepEnable'));
@@ -475,57 +476,60 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
       }
       this._updateVisibility();
     }
-  }; // _loadBeepEnable()
+  }; // _loadBeepEnableFromLocalStorage()
 
   /**
    * Function to update window.localStorage with IRC
    * channel inhibit auto-open panel on events.
    * Called when checkbox is clicked to enable/disable
    */
-  _updateLocalNoAutoOpen = () => {
+  _saveAutoOpenToLocalStorage = () => {
     // new object for channel beep enable status
     const now = Math.floor(Date.now() / 1000);
-    const defaultChannelNoAutoOpenObj = {
+    const defaultChannelAutoOpenObj = {
       timestamp: now,
-      onJoin: this.hasAttribute('no-open-on-join'),
-      onMessage: this.hasAttribute('no-open-on-message'),
-      onMode: this.hasAttribute('no-open-on-mode')
+      disableOnMessage: this.hasAttribute('disable-open-on-message'),
+      disableOnJoin: this.hasAttribute('disable-open-on-join'),
+      disableOnMode: this.hasAttribute('disable-open-on-mode')
     };
-    window.localStorage.setItem('defaultChannelNoAutoOpen',
-      JSON.stringify(defaultChannelNoAutoOpenObj));
-  }; // _updateLocalNoAutoOpen()
+    window.localStorage.setItem('defaultChannelAutoOpenOn',
+      JSON.stringify(defaultChannelAutoOpenObj));
+  }; // _saveAutoOpenToLocalStorage()
 
   /**
    * Load web browser default local storage auto-open panel on events.
    */
-  _loadNoAutoOpen = () => {
-    let defaultChannelNoAutoOpenObj = null;
+  _loadAutoOpenFromLocalStorage = () => {
+    let defaultChannelAutoOpenObj = null;
     try {
-      defaultChannelNoAutoOpenObj =
-        JSON.parse(window.localStorage.getItem('defaultChannelNoAutoOpen'));
+      defaultChannelAutoOpenObj =
+        JSON.parse(window.localStorage.getItem('defaultChannelAutoOpenOn'));
     } catch (error) {
       // Ignore errors
       // console.log(error);
     }
-    if (defaultChannelNoAutoOpenObj) {
-      if (defaultChannelNoAutoOpenObj.onJoin) {
-        this.setAttribute('no-open-on-join', '');
+    if (defaultChannelAutoOpenObj) {
+      if (defaultChannelAutoOpenObj.disableOnMessage) {
+        this.setAttribute('disable-open-on-message', '');
       } else {
-        this.removeAttribute('no-open-on-join');
+        this.removeAttribute('disable-open-on-message');
       }
-      if (defaultChannelNoAutoOpenObj.onMessage) {
-        this.setAttribute('no-open-on-message', '');
+      if (defaultChannelAutoOpenObj.disableOnJoin) {
+        this.setAttribute('disable-open-on-join', '');
       } else {
-        this.removeAttribute('no-open-on-message');
+        this.removeAttribute('disable-open-on-join');
       }
-      if (defaultChannelNoAutoOpenObj.onMode) {
-        this.setAttribute('no-open-on-mode', '');
+      if (defaultChannelAutoOpenObj.disableOnMode) {
+        this.setAttribute('disable-open-on-mode', '');
       } else {
-        this.removeAttribute('no-open-on-mode');
+        this.removeAttribute('disable-open-on-mode');
       }
-      this._updateVisibility();
     }
-  }; // _loadNoAutoOpen()
+    // else ...
+    //    No configuration, default is enabled (Not disabled)
+    //    The disabled attributes are not added to channel element
+    this._updateVisibility();
+  }; // _loadAutoOpenFromLocalStorage()
 
   /**
    * Add "title" attribute for mouse hover tool-tips.
@@ -545,12 +549,12 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
       'When checked, open new channel panels with audio beep enabled';
     this.shadowRoot.getElementById('beep3CheckBoxId').title =
       'When checked, open new channel panels with audio beep enabled';
-    this.shadowRoot.getElementById('noOpenOnJoinCheckBoxId').title =
-      'Disable auto-open of hidden channel panel when new nickname enters';
-    this.shadowRoot.getElementById('noOpenOnMessageCheckBoxId').title =
-      'Disable auto-open of hidden channel panel for channel messages';
-    this.shadowRoot.getElementById('noOpenOnModeCheckBoxId').title =
-      'Disable auto-open of hidden channel panel for channel mode changes';
+    this.shadowRoot.getElementById('autoOpenOnJoinCheckBoxId').title =
+      'Enable auto-open of hidden channel panel when new nickname enters';
+    this.shadowRoot.getElementById('autoOpenOnModeCheckBoxId').title =
+      'Enable auto-open of hidden channel panel for channel mode changes';
+    this.shadowRoot.getElementById('autoOpenOnMessageCheckBoxId').title =
+      'Enable auto-open of hidden channel panel for channel messages';
   };
 
   /**
@@ -569,8 +573,8 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
   // ------------------
   initializePlugin = () => {
     // Load beep sound configuration from local storage
-    this._loadBeepEnable();
-    this._loadNoAutoOpen();
+    this._loadBeepEnableFromLocalStorage();
+    this._loadAutoOpenFromLocalStorage();
     this._setFixedElementTitles();
   }; // initializePlugin()
 
@@ -615,7 +619,7 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
         this.setAttribute('beep1-enabled', '');
         document.getElementById('beepSounds').playBeep1Sound();
       }
-      this._updateLocalStorageBeepEnable();
+      this._saveBeepEnableToLocalStorage();
       this._updateVisibility();
     });
 
@@ -626,7 +630,7 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
         this.setAttribute('beep2-enabled', '');
         document.getElementById('beepSounds').playBeep2Sound();
       }
-      this._updateLocalStorageBeepEnable();
+      this._saveBeepEnableToLocalStorage();
       this._updateVisibility();
     });
 
@@ -637,38 +641,38 @@ window.customElements.define('manage-channels-panel', class extends HTMLElement 
         this.setAttribute('beep3-enabled', '');
         document.getElementById('beepSounds').playBeep3Sound();
       }
-      this._updateLocalStorageBeepEnable();
+      this._saveBeepEnableToLocalStorage();
       this._updateVisibility();
     });
 
     /**
-     * Inhibit (enabled by default) auto open channel panel on events
+     * Toggle auto open channel panel on events
      */
-    this.shadowRoot.getElementById('noOpenOnJoinCheckBoxId').addEventListener('click', () => {
-      if (this.hasAttribute('no-open-on-join')) {
-        this.removeAttribute('no-open-on-join');
+    this.shadowRoot.getElementById('autoOpenOnMessageCheckBoxId').addEventListener('click', () => {
+      if (this.hasAttribute('disable-open-on-message')) {
+        this.removeAttribute('disable-open-on-message');
       } else {
-        this.setAttribute('no-open-on-join', '');
+        this.setAttribute('disable-open-on-message', '');
       }
-      this._updateLocalNoAutoOpen();
+      this._saveAutoOpenToLocalStorage();
       this._updateVisibility();
     });
-    this.shadowRoot.getElementById('noOpenOnMessageCheckBoxId').addEventListener('click', () => {
-      if (this.hasAttribute('no-open-on-message')) {
-        this.removeAttribute('no-open-on-message');
+    this.shadowRoot.getElementById('autoOpenOnJoinCheckBoxId').addEventListener('click', () => {
+      if (this.hasAttribute('disable-open-on-join')) {
+        this.removeAttribute('disable-open-on-join');
       } else {
-        this.setAttribute('no-open-on-message', '');
+        this.setAttribute('disable-open-on-join', '');
       }
-      this._updateLocalNoAutoOpen();
+      this._saveAutoOpenToLocalStorage();
       this._updateVisibility();
     });
-    this.shadowRoot.getElementById('noOpenOnModeCheckBoxId').addEventListener('click', () => {
-      if (this.hasAttribute('no-open-on-mode')) {
-        this.removeAttribute('no-open-on-mode');
+    this.shadowRoot.getElementById('autoOpenOnModeCheckBoxId').addEventListener('click', () => {
+      if (this.hasAttribute('disable-open-on-mode')) {
+        this.removeAttribute('disable-open-on-mode');
       } else {
-        this.setAttribute('no-open-on-mode', '');
+        this.setAttribute('disable-open-on-mode', '');
       }
-      this._updateLocalNoAutoOpen();
+      this._saveAutoOpenToLocalStorage();
       this._updateVisibility();
     });
 
