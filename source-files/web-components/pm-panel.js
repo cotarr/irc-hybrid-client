@@ -1031,7 +1031,7 @@ window.customElements.define('pm-panel', class extends HTMLElement {
 
     // ----------------------------------
     // On creating a new PM chat element
-    // initialize the audio line-beep setting
+    // initialize the audio message-beep setting
     //
     // Note, reloading from cache destroys and creates
     // new PM elements, and will re-initialize

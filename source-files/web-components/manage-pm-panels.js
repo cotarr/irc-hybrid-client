@@ -499,7 +499,7 @@ window.customElements.define('manage-pm-panels', class extends HTMLElement {
     });
 
     // ---------------------------------------
-    // Event handler for open with line-beep checkbox
+    // Event handler for open with message-beep checkbox
     // ---------------------------------------
     this.shadowRoot.getElementById('openPmWithBeepCheckBoxId')
       .addEventListener('click', (event) => {
