@@ -29,7 +29,7 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
-import rotatingFileStream from 'rotating-file-stream';
+import { createStream } from 'rotating-file-stream';
 
 import config from '../config/index.mjs';
 
@@ -100,7 +100,7 @@ if ((nodeEnv !== 'development') && (!nodeDebugLog)) {
       logStream += ' size:' + logRotationSize;
     }
     logStream += ')';
-    accessLogStream = rotatingFileStream.createStream(accessLogFilename, rotateOptions);
+    accessLogStream = createStream(accessLogFilename, rotateOptions);
     accessLogOptions.stream = accessLogStream;
   } else {
     // Else, log filename rotation disabled, use native fs module
@@ -170,7 +170,7 @@ if ((nodeEnv !== 'development') && (!nodeDebugLog)) {
     if ((logRotationSize) && (logRotationSize.length > 1)) {
       ircRotateOptions.size = logRotationSize;
     }
-    ircLogStream = rotatingFileStream.createStream(ircLogFilename, ircRotateOptions);
+    ircLogStream = createStream(ircLogFilename, ircRotateOptions);
   } else {
     ircLogStream = fs.createWriteStream(ircLogFilename, {
       encoding: 'utf8',

@@ -31,7 +31,7 @@ the default auto-open configuration for new channels that have no setting in the
 
 Backwards compatibility: By default, hidden panels will always auto-open unless disabled by the user.
 
-### Change
+### Change (auto-open checkboxes)
 
 - In channel management panel, added 3 checkboxes for default behavior of auto-open for Join, Message and Mode.
 - In channel panel, added 3 checkboxes to enable auto-open for Join, Message and Mode.
@@ -46,6 +46,11 @@ Backwards compatibility: By default, hidden panels will always auto-open unless 
 - Added title to checkboxes for popup tooltips.
 - Update help panel with auto-open disable instructions.
 - Updated /docs/ with auto-open inhibit checkboxes.
+
+### Change (Dependency Updates)
+
+- Updated npm dependencies: express-rate-limit@7.3.1, express-validator@7.1.0, redis@4.6.14, rotating-file-stream@3.2.3, utf-8-validate@6.0.4
+- In /server/irc/irc-client-log.mjs, the rotating-file-stream v3.2.3 update removed default export from ESM module. The import statement was changed to pull in exported function name directly instead of the default. Updated references in the code.
 
 ## [v2.0.14](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.0.14) 2024-06-22
 
