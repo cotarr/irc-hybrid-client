@@ -70,6 +70,16 @@ customElements.define('nav-menu', class extends HTMLElement {
       .classList.contains('nav-dropdown-div-show')) {
       // Call header-bar method, which calls hamburger-icon to set attributes
       document.getElementById('headerBar').updateMenuOpenState('open');
+      // After open the dropdown, move focus to top visible item.
+      // TODO Work around, iPhone not seeing focus change, timer solved.
+      setTimeout(() => {
+        if ((window.globals.webState.webConnected) &&
+          (window.globals.ircState.ircConnected)) {
+          this.shadowRoot.getElementById('group01ButtonId').focus();
+        } else {
+          this.shadowRoot.getElementById('group03ButtonId').focus();
+        }
+      }, 100);
     } else {
       // Call header-bar method, which calls hamburger-icon to set attributes
       document.getElementById('headerBar').updateMenuOpenState('closed');
@@ -157,7 +167,7 @@ customElements.define('nav-menu', class extends HTMLElement {
           // Since there are 3 layered elements here, and event.stopPropagation() is called.
           // It is necessary to add an ID to each element, but id must be unique
           // console.log('navMenu pmPanels adding pm panel', pmPanels[i]);
-          const pmPanelMenuItem = document.createElement('div');
+          const pmPanelMenuItem = document.createElement('button');
           pmPanelMenuItem.classList.add('nav-group01');
           pmPanelMenuItem.classList.add('nav-level1');
           pmPanelMenuItem.pmPanelName = pmPanels[i].toLowerCase();
@@ -321,7 +331,7 @@ customElements.define('nav-menu', class extends HTMLElement {
           // Since there are 3 layered elements here, and event.stopPropagation() is called.
           // It is necessary to add an ID to each element, but id must be unique
           // console.log('navMenu channels adding channel', channels[i]);
-          const channelMenuItem = document.createElement('div');
+          const channelMenuItem = document.createElement('button');
           channelMenuItem.classList.add('nav-group02');
           channelMenuItem.classList.add('nav-level1');
           channelMenuItem.channelName = channels[i].toLowerCase();
@@ -476,18 +486,42 @@ customElements.define('nav-menu', class extends HTMLElement {
     this.shadowRoot.getElementById('group01ButtonId').addEventListener('click', (event) => {
       event.stopPropagation();
       _toggleDropdownOnMenuClick('nav-group01');
+      const group01ButtonEl = this.shadowRoot.getElementById('group01ButtonId');
+      if (group01ButtonEl.getAttribute('aria-expanded') === 'true') {
+        group01ButtonEl.setAttribute('aria-expanded', 'false');
+      } else {
+        group01ButtonEl.setAttribute('aria-expanded', 'true');
+      }
     });
     this.shadowRoot.getElementById('group02ButtonId').addEventListener('click', (event) => {
       event.stopPropagation();
       _toggleDropdownOnMenuClick('nav-group02');
+      const group02ButtonEl = this.shadowRoot.getElementById('group02ButtonId');
+      if (group02ButtonEl.getAttribute('aria-expanded') === 'true') {
+        group02ButtonEl.setAttribute('aria-expanded', 'false');
+      } else {
+        group02ButtonEl.setAttribute('aria-expanded', 'true');
+      }
     });
     this.shadowRoot.getElementById('group03ButtonId').addEventListener('click', (event) => {
       event.stopPropagation();
       _toggleDropdownOnMenuClick('nav-group03');
+      const group03ButtonEl = this.shadowRoot.getElementById('group03ButtonId');
+      if (group03ButtonEl.getAttribute('aria-expanded') === 'true') {
+        group03ButtonEl.setAttribute('aria-expanded', 'false');
+      } else {
+        group03ButtonEl.setAttribute('aria-expanded', 'true');
+      }
     });
     this.shadowRoot.getElementById('group04ButtonId').addEventListener('click', (event) => {
       event.stopPropagation();
       _toggleDropdownOnMenuClick('nav-group04');
+      const group04ButtonEl = this.shadowRoot.getElementById('group04ButtonId');
+      if (group04ButtonEl.getAttribute('aria-expanded') === 'true') {
+        group04ButtonEl.setAttribute('aria-expanded', 'false');
+      } else {
+        group04ButtonEl.setAttribute('aria-expanded', 'true');
+      }
     });
 
     // --------------------------------

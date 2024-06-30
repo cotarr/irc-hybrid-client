@@ -1,6 +1,24 @@
 
 /* nav-menu */
 
+/* Dropdown menu button inherit light, dark color theme from parent div */
+button.nav-group {
+  color: inherit;
+  background-color: inherit;
+  box-shadow: initial;
+}
+button.nav-level0  {
+  color: inherit;
+  background-color: inherit;
+  box-shadow: initial;
+}
+
+button.nav-level1 {
+  color: inherit;
+  background-color: inherit;
+  box-shadow: initial;
+}
+
 .nav-menu-theme-light {
   background-color: white;
   color: black;
@@ -25,34 +43,45 @@
 }
 .nav-group {
   border: unset;
+  border-radius: 0px;
   cursor: pointer;
   display: block;
   font-size: 120%;
   font-weight: bold;
-  min-width: 212px;
+  min-width: 282px;
   padding: 7px 16px 6px 5px;
   text-align: left;
 }      
 .nav-group:hover {
   color: #dd00dd;
 }
+.nav-group:focus {
+  /* Halfway between light and dark theme */
+  border: 2px solid #808080;
+  border-radius: 8px;
+}
 .nav-group[unavailable] {
   display: none;
 }
 .nav-level0 {
   border: unset;
+  border-radius: 0px;
   cursor: pointer;
   display: block;
   font-size: 100%;
   font-weight: normal;
-  min-width: 212px;
+  min-width: 282px;
   padding: 7px 16px 7px 5px;
   text-align: left;
 }
 .nav-level0:hover {
   color: #dd00dd;
 }
- .nav-level0[collapsed] {
+.nav-level0:focus {
+  border: 2px solid #808080;
+  border-radius: 8px;
+}
+.nav-level0[collapsed] {
   display: none;
 }
 .nav-level1 {
@@ -61,12 +90,16 @@
   display: block;
   font-size: 100%;
   font-weight: normal;
-  min-width: 212px;
+  min-width: 282px;
   padding: 7px 16px 6px 32px;
   text-align: left;
 }
 .nav-level1:hover {
   color: #dd00dd;
+}
+.nav-level0:focus {
+  border: 2px solid #808080;
+  border-radius: 8px;
 }
 .nav-level1[collapsed] {
   display: none;

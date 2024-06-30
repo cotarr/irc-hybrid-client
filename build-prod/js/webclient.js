@@ -401,8 +401,9 @@ this.showPanel()}}else if(Array.isArray(event.detail.except)){if(event.detail.ex
 this.showPanel()}}))}});customElements.define('nav-menu',class extends HTMLElement{constructor(){super();const template=document.getElementById('navMenuTemplate')
 ;const templateContent=template.content;this.attachShadow({mode:'open'}).appendChild(templateContent.cloneNode(true));this.previousChannels=[];this.previousPmPanels=[];this.arrayOfMenuElements=[]
 ;this.ircConnectedLast=null;this.webConnectedLast=null}toggleDropdownMenu=()=>{this.shadowRoot.getElementById('navDropdownDivId').classList.toggle('nav-dropdown-div-show')
-;if(this.shadowRoot.getElementById('navDropdownDivId').classList.contains('nav-dropdown-div-show')){document.getElementById('headerBar').updateMenuOpenState('open')}else{
-document.getElementById('headerBar').updateMenuOpenState('closed')}};closeDropdownMenu=()=>{this.shadowRoot.getElementById('navDropdownDivId').classList.remove('nav-dropdown-div-show')
+;if(this.shadowRoot.getElementById('navDropdownDivId').classList.contains('nav-dropdown-div-show')){document.getElementById('headerBar').updateMenuOpenState('open');setTimeout((()=>{
+if(window.globals.webState.webConnected&&window.globals.ircState.ircConnected){this.shadowRoot.getElementById('group01ButtonId').focus()}else{this.shadowRoot.getElementById('group03ButtonId').focus()}
+}),100)}else{document.getElementById('headerBar').updateMenuOpenState('closed')}};closeDropdownMenu=()=>{this.shadowRoot.getElementById('navDropdownDivId').classList.remove('nav-dropdown-div-show')
 ;document.getElementById('headerBar').updateMenuOpenState('closed')};handleServerUnreadUpdate=status=>{const itemEl=this.shadowRoot.getElementById('item3_3_Id');if(status){
 itemEl.textContent='IRC Server (New Messages)'}else{itemEl.textContent='IRC Server (Alt-S)'}};handleNoticeUnreadUpdate=status=>{const itemEl=this.shadowRoot.getElementById('item3_5_Id');if(status){
 itemEl.textContent='Notices (New Messages)'}else{itemEl.textContent='Notices'}};handleWallopsUnreadUpdate=status=>{const itemEl=this.shadowRoot.getElementById('item3_4_Id');if(status){
@@ -410,7 +411,7 @@ itemEl.textContent='Wallops (New Messages)'}else{itemEl.textContent='Wallops'}};
 ;if(pmPanels.length!==this.previousPmPanels.length){changed=true}else if(pmPanels.length>0){for(let i=0;i<pmPanels.length;i++){if(pmPanels[i].toLowerCase()!==this.previousPmPanels[i].toLowerCase()){
 changed=true}}}if(changed){const parentEl=this.shadowRoot.getElementById('dropdownMenuPrivMsgContainerId');while(parentEl.firstChild){
 parentEl.firstChild.removeEventListener('click',this.handlePmPanelClick);parentEl.removeChild(parentEl.firstChild)}this.previousPmPanels=[];if(pmPanels.length>0){for(let i=0;i<pmPanels.length;i++){
-const pmPanelMenuItem=document.createElement('div');pmPanelMenuItem.classList.add('nav-group01');pmPanelMenuItem.classList.add('nav-level1');pmPanelMenuItem.pmPanelName=pmPanels[i].toLowerCase()
+const pmPanelMenuItem=document.createElement('button');pmPanelMenuItem.classList.add('nav-group01');pmPanelMenuItem.classList.add('nav-level1');pmPanelMenuItem.pmPanelName=pmPanels[i].toLowerCase()
 ;pmPanelMenuItem.setAttribute('pm-panel-name',pmPanels[i].toLowerCase());if(this.shadowRoot.getElementById('item1_1_Id').hasAttribute('collapsed')){pmPanelMenuItem.setAttribute('collapsed','')}
 const pmPanelNameSpan=document.createElement('span');pmPanelNameSpan.classList.add('mr10');if(pmPanels[i].toLowerCase()===window.globals.webState.activePrivateMessageCsNicks[i].toLowerCase()){
 pmPanelNameSpan.textContent=window.globals.webState.activePrivateMessageCsNicks[i]}else{pmPanelNameSpan.textContent=pmPanels[i]}pmPanelNameSpan.pmPanelName=pmPanels[i].toLowerCase()
@@ -434,7 +435,7 @@ this.shadowRoot.getElementById('item4_6_Id').textContent='Place web page in Stan
 this._showHideItemsInMenu();const channels=Array.from(window.globals.ircState.channels);let changed=false;if(channels.length!==this.previousChannels.length){changed=true}else if(channels.length>0){
 for(let i=0;i<channels.length;i++){if(channels[i].toLowerCase()!==this.previousChannels[i].toLowerCase()){changed=true}}}if(changed){
 const parentEl=this.shadowRoot.getElementById('dropdownMenuChannelContainerId');while(parentEl.firstChild){parentEl.firstChild.removeEventListener('click',this.handleChannelClick)
-;parentEl.removeChild(parentEl.firstChild)}this.previousChannels=[];if(channels.length>0){for(let i=0;i<channels.length;i++){const channelMenuItem=document.createElement('div')
+;parentEl.removeChild(parentEl.firstChild)}this.previousChannels=[];if(channels.length>0){for(let i=0;i<channels.length;i++){const channelMenuItem=document.createElement('button')
 ;channelMenuItem.classList.add('nav-group02');channelMenuItem.classList.add('nav-level1');channelMenuItem.channelName=channels[i].toLowerCase()
 ;channelMenuItem.setAttribute('channel-name',channels[i].toLowerCase());if(this.shadowRoot.getElementById('item2_1_Id').hasAttribute('collapsed')){channelMenuItem.setAttribute('collapsed','')}
 const channelNameSpan=document.createElement('span');channelNameSpan.classList.add('mr10');channelNameSpan.textContent=window.globals.ircState.channelStates[i].csName
@@ -462,48 +463,53 @@ itemEl.lastChild.textContent=channelEl.unreadMessageCount.toString();itemEl.last
 ;document.addEventListener('web-connect-changed',this._handleWebConnectChanged);this.arrayOfMenuElements=this.shadowRoot.querySelectorAll('.nav-level1');const _toggleDropdownOnMenuClick=groupName=>{
 if(this.arrayOfMenuElements.length>0){for(let i=0;i<this.arrayOfMenuElements.length;i++){if(this.arrayOfMenuElements[i].classList.contains(groupName)){
 if(this.arrayOfMenuElements[i].hasAttribute('collapsed')){this.arrayOfMenuElements[i].removeAttribute('collapsed')}else{this.arrayOfMenuElements[i].setAttribute('collapsed','')}}}}}
-;this.shadowRoot.getElementById('group01ButtonId').addEventListener('click',(event=>{event.stopPropagation();_toggleDropdownOnMenuClick('nav-group01')}))
-;this.shadowRoot.getElementById('group02ButtonId').addEventListener('click',(event=>{event.stopPropagation();_toggleDropdownOnMenuClick('nav-group02')}))
-;this.shadowRoot.getElementById('group03ButtonId').addEventListener('click',(event=>{event.stopPropagation();_toggleDropdownOnMenuClick('nav-group03')}))
-;this.shadowRoot.getElementById('group04ButtonId').addEventListener('click',(event=>{event.stopPropagation();_toggleDropdownOnMenuClick('nav-group04')}))
-;this.shadowRoot.getElementById('item1_1_Id').addEventListener('click',(event=>{event.stopPropagation();document.getElementById('managePmPanels').showPanel();this.closeDropdownMenu()}))
-;this.shadowRoot.getElementById('item2_1_Id').addEventListener('click',(event=>{event.stopPropagation();document.getElementById('manageChannelsPanel').showPanel();this.closeDropdownMenu()}))
-;this.shadowRoot.getElementById('item3_1_Id').addEventListener('click',(event=>{event.stopPropagation();document.getElementById('serverListPanel').showPanel();this.closeDropdownMenu()}))
-;this.shadowRoot.getElementById('item3_2_Id').addEventListener('click',(event=>{event.stopPropagation();document.getElementById('ircControlsPanel').showPanel();this.closeDropdownMenu()}))
-;this.shadowRoot.getElementById('item3_3_Id').addEventListener('click',(event=>{event.stopPropagation();document.getElementById('ircServerPanel').showPanel();this.closeDropdownMenu()}))
-;this.shadowRoot.getElementById('item3_4_Id').addEventListener('click',(event=>{event.stopPropagation();document.getElementById('wallopsPanel').showPanel();this.closeDropdownMenu()}))
-;this.shadowRoot.getElementById('item3_5_Id').addEventListener('click',(event=>{event.stopPropagation();document.getElementById('noticePanel').showPanel();this.closeDropdownMenu()}))
-;this.shadowRoot.getElementById('item3_6_Id').addEventListener('click',(event=>{event.stopPropagation();document.getElementById('helpPanel').showPanel()
-;document.dispatchEvent(new CustomEvent('global-scroll-to-top'));this.closeDropdownMenu()}));this.shadowRoot.getElementById('item4_1_Id').addEventListener('click',(event=>{event.stopPropagation()
-;document.getElementById('displayUtils').toggleColorTheme();this.closeDropdownMenu()}));this.shadowRoot.getElementById('item4_2_Id').addEventListener('click',(event=>{event.stopPropagation()
-;document.dispatchEvent(new CustomEvent('show-all-panels'));document.dispatchEvent(new CustomEvent('cancel-zoom'));this.closeDropdownMenu()}))
-;this.shadowRoot.getElementById('item4_3_Id').addEventListener('click',(event=>{event.stopPropagation();document.dispatchEvent(new CustomEvent('collapse-all-panels'))
-;document.dispatchEvent(new CustomEvent('cancel-zoom'));this.closeDropdownMenu()}));this.shadowRoot.getElementById('item4_4_Id').addEventListener('click',(event=>{event.stopPropagation()
-;document.dispatchEvent(new CustomEvent('hide-all-panels'));this.closeDropdownMenu()}));this.shadowRoot.getElementById('item4_5_Id').addEventListener('click',(event=>{event.stopPropagation()
-;document.getElementById('debugPanel').showPanel();this.closeDropdownMenu()}));this.shadowRoot.getElementById('item4_6_Id').addEventListener('click',(event=>{event.stopPropagation()
-;if(window.globals.webState.webConnected||window.globals.webState.webConnecting){document.getElementById('websocketPanel').webConnectNavBarMenuHandler('disconnect')}else{
-document.getElementById('websocketPanel').webConnectNavBarMenuHandler('connect')}this.closeDropdownMenu()}));this.shadowRoot.getElementById('item5_0_Id').addEventListener('click',(event=>{
-event.stopPropagation();document.getElementById('licensePanel').showPanel();this.closeDropdownMenu()}));this.shadowRoot.getElementById('item5_1_Id').addEventListener('click',(event=>{
-event.stopPropagation();document.getElementById('logoutPanel').handleLogoutRequest();this.closeDropdownMenu()}))}});customElements.define('activity-spinner',class extends HTMLElement{constructor(){
-super();const template=document.getElementById('activitySpinnerTemplate');const templateContent=template.content;this.attachShadow({mode:'open'}).appendChild(templateContent.cloneNode(true))
-;this.activitySpinnerCounter=0}requestActivitySpinner=()=>{this.activitySpinnerCounter+=1;this.shadowRoot.getElementById('activitySpinner').removeAttribute('hidden')};cancelActivitySpinner=()=>{
-this.activitySpinnerCounter-=1;if(this.activitySpinnerCounter<0){this.activitySpinnerCounter=0}if(this.activitySpinnerCounter>0){
-this.shadowRoot.getElementById('activitySpinner').removeAttribute('hidden')}else{this.shadowRoot.getElementById('activitySpinner').setAttribute('hidden','')}};resetActivitySpinner=()=>{
-this.activitySpinnerCounter=0;this.shadowRoot.getElementById('activitySpinner').setAttribute('hidden','')};connectedCallback(){if(this.hasAttribute('default')&&this.getAttribute('default')==='show'){
-this.requestActivitySpinner()}else{this.resetActivitySpinner()}}});customElements.define('hamburger-icon',class extends HTMLElement{constructor(){super()
-;const template=document.getElementById('hamburgerIconTemplate');const templateContent=template.content;this.attachShadow({mode:'open'}).appendChild(templateContent.cloneNode(true))
-;this.activitySpinnerCounter=0}updateHamburgerInfo=menuOpenState=>{if(menuOpenState==='open'){this.shadowRoot.getElementById('hamburgerBorderId').setAttribute('aria-expanded','true')}else{
-this.shadowRoot.getElementById('hamburgerBorderId').setAttribute('aria-expanded','false')}};updateHamburgerTitle=newTitle=>{this.shadowRoot.getElementById('hamburgerBorderId').title=newTitle}
-;setColorTheme=theme=>{const hamburgerIconEl=this.shadowRoot.getElementById('hamburgerBorderId');const hamburgerLine1El=this.shadowRoot.getElementById('hamburgerLine1Id')
-;const hamburgerLine2El=this.shadowRoot.getElementById('hamburgerLine2Id');const hamburgerLine3El=this.shadowRoot.getElementById('hamburgerLine3Id');if(theme==='light'){
-hamburgerIconEl.classList.remove('hamburger-icon-theme-dark');hamburgerLine1El.classList.remove('hamburger-line-theme-dark');hamburgerLine2El.classList.remove('hamburger-line-theme-dark')
-;hamburgerLine3El.classList.remove('hamburger-line-theme-dark');hamburgerIconEl.classList.add('hamburger-icon-theme-light');hamburgerLine1El.classList.add('hamburger-line-theme-light')
-;hamburgerLine2El.classList.add('hamburger-line-theme-light');hamburgerLine3El.classList.add('hamburger-line-theme-light')}else if(theme==='dark'){
-hamburgerIconEl.classList.remove('hamburger-icon-theme-light');hamburgerLine1El.classList.remove('hamburger-line-theme-light');hamburgerLine2El.classList.remove('hamburger-line-theme-light')
-;hamburgerLine3El.classList.remove('hamburger-line-theme-light');hamburgerIconEl.classList.add('hamburger-icon-theme-dark');hamburgerLine1El.classList.add('hamburger-line-theme-dark')
-;hamburgerLine2El.classList.add('hamburger-line-theme-dark');hamburgerLine3El.classList.add('hamburger-line-theme-dark')}else{throw new Error('Invalid color theme, allowed: light, dark')}}})
-;customElements.define('header-bar',class extends HTMLElement{constructor(){super();const template=document.getElementById('headerBarTemplate');const templateContent=template.content
-;this.attachShadow({mode:'open'}).appendChild(templateContent.cloneNode(true));this.privmsgicon=false;this.collapseAllToggle=0;this.collapseAllTimeout=0}static get observedAttributes(){
+;this.shadowRoot.getElementById('group01ButtonId').addEventListener('click',(event=>{event.stopPropagation();_toggleDropdownOnMenuClick('nav-group01')
+;const group01ButtonEl=this.shadowRoot.getElementById('group01ButtonId');if(group01ButtonEl.getAttribute('aria-expanded')==='true'){group01ButtonEl.setAttribute('aria-expanded','false')}else{
+group01ButtonEl.setAttribute('aria-expanded','true')}}));this.shadowRoot.getElementById('group02ButtonId').addEventListener('click',(event=>{event.stopPropagation()
+;_toggleDropdownOnMenuClick('nav-group02');const group02ButtonEl=this.shadowRoot.getElementById('group02ButtonId');if(group02ButtonEl.getAttribute('aria-expanded')==='true'){
+group02ButtonEl.setAttribute('aria-expanded','false')}else{group02ButtonEl.setAttribute('aria-expanded','true')}}));this.shadowRoot.getElementById('group03ButtonId').addEventListener('click',(event=>{
+event.stopPropagation();_toggleDropdownOnMenuClick('nav-group03');const group03ButtonEl=this.shadowRoot.getElementById('group03ButtonId');if(group03ButtonEl.getAttribute('aria-expanded')==='true'){
+group03ButtonEl.setAttribute('aria-expanded','false')}else{group03ButtonEl.setAttribute('aria-expanded','true')}}));this.shadowRoot.getElementById('group04ButtonId').addEventListener('click',(event=>{
+event.stopPropagation();_toggleDropdownOnMenuClick('nav-group04');const group04ButtonEl=this.shadowRoot.getElementById('group04ButtonId');if(group04ButtonEl.getAttribute('aria-expanded')==='true'){
+group04ButtonEl.setAttribute('aria-expanded','false')}else{group04ButtonEl.setAttribute('aria-expanded','true')}}));this.shadowRoot.getElementById('item1_1_Id').addEventListener('click',(event=>{
+event.stopPropagation();document.getElementById('managePmPanels').showPanel();this.closeDropdownMenu()}));this.shadowRoot.getElementById('item2_1_Id').addEventListener('click',(event=>{
+event.stopPropagation();document.getElementById('manageChannelsPanel').showPanel();this.closeDropdownMenu()}));this.shadowRoot.getElementById('item3_1_Id').addEventListener('click',(event=>{
+event.stopPropagation();document.getElementById('serverListPanel').showPanel();this.closeDropdownMenu()}));this.shadowRoot.getElementById('item3_2_Id').addEventListener('click',(event=>{
+event.stopPropagation();document.getElementById('ircControlsPanel').showPanel();this.closeDropdownMenu()}));this.shadowRoot.getElementById('item3_3_Id').addEventListener('click',(event=>{
+event.stopPropagation();document.getElementById('ircServerPanel').showPanel();this.closeDropdownMenu()}));this.shadowRoot.getElementById('item3_4_Id').addEventListener('click',(event=>{
+event.stopPropagation();document.getElementById('wallopsPanel').showPanel();this.closeDropdownMenu()}));this.shadowRoot.getElementById('item3_5_Id').addEventListener('click',(event=>{
+event.stopPropagation();document.getElementById('noticePanel').showPanel();this.closeDropdownMenu()}));this.shadowRoot.getElementById('item3_6_Id').addEventListener('click',(event=>{
+event.stopPropagation();document.getElementById('helpPanel').showPanel();document.dispatchEvent(new CustomEvent('global-scroll-to-top'));this.closeDropdownMenu()}))
+;this.shadowRoot.getElementById('item4_1_Id').addEventListener('click',(event=>{event.stopPropagation();document.getElementById('displayUtils').toggleColorTheme();this.closeDropdownMenu()}))
+;this.shadowRoot.getElementById('item4_2_Id').addEventListener('click',(event=>{event.stopPropagation();document.dispatchEvent(new CustomEvent('show-all-panels'))
+;document.dispatchEvent(new CustomEvent('cancel-zoom'));this.closeDropdownMenu()}));this.shadowRoot.getElementById('item4_3_Id').addEventListener('click',(event=>{event.stopPropagation()
+;document.dispatchEvent(new CustomEvent('collapse-all-panels'));document.dispatchEvent(new CustomEvent('cancel-zoom'));this.closeDropdownMenu()}))
+;this.shadowRoot.getElementById('item4_4_Id').addEventListener('click',(event=>{event.stopPropagation();document.dispatchEvent(new CustomEvent('hide-all-panels'));this.closeDropdownMenu()}))
+;this.shadowRoot.getElementById('item4_5_Id').addEventListener('click',(event=>{event.stopPropagation();document.getElementById('debugPanel').showPanel();this.closeDropdownMenu()}))
+;this.shadowRoot.getElementById('item4_6_Id').addEventListener('click',(event=>{event.stopPropagation();if(window.globals.webState.webConnected||window.globals.webState.webConnecting){
+document.getElementById('websocketPanel').webConnectNavBarMenuHandler('disconnect')}else{document.getElementById('websocketPanel').webConnectNavBarMenuHandler('connect')}this.closeDropdownMenu()}))
+;this.shadowRoot.getElementById('item5_0_Id').addEventListener('click',(event=>{event.stopPropagation();document.getElementById('licensePanel').showPanel();this.closeDropdownMenu()}))
+;this.shadowRoot.getElementById('item5_1_Id').addEventListener('click',(event=>{event.stopPropagation();document.getElementById('logoutPanel').handleLogoutRequest();this.closeDropdownMenu()}))}})
+;customElements.define('activity-spinner',class extends HTMLElement{constructor(){super();const template=document.getElementById('activitySpinnerTemplate');const templateContent=template.content
+;this.attachShadow({mode:'open'}).appendChild(templateContent.cloneNode(true));this.activitySpinnerCounter=0}requestActivitySpinner=()=>{this.activitySpinnerCounter+=1
+;this.shadowRoot.getElementById('activitySpinner').removeAttribute('hidden')};cancelActivitySpinner=()=>{this.activitySpinnerCounter-=1;if(this.activitySpinnerCounter<0){this.activitySpinnerCounter=0}
+if(this.activitySpinnerCounter>0){this.shadowRoot.getElementById('activitySpinner').removeAttribute('hidden')}else{this.shadowRoot.getElementById('activitySpinner').setAttribute('hidden','')}}
+;resetActivitySpinner=()=>{this.activitySpinnerCounter=0;this.shadowRoot.getElementById('activitySpinner').setAttribute('hidden','')};connectedCallback(){
+if(this.hasAttribute('default')&&this.getAttribute('default')==='show'){this.requestActivitySpinner()}else{this.resetActivitySpinner()}}})
+;customElements.define('hamburger-icon',class extends HTMLElement{constructor(){super();const template=document.getElementById('hamburgerIconTemplate');const templateContent=template.content
+;this.attachShadow({mode:'open'}).appendChild(templateContent.cloneNode(true));this.activitySpinnerCounter=0}updateHamburgerInfo=menuOpenState=>{if(menuOpenState==='open'){
+this.shadowRoot.getElementById('hamburgerBorderId').setAttribute('aria-expanded','true')}else{this.shadowRoot.getElementById('hamburgerBorderId').setAttribute('aria-expanded','false')}}
+;updateHamburgerTitle=newTitle=>{this.shadowRoot.getElementById('hamburgerBorderId').title=newTitle};setColorTheme=theme=>{const hamburgerIconEl=this.shadowRoot.getElementById('hamburgerBorderId')
+;const hamburgerLine1El=this.shadowRoot.getElementById('hamburgerLine1Id');const hamburgerLine2El=this.shadowRoot.getElementById('hamburgerLine2Id')
+;const hamburgerLine3El=this.shadowRoot.getElementById('hamburgerLine3Id');if(theme==='light'){hamburgerIconEl.classList.remove('hamburger-icon-theme-dark')
+;hamburgerLine1El.classList.remove('hamburger-line-theme-dark');hamburgerLine2El.classList.remove('hamburger-line-theme-dark');hamburgerLine3El.classList.remove('hamburger-line-theme-dark')
+;hamburgerIconEl.classList.add('hamburger-icon-theme-light');hamburgerLine1El.classList.add('hamburger-line-theme-light');hamburgerLine2El.classList.add('hamburger-line-theme-light')
+;hamburgerLine3El.classList.add('hamburger-line-theme-light')}else if(theme==='dark'){hamburgerIconEl.classList.remove('hamburger-icon-theme-light')
+;hamburgerLine1El.classList.remove('hamburger-line-theme-light');hamburgerLine2El.classList.remove('hamburger-line-theme-light');hamburgerLine3El.classList.remove('hamburger-line-theme-light')
+;hamburgerIconEl.classList.add('hamburger-icon-theme-dark');hamburgerLine1El.classList.add('hamburger-line-theme-dark');hamburgerLine2El.classList.add('hamburger-line-theme-dark')
+;hamburgerLine3El.classList.add('hamburger-line-theme-dark')}else{throw new Error('Invalid color theme, allowed: light, dark')}}});customElements.define('header-bar',class extends HTMLElement{
+constructor(){super();const template=document.getElementById('headerBarTemplate');const templateContent=template.content;this.attachShadow({mode:'open'}).appendChild(templateContent.cloneNode(true))
+;this.privmsgicon=false;this.collapseAllToggle=0;this.collapseAllTimeout=0}static get observedAttributes(){
 return['beepicon','channelicon','noticeicon','privmsgicon','servericon','wallopsicon','zoomicon']}get beepicon(){return this.hasAttribute('beepicon')}set beepicon(val){if(val){
 this.setAttribute('beepicon','')}else{this.removeAttribute('beepicon')}}get channelicon(){return this.hasAttribute('channelicon')}set channelicon(val){if(val){this.setAttribute('channelicon','')}else{
 this.removeAttribute('channelicon')}}get noticeicon(){return this.hasAttribute('noticeicon')}set noticeicon(val){if(val){this.setAttribute('noticeicon','')}else{this.removeAttribute('noticeicon')}}
