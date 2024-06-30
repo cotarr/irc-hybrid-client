@@ -40,6 +40,28 @@ customElements.define('hamburger-icon', class extends HTMLElement {
   }
 
   /**
+   * Update hamburger icon attributes
+   * @param {String} menuOpenState - Nav menu state 'open', 'closed'
+   */
+  updateHamburgerInfo = (menuOpenState) => {
+    if (menuOpenState === 'open') {
+      this.shadowRoot.getElementById('hamburgerBorderId')
+        .setAttribute('aria-expanded', 'true');
+    } else {
+      this.shadowRoot.getElementById('hamburgerBorderId')
+        .setAttribute('aria-expanded', 'false');
+    }
+  };
+
+  /**
+   * Update main nav button title attribute
+   * @param {String} newTitle - Tooltip popup for main nav menu icon
+   */
+  updateHamburgerTitle = (newTitle) => {
+    this.shadowRoot.getElementById('hamburgerBorderId').title = newTitle;
+  };
+
+  /**
    * Change colors of the hamburger icon
    * @param {string} theme - Allowed:  'light', 'dark'
    */
@@ -76,6 +98,6 @@ customElements.define('hamburger-icon', class extends HTMLElement {
   // initializePlugin () {
   // }
 
-  // connectedCallback() {
+  // connectedCallback () {
   // }
 });

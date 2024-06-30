@@ -83,13 +83,26 @@ textarea {
 .global-inline-block {
   display: inline-block;
 }
+
+.global-message-button {
+  border-radius: 15px;
+  font-weight: bold;
+  font-size: 103%;
+  display: inline-block;
+  margin-right: 2px;
+  padding: 3px 6px 2px 5px;
+  cursor: pointer;
+}
+.global-message-button[hidden] {
+  display: none;
+}
 .global-message-icon {
   border-radius: 15px;
+  box-shadow: 2px 2px 3px rgba(0,0,0,0.35);
   font-weight: bold;
   display: inline-block;
   margin-right: 2px;
   padding: 3px 5px 2px 5px;
-  cursor: pointer;
 }
 .global-message-icon[hidden] {
   display: none;

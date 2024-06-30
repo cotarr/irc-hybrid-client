@@ -400,8 +400,10 @@ if(event.detail.except!==this.id){this.hidePanel()}}else if(Array.isArray(event.
 this.showPanel()}}else if(Array.isArray(event.detail.except)){if(event.detail.except.indexOf(this.id)<0&&event.detail.debug){this.showPanel()}}}else if(event.detail&&event.detail.debug){
 this.showPanel()}}))}});customElements.define('nav-menu',class extends HTMLElement{constructor(){super();const template=document.getElementById('navMenuTemplate')
 ;const templateContent=template.content;this.attachShadow({mode:'open'}).appendChild(templateContent.cloneNode(true));this.previousChannels=[];this.previousPmPanels=[];this.arrayOfMenuElements=[]
-;this.ircConnectedLast=null;this.webConnectedLast=null}toggleDropdownMenu=()=>{this.shadowRoot.getElementById('navDropdownDivId').classList.toggle('nav-dropdown-div-show')};closeDropdownMenu=()=>{
-this.shadowRoot.getElementById('navDropdownDivId').classList.remove('nav-dropdown-div-show')};handleServerUnreadUpdate=status=>{const itemEl=this.shadowRoot.getElementById('item3_3_Id');if(status){
+;this.ircConnectedLast=null;this.webConnectedLast=null}toggleDropdownMenu=()=>{this.shadowRoot.getElementById('navDropdownDivId').classList.toggle('nav-dropdown-div-show')
+;if(this.shadowRoot.getElementById('navDropdownDivId').classList.contains('nav-dropdown-div-show')){document.getElementById('headerBar').updateMenuOpenState('open')}else{
+document.getElementById('headerBar').updateMenuOpenState('closed')}};closeDropdownMenu=()=>{this.shadowRoot.getElementById('navDropdownDivId').classList.remove('nav-dropdown-div-show')
+;document.getElementById('headerBar').updateMenuOpenState('closed')};handleServerUnreadUpdate=status=>{const itemEl=this.shadowRoot.getElementById('item3_3_Id');if(status){
 itemEl.textContent='IRC Server (New Messages)'}else{itemEl.textContent='IRC Server (Alt-S)'}};handleNoticeUnreadUpdate=status=>{const itemEl=this.shadowRoot.getElementById('item3_5_Id');if(status){
 itemEl.textContent='Notices (New Messages)'}else{itemEl.textContent='Notices'}};handleWallopsUnreadUpdate=status=>{const itemEl=this.shadowRoot.getElementById('item3_4_Id');if(status){
 itemEl.textContent='Wallops (New Messages)'}else{itemEl.textContent='Wallops'}};handlePmListUpdate=()=>{const pmPanels=Array.from(window.globals.webState.activePrivateMessageNicks);let changed=false
@@ -490,7 +492,9 @@ this.shadowRoot.getElementById('activitySpinner').removeAttribute('hidden')}else
 this.activitySpinnerCounter=0;this.shadowRoot.getElementById('activitySpinner').setAttribute('hidden','')};connectedCallback(){if(this.hasAttribute('default')&&this.getAttribute('default')==='show'){
 this.requestActivitySpinner()}else{this.resetActivitySpinner()}}});customElements.define('hamburger-icon',class extends HTMLElement{constructor(){super()
 ;const template=document.getElementById('hamburgerIconTemplate');const templateContent=template.content;this.attachShadow({mode:'open'}).appendChild(templateContent.cloneNode(true))
-;this.activitySpinnerCounter=0}setColorTheme=theme=>{const hamburgerIconEl=this.shadowRoot.getElementById('hamburgerBorderId');const hamburgerLine1El=this.shadowRoot.getElementById('hamburgerLine1Id')
+;this.activitySpinnerCounter=0}updateHamburgerInfo=menuOpenState=>{if(menuOpenState==='open'){this.shadowRoot.getElementById('hamburgerBorderId').setAttribute('aria-expanded','true')}else{
+this.shadowRoot.getElementById('hamburgerBorderId').setAttribute('aria-expanded','false')}};updateHamburgerTitle=newTitle=>{this.shadowRoot.getElementById('hamburgerBorderId').title=newTitle}
+;setColorTheme=theme=>{const hamburgerIconEl=this.shadowRoot.getElementById('hamburgerBorderId');const hamburgerLine1El=this.shadowRoot.getElementById('hamburgerLine1Id')
 ;const hamburgerLine2El=this.shadowRoot.getElementById('hamburgerLine2Id');const hamburgerLine3El=this.shadowRoot.getElementById('hamburgerLine3Id');if(theme==='light'){
 hamburgerIconEl.classList.remove('hamburger-icon-theme-dark');hamburgerLine1El.classList.remove('hamburger-line-theme-dark');hamburgerLine2El.classList.remove('hamburger-line-theme-dark')
 ;hamburgerLine3El.classList.remove('hamburger-line-theme-dark');hamburgerIconEl.classList.add('hamburger-icon-theme-light');hamburgerLine1El.classList.add('hamburger-line-theme-light')
@@ -533,26 +537,28 @@ this.shadowRoot.getElementById('titleDivId').setAttribute('noIcons','');if(windo
 }else{this.shadowRoot.getElementById('titleDivId').setAttribute('hidden','')}}else{this.shadowRoot.getElementById('titleDivId').removeAttribute('noIcons','')
 ;this.shadowRoot.getElementById('titleDivId').setAttribute('hidden','')}if(window.globals.ircState.ircConnected&&window.globals.webState.webConnected){
 this.shadowRoot.getElementById('collapseAllButtonId').removeAttribute('hidden')}else{this.shadowRoot.getElementById('collapseAllButtonId').setAttribute('hidden','')}};_setFixedElementTitles=()=>{
-this.shadowRoot.getElementById('hamburgerIconId').title='Navigation Dropdown Menu';this.shadowRoot.getElementById('waitConnectIconId').title='Waiting to auto-reconnect to IRC server'
-;this.shadowRoot.getElementById('ircIsAwayIconId').title='Cancel IRC away (/AWAY)';this.shadowRoot.getElementById('panelZoomIconId').title='Un-zoom panels'
-;this.shadowRoot.getElementById('serverUnreadExistIconId').title='Unread IRC server message, click to view panel'
+this.shadowRoot.getElementById('hamburgerIconId').updateHamburgerInfo('closed');this.shadowRoot.getElementById('hamburgerIconId').updateHamburgerTitle('Navigation Dropdown Menu')
+;this.shadowRoot.getElementById('waitConnectIconId').title='Waiting to auto-reconnect to IRC server';this.shadowRoot.getElementById('ircIsAwayIconId').title='Cancel IRC away (/AWAY)'
+;this.shadowRoot.getElementById('panelZoomIconId').title='Un-zoom panels';this.shadowRoot.getElementById('serverUnreadExistIconId').title='Unread IRC server message, click to view panel'
 ;this.shadowRoot.getElementById('channelUnreadExistIconId').title='Unread IRC channel message, click to view panel'
 ;this.shadowRoot.getElementById('privMsgUnreadExistIconId').title='Unread Private Message (PM), click to view panel'
 ;this.shadowRoot.getElementById('noticeUnreadExistIconId').title='Unread IRC Notice, click to view panel'
 ;this.shadowRoot.getElementById('wallopsUnreadExistIconId').title='Unread IRC Wallops, click to view panel';this.shadowRoot.getElementById('nickRecovIconId').title='Waiting to recover main nickname'
 ;this.shadowRoot.getElementById('enableAudioButtonId').title='Browser had disabled media playback. Click to enable beep sounds'
 ;this.shadowRoot.getElementById('collapseAllButtonId').title='Toggle: Collapse active panels to bar, Hide all panels'};_updateDynamicElementTitles=()=>{
-const webConnectIconEl=this.shadowRoot.getElementById('webConnectIconId');if(webConnectIconEl.hasAttribute('connected')){webConnectIconEl.title='Place web page in Standby (Remote IRC stays active)'
-}else{webConnectIconEl.title='Re-connect web page to remote IRC client'}const ircConnectIconEl=this.shadowRoot.getElementById('ircConnectIconId');if(ircConnectIconEl.hasAttribute('connected')){
-ircConnectIconEl.title='Disconnect IRC server from remote IRC client (/QUIT)'}else{ircConnectIconEl.title='Connect to the currently selected IRC server'}
-const titleDivEl=this.shadowRoot.getElementById('titleDivId');if(window.globals.ircState.ircConnected){
-titleDivEl.textContent=window.globals.ircState.ircServerName+' ('+window.globals.ircState.nickName+')'}else{titleDivEl.textContent='irc-hybrid-client'}};updateStatusIcons=()=>{const state={
-hideNavMenu:false,webConnect:'disconnected',ircConnect:'unavailable',wait:false,away:false,zoom:false,serverUnread:false,channelUnread:false,privMsgUnread:false,noticeUnread:false,wallopsUnread:false,
-nickRecovery:false,enableAudio:false};if(this.hasAttribute('beepicon')){state.enableAudio=true}if(this.hasAttribute('channelicon')){state.channelUnread=true}if(this.hasAttribute('noticeicon')){
-state.noticeUnread=true}if(this.hasAttribute('privmsgicon')){state.privMsgUnread=true}if(this.hasAttribute('servericon')){state.serverUnread=true}if(this.hasAttribute('wallopsicon')){
-state.wallopsUnread=true}if(this.hasAttribute('zoomicon')){state.zoom=true}if(window.globals.webState.webConnected){state.webConnect='connected';if(window.globals.ircState.ircConnected){
-if(window.globals.ircState.ircRegistered){state.ircConnect='connected'}else{state.ircConnect='connecting'}if(window.globals.ircState.ircIsAway){state.away=true}}else{
-if(window.globals.webState.ircConnecting||window.globals.ircState.ircConnecting){state.ircConnect='connecting'}else{state.ircConnect='disconnected'}
+const webConnectIconEl=this.shadowRoot.getElementById('webConnectIconId');if(webConnectIconEl.hasAttribute('connected')){
+webConnectIconEl.title='Web server connected. Click to place web page in Standby (Remote IRC stays active)'}else{
+webConnectIconEl.title='Web server is not connected. Click to re-connect web page to remote IRC client'}const ircConnectIconEl=this.shadowRoot.getElementById('ircConnectIconId')
+;if(ircConnectIconEl.hasAttribute('connected')){ircConnectIconEl.title='IRC network connected. Click to disconnect IRC server from remote IRC client (/QUIT)'
+}else if(ircConnectIconEl.hasAttribute('unavailable')){ircConnectIconEl.title='IRC connect button is disabled because web server is not connected.'}else{
+ircConnectIconEl.title='IRC network is not connected. Click to connect to the currently selected IRC server'}const titleDivEl=this.shadowRoot.getElementById('titleDivId')
+;if(window.globals.ircState.ircConnected){titleDivEl.textContent=window.globals.ircState.ircServerName+' ('+window.globals.ircState.nickName+')'}else{titleDivEl.textContent='irc-hybrid-client'}}
+;updateStatusIcons=()=>{const state={hideNavMenu:false,webConnect:'disconnected',ircConnect:'unavailable',wait:false,away:false,zoom:false,serverUnread:false,channelUnread:false,privMsgUnread:false,
+noticeUnread:false,wallopsUnread:false,nickRecovery:false,enableAudio:false};if(this.hasAttribute('beepicon')){state.enableAudio=true}if(this.hasAttribute('channelicon')){state.channelUnread=true}
+if(this.hasAttribute('noticeicon')){state.noticeUnread=true}if(this.hasAttribute('privmsgicon')){state.privMsgUnread=true}if(this.hasAttribute('servericon')){state.serverUnread=true}
+if(this.hasAttribute('wallopsicon')){state.wallopsUnread=true}if(this.hasAttribute('zoomicon')){state.zoom=true}if(window.globals.webState.webConnected){state.webConnect='connected'
+;if(window.globals.ircState.ircConnected){if(window.globals.ircState.ircRegistered){state.ircConnect='connected'}else{state.ircConnect='connecting'}if(window.globals.ircState.ircIsAway){
+state.away=true}}else{if(window.globals.webState.ircConnecting||window.globals.ircState.ircConnecting){state.ircConnect='connecting'}else{state.ircConnect='disconnected'}
 if(window.globals.ircState.ircAutoReconnect&&window.globals.ircState.ircConnectOn&&!window.globals.ircState.ircConnected&&!window.globals.ircState.ircConnecting){state.wait=true}}}else{
 if(window.globals.webState.webConnecting){state.webConnect='connecting'}state.ircConnect='unavailable'}if(!window.globals.webState.webConnected||!window.globals.ircState.ircConnected){state.away=false
 ;state.zoom=false;state.serverUnread=false;state.channelUnread=false;state.privMsgUnread=false;state.noticeUnread=false;state.wallopsUnread=false;state.nickRecovery=false}
@@ -564,7 +570,8 @@ this.updateStatusIcons();this._setFixedElementTitles();this._updateDynamicElemen
 ;const audioIconEl=this.shadowRoot.getElementById('enableAudioButtonId');if(serverIconEl.hasAttribute('flash')){serverIconEl.removeAttribute('flash');wallopsIconEl.removeAttribute('flash')
 ;noticeIconEl.removeAttribute('flash');privMsgIconEl.removeAttribute('flash');channelIconEl.removeAttribute('flash');audioIconEl.removeAttribute('flash')}else{serverIconEl.setAttribute('flash','')
 ;wallopsIconEl.setAttribute('flash','');noticeIconEl.setAttribute('flash','');privMsgIconEl.setAttribute('flash','');channelIconEl.setAttribute('flash','');audioIconEl.setAttribute('flash','')}}),500)
-};connectedCallback(){this.shadowRoot.getElementById('navDropdownButtonId').addEventListener('click',(event=>{event.stopPropagation();document.getElementById('navMenu').toggleDropdownMenu()}))
+};updateMenuOpenState=menuOpenState=>{this.shadowRoot.getElementById('hamburgerIconId').updateHamburgerInfo(menuOpenState)};connectedCallback(){
+this.shadowRoot.getElementById('navDropdownButtonId').addEventListener('click',(event=>{event.stopPropagation();document.getElementById('navMenu').toggleDropdownMenu()}))
 ;this.shadowRoot.getElementById('enableAudioButtonId').addEventListener('click',(()=>{document.getElementById('beepSounds').userInitiatedAudioPlay()}))
 ;this.shadowRoot.getElementById('webConnectIconId').addEventListener('click',(()=>{document.getElementById('websocketPanel').webConnectHeaderBarIconHandler()}))
 ;this.shadowRoot.getElementById('ircConnectIconId').addEventListener('click',(()=>{document.getElementById('ircControlsPanel').webConnectHeaderBarIconHandler()}))

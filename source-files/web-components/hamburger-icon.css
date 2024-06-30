@@ -31,8 +31,8 @@
   display: inline-block;
   margin: 0px;
   margin-left: 10px;
-  padding: px;
-  width: 26px;
+  padding: 0px;
+  width: 28px;
 }
 .hamburger-icon:hover {
   background-color: #808080;

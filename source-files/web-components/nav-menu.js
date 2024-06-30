@@ -66,6 +66,14 @@ customElements.define('nav-menu', class extends HTMLElement {
     //   'nav-dropdown-div-show')) {
     //   document.dispatchEvent(new CustomEvent('global-scroll-to-top'));
     // }
+    if (this.shadowRoot.getElementById('navDropdownDivId')
+      .classList.contains('nav-dropdown-div-show')) {
+      // Call header-bar method, which calls hamburger-icon to set attributes
+      document.getElementById('headerBar').updateMenuOpenState('open');
+    } else {
+      // Call header-bar method, which calls hamburger-icon to set attributes
+      document.getElementById('headerBar').updateMenuOpenState('closed');
+    }
   };
 
   /**
@@ -73,6 +81,8 @@ customElements.define('nav-menu', class extends HTMLElement {
    */
   closeDropdownMenu = () => {
     this.shadowRoot.getElementById('navDropdownDivId').classList.remove('nav-dropdown-div-show');
+    // Call header-bar method, which calls hamburger-icon to set attributes
+    document.getElementById('headerBar').updateMenuOpenState('closed');
   };
 
   /**

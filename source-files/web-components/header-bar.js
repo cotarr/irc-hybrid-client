@@ -309,8 +309,10 @@ customElements.define('header-bar', class extends HTMLElement {
    * Values are based on global ircState object.
    */
   _setFixedElementTitles = () => {
-    this.shadowRoot.getElementById('hamburgerIconId').title =
-      'Navigation Dropdown Menu';
+    this.shadowRoot.getElementById('hamburgerIconId')
+      .updateHamburgerInfo('closed');
+    this.shadowRoot.getElementById('hamburgerIconId')
+      .updateHamburgerTitle('Navigation Dropdown Menu');
     this.shadowRoot.getElementById('waitConnectIconId').title =
       'Waiting to auto-reconnect to IRC server';
     this.shadowRoot.getElementById('ircIsAwayIconId').title =
@@ -342,15 +344,22 @@ customElements.define('header-bar', class extends HTMLElement {
   _updateDynamicElementTitles = () => {
     const webConnectIconEl = this.shadowRoot.getElementById('webConnectIconId');
     if (webConnectIconEl.hasAttribute('connected')) {
-      webConnectIconEl.title = 'Place web page in Standby (Remote IRC stays active)';
+      webConnectIconEl.title =
+        'Web server connected. Click to place web page in Standby (Remote IRC stays active)';
     } else {
-      webConnectIconEl.title = 'Re-connect web page to remote IRC client';
+      webConnectIconEl.title =
+        'Web server is not connected. Click to re-connect web page to remote IRC client';
     }
     const ircConnectIconEl = this.shadowRoot.getElementById('ircConnectIconId');
     if (ircConnectIconEl.hasAttribute('connected')) {
-      ircConnectIconEl.title = 'Disconnect IRC server from remote IRC client (/QUIT)';
+      ircConnectIconEl.title =
+        'IRC network connected. Click to disconnect IRC server from remote IRC client (/QUIT)';
+    } else if (ircConnectIconEl.hasAttribute('unavailable')) {
+      ircConnectIconEl.title =
+        'IRC connect button is disabled because web server is not connected.';
     } else {
-      ircConnectIconEl.title = 'Connect to the currently selected IRC server';
+      ircConnectIconEl.title =
+        'IRC network is not connected. Click to connect to the currently selected IRC server';
     }
     const titleDivEl = this.shadowRoot.getElementById('titleDivId');
     if (window.globals.ircState.ircConnected) {
@@ -488,6 +497,14 @@ customElements.define('header-bar', class extends HTMLElement {
         audioIconEl.setAttribute('flash', '');
       }
     }, 500);
+  };
+
+  /**
+   * Update HamburgerIcon Nav Menu icon attributes
+   * @param {String} menuOpenState - Navigation dropdown state 'open' or 'closed'
+   */
+  updateMenuOpenState = (menuOpenState) => {
+    this.shadowRoot.getElementById('hamburgerIconId').updateHamburgerInfo(menuOpenState);
   };
 
   /**
