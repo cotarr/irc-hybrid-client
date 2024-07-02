@@ -423,8 +423,9 @@ for(let i=0;i<pmPanels.length;i++){if(pmPanels[i].toLowerCase()!==this.previousP
 const parentEl=this.shadowRoot.getElementById('dropdownMenuPrivMsgContainerId');while(parentEl.firstChild){parentEl.firstChild.removeEventListener('click',this.handlePmPanelClick)
 ;parentEl.removeChild(parentEl.firstChild)}this.previousPmPanels=[];if(pmPanels.length>0){for(let i=0;i<pmPanels.length;i++){const pmPanelMenuItem=document.createElement('button')
 ;pmPanelMenuItem.setAttribute('nav-group','1');pmPanelMenuItem.setAttribute('nav-level','1');pmPanelMenuItem.classList.add('nav-level1');pmPanelMenuItem.pmPanelName=pmPanels[i].toLowerCase()
-;pmPanelMenuItem.setAttribute('pm-panel-name',pmPanels[i].toLowerCase());if(this.shadowRoot.getElementById('item1_1_Id').hasAttribute('collapsed')){pmPanelMenuItem.setAttribute('collapsed','')}
-const pmPanelNameSpan=document.createElement('span');pmPanelNameSpan.classList.add('mr10');if(pmPanels[i].toLowerCase()===window.globals.webState.activePrivateMessageCsNicks[i].toLowerCase()){
+;pmPanelMenuItem.setAttribute('title','Open the private message panel for nickname: '+pmPanels[i]);pmPanelMenuItem.setAttribute('pm-panel-name',pmPanels[i].toLowerCase())
+;if(this.shadowRoot.getElementById('item1_1_Id').hasAttribute('collapsed')){pmPanelMenuItem.setAttribute('collapsed','')}const pmPanelNameSpan=document.createElement('span')
+;pmPanelNameSpan.classList.add('mr10');if(pmPanels[i].toLowerCase()===window.globals.webState.activePrivateMessageCsNicks[i].toLowerCase()){
 pmPanelNameSpan.textContent=window.globals.webState.activePrivateMessageCsNicks[i]}else{pmPanelNameSpan.textContent=pmPanels[i]}pmPanelNameSpan.pmPanelName=pmPanels[i].toLowerCase()
 ;pmPanelNameSpan.setAttribute('pm-panel-name',pmPanels[i].toLowerCase());pmPanelMenuItem.appendChild(pmPanelNameSpan);const pmPanelMessageCount=document.createElement('div')
 ;pmPanelMessageCount.classList.add('global-count');pmPanelMessageCount.setAttribute('title','Unread Message Count');if(document.querySelector('body').getAttribute('theme')==='light'){
@@ -448,30 +449,31 @@ for(let i=0;i<channels.length;i++){if(channels[i].toLowerCase()!==this.previousC
 const parentEl=this.shadowRoot.getElementById('dropdownMenuChannelContainerId');while(parentEl.firstChild){parentEl.firstChild.removeEventListener('click',this.handleChannelClick)
 ;parentEl.removeChild(parentEl.firstChild)}this.previousChannels=[];if(channels.length>0){for(let i=0;i<channels.length;i++){const channelMenuItem=document.createElement('button')
 ;channelMenuItem.setAttribute('nav-group','2');channelMenuItem.setAttribute('nav-level','1');channelMenuItem.classList.add('nav-level1');channelMenuItem.channelName=channels[i].toLowerCase()
-;channelMenuItem.setAttribute('channel-name',channels[i].toLowerCase());if(this.shadowRoot.getElementById('item2_1_Id').hasAttribute('collapsed')){channelMenuItem.setAttribute('collapsed','')}
-const channelNameSpan=document.createElement('span');channelNameSpan.classList.add('mr10');channelNameSpan.textContent=window.globals.ircState.channelStates[i].csName
-;channelNameSpan.channelName=channels[i].toLowerCase();channelNameSpan.setAttribute('channel-name',channels[i].toLowerCase());channelMenuItem.appendChild(channelNameSpan)
-;const channelMessageCount=document.createElement('div');channelMessageCount.classList.add('global-count');channelMessageCount.setAttribute('title','Unread Message Count')
-;if(document.querySelector('body').getAttribute('theme')==='light'){channelMessageCount.classList.add('global-border-theme-light');channelMessageCount.classList.add('global-text-theme-light')}else{
-channelMessageCount.classList.add('global-border-theme-dark');channelMessageCount.classList.add('global-text-theme-dark')}channelMessageCount.textContent='0'
-;channelMessageCount.setAttribute('hidden','');channelMessageCount.channelName=channels[i].toLowerCase();channelMessageCount.setAttribute('channel-name',channels[i].toLowerCase())
-;channelMenuItem.appendChild(channelMessageCount);this.previousChannels.push(channels[i].toLowerCase());parentEl.appendChild(channelMenuItem)
-;channelMenuItem.addEventListener('click',this.handleChannelClick)}}this.arrayOfAllMenuElements=this.shadowRoot.querySelectorAll('button')}};handleChannelClick=event=>{event.stopPropagation()
-;const channelNameId=event.target.channelName;document.getElementById('channel:'+channelNameId).showAndScrollPanel();this.closeDropdownMenu()};_handleGlobalAltMKeypress=()=>{
-if(!this.shadowRoot.getElementById('navDropdownDivId').classList.contains('nav-dropdown-div-show')){this._openNavMenu();return true}else{return false}};_handleNavEscapeKeypress=()=>{
-if(this.shadowRoot.getElementById('navDropdownDivId').classList.contains('nav-dropdown-div-show')){if(this.shadowRoot.getElementById('navDropdownDivId').classList.contains('nav-dropdown-div-show')){
-this.closeDropdownMenu();document.getElementById('headerBar').giveNavMenuHamburgerIconFocus()}return true}else{return false}};_handleNavHomeKeypress=()=>{
-if(this.shadowRoot.getElementById('navDropdownDivId').classList.contains('nav-dropdown-div-show')){this._setFocusTopAvailableItem();return true}else{return false}};_handleNavArrowLeftKeypress=()=>{
-if(this.shadowRoot.getElementById('navDropdownDivId').classList.contains('nav-dropdown-div-show')){const activeElement=this.shadowRoot.activeElement
-;const activeElementIndex=this._getMenuIndexWithFocus();if(activeElement){if(activeElement.getAttribute('nav-level')==='0'&&activeElement.classList.contains('group-level0')){if(activeElementIndex>=0){
-const navGroup=activeElement.getAttribute('nav-group');let currentCollapsedState=false;this.arrayOfAllMenuElements.forEach((menuItemEl=>{
-if(menuItemEl.getAttribute('nav-group')===navGroup&&menuItemEl.getAttribute('nav-level')==='1'){if(menuItemEl.hasAttribute('collapsed')){currentCollapsedState=true}}}));if(currentCollapsedState){
-this.closeDropdownMenu();document.getElementById('headerBar').giveNavMenuHamburgerIconFocus();return true}else{this.arrayOfAllMenuElements.forEach((navMenuEl=>{
-if(navMenuEl.getAttribute('nav-level')==='1'&&navMenuEl.getAttribute('nav-group')===navGroup){navMenuEl.setAttribute('collapsed','')}}));activeElement.setAttribute('aria-expanded','false')
-;activeElement.focus();return true}}}else if(activeElement.getAttribute('nav-level')==='1'){if(activeElement.hasAttribute('nav-group')){const navGroup=activeElement.getAttribute('nav-group')
-;this.arrayOfAllMenuElements.forEach((menuItemEl=>{if(menuItemEl.getAttribute('nav-group')===navGroup){menuItemEl.setAttribute('collapsed','')}}));this.arrayOfAllMenuElements.forEach((menuItemEl=>{
-if(menuItemEl.getAttribute('nav-group')===navGroup&&menuItemEl.getAttribute('nav-level')==='0'){menuItemEl.focus()}}))}return true}else{this.closeDropdownMenu()
-;document.getElementById('headerBar').giveNavMenuHamburgerIconFocus();return true}}return false}return false};_handleNavArrowRightKeypress=()=>{
+;channelMenuItem.setAttribute('channel-name',channels[i].toLowerCase());channelMenuItem.setAttribute('title',channels[i].toLowerCase())
+;channelMenuItem.setAttribute('title','Open the IRC channel panel for IRC channel: '+channels[i]);if(this.shadowRoot.getElementById('item2_1_Id').hasAttribute('collapsed')){
+channelMenuItem.setAttribute('collapsed','')}const channelNameSpan=document.createElement('span');channelNameSpan.classList.add('mr10')
+;channelNameSpan.textContent=window.globals.ircState.channelStates[i].csName;channelNameSpan.channelName=channels[i].toLowerCase()
+;channelNameSpan.setAttribute('channel-name',channels[i].toLowerCase());channelMenuItem.appendChild(channelNameSpan);const channelMessageCount=document.createElement('div')
+;channelMessageCount.classList.add('global-count');channelMessageCount.setAttribute('title','Unread Message Count');if(document.querySelector('body').getAttribute('theme')==='light'){
+channelMessageCount.classList.add('global-border-theme-light');channelMessageCount.classList.add('global-text-theme-light')}else{channelMessageCount.classList.add('global-border-theme-dark')
+;channelMessageCount.classList.add('global-text-theme-dark')}channelMessageCount.textContent='0';channelMessageCount.setAttribute('hidden','');channelMessageCount.channelName=channels[i].toLowerCase()
+;channelMessageCount.setAttribute('channel-name',channels[i].toLowerCase());channelMenuItem.appendChild(channelMessageCount);this.previousChannels.push(channels[i].toLowerCase())
+;parentEl.appendChild(channelMenuItem);channelMenuItem.addEventListener('click',this.handleChannelClick)}}this.arrayOfAllMenuElements=this.shadowRoot.querySelectorAll('button')}}
+;handleChannelClick=event=>{event.stopPropagation();const channelNameId=event.target.channelName;document.getElementById('channel:'+channelNameId).showAndScrollPanel();this.closeDropdownMenu()}
+;_handleGlobalAltMKeypress=()=>{if(!this.shadowRoot.getElementById('navDropdownDivId').classList.contains('nav-dropdown-div-show')){this._openNavMenu();return true}else{return false}}
+;_handleNavEscapeKeypress=()=>{if(this.shadowRoot.getElementById('navDropdownDivId').classList.contains('nav-dropdown-div-show')){
+if(this.shadowRoot.getElementById('navDropdownDivId').classList.contains('nav-dropdown-div-show')){this.closeDropdownMenu();document.getElementById('headerBar').giveNavMenuHamburgerIconFocus()}
+return true}else{return false}};_handleNavHomeKeypress=()=>{if(this.shadowRoot.getElementById('navDropdownDivId').classList.contains('nav-dropdown-div-show')){this._setFocusTopAvailableItem()
+;return true}else{return false}};_handleNavArrowLeftKeypress=()=>{if(this.shadowRoot.getElementById('navDropdownDivId').classList.contains('nav-dropdown-div-show')){
+const activeElement=this.shadowRoot.activeElement;const activeElementIndex=this._getMenuIndexWithFocus();if(activeElement){
+if(activeElement.getAttribute('nav-level')==='0'&&activeElement.classList.contains('group-level0')){if(activeElementIndex>=0){const navGroup=activeElement.getAttribute('nav-group')
+;let currentCollapsedState=false;this.arrayOfAllMenuElements.forEach((menuItemEl=>{if(menuItemEl.getAttribute('nav-group')===navGroup&&menuItemEl.getAttribute('nav-level')==='1'){
+if(menuItemEl.hasAttribute('collapsed')){currentCollapsedState=true}}}));if(currentCollapsedState){this.closeDropdownMenu();document.getElementById('headerBar').giveNavMenuHamburgerIconFocus()
+;return true}else{this.arrayOfAllMenuElements.forEach((navMenuEl=>{if(navMenuEl.getAttribute('nav-level')==='1'&&navMenuEl.getAttribute('nav-group')===navGroup){navMenuEl.setAttribute('collapsed','')}
+}));activeElement.setAttribute('aria-expanded','false');activeElement.focus();return true}}}else if(activeElement.getAttribute('nav-level')==='1'){if(activeElement.hasAttribute('nav-group')){
+const navGroup=activeElement.getAttribute('nav-group');this.arrayOfAllMenuElements.forEach((menuItemEl=>{if(menuItemEl.getAttribute('nav-group')===navGroup){menuItemEl.setAttribute('collapsed','')}}))
+;this.arrayOfAllMenuElements.forEach((menuItemEl=>{if(menuItemEl.getAttribute('nav-group')===navGroup&&menuItemEl.getAttribute('nav-level')==='0'){menuItemEl.focus()}}))}return true}else{
+this.closeDropdownMenu();document.getElementById('headerBar').giveNavMenuHamburgerIconFocus();return true}}return false}return false};_handleNavArrowRightKeypress=()=>{
 if(this.shadowRoot.getElementById('navDropdownDivId').classList.contains('nav-dropdown-div-show')){const activeElementIndex=this._getMenuIndexWithFocus();if(activeElementIndex>=0){
 const activeElement=this.arrayOfAllMenuElements[activeElementIndex];if(activeElement){if(activeElement.getAttribute('nav-level')==='0'&&activeElement.classList.contains('group-level0')){
 const navGroup=activeElement.getAttribute('nav-group');this.arrayOfAllMenuElements.forEach((menuItemEl=>{if(menuItemEl.getAttribute('nav-group')===navGroup){menuItemEl.removeAttribute('collapsed')}}))
@@ -487,7 +489,26 @@ this.arrayOfAllMenuElements[nextIndex].focus()}else{this._setFocusTopAvailableIt
 if(this.shadowRoot.getElementById('navDropdownDivId').classList.contains('nav-dropdown-div-show')){const index=this.arrayOfAllMenuElements.length-1;this.arrayOfAllMenuElements[index].focus()
 ;return true}else{return false}};initializePlugin=()=>{this._handleIrcStateChanged();document.getElementById('userInfo').getLoginInfo().then((userinfo=>{
 if(Object.hasOwn(userinfo,'user')&&userinfo.user.length>0){this.shadowRoot.getElementById('item5_1_Id').textContent='Logout ('+userinfo.name+')'}})).catch((err=>{console.log(err)}))}
-;connectedCallback(){document.addEventListener('click',(event=>{this.closeDropdownMenu()}));document.addEventListener('color-theme-changed',(event=>{if(event.detail.theme==='light'){
+;connectedCallback(){this.shadowRoot.getElementById('group01ButtonId').title='Expand list of IRC private message panels'
+;this.shadowRoot.getElementById('group02ButtonId').title='Expand list of IRC channel panels'
+;this.shadowRoot.getElementById('group03ButtonId').title='Expand list of panels related to IRC controls and IRC configuration changes'
+;this.shadowRoot.getElementById('group04ButtonId').title='Expand list of miscellaneous panels that are less frequently used'
+;this.shadowRoot.getElementById('item1_1_Id').title='Open private message management panel. Start new private message chat'
+;this.shadowRoot.getElementById('item2_1_Id').title='Open IRC channel management panel. Join new IRC channels'
+;this.shadowRoot.getElementById('item3_1_Id').title='Open IRC server list editor panel to add new IRC servers or modify IRC server list, requires IRC not connected'
+;this.shadowRoot.getElementById('item3_2_Id').title='Open IRC Controls panel to connect or disconnect from the IRC network or to change away status'
+;this.shadowRoot.getElementById('item3_3_Id').title='Open IRC Server panel to view IRC server messages and issue IRC text commands'
+;this.shadowRoot.getElementById('item3_4_Id').title='Open Wallops Panel to view current IRC wallops messages'
+;this.shadowRoot.getElementById('item3_5_Id').title='Open Notice panel to view current IRC notice messages'
+;this.shadowRoot.getElementById('item3_6_Id').title='Open IRC help panel to show list of available IRC text commands and application keystroke shortcuts (hot keys)'
+;this.shadowRoot.getElementById('item4_1_Id').title='Changes application color theme';this.shadowRoot.getElementById('item4_2_Id').title='Make all commonly used panels visible'
+;this.shadowRoot.getElementById('item4_3_Id').title='Collapse all IRC channel panels and private message panels to a bar. New activity will activate counter icons, but panel remains closed'
+;this.shadowRoot.getElementById('item4_4_Id').title='Hide all IRC panels. New activity in the panel will automatically re-open the panel from hidden.'
+;this.shadowRoot.getElementById('item4_5_Id').title='Show debug panel, used to debug internal program variables in real time'
+;this.shadowRoot.getElementById('item4_6_Id').title='Disconnect the browser web page from the web server. Your nickname will remain active on the IRC network'
+;this.shadowRoot.getElementById('item5_0_Id').title='Show MIT open source license for the irc-hybrid-client application'
+;this.shadowRoot.getElementById('item5_1_Id').title='Logout the web browser from the page. Your nickname will remain active on the IRC network';document.addEventListener('click',(event=>{
+this.closeDropdownMenu()}));document.addEventListener('color-theme-changed',(event=>{if(event.detail.theme==='light'){
 this.shadowRoot.getElementById('navDropdownDivId').classList.remove('nav-menu-theme-dark');this.shadowRoot.getElementById('navDropdownDivId').classList.add('nav-menu-theme-light')}else{
 this.shadowRoot.getElementById('navDropdownDivId').classList.remove('nav-menu-theme-light');this.shadowRoot.getElementById('navDropdownDivId').classList.add('nav-menu-theme-dark')}}))
 ;document.addEventListener('irc-state-changed',this._handleIrcStateChanged);document.addEventListener('update-channel-count',(event=>{
@@ -527,7 +548,7 @@ this.arrayOfAllMenuElements[matchingGroupIndex].focus()}};this.shadowRoot.getEle
 ;if(window.globals.webState.webConnected||window.globals.webState.webConnecting){document.getElementById('websocketPanel').webConnectNavBarMenuHandler('disconnect')}else{
 document.getElementById('websocketPanel').webConnectNavBarMenuHandler('connect')}this.closeDropdownMenu()}));this.shadowRoot.getElementById('item5_0_Id').addEventListener('click',(event=>{
 event.stopPropagation();document.getElementById('licensePanel').showPanel();this.closeDropdownMenu()}));this.shadowRoot.getElementById('item5_1_Id').addEventListener('click',(event=>{
-event.stopPropagation();document.getElementById('logoutPanel').handleLogoutRequest();this.closeDropdownMenu()}));document.addEventListener('keydown',(e=>{
+event.stopPropagation();document.getElementById('logoutPanel').handleLogoutRequest();this.closeDropdownMenu()}));window.addEventListener('keydown',(e=>{
 if(e.altKey&&!e.ctrlKey&&!e.shiftKey&&!e.metaKey&&e.code==='KeyM'){if(this._handleGlobalAltMKeypress()){e.preventDefault()}}}),false);this.shadowRoot.addEventListener('keydown',(e=>{
 if(!e.altKey&&!e.ctrlKey&&!e.shiftKey&&!e.metaKey){if(e.code==='Escape'){if(this._handleNavEscapeKeypress()){e.preventDefault()}}if(e.code==='Home'||e.code==='PageUp'){
 if(this._handleNavHomeKeypress()){e.preventDefault()}}if(e.code==='ArrowRight'){if(this._handleNavArrowRightKeypress()){e.preventDefault()}}if(e.code==='ArrowLeft'){

@@ -8,7 +8,7 @@ and this project adheres to
 
 - To view notes on v2 major upgrade, scroll to Version v2.0.0 2023-09-12
 
-## v2.0.16-dev03 (DRAFT)
+## v2.0.16-dev04 (DRAFT)
 
 The goal of this update is to improve overall web page navigation.
 Many of the navigation controls are div elements with event listeners.
@@ -23,6 +23,7 @@ and convert them from div elements to styled button elements.
 - nav-menu: Converted div elements to styled button elements.
 - nav-menu: Added keyboard navigation to dropdown menu (major code refactor)
 - nav-menu: Added global hotkey Alt-M to open dropdown menu
+- nav-menu: Added title attributes to nav menu items to function as popup tooltips.
 - Miscellaneous edits in other modules to avoid keystroke event conflicts
 - Add `<nav>` symantic element blocks in various places to designate navigation controls
 

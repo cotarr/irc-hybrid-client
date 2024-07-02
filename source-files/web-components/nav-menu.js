@@ -272,6 +272,8 @@ customElements.define('nav-menu', class extends HTMLElement {
           pmPanelMenuItem.setAttribute('nav-level', '1');
           pmPanelMenuItem.classList.add('nav-level1');
           pmPanelMenuItem.pmPanelName = pmPanels[i].toLowerCase();
+          pmPanelMenuItem.setAttribute('title',
+            'Open the private message panel for nickname: ' + pmPanels[i]);
           pmPanelMenuItem.setAttribute('pm-panel-name', pmPanels[i].toLowerCase());
           // insert into the menu with same collapsed attribute as other menu members in same grop
           if (this.shadowRoot.getElementById('item1_1_Id').hasAttribute('collapsed')) {
@@ -443,7 +445,10 @@ customElements.define('nav-menu', class extends HTMLElement {
           channelMenuItem.classList.add('nav-level1');
           channelMenuItem.channelName = channels[i].toLowerCase();
           channelMenuItem.setAttribute('channel-name', channels[i].toLowerCase());
-          // insert into the menu with same collapsed attribute as other menu members in same grop
+          channelMenuItem.setAttribute('title', channels[i].toLowerCase());
+          channelMenuItem.setAttribute('title',
+            'Open the IRC channel panel for IRC channel: ' + channels[i]);
+          // insert into the menu with same collapsed attribute as other menu members in same group
           if (this.shadowRoot.getElementById('item2_1_Id').hasAttribute('collapsed')) {
             channelMenuItem.setAttribute('collapsed', '');
           }
@@ -749,6 +754,29 @@ customElements.define('nav-menu', class extends HTMLElement {
   };
 
   connectedCallback () {
+    /* eslint-disable max-len */
+    this.shadowRoot.getElementById('group01ButtonId').title = 'Expand list of IRC private message panels';
+    this.shadowRoot.getElementById('group02ButtonId').title = 'Expand list of IRC channel panels';
+    this.shadowRoot.getElementById('group03ButtonId').title = 'Expand list of panels related to IRC controls and IRC configuration changes';
+    this.shadowRoot.getElementById('group04ButtonId').title = 'Expand list of miscellaneous panels that are less frequently used';
+    this.shadowRoot.getElementById('item1_1_Id').title = 'Open private message management panel. Start new private message chat';
+    this.shadowRoot.getElementById('item2_1_Id').title = 'Open IRC channel management panel. Join new IRC channels';
+    this.shadowRoot.getElementById('item3_1_Id').title = 'Open IRC server list editor panel to add new IRC servers or modify IRC server list, requires IRC not connected';
+    this.shadowRoot.getElementById('item3_2_Id').title = 'Open IRC Controls panel to connect or disconnect from the IRC network or to change away status';
+    this.shadowRoot.getElementById('item3_3_Id').title = 'Open IRC Server panel to view IRC server messages and issue IRC text commands';
+    this.shadowRoot.getElementById('item3_4_Id').title = 'Open Wallops Panel to view current IRC wallops messages';
+    this.shadowRoot.getElementById('item3_5_Id').title = 'Open Notice panel to view current IRC notice messages';
+    this.shadowRoot.getElementById('item3_6_Id').title = 'Open IRC help panel to show list of available IRC text commands and application keystroke shortcuts (hot keys)';
+    this.shadowRoot.getElementById('item4_1_Id').title = 'Changes application color theme';
+    this.shadowRoot.getElementById('item4_2_Id').title = 'Make all commonly used panels visible';
+    this.shadowRoot.getElementById('item4_3_Id').title = 'Collapse all IRC channel panels and private message panels to a bar. New activity will activate counter icons, but panel remains closed';
+    this.shadowRoot.getElementById('item4_4_Id').title = 'Hide all IRC panels. New activity in the panel will automatically re-open the panel from hidden.';
+    this.shadowRoot.getElementById('item4_5_Id').title = 'Show debug panel, used to debug internal program variables in real time';
+    this.shadowRoot.getElementById('item4_6_Id').title = 'Disconnect the browser web page from the web server. Your nickname will remain active on the IRC network';
+    this.shadowRoot.getElementById('item5_0_Id').title = 'Show MIT open source license for the irc-hybrid-client application';
+    this.shadowRoot.getElementById('item5_1_Id').title = 'Logout the web browser from the page. Your nickname will remain active on the IRC network';
+    /* eslint-enable max-len */
+
     //
     // listen for global click outside the dropdown menu and close the menu
     //
@@ -967,7 +995,7 @@ customElements.define('nav-menu', class extends HTMLElement {
     //
     // Global event listener for Alt-M to open nav menu
     //
-    document.addEventListener('keydown', (e) => {
+    window.addEventListener('keydown', (e) => {
       // console.log(e.code);
       if ((e.altKey) &&
         (!e.ctrlKey) &&
