@@ -25,7 +25,10 @@
 // It is a static element without any functionality.
 //
 // Public Methods:
+//    giveNavMenuHamburgerIconFocus = ()
 //    setColorTheme(theme)
+//    updateHamburgerInfo(menuOpenState)
+//    updateHamburgerTitle(newTitle)
 //
 // ------------------------------------------------------------------------------
 'use strict';
@@ -59,6 +62,13 @@ customElements.define('hamburger-icon', class extends HTMLElement {
    */
   updateHamburgerTitle = (newTitle) => {
     this.shadowRoot.getElementById('hamburgerBorderId').title = newTitle;
+  };
+
+  /**
+   * Set focus to Hamburger Nav Icon
+   */
+  giveNavMenuHamburgerIconFocus = () => {
+    this.shadowRoot.getElementById('hamburgerBorderId').focus();
   };
 
   /**
@@ -98,6 +108,22 @@ customElements.define('hamburger-icon', class extends HTMLElement {
   // initializePlugin () {
   // }
 
-  // connectedCallback () {
-  // }
+  connectedCallback () {
+    // Detect keyboard keypress and use for Navigation of the dropdown Nav menu
+    this.shadowRoot.addEventListener('keydown', (e) => {
+      if (!(e.altKey) &&
+        (!e.ctrlKey) &&
+        (!e.shiftKey) &&
+        (!e.metaKey)) {
+        // console.log(e.code);
+        // //
+        if (e.code === 'ArrowRight') {
+          const activeElement = this.shadowRoot.activeElement;
+          if (activeElement.id === 'hamburgerBorderId') {
+            document.getElementById('navMenu').openIfClosedNavMenu();
+          }
+        }
+      }
+    }, false);
+  }
 });

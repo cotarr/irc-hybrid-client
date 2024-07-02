@@ -2,7 +2,7 @@
 /* nav-menu */
 
 /* Dropdown menu button inherit light, dark color theme from parent div */
-button.nav-group {
+button.group-level0 {
   color: inherit;
   background-color: inherit;
   box-shadow: initial;
@@ -41,7 +41,7 @@ button.nav-level1 {
 .nav-dropdown-div-show {
   display:block;
 }
-.nav-group {
+.group-level0 {
   border: unset;
   border-radius: 0px;
   cursor: pointer;
@@ -52,15 +52,15 @@ button.nav-level1 {
   padding: 7px 16px 6px 5px;
   text-align: left;
 }      
-.nav-group:hover {
+.group-level0:hover {
   color: #dd00dd;
 }
-.nav-group:focus {
+.group-level0:focus {
   /* Halfway between light and dark theme */
   border: 2px solid #808080;
   border-radius: 8px;
 }
-.nav-group[unavailable] {
+.group-level0[unavailable] {
   display: none;
 }
 .nav-level0 {

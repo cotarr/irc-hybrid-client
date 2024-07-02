@@ -33,7 +33,9 @@
 //   * Initialization code and global event listeners
 //
 // Public methods
+//   giveNavMenuHamburgerIconFocus()
 //   setHeaderBarIcons(options)
+//   updateMenuOpenState(menuOpenState)
 //
 // Public Properties
 //   beepicon (boolean)
@@ -505,6 +507,13 @@ customElements.define('header-bar', class extends HTMLElement {
    */
   updateMenuOpenState = (menuOpenState) => {
     this.shadowRoot.getElementById('hamburgerIconId').updateHamburgerInfo(menuOpenState);
+  };
+
+  /**
+   * Find Nav menu hamburger icon and give it focus
+   */
+  giveNavMenuHamburgerIconFocus = () => {
+    this.shadowRoot.getElementById('hamburgerIconId').giveNavMenuHamburgerIconFocus();
   };
 
   /**

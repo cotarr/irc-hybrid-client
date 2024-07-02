@@ -818,6 +818,7 @@ window.customElements.define('local-command-parser', class extends HTMLElement {
      * Detect Hotkey from keypress and call web component to show/hide panels
      */
     window.addEventListener('keydown', (e) => {
+      if (document.getElementById('navMenu').isMainNavMenuParsingKeystrokes()) return;
       if (!window.globals.webState.webConnected) return;
       // console.log('code', e.code);
       if ((e.altKey) &&

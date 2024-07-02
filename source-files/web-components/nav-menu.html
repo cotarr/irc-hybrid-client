@@ -4,36 +4,37 @@
 <template id='navMenuTemplate'>
   <link rel="stylesheet" href="css/styles.css">
   <div id="navDropdownDivId" class="nav-dropdown-div nav-menu-theme-dark">
+    <nav>
+      <button id="group01ButtonId" nav-group="1" nav-level="0" class="group-level0" aria-expanded="false">+ Private Messages</button>
+      <button id="item1_1_Id" nav-group="1" nav-level="1" class="nav-level1" collapsed>New Private Message (Alt-P) ...</button>
+      <!-- Dynamic Generated Private Message list -->
+      <div id="dropdownMenuPrivMsgContainerId">
+      </div>
 
-    <button id="group01ButtonId" class="nav-group" aria-expanded="false">+ Private Messages</button>
-    <button id="item1_1_Id"  class="nav-group01 nav-level1" collapsed>New Private Message (Alt-P) ...</button>
-    <!-- Dynamic Generated Private Message list -->
-    <div id="dropdownMenuPrivMsgContainerId">
-    </div>
+      <button id="group02ButtonId" nav-group="2" nav-level="0" class="group-level0" aria-expanded="false">+ IRC Channels</button>
+      <button id="item2_1_Id" nav-group="2" nav-level="1" class="nav-level1" collapsed>New Channel (Alt-C) ...</button>
+      <!-- Dynamic Generated IRC channel list -->
+      <div id="dropdownMenuChannelContainerId">
+      </div>
 
-    <button id="group02ButtonId" class="nav-group" aria-expanded="false">+ IRC Channels</button>
-    <button id="item2_1_Id" class="nav-group02 nav-level1" collapsed>New Channel (Alt-C) ...</button>
-    <!-- Dynamic Generated IRC channel list -->
-    <div id="dropdownMenuChannelContainerId">
-    </div>
-
-    <button id="group03ButtonId" class="nav-group" aria-expanded="false">+ View Panels</button>
-    <button id="item3_1_Id" class="nav-group03 nav-level1" collapsed>IRC Server List (Alt-L)</button>
-    <button id="item3_2_Id" class="nav-group03 nav-level1" collapsed>IRC Controls (Alt-I)</button>
-    <button id="item3_3_Id" class="nav-group03 nav-level1" collapsed>IRC Server (Alt-S)</button>
-    <button id="item3_4_Id" class="nav-group03 nav-level1" collapsed>Wallops</button>
-    <button id="item3_5_Id" class="nav-group03 nav-level1" collapsed>Notices</button>
-    <button id="item3_6_Id" class="nav-group03 nav-level1" collapsed>Help Commands Hotkeys (Alt-H)</button>
-    
-    <button id="group04ButtonId" class="nav-group" aria-expanded="false">+ More...</button>
-    <button id="item4_1_Id" class="nav-group04 nav-level1" collapsed>Toggle Light/Dark Theme</button>
-    <button id="item4_2_Id" class="nav-group04 nav-level1" collapsed>Show All Panels</button>
-    <button id="item4_3_Id" class="nav-group04 nav-level1" collapsed>Collapsed Panels</button>
-    <button id="item4_4_Id" class="nav-group04 nav-level1" collapsed>Hide All Panels</button>
-    <button id="item4_5_Id" class="nav-group04 nav-level1" collapsed>Debug Tools</button>
-    <button id="item4_6_Id" class="nav-group04 nav-level1" collapsed>Connect browser</button>
-    
-    <button id="item5_0_Id" class="nav-level0">MIT License</button>
-    <button id="item5_1_Id" class="nav-level0">Logout...</button>
+      <button id="group03ButtonId" nav-group="3" nav-level="0" class="group-level0" aria-expanded="false">+ View Panels</button>
+      <button id="item3_1_Id" nav-group="3" nav-level="1" class="nav-level1" collapsed>IRC Server List (Alt-L)</button>
+      <button id="item3_2_Id" nav-group="3" nav-level="1" class="nav-level1" collapsed>IRC Controls (Alt-I)</button>
+      <button id="item3_3_Id" nav-group="3" nav-level="1" class="nav-level1" collapsed>IRC Server (Alt-S)</button>
+      <button id="item3_4_Id" nav-group="3" nav-level="1" class="nav-level1" collapsed>Wallops</button>
+      <button id="item3_5_Id" nav-group="3" nav-level="1" class="nav-level1" collapsed>Notices</button>
+      <button id="item3_6_Id" nav-group="3" nav-level="1" class="nav-level1" collapsed>Help Commands Hotkeys (Alt-H)</button>
+      
+      <button id="group04ButtonId" nav-group="4" nav-level="0" class="group-level0" aria-expanded="false">+ More...</button>
+      <button id="item4_1_Id" nav-group="4" nav-level="1" class="nav-level1" collapsed>Toggle Light/Dark Theme</button>
+      <button id="item4_2_Id" nav-group="4" nav-level="1" class="nav-level1" collapsed>Show All Panels</button>
+      <button id="item4_3_Id" nav-group="4" nav-level="1" class="nav-level1" collapsed>Collapsed Panels</button>
+      <button id="item4_4_Id" nav-group="4" nav-level="1" class="nav-level1" collapsed>Hide All Panels</button>
+      <button id="item4_5_Id" nav-group="4" nav-level="1" class="nav-level1" collapsed>Debug Tools</button>
+      <button id="item4_6_Id" nav-group="4" nav-level="1" class="nav-level1" collapsed>Connect browser</button>
+      
+      <button id="item5_0_Id" nav-group="99" nav-level="0" class="nav-level0">MIT License</button>
+      <button id="item5_1_Id" nav-group="99" nav-level="0" class="nav-level0">Logout...</button>
+    </nav>
   </div>  
 </template>

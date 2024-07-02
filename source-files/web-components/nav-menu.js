@@ -38,7 +38,9 @@
 //   handleWallopsUnreadUpdate(status)
 //   handlePmListUpdate()
 //   handlePmPanelClick()
-//    handleChannelClick()
+//   handleChannelClick()
+//   isMainNavMenuParsingKeystrokes()
+//   openIfClosedNavMenu()
 //
 // ------------------------------------------------------------------------------
 'use strict';
@@ -51,35 +53,123 @@ customElements.define('nav-menu', class extends HTMLElement {
       .appendChild(templateContent.cloneNode(true));
     this.previousChannels = [];
     this.previousPmPanels = [];
-    this.arrayOfMenuElements = [];
+    this.arrayOfAllMenuElements = [];
     this.ircConnectedLast = null;
     this.webConnectedLast = null;
   }
 
   /**
-   * Make dropdown menu visible
+   * Internal function to set focus to highest on page (lowest index) nav menu item
    */
-  toggleDropdownMenu = () => {
-    this.shadowRoot.getElementById('navDropdownDivId').classList.toggle('nav-dropdown-div-show');
+  _setFocusTopAvailableItem = () => {
+    if (this.arrayOfAllMenuElements.length > 0) {
+      for (let i = 0; i < this.arrayOfAllMenuElements.length; i++) {
+        if ((!this.arrayOfAllMenuElements[i].hasAttribute('unavailable')) &&
+        (!this.arrayOfAllMenuElements[i].hasAttribute('collapsed'))) {
+          this.arrayOfAllMenuElements[i].focus();
+          break;
+        }
+      }
+    }
+  };
+
+  /**
+   * Internal function to get index value of menu item that currently has focus
+   * @returns {Number} index into arrayOfAllMenuElements, else -1
+   */
+  _getMenuIndexWithFocus = () => {
+    let index = -1;
+    const activeElement = this.shadowRoot.activeElement;
+    if ((activeElement) &&
+      (this.shadowRoot.getElementById('navDropdownDivId')
+        .classList.contains('nav-dropdown-div-show'))) {
+      for (let i = 0; i < this.arrayOfAllMenuElements.length; i++) {
+        if (activeElement.hasAttribute('id')) {
+          if (activeElement.id === this.arrayOfAllMenuElements[i].id) {
+            index = i;
+          }
+        }
+        if (activeElement.hasAttribute('pm-panel-name')) {
+          if (activeElement.getAttribute('pm-panel-name') ===
+            this.arrayOfAllMenuElements[i].getAttribute('pm-panel-name')) {
+            index = i;
+          }
+        }
+        if (activeElement.hasAttribute('channel-name')) {
+          if (activeElement.getAttribute('channel-name') ===
+            this.arrayOfAllMenuElements[i].getAttribute('channel-name')) {
+            index = i;
+          }
+        }
+      }
+    }
+    return index;
+  };
+
+  /**
+   * Internal function to make nav menu visible and set nav menu state
+   */
+  _openNavMenu = () => {
+    if (!this.shadowRoot.getElementById('navDropdownDivId')
+      .classList.contains('nav-dropdown-div-show')) {
+      this.shadowRoot.getElementById('navDropdownDivId')
+        .classList.add('nav-dropdown-div-show');
+    }
+
     // Make sure dropdown menu is visible by scrolling to the top when opening menu
     // if (this.shadowRoot.getElementById('navDropdownDivId').classList.contains(
     //   'nav-dropdown-div-show')) {
     //   document.dispatchEvent(new CustomEvent('global-scroll-to-top'));
     // }
+
+    // Call header-bar method, which calls hamburger-icon to set attributes
+    document.getElementById('headerBar').updateMenuOpenState('open');
+    // After open the dropdown, move focus to top visible item.
+    if (window.innerWidth > 500) {
+      // Case of Linux desktop browser, delay moving focus (workaround)
+      setTimeout(() => {
+        // Temporarily move focus to last menu element (trick browser, workaround)
+        this.arrayOfAllMenuElements[this.arrayOfAllMenuElements.length - 1].focus();
+      }, 10);
+      setTimeout(() => {
+        // Then move focus back to intended element
+        this._setFocusTopAvailableItem();
+      }, 20);
+    } else {
+      // Else Case of iPhone not accept focus without delay (workaround)
+      setTimeout(() => {
+        // Temporarily move focus to last menu element (trick browser, workaround)
+        this.arrayOfAllMenuElements[this.arrayOfAllMenuElements.length - 1].focus();
+      }, 110);
+      setTimeout(() => {
+        // Then move focus back to intended element
+        this._setFocusTopAvailableItem();
+      }, 120);
+    }
+  };
+
+  /**
+   * Return status of Nav Menu visibility and keystroke parser (Public method)
+   * Used inside other web components to avoid keystroke event listener conflicts
+   * @returns {Boolean} True if Nav menu visible parsing keystrokes
+   */
+  isMainNavMenuParsingKeystrokes = () => {
     if (this.shadowRoot.getElementById('navDropdownDivId')
       .classList.contains('nav-dropdown-div-show')) {
-      // Call header-bar method, which calls hamburger-icon to set attributes
-      document.getElementById('headerBar').updateMenuOpenState('open');
-      // After open the dropdown, move focus to top visible item.
-      // TODO Work around, iPhone not seeing focus change, timer solved.
-      setTimeout(() => {
-        if ((window.globals.webState.webConnected) &&
-          (window.globals.ircState.ircConnected)) {
-          this.shadowRoot.getElementById('group01ButtonId').focus();
-        } else {
-          this.shadowRoot.getElementById('group03ButtonId').focus();
-        }
-      }, 100);
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+  /**
+   * Toggle Nav dropdown menu visibility (Public method)
+   */
+  toggleDropdownMenu = () => {
+    this.shadowRoot.getElementById('navDropdownDivId').classList.toggle('nav-dropdown-div-show');
+    if (this.shadowRoot.getElementById('navDropdownDivId')
+      .classList.contains('nav-dropdown-div-show')) {
+      this._openNavMenu();
     } else {
       // Call header-bar method, which calls hamburger-icon to set attributes
       document.getElementById('headerBar').updateMenuOpenState('closed');
@@ -87,7 +177,7 @@ customElements.define('nav-menu', class extends HTMLElement {
   };
 
   /**
-   * Hide dropdown menu
+   * Hide dropdown menu (public method)
    */
   closeDropdownMenu = () => {
     this.shadowRoot.getElementById('navDropdownDivId').classList.remove('nav-dropdown-div-show');
@@ -96,7 +186,17 @@ customElements.define('nav-menu', class extends HTMLElement {
   };
 
   /**
-   * Update icons to show or hide icon for unread Server messages
+   * Nav menu method to open Nav menu from external call (public method)
+   */
+  openIfClosedNavMenu = () => {
+    if (!(this.shadowRoot.getElementById('navDropdownDivId')
+      .classList.contains('nav-dropdown-div-show'))) {
+      this._openNavMenu();
+    }
+  };
+
+  /**
+   * Update icons to show or hide icon for unread Server messages (Public method)
    * @param {boolean} status - True will make icon visible
    */
   handleServerUnreadUpdate = (status) => {
@@ -109,7 +209,7 @@ customElements.define('nav-menu', class extends HTMLElement {
   };
 
   /**
-   * Update icons to show or hide icon for unread Notice messages
+   * Update icons to show or hide icon for unread Notice messages (Public method)
    * @param {boolean} status - True will make icon visible
    */
   handleNoticeUnreadUpdate = (status) => {
@@ -122,7 +222,7 @@ customElements.define('nav-menu', class extends HTMLElement {
   };
 
   /**
-   * Update icons to show or hide icon for unread Wallops messages
+   * Update icons to show or hide icon for unread Wallops messages (public method)
    * @param {boolean} status - True will make icon visible
    */
   handleWallopsUnreadUpdate = (status) => {
@@ -135,7 +235,7 @@ customElements.define('nav-menu', class extends HTMLElement {
   };
 
   /**
-   * Called by a pm-panel element to update count of unread messages for a panel.
+   * Called by a pm-panel element to update count of unread messages for a panel. (Public Method)
    */
   handlePmListUpdate = () => {
     // list of PM panels list
@@ -168,7 +268,8 @@ customElements.define('nav-menu', class extends HTMLElement {
           // It is necessary to add an ID to each element, but id must be unique
           // console.log('navMenu pmPanels adding pm panel', pmPanels[i]);
           const pmPanelMenuItem = document.createElement('button');
-          pmPanelMenuItem.classList.add('nav-group01');
+          pmPanelMenuItem.setAttribute('nav-group', '1');
+          pmPanelMenuItem.setAttribute('nav-level', '1');
           pmPanelMenuItem.classList.add('nav-level1');
           pmPanelMenuItem.pmPanelName = pmPanels[i].toLowerCase();
           pmPanelMenuItem.setAttribute('pm-panel-name', pmPanels[i].toLowerCase());
@@ -212,12 +313,12 @@ customElements.define('nav-menu', class extends HTMLElement {
         }
       }
       // Used to iterate menu items to show or hide visibility
-      this.arrayOfMenuElements = this.shadowRoot.querySelectorAll('.nav-level1');
+      this.arrayOfAllMenuElements = this.shadowRoot.querySelectorAll('button');
     } // changed
   };
 
   /**
-   * Called by pm-panel to clear unread message count
+   * Called by pm-panel to clear unread message count (public method)
    * @param {Object} event.target.pmPanelName
    */
   handlePmPanelClick = (event) => {
@@ -227,6 +328,9 @@ customElements.define('nav-menu', class extends HTMLElement {
     this.closeDropdownMenu();
   };
 
+  /**
+   * Show or Hide Nav Menu items based on IRC and Web Server connection status
+   */
   _showHideItemsInMenu = () => {
     // Detect state change for IRC server connection. if changed, close the dropdown
     if ((window.globals.ircState.ircConnected !== this.ircConnectedLast) ||
@@ -276,8 +380,10 @@ customElements.define('nav-menu', class extends HTMLElement {
         });
       }
       // collapse all items, else state corruption
-      this.arrayOfMenuElements.forEach((itemId) => {
-        itemId.setAttribute('collapsed', '');
+      this.arrayOfAllMenuElements.forEach((itemEl) => {
+        if (itemEl.getAttribute('nav-level') === '1') {
+          itemEl.setAttribute('collapsed', '');
+        }
       });
     }
   };
@@ -332,7 +438,8 @@ customElements.define('nav-menu', class extends HTMLElement {
           // It is necessary to add an ID to each element, but id must be unique
           // console.log('navMenu channels adding channel', channels[i]);
           const channelMenuItem = document.createElement('button');
-          channelMenuItem.classList.add('nav-group02');
+          channelMenuItem.setAttribute('nav-group', '2');
+          channelMenuItem.setAttribute('nav-level', '1');
           channelMenuItem.classList.add('nav-level1');
           channelMenuItem.channelName = channels[i].toLowerCase();
           channelMenuItem.setAttribute('channel-name', channels[i].toLowerCase());
@@ -370,12 +477,12 @@ customElements.define('nav-menu', class extends HTMLElement {
         }
       }
       // Used to iterate menu items to show or hide visibility
-      this.arrayOfMenuElements = this.shadowRoot.querySelectorAll('.nav-level1');
+      this.arrayOfAllMenuElements = this.shadowRoot.querySelectorAll('button');
     } // changed
   };
 
   /**
-   * Called by channel-panel to clear unread message count
+   * Called by channel-panel to clear unread message count (Public Method)
    * @param {Object} event.target.channelName
    */
   handleChannelClick = (event) => {
@@ -383,6 +490,241 @@ customElements.define('nav-menu', class extends HTMLElement {
     const channelNameId = event.target.channelName;
     document.getElementById('channel:' + channelNameId).showAndScrollPanel();
     this.closeDropdownMenu();
+  };
+
+  /**
+   * Handle Alt-M Keypress to open menu globally
+   */
+  _handleGlobalAltMKeypress = () => {
+    if (!this.shadowRoot.getElementById('navDropdownDivId')
+      .classList.contains('nav-dropdown-div-show')) {
+      this._openNavMenu();
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+  /**
+   * Handle Escape Keypress,
+   */
+  _handleNavEscapeKeypress = () => {
+    if (this.shadowRoot.getElementById('navDropdownDivId')
+      .classList.contains('nav-dropdown-div-show')) {
+      // Close menu
+      if (this.shadowRoot.getElementById('navDropdownDivId')
+        .classList.contains('nav-dropdown-div-show')) {
+        this.closeDropdownMenu();
+        document.getElementById('headerBar').giveNavMenuHamburgerIconFocus();
+      }
+      // Menu visible, return true to abort default keystroke behavior.
+      return true;
+    } else {
+      // Menu not visible, abort, continue to keystroke default event handler
+      return false;
+    }
+  };
+
+  /**
+   * Handle Home Keypress,
+   */
+  _handleNavHomeKeypress = () => {
+    if (this.shadowRoot.getElementById('navDropdownDivId')
+      .classList.contains('nav-dropdown-div-show')) {
+      // Set focus to first navigation menu item
+      // TODO not working, why?
+      this._setFocusTopAvailableItem();
+      // Menu visible, return true to abort default keystroke behavior.
+      return true;
+    } else {
+      // Menu not visible, abort, continue to keystroke default event handler
+      return false;
+    }
+  };
+
+  /**
+   * Handle ArrowLeft Keypress
+   */
+  _handleNavArrowLeftKeypress = () => {
+    if (this.shadowRoot.getElementById('navDropdownDivId')
+      .classList.contains('nav-dropdown-div-show')) {
+      const activeElement = this.shadowRoot.activeElement;
+      const activeElementIndex = this._getMenuIndexWithFocus();
+      if (activeElement) {
+        // Case 1 of 2, Level 0 Parent Menu item, collapse all and close nav menu
+        if ((activeElement.getAttribute('nav-level') === '0') &&
+          (activeElement.classList.contains('group-level0'))) {
+          if (activeElementIndex >= 0) {
+            const navGroup = activeElement.getAttribute('nav-group');
+            let currentCollapsedState = false;
+            this.arrayOfAllMenuElements.forEach((menuItemEl) => {
+              if ((menuItemEl.getAttribute('nav-group') === navGroup) &&
+                (menuItemEl.getAttribute('nav-level') === '1')) {
+                if (menuItemEl.hasAttribute('collapsed')) currentCollapsedState = true;
+              }
+            });
+            // Case of sub menu already collapsed,
+            if (currentCollapsedState) {
+              // Else case of sub menu already collapsed.
+              this.closeDropdownMenu();
+              document.getElementById('headerBar').giveNavMenuHamburgerIconFocus();
+              return true;
+            } else {
+              // Close menu
+              this.arrayOfAllMenuElements.forEach((navMenuEl) => {
+                if ((navMenuEl.getAttribute('nav-level') === '1') &&
+                  (navMenuEl.getAttribute('nav-group') === navGroup)) {
+                  // Case of sub menu item, hide
+                  navMenuEl.setAttribute('collapsed', '');
+                }
+              });
+              // keep focus on active element
+              activeElement.setAttribute('aria-expanded', 'false');
+              activeElement.focus();
+              return true;
+            }
+          }
+        // Case 2 of 2, Level 1 sub-menu item, collapse just this group
+        } else if (activeElement.getAttribute('nav-level') === '1') {
+          if (activeElement.hasAttribute('nav-group')) {
+            const navGroup = activeElement.getAttribute('nav-group');
+            // Collapse all matching sub-men items
+            this.arrayOfAllMenuElements.forEach((menuItemEl) => {
+              if (menuItemEl.getAttribute('nav-group') === navGroup) {
+                menuItemEl.setAttribute('collapsed', '');
+              }
+            });
+            // After collapse submenu, set focus to parent item in Nav Menu
+            this.arrayOfAllMenuElements.forEach((menuItemEl) => {
+              if ((menuItemEl.getAttribute('nav-group') === navGroup) &&
+                (menuItemEl.getAttribute('nav-level') === '0')) {
+                menuItemEl.focus();
+              }
+            });
+          }
+          // True to disable further event processing
+          return true;
+        } else {
+          // Else case level 0 individual items
+          this.closeDropdownMenu();
+          document.getElementById('headerBar').giveNavMenuHamburgerIconFocus();
+          return true;
+        }
+      } // if (activeElement)
+      return false;
+    } // if visible
+    // Menu not visible, abort, continue to keystroke default event handler
+    return false;
+  }; // handleNavArrowLeftKeypress()
+
+  /**
+   * Handle ArrowRight Keypress
+   */
+  _handleNavArrowRightKeypress = () => {
+    if (this.shadowRoot.getElementById('navDropdownDivId')
+      .classList.contains('nav-dropdown-div-show')) {
+      const activeElementIndex = this._getMenuIndexWithFocus();
+      if (activeElementIndex >= 0) {
+        const activeElement = this.arrayOfAllMenuElements[activeElementIndex];
+        if (activeElement) {
+          // Level 0 Parent Menu item, expand group
+          if ((activeElement.getAttribute('nav-level') === '0') &&
+            (activeElement.classList.contains('group-level0'))) {
+            const navGroup = activeElement.getAttribute('nav-group');
+            // Expand all matching sub-men items
+            this.arrayOfAllMenuElements.forEach((menuItemEl) => {
+              if (menuItemEl.getAttribute('nav-group') === navGroup) {
+                menuItemEl.removeAttribute('collapsed');
+              }
+            });
+            if (activeElementIndex >= 0) {
+              // Keep focus on clicked element
+              activeElement.focus();
+              activeElement.setAttribute('aria-expanded', 'true');
+            }
+          }
+          return true;
+        }
+      }
+    }
+    // Menu not visible, abort, continue to keystroke default event handler
+    return false;
+  }; // handleNavArrowLeftKeypress()
+
+  _handleNavArrowUpKeypress = () => {
+    if (this.shadowRoot.getElementById('navDropdownDivId')
+      .classList.contains('nav-dropdown-div-show')) {
+      const index = this._getMenuIndexWithFocus();
+      let nextIndex = -1;
+      if ((this.arrayOfAllMenuElements.length > 0) &&
+        (index >= 1) && (index < this.arrayOfAllMenuElements.length)) {
+        for (let i = index - 1; i >= 0; i--) {
+          if ((!this.arrayOfAllMenuElements[i].hasAttribute('collapsed')) &&
+            (!this.arrayOfAllMenuElements[i].hasAttribute('unavailable'))) {
+            nextIndex = i;
+            break;
+          }
+        }
+        if (nextIndex >= 0) {
+          this.arrayOfAllMenuElements[nextIndex].focus();
+        } else {
+          // if no menu item have focus, then set to first menu item
+          this._setFocusTopAvailableItem();
+        }
+      }
+      // Menu visible, return true to abort default keystroke behavior.
+      return true;
+    } else {
+      // Menu not visible, abort, continue to keystroke default event handler
+      return false;
+    }
+  }; // handleNavArrowUpKeypress()
+
+  _handleNavArrowDownKeypress = () => {
+    if (this.shadowRoot.getElementById('navDropdownDivId')
+      .classList.contains('nav-dropdown-div-show')) {
+      const index = this._getMenuIndexWithFocus();
+
+      let nextIndex = -1;
+      if ((this.arrayOfAllMenuElements.length > 0) &&
+        (index >= 0) && (index < this.arrayOfAllMenuElements.length - 1)) {
+        for (let i = index + 1; i < this.arrayOfAllMenuElements.length; i++) {
+          if ((!this.arrayOfAllMenuElements[i].hasAttribute('collapsed')) &&
+            (!this.arrayOfAllMenuElements[i].hasAttribute('unavailable'))) {
+            nextIndex = i;
+            break;
+          }
+        }
+        if (nextIndex >= 0) {
+          this.arrayOfAllMenuElements[nextIndex].focus();
+        } else {
+          // if no menu item have focus, then set to first menu item
+          this._setFocusTopAvailableItem();
+        }
+      }
+      // Menu visible, return true to abort default keystroke behavior.
+      return true;
+    } else {
+      // Menu not visible, abort, continue to keystroke default event handler
+      return false;
+    }
+  }; // handleNavArrowDownKeypress()
+
+  /**
+   * Handle End Keypress,
+   */
+  _handleNavEndKeypress = () => {
+    if (this.shadowRoot.getElementById('navDropdownDivId')
+      .classList.contains('nav-dropdown-div-show')) {
+      // Set focus to first navigation menu item
+      const index = this.arrayOfAllMenuElements.length - 1;
+      this.arrayOfAllMenuElements[index].focus();
+      // Menu visible, return true to abort default keystroke behavior.
+      return true;
+    } else {
+      // Menu not visible, abort, continue to keystroke default event handler
+      return false;
+    }
   };
 
   // ------------------
@@ -414,6 +756,7 @@ customElements.define('nav-menu', class extends HTMLElement {
     // document.getElementById('scrollableDivId').addEventListener('click', (event) => {
       this.closeDropdownMenu();
     });
+
     document.addEventListener('color-theme-changed', (event) => {
       if (event.detail.theme === 'light') {
         this.shadowRoot.getElementById('navDropdownDivId').classList.remove('nav-menu-theme-dark');
@@ -465,63 +808,64 @@ customElements.define('nav-menu', class extends HTMLElement {
     document.addEventListener('web-connect-changed', this._handleWebConnectChanged);
 
     //
-    // Build arrays of page elements
+    // Build arrays of dropdown menu elements
     //
-    this.arrayOfMenuElements = this.shadowRoot.querySelectorAll('.nav-level1');
+    this.arrayOfAllMenuElements = this.shadowRoot.querySelectorAll('button');
 
-    // if click the superior button, open/close the dropdown, if expandable
-    const _toggleDropdownOnMenuClick = (groupName) => {
-      if (this.arrayOfMenuElements.length > 0) {
-        for (let i = 0; i < this.arrayOfMenuElements.length; i++) {
-          if (this.arrayOfMenuElements[i].classList.contains(groupName)) {
-            if (this.arrayOfMenuElements[i].hasAttribute('collapsed')) {
-              this.arrayOfMenuElements[i].removeAttribute('collapsed');
+    /**
+     * If click the superior button, open/close the dropdown, if expandable
+     * @param {String} groupNumber, group number is string "0", "1"...
+    */
+    const _toggleDropdownMenuByGroup = (groupNumberStr) => {
+      if (this.arrayOfAllMenuElements.length > 0) {
+        let collapsedState = false;
+        // First, toggle sub elements
+        for (let i = 0; i < this.arrayOfAllMenuElements.length; i++) {
+          if ((this.arrayOfAllMenuElements[i].getAttribute('nav-group') === groupNumberStr) &&
+             (this.arrayOfAllMenuElements[i].getAttribute('nav-level') === '1')) {
+            if (this.arrayOfAllMenuElements[i].hasAttribute('collapsed')) {
+              this.arrayOfAllMenuElements[i].removeAttribute('collapsed');
+              collapsedState = false;
             } else {
-              this.arrayOfMenuElements[i].setAttribute('collapsed', '');
+              this.arrayOfAllMenuElements[i].setAttribute('collapsed', '');
+              collapsedState = true;
             }
           }
         } // next i
+        // Next, based on last sub-element toggle, set aria attribute of parent
+        let matchingGroupIndex = -1;
+        for (let i = 0; i < this.arrayOfAllMenuElements.length; i++) {
+          if ((this.arrayOfAllMenuElements[i].getAttribute('nav-group') === groupNumberStr) &&
+          (this.arrayOfAllMenuElements[i].getAttribute('nav-level') === '0') &&
+          (this.arrayOfAllMenuElements[i].classList.contains('group-level0'))) {
+            matchingGroupIndex = i;
+            if (collapsedState) {
+              this.arrayOfAllMenuElements[i].setAttribute('aria-expanded', 'false');
+            } else {
+              this.arrayOfAllMenuElements[i].setAttribute('aria-expanded', 'true');
+            }
+          }
+        } // next i
+        // Keep focus on Parent menu item
+        this.arrayOfAllMenuElements[matchingGroupIndex].focus();
       }
-    };
+    }; // _toggleDropdownMenuByGroup()
+
     this.shadowRoot.getElementById('group01ButtonId').addEventListener('click', (event) => {
       event.stopPropagation();
-      _toggleDropdownOnMenuClick('nav-group01');
-      const group01ButtonEl = this.shadowRoot.getElementById('group01ButtonId');
-      if (group01ButtonEl.getAttribute('aria-expanded') === 'true') {
-        group01ButtonEl.setAttribute('aria-expanded', 'false');
-      } else {
-        group01ButtonEl.setAttribute('aria-expanded', 'true');
-      }
+      _toggleDropdownMenuByGroup('1');
     });
     this.shadowRoot.getElementById('group02ButtonId').addEventListener('click', (event) => {
       event.stopPropagation();
-      _toggleDropdownOnMenuClick('nav-group02');
-      const group02ButtonEl = this.shadowRoot.getElementById('group02ButtonId');
-      if (group02ButtonEl.getAttribute('aria-expanded') === 'true') {
-        group02ButtonEl.setAttribute('aria-expanded', 'false');
-      } else {
-        group02ButtonEl.setAttribute('aria-expanded', 'true');
-      }
+      _toggleDropdownMenuByGroup('2');
     });
     this.shadowRoot.getElementById('group03ButtonId').addEventListener('click', (event) => {
       event.stopPropagation();
-      _toggleDropdownOnMenuClick('nav-group03');
-      const group03ButtonEl = this.shadowRoot.getElementById('group03ButtonId');
-      if (group03ButtonEl.getAttribute('aria-expanded') === 'true') {
-        group03ButtonEl.setAttribute('aria-expanded', 'false');
-      } else {
-        group03ButtonEl.setAttribute('aria-expanded', 'true');
-      }
+      _toggleDropdownMenuByGroup('3');
     });
     this.shadowRoot.getElementById('group04ButtonId').addEventListener('click', (event) => {
       event.stopPropagation();
-      _toggleDropdownOnMenuClick('nav-group04');
-      const group04ButtonEl = this.shadowRoot.getElementById('group04ButtonId');
-      if (group04ButtonEl.getAttribute('aria-expanded') === 'true') {
-        group04ButtonEl.setAttribute('aria-expanded', 'false');
-      } else {
-        group04ButtonEl.setAttribute('aria-expanded', 'true');
-      }
+      _toggleDropdownMenuByGroup('4');
     });
 
     // --------------------------------
@@ -615,5 +959,72 @@ customElements.define('nav-menu', class extends HTMLElement {
       document.getElementById('logoutPanel').handleLogoutRequest();
       this.closeDropdownMenu();
     });
+
+    // ---------------------------
+    // Keypress event handlers
+    // ---------------------------
+
+    //
+    // Global event listener for Alt-M to open nav menu
+    //
+    document.addEventListener('keydown', (e) => {
+      // console.log(e.code);
+      if ((e.altKey) &&
+        (!e.ctrlKey) &&
+        (!e.shiftKey) &&
+        (!e.metaKey) &&
+        (e.code === 'KeyM')) {
+        if (this._handleGlobalAltMKeypress()) {
+          e.preventDefault();
+        }
+      };
+    }, false);
+
+    //
+    // Detect keyboard keypress and use for Navigation of the dropdown Nav menu
+    //
+    this.shadowRoot.addEventListener('keydown', (e) => {
+      // console.log(e.code);
+      if (!(e.altKey) &&
+        (!e.ctrlKey) &&
+        (!e.shiftKey) &&
+        (!e.metaKey)) {
+        if (e.code === 'Escape') {
+          if (this._handleNavEscapeKeypress()) {
+            e.preventDefault();
+          }
+        }
+        if ((e.code === 'Home') || (e.code === 'PageUp')) {
+          if (this._handleNavHomeKeypress()) {
+            e.preventDefault();
+          }
+        }
+        if (e.code === 'ArrowRight') {
+          if (this._handleNavArrowRightKeypress()) {
+            e.preventDefault();
+          }
+        }
+        if (e.code === 'ArrowLeft') {
+          if (this._handleNavArrowLeftKeypress()) {
+            e.preventDefault();
+          }
+        }
+        if (e.code === 'ArrowUp') {
+          if (this._handleNavArrowUpKeypress()) {
+            e.preventDefault();
+          }
+        }
+        if (e.code === 'ArrowDown') {
+          if (this._handleNavArrowDownKeypress()) {
+            e.preventDefault();
+          }
+        }
+        if ((e.code === 'End') || (e.code === 'PageDown')) {
+          if (this._handleNavEndKeypress()) {
+            e.preventDefault();
+          }
+        }
+      }
+    }, false);
   }; // connectedCallback()
 });

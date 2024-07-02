@@ -1311,6 +1311,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
    * @param {string} e - Keyboard character pressed by user
    */
   _channelAutoComplete = (e) => {
+    if (document.getElementById('navMenu').isMainNavMenuParsingKeystrokes()) return;
     // Before auto-complete, check for hotkeys
     if ((e.altKey) &&
       (!e.ctrlKey) &&

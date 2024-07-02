@@ -237,6 +237,10 @@ window.customElements.define('irc-server-panel', class extends HTMLElement {
     const serverInputAreaEl = this.shadowRoot.getElementById('panelMessageInputId');
     const autoCompleteSpaceKey = 32;
     const trailingSpaceKey = 32;
+
+    // Nav menu is expanded, ignore keystrokes
+    if (document.getElementById('navMenu').isMainNavMenuParsingKeystrokes()) return;
+
     if (!e.code) return;
 
     if ((e.code) && (e.code === 'Tab')) {
