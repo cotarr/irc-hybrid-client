@@ -33,6 +33,7 @@
   background-color: blue;
   border: 1px solid black;
   border-radius: 12px;
+  box-shadow: initial;
   color: white;
   font-weight: bold;
   font-size: 104%;
@@ -48,6 +49,7 @@
   background-color: #e00000;
   border: 1px solid black;
   border-radius: 12px;
+  box-shadow: initial;
   color: white;
   font-weight: bold;
   display: inline-block;
@@ -72,7 +74,6 @@
 .hbar-enable-audio {
   background-color: #80bde4;
   color: #000000;
-  font-size: 104%;
 }
 .hbar-enable-audio[flash] {
   background-color: rgba(0,0,0,0);
@@ -91,6 +92,7 @@
 }
 .hbar-recovery-icon {
   background-color: #f2f1e1;
+  box-shadow: initial;
   color: black;
   border: 1px solid black;
   border-radius: 15px;
@@ -108,11 +110,16 @@
   font-weight: bold;
   font-size: 120%;
 }
+.hbar-show-hide-button {
+  font-family: monospace;
+  margin-bottom: 0px;
+  padding: 4px 8px 4px 8px;
+}
 .hbar-wait-icon {
   background-color: #ae45b0;
   border: 1px solid black;
   border-radius: 12px;
-  box-shadow: 2px 2px 3px rgba(0,0,0,0.35);
+  box-shadow: initial;
   color: white;
   font-weight: bold;
   font-size: 104%;
