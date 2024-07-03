@@ -8,7 +8,7 @@ and this project adheres to
 
 - To view notes on v2 major upgrade, scroll to Version v2.0.0 2023-09-12
 
-## v2.0.16-dev04 (DRAFT)
+## v2.0.16-dev05 (DRAFT)
 
 The goal of this update is to improve overall web page navigation.
 Many of the navigation controls are div elements with event listeners.
@@ -26,7 +26,8 @@ and convert them from div elements to styled button elements.
 - nav-menu: Added title attributes to nav menu items to function as popup tooltips.
 - Miscellaneous edits in other modules to avoid keystroke event conflicts
 - Add `<nav>` symantic element blocks in various places to designate navigation controls
-
+- debug-panel: Added button 2_5 to initiate an example error message
+- error-panel: CSS smaller window in upper right corner of screen, added attribute role="alert"
 
 ## [v2.0.15](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.0.15) 2024-06-25
 

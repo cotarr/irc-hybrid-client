@@ -62,6 +62,7 @@ window.customElements.define('error-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
     const errorContentDivEl = this.shadowRoot.getElementById('errorContentDivId');
     const errorMessageEl = document.createElement('div');
+    errorMessageEl.setAttribute('role', 'alert');
     errorMessageEl.textContent = errorString || 'Error: unknown error (2993)';
     errorContentDivEl.appendChild(errorMessageEl);
     this.errorRemainSeconds = this.errorExpireSeconds;

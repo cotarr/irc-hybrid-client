@@ -471,6 +471,11 @@ window.customElements.define('debug-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('button_2_4').addEventListener('click', () => {
       document.getElementById('displayUtils').manualRecalcPageWidth();
     });
+    this.shadowRoot.getElementById('button_2_5').addEventListener('click', () => {
+      setTimeout(() => {
+        document.getElementById('errorPanel').showError('This is an example error message');
+      }, 100);
+    });
     // --------------------
     // Data and Variables
     // --------------------

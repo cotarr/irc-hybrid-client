@@ -35,20 +35,20 @@ border-radius:12px;color:#fff;font-weight:700;display:inline-block;font-size:104
 z-index:4}.hbar-recovery-icon{background-color:#f2f1e1;color:#000;border:1px solid #000;border-radius:15px;color:#000;font-weight:700;display:inline-block;margin-right:2px;padding:3px 5px 2px 5px;
 cursor:pointer}.hbar-recovery-icon[hidden]{display:none}.hbar-title-div{font-weight:700;font-size:120%}.hbar-wait-icon{background-color:#ae45b0;border:1px solid #000;border-radius:12px;box-shadow:2px 
 2px 3px rgba(0,0,0,.35);color:#fff;font-weight:700;font-size:104%;display:inline-block;margin-right:2px;padding:3px 10px 2px 10px}.hbar-wait-icon[hidden]{display:none}.error-panel-div{position:fixed;
-top:0;left:0;width:100%;color:#fff;background-color:red;padding-left:15px;padding-top:5px;padding-bottom:5px;z-index:10}.error-panel-title{text-align:center;font-size:120%}.help-panel-theme-light{
-background-color:#aaa;border:1px solid #000;color:#000}.help-panel-theme-dark{background-color:#5c5c5c;border:1px solid #a3a3a3;color:#fff}.help-panel-help-div{border:1px solid #000;border-radius:5px;
-margin-right:10px;margin-bottom:10px;padding:10px}.help-panel-docs-div-light{background-color:#9ac9ff;border:1px solid #565656;border-radius:7px;color:#000;margin-top:10px;margin-right:10px;
-margin-bottom:20px;padding:10px}.help-panel-docs-div-dark{background-color:#25159a;border:1px solid #000;border-radius:7px;color:#fff;margin-top:10px;margin-right:10px;margin-bottom:20px;padding:10px}
-.license-panel-theme-light{background-color:#aaa;border:1px solid #000;color:#000}.license-panel-theme-dark{background-color:#5c5c5c;border:1px solid #a3a3a3;color:#fff}.license-panel-license-div{
-border:1px solid #000;border-radius:5px;margin-right:10px;margin-bottom:10px;padding:10px}.logout-panel-theme{border:1px solid #000;border-radius:6px;background-color:#ff0;color:#000;padding:10px}
-.server-form-theme-light{background-color:#82bbc4;border:1px solid #000;color:#000}.server-form-theme-dark{background-color:#134850;border:1px solid #7ac4cf;color:#fff}.server-form-input-group1-light{
-background-color:#d7fcee;border:1px solid #000;border-radius:7px;color:#000;padding-top:0;padding-left:10px;padding-bottom:10px}.server-form-input-group1-dark{background-color:#1a5e42;border:1px solid
- #fff;border-radius:7px;color:#fff;padding-top:0;padding-left:10px;padding-bottom:10px}.server-form-input-group2-light{background-color:#c4deff;border:1px solid #000;border-radius:7px;color:#000;
-padding-top:0;padding-left:10px;padding-bottom:10px}.server-form-input-group2-dark{background-color:#1d61b9;border:1px solid #fff;border-radius:7px;color:#fff;padding-top:0;padding-left:10px;
-padding-bottom:10px}.server-form-yellow-warning-div{background-color:#ff0;border:1px solid #000;border-radius:7px;color:#000;margin-top:10px;margin-right:10px;padding:10px}
-.server-form-white-example-div{border:1px solid grey;display:inline-block;margin-top:3px;padding-top:0;padding-left:5px;padding-right:5px}.server-form-white-info-div{background-color:#fff;border:1px 
-solid #000;color:#000;margin-top:3px;margin-bottom:10px;padding-left:5px;padding-right:5px}input[type=number].server-form-group-input{width:50px}input[type=number].server-form-port-input{width:75px}
-.server-form-required-input{background-color:#cf23c7;border-radius:5px;display:inline-block;width:11px;height:11px;margin-right:3px}.server-form-optional-input{background-color:rgba(0,0,0,0);
+top:0;right:0;width:fit-content;min-width:200px;color:#fff;background-color:red;border:1px solid #fff;border-radius:8px;padding:5px 15px 5px 15px;z-index:10}.error-panel-title{text-align:center;
+font-size:120%}.help-panel-theme-light{background-color:#aaa;border:1px solid #000;color:#000}.help-panel-theme-dark{background-color:#5c5c5c;border:1px solid #a3a3a3;color:#fff}.help-panel-help-div{
+border:1px solid #000;border-radius:5px;margin-right:10px;margin-bottom:10px;padding:10px}.help-panel-docs-div-light{background-color:#9ac9ff;border:1px solid #565656;border-radius:7px;color:#000;
+margin-top:10px;margin-right:10px;margin-bottom:20px;padding:10px}.help-panel-docs-div-dark{background-color:#25159a;border:1px solid #000;border-radius:7px;color:#fff;margin-top:10px;margin-right:
+10px;margin-bottom:20px;padding:10px}.license-panel-theme-light{background-color:#aaa;border:1px solid #000;color:#000}.license-panel-theme-dark{background-color:#5c5c5c;border:1px solid #a3a3a3;color
+:#fff}.license-panel-license-div{border:1px solid #000;border-radius:5px;margin-right:10px;margin-bottom:10px;padding:10px}.logout-panel-theme{border:1px solid #000;border-radius:6px;background-color:
+#ff0;color:#000;padding:10px}.server-form-theme-light{background-color:#82bbc4;border:1px solid #000;color:#000}.server-form-theme-dark{background-color:#134850;border:1px solid #7ac4cf;color:#fff}
+.server-form-input-group1-light{background-color:#d7fcee;border:1px solid #000;border-radius:7px;color:#000;padding-top:0;padding-left:10px;padding-bottom:10px}.server-form-input-group1-dark{
+background-color:#1a5e42;border:1px solid #fff;border-radius:7px;color:#fff;padding-top:0;padding-left:10px;padding-bottom:10px}.server-form-input-group2-light{background-color:#c4deff;border:1px 
+solid #000;border-radius:7px;color:#000;padding-top:0;padding-left:10px;padding-bottom:10px}.server-form-input-group2-dark{background-color:#1d61b9;border:1px solid #fff;border-radius:7px;color:#fff;
+padding-top:0;padding-left:10px;padding-bottom:10px}.server-form-yellow-warning-div{background-color:#ff0;border:1px solid #000;border-radius:7px;color:#000;margin-top:10px;margin-right:10px;padding:
+10px}.server-form-white-example-div{border:1px solid grey;display:inline-block;margin-top:3px;padding-top:0;padding-left:5px;padding-right:5px}.server-form-white-info-div{background-color:#fff;border:
+1px solid #000;color:#000;margin-top:3px;margin-bottom:10px;padding-left:5px;padding-right:5px}input[type=number].server-form-group-input{width:50px}input[type=number].server-form-port-input{width:
+75px}.server-form-required-input{background-color:#cf23c7;border-radius:5px;display:inline-block;width:11px;height:11px;margin-right:3px}.server-form-optional-input{background-color:rgba(0,0,0,0);
 border-radius:5px;display:inline-block;width:11px;height:11px;margin-right:3px}.server-list-theme-light{background-color:#b8f5ff;border:1px solid #000;color:#000}.server-list-theme-dark{
 background-color:#117180;border:1px solid #7ac4cf;color:#fff}table.server-list-table{border-spacing:0;font-size:80%;border:1px solid grey}tbody.server-list-tbody-light{background-color:#fff;color:#000
 }tbody.server-list-tbody-dark{background-color:#000;color:#fff}td.server-list-td{border:.5px solid grey;padding:3px}th.server-list-th{border:.5px solid grey;padding:3px}.server-list-button-div{border:

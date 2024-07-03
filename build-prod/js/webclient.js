@@ -681,50 +681,51 @@ hamburgerIconEl.setColorTheme('dark');headerBarDivEl.classList.remove('header-ba
 ;this.errorExpireSeconds=5;this.errorRemainSeconds=0}clearError=()=>{this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible')
 ;const errorContentDivEl=this.shadowRoot.getElementById('errorContentDivId');while(errorContentDivEl.firstChild){errorContentDivEl.removeChild(errorContentDivEl.firstChild)}this.errorRemainSeconds=0}
 ;showError=errorString=>{this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible','');const errorContentDivEl=this.shadowRoot.getElementById('errorContentDivId')
-;const errorMessageEl=document.createElement('div');errorMessageEl.textContent=errorString||'Error: unknown error (2993)';errorContentDivEl.appendChild(errorMessageEl)
-;this.errorRemainSeconds=this.errorExpireSeconds};_expireErrorMessages=()=>{if(this.errorRemainSeconds>0){this.errorRemainSeconds--;if(this.errorRemainSeconds===0){this.clearError()}else{
-this.shadowRoot.getElementById('errorTitleId').textContent='Tap to Close ('+this.errorRemainSeconds.toString()+')'}}};timerTickHandler=()=>{this._expireErrorMessages()};connectedCallback(){
-this.shadowRoot.getElementById('panelDivId').addEventListener('click',(()=>{this.clearError()}))}});window.customElements.define('help-panel',class extends HTMLElement{constructor(){super()
-;const template=document.getElementById('helpPanelTemplate');const templateContent=template.content;this.attachShadow({mode:'open'}).appendChild(templateContent.cloneNode(true))
-;this.docsFolderTestComplete=false}_scrollToTop=()=>{this.focus();const newVertPos=window.scrollY+this.getBoundingClientRect().top-50;window.scrollTo({top:newVertPos,behavior:'smooth'})}
-;showPanel=()=>{this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible','');this._setDocsFolderLinkVisibility();document.dispatchEvent(new CustomEvent('cancel-zoom'))
-;this._scrollToTop()};collapsePanel=()=>{this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible')};hidePanel=()=>{
-this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible')};handleHotKey=()=>{if(this.shadowRoot.getElementById('panelVisibilityDivId').hasAttribute('visible')){this.hidePanel()
-}else{this.showPanel()}};_setDocsFolderLinkVisibility=()=>{if(this.docsFolderTestComplete){return}this.docsFolderTestComplete=true;const fetchController=new AbortController
-;const fetchTimeout=document.getElementById('globVars').constants('fetchTimeout');const activitySpinnerEl=document.getElementById('activitySpinner');const fetchOptions={method:'HEAD',headers:{
-redirect:'error',signal:fetchController.signal,Accept:'text/html'}};const fetchURL='/irc/docs/index.html';activitySpinnerEl.requestActivitySpinner()
-;const fetchTimerId=setTimeout((()=>fetchController.abort()),fetchTimeout);fetch(fetchURL,fetchOptions).then((response=>{if(response.ok){
-this.shadowRoot.getElementById('viewDocsButtonDivId').removeAttribute('hidden')}if(fetchTimerId){clearTimeout(fetchTimerId)}activitySpinnerEl.cancelActivitySpinner()})).catch((()=>{if(fetchTimerId){
-clearTimeout(fetchTimerId)}activitySpinnerEl.cancelActivitySpinner()}))};connectedCallback(){this.shadowRoot.getElementById('closePanelButtonId').addEventListener('click',(()=>{
-this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible')}));document.addEventListener('collapse-all-panels',(event=>{if(event.detail&&event.detail.except){
-if(typeof event.detail.except==='string'){if(event.detail.except!==this.id){this.collapsePanel()}}else if(Array.isArray(event.detail.except)){if(event.detail.except.indexOf(this.id)<0){
-this.collapsePanel()}}}else{this.collapsePanel()}}));document.addEventListener('color-theme-changed',(event=>{const panelDivEl=this.shadowRoot.getElementById('panelDivId')
-;const infoDivEl=this.shadowRoot.getElementById('infoDivId');const viewDocsButtonDivEl=this.shadowRoot.getElementById('viewDocsButtonDivId');if(event.detail.theme==='light'){
-panelDivEl.classList.remove('help-panel-theme-dark');panelDivEl.classList.add('help-panel-theme-light');infoDivEl.classList.remove('global-text-theme-dark')
-;infoDivEl.classList.add('global-text-theme-light');viewDocsButtonDivEl.classList.remove('help-panel-docs-div-dark');viewDocsButtonDivEl.classList.add('help-panel-docs-div-light')}else{
-panelDivEl.classList.remove('help-panel-theme-light');panelDivEl.classList.add('help-panel-theme-dark');infoDivEl.classList.remove('global-text-theme-light')
-;infoDivEl.classList.add('global-text-theme-dark');viewDocsButtonDivEl.classList.remove('help-panel-docs-div-light');viewDocsButtonDivEl.classList.add('help-panel-docs-div-dark')}}))
-;document.addEventListener('irc-state-changed',(()=>{if(window.globals.ircState.ircConnected!==this.ircConnectedLast){this.ircConnectedLast=window.globals.ircState.ircConnected
-;if(!window.globals.ircState.ircConnected){this.hidePanel()}}}));document.addEventListener('hide-all-panels',(event=>{if(event.detail&&event.detail.except){if(typeof event.detail.except==='string'){
-if(event.detail.except!==this.id){this.hidePanel()}}else if(Array.isArray(event.detail.except)){if(event.detail.except.indexOf(this.id)<0){this.hidePanel()}}}else{this.hidePanel()}}))
-;document.addEventListener('show-all-panels',(event=>{if(event.detail&&event.detail.except){if(typeof event.detail.except==='string'){if(event.detail.except!==this.id&&event.detail.debug){
-this.showPanel()}}else if(Array.isArray(event.detail.except)){if(event.detail.except.indexOf(this.id)<0&&event.detail.debug){this.showPanel()}}}else if(event.detail&&event.detail.debug){
-this.showPanel()}}))}});window.customElements.define('license-panel',class extends HTMLElement{constructor(){super();const template=document.getElementById('licensePanelTemplate')
-;const templateContent=template.content;this.attachShadow({mode:'open'}).appendChild(templateContent.cloneNode(true))}_scrollToTop=()=>{this.focus()
+;const errorMessageEl=document.createElement('div');errorMessageEl.setAttribute('role','alert');errorMessageEl.textContent=errorString||'Error: unknown error (2993)'
+;errorContentDivEl.appendChild(errorMessageEl);this.errorRemainSeconds=this.errorExpireSeconds};_expireErrorMessages=()=>{if(this.errorRemainSeconds>0){this.errorRemainSeconds--
+;if(this.errorRemainSeconds===0){this.clearError()}else{this.shadowRoot.getElementById('errorTitleId').textContent='Tap to Close ('+this.errorRemainSeconds.toString()+')'}}};timerTickHandler=()=>{
+this._expireErrorMessages()};connectedCallback(){this.shadowRoot.getElementById('panelDivId').addEventListener('click',(()=>{this.clearError()}))}})
+;window.customElements.define('help-panel',class extends HTMLElement{constructor(){super();const template=document.getElementById('helpPanelTemplate');const templateContent=template.content
+;this.attachShadow({mode:'open'}).appendChild(templateContent.cloneNode(true));this.docsFolderTestComplete=false}_scrollToTop=()=>{this.focus()
 ;const newVertPos=window.scrollY+this.getBoundingClientRect().top-50;window.scrollTo({top:newVertPos,behavior:'smooth'})};showPanel=()=>{
-this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible','');document.dispatchEvent(new CustomEvent('cancel-zoom'));this._scrollToTop()};collapsePanel=()=>{
-this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible')};hidePanel=()=>{this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible')}
-;connectedCallback(){this.shadowRoot.getElementById('closePanelButtonId').addEventListener('click',(()=>{this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible')}))
+this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible','');this._setDocsFolderLinkVisibility();document.dispatchEvent(new CustomEvent('cancel-zoom'));this._scrollToTop()}
+;collapsePanel=()=>{this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible')};hidePanel=()=>{this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible')}
+;handleHotKey=()=>{if(this.shadowRoot.getElementById('panelVisibilityDivId').hasAttribute('visible')){this.hidePanel()}else{this.showPanel()}};_setDocsFolderLinkVisibility=()=>{
+if(this.docsFolderTestComplete){return}this.docsFolderTestComplete=true;const fetchController=new AbortController;const fetchTimeout=document.getElementById('globVars').constants('fetchTimeout')
+;const activitySpinnerEl=document.getElementById('activitySpinner');const fetchOptions={method:'HEAD',headers:{redirect:'error',signal:fetchController.signal,Accept:'text/html'}}
+;const fetchURL='/irc/docs/index.html';activitySpinnerEl.requestActivitySpinner();const fetchTimerId=setTimeout((()=>fetchController.abort()),fetchTimeout)
+;fetch(fetchURL,fetchOptions).then((response=>{if(response.ok){this.shadowRoot.getElementById('viewDocsButtonDivId').removeAttribute('hidden')}if(fetchTimerId){clearTimeout(fetchTimerId)}
+activitySpinnerEl.cancelActivitySpinner()})).catch((()=>{if(fetchTimerId){clearTimeout(fetchTimerId)}activitySpinnerEl.cancelActivitySpinner()}))};connectedCallback(){
+this.shadowRoot.getElementById('closePanelButtonId').addEventListener('click',(()=>{this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible')}))
 ;document.addEventListener('collapse-all-panels',(event=>{if(event.detail&&event.detail.except){if(typeof event.detail.except==='string'){if(event.detail.except!==this.id){this.collapsePanel()}
 }else if(Array.isArray(event.detail.except)){if(event.detail.except.indexOf(this.id)<0){this.collapsePanel()}}}else{this.collapsePanel()}}));document.addEventListener('color-theme-changed',(event=>{
-const panelDivEl=this.shadowRoot.getElementById('panelDivId');const licenseDivEl=this.shadowRoot.getElementById('licenseDivId');if(event.detail.theme==='light'){
-panelDivEl.classList.remove('license-panel-theme-dark');panelDivEl.classList.add('license-panel-theme-light');licenseDivEl.classList.remove('global-text-theme-dark')
-;licenseDivEl.classList.add('global-text-theme-light')}else{panelDivEl.classList.remove('license-panel-theme-light');panelDivEl.classList.add('license-panel-theme-dark')
-;licenseDivEl.classList.remove('global-text-theme-light');licenseDivEl.classList.add('global-text-theme-dark')}}));document.addEventListener('irc-state-changed',(()=>{
+const panelDivEl=this.shadowRoot.getElementById('panelDivId');const infoDivEl=this.shadowRoot.getElementById('infoDivId')
+;const viewDocsButtonDivEl=this.shadowRoot.getElementById('viewDocsButtonDivId');if(event.detail.theme==='light'){panelDivEl.classList.remove('help-panel-theme-dark')
+;panelDivEl.classList.add('help-panel-theme-light');infoDivEl.classList.remove('global-text-theme-dark');infoDivEl.classList.add('global-text-theme-light')
+;viewDocsButtonDivEl.classList.remove('help-panel-docs-div-dark');viewDocsButtonDivEl.classList.add('help-panel-docs-div-light')}else{panelDivEl.classList.remove('help-panel-theme-light')
+;panelDivEl.classList.add('help-panel-theme-dark');infoDivEl.classList.remove('global-text-theme-light');infoDivEl.classList.add('global-text-theme-dark')
+;viewDocsButtonDivEl.classList.remove('help-panel-docs-div-light');viewDocsButtonDivEl.classList.add('help-panel-docs-div-dark')}}));document.addEventListener('irc-state-changed',(()=>{
 if(window.globals.ircState.ircConnected!==this.ircConnectedLast){this.ircConnectedLast=window.globals.ircState.ircConnected;if(!window.globals.ircState.ircConnected){this.hidePanel()}}}))
 ;document.addEventListener('hide-all-panels',(event=>{if(event.detail&&event.detail.except){if(typeof event.detail.except==='string'){if(event.detail.except!==this.id){this.hidePanel()}
 }else if(Array.isArray(event.detail.except)){if(event.detail.except.indexOf(this.id)<0){this.hidePanel()}}}else{this.hidePanel()}}));document.addEventListener('show-all-panels',(event=>{
 if(event.detail&&event.detail.except){if(typeof event.detail.except==='string'){if(event.detail.except!==this.id&&event.detail.debug){this.showPanel()}}else if(Array.isArray(event.detail.except)){
+if(event.detail.except.indexOf(this.id)<0&&event.detail.debug){this.showPanel()}}}else if(event.detail&&event.detail.debug){this.showPanel()}}))}})
+;window.customElements.define('license-panel',class extends HTMLElement{constructor(){super();const template=document.getElementById('licensePanelTemplate');const templateContent=template.content
+;this.attachShadow({mode:'open'}).appendChild(templateContent.cloneNode(true))}_scrollToTop=()=>{this.focus();const newVertPos=window.scrollY+this.getBoundingClientRect().top-50;window.scrollTo({
+top:newVertPos,behavior:'smooth'})};showPanel=()=>{this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible','');document.dispatchEvent(new CustomEvent('cancel-zoom'))
+;this._scrollToTop()};collapsePanel=()=>{this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible')};hidePanel=()=>{
+this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible')};connectedCallback(){this.shadowRoot.getElementById('closePanelButtonId').addEventListener('click',(()=>{
+this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible')}));document.addEventListener('collapse-all-panels',(event=>{if(event.detail&&event.detail.except){
+if(typeof event.detail.except==='string'){if(event.detail.except!==this.id){this.collapsePanel()}}else if(Array.isArray(event.detail.except)){if(event.detail.except.indexOf(this.id)<0){
+this.collapsePanel()}}}else{this.collapsePanel()}}));document.addEventListener('color-theme-changed',(event=>{const panelDivEl=this.shadowRoot.getElementById('panelDivId')
+;const licenseDivEl=this.shadowRoot.getElementById('licenseDivId');if(event.detail.theme==='light'){panelDivEl.classList.remove('license-panel-theme-dark')
+;panelDivEl.classList.add('license-panel-theme-light');licenseDivEl.classList.remove('global-text-theme-dark');licenseDivEl.classList.add('global-text-theme-light')}else{
+panelDivEl.classList.remove('license-panel-theme-light');panelDivEl.classList.add('license-panel-theme-dark');licenseDivEl.classList.remove('global-text-theme-light')
+;licenseDivEl.classList.add('global-text-theme-dark')}}));document.addEventListener('irc-state-changed',(()=>{if(window.globals.ircState.ircConnected!==this.ircConnectedLast){
+this.ircConnectedLast=window.globals.ircState.ircConnected;if(!window.globals.ircState.ircConnected){this.hidePanel()}}}));document.addEventListener('hide-all-panels',(event=>{
+if(event.detail&&event.detail.except){if(typeof event.detail.except==='string'){if(event.detail.except!==this.id){this.hidePanel()}}else if(Array.isArray(event.detail.except)){
+if(event.detail.except.indexOf(this.id)<0){this.hidePanel()}}}else{this.hidePanel()}}));document.addEventListener('show-all-panels',(event=>{if(event.detail&&event.detail.except){
+if(typeof event.detail.except==='string'){if(event.detail.except!==this.id&&event.detail.debug){this.showPanel()}}else if(Array.isArray(event.detail.except)){
 if(event.detail.except.indexOf(this.id)<0&&event.detail.debug){this.showPanel()}}}else if(event.detail&&event.detail.debug){this.showPanel()}}))}})
 ;window.customElements.define('logout-panel',class extends HTMLElement{constructor(){super();const template=document.getElementById('logoutPanelTemplate');const templateContent=template.content
 ;this.attachShadow({mode:'open'}).appendChild(templateContent.cloneNode(true))}_scrollToTop=()=>{this.focus();const newVertPos=window.scrollY+this.getBoundingClientRect().top-50;window.scrollTo({
@@ -2354,8 +2355,9 @@ document.getElementById('activitySpinner').requestActivitySpinner();document.get
 zoom:true,away:true,serverUnread:true,channelUnread:true,privMsgUnread:true,noticeUnread:true,wallopsUnread:true,nickRecovery:true,enableAudio:true})
 ;document.getElementById('headerBar')._updateDynamicElementTitles()}));this.shadowRoot.getElementById('button_2_3').addEventListener('click',(()=>{
 document.getElementById('displayUtils').toggleColorTheme()}));this.shadowRoot.getElementById('button_2_4').addEventListener('click',(()=>{
-document.getElementById('displayUtils').manualRecalcPageWidth()}));this.shadowRoot.getElementById('button_3_1').addEventListener('click',(()=>{document.getElementById('showIrcState').showPanel()}))
-;this.shadowRoot.getElementById('button_3_2').addEventListener('click',(()=>{document.getElementById('showWebState').showPanel()}))
+document.getElementById('displayUtils').manualRecalcPageWidth()}));this.shadowRoot.getElementById('button_2_5').addEventListener('click',(()=>{setTimeout((()=>{
+document.getElementById('errorPanel').showError('This is an example error message')}),100)}));this.shadowRoot.getElementById('button_3_1').addEventListener('click',(()=>{
+document.getElementById('showIrcState').showPanel()}));this.shadowRoot.getElementById('button_3_2').addEventListener('click',(()=>{document.getElementById('showWebState').showPanel()}))
 ;this.shadowRoot.getElementById('button_3_3').addEventListener('click',(()=>{document.getElementById('showRaw').showPanel()}))
 ;this.shadowRoot.getElementById('button_3_4').addEventListener('click',(()=>{document.getElementById('showEvents').showPanel()}))
 ;this.shadowRoot.getElementById('button_4_1').addEventListener('click',(()=>{document.getElementById('ircControlsPanel').getIrcState().catch((()=>{}))}))
