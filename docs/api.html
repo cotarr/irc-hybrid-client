@@ -1646,19 +1646,13 @@ auth_scopes:         "irc.all"
         <p>
           To view websocket messages in the IRC client, first open the irc-hybrid-client web page.
           Enter the username and password that were setup for Thunder Client tests as described above.
-          Next, open the Server window, then select the [More...] button.
-        </p>
-        <p>
-          Selection of the [x]View-Raw checkbox will cause the Server window to display
-          raw IRC server messages.
-        </p>
-        <p>
-          Selection of the [x]View-Comms checkbox will add Non-IRC messages to the Server
-          window. These include HEARTBEAT, UPDATE, and other informational messages
-          as described above. View-Comms requires that View-Raw also be selected.
+          In the main navigation dropdown menu, select <q>More...</q>, then select <q>Debug Tools</q>.
+          The Debug Panel will open. An screen shot of the debug panel is included at the bottom of this page.
+          In the Debug Panel, select Button 3-3 Open: IRC raw message log.
+          Press the <q>Start</q> button to enable real time display of websocket messages.
         </p>
 
-        <img src=images/raw-server-messages.png width="757" height="282"alt="API response Example">
+        <img src=images/raw-server-messages.png width="714" height="341"alt="Debug Panel">
 
         <h3>3 - Browser Websocket Messages (custom debug tool)</h3>
         <p>
@@ -1734,7 +1728,7 @@ http://localhost:3000/testws/test-websocket.html
           &quot; server/testws&quot; folder.
         </p>
 
-        <img src=images/websocket-trace.png width="874" height="464"alt="Websocket Example">
+        <img src=images/websocket-trace.png width="600" height="870"alt="Websocket Example">
 
 
         <div class="vh-20"></div>
@@ -1772,13 +1766,15 @@ http://localhost:3000/testws/test-websocket.html
         </ul>
         <h3>Debug Functions</h3>
         <ul>
-          <li>Button 1-1 Emulate IRC ping timeout</li>
-          <li>Button 1-2 Emulate websocket timeout</li>
-          <li>Button 1-3 Command NodeJs to perform garbage collection, report memory before and after (Requires backend started with &quot; node --expose-gc&quot;)</li>
+          <li>Button 1-1 Emulate IRC ping timeout by forcing internal variables to exceed time limits.</li>
+          <li>Button 1-2 Emulate websocket timeout by forcing internal variables to exceed time limits</li>
+          <li>Button 1-3 Command NodeJs to perform garbage collection (image below), report memory before and after (Requires backend started with &quot; node --expose-gc&quot;)</li>
           <li>Button 1-4 Websocket ping, shows response time for both HTTP response and websocket stream response. Results shown at bottom of debug panel.</li>
           <li>Button 2-1 Force all panels to be visible (Use care not to activate buttons in panels intended to be hidden)</li>
-          <li>Button 2-2 Force all status icons in the header bar to be visible (To cancel refresh page)</li>
+          <li>Button 2-2 Force all status icons in the header bar to be visible. Used to edit CSS styles. (To cancel refresh page)</li>
           <li>Button 2-3 Toggle Light/Dark theme</li>
+          <li>Button 2-4 Recalculate page size. These are internal pixel calculations for dynamic styles</li>
+          <li>Button 2-5 Generate an example error to observe the error message pop-up window.</li>
           <li>Button 3-1 Open show-ircstate debugging panel showing current values of IRC server state variables in NodeJs backend</li>
           <li>Button 3-2 Open show-webstate debugging panel showing current values of local browser state variables</li>
           <li>Button 3-3 Open show-raw debugging panel. Display incoming IRC server messages in raw format. Show current message cache</li>
@@ -1791,6 +1787,15 @@ http://localhost:3000/testws/test-websocket.html
           <li>Button 5-2 Play Beep Sound 2</li>
           <li>Button 5-3 Play Beep Sound 3</li>
         </ul>
+        <h3>Debug Panel Examples</h3>
+        <p>
+          In the example below, Button 1-3 was selected. The memory usage was displayed at the bottom of the Debug Panel.
+        </p>
+        <img src=images/debug-panel.png width="758" height="1291"alt="Debug Panel">
+        <p>
+          Example showing the Button 3-3 from the Debug Panel.
+        </p>
+        <img src=images/raw-server-messages.png width="714" height="341"alt="Debug Panel">
         <div class="vh-20"></div>
 
       </div> <!-- /text-div -->

@@ -8,6 +8,13 @@ and this project adheres to
 
 - To view notes on v2 major upgrade, scroll to Version v2.0.0 2023-09-12
 
+## [v2.0.17](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.0.17) 2024-07-06
+
+There are no code changes in v2.0.17.
+
+- /docs/ - Update some screen capture images in help files.
+- Update the websocket test utility used in development.
+
 ## [v2.0.16](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.0.16) 2024-07-04
 
 The goal of this update is to improve overall web page navigation.

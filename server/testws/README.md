@@ -31,11 +31,12 @@ This temporary web page is intended to be used to confirm the websocket server i
 
 ### Recommend test procedure
 
-* Stop the web server (if running). This removes any active user login status.
-* Remove comment the route `app.use('/testws', module1.testWsRouter);` in file web-server.js to temporarily enable the test page
+* Stop the web server (if running).
+* Remove the `\\` comments around the route `app.use('/testws', module1.testWsRouter);` in file web-server.js to temporarily enable the test page
 * Set environment `export NODE_ENV=development`
-* Start web server
+* Start/Restart the web server
 * Set browser to test page: http://localhost:3003/testws/test-websocket.html
+* Open web browser developer tools. Delete all cookies for this page.
 * 1) Select the [Connect Websocket] button
 * Expected response:  "websocket: error event fired", "websocket: close event fired"
 * 2) Select the [Schedule Connect] button

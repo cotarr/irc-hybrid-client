@@ -11,22 +11,49 @@
   </head>
   <body>
     <h1>test-websocket (development only)</h1>
-
-    <div class="button-div">
+    <h2>Recommended Tests</h2>
+    <ul>
+      <li>[Schedule Auth] fails without cookie (no login)</li>
+      <li>[Schedule Auth] fails without CSRF token (cross site request)</li>
+      <li>[Connect Websocket] fails when authorization timer not started</li>
+      <li>[Connect Websocket] fails when authorization timer is expired</li>
+    </ul>
+    <div class="border-div">
       <div>
-        Use browser back arrow to return here.<br>
-        Wait > 10 seconds before testing.
+        1) Get a valid cookie using main irc-hybrid-client application.<br><br>
+        Click the [Login] button to obtain an irc-hybrid-client cookie.<br>
+        Return to this testing page: <code> /testws/test-websocket.html</code><br>
+        Wait at least 10 seconds before testing.
       </div>
+      <div class="vs10"></div>
       <a href="/login"><button>Login</button></a>
       <a href="/logout"><button>Logout</button></a>
     </div>
 
-    <div class="button-div">
+    <div class="border-div">
       <div>
-        Schedule authorization before connect.<br>
+        2) Enable websocket requests<br><br>
+        Press button to start authorization timer.<br>
         Timeout = 10 seconds.
       </div>
-      <button id="schedAuthButton">Schedule Auth</button>
+      <div>
+        <input id="noCsrfTokenCheckbox" type="checkbox">
+        <span>Submit without CSRF token (Auth error)</span>
+      </div>
+      <div>
+        <input id="invalidCsrfTokenCheckbox" type="checkbox">
+        <span>Submit with invalid CSRF token (Auth error)</span>
+      </div>
+      <li>Test: Use browser dev tools to delete cookie (Auth error)</li>
+      <div class="vs10"></div>
+      <div>
+        <button id="schedAuthButton">Schedule Auth</button>
+      </div>
+    </div>
+    <div class="border-div">
+      3) Open websocket<br><br>
+      <li>Test: Use browser dev tools to delete cookie (Auth error)</li>
+      <div class="vs10"></div>
       <button id="connectWebSocket">Connect Websocket</button>
     </div>
 
@@ -47,11 +74,16 @@
     <div class="button-div">
       <button id="clearMessages">Clear All</button>
     </div>
-    <h2>Recommend Two Tests</h2>
-    <ul>
-      <li>Schedule Auth fails without cookie (no login) or altered csrfToken</li>
-      <li>Connect Websocket fails without Schedule Auth</li>
-    </ul>
-
+    <div class="border-div">
+      <div>
+        4) Optional: Send unexpected message to remote server via websocket.<br>
+        Normal data flows from Server to Browser.<br>
+        No data should flow from Browser to Server.<br>
+        In the case where the web server receives an unexpected message <br>
+        over the websocket, an error is printed to the console.log().
+      </div>
+      <div class="vs10"></div>
+      <button id="sendUnexpectedMessage">Send Unexpended Message</button>
+    </div>
   </body>
 </html>

@@ -28,11 +28,20 @@ button[disabled] {
   background-color: #b8b8b8;
   color: #444444
 }
+code {
+  background-color: white;
+}
 
 .button-div {
   padding-top: 25px;
 }
-
+.border-div {
+  background-color: #b5fcfc;
+  border: 1px solid black;
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 20px;
+}
 .log-div {
   background-color: white;
   border: 1px solid black;
@@ -45,4 +54,7 @@ button[disabled] {
   border: 1px solid black;
   border-radius: 7px;
   padding-left: 10px;
+}
+.vs10 {
+  height: 10px;
 }

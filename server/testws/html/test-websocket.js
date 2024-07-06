@@ -67,12 +67,19 @@ function initWebSocketAuth () {
   const fetchOptions = {
     method: 'POST',
     headers: {
-      'CSRF-Token': csrfToken,
       'Content-type': 'application/json',
       Accept: 'application/json'
     },
     body: JSON.stringify({ purpose: 'websocket-auth' })
   };
+  if (!document.getElementById('noCsrfTokenCheckbox').checked) {
+    if (document.getElementById('invalidCsrfTokenCheckbox').checked) {
+      // This is a random generated CSRF token that will not match session storage
+      fetchOptions.headers['CSRF-Token'] = '0agVm341bCin1sfG9gF9ocYsdW8';
+    } else {
+      fetchOptions.headers['CSRF-Token'] = csrfToken;
+    }
+  }
   fetch(fetchURL, fetchOptions)
     .then((response) => {
       // console.log(response.status);
@@ -167,6 +174,19 @@ document.getElementById('connectWebSocket').addEventListener('click', function (
 document.getElementById('clearMessages').addEventListener('click', function () {
   document.getElementById('logContent').textContent = '';
   document.getElementById('messageContent').textContent = '';
+});
+
+function sendUnexpectedMessage () {
+  if ((wsocket) && (wsocket.readyState === 1)) {
+    logMessage('Sending unexpected websocket message: "MYMESSAGE"');
+    wsocket.send('MYMESSAGE');
+  } else {
+    logMessage('Error: Websocket not connected');
+  }
+}
+
+document.getElementById('sendUnexpectedMessage').addEventListener('click', function () {
+  sendUnexpectedMessage();
 });
 
 logMessage('Page loaded.');
