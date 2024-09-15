@@ -8,6 +8,13 @@ and this project adheres to
 
 - To view notes on v2 major upgrade, scroll to Version v2.0.0 2023-09-12
 
+## Next
+
+### Updates
+
+- Fix npm audit security warning: update to express@4.21.0
+- Update npm dependencies: express-rate-limit@7.4.0, express-validator@7.2.0, redis@4.7.0, rotating-file-stream@3.2.4
+
 ## [v2.0.17](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.0.17) 2024-07-06
 
 There are no code changes in v2.0.17.
