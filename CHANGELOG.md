@@ -8,6 +8,11 @@ and this project adheres to
 
 - To view notes on v2 major upgrade, scroll to Version v2.0.0 2023-09-12
 
+
+## Next
+
+-- Edit .github/workflows/codeql-analysis.yml to change v2 to v3 scanning configuration
+
 ## [v2.0.18](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.0.18) 2024-09-15
 
 ### Updates
