@@ -11,7 +11,8 @@ and this project adheres to
 
 ## Next
 
--- Edit .github/workflows/codeql-analysis.yml to change v2 to v3 scanning configuration
+- Edit package-lock.json to force cookie@0.7.1 to clear npm audit warning
+- Edit .github/workflows/codeql-analysis.yml to change v2 to v3 scanning configuration
 
 ## [v2.0.18](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.0.18) 2024-09-15
 
