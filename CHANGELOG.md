@@ -9,7 +9,7 @@ and this project adheres to
 - To view notes on v2 major upgrade, scroll to Version v2.0.0 2023-09-12
 
 
-## Next
+## [v2.0.19](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.0.19) 2024-10-05
 
 - Edit package-lock.json to force cookie@0.7.1 to clear npm audit warning
 - Edit .github/workflows/codeql-analysis.yml to change v2 to v3 scanning configuration
