@@ -35,7 +35,6 @@
 // ---------------------------------------------------------------------------
 
 'use strict';
-/* eslint-disable max-len */
 
 // import path from 'path';
 import fs from 'fs';
@@ -305,5 +304,3 @@ export default { site, server, session, oauth2, loginUsers, irc, proxy };
 //   console.log(JSON.stringify({ site, server, session, oauth2, loginUsers, irc, proxy }, null, 2));
 //   process.exit(0);
 // }
-
-/* eslint-enable max-len */

@@ -92,7 +92,6 @@ export const parseBrowserMessageForCommand = function (message) {
     }
     // Note: outboundArg1Rest may start with leading colon ':'
     while (i <= end) {
-      // eslint-disable-next-line no-unused-vars
       outboundArg1Rest += outboundCommandRest.charAt(i);
       i++;
     }

@@ -754,7 +754,6 @@ customElements.define('nav-menu', class extends HTMLElement {
   };
 
   connectedCallback () {
-    /* eslint-disable max-len */
     this.shadowRoot.getElementById('group01ButtonId').title = 'Expand list of IRC private message panels';
     this.shadowRoot.getElementById('group02ButtonId').title = 'Expand list of IRC channel panels';
     this.shadowRoot.getElementById('group03ButtonId').title = 'Expand list of panels related to IRC controls and IRC configuration changes';
@@ -775,7 +774,6 @@ customElements.define('nav-menu', class extends HTMLElement {
     this.shadowRoot.getElementById('item4_6_Id').title = 'Disconnect the browser web page from the web server. Your nickname will remain active on the IRC network';
     this.shadowRoot.getElementById('item5_0_Id').title = 'Show MIT open source license for the irc-hybrid-client application';
     this.shadowRoot.getElementById('item5_1_Id').title = 'Logout the web browser from the page. Your nickname will remain active on the IRC network';
-    /* eslint-enable max-len */
 
     //
     // listen for global click outside the dropdown menu and close the menu

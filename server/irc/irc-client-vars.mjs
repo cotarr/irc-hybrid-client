@@ -28,8 +28,6 @@
 
 // const nodeEnv = process.env.NODE_ENV || 'development';
 
-/* eslint-disable prefer-const */
-
 // Replaced when loaded from file
 const servers = {
   configVersion: -1,
@@ -193,4 +191,4 @@ export default {
   timestamp,
   unixTimestamp
 };
-/* eslint-enable prefer-const */
+

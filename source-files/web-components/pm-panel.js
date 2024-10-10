@@ -815,7 +815,6 @@ window.customElements.define('pm-panel', class extends HTMLElement {
     //
     // 2 - Remove eventListeners
     //
-    /* eslint-disable max-len */
     this.shadowRoot.getElementById('beepCheckBoxId').removeEventListener('click', this._handlePrivMsgBeep1CBInputElClick);
     this.shadowRoot.getElementById('bottomCollapseButtonId').removeEventListener('click', this._handleBottomCollapseButton);
     this.shadowRoot.getElementById('closePanelButtonId').removeEventListener('click', this._handleCloseButton);
@@ -840,7 +839,6 @@ window.customElements.define('pm-panel', class extends HTMLElement {
     document.removeEventListener('irc-state-changed', this._handleIrcStateChanged);
     document.removeEventListener('resize-custom-elements', this._handleResizeCustomElements);
     document.removeEventListener('show-all-panels', this._handleShowAllPanels);
-    /* eslint-enable max-len */
 
     //
     // 3 - Channel panel removes itself from the DOM
@@ -1119,7 +1117,6 @@ window.customElements.define('pm-panel', class extends HTMLElement {
     // 1 of 2 Listeners on internal elements
     // -------------------------------------
 
-    /* eslint-disable max-len */
     this.shadowRoot.getElementById('beepCheckBoxId').addEventListener('click', this._handlePrivMsgBeep1CBInputElClick);
     this.shadowRoot.getElementById('bottomCollapseButtonId').addEventListener('click', this._handleBottomCollapseButton);
     this.shadowRoot.getElementById('closePanelButtonId').addEventListener('click', this._handleCloseButton);
@@ -1147,6 +1144,5 @@ window.customElements.define('pm-panel', class extends HTMLElement {
     document.addEventListener('irc-state-changed', this._handleIrcStateChanged);
     document.addEventListener('resize-custom-elements', this._handleResizeCustomElements);
     document.addEventListener('show-all-panels', this._handleShowAllPanels);
-    /* eslint-enable max-len */
   } // connectedCallback()
 });

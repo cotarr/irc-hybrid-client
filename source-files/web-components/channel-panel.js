@@ -2191,7 +2191,6 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     //
     // 2 - Remove eventListeners
     //
-    /* eslint-disable max-len */
     this.shadowRoot.getElementById('autocompleteCheckboxId').removeEventListener('click', this._handleAutoCompleteCheckboxClick);
     this.shadowRoot.getElementById('beep1CheckBoxId').removeEventListener('click', this._handleChannelBeep1CBInputElClick);
     this.shadowRoot.getElementById('beep2CheckBoxId').removeEventListener('click', this._handleChannelBeep2CBInputElClick);
@@ -2230,7 +2229,6 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     document.removeEventListener('resize-custom-elements', this._handleResizeCustomElements);
     document.removeEventListener('show-all-panels', this._handleShowAllPanels);
     document.removeEventListener('web-connect-changed', this._handleWebConnectChanged);
-    /* eslint-enable max-len */
 
     //
     // 3 - Channel panel removes itself from the DOM
@@ -2589,7 +2587,6 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     // -------------------------------------
     // 1 of 2 Listeners on internal elements
     // -------------------------------------
-    /* eslint-disable max-len */
     this.shadowRoot.getElementById('autocompleteCheckboxId').addEventListener('click', this._handleAutoCompleteCheckboxClick);
     this.shadowRoot.getElementById('beep1CheckBoxId').addEventListener('click', this._handleChannelBeep1CBInputElClick);
     this.shadowRoot.getElementById('beep2CheckBoxId').addEventListener('click', this._handleChannelBeep2CBInputElClick);
@@ -2631,6 +2628,5 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     document.addEventListener('resize-custom-elements', this._handleResizeCustomElements);
     document.addEventListener('show-all-panels', this._handleShowAllPanels);
     document.addEventListener('web-connect-changed', this._handleWebConnectChanged);
-    /* eslint-enable max-len */
   };
 });

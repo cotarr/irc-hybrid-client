@@ -10,6 +10,9 @@ and this project adheres to
 
 ## Next
 
+- Upgrade eslint from version 8 to version 9. Version 9 does not enforce code style formatting.
+- Minor edits to remove eslint override directives no longer applicable to version 9 (No code changes)
+
 - Update helmet@8.0.0 with comments for helmet defaults in server/web-server.mjs
 - Update npm dependencies: @dr.pogodin/csurf@1.14.0, cookie@1.0.0, cookie-parser@1.4.7, express@4.21.1, express-rate-limit@7.4.1, express-session@1.18.1, rotating-file-stream@3.2.5
 - Delete and regenerate package-lock.json, confirmed npm audit warning after package updates.
