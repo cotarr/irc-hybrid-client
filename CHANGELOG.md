@@ -8,6 +8,11 @@ and this project adheres to
 
 - To view notes on v2 major upgrade, scroll to Version v2.0.0 2023-09-12
 
+## Next
+
+- Update helmet@8.0.0 with comments for helmet defaults in server/web-server.mjs
+- Update npm dependencies: @dr.pogodin/csurf@1.14.0, cookie@1.0.0, cookie-parser@1.4.7, express@4.21.1, express-rate-limit@7.4.1, express-session@1.18.1, rotating-file-stream@3.2.5
+- Delete and regenerate package-lock.json, confirmed npm audit warning after package updates.
 
 ## [v2.0.19](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.0.19) 2024-10-05
 
