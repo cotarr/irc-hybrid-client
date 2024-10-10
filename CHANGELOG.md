@@ -8,7 +8,7 @@ and this project adheres to
 
 - To view notes on v2 major upgrade, scroll to Version v2.0.0 2023-09-12
 
-## Next
+## [v2.0.20](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.0.20) 2024-10-10
 
 - Upgrade eslint from version 8 to version 9. Version 9 does not enforce code style formatting.
 - Minor edits to remove eslint override directives no longer applicable to version 9 (No code changes)
