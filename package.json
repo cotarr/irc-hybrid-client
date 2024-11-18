@@ -1,6 +1,6 @@
 {
   "name": "irc-hybrid-client",
-  "version": "2.0.20",
+  "version": "2.0.21",
   "description": "Single user hybrid IRC client using JavaScript front end and Node/Express backend",
   "type": "module",
   "main": "bin/www.mjs",
@@ -47,7 +47,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.12.0",
-    "eslint": "^9.12.0",
+    "eslint": "^9.15.0",
     "globals": "^15.11.0"
   }
 }
