@@ -26,7 +26,7 @@
     "@dr.pogodin/csurf": "^1.14.1",
     "bcryptjs": "^2.4.3",
     "compression": "^1.7.5",
-    "connect-redis": "^7.1.0",
+    "connect-redis": "^8.0.1",
     "cookie": "^1.0.2",
     "cookie-parser": "^1.4.7",
     "cookie-signature": "^1.2.2",

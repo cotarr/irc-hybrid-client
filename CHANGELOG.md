@@ -14,6 +14,9 @@ and this project adheres to
 - Update @dr.pogodin/csurf, compression, cookie, cookie-signature, dotenv, utf-8-validate
 - Update dev dependencies eslint to latest
 
+- Dependency major revision connect-redis from v7 to v8
+- Update server/web-server.mjs npm dependency import `import {RedisStore} from "connect-redis"`
+  
 ## [v2.0.21](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.0.21) 2024-11-18
 
 - Bump eslint@9.15.0 to clear GitHub dependabot audit warning

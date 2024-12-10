@@ -41,7 +41,7 @@ import logger from 'morgan';
 import helmet from 'helmet';
 import compression from 'compression';
 import { createClient } from 'redis';
-import RedisStore from 'connect-redis';
+import {RedisStore} from "connect-redis"
 import memorystore from 'memorystore';
 import csrf from '@dr.pogodin/csurf';
 
