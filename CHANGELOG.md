@@ -8,7 +8,7 @@ and this project adheres to
 
 - To view notes on v2 major upgrade, scroll to Version v2.0.0 2023-09-12
 
-## Next
+## [v2.0.22](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.0.22) 2024-12-10
 
 - Update express@4.21.2 to clear npm audit warning
 - Update @dr.pogodin/csurf, compression, cookie, cookie-signature, dotenv, utf-8-validate
