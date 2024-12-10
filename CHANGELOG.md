@@ -8,6 +8,10 @@ and this project adheres to
 
 - To view notes on v2 major upgrade, scroll to Version v2.0.0 2023-09-12
 
+## Next
+
+- Update express@4.21.2 to clear npm audit warning
+
 ## [v2.0.21](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.0.21) 2024-11-18
 
 - Bump eslint@9.15.0 to clear GitHub dependabot audit warning
