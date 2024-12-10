@@ -11,6 +11,8 @@ and this project adheres to
 ## Next
 
 - Update express@4.21.2 to clear npm audit warning
+- Update @dr.pogodin/csurf, compression, cookie, cookie-signature, dotenv, utf-8-validate
+- Update dev dependencies eslint to latest
 
 ## [v2.0.21](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.0.21) 2024-11-18
 
