@@ -878,8 +878,9 @@ export const logout = function (req, res, next) {
     let cookieOptions = null;
     if (Object.hasOwn(req.session, 'cookie')) {
       cookieOptions = {
-        maxAge: req.session.cookie.originalMaxAge,
-        expires: req.session.cookie.expires,
+        // Express has deprecated maxAge and expires in clearCookie() options.
+        // maxAge: req.session.cookie.originalMaxAge,
+        // expires: req.session.cookie.expires,
         secure: req.session.cookie.secure,
         httpOnly: req.session.cookie.httpOnly,
         path: req.session.cookie.path

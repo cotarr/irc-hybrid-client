@@ -8,6 +8,15 @@ and this project adheres to
 
 - To view notes on v2 major upgrade, scroll to Version v2.0.0 2023-09-12
 
+## Next
+
+### Fixed
+
+When using the web page logout function, the log file showed a deprecation warning related to using res.clearCookie(). The res.clearCookie options object no longer accepts maxAge or expires properties as these are automatically set to expire immediately.
+
+- middlewares/remote-authenticate.mjs Remove maxAge and expires properties from res.clearCookie() options.
+- middlewares/user-authenticate.mjs Remove maxAge and expires properties from res.clearCookie() options.
+
 ## [v2.0.22](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.0.22) 2024-12-10
 
 - Update express@4.21.2 to clear npm audit warning
