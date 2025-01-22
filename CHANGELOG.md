@@ -8,7 +8,7 @@ and this project adheres to
 
 - To view notes on v2 major upgrade, scroll to Version v2.0.0 2023-09-12
 
-## Next
+## [v2.0.23](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.0.23) 2025-01-22
 
 ### Fixed
 
