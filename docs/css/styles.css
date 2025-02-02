@@ -157,6 +157,10 @@ th, td {
   height: 25px;
 }
 
+.hash-spacer {
+  height: 30px;
+}
+
 .home-detail {
   margin-bottom: 15px;
   padding: 10px;

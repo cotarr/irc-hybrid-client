@@ -16,3 +16,5 @@ tools/showIrcLogTimeZone.json
 *.bak
 .env
 custom*
+debug
+

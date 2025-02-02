@@ -56,13 +56,13 @@
         </p>
 
         <p>
-          In most cases, the API requests return a web response showing
+          In most cases, the API requests return a HTTP response showing
           the asynchronous request was either accepted or caused an error.
           The API response body contains an error boolean flag within a JSON object.
         </p>
 
         <p>
-          General state errors, such as &quot;IRC Server not connected&quot; are returned
+          General state errors, such as <q>IRC Server not connected</q> are returned
           within API response body with status 200 and description of the error as a JSON object.
         </p>
 
@@ -72,7 +72,7 @@
 
         <p>
           Network connection errors occurring with the IRC server connection between NodeJs backend and IRC server
-          are returned in the websocket stream prefixed with the string value &quot;webError: &quot;.
+          are returned in the websocket stream prefixed with the string value <q>webError: </q>.
         </p>
 
         <p>
@@ -136,17 +136,18 @@
         <h3>Cookies</h3>
 
         <p>
-          HTTP requests to the web server API require a session cookie with a valid digital signature.
+          HTTP requests to the web server API require a non-expired session cookie with a valid digital signature.
           API requests made to any protected API without a valid cookie will return
           status 403 Forbidden.
-        </p><p>
-          The user should have previously obtained a cookie by loading the page at 
-          &quot;/irc/webclient.html&quot;.
-          The web server will check for a valid cookie.
-          In the case of a missing, invalid or expired cookie, the users web
-          browser is redirected from /irc/webclient.html to the proper form for entry of username and password. 
-          After successful password entry, the browser is redirected back to /irc/webclient.html with
-          a new valid cookie.
+        </p>
+        <p>
+          Irc-hybrid-client is a single page web application located at <q>/irc/webclient.html</q>.
+          When visiting the page, the web server will check for a valid cookie.
+          In the case of a missing, invalid or expired cookie, the user's web
+          browser is redirected from /irc/webclient.html to /login 
+          page where the user can enter their username and password.. 
+          After successful password entry, the browser is redirected back 
+          to /irc/webclient.html with a new valid cookie.
         </p>
 
         <h3>CSRF Tokens</h3>
@@ -175,12 +176,12 @@
           can be added to the request headers as follows:
         </p>
 <div class="pre-div"><pre>
-  &quot;accept&quot;: &quot;application/json&quot;,
-  &quot;csrf-token&quot;: &quot;ob1P2QF3-bBXabc8At9xxiJyC2I44sAbjgsA&quot;,
-  &quot;content-type&quot;: &quot;application/json&quot;,
+"accept": "application/json",
+"csrf-token": "ob1P2QF3-bBXabc8At9xxiJyC2I44sAbjgsA",
+"content-type": "application/json",
 </pre></div>
         
-        <p>Requests with missing or invalid CSRF tokens will return 403 Forbidden &quot;invalid csrf token&quot;</p> 
+        <p>Requests with missing or invalid CSRF tokens will return 403 Forbidden <q>invalid csrf token</q></p> 
 
         <h1>IRC Client API Routes</h1>
 
@@ -188,12 +189,12 @@
 
         <p>
           The backend NodeJs web server maintains a list of available IRC servers.
-          This list is loaded from a configuration file &quot;servers.json&quot;.
-          Calls to /irc/server shall include an &quot;index&quot; property of type integer
+          This list is loaded from a configuration file <q>servers.json</q>.
+          Calls to /irc/server shall include an <q>index</q> property of type integer
           that is used to select a specific server.
         </p>
         <ul>
-          <li>A value of 0 or greater is used to specify the index of an IRC server in the list.</li>
+          <li>A value of 0 or greater is used to select a specific index number for an IRC server in the list.</li>
           <li>A value of -1 is used to rotate to the next server in the configuration.</li>
           <li>A value of -2 is used to rotate to the previous server in the configuration.</li>
         </ul>
@@ -202,7 +203,7 @@
           In the case where the change in selected IRC server causes a change in IRC server group number, 
           or if the requested IRC server number is equal to zero, the IRC message cache 
           on the web server will be cleared. The web server will then send a 
-          &quot;CACHERESET&quot; command to all connected web browsers over the websocket connection.
+          <q>CACHERESET</q> command to all connected web browsers over the websocket connection.
           The web browser will interpret this command as a change in IRC networks.
           The browser will clear all relevant textarea elements in order to prevent previously received
           messages on one IRC network from being displayed as if
@@ -213,21 +214,23 @@
         </p>
 
         <p>
-          When the web server configuration changes to index a different IRC server,
+          When the web server configuration changes the index to point to a different IRC server,
           an "UPDATE" command is sent to the browser over the websocket stream.
           Upon receipt of the UPDATE request, the browser should perform a GET request to route /irc/getircstate.
           The getircstate response contains updated server configuration in JSON format.
           (see getircstate below)
         </p>
 
-<p>POST Request Body:</p>
+        <p>POST Request Body:</p>
+
 <div class="pre-div"><pre>
 {
   "index": -1
 }
 </pre></div>
 
-<p>Success Response:</p>
+        <p>Success Response:</p>
+
 <div class="pre-div"><pre>
 {
   "error": false,
@@ -236,7 +239,8 @@
 }
 </pre></div>
 
-<p>Error Response:</p>
+        <p>Error Response:</p>
+
 <div class="pre-div"><pre>
 {
   "error": true,
@@ -247,7 +251,7 @@
         <h3>POST /irc/connect</h3>
 
         <p>
-          Calls to the connect API are used to request the backend NodeJs web server
+          Calls to the Connect API are used to request the backend NodeJs web server
           to initiate an IRC client connection to the IRC server.
           The nickName and realName are required properties of type UTF-8 string.
           The IRC user name (identd alternate user) is not editable from the browser and
@@ -257,7 +261,7 @@
 
         <p>
           Connection to an IRC server involves several steps, such as opening a TCP socket,
-          sending commands to set nickname and other IRC formation. As the connection is
+          sending commands to set nickname and other IRC information. As the connection is
           established, the irc state object located in the web server is updated.
           Each time the state changes, an "UPDATE" command is sent to the browser
           over the web socket stream.
@@ -266,7 +270,8 @@
           (see getircstate below)
         </p>
 
-<p>POST Request Body</p>
+        <p>POST Request Body</p>
+
 <div class="pre-div"><pre>
 {
   "nickName": "myNickName",
@@ -275,14 +280,16 @@
 }
 </pre></div>
 
-<p>Success Response:</p>
+          <p>Success Response:</p>
+
 <div class="pre-div"><pre>
 {
     "error": false
 }
 </pre></div>
 
-<p>Error Response:</p>
+          <p>Error Response:</p>
+
 <div class="pre-div"><pre>
 {
     "error": true,
@@ -290,25 +297,24 @@
 }
 </pre></div>
 
+        <div class="hash-spacer" id="messageroute"></div>
         <h3>POST /irc/message</h3>
 
         <p>
-          Calls to this API are used to send RFC 2812 IRC messages from web browser
+          Calls to the Message API are used to send RFC 2812 IRC messages from web browser
           to the NodeJs backend server for re-transmission to the IRC server.
         </p>
         <p>
-          The request body should contain a &quot;message&quot; property of type UTF-8 string
+          The request body should contain a <q>message</q> property of type UTF-8 string
           containing the RFC 2812 IRC message.
           Multiple messages are not allowed. The end-of-line characters should not be included.
         </p>
-
         <p>
           Assuming the IRC command is accepted by the IRC server, the IRC response is
           sent to the browser via the websocket stream as a standard RFC 2812 IRC message.
           These messages are UTF-8 text and delimited by return and end-of-line
-          characters 0x10 and 0x13 (&quot;&#92;r&#92;n&quot;). See RFC 2812 for specification of these messages.
+          characters 0x10 and 0x13 (<q>&#92;r&#92;n</q>). See RFC 2812 for specification of these messages.
         </p>
-
         <p>
           Issuing some commands to the IRC server may result in a state change of the IRC client.
           One example would be a command to JOIN an IRC channel.
@@ -320,21 +326,24 @@
           (see getircstate below)
         </p>
 
-<p>POST Request Body:</p>
+        <p>POST Request Body:</p>
+
 <div class="pre-div"><pre>
 {
   "message": "PRIVMSG #mychannel :Hello World"
 }
 </pre></div>
 
-<p>Success Response:</p>
+        <p>Success Response:</p>
+
 <div class="pre-div"><pre>
 {
     "error": false
 }
 </pre></div>
 
-<p>Error Response:</p>
+      <p>Error Response:</p>
+
 <div class="pre-div"><pre>
 {
     "error": true,
@@ -342,20 +351,25 @@
 }
 </pre></div>
 
-<p>Websocket Response (IRC server PRIVMSG message in stream)</p>
+        <p>Websocket Response (IRC server PRIVMSG message in stream)</p>
+
 <div class="pre-div"><pre>
 @time=2021-06-18T20:09:38.944Z :myNickName!*@* PRIVMSG #test :hello, how are you
 </pre></div>
 
-<p>Example Request causing IRC server to issue an error as IRC message
-by sending invalid server name with TIME request.</p>
+        <p>
+          Example Request causing IRC server to issue an error as IRC message
+            by sending invalid server name with TIME request.
+        </p>
+
 <div class="pre-div"><pre>
 {
   "message": "TIME invalid.server.name"
 }
 </pre></div>
 
-<p>Websocket Error Response (IRC server 402 error message in stream)</p>
+        <p>Websocket Error Response (IRC server 402 error message in stream)</p>
+
 <div class="pre-div"><pre>
 @time=2021-06-18T20:05:26.538Z :irc.example.com 402 myNickName invalid.server.name :No such server
 </pre></div>
@@ -364,12 +378,13 @@ by sending invalid server name with TIME request.</p>
 
         <p>
           The actual IRC client is located within the NodeJs backend web server.
+          This is a remote client, not an IRC proxy.
           API calls to route /irc/getircstate will retrieve a JSON object containing
           all relevant state information for the IRC client connection and IRC channel membership.
         </p>
 
         <p>
-          The web browser should listen for a websocket stream message containing a string matching &quot;UPDATE&quot;.
+          The web browser should listen for a websocket stream message containing a string matching <q>UPDATE</q>.
           When an UPDATE is received as a single line message delimited by 0x10,0x13, (...&#92;r&#92;nUPDATE&#92;r&#92;n...)
           the browser javascript should fetch a GET request to the /irc/getircstate route.
           The browser should then parse the state object for changes and update the user interface as needed.
@@ -384,7 +399,8 @@ by sending invalid server name with TIME request.</p>
         </p>
 
 
-<p>Websocket stream showing JOIN to channel and UPDATE command.</p>
+          <p>Websocket stream showing JOIN to channel and UPDATE command.</p>
+
 <div class="pre-div"><pre>
 @time=2021-06-18T21:13:06.949Z :myNickName!*@* PRIVMSG #test :Hello, how are you doing
 @time=2021-06-18T21:14:16.322Z :otherName!*@* PRIVMSG #test :I am doing fine, how are you
@@ -400,7 +416,8 @@ UPDATE
           which contains an updated array containing channel member nicknames.
         </p>
 
-<p>API response to GET /irc/getircstate</p>
+        <p>API response to GET /irc/getircstate</p>
+
 <div class="pre-div"><pre>
 {
     "ircConnectOn": true,
@@ -474,24 +491,26 @@ UPDATE
         <h3>POST /irc/prune</h3>
 
         <p>
-          This is used to remove a non-joined IRC channel from the active channel list.
+          The Prune API is used to remove a non-joined IRC channel from the active channel list.
           Trying to prune a channel while present in the channel will cause an error.
           Pruning a channel will delete the IRC message cache buffer associated with the pruned channel.
           In the case where the maximum count of IRC channel message buffers was exceeded, the prune 
           function will erase channel messages from the default IRC message cache.
         </p>
         <p>
-          The request body shall contain the property &quot;channel&quot; of type string
+          The request body shall contain the property <q>channel</q> of type string
           containing the channel name.
         </p>
 
-<p>POST Request Body</p>
+        <p>POST Request Body</p>
+
 <div class="pre-div"><pre>
 {
   "channel": "#test"
 }
 </pre></div>
 
+        <div class="hash-spacer" id="cacheroute"></div>
         <h3>GET /irc/cache</h3>
 
         <p>
@@ -520,8 +539,9 @@ UPDATE
           cache buffers are concatenated before sending. A section of messages from 
           a single IRC channel cache would be in chronological order within that IRC channel.
           The web browser will restore the display independently for each IRC channel, so 
-          a channel window will be properly ordered. Combined, however, the overall set of messages 
-          may be out of chronological order between different cache buffers.
+          a channel window will be properly ordered. However, when different
+          buffers are combined the overall set of messages may be out of chronological
+          order between different cache buffers.
         </p>
 
         <p>
@@ -532,7 +552,8 @@ UPDATE
           Over time messages will cycle out of the cache and may be lost without viewing.
         </p>
 
-<p>Example API response:</p>
+        <p>Example API response:</p>
+
 <div class="pre-div"><pre>
 [
   "@time=2021-06-18T21:13:06.949Z :myNickName!*@* PRIVMSG #test :Hello, how are you doing",
@@ -563,7 +584,8 @@ UPDATE
           for each IRC channel where the NICK is applicable.
         </p>
 
-<p>Example showing QUIT, cachedQUIT, NICK, and cachedNick messages</p>        
+        <p>Example showing QUIT, cachedQUIT, NICK, and cachedNick messages</p>        
+
 <div class="pre-div"><pre>
 
 Live message:
@@ -577,15 +599,16 @@ Cached message with 2 IRC channels.
 
 </pre></div>
 
+        <div class="hash-spacer" id="eraseroute"></div>
         <h3>POST /irc/erase</h3>
 
         <p>
-          This API is used to delete the contents of the IRC message cache.
+          The Erase API is used to delete the contents of the IRC message cache.
           The entire message cache may be erased and reinitialized, or
           specific message types may be erased from the cache.
         </p>
         <p>
-          The primary purpose for cache erase is to remove previous content
+          The primary purpose for having a cache erase function is to remove previous content
           when changing from one IRC network to a different IRC network.
         </p>
         <p>
@@ -602,28 +625,28 @@ Cached message with 2 IRC channels.
         </p>
         <p>
           A target specifier is required to determine the scope of the erase function.
-          The target specifier in an &quot;erase&quot; property in the body of the POST request.
+          The target specifier in an <q>erase</q> property in the body of the POST request.
           Valid values are:
         </p>
         <ul>
           <li>
             CACHE - Erase entire IRC server message cache.
             If the message cache contains valid data when the erase request is received, 
-            the web server will send a &quot;CACHERESET&quot; command to all connected
+            the web server will send a <q>CACHERESET</q> command to all connected
             web browsers over the websocket connection.
             The CACHERESET command will cause all connected web browsers to 
             clear all related textarea elements.
           </li>
           <li>
             WALLOPS - This will identify and erase WALLOPS message in the default message cache.
-            The web server then sends a &quot;CACHEPULL&quot; command to all 
+            The web server then sends a <q>CACHEPULL</q> command to all 
             connected web browsers over the websocket connection.
             The CACHEPULL command will cause all connected web browsers to reload 
             the entire message cache and update textarea elements accordingly.
           </li>
           <li>
             NOTICE - This will identify and erase NOTICE message in the default message cache.
-            The web server then sends a &quot;CACHEPULL&quot; command to all 
+            The web server then sends a <q>CACHEPULL</q> command to all 
             connected web browsers over the websocket connection.
             The CACHEPULL command will cause all connected web browsers to reload 
             the entire message cache and update textarea elements accordingly.
@@ -631,43 +654,46 @@ Cached message with 2 IRC channels.
           <li>
             PRIVMSG - This will erase all user PRIVMSG messages that were stored
             in the private message cache (pmcache). Channel PRIVMSG message will not be erased.
-            The web server then sends a &quot;CACHEPULL&quot; command to all 
+            The web server then sends a <q>CACHEPULL</q> command to all 
             connected web browsers over the websocket connection.
             The CACHEPULL command will cause all connected web browsers to reload 
             the entire message cache and update textarea elements accordingly.
           </li>
         </ul>
-<p>Example POST Request Body:</p>
+
+        <p>Example POST Request Body:</p>
+
 <div class="pre-div"><pre>
 {
   "erase": "CACHE"
 }
 </pre></div>
 
-
         <h3>POST /irc/disconnect</h3>
-
         <p>
-          This is an emergency function used to forcibly close the socket to the IRC server.
+          The Disconnect API is an emergency function used to forcibly close the socket to the IRC server.
           In routine operation, IRC connections should be closed by sending
-          an RFC 2812 &quot;QUIT&quot; command to the web server for
+          an RFC 2812 <q>QUIT</q> command to the web server for
           re-transmission to the IRC server as a normal IRC command.
-          The body of the request should contain an empty JSON object "{}".
+          The body of the disconnect request should contain an empty JSON object "{}".
         </p>
 
-<p>POST Example body:</p>
+        <p>POST Example body:</p>
+
 <div class="pre-div"><pre>
 {
 }
 </pre></div>
 
         <h3>POST /terminate</h3>
+        <p>
+          The Terminate API is essentially a <q>die</q> function to forcibly shutdown the NodeJs web server.
+          A confirmation flag of type boolean is required in a <q>terminate</q> property
+          in the POST body.
+        </p>
 
-        This is essentially a &quot;die&quot; function to forcibly shutdown the NodeJs web server.
-        A confirmation flag of type boolean is required in a &quot;terminate&quot; property
-        in the POST body.
+        <p>POST Example body:</p>
 
-<p>POST Example body:</p>
 <div class="pre-div"><pre>
 {
   "terminate": "YES"
@@ -679,26 +705,31 @@ Cached message with 2 IRC channels.
         </div>
 
         <p>
-          The server list editor web page located at &quot;/irc/serverlist.html&quot;
-          is used to view the list of available IRC server definitions.
+          The server list editor web page is located at <q>/irc/serverlist.html</q>.
+          It is used to view the list of available IRC server definitions.
           Individual IRC servers can be modified using a simple HTML form editor.
-          The purpose of the API located at &quot;/irc/serverlist&quot; is to service the 
+          The purpose of the Server List API located at <q>/irc/serverlist</q> is to serve the 
           associated HTML page.
-        </p><p>
+        </p>
+        <p>
           Modification of the list of IRC servers operates independently of the 
           IRC web client. The IRC client must be disconnected from all IRC servers
           in order to use these API calls to modify the list of IRC servers. 
-        </p><p>
+        </p>
+        <p>
           The list of IRC servers is stored in the base folder of the IRC web 
-          server in the file &quot;servers.json&quot;
+          server in the file <q>servers.json</q>.
           The file may be edited manually instead of using this interface.
-        </p><p>
+          The web server should be shut down before manually manually 
+          editing the servers.json file.
+        </p
+        ><p>
           The IRC server list editor can be disabled by setting 
-          &quot;disableServerListEditor: true&quot; in the credentials.json file
-          or by setting the environment variable &quot;IRC_DISABLE_LIST_EDITOR=true&quot;
+          <q>disableServerListEditor: true</q> in the credentials.json file
+          or by setting the environment variable <q>IRC_DISABLE_LIST_EDITOR=true</q>
            When disabled, all attempts to access the 
           /irc/serverlist API will return Status 405 Method not allowed 
-          &quot;Server List Editor Disabled&quot;
+          <q>Server List Editor Disabled</q>
         </p><p>
           The API supports several methods, such as GET, POST, PATCH, COPY, and DELETE
           which are used to perform various tasks.
@@ -712,6 +743,8 @@ Cached message with 2 IRC channels.
           are write only fields. New values may be submitted, but existing values
           are not returned by the API. However, these values are stored
           un-encrypted in plain text in the servers.json file, and may be viewed there.
+          On multi-user servers, file permissions for the servers.json file should be set
+          accordingly to prevent other users from seeing credentials in the servers.json file.
         </p>
 
         <h3>GET /irc/serverlist (without params)</h3>
@@ -723,7 +756,8 @@ Cached message with 2 IRC channels.
           The list of IRC channels is a comma separated list.
         </p>
 
-<p>API response to GET /irc/serverlist</p>
+        <p>API response to GET /irc/serverlist</p>
+
 <div class="pre-div"><pre>
 [
     {
@@ -774,19 +808,21 @@ Cached message with 2 IRC channels.
         <h3>GET /irc/serverlist?index=0&lock=1</h3>
 
         <p>
-          Submitting a GET request with a query parameter &quot;index&quot;
-          will return the individual server definition with the specified index number.
-          Specification of the query parameter &quot;lock=1&quot; will attempt to 
+          Submitting a GET request with a query parameter <q>index</q>
+          will return the individual server definition located at the specified index number.
+          Specification of the query parameter <q>lock=1</q> will attempt to 
           check out the record for editing by placing a lock flag on the database.
-          Repeating the same request with &quot;lock=0&quot; will clear the lock flag .
+          Repeating the same request with <q>lock=0</q> will clear the lock flag .
         </p>
         <p>
           The purpose of this request is to checkout and open an existing 
-          IRC server definition for editing. When editing complete,
-          the modified data would be returned using the PATCH method shown further below.
+          IRC server definition for editing. After the user has 
+          completed editing of the server definition in the browser,
+          the modified data will be submitted to the web server using the PATCH method shown further below.
         </p>
 
-<p>API response to GET /irc/getircstate?index=0&lock=1</p>
+        <p>API response to GET /irc/getircstate?index=0&lock=1</p>
+
 <div class="pre-div"><pre>
 {
   "index": 0,
@@ -815,8 +851,8 @@ Cached message with 2 IRC channels.
           Error responses: 
         </p>
         <ul>
-          <li>Status 400 Bad Request &quot;Server list array index out of range&quot;</li>
-          <li>Status 409 Conflict &quot;Lock already set&quot;</li>
+          <li>Status 400 Bad Request <q>Server list array index out of range</q></li>
+          <li>Status 409 Conflict <q>Lock already set</q></li>
         </ul>
 
         <h3>POST /irc/serverlist</h3>
@@ -827,16 +863,17 @@ Cached message with 2 IRC channels.
           A valid CSRF token is required in the request headers as described above.
         </p>
         <p>
-          The request must not include an &quot;index&quot; property because a 
+          The request must not include an <q>index</q> property because a 
           new index will be automatically generated when the record is created.
         </p>
         <p>
-          The properties &quot;password&quot;, &quot;saslPassword&quot; and &quot;identifyCommand&quot;
-          are optional. If the POST request includes these properties, they will be part
-          of the server definition. An empty string may be submitted, such as: password:&quot;&quot; 
+          The properties <q>password</q>, <q>saslPassword</q> and <q>identifyCommand</q>
+          are optional. If the POST request includes these properties, they will be included as part
+          of the IRC server definition. An empty string may be submitted, such as: password:<q></q> 
         </p>
 
-<p>POST Request Body:</p>
+        <p>POST Request Body:</p>
+
 <div class="pre-div"><pre>
 {
   "disabled": false,
@@ -868,7 +905,8 @@ Cached message with 2 IRC channels.
           The response body will include the index number of the new record.
         </p>
 
-<p>Success Response:</p>
+        <p>Success Response:</p>
+
 <div class="pre-div"><pre>
 {
   "status": "success",
@@ -877,12 +915,14 @@ Cached message with 2 IRC channels.
 }
 </pre></div>
 
-<p>Error Response:</p>
+        <p>Error Response:</p>
+
 <ul>
-  <li>Status 409 Conflict &quot;Attempt to modify locked data table&quot;</li>
+  <li>Status 409 Conflict <q>Attempt to modify locked data table</q></li>
 </ul>
 
-<p>Input Validation Error Response: (Missing port number)</p>
+        <p>Input Validation Error Response: (Missing port number)</p>
+
 <div class="pre-div"><pre>
 {
   "status": 422,
@@ -902,40 +942,41 @@ Cached message with 2 IRC channels.
 }
 </pre></div>
 
-<h3>PATCH /irc/serverlist?index=xxx</h3>
+        <h3>PATCH /irc/serverlist?index=xxx</h3>
 
-<p>
-  The PATCH method is used to modify an existing IRC server definition.
-  Prior to calling the PATCH method, a current copy of the data
-  should be retrieved using GET /irc/serverlist?index=xxx?lock=1.
-  The GET request query parameter &quot;lock=1&quot; will set a lock flag
-  with the index value for this record.
-  Successful completion of this request will remove the lock flag automatically.
-  A valid CSRF token is required in the request headers as described above.
-</p>
-<p>
-  The index parameter is required as a URL query parameter. 
-  The index value specified in the body of the request must match the index
-  value in the URL query parameters.
-</p>
-<p>
-  The properties &quot;password&quot;, &quot;saslPassword&quot; and 
-  &quot;identifyCommand&quot; are optional. 
-  In the example below, these propertires are omitted.
-  If the PATCH request includes these properties, 
-  any existing value will be replaced. If the properties are 
-  omitted from the object, no changes will be made to hose properties 
-  in the original record.
-  The GET request will not include these existing values for security concerns.
-  An empty string can be sent to remove a previous value (i.e. no server password).
-  In the example below, they are omitted, retaining existing values.
-</p>
-<p>
-  It is also possible to edit the existing servers manually in the 
-  servers.json file using a text editor.
-</p>
+        <p>
+          The PATCH method is used to modify an existing IRC server definition.
+          Prior to calling the PATCH method, a current copy of the data
+          should be retrieved using GET /irc/serverlist?index=xxx?lock=1.
+          The GET request query parameter <q>lock=1</q> will set a lock flag
+          with the index value for this record.
+          Successful completion of this request will remove the lock flag automatically.
+          A valid CSRF token is required in the request headers as described above.
+        </p>
+        <p>
+          The index parameter is required as a URL query parameter. 
+          The index value specified in the body of the request must match the index
+          value in the URL query parameters.
+        </p>
+        <p>
+          The properties <q>password</q>, <q>saslPassword</q> and 
+          <q>identifyCommand</q> are optional. 
+          In the example below, these propertires are omitted.
+          If the PATCH request includes these properties, 
+          any existing value will be replaced. If the properties are 
+          omitted from the object, no changes will be made to hose properties 
+          in the original record.
+          The GET request will not include these existing values for security concerns.
+          An empty string can be sent to remove a previous value (i.e. no server password).
+          In the example below, they are omitted, retaining existing values.
+        </p>
+        <p>
+          It is also possible to edit the existing servers manually in the 
+          servers.json file using a text editor.
+        </p>
 
-<p>PATCH Request Body:</p>
+        <p>PATCH Request Body:</p>
+
 <div class="pre-div"><pre>
 {
   "index": 0,
@@ -961,7 +1002,8 @@ Cached message with 2 IRC channels.
 }  
 </pre></div>
 
-<p>Success Response:</p>
+        <p>Success Response:</p>
+
 <div class="pre-div"><pre>
 {
 "status": "success",
@@ -970,12 +1012,13 @@ Cached message with 2 IRC channels.
 }
 </pre></div>
 
-<p>Error Response:</p>
-<ul>
-<li>Status 409 Conflict &quot;Attempt to modify unlocked data table&quot;</li>
-</ul>
+        <p>Error Response:</p>
+        <ul>
+        <li>Status 409 Conflict <q>Attempt to modify unlocked data table</q></li>
+        </ul>
 
-<p>Input Validation Error Response: (Missing port number)</p>
+        <p>Input Validation Error Response: (Missing port number)</p>
+
 <div class="pre-div"><pre>
 {
   "status": 422,
@@ -1009,14 +1052,17 @@ Cached message with 2 IRC channels.
           the new record created by the request.
         </p>
 
-<p>COPY Request Body:</p>
+
+        <p>COPY Request Body:</p>
+
 <div class="pre-div"><pre>
 {
   "index": 0
 } 
 </pre></div>
 
-<p>Success Response:</p>
+        <p>Success Response:</p>
+
 <div class="pre-div"><pre>
 {
   "status": "success",
@@ -1027,10 +1073,10 @@ Cached message with 2 IRC channels.
 
         <p>Error Response:</p>
         <ul>
-        <li>Status 409 Conflict &quot;Attempt to modify locked data table&quot;</li>
+        <li>Status 409 Conflict <q>Attempt to modify locked data table</q></li>
         </ul>
 
-        <h3>DELETE /irc/serverlist?index=xxx</h3>
+        <h3>DELETE /irc/serverlist?index=x</h3>
 
         <p>
           The DELETE method will remove and delete the record at the specified index.
@@ -1045,19 +1091,21 @@ Cached message with 2 IRC channels.
         </p>
         <p>
           The body of the request may include other valid properties. Only the 
-          &quot;index&quot; property is used by the DELETE method.
+          <q>index</q> property is used by the DELETE method.
           Other valid properties are ignored. Extraneous unrecognized properties will 
           generate an error.
         </p>
 
-<p>DELETE Request Body:</p>
+        <p>DELETE Request Body:</p>
+
 <div class="pre-div"><pre>
  {
   "index": 2,
 }
 </pre></div>
 
-<p>Success Response:</p>
+        <p>Success Response:</p>
+
 <div class="pre-div"><pre>
 {
   "status": "success",
@@ -1068,22 +1116,22 @@ Cached message with 2 IRC channels.
 
         <p>Error Response:</p>
         <ul>
-        <li>Status 409 Conflict &quot;Attempt to modify locked data table&quot;</li>
+        <li>Status 409 Conflict <q>Attempt to modify locked data table</q></li>
         </ul>
 
         <h3>POST /irc/serverlist/tools?index=0</h3>
 
         <p>
-          A &quot;tools&quot; API can be used to perform various toolbox functions
+          A <q>tools</q> API can be used to perform various toolbox functions
           to the server list.
-          The selection is based on the &quot;action&quot; property in the 
+          The selection is based on the <q>action</q> property in the 
           body of the request.  The following actions are available.
         </p>
 
-        <h3>POST /irc/serverlist/tools?index=xxx with action: 'move-up'</h3>
+        <h3>POST /irc/serverlist/tools?index=x with action: 'move-up'</h3>
 
         <p>
-          When action is set to &quot;move-up&quot;
+          When action is set to <q>move-up</q>
           the record at the specified index is moved up to the next decremented index number.
           The up direction will lower the index number by 1 moving records towards index 0.
           The record at index 0 can not be moved, and the request will be ignored without error.
@@ -1091,7 +1139,8 @@ Cached message with 2 IRC channels.
           the relocated record.
         </p>
 
-<p>POST Request Body:</p>
+        <p>POST Request Body:</p>
+
 <div class="pre-div"><pre>
  {
   "index": 2,
@@ -1099,7 +1148,8 @@ Cached message with 2 IRC channels.
 }
 </pre></div>
 
-<p>Success Response:</p>
+        <p>Success Response:</p>
+
 <div class="pre-div"><pre>
 {
   "status": "success",
@@ -1108,18 +1158,19 @@ Cached message with 2 IRC channels.
 }
 </pre></div>
 
-<h3>POST /irc/serverlist/tools?index=xxx with action: 'toggle-disabled'</h3>
+<h3>POST /irc/serverlist/tools?index=x with action: 'toggle-disabled'</h3>
 
-<p>
-  When action is set to &quot;toggle-disabled&quot;
-  the record at the specified index will toggle the &quot;disabled&quot; property
-  between true and false.
-  The index property in the response body will point to the index of
-  the modified record. The new value of the disabled property will
-  be returned in the body of the response as a boolean &quot;value&quot; property.
-</p>
+        <p>
+          When action is set to <q>toggle-disabled</q>
+          the record at the specified index will toggle the <q>disabled</q> property
+          between true and false.
+          The index property in the response body will point to the index of
+          the modified record. The new value of the disabled property will
+          be returned in the body of the response as a boolean <q>value</q> property.
+        </p>
 
-<p>POST Request Body:</p>
+        <p>POST Request Body:</p>
+
 <div class="pre-div"><pre>
 {
 "index": 2,
@@ -1127,7 +1178,8 @@ Cached message with 2 IRC channels.
 }
 </pre></div>
 
-<p>Success Response:</p>
+        <p>Success Response:</p>
+
 <div class="pre-div"><pre>
 {
 "status": "success",
@@ -1140,17 +1192,17 @@ Cached message with 2 IRC channels.
 
         <p>Error Response:</p>
         <ul>
-        <li>Status 409 Conflict &quot;Attempt to modify locked data table&quot;</li>
+        <li>Status 409 Conflict <q>Attempt to modify locked data table</q></li>
         </ul>
 
         <div class="desc-title">
           Websocket Interface
         </div>
         <p>
-          In a typical IRC client program, such as mirc or hexchat, the client IRC program
+          In a typical IRC client program, such as mIRC or Hexchat, the client IRC program
           establishes a bi-directional TCP network socket connection between the IRC client and the
           IRC server. The client software sends IRC commands and channel text messages over the
-          TCP socket. The IRC server responds asynchronously with RFC 2812 messages over the
+          TCP socket. The IRC server responds asynchronously with RFC 2812 messages over the same
           TCP network socket.
         </p>
         <p>
@@ -1158,7 +1210,7 @@ Cached message with 2 IRC channels.
           The backend maintains the IRC server TCP socket connection.
           The backend is capable to maintain a valid IRC user connection independent of the web
           browser. Therefore, IRC server messages related to connection status, channel
-          membership, and other state is parsed and maintained within the backend server.
+          membership, and other state data is parsed and maintained within the backend server.
         </p>
         <p>
           Although a summary of IRC connection state can be retrieved over the /irc/getircstate API,
@@ -1166,14 +1218,14 @@ Cached message with 2 IRC channels.
         </p>
         <p>
           Independent of the TCP socket connection between the backend and the IRC server,
-          the web browser opens an independent websocket connection to the backend webserver,
-          using ws:// or wss:// protocol standard websocket connections.
+          the web browser opens a second independent websocket connection to the backend webserver,
+          using standardized ws:// or wss:// protocol websocket connections.
           The websocket passes a stream of utf-8 characters.
-          Each message is delimited by CR,LF end of line characters (&quot;\r\n&quot;).
+          Each message is delimited by CR,LF end of line characters (<q>\r\n</q>).
         </p>
         <p>
           The TCP socket for the websocket connection between web browser and the irc-hybrid-client web
-          server is managed on the server end by the NPM package &quot;ws&quot; using 
+          server is managed on the server end by the NPM package <q>ws</q> using 
           RFC 6455 Websocket Protocol. Chrome supports this type of websocket connection and 
           no special library is required for the web browser.
           The general connection process involves making a HTTP request with special headers
@@ -1202,7 +1254,7 @@ Cached message with 2 IRC channels.
         </p>
         <p>
           The websocket stream also contain command messages intended to initiate browser actions.
-          There are 6 types of command defined in the following table.
+          The following table defines the list of commands.
           Each message type begins with a specific prefix string as shown in the first table column.
         </p>
         <p>
@@ -1268,10 +1320,10 @@ Cached message with 2 IRC channels.
               <td>
                 DEBUGPONG is a diagnostic command used to measure network latency 
                 between the web browser and the web server. The test is triggered 
-                when the browser performs a GET request to the &quot;/irc/test3&quot; route.
+                when the browser performs a GET request to the <q>/irc/test3</q> route.
                 The HTTP connection will return a Status 201 response which may be 
                 used to measure the API delay time of the HTTP response. Concurrently, the web server will 
-                return the text command &quot;DEBUGPONG&quot; through the web socket stream.
+                return the text command <q>DEBUGPONG</q> through the web socket stream.
                 The browser can then measure the latency of commands sent to the API and returned
                 by websocket stream. There is a button in the Debug panel to perform this.
               </td>
@@ -1306,7 +1358,7 @@ Cached message with 2 IRC channels.
             <tr>
               <td>--&gt;</td>
               <td>
-                The prefix &quot;--&gt;&quot; is an indicator to specify copies of outgoing messages that are
+                The prefix <q>--&gt;</q> is an indicator to specify copies of outgoing messages that are
                 sent from the backend web server to the IRC server.
                 Outgoing messages are echoed verbatim to all connected web browsers.
                 Some IRC commands containing possible passwords may be filtered.
@@ -1316,10 +1368,10 @@ Cached message with 2 IRC channels.
                 by clicking checkboxes for [x]View-Raw and [x]Add-Comms.
                 These are outgoing messages. There is no assurance the IRC server accepted them without error.
                 Therefore, these messages should be considered as informational only for debug purposes.
-                Messages starting with &quot;--&gt;&quot; should not be parsed by the browser for content.
+                Messages starting with <q>--&gt;</q> should not be parsed by the browser for content.
                 As shown in the following example,
                 the user +i user mode change should be parsed from the (incoming)
-                &quot;MODE&quot; IRC message, not the (outgoing) &quot;--&gt;&quot; debug message.
+                <q>MODE</q> IRC message, not the (outgoing) <q>--&gt;</q> debug message.
               </td>
             </tr>
           </tbody>
@@ -1327,6 +1379,7 @@ Cached message with 2 IRC channels.
         <p>
           The following example shows a sample of websocket messages.
         </p>
+
 <div class="pre-div"><pre>
 HEARTBEAT
 HEARTBEAT
@@ -1350,319 +1403,272 @@ LAG=0.023
 HEARTBEAT
 </pre></div>
 
+        <div class="hash-spacer" id="apitesting"></div>
         <div class="desc-title">
           API Manual Testing
         </div>
+        <h2>Debugging Overview</h2>
         <p>
-          Manual testing of the backend web server requires two tools. One to issue
-          http GET and POST methods to the web server. These API requests initiate subsequent
-          RFC 2812 IRC commands which are sent asynchronously to the IRC server.
-          A second tool is required to observe the asynchronous RFC 2812 IRC messages which
-          originate in the IRC server and are passed through the web server and
-          onward to the web browser using the websocket stream connection.
-        </p>
-        <p>
-          One way to send http requests to the backend is to use the VSCode extension Thunder Client.
-          This is an API test application similar to Postman.
-          The irc-hybrid-client github repository includes a Thunder Client collection
-          containing example API calls described above.
-          This program's API debug collection can be imported from the cloned repository.
-          The following documentation will explain using Thunder Client to issue API requests.
-          Thunder Client should be used in combination with an independent method to monitor IRC messages.
-        </p>
-        <p>
-          Warning: Running the tests individually can cause the web server to initiate IRC 
-          connections and issue IRC commands WITHOUT display of the IRC server responses.
-          This is because IRC server responses are returned asynchronously 
-          in the websocket stream which is not visible in Thunder Client.
-          In most cases, the API response is limited to a true/false error flag 
-          showing initialization of an asynchronous request, not subsequent completion or data.
-          
-          The collections include tests defined in a specific order such that interaction between the
-          web server and IRC server are blocked as authorization failures. Should you choose to run
-          the API requests individually, it is recommended to use a dedicated IRC server.
-        </p>
-
-        <h3>IRC server setup for testing</h3>
-        <p>
-          It is recommended to install a temporary IRC server to perform these tests.
-          The irc-hybrid-client was developed using the Debian apt package "ngircd".
-          Performing these tests can submit multiple IRC messages in rapid succession.
-          Running this on a public IRC server may get the IP addressed banned.
-        </p>
-        <p>
-          It is recommended to run the entire test on an isolated network or 
-          inside a virtual machine. In an isolated environment TLS and TLS certificates are not required.
-          Development testing was performed using a ngirc IRC server on a raspberry pi
-          on segregated network behind a NAT router.          
-        </p>
-        <p>
-          The temporary IRC server that we just created must be added to the irc-hybrid-client server list.
-          If you prefer to use the internal server list editor web page, you can skip the next part 
-          and use the server list editor web page after the app is running.
-        </p>
-        <p>
-          In the base folder of the repository, copy the example IRC server file to servers.json
-
-        </p>
-<pre>
-   cp -v example-servers.json servers.json
-</pre>
-        <p>
-          The File will look like this. Setup the servers.json to match the test IRC server you just installed.
-          The file is in JSON format. Use caution to use quotes and commas in the proper syntax.
-          The important values are marked with arrows.
-        </p>
-<div class="pre-div"><pre>
-{
-  "configVersion": 2,
-  "ctcpTimeLocale": ["en-US", "UTC"],
-  "serverArray": [
-    {
-      "disabled": false,
-      "name": "Test IRC Server",    &lt;------
-      "host": "127.0.0.1",          &lt;------
-      "port": 6667,                 &lt;------
-      "tls": false,
-      "verify": false,
-      "proxy": false,
-      "reconnect": false,
-      "logging": false,
-      "password": "",
-      "saslUsername": "",
-      "saslPassword": "",
-      "identifyNick": "",
-      "identifyCommand": "",
-      "nick": "Bob",                &lt;------
-      "altNick": "",
-      "recoverNick": false,
-      "user": "user",               &lt;------
-      "real": "Bob Smith",          &lt;------
-      "modes": "+i",
-      "channelList": ["#test"]
-    }
-  ]
-}  
-</pre></div>
-
-        <h4>Configuration of irc-hybrid-client for testing</h4>
-        <p>
-          Previous sections of this documentation contained detail
-          instructions for installation and setup of the irc-hybrid-client 
-          web server. The following are limited instructions for creating 
-          a test instance of the web server in an isolated environment 
-          that is protected from the internet.
-        </p>
-        <p>
-          The irc-hybrid-client is configured using a .env file.
-          The following minimum configuration may be used for testing.
+          In general terms testing of this application involves three areas: 
         </p>
         <ul>
-          <li>Make sure credentials.json does not exist, this demo will use a .env file for configuration.</li>
-          <li>In the base repository folder, create a .env file. The following minimum configuration copied from the repository main README.md</li>
-          <li>The SERVER_INSTANCE must be set to 0 (zero) to setup a unique cookie name.</li>
-          <li>Use a password random generator like pwgen to generate an insert SESSION_SECRET.</li>
-          <li>Use the &quot;tools/genEnvVarAuthForUser_1.mjs&quot; utility to generate a user hash.</li>
+          <li>Web Browser</li>
+          <li>IRC Server</li>
+          <li>Web Server</li>
         </ul>
         <p>
-          Example .env file
+          First, the <b>Web Browser</b> component of the irc-hybrid-client
+          is in itself a complex web application. 
+          It has a graphical desktop user interface that operates as a full IRC client.
+          It receives RFC-2812 messages from the IRC network (via the web server).
+          It accepts the user's input and sends command messages back to the IRC network (via the web server).
+          Irc-hybrid-client was developed using the Chrome web browser using Chrome's internal
+          developer tools. For purposes of debugging and testing, the irc-hybrid-client 
+          web page has it's own internal <a href="#debugpanel">Debug Panel</a> that can be used to 
+          comprehensively exercise various IRC client actions. The Debug panel is available in the web page 
+          dropdown menu by selecting: Other -&gt; Debug Tools. The <a href="#debugpanel">Debug Panel</a>
+          section shown below includes instruction for operation of the Debug Panel.
+        </p>
+        <p>
+          For the second method, the remote <b>IRC Server</b> (on the Internet) will accept IRC commands
+          from irc-hybrid-client and respond with IRC messages. Unfortunately, each
+          IRC network is different, each having various customizations. Some IRC networks
+          include IRCv3 extensions. Irc-hybrid-client was developed locally using 
+          the <q>ngircd</q> IRC server apt package in Debian Linux, and the 
+          <a ref="https:///www.dal.ent">DALnet</a> IRC network. In the case where
+          it becomes necessary to debug the IRC network itself, the best way to do 
+          this is to use irc-hybrid-client itself.
+          The <a href="/docs/index.html#ircserverpanel">IRC Server</a> panel
+          may be used to send RFC-2812 formatted commands directly to the IRC server 
+          using the IRC text command: <q>/QUOTE &lt;message&gt;</q>.
+          Responses from the IRC network maybe be viewed in the
+          <a href="#rawservermessages">Raw Server Messages</a> panel which displays 
+          websocket messages from the IRC server (via the web server) in real time.
+          An alternate method to explore IRC server operation would be to use 
+          Linux's <q>telnet</q> or <q>telnet-ssl</q> application.
+          The telnet application will allow a developer to use the CLI terminal to issue 
+          direct IRC commands from the keyboard, view response messages in the terminal,
+          and interact with the IRC network in real time. There are many examples on 
+          the internet showing use of a telnet client to interact with an IRC server.
+        </p>
+        <p>
+          For the third and primary debug method, the main focus of this help page is to debug the <b>Web Server API</b>
+          using three methods:
+        </p>
+        <ul>
+          <li>API testing the Bruno API client</li>
+          <li>API testing using dedicated debug test scripts</li>
+          <li>API testing using the web page Debug Panel.</li>
+        </ul>
+        <p>
+          Independent of which of the three methods is used, testing involves two parts.
+          One part requires a method to issue HTTP requests to the web server API. 
+          For the other part, a tool is needed to monitor RFC-2812 IRC network response 
+          messages that are returned from the web server using a websocket connection.
+          Before describing the three methods, Bruno, debug, scripts, and Debug Panel,
+          It is necessary to provide instruction on methods to monitor websocket data.
+        </p>
+        <p>
+          Warning: Submitting API calls to the web server can cause the web server to initiate IRC 
+          connections and issue IRC commands WITHOUT displaying IRC server responses.
+          This is because IRC server responses are returned asynchronously 
+          in the websocket stream. Therefore, to avoid getting k-lined on a major IRC network,
+          it is strongly remommended that <b><i>API tests should be run on a dedicated development IRC server.</i></b>
+        </p>
+        <p>
+          All three of these debug methods involve common setup of a development environment.
+          The following section describes common setup procedures, followed by instructions for running tests.
         </p>
 
+        <h3>Irc-hybrid-client web server configuration</h3>
+        <p>
+          A private development IRC server is recommended to avoid k-line from tests. 
+          The irc-hybrid-client was written using the "ngircd" Debian apt repository.
+          If possible, an isolated virtual machine is preferred where the VM contains both
+          the test instance of the IRC server and the irc-hybric-client web server.
+        </p>
+        <p>
+          Install the irc-hybrid-client web server in accordance with the
+          <a href="/docs/installation.html">Installation Instructions</a>
+        </p>
+        <p>
+          Configure irc-hybrid-client .env file for testing
+        </p>
+        <ul>
+          <li>For testing, the irc-hybrid-client configuration must use the <q>.env</q> file (Not the legacy <q>credentials.js</q> file)</li>
+          <li>In the base folder of the irc-hybrid-client repository, create a new .env file.</li>
+          <li>Configure generic web server settings such as port number in the .env file using the "example-.env" as a template.</li>
+        </ul>        
+        <p>
+          Example minimum configuration for testing.
+        </p>        
+        
 <div class="pre-div"><pre>
 ENV_VAR_CONFIG_VERSION=2
-LOGIN_USER_USERID=1
-LOGIN_USER_USER="user1"
-LOGIN_USER_NAME="Bob Smith"
-LOGIN_USER_HASH="---BCRYPT-HASH-GOES-HERE---"
+SERVER_TLS_KEY=/home/user/.tls/key.pem
+SERVER_TLS_CERT=/home/user/.tls/cert.pem
 SERVER_TLS=false
 SERVER_PORT=3003
+SERVER_PID_FILENAME=/home/user/tmp/ircHybridClient.PID
 SERVER_INSTANCE_NUMBER=0
-SESSION_SECRET="---COOKIE-SECRET-GOES-HERE---"  
+SESSION_SECRET="---cookie-secret-goes-here--"
 </pre></div>
-
-
-        <h4>Thunder Client configuration</h4>
+        
         <p>
-          This must be done **BEFORE** importing the collection. Otherwise, tests 
-          using the COPY method will be imported as GET requests.
+          The following variables must NOT be defined in the .env file when running debug test scripts. 
+          The test runner (debug/runner.sh) will restart the irc-hybrid-client server
+          several times with different values for these variables. 
+          The .env file will over-write these ad-hoc environment variables and cause the tests to fail.
         </p>
-        <p>
-          In Thunder Client: Disable the functionality to follow redirects (302)
-        </p>
-<pre>
-  Settings > User > Extensions > Thunder Client > Follow Redirects (Uncheck)
-</pre>        
-        <p>
-          In Thunder Client: Add "COPY" as a custom HTTP method.
-        </p>          
-<pre>
-  Settings > User > Extensions > Thunder Client > Custom Methods: COPY
-</pre>          
-
-        <h4>Thunder Client Environment Variables</h4>
-        <p>
-          A local environment is required to save authorization codes and access_tokens. 
-          In the Thunder Client &quot;Env&quot; tab, if &quot;(Local Env)&quot; does not show in the 
-          list of environments. it must be created by selecting &quot;Local Environment&quot; in dropdown.          
-        </p>
-        <p>
-          The following environment variables may be imported into Thunder Client 
-          from: &quot;thunderclient/thunder-environment_irc-hybrid-client.json&quot;. 
-          The first 6 environment variables listed below are used for the main IRC test collection.
-          The remaining 7 environment variables that begin with &quot;auth_&quot; are only 
-          required if remote authentication is used. 
-          The variables beginning with auth_ may be omitted for this part of the test.
-        </p>
-        <ul>
-          <li>The server_URL is the web server, not the IRC server</li>
-          <li>The server_user1 and server_password1 values are for the web page login, not IRC.</li>
-          <li>The irc_nickname and irc_channel will be used for the tests.</li>
-        </ul>
-
-        <div class="pre-div"><pre>
-server_URL:          "http://localhost:3003"
-server_user1:        "user1"
-server_password1:    "mysecret"
-irc_nickname:        "myNick"
-irc_channel":        "#test"
-server_die:          "NO"
-
-auth_host:           "http://127.0.0.1:3500"
-auth_redirect_uri:   "http://localhost:3003/login/callback"
-auth_username:       "bob"
-auth_password:       "bobssecret"
-auth_client_id:      "irc_client_1"
-auth_client_secret:  "ssh-secret"
-auth_scopes:         "irc.all"
-</pre></div>
-
-        <h4>Thunder Client Collection</h4>
-        <p>
-          In the Thunder Client extension in VSCode, 
-          import the <b>irc-hybrid-client</b> collection from 
-          &quot;thunderclient/thunder-collection_irc-hybrid-client.json&quot;. 
-          This collection is divided into 5 folders that can be run as 
-          individual sequences or collectively the entire collection can 
-          be run as a single sequence.
-        </p>
-        <p>
-          The test described below are in the collection folder &quot;Message Debug&quot;
-        </p>
-
-        <h4>Obtaining a Thunder Client cookie</h4>
-        <p>
-          To get a valid cookie, run selections 7.1, 7.2, and 7.3 from the Thunder Client collection.
-          7.1 Will clear previous cookie.
-          7.2 Will request the login form, then extract a login random nonce and CSRF token from the form.
-          7.3 Will issue a POST request containing username and password to authenticate the user.
-          Steps 7.2 and 7.3 are time critical and must be executed together to avoid
-          time expiration of the random nonce.
-        </p>
-
-        <h4>List of tests</h4>
-        <p>
-          Collection: &quot;irc-hybrid-client message debug &quot;
-        </p>
-        <ul>
-          <li>7.1-7.3 Login to web server</li>
-          <li>8.1 Selects server index 0 in the IRC server list.</li>
-          <li>8.2 Download IRC client state object, confirm server index=0</li>
-          <li>8.3 Connect backend to IRC server (be careful here)</li>
-          <li>Timer 5 seconds. If your IRC server needs more time for domain lookup and identd lookup, you can extend this longer.</li>
-          <li>8.4 Download IRC client state object, confirm connected to IRC.</li>
-          <li>8.5 JOIN an IRC channel</li>
-          <li>Timer 1 second (for IRC server latency)</li>
-          <li>8.6 Download IRC client state, confirm join in channel</li>
-          <li>8.7 Send a channel message (PRIVMSG)</li>
-          <li>8.8 PART or leave the channel.</li>
-          <li>Timer 1 second (for IRC server latency)</li>
-          <li>8.9 Download IRC client state, confirm part</li>
-          <li>8.10 Remove (prune) the channel data from backend.</li>
-          <li>8.11 Download IRC client state, confirm channel pruned</li>
-          <li>8.12 Retrieve message cache</li>
-          <li>8.13 Disconnect backend from IRC</li>
-          <li>8.14 Clear the message cache.</li>
-          <li>8.15 Confirm empty cache.</li>
-          <li>8.16 Terminate (Die) the backend web server (This will show a message, but not die unless environment variable server_die is set to "YES").</li>
-        </ul>
-
-        <h4>1F Additional documentation</h4>
-        <p>
-          Additional documentation is available in a README.md file located in the
-          github directory where the Thunder Client collections are located.
-        </p>
-
-        <h4>1G - IRC command issuance</h4>
-        <p>
-          The following screen capture shows an API POST request used to emulate
-          transmission of a user text message to an active IRC channel. The body of the POST request contains a
-          &quot;message&quot; property containing an RFC 2812 formatted message.
-          The IRC message includes the command &quot;PRIVMSG&quot;, followed by the
-          first IRC argument (channel name), followed by the second IRC argument (text message content)
-          which begins with a colon (:) character, followed by a UTF-8 string terminating
-          in an end-of-line character.
-        </p>
-        <p>
-          The Thunder Client response shown below has the response body tab selected.
-          The contents of the response is limited to a boolean error flag.
-          The error condition refers to acceptance
-          of the API request by the web server. As the IRC command is passed to the
-          IRC server, should an IRC server error occur, the IRC server error
-          will appear in the websocket stream, not on the API response.
-        </p>
-        <img src=images/thunder-client.png width="894" height="571"alt="API test Example">
-        <p>
-          Thunder Client is not capable to view the websocket response.
-          The expected response should be returned to the web browser as stream data containing
-          IRC messages received over the websocket.
-          The example below shows the sample websocket message expected from the above Thunder Client request.
-          The first line is a RFC 2812 formatted IRC message intended to be parsed by the browser
-          in order to add content to the displayed web page.
-          The second line starting with &quot;--&gt;&quot; is a verbatim copy of the outgoing
-          IRC message sent to the IRC server which is intended to be used for debugging purposes only.
-        </p>
+        
 <div class="pre-div"><pre>
-@time=2021-07-19T14:35:37.000Z :myNick!*@* PRIVMSG #test :This is a test message (irc-hybrid-client)
---> PRIVMSG #test :This is a test message (irc-hybrid-client)
-</div>
+# Not allowed in .env during testing.
+NODE_ENV=
+SESSION_SET_ROLLING_COOKIE=
+SESSION_EXPIRE_SEC=
+OAUTH2_ENABLE_REMOTE_LOGIN=
+IRC_DISABLE_LIST_EDITOR=
+IRC_SERVE_HTML_HELP_DOCS=
+</pre></div>
+        
         <p>
-          As a side note, IRC servers do not return outgoing IRC channel text messages back to the IRC client.
-          The irc-hybrid-client supports multiple concurrent browsers connected at the same time.
-          In order to display outgoing messages on all connected browsers,
-          the previous websocket PRIVMSG response was generated by the backend in valid RFC 2812 format,
-          so it could be parsed in the browser, equivalent to incoming PRIVSG messages from other users.
+          If necessary, update .env file for the web server's login username and password using the 
+          irc-hybrid-client utility found in "tools/genEnvVarAuthForUser_1.mjs". 
+          The .env file should look similar to this:
         </p>
+          
+<div class="pre-div"><pre>
+LOGIN_USER_USERID=1
+LOGIN_USER_USER=user1
+LOGIN_USER_NAME="Bob Smith"
+LOGIN_USER_HASH="---BCRYPT-HASH-GOES-HERE---"
+</pre></div>
+        
+        <ul>
+          <li>Start the web server from the irc-hybrid-client directory `npm start`</li>
+          <li>Using a web browser, login to the web server at route <q>/irc/webclient.html</q> and confirm username and password are working correctly.</li>
+          <li>Create at least one definition for a development IRC server to be used for testing in accordance with the <a href="/docs/server-config.html">IRC Configuration</a> instructions.</li>
+          <li>Using the web browser, connect to the IRC network and confirm the testing instance of the irc-hybrid-client web server are working as expected.</li>
+          <li>Close the web browser</li>
+        </ul>
+        
+        <h3>Monitoring Websocket Responses</h3>
         <p>
-          The following sections include instruction on methods to view these web socket messages.
+          Neither Bruno nor the debug test scripts are able to monitor and display websocket data.
+          Response messages are returned to the web browser as stream data containing
+          IRC messages received over the websocket.
+          The following example shows an IRC channel message being sent to the IRC network.
+          In response to recieving the channel message, the IRC server will echo a copy
+          of the message to all of the users present in the IRC channel.
+          The irc-hybrid-client web server returns the IRC message to web browser over 
+          a websocket connection between the browser and web server.
+        </p>
+        <ul>
+          <li>Sending IRC message to channel #test from user debug-nick</li>
+        </ul>
+
+<div class="pre-div"><pre>
+PRIVMSG #test :This is a test message (irc-hybrid-client)
+</pre></div>
+
+        <ul>
+          <li>Response websocket message over web server's websocket</li>
+        </ul>
+
+<div class="pre-div"><pre>
+@time=2021-07-19T14:35:37.000Z :debug-nick!*@* PRIVMSG #test :This is a test message (irc-hybrid-client)
+</pre></div>
+
+        <p>
+          The following sections include instructions on various methods to view these web socket messages.
         </p>
 
-        <h3>2 - Browser Websocket Messages (using IRC client)</h3>
+        <h3>1 of 3 - Monitor Websocket Messages using the irc-hybrid-client web page</h3>
         <p>
-          There are two ways to view websocket stream messages.
-          Websocket messages can be viewed in raw format within the irc-hybrid-client
-          web page. Alternately, a simple html page and javascript file was included
-          as a debug tool to monitor the websocket independent of the IRC client web page.
+          The irch-hybrid-client web page includes a <a href="#debugpanel">Debug Panel</a> that 
+          is used in software development. One of the sub-panels can view websocket messages in real time.
         </p>
         <p>
-          To view websocket messages in the IRC client, first open the irc-hybrid-client web page.
-          Enter the username and password that were setup for Thunder Client tests as described above.
+          To view websocket messages in the irc-hybrid-client, first open the irc-hybrid-client web page.
+          Enter the exact same username and password that are used with either Bruno tests or the debug test scripts.
           In the main navigation dropdown menu, select <q>More...</q>, then select <q>Debug Tools</q>.
-          The Debug Panel will open. An screen shot of the debug panel is included at the bottom of this page.
-          In the Debug Panel, select Button 3-3 Open: IRC raw message log.
+          The Debug Panel will open. An screen shot of the  <a href="#debugpanel">Debug Panel</a> 
+          is included at the bottom of this page. In the Debug Panel, select Button <q>3-3 Open: IRC raw message log</q>.
           Press the <q>Start</q> button to enable real time display of websocket messages.
         </p>
 
-        <img src=images/raw-server-messages.png width="714" height="341"alt="Debug Panel">
+        <img src=images/raw-server-messages2.png width="1020" height="382"alt="Debug Panel">
 
-        <h3>3 - Browser Websocket Messages (custom debug tool)</h3>
+        <p>
+          You will notice the message is listed two times. The first message is the websocket message
+          from the IRC network. The second message starting with <q>--&gt;</q> showd the outgoing message.
+          Sorry, they are in reverse order due internal contraints associated with event handling.
+        </p>
+
+        <h3>2 of 3 - Monitor Websocket Messages using the web server's Cache API</h3>
+        <p>
+          This method is considered to be a workaround approach.
+          The web server contains an IRC message cache. The purpose of the message cache is
+          to allow connected web browsers refresh the web page message window.
+          This is used when opening the irc-hybrid-client webpage for the first time and
+          after network disconnects.
+        </p>
+        <p>
+          The irc-hybrid-client web server has two API routes that can be utilized during testing
+          to view responses in the message cache. The <a href="#eraseroute">Erase API</a> will erase all 
+          current message in the cache. The <a href="#cacheroute">Cache API</a> will retrieve the entire message cache.
+          This method may be useful during debugging operations becasue the data is returned to the 
+          program performing the test within the body of the HTTP response from the web server API.
+          Therefore, a websocket connection is not required to observe the response.
+        </p>
+        <p>
+          Response timing should be considered as a possible issue. After sending an 
+          IRC command, the IRC server will take some time to process the transaction.
+          It is possible to retrieve the message cache from the web server before
+          the IRC network has returned it's response. This is especially true on 
+          public IRC networks with a large number of users. Therefore, during testing
+          a time delay sould be performed before retrieving the message cache.
+        </p>
+        <p>
+          As an example, consder an example where an IRC channel message is sent to the IRC network from user debug-nick.
+        </p>
+
+<div class="pre-div"><pre>
+PRIVMSG #test :This is a test message (irc-hybrid-client)
+</pre></div>
+        <ul>
+          <li>First: perform a POST request to the <q>/irc/erase</q> route (<a href="#eraseroute">Erase API Specification</a>) to clear all previous messages.</li>
+          <li>Second: Send an POST request to the <q>/irc/message</q> route (<a href="#messageroute">Message API Specification</a>) to send an IRC message</li>
+          <li>Third: Pause for a short delay.</li>
+          <li>Fourth: perform a GET request to the <q>/irc/cache</q> route (<a href="#cacheroute">Cache API Specification</a>) to view the full cache containing the response</li>
+        </ul>
+        <p>
+          The http response to the Cache API will return JSON encoded array of strings, where each string 
+          represents a separate IRC message. However, the order of messages in the cache 
+          does not reflect the order in which the messages are raceived, so it is 
+          important to erase the cache before sending an IRC message that expects a response.
+        </p>
+
+<div class="pre-div"><pre>
+[
+  "@time=2025-02-01T15:31:55.405Z :debug-nick!*@* PRIVMSG #test :This is a test message (irc-hybrid-client)"
+]
+</pre></div>
+        <p>
+          It is also possible to view the message cache from inside the web page using the Raw Server Message panel
+          described in option 1 of 3 above. The Raw Server Message panel includes a <q>Fetch Cache</q>
+          button that will retrieve and display the entire message cache on the irc-hybrid-client web page.
+        </p>
+
+        <h3>3 of 3 - Monitor Websocket Messages (custom debug tool)</h3>
         <p>
           The irc-hybrid-client github repository contains a custom web page used to
           test the websocket connection. In order for the session cookies to work properly
           with the websocket, the websocket must exist on the same web server containing
           the browser html page and browser javascript. The custom web page is located
-          in the &quot;server/testws&quot; folder. It contains 3 files, one each html, js and css.
+          in the <q>server/testws</q> folder. It contains 3 files, one each html, js and css.
           To enable this route and serve these files from the main web server, TEMPORARILY remove comment
-          characters from the following code located in the &quot;server/web-server.mjs" file.
+          characters from the following code located in the <q>server/web-server.mjs" file.
           Restart the server after the edit.
         </p>
 
@@ -1679,10 +1685,9 @@ auth_scopes:         "irc.all"
           visible. Remember to disable the route by replacing the comment characters after testing.
         </p>
         <p>
-          It is necessary to obtain a session cookie. Both Thunder Client and the web browser each
-          requires it's own cookie. The easiest way to do this is to
-          open the normal login form at the &quot;/login&quot; route. The login route can be appended to the
-          testing web URL, such as &quot;http://localhost:3000/login". The following window should
+          It is necessary to obtain a session cookie.  The easiest way to do this is to
+          open the normal login form at the <q>/login</q> route. The login route can be appended to the
+          testing web URL, such as <q>http://localhost:3000/login". The following window should
           open.
         <p>
 
@@ -1691,7 +1696,7 @@ auth_scopes:         "irc.all"
         </p>
           If your login is successful, the normal IRC client page will open.
           This page will not be used. Instead, edit the URL in the browser bar and
-          go to the following route: &quot;/testws/test-websocket.html&quot;. If you are using
+          go to the following route: <q>/testws/test-websocket.html</q>. If you are using
           localhost, it will look something like this, but possibly a different port number,
           depending on your configuration file.
         </p>
@@ -1714,25 +1719,444 @@ http://localhost:3000/testws/test-websocket.html
         <p>
           To do this, first select the [Schedule Auth] button, then
           immediately select the [Connect Websocket] button.
-          If successful, you will see the message: &quot;websocket: open event fired&quot;.
+          If successful, you will see the message: <q>websocket: open event fired</q>.
         </p>
         <p>
-          Websocket messages appear in the textarea labeled &quot;Messages&quot;
+          Websocket messages appear in the textarea labeled <q>Messages</q>
         </p>
         <p>
-          Please remember to disable the &quot;/testws&quot; route after testing.
+          Please remember to disable the <q>/testws</q> route after testing.
         </p>
         <p>
           For additional information about use of the test websocket page to verifiy
           access restrictions to the web socket, view the README.md file in the
-          &quot; server/testws&quot; folder.
+          <q> server/testws</q> folder.
         </p>
 
         <img src=images/websocket-trace.png width="600" height="870"alt="Websocket Example">
 
+        <h2>Bruno API Client Setup</h2>
+        <p>
+          <a href="https://www.usebruno.com/">Bruno</a> is a free general purpose API testing client similar to Postman.
+        </p>
+        <p>
+          With irc-hybrid-client, Bruno is primarily used to perform real time debugging
+          when changing API routes or adding new API routes. The Brunno
+          collections do not contain a comprehensive set of tests.
+        </p>
 
-        <div class="vh-20"></div>
-        <div class="vh-20"></div>
+        <p>
+          In Debian, Bruno is installed as a Bruno APT package from the Bruno web site following 
+          the instructions at <a href="https://www.usebruno.com/">www.usebruno.com</a>. 
+          For other distributions of Linux follow the instruction on the Bruno web site.
+          The default settings should be sufficient for these tests.
+        </p>
+        <p>
+          In Bruno, a test collection is loaded from a git repository by select 
+          the disk folder that contains the collection. For irc-hybrid-client, 
+          the Bruno collection is saved in a separate git repository named 
+          <q>irc-hybrid-client-dev-tools</q>. In order to run the tests both 
+          irc-hybrid-client and irc-hybrid-client-dev-tools repositories must 
+          both be installed in the same parent folder.
+        </p>
+        <p>
+          Example of side by side repositories:
+        </p>
+
+<div class="pre-div"><pre>
+drwxr-xr-x 13 user user 4096 Jan 23 14:13 irc-hybrid-client
+drwxr-xr-x  5 user user 4096 Jan 23 09:52 irc-hybrid-client-dev-tools
+</pre></div>
+
+        <p>
+          Example commands to install both repositories:
+        </p>
+        
+<div class="pre-div"><pre>
+# Clone GitHub repositories.
+git clone https://github.com/cotarr/irc-hybrid-client.git
+git clone https://github.com/cotarr/irc-hybrid-client-dev-tools.git
+cd irc-hybrid-client
+# install dependencies
+npm install
+</pre></div>
+
+        <p>
+          In Bruno, a test collection is loaded from a git repository by 
+          selectomg the disk folder that contains the collection. 
+          For irc-hybrid-client, the Bruno collection is saved in 
+          a separate git repository named <q>irc-hybrid-client-dev-tools</q>.
+        </p>
+        <ul>
+          <li>Open Bruno</li>
+          <li>Select: <q>Open collection</q>, it will expect a disk folder name</li>
+          <li>Navigate to the <q>irc-hybrid-client-dev-tools</q> repository, find the <q>bruno</q> folder</li>
+          <li>Select the <q>irc-hybrid-client</q> folder in the <q>irc-hybrid-client-dev-tools/bruno/</q> folder.</li>
+        </ul>
+
+        <h3>
+          Bruno .env Environment Variables
+        </h3>
+        <p>
+          When Bruno starts, it will look for an .env file in the collection folder. 
+          There are two ways to do this. A dedicated .env file may be put into the 
+          collection folder as "irc-hybrid-client-dev-tools/bruno/irc-hybrid-client/.env". 
+          The second way is to create a symbolic link to the .env file in the irc-hybrid-client repository.
+        </p>
+        <p>
+          <em>Security caution: Avoid committing credentials in the .env file to a git repository by adjusting the .gitignore if needed.</em>
+        </p>
+        <p>
+          The advantage of using a symbolic link as the Bruno tests can use the same test 
+          configuration as the debug test scripts in the /debug/ folder of the dev tools repository.
+        </p>        
+        <ul>
+          <li>Change directory to: <q>irc-hybrid-client-dev-tools/bruno/irc-hybrid-client/</q> folder.</li>
+          <li>Execute a <q>ln</q> command using the full path of the .env file in the irc-hybrid-client repository as follows but using the proper folder locations for your system.</li>
+        </ul>
+        <p>
+          Example:
+        </p>        
+        
+<div class="pre-div"><pre>
+# Go to Bruno's collection folder
+cd /home/user/some-folder/irc-hybrid-client-dev-tools/bruno/irc-hybrid-client/
+
+# Create a link to the irc-hybrid-client .env file (full path name)
+ln -s /home/user/some-folder/irc-hybrid-client/.env  .env
+</pre></div>
+        
+        <p>
+          Environment variables that begin with "TESTENV_" are used to configure 
+          the testing script. Both server configuration variables and testing 
+          variables may be included in the same .env file.
+        </p>
+        <p>
+          The .env file must include setting for the testing instance 
+          of the irc-hybrid-client web server including the web server URL, 
+          web login username and web login password. You should substitute 
+          values that were configured for your web server.
+        </p>        
+        
+<div class="pre-div"><pre>
+TESTENV_WEB_URL=http://localhost:3003
+TESTENV_WEB_USERNAME=user1
+TESTENV_WEB_PASSWORD=mysecret
+</pre></div>
+        
+        <p>
+          By default the test script will use the first IRC server definition. 
+          If you prefer to use one of the other IRC server definitions, 
+          set the TESTENV_IRC_SERVERINDEX to an integer starting with zero.
+        </p>
+        
+<div class="pre-div"><pre>
+TESTENV_IRC_SERVERINDEX=0
+</pre></div>
+
+        <p>
+          Various IRC related data values are required for use in testing. 
+          These must be specified using environment variables. 
+          Add the following definitions the the .env file, but substitute 
+          different data values as needed for your specific test environment.
+
+        </p>
+        
+<div class="pre-div"><pre>
+TESTENV_IRC_REGISTERDELAY=5
+TESTENV_IRC_NICKNAME=debug-nick
+TESTENV_IRC_REALNAME=test
+TESTENV_IRC_CONNECTMODE="+i"
+TESTENV_IRC_CHANNEL="#test"
+</pre></div>
+        
+        <h3>Running Tests in Bruno</h3>
+        <p>
+          When using Bruno, API requests should be submitted to the server one at a time.
+          Do not use Bruno's runner to run multiple tests as a set.
+          Running tests as a set executes multiple tests asynchronously and some 
+          responses may not be properly parsed into runtime variables before those 
+          data values are needed as input to subsequent requests.
+        </p>
+        <p>
+          Before issuing requests to authenticated routes, it is necessary to obtain 
+          a user login session cookie and CSRF token. This is done by running the following requests one at a time:
+        </p>
+        <ul>
+          <li>210-login-form</li>
+          <li>220-submit-password</li>
+          <li>230-get-csrf-token</li>
+        </ul>
+        <p>
+          The following screen capture image shows the Bruno API client being used to
+          submit an IRC channel message to channel #test from user debug-nick.
+          The request body shown on the left and the response body is shown on the right.
+        </p>
+
+        <img src="images/bruno-message.png" width="1060" height="699"alt="API test Example">
+
+        <h3>Bruno Collection Documentation</h3>
+        <p>
+          In Bruno, documentation for each request is shown in the <q>Docs</q> tab of that request.
+        </p>
+        <p>
+          The irc-hybrid-client-dev-tools get repository contains additional instructions
+          located in the /bruno/README.md including a full list of all the tests.
+        </p>
+
+        <h2>Irc-hybird-client Debug Test Scripts</h2>
+        <h3>Description of the Debug Test Script Collection</h3>
+        <p>
+          The debug test script feature is a collection of various irc-hybrid-client web 
+          server API tests that are written in native javascript using the Node.js 
+          assertion library. 
+        </p>
+          The primary purpose of the debug test scripts is to check the operation 
+          of the irc-hybrid-client web server following installation of NPM dependency 
+          package updates. Often these dependency module upgrades include major 
+          version revisions that may contain breaking changes. Following 
+          installation of updates, these provide a quick check that noting 
+          within the web server has been broken by the updates.        <p>
+        </p>
+        <h3>
+          Installation of test environment
+        </h3>
+
+        <p>
+          The test scripts are located in a separate repository "irc-hybrid-client-dev-tools" 
+          In order to run the tests both irc-hybrid-client and irc-hybrid-client-dev-tools r
+          epositories must both be installed in the same parent folder.
+        </p>
+        <p>
+          Example of side by side repositories:
+        </p>
+
+<div class="pre-div"><pre>
+drwxr-xr-x 13 user user 4096 Jan 23 14:13 irc-hybrid-client
+drwxr-xr-x  5 user user 4096 Jan 23 09:52 irc-hybrid-client-dev-tools
+</pre></div>
+
+        <p>
+          Since the debug scripts are in an alternate folder location, a symbolic link inside the irc-hybrid-client
+          repository is needed to make the remote <q>/debug/</q> folder visible inside the irc-hybrid-client repository folder.
+        </p>
+          <p>
+          Example commands to install both repositories and create symlink:
+        <p>
+
+<div class="pre-div"><pre>
+# Clone GitHub repositories.
+git clone https://github.com/cotarr/irc-hybrid-client.git
+git clone https://github.com/cotarr/irc-hybrid-client-dev-tools.git
+
+cd irc-hybrid-client
+
+# install dependencies
+npm install
+
+# Create symbolic link from irc-hybrid-client repository to the testing folder
+ln -s ../irc-hybrid-client-dev-tools/debug debug
+</pre></div>
+
+
+        <h3>Test script (.env) Environment Variables</h3>
+        <p>
+          Environment variables that begin with "TESTENV_" are used to configure the testing script. They are located in the same .env file as the irc-hybrid-client configuration.
+        </p>
+        <p>
+          The irc-hybrid-client .env file must include setting for the testing instance of the irc-hybrid-client web server including the web server URL, web login username and web login password. You should substitute values that were configured for your web server.
+        </p>
+
+<div class="pre-div"><pre>
+TESTENV_WEB_URL=http://localhost:3003
+TESTENV_WEB_USERNAME=user1
+TESTENV_WEB_PASSWORD=mysecret
+</pre></div>
+
+        <p>
+          By default the test script will use the first IRC server definition. 
+          If you prefer to use one of the other IRC server definitions, 
+          set the TESTENV_IRC_SERVERINDEX to an integer starting with zero.
+        </p>
+
+<div class="pre-div"><pre>
+TESTENV_IRC_SERVERINDEX=0
+</pre></div>
+
+        <p>
+          Various IRC related data values are required for use in testing. 
+          These must be specified using environment variables. 
+          Add the following definitions the the .env file, but substitute 
+          different data values as needed for your specific test environment.
+        </p>
+
+<div class="pre-div"><pre>
+TESTENV_IRC_REGISTERDELAY=5
+TESTENV_IRC_NICKNAME=debug-nick
+TESTENV_IRC_REALNAME=test
+TESTENV_IRC_CONNECTMODE="+i"
+TESTENV_IRC_CHANNEL="#test"
+</pre></div>
+
+        <h3>Command line examples</h3>
+        <p>
+          The tests should be run from the base folder of the "irc-hybrid-client" 
+          repository using the symlink to the debug folder.
+          This is an example showing execution of one of the test scripts.
+          Change directory to the base folder of irc-hybrid-client.
+        </p>
+        <p>
+          In the terminal, enter the following command in base folder of the irc-hybric-client repository:
+        </p>
+
+<div class="pre-div"><pre>
+node ./debug/public-routes.js
+</pre></div>
+
+        <p>
+          The debug/public-routes.js script will confirm some un-protected public routes that
+          do not require a user's login session cookie.
+        </p>
+
+<div class="pre-div"><pre>
+      Test: 100 GET /status (server is running)
+        200 GET http://localhost:3003/status
+        Expect: status === 200
+        Expect: status: "ok"
+      
+      Test: 101 GET /.well-known/security.txt
+        200 GET http://localhost:3003/.well-known/security.txt
+        Expect: status === 200
+        Expect: response include security contact email
+      
+      Test: 102 GET /robots.txt
+        200 GET http://localhost:3003/robots.txt
+        Expect: status === 200
+        Expect: response include "Disallow: /"
+      
+      Test: 103 GET /favicon.ico
+        204 GET http://localhost:3003/favicon.ico
+        Expect: status === 204
+      
+      Test: 300 GET /not-found.html (Error handler)
+        404 GET http://localhost:3003/not-found.html
+        Expect: status === 404
+        Expect: Error response includes "Not Found"
+      ---------------------
+        All Tests Passed
+      ---------------------
+</pre></div>
+
+      <h3>Command line arguments</h3>
+      <p>
+        Execution of the debug test scripts will basically list a passing 
+        result for each test. Setting these environment variables from 
+        the command line will show additional information during test execution.
+      </p>
+
+      <table class="table-generic">
+        <tbody>
+          <tr>
+            <th>Enviornment</th>
+            <th>Description</th>
+          </tr>
+          <tr>
+            <td>SHOWRES=1</td>
+            <td>Print raw response body for each request</td>
+          </tr>
+          <tr>
+            <td>SHOWRES=2</td>
+            <td>Print response headers for each request</td>
+          </tr>
+          <tr>
+            <td>SHOWRES=3</td>
+            <td>Print both body and headers each request</td>
+          </tr>
+          <tr>
+            <td>SHOWCOOKIE=1</td>
+            <td>Print request, response cookie </td>
+          </tr>
+          <tr>
+            <td>SHOWWEBSOCKET=1</td>
+            <td>Print websocket connect state change</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>
+        For debugging writing of new tests
+      </p>
+
+      <table class="table-generic">
+        <tbody>
+          <tr>
+            <th>Enviornment</th>
+            <th>Description</th>
+          </tr>
+          <tr>
+            <td>SHOWCHAIN=1 </td>
+            <td>Print chain object at end of tests (debug)</td>
+          </tr>
+          <tr>
+            <td>SHOWCHAIN=2</td>
+            <td>Print chain object after each test (debug)</td>
+          </tr>
+          <tr>
+            <td>SHOWSTACK=1</td>
+            <td>Error handler print stack</td>
+          </tr>
+        </tbody>
+      </table>
+    
+      <p>
+        Command line example:
+      </p>
+      
+<div class="pre-div"><pre>
+SHOWRES=3 SHOWCOOKIE=1 SHOWSTACK=1 node debug/public-routes.js
+</pre></div>
+
+      <h3>Test runner.sh bash script</h3>
+      <p>
+        The debug/runner.sh bash script will run all the test modules in sequence. 
+        The script will pause for 5 seconds between each test to provide an 
+        opportunity to review data and/or to abort the tests using ctrl-C.
+      </p>
+      <p>
+        For various different test configurations, the script will stop 
+        the irc-hybrid-client server, issue new environment variables, 
+        then restart the server. For this to work properly, a folder is 
+        needed to store the server process PID. The default is ~/tmp in 
+        the user's home directory. The PID folder must exist. 
+        An alternate PID folder may be specified as an environment 
+        variables, such as PID_DIR=/home/user/somewhere
+      </p>
+      <p>
+        The runner.sh script will create log files in the PID_DIR folder (~/tmp by default).
+      </p>
+      <p>
+        Do not start the web server. The runner.sh script will start the web server automatically. Start the script from the repository base folder using:
+      </p>
+
+      <h3>Debug Test Script Documentation</h3>
+      <p>
+        In the /debug/ folder of irc-hybrid-client-dev-tools repository
+        there is a <q>debug/README.md</q> file that includes additional
+        documentation including a complete list of all testing requests.
+      </p>
+      <h2>
+        Legacy API tests
+      </h2>
+      <p>
+        The legacy postman collections can be found in the "postman/" folder in commit
+        ca1bec034ca2500251bd67387d94c650b3620db1 from 2023-07-17.
+      </p>
+      <p>
+        The legacy ThunderClient collections (vscode extension) can be found in then "thunderclient/" 
+        folder in commit 4521f164eb84767447eaa5566b8ca6209f53b966 for version v2.0.23 from 2025-01-22
+      </p>
+
+        <div class="hash-spacer" id="debugpanel"></div>
         <div class="desc-title">
           Web page Debug Panel
         </div>
@@ -1747,6 +2171,10 @@ http://localhost:3000/testws/test-websocket.html
           information that would typically be available in the browser development tools console
           to be viewed directly in the application.
         </p>
+        <img src=images/debug-panel.png width="758" height="1291"alt="Debug Panel">
+        <p>
+          In the debug panel image above, Button 1-3 was selected. The memory usage was displayed at the bottom of the Debug Panel.
+        </p>
         <p>
           For users interested in learning how the RFC-2812 IRC protocol works, 
           debug tools allow display of RAW IRC messages as they pass to and from the IRC network from your IRC client.
@@ -1755,7 +2183,7 @@ http://localhost:3000/testws/test-websocket.html
           The Debug panel can be invoked from the dropdown navigation menu.
         </p>
         <p>
-          Appending &quot;#DEBUG&quot; to web page URL will show the debug panel when the page loads.
+          Appending <q>#DEBUG</q> to web page URL will show the debug panel when the page loads.
         </p>
 
         <h3>Admin Functions</h3>
@@ -1768,7 +2196,7 @@ http://localhost:3000/testws/test-websocket.html
         <ul>
           <li>Button 1-1 Emulate IRC ping timeout by forcing internal variables to exceed time limits.</li>
           <li>Button 1-2 Emulate websocket timeout by forcing internal variables to exceed time limits</li>
-          <li>Button 1-3 Command NodeJs to perform garbage collection (image below), report memory before and after (Requires backend started with &quot; node --expose-gc&quot;)</li>
+          <li>Button 1-3 Command NodeJs to perform garbage collection (image below), report memory before and after (Requires backend started with <q> node --expose-gc</q>)</li>
           <li>Button 1-4 Websocket ping, shows response time for both HTTP response and websocket stream response. Results shown at bottom of debug panel.</li>
           <li>Button 2-1 Force all panels to be visible (Use care not to activate buttons in panels intended to be hidden)</li>
           <li>Button 2-2 Force all status icons in the header bar to be visible. Used to edit CSS styles. (To cancel refresh page)</li>
@@ -1788,12 +2216,10 @@ http://localhost:3000/testws/test-websocket.html
           <li>Button 5-3 Play Beep Sound 3</li>
         </ul>
         <h3>Debug Panel Examples</h3>
-        <p>
-          In the example below, Button 1-3 was selected. The memory usage was displayed at the bottom of the Debug Panel.
-        </p>
-        <img src=images/debug-panel.png width="758" height="1291"alt="Debug Panel">
-        <p>
-          Example showing the Button 3-3 from the Debug Panel.
+        <p id="rawservermessages">
+          Example showing the Raw Server Messages panel that was opened by clicking
+          Button 3-3 from the Debug Panel. This panel will allow real time display
+          of websocket server messages.
         </p>
         <img src=images/raw-server-messages.png width="714" height="341"alt="Debug Panel">
         <div class="vh-20"></div>

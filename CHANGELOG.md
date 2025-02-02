@@ -8,6 +8,35 @@ and this project adheres to
 
 - To view notes on v2 major upgrade, scroll to Version v2.0.0 2023-09-12
 
+## Next
+
+The API test scripts located in the thunderclient/ folder no longer work.
+The VSCode extension Thunder Client has changed it's terms.
+Testing features used for irc-hybrid-client have been moved 
+behind a paywall and are no longer offered in the free version.
+
+In response to this, some of the Thunder Client tests have been rewritten to use the Bruno API testing client.
+These test collections are now located in the separate git repository "irc-hybrid-client-dev-tools"
+in a folder named "/Bruno/" in the base folder of the irc-hybrid-client-dev-tools repository.
+Instruction are avalable in /Bruno/README.md file.
+
+Additionally, a second set of debug test scripts was written in native Javascript
+using the NodeJs internnal Assertion library. The debug test scripts are located 
+in a separate git repository "irc-hybrid-client-dev-tools"
+in a folder named "/debug/" in the base folder of the irc-hybrid-client-dev-tools repository.
+Instruction are available in /debug/README.md file.
+
+The legacy ThunderClient collections (vscode extension) can be found in the
+ "thunderclient/" folder in commit 4521f164eb84767447eaa5566b8ca6209f53b966 for version v2.0.23 from 2025-01-22.
+
+### Changes
+
+- There are no code changes in v2.0.24.
+
+- Added "debug" to the .gitignore to avoid committing the debug test script symbolic link into the repository.
+- The Thunder Client tests in the /thunderclient/ folder have been deleted.
+- Updated the /docs/ folder web page help files to describe the new API testing utilities.
+
 ## [v2.0.23](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.0.23) 2025-01-22
 
 ### Fixed
