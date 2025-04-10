@@ -1175,247 +1175,36 @@ IRC_SOCKET_LOCAL_ADDRESS=fc00:10::1000
           Optional Remote Login
         </div>
 
-        <p>
-          The irc-hybrid-client is intended to run as a stand alone web server where a web browser 
-          can authenticate using a password entry form that is integral to the application.
-          This is the default configuration as described in the sections above.
+        <p></p>
+          The (optional) &quot;collab-auth&quot; remote authentication server is no longer available.
         </p>
         <p>
-          As an optional alternative, the irc-hybrid-client can be 
-          configured to use a remote authentication server.
-          The intended purpose is to allow a single user account to grant access to multiple 
-          servers on a home network. This would allow a user to gain access to several instances 
-          of irc-hybrid-client. This may be useful if multiple irc-hybrid-client instances are
-          run concurrently while connected to different IRC networks.
+          Early versions of irc-hybrid-client supported two authentication methods
+          used to gain access to the irc-hybrid client web page. By default, the irc-hybrid-client 
+          application includes a stand alone login form where a user can 
+          authenticate their identity using a username and password. Early versions 
+          also included a second (optional) authentication method using a custom 
+          implementation of OAuth 2.0 called &quot;collab-auth&quot; which allowed
+          multiple instances of irc-hybrid-client to authenticate from a single remote server.
         </p>
         <p>
-          An independent authorization server (<a href="https://github.com/cotarr/collab-auth">collab-auth</a>)
-          was written in parallel with this irc-hybrid-client project. 
-          It uses a custom implementation of Oauth 2.0. 
+          Since some users may continue to use remote authentication with a legacy
+          copy of collab-auth, or by a different OAuth 2 method, the remote authentication 
+          code will remain in irc-hybrid-client at this time.
         </p>
         <p>
-          In general terms, the authorization workflow will operate as follows: 
-          When a user attempts to load the irc-hybrid-client web page without a valid 
-          login cookie, the user's browser will be redirected to the authorization 
-          server. The user will authenticate their identity by entry of username and password.
-          The user's web browser will then be redirected back to the irc-hybrid-client  
-          with a temporary authorization code. The irc-hybrid-client will submit the 
-          code to the authorization server. A new Oauth 2.0 access token will be created and 
-          returned to the irc-hybrid-client web server. The irc-hybrid-client server will then
-          validate and decode the token by sending the token to the authorization server, which 
-          will return token meta-data to the irc-hybrid-client. The irc-hybrid-client 
-          will extract a list of scope values from the token meta-data, and compare the token scopes 
-          to the list of scopes in the irc-hybrid-client configuration. If the users token 
-          is successfully validated and at least 1 matching scope found, the user's 
-          cookie will then be designated as authorized.
-          The IRC page will then load, and the user can participate on IRC.
+          Specific instructions for configuration of the collab-auth server have 
+          been removed from this documentation. This legacy documentation can be
+          viewed by rolling the irc-hybrid-client git repository back to 
+          version 2.0.24 (commit hash 40d37dd).
         </p>
-        <div class="install-section-title">Prerequisites</div>
-          <p>
-            The following items are required. These are beyond the scope of these instructions, so
-            it is assumed you are familiar with this type of web site setup.
-          </p>
-          <ul>
-            <li>
-              To avoid cookie overlap, a unique domain name should be created for 
-              the authorization server that is different from any of the irc-hybrid-client 
-              domain names. Example: auth.example.com, irc1.example.com.
-            </li>
-            <li>
-              If more than 1 irc-hybrid-client is installed on the same physical 
-              computer, each irc-hybrid-client must use a different network port number
-              and a different instanceNumber.
-            </li>
-            <li>
-              The collab-auth authorization server must be installed, 
-              running and tested. (<a href="https://cotarr.github.io/collab-auth/">Documentation</a>)
-            </li>
-          </ul>
         <p>
+          In place of the collab-auth documentation, a general description and 
+          example OAuth 2.0 workflow have been added to the <a href="api.html#remoteAuth">API Examples Page</a>. 
+          The intent of this documentation is to assist with 
+          troubleshooting for any users who continue to use legacy remote authentication.
         </p>
 
-        <div class="install-section-title">Scope definitions</div>
-        <p>
-          The <i>Scope</i> value is the primary determiner to specify if a given user will have 
-          access to a specific irc-hybrid-client instance.
-        </p>
-        <p>
-          The irc-hybrid-client configuration will contain a single scope or multiple scope values in the
-          &quot;remoteScope&quot; property of the credentials.json file. When more than one 
-          irc-hybrid-client is running at the same time, different scope values will determine 
-          which user can access which irc-hybrid-client instance.
-        </p>
-        <p>
-          In order for a irc-hybrid-client scope to be valid, it must be listed as one of the scopes in the &quot;allowedScope&quot; list 
-          of the irc-hybrid-client's client credentials for the authorization server.
-        </p>
-        <p>
-          An authorization server user account will also have one or more scopes listed in the user's &quot;role&quot;.
-          In order to gain access to an irc-hybrid-client, at least one of the user's role entries must match an entry 
-          in the irc-hybrid-client configuration.
-        </p>
-        <p>
-          In the case where there is only 1 user and 1 irc-hybrid-client, then a single scope value may be used in 
-          the user's role, the client's allowedScope, and the irc-hybrid-client remoteScope.
-        </p>
-
-        <div class="install-section-title">Client Account Configuration</div>
-        <p>
-          Under Oauth 2.0, &quot;client&quot; credentials are assigned to a web server or other network resource.
-          The purpose of client credentials is to grant permission to the web server to interact with the authorization server.
-        </p>
-        <p>
-          clientId/clientSecret: Each client account will need a unique client id and client secret. The clientId and
-          client secret are used to authenticate an instance of irc-hybrid-client to the authentication server.
-          One client credential can be used on multiple irc-hybrid-clients or one unique client can be 
-          created for each irc-hybrid-client, depending on the complexity of the overall setup.
-        </p>
-        <p>
-          allowedScope: The first scope value <blue-example>&quot;auth.token&quot;</blue-example> is always required. It is a 
-          standard value that is used to grant the irc-hybrid-client permission 
-          to request access tokens from the authentication server.
-          This is followed by a comma separated list of unique scope values.
-          The list must include the sum of all scope values 
-          used in all irc-hybrid-clients that share the client credentials.
-          This can be thought of as a list of possible scopes that irc-hybrid-clients are allowed to use.
-        </p>
-        <p>
-          allowedRedirectURI: The Oauth 2.0 authentication workflow includes a browser redirect to the 
-          URL address of the authorization server. After user authentication, the authentication server
-          will redirect the user's browser back to the URL address of the specific irc-hybrid-client server that 
-          had initiated the authentication workflow.
-          In order to prevent malicious redirects, the authorization server will only allow a login callback
-          to a redirectURI that is listed in a list of allowedRedirectURI in the client credentials.
-          During the authentication workflow, the authorization server
-          will reject any redirect with a callback addresses that is not an exact match in this list.
-        </p>
-
-        <table class="account-table" border="1" cellpadding="5px">
-          <tr><th>Key Name</th><th>Example</th><th>Description</th></tr>
-          <tr><td>name</td><td>irc-hybrid-client 1</td><td>Account Descriptive Name</td></tr>
-          <tr><td>clientId</td><td><yellow-example>irc_client_1</yellow-example></td><td>Unique ID value (similar to username)</td></tr>
-          <tr><td>clientSecret</td><td>xxxxxxxxxxxxxxxxxxxxxxxx</td><td>Recommend auto generate random string</td></tr>
-          <tr><td>trustedClient</td><td>No</td><td>Oauth 2.0 decision dialog flag (no)</td></tr>
-          <tr><td>allowedScope</td><td><blue-example>auth.token,</blue-example> irc.demo1, irc.test, <yellow-example>irc.all</yellow-example><td>List of scopes delimited by comma-space</td></tr>
-          <tr><td>allowedRedirectURI</td><td>http://localhost:3003/login/callback, http://localhost:4210/login/callback</td><td>Server URL + &quot;/login/callback&quot;</td></tr>
-        </table>
-
-        <div class="install-section-title">User Account Configuration</div>
-        <p>
-          Administration of user accounts is explained in the collab-auth 
-          <a href="https://cotarr.github.io/collab-auth/">documentation</a>.
-          For a user to be granted access to a specific irc-hybrid-client instance,
-          the role of the user account must include one of the remoteScope values 
-          from the irc-hybrid-client configuration.
-        </p>
-        <p>
-          Create a new user account, or edit an existing user account.
-          In the field marked &quot;role&quot; add one or more scope designations 
-          from the irc-hybrid-client configuration. 
-          In this case, <yellow-example>irc.all</yellow-example> is used.
-        </p>
-        <table class="account-table" border="1" cellpadding="5px">
-          <tr><td>Number</td></td><td>1</td></tr>
-          <tr><td>Username</td><td>bob</td></tr>
-          <tr><td>Password</td><td>xxxxxxxxxxxx</td></tr>
-          <tr><td>Name</td><td>Bob Smith</td></tr>
-          <tr><td>Login Disabled</td><td>false</td></tr>
-          <tr><td>Role</td><td>user.password, <yellow-example>irc.all</yellow-example></td></tr>
-        </table>
-
-        <div class="install-section-title">irc-hybrid-client Configuration</div>
-        <p>
-          For a specific instance of irc-hybrid-client, the configuration is located 
-          in the &quot;credentials.json&quot; file or alternately configured using
-          environment variables. Only the properties related to remote login 
-          will be discussed in this section.
-        </p>
-        <p>
-          When using remote login, the local user account described above is not used 
-          and the local user account entries may be omitted from the configuration.
-          If you want to switch back and forth between local login and remote login, 
-          you may leave the local user account in the configuration.
-          The local user definitions specified above will not be functional when remote login is enabled.
-          If present, the local users definitions will not impact remote login.
-
-        </p>
-        <p>
-          enableRemoteLogin/OAUTH2_ENABLE_REMOTE_LOGIN: This is a boolean flag. If the property does not exist 
-          or the enableRemoteLogin property is false, the default internal login will be enabled.
-          When set to true, remote login is enabled.
-        </p>
-        <p>
-          remoteAuthHost/OAUTH2_REMOTE_AUTH_HOST: This is the address of the remote authorization server.
-          Hostnames must specify http or https. When using non-standard port numbers, 
-          the port should be specified. With TLS standard port 443 the port may be omitted.
-        </p>
-        <p>
-          remoteCallbackHost/OAUTH2_REMOTE_CALLBACK_HOST: This is address of this 
-          irc-hybrid-client web server. After successful entry of 
-          username and password, the authorization server will redirect the 
-          web browser back to this address with an authorization code.
-          the value must match the allowedRedirectURI property defined
-          in the client account on the authorization server.
-        </p>
-        <p>
-          clientId/OAUTH2_REMOTE_CLIENT_ID: 
-          The client id must exactly match the client credentials as 
-          defined in the authorization server client account.
-        </p>
-        <p>
-          clientSecret/OAUTH2_REMOTE_CLIENT_SECRET: 
-          The client secret must exactly match the client credentials as 
-          defined in the authorization server client account.
-          Take precautions to protect the client credentials from accidental disclosure
-          as this could grant unauthorized access to the authorization server. 
-        </p>
-        <p>
-          remoteScope/OAUTH2_REMOTE_SCOPE: The remoteScope property may be a single string value, or it may be an 
-          array of strings. The OAUTH2_REMOTE_SCOPE environment variable may 
-          be assigned as one string value, or multiple string values separated by commas without spaces.   
-          Any authenticated user may access an instance 
-          of irc-hybrid-client if one of the remoteScope values here is an exact 
-          match to at least one of the scopes defined in the user's role and the 
-          client allowedScope. To clarify, the scope is a 3 way match, the client account's 
-          &quot;allowedScope&quot;, the user account's &quot;role&quot;, 
-          and the irc-hybrid-client server's &quot;remoteScope&quot; or 
-          &quot;OAUTH2_REMOTE_SCOPE&quot; value for the irc-hybrid-client
-          server's scope.
-        </p>
-
-<div class="pre-div"><pre>
-{
-  ...
-  
-  "loginUsers": [ ],
-  "enableRemoteLogin": true,
-  "remoteAuthHost": "http://127.0.0.1:3500",
-  "remoteCallbackHost": "http://localhost:3003",
-  "remoteClientId": <yellow-example>irc_client_1</yellow-example>,
-  "remoteClientSecret": "xxxxxxxxxxxxxxxxxxxxxxxx",
-  "remoteScope": [
-    <yellow-example>"irc.all"</yellow-example>,
-    "irc.demo1"
-  ]
-}
-</pre></div>    
-<div class="pre-div2"><pre>
-OAUTH2_ENABLE_REMOTE_LOGIN=true
-OAUTH2_REMOTE_AUTH_HOST=http://127.0.0.1:3500
-OAUTH2_REMOTE_CALLBACK_HOST=http://localhost:3003
-OAUTH2_REMOTE_CLIENT_ID=<yellow-example>irc_client_1</yellow-example>
-OAUTH2_REMOTE_CLIENT_SECRET="xxxxxxxxxxxxxxxxxxxxxxxx"
-OAUTH2_REMOTE_SCOPE=<yellow-example>irc.all</yellow-example>,irc.two
-</pre></div> 
-
-      <div class="install-section-title">Other Oauth Providers</div>
-
-      <p>
-        It is unlikely that irc-hybrid-client will work with other generic 
-        Oauth 2.0 providers without modification to the middlewares/remote-authentication.mjs 
-        javascript file. Both irc-hybrid-client and collab-auth were written concurrently
-        by the same author.
-      </p>
 
       </div> <!-- /text-div -->
 

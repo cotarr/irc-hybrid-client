@@ -302,16 +302,16 @@ page of the irc-hybrid-client documentation for information.
 
 ### Optional remote login
 
-The irc-hybrid-client program supports optional remote login capability using an external 
-authorization server. An independent authorization server [collab-auth](https://github.com/cotarr/collab-auth)
-was written in parallel with this irc-hybrid-client project. 
-It uses a custom implementation of Oauth 2.0. 
-Further description is available in the 
-[Login Config](https://cotarr.github.io/irc-hybrid-client/login-config.html) 
-page of the irc-hybrid-client documentation.
-Only collab-auth is supported. Other generic Oauth 2.0 providers are not supported.
+The (optional) "collab-auth" remote authentication server is no longer available.
 
-The default irc-hybrid-client configuration uses stand alone internal user authentication by password entry.
+Since some users may continue to use remote authentication with a legacy
+copy of collab-auth, or by a different OAuth 2 method, the remote authentication
+code will remain in irc-hybrid-client at this time.
+A description of the authentication workflow can be found at the bottom of
+the API Examples page in the /docs/.
+Legacy documentation for collab-auth configuration can be viewed by rolling the
+irc-hybrid-client git repository back to version 2.0.24 (commit hash 40d37dd).
+
 
 ### eslint
 

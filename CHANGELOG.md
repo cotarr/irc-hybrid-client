@@ -8,6 +8,23 @@ and this project adheres to
 
 - To view notes on v2 major upgrade, scroll to Version v2.0.0 2023-09-12
 
+## Next
+
+The (optional) "collab-auth" remote authentication server is no longer available.
+
+Since some users may continue to use remote authentication with a legacy
+copy of collab-auth, or by a different OAuth 2 method, the legacy remote authentication
+code will remain in irc-hybrid-client at this time.
+
+The collab-auth configuration instructions have been removed from the /docs/
+login configuration page. In it's place a general description of the
+authentication workflow was added at the bottom of the /docs/ API Examples page.
+The README.md was updated accordingly. Legacy documentation for collab-auth
+configuration can be viewed by rolling the irc-hybrid-client git repository
+back to version 2.0.24 (commit hash 40d37dd).
+
+There are no code changes in Version v2.0.25
+
 ## [v2.0.24](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.0.24) 2025-02-04
 
 The ThunderClient tests included in the irc-hybrid-client
