@@ -8,6 +8,13 @@ and this project adheres to
 
 - To view notes on v2 major upgrade, scroll to Version v2.0.0 2023-09-12
 
+## Next
+
+- Update all npm dependencies where minor revisions were available.
+- Update two dependencies with major revisions: bcryptjs 2.4.3 to 3.0.2, redis 4.7.1 to 5.1.1
+- Test scripts located in the external repository irc-hybrid-client-dev-tools were modified to accommodate package updates that had internal changes effecting the tests.
+- There are no irc-hybrid-client code changes in this update.
+
 ## [v2.0.25](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.0.25) 2025-04-10
 
 The (optional) "collab-auth" remote authentication server is no longer available.

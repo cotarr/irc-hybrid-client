@@ -23,31 +23,31 @@
   },
   "homepage": "https://github.com/cotarr/irc-hybrid-client#readme",
   "dependencies": {
-    "@dr.pogodin/csurf": "^1.14.1",
-    "bcryptjs": "^2.4.3",
-    "compression": "^1.7.5",
-    "connect-redis": "^8.0.1",
+    "@dr.pogodin/csurf": "^1.16.4",
+    "bcryptjs": "^3.0.2",
+    "compression": "^1.8.0",
+    "connect-redis": "^8.1.0",
     "cookie": "^1.0.2",
     "cookie-parser": "^1.4.7",
     "cookie-signature": "^1.2.2",
-    "dotenv": "^16.4.7",
+    "dotenv": "^16.5.0",
     "express": "^4.21.2",
-    "express-rate-limit": "^7.4.1",
+    "express-rate-limit": "^7.5.0",
     "express-session": "^1.18.1",
-    "express-validator": "^7.2.0",
-    "helmet": "^8.0.0",
+    "express-validator": "^7.2.1",
+    "helmet": "^8.1.0",
     "memorystore": "^1.6.7",
     "morgan": "^1.10.0",
     "node-fetch": "^3.3.2",
-    "redis": "^4.7.0",
-    "rotating-file-stream": "^3.2.5",
+    "redis": "^5.1.1",
+    "rotating-file-stream": "^3.2.6",
     "socks5-client": "^1.2.8",
     "utf-8-validate": "^6.0.5",
-    "ws": "^8.18.0"
+    "ws": "^8.18.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.12.0",
-    "eslint": "^9.16.0",
-    "globals": "^15.13.0"
+    "eslint": "^9.28.0",
+    "globals": "^16.2.0"
   }
 }
