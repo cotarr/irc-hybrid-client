@@ -8,7 +8,7 @@ and this project adheres to
 
 - To view notes on v2 major upgrade, scroll to Version v2.0.0 2023-09-12
 
-## Next
+## [v2.0.26](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.0.26) 2025-06-02
 
 - Update all npm dependencies where minor revisions were available.
 - Update two dependencies with major revisions: bcryptjs 2.4.3 to 3.0.2, redis 4.7.1 to 5.1.1
