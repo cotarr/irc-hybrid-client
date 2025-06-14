@@ -8,6 +8,14 @@ and this project adheres to
 
 - To view notes on v2 major upgrade, scroll to Version v2.0.0 2023-09-12
 
+## [v2.0.27](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.0.27) 2025-06-14
+
+- Run npm audit fix to clear GitHub dependabot audit warning for dev dependency
+
+## [v2.0.26](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.0.26) 2025-06-02
+
+- Run npm audit fix to clear GitHub dependabot audit warning for dev dependency
+
 ## [v2.0.26](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.0.26) 2025-06-02
 
 - Update all npm dependencies where minor revisions were available.
