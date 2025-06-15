@@ -2055,12 +2055,6 @@ const getIrcState = function (req, res, next) {
 // Route:  /irc/cache
 // -----------------------------------------------
 const getCache = function (req, res, next) {
-  if (Object.keys(req.body).length > 0) {
-    const err = new Error('BAD REQUEST');
-    err.status = 400;
-    err.message = 'Extraneous property in cache request';
-    return next(err);
-  }
   const cacheArrayOfBuffers = ircMessageCache.allMessages();
   const outArray = [];
   let err = false;

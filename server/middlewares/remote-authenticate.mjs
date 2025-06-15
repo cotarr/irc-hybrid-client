@@ -395,7 +395,7 @@ const sanitizeErrorInput = function (inString) {
 //
 const _callbackQueryParamsInputValidation = (req, chain) => {
   return new Promise(function (resolve, reject) {
-    if ((Object.hasOwn(req, 'query')) &&
+    if (('query' in req) &&
       (typeof req.query === 'object')) {
       // Error detection...
       if ((Object.hasOwn(req.query, 'error')) ||
@@ -508,7 +508,7 @@ const _regenerateSessionCookie = function (req, chain) {
 // ---------------------------------------------------------
 const _extractCallbackAuthCode = function (req, chain) {
   return new Promise(function (resolve, reject) {
-    if ((Object.hasOwn(req, 'query')) &&
+    if (('query' in req) &&
       (Object.hasOwn(req.query, 'code')) &&
       (typeof req.query.code === 'string') &&
       (req.query.code.length > 0) &&

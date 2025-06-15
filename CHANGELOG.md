@@ -8,6 +8,34 @@ and this project adheres to
 
 - To view notes on v2 major upgrade, scroll to Version v2.0.0 2023-09-12
 
+## v2.1.0-debug
+
+### Migrate Express 4 to 5
+
+Express has released a major upgrade from Express 4 to Express 5.
+
+Most of the syntax changes in Express 5 were encoded into later versions of Express 4
+as "deprecation" warning at runtime. As these deprecation warnings were identified
+the code was upgraded in past releases to resolve the deprecation warnings.
+Therefore, very little modification was expected for the move to Express 5.
+
+Upgrade Process:
+
+- Upgraded express to express@5.1.0
+- Deleted package-lock.json
+- Removed /node-modules/ folder
+- Run a clean `npm install` with express 5 (no install errors occurred)
+
+Changes for Express 5
+
+- Express 4 requests without a body would returned an empty object (req.body = {}). Express 5 returns (req.body = undefined). Therefore `Object.keys(req.body).length` threw an error as 'undefined'. Fixed irc/irc-client.mjs line 2058 (Removed extraneous check for body property in GET request)
+
+- In Express 5 req.query has been changed from a writable property to a getter.
+  - Fixed middlewares/user-authenticate.mjs line 383 Changed: `(Object.hasOwn(req, 'query'))` to `('query' in req)`
+  - Fixed middlewares/remote-authenticate.mjs line 398 Changed: `(Object.hasOwn(req, 'query'))` to `('query' in req)`
+  - Fixed middlewares/remote-authenticate.mjs line 511 Changed: `(Object.hasOwn(req, 'query'))` to `('query' in req)`
+
+
 ## [v2.0.28](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.0.28) 2025-06-14
 
 - Update npm dependencies (this is also a fix to dependabot warning in last commit)

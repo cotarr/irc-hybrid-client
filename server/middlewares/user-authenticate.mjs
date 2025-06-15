@@ -380,7 +380,7 @@ export const loginAuthorize = [loginRateLimiter, function (req, res, next) {
           let inputNonce = '';
           let inputUser = '';
           let inputPassword = '';
-          if ((Object.hasOwn(req, 'query')) &&
+          if (('query' in req) &&
             (Object.hasOwn(req.query, 'nonce')) &&
             (typeof req.query.nonce === 'string')) {
             inputNonce = req.query.nonce.toString('utf8');
