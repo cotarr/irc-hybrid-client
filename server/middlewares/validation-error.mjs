@@ -77,7 +77,7 @@ export const checkExtraneousKeys = function (req, allowKeys, location) {
   if (!req.locals.errors) req.locals.errors = [];
 
   function checkKeys (checkObject, locationString) {
-    const keys = Object.keys(checkObject);
+    const keys = Object.keys(checkObject || {});
     for (const key of keys) {
       if (allowKeys.indexOf(key) < 0) {
         req.locals.errors.push({

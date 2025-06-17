@@ -29,6 +29,7 @@ Upgrade Process:
 Changes for Express 5
 
 - Express 4 requests without a body would returned an empty object (req.body = {}). Express 5 returns (req.body = undefined). Therefore `Object.keys(req.body).length` threw an error as 'undefined'. Fixed irc/irc-client.mjs line 2058 (Removed extraneous check for body property in GET request)
+- Fixed middlewares/validation-error, check for extraneous object keys, due to req.body returning undefined in Express 5.
 
 - In Express 5 req.query has been changed from a writable property to a getter.
   - Fixed middlewares/user-authenticate.mjs line 383 Changed: `(Object.hasOwn(req, 'query'))` to `('query' in req)`
