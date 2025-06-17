@@ -5,7 +5,7 @@
   "type": "module",
   "main": "bin/www.mjs",
   "engines": {
-    "node": ">=16"
+    "node": ">=18"
   },
   "scripts": {
     "lint": "npx eslint source-files/js/*.js source-files/web-components/*.js server/testws/html/*.js server/*/*.mjs server/*.mjs bin/www.mjs tools/*.mjs",

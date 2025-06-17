@@ -36,6 +36,7 @@ Changes for Express 5
   - Fixed middlewares/remote-authenticate.mjs line 398 Changed: `(Object.hasOwn(req, 'query'))` to `('query' in req)`
   - Fixed middlewares/remote-authenticate.mjs line 511 Changed: `(Object.hasOwn(req, 'query'))` to `('query' in req)`
 
+- Bump minimum version of node to node >=18 for compatibility with Express V5.
 
 ## [v2.0.28](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.0.28) 2025-06-14
 
