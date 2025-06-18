@@ -8,9 +8,9 @@ and this project adheres to
 
 - To view notes on v2 major upgrade, scroll to Version v2.0.0 2023-09-12
 
-## v2.1.0-debug
+## [v2.1.0](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.1.0) 2025-06-18
 
-### Migrate Express 4 to 5
+### Migrate Express v4 to Express v5
 
 Express has released a major upgrade from Express 4 to Express 5.
 
@@ -28,7 +28,8 @@ Upgrade Process:
 
 Changes for Express 5
 
-- Express 4 requests without a body would returned an empty object (req.body = {}). Express 5 returns (req.body = undefined). Therefore `Object.keys(req.body).length` threw an error as 'undefined'. Fixed irc/irc-client.mjs line 2058 (Removed extraneous check for body property in GET request)
+- In Express 4 requests where the body was not parsed would return (req.body = {}). Express 5 returns (req.body = undefined). Therefore `Object.keys(req.body).length` threw an error as 'undefined'. Fixed irc/irc-client.mjs line 2058 (Removed extraneous check for body property in GET request)
+
 - Fixed middlewares/validation-error, check for extraneous object keys, due to req.body returning undefined in Express 5.
 
 - In Express 5 req.query has been changed from a writable property to a getter.
