@@ -25,29 +25,29 @@
   "dependencies": {
     "@dr.pogodin/csurf": "^1.16.5",
     "bcryptjs": "^3.0.2",
-    "compression": "^1.8.0",
+    "compression": "^1.8.1",
     "connect-redis": "^9.0.0",
     "cookie": "^1.0.2",
     "cookie-parser": "^1.4.7",
     "cookie-signature": "^1.2.2",
-    "dotenv": "^16.5.0",
+    "dotenv": "^17.2.0",
     "express": "^5.1.0",
-    "express-rate-limit": "^7.5.0",
-    "express-session": "^1.18.1",
+    "express-rate-limit": "^8.0.1",
+    "express-session": "^1.18.2",
     "express-validator": "^7.2.1",
     "helmet": "^8.1.0",
     "memorystore": "^1.6.7",
-    "morgan": "^1.10.0",
+    "morgan": "^1.10.1",
     "node-fetch": "^3.3.2",
-    "redis": "^5.5.6",
+    "redis": "^5.6.0",
     "rotating-file-stream": "^3.2.6",
     "socks5-client": "^1.2.8",
     "utf-8-validate": "^6.0.5",
-    "ws": "^8.18.2"
+    "ws": "^8.18.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.12.0",
-    "eslint": "^9.29.0",
-    "globals": "^16.2.0"
+    "eslint": "^9.31.0",
+    "globals": "^16.3.0"
   }
 }
