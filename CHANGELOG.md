@@ -8,7 +8,7 @@ and this project adheres to
 
 - To view notes on v2 major upgrade, scroll to Version v2.0.0 2023-09-12
 
-## Next
+## [v2.1.1](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.1.1) 2025-07-19
 
 - Bump compression@1.8.1 to clear npm audit security warning
 - Bump express-session@n1.18.2 to clear npm audit security warning
