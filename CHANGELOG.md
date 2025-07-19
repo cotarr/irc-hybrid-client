@@ -8,6 +8,15 @@ and this project adheres to
 
 - To view notes on v2 major upgrade, scroll to Version v2.0.0 2023-09-12
 
+## Next
+
+- Bump compression@1.8.1 to clear npm audit security warning
+- Bump express-session@n1.18.2 to clear npm audit security warning
+- Bump morgan@1.10.1 to clear npm audit warning
+- Update all remaining npm package versions to current
+
+- Run npm audit fix to clear GitHub dependabot security warning on eslint. This bumps plugin-kit to v0.3.3 used by eslint. Eslint is dev dependency.
+
 ## [v2.1.0](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.1.0) 2025-06-18
 
 ### Migrate Express v4 to Express v5
