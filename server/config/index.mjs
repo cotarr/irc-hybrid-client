@@ -40,7 +40,7 @@
 import fs from 'fs';
 import dotenv from 'dotenv';
 // Import the .env file
-dotenv.config();
+dotenv.config({ quiet: true });
 
 // Check requirement for minimum node version
 const minNodeVersion = 16;

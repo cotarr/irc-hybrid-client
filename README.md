@@ -72,7 +72,7 @@ The steps listed here in the README.md are a minimal installation guide for
 people very familiar with deploying Node.js/Express servers.
 It is recommended to follow the documentation installation instructions instead.
 
-- Backend web server requires Node v16 or greater.
+- Backend web server requires NodeJs Version 20 or greater.
 
 ```bash
 # clone the github repository

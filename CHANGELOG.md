@@ -8,6 +8,14 @@ and this project adheres to
 
 - To view notes on v2 major upgrade, scroll to Version v2.0.0 2023-09-12
 
+## Next
+
+- Dropped support for NodeJs Version 18. Node 18 is end of life. (minimum >= 20). Update documentation to show new minimum version.
+
+- Delete /node_modules/ folder, delete and regenerate package-lock.json. This is to clean up any legacy `npm audit fix` patches. The `npm audit` scan is now clean with dependencies installed from package.json.
+
+- In file server/config/index.js, modified `dotenv.config({ quiet: true })` by adding `quiet: true`to suppress console log messages promoting and alternate dotenv npm package at server startup.
+
 ## [v2.1.1](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.1.1) 2025-07-19
 
 - Bump compression@1.8.1 to clear npm audit security warning

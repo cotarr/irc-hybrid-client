@@ -14,7 +14,7 @@ import fs from 'fs';
 import bcrypt from 'bcryptjs';
 import dotenv from 'dotenv';
 
-dotenv.config({ path: '../.env' });
+dotenv.config({ quiet: true, path: '../.env' });
 
 try {
   const packageJson = JSON.parse(fs.readFileSync('../package.json', 'utf8'));

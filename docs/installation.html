@@ -66,17 +66,16 @@
 
         <div class="install-section-title">System Requirements (Server)</div>
         <p>
-          NodeJs: As of irc-hybrid-client v0.2.41, the backend web 
-          server requires Node version 16 or greater.
-          Node 18 is currently used for development.
-          Node 18 may be required as minimum version the future.
+          NodeJs: As of irc-hybrid-client v2.1.1, the backend web 
+          server requires NodeJs version 20 or greater.
         </p>
         <p>
-          The application was developed in a virtual machine 
-          running Debian-11 with the web server running Node v18. 
+          Current development occurs in a virtual machine 
+          running Debian-12 with the web server running Node v22.
+          No issues have been observed using NodeJs 20, 22, and 24. 
           The author deploys it for personal use in a cloud VPS 
-          single-core shared cpu droplets with 500MB RAM running Debian 11.
-          It has also run on a RaspberryPi 3 and 4 behind a home network NAT router.
+          single-core shared cpu droplets with 1 GB RAM running Debian 12.
+          It has been run on a RaspberryPi 3 and 4 behind a home network NAT router.
         </p>
         <p>
           No formal security evaluation has been performed.
@@ -120,20 +119,23 @@
           You can check if nodejs is installed by typing
           &quot;node -v&quot;
           in your terminal. If installed, the version will be displayed.
-          This program requires node v16 or greater.
+          This program requires NodeJs Version v20 or greater.
           If node is not installed, there are several options:
         </p>
         <p>
           To install Node.js, one option is to visit the Node.js website at
-          <a href="https://nodejs.org/en/">https://nodejs.org/en/</a>
-          where you can download a tar file and compile node from source.
+          <a href="https://nodejs.org/en/">https://nodejs.org/en/</a> where you can view instructions 
+          to download the current version of NVM, the Node Version Manager.
           The second alternative is to use pre-compiled binaries
           for Linux that are available from
           <a href="https://github.com/nodesource/distributions">https://github.com/nodesource/distributions</a>.
           Both of these include installation instructions.
           Depending on your version of Linux, &quot;nodejs&quot; and &quot;npm&quot; may be available
-          as system packages in your Linux distribution, but these may be older versions.
-        </p>
+          as system packages in your Linux distribution, but this may be an older 
+          version of NodeJs not supported by irc-hybrid-client.
+          As a last alternative, it is possible compile NodeJs from source following instructions at
+          <a href="https://nodejs.org/en/">https://nodejs.org/en/</a>.
+         </p>
         <div class="install-section-title">2 - Clone github repository</div>
         <p>
           The next step is to clone the github repository. Typing the following
