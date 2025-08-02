@@ -8,6 +8,8 @@ and this project adheres to
 
 - To view notes on v2 major upgrade, scroll to Version v2.0.0 2023-09-12
 
+## [v2.1.3](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.1.3) 2025-08-02
+
 - Bump eslint to v9.32.0 to clear npm audit warning (dev dependency)
 - Bump dotenv@17.2.1, redis@5.7.0 to latest version.
 
