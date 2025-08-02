@@ -8,6 +8,9 @@ and this project adheres to
 
 - To view notes on v2 major upgrade, scroll to Version v2.0.0 2023-09-12
 
+- Bump eslint to v9.32.0 to clear npm audit warning (dev dependency)
+- Bump dotenv@17.2.1, redis@5.7.0 to latest version.
+
 ## [v2.1.2](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.1.2) 2025-07-21
 
 - Dropped support for NodeJs Version 18. Node 18 is end of life. (minimum >= 20). Update documentation to show new minimum version.

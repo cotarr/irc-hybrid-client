@@ -30,7 +30,7 @@
     "cookie": "^1.0.2",
     "cookie-parser": "^1.4.7",
     "cookie-signature": "^1.2.2",
-    "dotenv": "^17.2.0",
+    "dotenv": "^17.2.1",
     "express": "^5.1.0",
     "express-rate-limit": "^8.0.1",
     "express-session": "^1.18.2",
@@ -39,7 +39,7 @@
     "memorystore": "^1.6.7",
     "morgan": "^1.10.1",
     "node-fetch": "^3.3.2",
-    "redis": "^5.6.0",
+    "redis": "^5.7.0",
     "rotating-file-stream": "^3.2.6",
     "socks5-client": "^1.2.8",
     "utf-8-validate": "^6.0.5",
@@ -47,7 +47,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.12.0",
-    "eslint": "^9.31.0",
+    "eslint": "^9.32.0",
     "globals": "^16.3.0"
   }
 }
