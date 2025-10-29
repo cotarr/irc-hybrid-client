@@ -8,6 +8,8 @@ and this project adheres to
 
 - To view notes on v2 major upgrade, scroll to Version v2.0.0 2023-09-12
 
+## [v2.1.4](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.1.4) 2025-10-29
+
 - Npm audit warning for validator <13.15.20 used by express-validator
 - Updated all npm modules to current, delete /node_modules/ and package-lock.json to clear npm audit warning
 
