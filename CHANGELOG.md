@@ -8,6 +8,10 @@ and this project adheres to
 
 - To view notes on v2 major upgrade, scroll to Version v2.0.0 2023-09-12
 
+## Next
+
+- Update all npm dependencies to clear npm audit warning.
+
 ## [v2.1.6](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.1.6) 2026-01-05
 
 - Run audit fix to install qs v6.14.1 to fix npm audit warning
