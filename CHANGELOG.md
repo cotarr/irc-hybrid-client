@@ -6,7 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-- To view notes on v2 major upgrade, scroll to Version v2.0.0 2023-09-12
+## Next
+
+- In server/middlewares/remote-authenticate.mjs, removed import of npm module 'node-fetch' which was only required for NodeJs v18 and below. This was a work around that is no longer required for NodeJs >=20. The alternate fetch function was only imported when not available in NodeJs as an internal native module. This clears a deprecation warning displayed on new installs.
 
 ## [v2.1.7](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.1.7) 2026-01-24
 

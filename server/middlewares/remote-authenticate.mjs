@@ -67,7 +67,6 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import nodeFetch from 'node-fetch';
 
 import config, { oauth2 } from '../config/index.mjs';
 
@@ -132,24 +131,6 @@ if (config.oauth2.enableRemoteLogin) {
     }
   }
 } // remote auth enabled
-
-//
-// At program startup, check if native fetch() exists.
-// If the fetch() API is not found, load legacy v2
-// of the node-fetch package.
-//
-if (((typeof fetch).toString() !== 'function') && (oauth2.enableRemoteLogin)) {
-  const nodeUpgradeMessage =
-  '+-----------------------------------------------------------\n' +
-  '| During startup, the fetch() API was not detected. For backward\n' +
-  '| compatibility, the NPM module "node-fetch" was loaded.\n' +
-  '| In version v18.0.0 NodeJs introduced a native fetch() API.\n' +
-  '| In the future, NodeJs v18 or greater may be required when\n' +
-  '| using the optional remote login. (CHANGELOG v0.2.41)\n' +
-  '+-----------------------------------------------------------';
-  console.log(nodeUpgradeMessage);
-  global.fetch = nodeFetch;
-}
 
 //
 // Custom log file (Option: setup to fail2ban to block IP addresses)
