@@ -841,6 +841,7 @@ window.customElements.define('local-command-parser', class extends HTMLElement {
         }
         //
         // Hot keys available both connected and disconnected from IRC server
+        if (e.code === 'Period') document.getElementById('debugPanel').handleHotKey();
         if (e.code === 'KeyH') document.getElementById('helpPanel').handleHotKey();
         if (e.code === 'KeyI') document.getElementById('ircControlsPanel').handleHotKey();
         if (e.code === 'KeyL') document.getElementById('serverListPanel').handleHotKey();

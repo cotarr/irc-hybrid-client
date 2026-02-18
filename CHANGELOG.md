@@ -8,11 +8,17 @@ and this project adheres to
 
 ## Next
 
+Features
+
+- Added new hot-key Alt-. (Alt + Period) to show/hide the debug panel.
+
+Updates and Fixes
+
 - Delete /node_modules/ and package-lock.json. Update production npm dependencies to current versions.
-- Update README and docs/installation.html to recommend using `npm ci --omit=sev` for server installation.
+- Update README and docs/installation.html to recommend using `npm ci --omit=dev` for server installation.
 - Removed version 2.0 upgrade notes from README.
 
-- In server/middlewares/remote-authenticate.mjs, removed import of npm module 'node-fetch' which was only required for NodeJs v18 and below. This was a work around that is no longer required for NodeJs >=20. The alternate fetch function was only imported when not available in NodeJs as an internal native module. This clears a deprecation warning displayed on new installs.
+- In server/middlewares/remote-authenticate.mjs, removed import of npm module 'node-fetch' which was only required for NodeJs v18 and below. This was a work around that is no longer required for the current floor of NodeJs >=20. The alternate fetch function was only imported when not available in NodeJs as an internal native module. This clears a deprecation warning displayed on new installs.
 
 ## [v2.1.7](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.1.7) 2026-01-24
 

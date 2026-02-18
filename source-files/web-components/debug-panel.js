@@ -67,6 +67,17 @@ window.customElements.define('debug-panel', class extends HTMLElement {
   };
 
   /**
+   * Handle keydown event to show/hide panel, called from local-command-parser.
+   */
+  handleHotKey = () => {
+    if (this.shadowRoot.getElementById('panelVisibilityDivId').hasAttribute('visible')) {
+      this.hidePanel();
+    } else {
+      this.showPanel();
+    }
+  };
+
+  /**
    * Add formatted text to the Debug Result panel
    * Multi-line values should append \n
    * @param {string} formattedText - Test for display

@@ -197,20 +197,20 @@ if(ircMessage){return{error:false,message:null,ircMessage:ircMessage}}return{err
 window.addEventListener('keydown',(e=>{if(document.getElementById('navMenu').isMainNavMenuParsingKeystrokes()){return}if(!window.globals.webState.webConnected){return}
 if(e.altKey&&!e.ctrlKey&&!e.shiftKey){if(window.globals.ircState.ircConnected){if(e.code==='KeyB'){document.dispatchEvent(new CustomEvent('collapse-all-panels'))
 ;document.dispatchEvent(new CustomEvent('cancel-zoom'))}if(e.code==='KeyC'){document.getElementById('manageChannelsPanel').handleHotKey()}if(e.code==='KeyN'){
-document.getElementById('manageChannelsPanel').handleHotKeyNextChannel()}if(e.code==='KeyP'){document.getElementById('managePmPanels').handleHotKey()}}if(e.code==='KeyH'){
-document.getElementById('helpPanel').handleHotKey()}if(e.code==='KeyI'){document.getElementById('ircControlsPanel').handleHotKey()}if(e.code==='KeyL'){
-document.getElementById('serverListPanel').handleHotKey()}if(e.code==='KeyS'){document.getElementById('ircServerPanel').handleHotKey()}if(e.code==='KeyX'){
-document.dispatchEvent(new CustomEvent('hide-all-panels'))}}}))}});window.customElements.define('remote-command-parser',class extends HTMLElement{_parseIrcMessage=message=>{
-const _extractTimeString=(start,end,messageString)=>{let i=start;let timeString='';while(messageString.charAt(i)!==' '&&i<=end){timeString+=messageString.charAt(i);i++}
-const outStringHMS=document.getElementById('displayUtils').timestampToHMS(timeString);const outStringYMD=document.getElementById('displayUtils').timestampToYMD(timeString);return{dataHMS:outStringHMS,
-dataYMD:outStringYMD,nextIndex:i+1}};const _isColonString=(start,messageString)=>{if(messageString.charAt(start)===':'){return{isColonStr:true,nextIndex:start+1}}else{return{isColonStr:false,
-nextIndex:start}}};const _extractMidString=(start,end,messageString)=>{let i=start;let outString='';while(messageString.charAt(i)!==' '&&i<=end){outString+=messageString.charAt(i);i++}
-if(outString.length===0){outString=null}return{data:outString,nextIndex:i+1}};const _extractFinalString=(start,end,messageString)=>{let i=start;let outString='';while(i<=end){
-outString+=messageString.charAt(i);i++}if(outString.length===0){outString=null}return{data:outString,nextIndex:i+1}};const _extractNickname=inText=>{if(inText){
-if(inText.indexOf('!')>=0&&inText.indexOf('@')>=0&&inText.indexOf('!')<inText.indexOf('@')){const nick=inText.split('!')[0];return nick}else{return null}}else{return null}}
-;const _extractHostname=inText=>{if(inText){if(inText.indexOf('!')>=0&&inText.indexOf('@')>=0&&inText.indexOf('!')<inText.indexOf('@')){const host=inText.split('!')[1];return host}else{return null}
-}else{return null}};let timestamp=null;let datestamp=null;let prefix=null;let extNick=null;let extHost=null;let command=null;const params=[];const messageString=message.toString()
-;const end=messageString.length-1;let temp={nextIndex:0};temp=_extractTimeString(temp.nextIndex,end,messageString);timestamp=temp.dataHMS;datestamp=temp.dataYMD
+document.getElementById('manageChannelsPanel').handleHotKeyNextChannel()}if(e.code==='KeyP'){document.getElementById('managePmPanels').handleHotKey()}}if(e.code==='Period'){
+document.getElementById('debugPanel').handleHotKey()}if(e.code==='KeyH'){document.getElementById('helpPanel').handleHotKey()}if(e.code==='KeyI'){
+document.getElementById('ircControlsPanel').handleHotKey()}if(e.code==='KeyL'){document.getElementById('serverListPanel').handleHotKey()}if(e.code==='KeyS'){
+document.getElementById('ircServerPanel').handleHotKey()}if(e.code==='KeyX'){document.dispatchEvent(new CustomEvent('hide-all-panels'))}}}))}})
+;window.customElements.define('remote-command-parser',class extends HTMLElement{_parseIrcMessage=message=>{const _extractTimeString=(start,end,messageString)=>{let i=start;let timeString=''
+;while(messageString.charAt(i)!==' '&&i<=end){timeString+=messageString.charAt(i);i++}const outStringHMS=document.getElementById('displayUtils').timestampToHMS(timeString)
+;const outStringYMD=document.getElementById('displayUtils').timestampToYMD(timeString);return{dataHMS:outStringHMS,dataYMD:outStringYMD,nextIndex:i+1}};const _isColonString=(start,messageString)=>{
+if(messageString.charAt(start)===':'){return{isColonStr:true,nextIndex:start+1}}else{return{isColonStr:false,nextIndex:start}}};const _extractMidString=(start,end,messageString)=>{let i=start
+;let outString='';while(messageString.charAt(i)!==' '&&i<=end){outString+=messageString.charAt(i);i++}if(outString.length===0){outString=null}return{data:outString,nextIndex:i+1}}
+;const _extractFinalString=(start,end,messageString)=>{let i=start;let outString='';while(i<=end){outString+=messageString.charAt(i);i++}if(outString.length===0){outString=null}return{data:outString,
+nextIndex:i+1}};const _extractNickname=inText=>{if(inText){if(inText.indexOf('!')>=0&&inText.indexOf('@')>=0&&inText.indexOf('!')<inText.indexOf('@')){const nick=inText.split('!')[0];return nick}else{
+return null}}else{return null}};const _extractHostname=inText=>{if(inText){if(inText.indexOf('!')>=0&&inText.indexOf('@')>=0&&inText.indexOf('!')<inText.indexOf('@')){const host=inText.split('!')[1]
+;return host}else{return null}}else{return null}};let timestamp=null;let datestamp=null;let prefix=null;let extNick=null;let extHost=null;let command=null;const params=[]
+;const messageString=message.toString();const end=messageString.length-1;let temp={nextIndex:0};temp=_extractTimeString(temp.nextIndex,end,messageString);timestamp=temp.dataHMS;datestamp=temp.dataYMD
 ;temp=_isColonString(temp.nextIndex,messageString);if(temp.isColonStr){temp=_extractMidString(temp.nextIndex,end,messageString);prefix=temp.data;extNick=_extractNickname(temp.data)
 ;extHost=_extractHostname(temp.data)}temp=_extractMidString(temp.nextIndex,end,messageString);command=temp.data;let done=false;while(!done){if(temp.nextIndex>end){done=true}else{
 temp=_isColonString(temp.nextIndex,messageString);if(temp.isColonStr){temp=_extractFinalString(temp.nextIndex,end,messageString);params.push(temp.data);done=true}else{
@@ -2305,9 +2305,10 @@ this.shadowRoot.getElementById('autocompleteCheckboxId').addEventListener('click
 ;const template=document.getElementById('debugPanelTemplate');const templateContent=template.content;this.attachShadow({mode:'open'}).appendChild(templateContent.cloneNode(true))}_scrollToTop=()=>{
 this.focus();const newVertPos=window.scrollY+this.getBoundingClientRect().top-50;window.scrollTo({top:newVertPos,behavior:'smooth'})};showPanel=()=>{
 this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible','');document.dispatchEvent(new CustomEvent('cancel-zoom'));this._scrollToTop()};collapsePanel=()=>{
-this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible')};hidePanel=()=>{this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible')}
-;appendDebugResult=formattedText=>{this.shadowRoot.getElementById('debugResponseSectionId').removeAttribute('hidden');this.shadowRoot.getElementById('debugResponsePreId').textContent+=formattedText}
-;clearDebugResult=()=>{this.shadowRoot.getElementById('debugResponseSectionId').setAttribute('hidden','');this.shadowRoot.getElementById('debugResponsePreId').textContent=''};_test1ButtonHandler=()=>{
+this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible')};hidePanel=()=>{this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible')};handleHotKey=()=>{
+if(this.shadowRoot.getElementById('panelVisibilityDivId').hasAttribute('visible')){this.hidePanel()}else{this.showPanel()}};appendDebugResult=formattedText=>{
+this.shadowRoot.getElementById('debugResponseSectionId').removeAttribute('hidden');this.shadowRoot.getElementById('debugResponsePreId').textContent+=formattedText};clearDebugResult=()=>{
+this.shadowRoot.getElementById('debugResponseSectionId').setAttribute('hidden','');this.shadowRoot.getElementById('debugResponsePreId').textContent=''};_test1ButtonHandler=()=>{
 console.log('Test1 button pressed.');this.appendDebugResult('Memory Usage\nNodeJs garbage collect response\n');const fetchController=new AbortController;const fetchOptions={method:'GET',
 redirect:'error',signal:fetchController.signal,headers:{Accept:'application/json'}};const fetchURL=document.getElementById('globVars').webServerUrl+'/irc/test1'
 ;const fetchTimerId=setTimeout((()=>fetchController.abort()),5000);fetch(fetchURL,fetchOptions).then((response=>{if(response.ok){return response.json()}else{
