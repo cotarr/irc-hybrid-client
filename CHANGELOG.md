@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Next
+## [v2.1.8](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.1.8) 2026-02-18
 
 Features
 
@@ -15,7 +15,7 @@ Features
 Updates and Fixes
 
 - Update development dependency `eslint` from version 9 to version 10 including update eslint configuration.
-- Delete /node_modules/ and package-lock.json. Update production npm dependencies to current versions.
+- Delete /node_modules/ and package-lock.json. Update production npm dependencies to current versions to clear github dependabot warning.
 - Update README and docs/installation.html to recommend using `npm ci --omit=dev` for server installation.
 - Removed version 2.0 upgrade notes from README.
 
