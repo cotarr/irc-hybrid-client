@@ -44,8 +44,10 @@
 
         <div class="install-section-title">Project Status</div>
         <p>
-          This IRC client is functional and mostly stable, but still evolving. 
-          New features are still being added from time to time.
+          The irc-hybrid-client project was started in March 2021.
+          As it approaches 4 years old, irc-hybrid-client code is generally stable.
+          The project is currently in maintenance mode where NPM dependencies are updated to address outdated version and NPM audit warnings.
+          No major revisions are planned. Minor feature additions are still possible.
         </p>
 
         <div class="install-section-title">Prerequisite Knowledge</div>
@@ -71,7 +73,7 @@
         </p>
         <p>
           Current development occurs in a virtual machine 
-          running Debian-12 with the web server running Node v22.
+          running Debian 13 with the web server running Node v22.
           No issues have been observed using NodeJs 20, 22, and 24. 
           The author deploys it for personal use in a cloud VPS 
           single-core shared cpu droplets with 1 GB RAM running Debian 12.
@@ -101,7 +103,7 @@
         <div class="install-section-title">Other Requirements (IRC network)</div>
         <p>
           The IRC interface was primarily developed and tested using the DALnet
-          IRC network. Local testing was performed using ngirc-25 from the
+          IRC network. Local testing was performed using ngirc v26 from the
           Debian apt package. Other IRC servers have not been tested.
           RFC-2812 "Internet Relay Chat: Client Protocol" was the primary
           specification reference. Considering this is a limited functionality
@@ -153,7 +155,7 @@ cd irc-hybrid-client
           This program uses the Express web server.
           The Express web site is located at
           <a href="https://expressjs.com/">https://expressjs.com/</a>.
-          Express various JavaScript dependency libraries
+          Express requires various JavaScript dependency libraries
           will be installed using the npm package manager.
         </p>
         <p>
@@ -174,7 +176,7 @@ npm install
 # Option 2 Typical for server installation, use minified files, log output to files.
 # ci = clean install
 export NODE_ENV=production
-npm ci
+npm ci --omit=dev
 </pre></div>
 
         <div class="install-section-title">4 - TLS Certificates</div>
@@ -491,9 +493,26 @@ node bin/www.mjs
         </p>
 <div class="pre-div"><pre>
 git pull --ff-only
-npm ci
+npm ci --omit=dev
 </pre></div>
 
+        <div class="install-section-title">13 - Dependency Audit</div>
+        <p>
+          The NPM package manager includes an audit utility that may be used
+          to perform a search of NPM package names and version identifiers
+          in an NPM database of packages with reported security issues.
+          The following commands may be run from the base directory of the 
+          repository. It will read the package-lock.json file and 
+          search each dependency for a match in the database. If matches are found the will be printed.
+        </p>
+<div class="pre-div"><pre>
+npm audit --omit=dev
+</pre></div>
+        <p>
+          The npm audit utility is only applicable to the web server.
+          The frontend JavaScript running in the web browser is entirely
+          written in native JavaScript and does not contain any external dependencies.
+        </p>
       </div> <!-- /text-div -->
 
     </div> <!-- outer-div -->

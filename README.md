@@ -8,52 +8,19 @@ Screen capture images are available in the [documentation](https://cotarr.github
 
 [ChangeLog.md](https://github.com/cotarr/irc-hybrid-client/blob/master/CHANGELOG.md)
 
-## Version v2 Upgrade Notes
+## Project Status
 
-The frontend browser code was completely rewritten and merged into the 
-master branch as Version V2.0.0 on Sept 12, 2023. 
-For a detail description of the changes see the CHANGELOG.md file.
+The irc-hybrid-client project was started in March 2021.
+As it approaches 4 years old, irc-hybrid-client code is generally stable.
+The project is currently in maintenance mode where NPM dependencies are updated to address outdated version and NPM audit warnings.
+No major revisions are planned. Minor feature additions are still possible.
 
-The new version is intended be fully backward compatible. 
-Performing a `git pull` on irc-hybrid-client master branch will update both 
-frontend and backend NodeJs files.
-
-There are no changes to the configuration files on the backend server, so previous 
-configuration should work as-is. There are no changes to the format of the
-"servers.json" database of IRC server definitions. However, the file location
-of the root directory of the web server has changed (see CHANGELOG.md).
-Version 2 contains a bundled and minified version in the repository.
-
-Installations that use custom mp3 sound files will need to move the sound 
-files to the build-prod/sounds/ folder.
-
-The previous version v0.2.53 of the web browser frontend will no longer be maintained.
-It has been tagged as v1.0.0 to place a clean version boundary to the new version.
-The upgraded version will begin at Version v2.0.0.
-
-If any problems are experienced with Version 2, you can revert the 
-GitHub master branch to the last Version 0.2.53 commit from Aug 07, 2023 commit hash f87c3d4.
-If the Gulp bundler is used, the irc-hybrid-client-dev-tools repository must 
-also be rolled back as described in it's README.md file.
-
-### Project Status
-
-The upgrade of the web browser frontend to Version v2 has brought the 
-project back into a period of rapid changes to optimize the user interface.
-The backend core IRC client and web server did not change in the v2 upgrade
-and is mostly stable.
-
-The /docs/ folder has not been upgraded and it still contains Version 0.2.53
-screen capture images. New screen captures are deferred until last minute
-user interface adjustments have been comleted. In general, the /docs/ instructions 
-mostly refer to the backend web server and are still applicable to the new version.
-
-### Repository Contents
+## Repository Contents
 
 HTML, CSS, and JavaScript content is available in both the minified-bundled version and
-the commented development version. HTML source files are located in the 
-folder `source-files/`. The production minified build is located 
-in the folder `build-prod/`. Selection is determined by 
+the commented development version. HTML source files are located in the
+folder `source-files/`. The production minified build is located
+in the folder `build-prod/`. Selection is determined by
 the NODE_ENV environment variable. A development folder `build-dev`
 will not be committed to avoid duplication of source files.
 
@@ -64,10 +31,10 @@ The repository contains a /docs/ folder with HTML help documentation for the pro
 The /docs/ web pages can be enabled in the web server configuration.
 (The /docs/ are not updated for V2 TBD)
 
-# Installation
+## Installation
 
 There are complete step by step installation instructions in the
-[docmentation](https://cotarr.github.io/irc-hybrid-client).
+[documentation](https://cotarr.github.io/irc-hybrid-client).
 The steps listed here in the README.md are a minimal installation guide for
 people very familiar with deploying Node.js/Express servers.
 It is recommended to follow the documentation installation instructions instead.
@@ -87,33 +54,32 @@ npm install
 
 # Option 2 Typical for server installation, use minified files, log output to files.
 export NODE_ENV=production
-npm ci
+npm ci --omit=dev
 ```
 
-# Web Server Configuration
+## Web Server Configuration
 
-## Choose a configuration method
+### Choose a configuration method
 
 There are two possible methods that may be used to define the
-web server configuration settings. The settings may be stored as 
-properties in the "credentials.json" file, or the settings may 
+web server configuration settings. The settings may be stored as
+properties in the "credentials.json" file, or the settings may
 be defined as environment variables or entries in the .env file.
-Only one method can be used at a time. If the credentials.json 
-file exists, it will be parsed for settings, otherwise 
+Only one method can be used at a time. If the credentials.json
+file exists, it will be parsed for settings, otherwise
 the environment variables will be parsed for settings.
 
-In the case where someone may want to try the irc-hybrid-client in a 
-virtual machine on a private network, it is possible to setup 
+In the case where someone may want to try the irc-hybrid-client in a
+virtual machine on a private network, it is possible to setup
 a minimal configuration. This should only be used for testing.
 
-Most of the configuration settings can be allowed to fall back to the configuration defaults. 
+Most of the configuration settings can be allowed to fall back to the configuration defaults.
 At minimum, the configuration needs these items:
 
-* A defined user login account
-* The web server port number
-* A cookie secret. 
-* If using TLS, the full path names to the certificate files.
-
+- A defined user login account
+- The web server port number
+- A cookie secret.
+- If using TLS, the full path names to the certificate files.
 
 ### Option 1 - Bare minimum settings using credentials.json file
 
@@ -147,10 +113,10 @@ To make a minimal configuration that uses environment variables,
 copy the following environment variables, then paste them into a .env file
 in the base folder of the repository.
 Protect file permissions using `chmod 600 .env`.
-To use environment variables as the configuration, make sure the 
+To use environment variables as the configuration, make sure the
 credentials.json file does not exist in the base folder of the repository.
 
-```
+```sh
 ENV_VAR_CONFIG_VERSION=2
 LOGIN_USER_USERID=1
 LOGIN_USER_USER="user1"
@@ -174,14 +140,13 @@ cp -v example-credentials.json credentials.json
 chmod 600 credentials.json
 ```
 
-### Option 4 - Create example .env file using template:
-
+### Option 4 - Create example .env file using template
 
 If you are using an external method to manage environment variables,
 such as running irc-hybrid-client in a container, then
 use the environment variable template as a guide.
 
-To use environment variables as the configuration, make sure the 
+To use environment variables as the configuration, make sure the
 credentials.json file does not exist in the base folder of the repository.
 
 For configuration using a full settings template:
@@ -195,7 +160,7 @@ chmod 600 .env
 
 ## Customize web server settings
 
-- Enter the full file path for TLS certificates. If not using TLS, the file path lines may be omitted and set `tls: false` or `SERVER_TLS=false`. 
+- Enter the full file path for TLS certificates. If not using TLS, the file path lines may be omitted and set `tls: false` or `SERVER_TLS=false`.
 - Set the port number to a valid integer value. This is the listening port of the web server.
 - Set a unique cookie secret to a unique random string (Required).
 
@@ -204,10 +169,10 @@ chmod 600 .env
 It is necessary to assign one web page username and password.
 There is a detailed example in the documentation.
 
-When using credentials.json file or .env file as configuration, this must be done after copying 
+When using credentials.json file or .env file as configuration, this must be done after copying
 the example-credentials.json into the project folder
 
-The user account used for web page login may be created using one of two 
+The user account used for web page login may be created using one of two
 javascript files in the tools/ folder. Either the "updateAuthForUser_1.mjs" script maybe
 be used to add a user account to the credentials.json file, or the "genEnvVarAuthForUser_1.mjs"
 script may be used to generate the user account for environment variable configuration.
@@ -222,7 +187,9 @@ node updateAuthForUser_1.mjs
 # A revised copy of credentials.json will be displayed after password assignment
 cd ..
 ```
+
 Option 2 of 2: To generate a user account when using environment variable configuration:
+
 ```bash
 cd tools/
 # fill in user and password when prompted.
@@ -230,13 +197,14 @@ node genEnvVarAuthForUser_1.mjs
 # Copy/Paste the environment variable assignments as needed.
 cd ..
 ```
-# IRC server configuration
 
-The first time the web server is started, an empty IRC server list will be created 
+## IRC server configuration
+
+The first time the web server is started, an empty IRC server list will be created
 automatically as "servers.json" in the base folder of the repository.
 
-Upon the first login to the web page at `/irc/webclient.html`, the 
-browser will automatically display an IRC server edit form. 
+Upon the first login to the web page at `/irc/webclient.html`, the
+browser will automatically display an IRC server edit form.
 The form is used to define the first IRC server.
 Required fields are marked with a colored dot.
 Instruction related to the form's fields is located in the form itself using help buttons.
@@ -294,7 +262,7 @@ browser tabs for simultaneous connection to different IRC networks.
 [login configuration docs](https://cotarr.github.io/irc-hybrid-client/login-config.html)
 for information on use of the instanceNumber property.
 
-### Optional socks5 proxy support 
+### Optional socks5 proxy support
 
 The program includes limited support for socks5 proxy connections. See the
 [login config](https://cotarr.github.io/irc-hybrid-client/login-config.html)
@@ -312,10 +280,9 @@ the API Examples page in the /docs/.
 Legacy documentation for collab-auth configuration can be viewed by rolling the
 irc-hybrid-client git repository back to version 2.0.24 (commit hash 40d37dd).
 
-
 ### eslint
 
-```
+```bash
 # Run eslint as npm script defined package.json
 npm run lint
 ```
