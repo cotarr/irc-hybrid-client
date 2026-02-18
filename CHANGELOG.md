@@ -14,6 +14,7 @@ Features
 
 Updates and Fixes
 
+- Update development dependency `eslint` from version 9 to version 10 including update eslint configuration.
 - Delete /node_modules/ and package-lock.json. Update production npm dependencies to current versions.
 - Update README and docs/installation.html to recommend using `npm ci --omit=dev` for server installation.
 - Removed version 2.0 upgrade notes from README.

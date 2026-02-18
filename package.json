@@ -8,7 +8,7 @@
     "node": ">=20"
   },
   "scripts": {
-    "lint": "npx eslint source-files/js/*.js source-files/web-components/*.js server/testws/html/*.js server/*/*.mjs server/*.mjs bin/www.mjs tools/*.mjs",
+    "lint": "npx eslint source-files/js/*.js source-files/web-components/*.js server/testws/html/*.js server/*/*.mjs server/*.mjs bin/www.mjs tools/*.mjs *.json",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node bin/www.mjs"
   },
@@ -28,7 +28,7 @@
     "compression": "^1.8.1",
     "connect-redis": "^9.0.0",
     "cookie": "^1.1.1",
-    "cookie-parser": "^1.4.7",
+    "cookie-parser": "^1.4.7",  
     "cookie-signature": "^1.2.2",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
@@ -45,7 +45,9 @@
     "ws": "^8.19.0"
   },
   "devDependencies": {
-    "eslint": "^9.39.2",
-    "globals": "^17.1.0"
+    "@eslint/js": "^10.0.1",
+    "@eslint/json": "^1.0.1",
+    "eslint": "^10.0.0",
+    "globals": "^17.3.0"
   }
 }

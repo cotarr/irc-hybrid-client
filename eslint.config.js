@@ -1,13 +1,31 @@
-import globals from "globals";
-import pluginJs from "@eslint/js";
+import js from '@eslint/js';
+import globals from 'globals';
+import json from '@eslint/json';
+import { defineConfig } from 'eslint/config';
 
-
-export default [
-  {languageOptions: { globals: {...globals.browser, ...globals.node} }},
-  pluginJs.configs.recommended,
+export default defineConfig([
   {
+    files: ['**/*.{js,mjs,cjs}'],
+    plugins: { js },
+    extends: ['js/recommended'],
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+        ...globals.node
+      },
+    },
     rules: {
-      'no-unused-vars': 'off'
+      'no-unused-vars': 'off',
+      'no-useless-assignment': 'off'
+    }
+  },
+  {
+    files: ['**/*.json'],
+    plugins: { json },
+    language: 'json/json',
+    extends: ['json/recommended'],
+    rules: {
+      'json/no-empty-keys': 'off'
     }
   }
-];
+]);
