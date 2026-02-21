@@ -449,6 +449,8 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       this.shadowRoot.getElementById('autoOpenOnModeCheckBoxId');
     const autocompleteCheckboxEl = this.shadowRoot.getElementById('autocompleteCheckboxId');
     const autoCompleteTitleEl = this.shadowRoot.getElementById('autoCompleteTitle');
+    const enableCustomColorCheckboxEl = this.shadowRoot.getElementById('enableCustomColorCheckboxId');
+    const panelCustomColorInputEl = this.shadowRoot.getElementById('panelCustomColorInputId');
 
     const ircStateIndex = window.globals.ircState.channels.indexOf(this.channelName.toLowerCase());
     const webStateIndex = window.globals.webState.channels.indexOf(this.channelName.toLowerCase());
@@ -496,6 +498,13 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       autocompleteCheckboxEl.checked = true;
     } else {
       autocompleteCheckboxEl.checked = false;
+    }
+    if (panelDivEl.hasAttribute('enable-custom-color')) {
+      enableCustomColorCheckboxEl.checked = true;
+      panelCustomColorInputEl.setAttribute('disabled', '');
+    } else {
+      enableCustomColorCheckboxEl.checked = false;
+      panelCustomColorInputEl.removeAttribute('disabled');
     }
     //
     // If channel was previously joined, then parted, then re-joined
@@ -1433,6 +1442,158 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     } // case of tab key
   };
 
+/**
+ * Validate HTML hexadecimal color code in format #000000
+ * @param {string} hexColorStr - Hex color code to be tested
+ * @returns {boolean} true if hexColorStr is a valid hex color code, else return false
+ */
+  _validateHexColor = (hexColorStr) => {
+    const validChars = '0123456789abcdefABCDEF';
+    if (typeof hexColorStr !== 'string') return false;
+    if (hexColorStr.length !== 7) return false;
+    if (hexColorStr[0] !== '#') return false;
+    let valid = true;
+    for (let i = 1; i < 7; i++) {
+      const ch = hexColorStr[i];
+      if (validChars.indexOf(ch) < 0) valid = false;
+    }
+    return valid;
+  }; // _validateHexColor()
+
+  /**
+   * Function to update window.localStorage with hexadecimal color code
+   * for the channel panel custom background color.
+   * The localStorage write is performed when the user enables or disabled custom color.
+   */
+  _saveCustomColorToLocalStorage = () => {
+    const panelDivEl = this.shadowRoot.getElementById('panelDivId');
+    const now = Math.floor(Date.now() / 1000);
+    const channelCustomColorObj = {
+      timestamp: now,
+      channel: this.channelName.toLowerCase(),
+      enabled: panelDivEl.hasAttribute('enable-custom-color'),
+    };
+    if (channelCustomColorObj.enabled) {
+      if (this._validateHexColor(panelDivEl.getAttribute('custom-color-value'))) {
+        channelCustomColorObj.customColor = panelDivEl.getAttribute('custom-color-value');
+      } else {
+        channelCustomColorObj.enabled = false;
+      }
+    }
+
+    // Get array of previous IRC channel, each with status object
+    let customColorChannelIndex = -1;
+    let customColorChanArray = null;
+    customColorChanArray = JSON.parse(window.localStorage.getItem('customColorChanArray'));
+    if ((customColorChanArray) &&
+      (Array.isArray(customColorChanArray))) {
+      if (customColorChanArray.length > 0) {
+        for (let i = 0; i < customColorChanArray.length; i++) {
+          if (customColorChanArray[i].channel === this.channelName.toLowerCase()) {
+            customColorChannelIndex = i;
+          }
+        }
+      }
+    } else {
+      // Array did not exist, create it
+      customColorChanArray = [];
+    }
+    if (customColorChannelIndex >= 0) {
+      // update previous element
+      customColorChanArray[customColorChannelIndex] = channelCustomColorObj;
+    } else {
+      // create new element
+      customColorChanArray.push(channelCustomColorObj);
+    }
+    window.localStorage.setItem('customColorChanArray', JSON.stringify(customColorChanArray));
+    this._updateVisibility();
+  }; // _saveCustomColorToLocalStorage()
+
+  /**
+   * Load custom background color from local storage and apply to IRC channel web component.
+   * This is performed when the web component is initially created.
+   */
+  _loadCustomColorFromLocalStorage = () => {
+    const panelDivEl = this.shadowRoot.getElementById('panelDivId');
+    const panelCustomColorInputEl = this.shadowRoot.getElementById('panelCustomColorInputId');
+    let customColorChannelIndex = -1;
+    let customColorChanArray = null;
+    try {
+      customColorChanArray = JSON.parse(window.localStorage.getItem('customColorChanArray'));
+    } catch (error) {
+      // ignore error
+    }
+    if ((customColorChanArray) &&
+      (Array.isArray(customColorChanArray))) {
+      if (customColorChanArray.length > 0) {
+        for (let i = 0; i < customColorChanArray.length; i++) {
+          if (customColorChanArray[i].channel === this.channelName.toLowerCase()) {
+            customColorChannelIndex = i;
+          }
+        }
+      }
+    }
+    if (customColorChannelIndex >= 0) {
+      // Case of specific channel has previous color setting from localStorage
+      // console.log(JSON.stringify(customColorChanArray[customColorChannelIndex], null, 2));
+      if (customColorChanArray[customColorChannelIndex].enabled) {
+        if (this._validateHexColor(customColorChanArray[customColorChannelIndex].customColor)) {
+          // Enable and set custom background color that was retrieved from local storage.
+          panelDivEl.setAttribute('enable-custom-color', '');
+          panelDivEl.setAttribute('custom-color-value', customColorChanArray[customColorChannelIndex].customColor);
+          panelCustomColorInputEl.value = customColorChanArray[customColorChannelIndex].customColor
+          panelDivEl.style.backgroundColor = panelDivEl.getAttribute('custom-color-value');
+        } else {
+          // Invalid hex code, cancel...
+          panelDivEl.removeAttribute('enable-custom-color');
+          panelDivEl.removeAttribute('custom-color-value');
+          panelDivEl.style.backgroundColor = '';
+        }
+      } else {
+        // Not enabled, remove custom color if exists
+        panelDivEl.removeAttribute('enable-custom-color');
+        panelDivEl.removeAttribute('custom-color-value');
+        panelDivEl.style.backgroundColor = '';        
+      }
+    } else {
+      // The local storage did not contain a custom color entry
+      // Remove custom color if exists in browser
+      panelDivEl.removeAttribute('enable-custom-color');
+      panelDivEl.removeAttribute('custom-color-value');
+      panelDivEl.style.backgroundColor = ''; 
+    }
+    this._updateVisibility();
+  }; // _loadCustomColorFromLocalStorage()
+
+  /**
+   * Event handler for click the custom color enable checkbox in channel window
+   * Initiates inserting of background-color style into IRC channel web component
+   * and storage of custom color state into the browser local storage.
+   */
+  _handleCustomColorCBInputElClick = () => {
+    const errorPanelEl = document.getElementById('errorPanel');
+    const panelDivEl = this.shadowRoot.getElementById('panelDivId');
+    const panelCustomColorInputEl = this.shadowRoot.getElementById('panelCustomColorInputId');
+    if (panelDivEl.hasAttribute('enable-custom-color')) {
+      panelDivEl.removeAttribute('enable-custom-color');
+      panelDivEl.removeAttribute('custom-color-value');
+      panelDivEl.style.backgroundColor = '';
+    } else {
+      if (this._validateHexColor(panelCustomColorInputEl.value)) {
+        panelDivEl.setAttribute('enable-custom-color', '');
+        panelDivEl.setAttribute('custom-color-value', panelCustomColorInputEl.value);
+        panelDivEl.style.backgroundColor = panelDivEl.getAttribute('custom-color-value');
+      } else {
+        console.log('Error: Expect hex color format #000000');
+        errorPanelEl.showError('Error: Expect hex color format #000000')
+        panelDivEl.removeAttribute('enable-custom-color');
+        panelDivEl.removeAttribute('custom-color-value');
+      }
+    }
+    this._saveCustomColorToLocalStorage();
+    this._updateVisibility();
+  };
+
   /**
    * Update nickname list
    * List is shown in textarea panel for IRC channel nicknames
@@ -2203,6 +2364,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('clearButtonId').removeEventListener('click', this._handleClearButton);
     this.shadowRoot.getElementById('closePanelButtonId').removeEventListener('click', this._handleCloseButton);
     this.shadowRoot.getElementById('collapsePanelButtonId').removeEventListener('click', this._handleCollapseButton);
+    this.shadowRoot.getElementById('enableCustomColorCheckboxId').removeEventListener('click', this._handleCustomColorCBInputElClick);
     this.shadowRoot.getElementById('joinButtonId').removeEventListener('click', this._handleChannelJoinButtonElClick);
     this.shadowRoot.getElementById('multiLineSendButtonId').removeEventListener('click', this._handleMultiLineSendButtonClick);
     this.shadowRoot.getElementById('normalButtonId').removeEventListener('click', this._handleNormalButton);
@@ -2418,6 +2580,10 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       'Enable auto-open of hidden channel panel when new nickname enters';
     this.shadowRoot.getElementById('autoOpenOnModeCheckBoxId').title =
       'Enable auto-open of hidden channel panel for channel mode changes';
+    this.shadowRoot.getElementById('enableCustomColorCheckboxId').title =
+      'Enable custom background color for channel panel';
+    this.shadowRoot.getElementById('panelCustomColorInputId').title =
+      'Hexadecimal color code #000000 (#RRGGBB)';
   };
 
   /**
@@ -2470,6 +2636,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     // Load beep sound configuration from local storage
     this._loadBeepEnableFromLocalStorage();
     this._loadAutoOpenFromLocalStorage();
+    this._loadCustomColorFromLocalStorage();
 
     // enable brief mode on narrow screens
     if (window.globals.webState.dynamic.panelPxWidth < this.mobileBreakpointPx) {
@@ -2599,6 +2766,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     this.shadowRoot.getElementById('clearButtonId').addEventListener('click', this._handleClearButton);
     this.shadowRoot.getElementById('collapsePanelButtonId').addEventListener('click', this._handleCollapseButton);
     this.shadowRoot.getElementById('closePanelButtonId').addEventListener('click', this._handleCloseButton);
+    this.shadowRoot.getElementById('enableCustomColorCheckboxId').addEventListener('click', this._handleCustomColorCBInputElClick);
     this.shadowRoot.getElementById('joinButtonId').addEventListener('click', this._handleChannelJoinButtonElClick);
     this.shadowRoot.getElementById('multiLineSendButtonId').addEventListener('click', this._handleMultiLineSendButtonClick);
     this.shadowRoot.getElementById('normalButtonId').addEventListener('click', this._handleNormalButton);

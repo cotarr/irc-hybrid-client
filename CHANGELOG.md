@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Next
+
+Features
+
+- Added the capability to specify a custom background color to each IRC channel. The color is entered as a 7 digit hexadecimal color code (#888888). The data is saved to local storage to persist within a browser login session.
+
 ## [v2.1.8](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.1.8) 2026-02-18
 
 Features

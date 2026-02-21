@@ -1929,15 +1929,17 @@ this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible'
 ;const beep3CheckBoxEl=this.shadowRoot.getElementById('beep3CheckBoxId');const briefCheckboxEl=this.shadowRoot.getElementById('briefCheckboxId')
 ;const autoOpenOnMessageCheckBoxEl=this.shadowRoot.getElementById('autoOpenOnMessageCheckBoxId');const autoOpenOnJoinCheckBoxEl=this.shadowRoot.getElementById('autoOpenOnJoinCheckBoxId')
 ;const autoOpenOnModeCheckBoxEl=this.shadowRoot.getElementById('autoOpenOnModeCheckBoxId');const autocompleteCheckboxEl=this.shadowRoot.getElementById('autocompleteCheckboxId')
-;const autoCompleteTitleEl=this.shadowRoot.getElementById('autoCompleteTitle');const ircStateIndex=window.globals.ircState.channels.indexOf(this.channelName.toLowerCase())
+;const autoCompleteTitleEl=this.shadowRoot.getElementById('autoCompleteTitle');const enableCustomColorCheckboxEl=this.shadowRoot.getElementById('enableCustomColorCheckboxId')
+;const panelCustomColorInputEl=this.shadowRoot.getElementById('panelCustomColorInputId');const ircStateIndex=window.globals.ircState.channels.indexOf(this.channelName.toLowerCase())
 ;const webStateIndex=window.globals.webState.channels.indexOf(this.channelName.toLowerCase());if(panelDivEl.hasAttribute('beep1-enabled')){beep1CheckBoxEl.checked=true}else{
 beep1CheckBoxEl.checked=false}if(panelDivEl.hasAttribute('beep2-enabled')){beep2CheckBoxEl.checked=true}else{beep2CheckBoxEl.checked=false}if(panelDivEl.hasAttribute('beep3-enabled')){
 beep3CheckBoxEl.checked=true}else{beep3CheckBoxEl.checked=false}if(panelDivEl.hasAttribute('disable-open-on-message')){autoOpenOnMessageCheckBoxEl.checked=false}else{
 autoOpenOnMessageCheckBoxEl.checked=true}if(panelDivEl.hasAttribute('disable-open-on-join')){autoOpenOnJoinCheckBoxEl.checked=false}else{autoOpenOnJoinCheckBoxEl.checked=true}
 if(panelDivEl.hasAttribute('disable-open-on-mode')){autoOpenOnModeCheckBoxEl.checked=false}else{autoOpenOnModeCheckBoxEl.checked=true}if(panelDivEl.hasAttribute('brief-enabled')){
 briefCheckboxEl.checked=true;autoCompleteTitleEl.textContent='Auto-complete (tab, space-space)'}else{briefCheckboxEl.checked=false;autoCompleteTitleEl.textContent='Auto-complete (tab)'}
-if(panelDivEl.hasAttribute('auto-comp-enabled')){autocompleteCheckboxEl.checked=true}else{autocompleteCheckboxEl.checked=false}if(ircStateIndex>=0&&webStateIndex>=0){
-if(window.globals.ircState.channelStates[ircStateIndex].joined){this.shadowRoot.getElementById('joinButtonId').setAttribute('hidden','')
+if(panelDivEl.hasAttribute('auto-comp-enabled')){autocompleteCheckboxEl.checked=true}else{autocompleteCheckboxEl.checked=false}if(panelDivEl.hasAttribute('enable-custom-color')){
+enableCustomColorCheckboxEl.checked=true;panelCustomColorInputEl.setAttribute('disabled','')}else{enableCustomColorCheckboxEl.checked=false;panelCustomColorInputEl.removeAttribute('disabled')}
+if(ircStateIndex>=0&&webStateIndex>=0){if(window.globals.ircState.channelStates[ircStateIndex].joined){this.shadowRoot.getElementById('joinButtonId').setAttribute('hidden','')
 ;this.shadowRoot.getElementById('pruneButtonId').setAttribute('hidden','');this.shadowRoot.getElementById('partButtonId').removeAttribute('hidden')}else{
 this.shadowRoot.getElementById('joinButtonId').removeAttribute('hidden');this.shadowRoot.getElementById('pruneButtonId').removeAttribute('hidden')
 ;this.shadowRoot.getElementById('partButtonId').setAttribute('hidden','')}}if(window.globals.ircState.channelStates[ircStateIndex].joined){
@@ -2075,7 +2077,31 @@ panelMessageInputEl.value+=window.globals.ircState.progName+' '+window.globals.i
 panelMessageInputEl.value+=String.fromCharCode(trailingSpaceKey);e.preventDefault()}else{panelMessageInputEl.value=panelMessageInputEl.value.slice(0,panelMessageInputEl.value.length-1);let snippet=''
 ;const snippetArray=panelMessageInputEl.value.split(' ');if(snippetArray.length>0){snippet=snippetArray[snippetArray.length-1]}if(snippet.length>0){
 const matchStr=this._autoCompleteInputElement(snippet);if(this.lastAutoCompleteMatch!==matchStr){this.lastAutoCompleteMatch=matchStr;e.preventDefault()}}else{
-panelMessageInputEl.value+=String.fromCharCode(autoCompleteSpaceKey)}}}}}};_updateNickList=()=>{const panelNickListEl=this.shadowRoot.getElementById('panelNickListId')
+panelMessageInputEl.value+=String.fromCharCode(autoCompleteSpaceKey)}}}}}};_validateHexColor=hexColorStr=>{const validChars='0123456789abcdefABCDEF';if(typeof hexColorStr!=='string'){return false}
+if(hexColorStr.length!==7){return false}if(hexColorStr[0]!=='#'){return false}let valid=true;for(let i=1;i<7;i++){const ch=hexColorStr[i];if(validChars.indexOf(ch)<0){valid=false}}return valid}
+;_saveCustomColorToLocalStorage=()=>{const panelDivEl=this.shadowRoot.getElementById('panelDivId');const now=Math.floor(Date.now()/1000);const channelCustomColorObj={timestamp:now,
+channel:this.channelName.toLowerCase(),enabled:panelDivEl.hasAttribute('enable-custom-color')};if(channelCustomColorObj.enabled){
+if(this._validateHexColor(panelDivEl.getAttribute('custom-color-value'))){channelCustomColorObj.customColor=panelDivEl.getAttribute('custom-color-value')}else{channelCustomColorObj.enabled=false}}
+let customColorChannelIndex=-1;let customColorChanArray=null;customColorChanArray=JSON.parse(window.localStorage.getItem('customColorChanArray'))
+;if(customColorChanArray&&Array.isArray(customColorChanArray)){if(customColorChanArray.length>0){for(let i=0;i<customColorChanArray.length;i++){
+if(customColorChanArray[i].channel===this.channelName.toLowerCase()){customColorChannelIndex=i}}}}else{customColorChanArray=[]}if(customColorChannelIndex>=0){
+customColorChanArray[customColorChannelIndex]=channelCustomColorObj}else{customColorChanArray.push(channelCustomColorObj)}
+window.localStorage.setItem('customColorChanArray',JSON.stringify(customColorChanArray));this._updateVisibility()};_loadCustomColorFromLocalStorage=()=>{
+const panelDivEl=this.shadowRoot.getElementById('panelDivId');const panelCustomColorInputEl=this.shadowRoot.getElementById('panelCustomColorInputId');let customColorChannelIndex=-1
+;let customColorChanArray=null;try{customColorChanArray=JSON.parse(window.localStorage.getItem('customColorChanArray'))}catch(error){}if(customColorChanArray&&Array.isArray(customColorChanArray)){
+if(customColorChanArray.length>0){for(let i=0;i<customColorChanArray.length;i++){if(customColorChanArray[i].channel===this.channelName.toLowerCase()){customColorChannelIndex=i}}}}
+if(customColorChannelIndex>=0){if(customColorChanArray[customColorChannelIndex].enabled){if(this._validateHexColor(customColorChanArray[customColorChannelIndex].customColor)){
+panelDivEl.setAttribute('enable-custom-color','');panelDivEl.setAttribute('custom-color-value',customColorChanArray[customColorChannelIndex].customColor)
+;panelCustomColorInputEl.value=customColorChanArray[customColorChannelIndex].customColor;panelDivEl.style.backgroundColor=panelDivEl.getAttribute('custom-color-value')}else{
+panelDivEl.removeAttribute('enable-custom-color');panelDivEl.removeAttribute('custom-color-value');panelDivEl.style.backgroundColor=''}}else{panelDivEl.removeAttribute('enable-custom-color')
+;panelDivEl.removeAttribute('custom-color-value');panelDivEl.style.backgroundColor=''}}else{panelDivEl.removeAttribute('enable-custom-color');panelDivEl.removeAttribute('custom-color-value')
+;panelDivEl.style.backgroundColor=''}this._updateVisibility()};_handleCustomColorCBInputElClick=()=>{const errorPanelEl=document.getElementById('errorPanel')
+;const panelDivEl=this.shadowRoot.getElementById('panelDivId');const panelCustomColorInputEl=this.shadowRoot.getElementById('panelCustomColorInputId')
+;if(panelDivEl.hasAttribute('enable-custom-color')){panelDivEl.removeAttribute('enable-custom-color');panelDivEl.removeAttribute('custom-color-value');panelDivEl.style.backgroundColor=''
+}else if(this._validateHexColor(panelCustomColorInputEl.value)){panelDivEl.setAttribute('enable-custom-color','');panelDivEl.setAttribute('custom-color-value',panelCustomColorInputEl.value)
+;panelDivEl.style.backgroundColor=panelDivEl.getAttribute('custom-color-value')}else{console.log('Error: Expect hex color format #000000')
+;errorPanelEl.showError('Error: Expect hex color format #000000');panelDivEl.removeAttribute('enable-custom-color');panelDivEl.removeAttribute('custom-color-value')}
+this._saveCustomColorToLocalStorage();this._updateVisibility()};_updateNickList=()=>{const panelNickListEl=this.shadowRoot.getElementById('panelNickListId')
 ;const index=window.globals.ircState.channels.indexOf(this.channelName.toLowerCase());if(index>=0){this.maxNickLength=0;if(window.globals.ircState.channelStates[index].names.length>0){
 panelNickListEl.value='';const opList=[];const otherList=[];for(let i=0;i<window.globals.ircState.channelStates[index].names.length;i++){
 if(window.globals.ircState.channelStates[index].names[i].charAt(0)==='@'){opList.push(window.globals.ircState.channelStates[index].names[i])}else{
@@ -2195,6 +2221,7 @@ let newTextTheme='global-text-theme-dark';let oldTextTheme='global-text-theme-li
 ;this.shadowRoot.getElementById('clearButtonId').removeEventListener('click',this._handleClearButton)
 ;this.shadowRoot.getElementById('closePanelButtonId').removeEventListener('click',this._handleCloseButton)
 ;this.shadowRoot.getElementById('collapsePanelButtonId').removeEventListener('click',this._handleCollapseButton)
+;this.shadowRoot.getElementById('enableCustomColorCheckboxId').removeEventListener('click',this._handleCustomColorCBInputElClick)
 ;this.shadowRoot.getElementById('joinButtonId').removeEventListener('click',this._handleChannelJoinButtonElClick)
 ;this.shadowRoot.getElementById('multiLineSendButtonId').removeEventListener('click',this._handleMultiLineSendButtonClick)
 ;this.shadowRoot.getElementById('normalButtonId').removeEventListener('click',this._handleNormalButton);this.shadowRoot.getElementById('panelDivId').removeEventListener('click',this._handlePanelClick)
@@ -2247,16 +2274,17 @@ if(typeof event.detail.except==='string'){if(event.detail.except!==this.id){this
 ;this.shadowRoot.getElementById('beep3CheckBoxId').title='Enable audio beep sound when your own nickname is identified in text'
 ;this.shadowRoot.getElementById('autoOpenOnMessageCheckBoxId').title='Enable auto-open of hidden channel panel for channel messages'
 ;this.shadowRoot.getElementById('autoOpenOnJoinCheckBoxId').title='Enable auto-open of hidden channel panel when new nickname enters'
-;this.shadowRoot.getElementById('autoOpenOnModeCheckBoxId').title='Enable auto-open of hidden channel panel for channel mode changes'};timerTickHandler=()=>{if(this.activityIconInhibitTimer>0){
-this.activityIconInhibitTimer--}};initializePlugin=()=>{const manageChannelsPanelEl=document.getElementById('manageChannelsPanel')
-;if(window.globals.webState.channels.indexOf(this.channelName.toLowerCase())>=0){throw new Error('createChannelEl: channel already exist')}
-window.globals.webState.channels.push(this.channelName.toLowerCase());this.initIrcStateIndex=window.globals.ircState.channels.indexOf(this.channelName.toLowerCase())
-;window.globals.webState.channelStates.push({lastJoined:window.globals.ircState.channelStates[this.initIrcStateIndex].joined})
-;this.channelIndex=window.globals.ircState.channels.indexOf(this.channelName.toLowerCase());this._setFixedElementTitles()
-;this.shadowRoot.getElementById('panelDivId').setAttribute('lastDate','0000-00-00');this.shadowRoot.getElementById('channelNameDivId').textContent=this.channelCsName
+;this.shadowRoot.getElementById('autoOpenOnModeCheckBoxId').title='Enable auto-open of hidden channel panel for channel mode changes'
+;this.shadowRoot.getElementById('enableCustomColorCheckboxId').title='Enable custom background color for channel panel'
+;this.shadowRoot.getElementById('panelCustomColorInputId').title='Hexadecimal color code #000000 (#RRGGBB)'};timerTickHandler=()=>{if(this.activityIconInhibitTimer>0){this.activityIconInhibitTimer--}}
+;initializePlugin=()=>{const manageChannelsPanelEl=document.getElementById('manageChannelsPanel');if(window.globals.webState.channels.indexOf(this.channelName.toLowerCase())>=0){
+throw new Error('createChannelEl: channel already exist')}window.globals.webState.channels.push(this.channelName.toLowerCase())
+;this.initIrcStateIndex=window.globals.ircState.channels.indexOf(this.channelName.toLowerCase());window.globals.webState.channelStates.push({
+lastJoined:window.globals.ircState.channelStates[this.initIrcStateIndex].joined});this.channelIndex=window.globals.ircState.channels.indexOf(this.channelName.toLowerCase())
+;this._setFixedElementTitles();this.shadowRoot.getElementById('panelDivId').setAttribute('lastDate','0000-00-00');this.shadowRoot.getElementById('channelNameDivId').textContent=this.channelCsName
 ;if(window.globals.ircState.channelStates[this.channelIndex].topic==null){this.shadowRoot.getElementById('channelTopicDivId').textContent=''}else{
 this.shadowRoot.getElementById('channelTopicDivId').textContent=document.getElementById('displayUtils').cleanFormatting(window.globals.ircState.channelStates[this.channelIndex].topic)}
-this._loadBeepEnableFromLocalStorage();this._loadAutoOpenFromLocalStorage();if(window.globals.webState.dynamic.panelPxWidth<this.mobileBreakpointPx){
+this._loadBeepEnableFromLocalStorage();this._loadAutoOpenFromLocalStorage();this._loadCustomColorFromLocalStorage();if(window.globals.webState.dynamic.panelPxWidth<this.mobileBreakpointPx){
 this.shadowRoot.getElementById('panelDivId').setAttribute('brief-enabled','');this.shadowRoot.getElementById('briefCheckboxId').checked=true}else{
 this.shadowRoot.getElementById('panelDivId').removeAttribute('brief-enabled');this.shadowRoot.getElementById('briefCheckboxId').checked=false}
 if(window.InputEvent&&typeof InputEvent.prototype.getTargetRanges==='function'){this.shadowRoot.getElementById('panelDivId').setAttribute('auto-comp-enabled','')}else{
@@ -2284,6 +2312,7 @@ this.shadowRoot.getElementById('autocompleteCheckboxId').addEventListener('click
 ;this.shadowRoot.getElementById('clearButtonId').addEventListener('click',this._handleClearButton)
 ;this.shadowRoot.getElementById('collapsePanelButtonId').addEventListener('click',this._handleCollapseButton)
 ;this.shadowRoot.getElementById('closePanelButtonId').addEventListener('click',this._handleCloseButton)
+;this.shadowRoot.getElementById('enableCustomColorCheckboxId').addEventListener('click',this._handleCustomColorCBInputElClick)
 ;this.shadowRoot.getElementById('joinButtonId').addEventListener('click',this._handleChannelJoinButtonElClick)
 ;this.shadowRoot.getElementById('multiLineSendButtonId').addEventListener('click',this._handleMultiLineSendButtonClick)
 ;this.shadowRoot.getElementById('normalButtonId').addEventListener('click',this._handleNormalButton);this.shadowRoot.getElementById('panelDivId').addEventListener('click',this._handlePanelClick)
