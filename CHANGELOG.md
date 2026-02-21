@@ -12,6 +12,10 @@ Features
 
 - Added the capability to specify a custom background color to each IRC channel. The color is entered as a 7 digit hexadecimal color code (#888888). The data is saved to local storage to persist within a browser login session.
 
+Updates
+
+- Deleted and regenerate package-lock.json to clear npm audit warning in npm dependency eslint.
+
 ## [v2.1.8](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.1.8) 2026-02-18
 
 Features
