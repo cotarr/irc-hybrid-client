@@ -1,6 +1,6 @@
 {
   "name": "irc-hybrid-client",
-  "version": "2.1.11",
+  "version": "2.1.12",
   "description": "Single user hybrid IRC client using JavaScript front end and Node/Express backend",
   "type": "module",
   "main": "bin/www.mjs",
@@ -23,7 +23,7 @@
   },
   "homepage": "https://github.com/cotarr/irc-hybrid-client#readme",
   "dependencies": {
-    "@dr.pogodin/csurf": "^1.16.8",
+    "@dr.pogodin/csurf": "^1.16.9",
     "bcryptjs": "^3.0.3",
     "compression": "^1.8.1",
     "connect-redis": "^9.0.0",
@@ -32,7 +32,7 @@
     "cookie-signature": "^1.2.2",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
-    "express-rate-limit": "^8.3.0",
+    "express-rate-limit": "^8.3.1",
     "express-session": "^1.19.0",
     "express-validator": "^7.3.1",
     "helmet": "^8.1.0",
@@ -42,12 +42,12 @@
     "rotating-file-stream": "^3.2.9",
     "socks5-client": "^1.2.8",
     "utf-8-validate": "^6.0.6",
-    "ws": "^8.19.0"
+    "ws": "^8.20.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@eslint/json": "^1.1.0",
-    "eslint": "^10.0.3",
+    "@eslint/json": "^1.2.0",
+    "eslint": "^10.1.0",
     "globals": "^17.4.0"
   }
 }
