@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v2.1.13](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.1.13) 2026-04-04
+
+- Update outdated npm dependencies to clear npm audit warning
+
 ## [v2.1.12](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.1.12) 2026-03-28
 
 - Update outdated npm dependencies to clear npm audit warning
