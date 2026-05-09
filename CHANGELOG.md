@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v2.1.15](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.1.15) 2026-05-09
+
 - Fixed - When IRC persistent message cache is enabled, detect and ignore zero length file.
 
 Issue: Occasionally afer rebooting my Linux server, the
@@ -22,7 +24,6 @@ with a freshly initialized empty message cache.
 A console log message is created to log the event.
 This only applies if the persistent message cache is enabled
 with `IRC_PERSIST_MESSAGE_CACHE=true`
-
 
 ## [v2.1.14](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.1.14) 2026-05-06
 
