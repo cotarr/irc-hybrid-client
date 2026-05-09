@@ -963,7 +963,11 @@ if (config.irc.persistIrcMessageCache) {
         if (!err) {
           let decoded = null;
           try {
-            decoded = JSON.parse(data);
+            if (data != null && data.length === 0) {
+              console.log('Message cache: File zero length, ignoring. Starting with empty cache');
+            } else {
+              decoded = JSON.parse(data);
+            }
           } catch (error) {
             console.log('Error decoding previous message cache JSON format');
             console.error(error);
