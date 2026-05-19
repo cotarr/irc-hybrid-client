@@ -6,11 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v2.1.16](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.1.16) 2026-05-19
+
+- Update outdated npm dependencies to clear npm audit warning
+
 ## [v2.1.15](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.1.15) 2026-05-09
 
 - Fixed - When IRC persistent message cache is enabled, detect and ignore zero length file.
 
-Issue: Occasionally afer rebooting my Linux server, the
+Issue: Occasionally after rebooting my Linux server, the
 IRC message cache file is left with a size of zero bytes.
 I assumed that during Linux server shutdown the irc-hybrid-client
 is killed by the Linux kernel prior to completing the file
