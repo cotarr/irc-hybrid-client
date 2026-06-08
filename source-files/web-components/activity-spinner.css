@@ -15,7 +15,6 @@
   z-index: 4;
   animation: spin 2s linear infinite;
 }
-/* for previous .activity8-spinner */
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }

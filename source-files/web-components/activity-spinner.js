@@ -28,7 +28,7 @@
 // Methods:
 //   requestActivitySpinner() - Increments counter, make spinner visible
 //   cancelActivitySpinner() -  Decrement count, if 0 then hide spinner
-//   resetActivityCounter() - Set counter to 0, hide spinner
+//   resetActivitySpinner() - Set counter to 0, hide spinner
 //
 // Attributes
 //   default   values: "show", "hide"

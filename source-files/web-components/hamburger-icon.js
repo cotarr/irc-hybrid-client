@@ -22,7 +22,6 @@
 // ------------------------------------------------------------------------------
 //
 // This web component is a simple CSS based hamburger icon used to call a menu.
-// It is a static element without any functionality.
 //
 // Public Methods:
 //    giveNavMenuHamburgerIconFocus = ()
