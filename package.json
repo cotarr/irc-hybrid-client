@@ -9,6 +9,7 @@
   },
   "scripts": {
     "lint": "npx eslint source-files/js/*.js source-files/web-components/*.js server/testws/html/*.js server/*/*.mjs server/*.mjs bin/www.mjs tools/*.mjs *.json",
+    "spell": "npx cspell cspell bin docs server source-files README.md",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node bin/www.mjs"
   },
@@ -47,6 +48,7 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@eslint/json": "^1.2.0",
+    "cspell": "^10.0.1",
     "eslint": "^10.4.0",
     "globals": "^17.6.0"
   }

@@ -11,6 +11,8 @@ This is a pass through some of the files doing minor code clean up, spelling and
 - web-components/help-panel.js - Fix fetch request supervisory timeout
 - web-components/websocket-panel.js - Missing `this.` before shadowroot.
 
+- Installed npm package cspell as development dependency
+
 ## [v2.1.17](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.1.17) 2026-05-23
 
 - Update outdated npm dependencies to clear npm audit warning
