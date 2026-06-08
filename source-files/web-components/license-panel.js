@@ -21,7 +21,7 @@
 // SOFTWARE.
 // ------------------------------------------------------------------------------
 //
-//    License Panel, MIT License, List of available IRC Commands
+//    License Panel, MIT License
 //
 // ------------------------------------------------------------------------------
 //
@@ -138,7 +138,6 @@ window.customElements.define('license-panel', class extends HTMLElement {
 
     /**
      * Global event listener on document object to detect state change of remote IRC server
-     * Detect addition of new IRC channels and create channel panel.
      * Data source: ircState object
      * @listens document:irc-state-changed
      */

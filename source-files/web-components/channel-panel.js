@@ -680,7 +680,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
     if (multiLineArray.length > 100) {
       multiLineActionDivEl.setAttribute('hidden', '');
       panelMessageInputEl.value = '';
-      errorPanelEl.showError('Maximum multi-line clipboard paste 100 Lin`es');
+      errorPanelEl.showError('Maximum multi-line clipboard paste 100 Lines');
     } else {
       // initialize state flags
       const lastIrcConnect = window.globals.ircState.times.ircConnect;

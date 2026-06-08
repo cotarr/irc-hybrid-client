@@ -5,7 +5,6 @@ servers*
 secure/sounds/custom-beep*
 secure-minify/sounds/custom-beep*
 
-
 source-files/sounds/custom-beep*
 build-dev/sounds/custom-beep*
 build-prod/sounds/custom-beep*
@@ -17,4 +16,6 @@ tools/showIrcLogTimeZone.json
 .env
 custom*
 debug
+.agents
+AGENTS.md
 

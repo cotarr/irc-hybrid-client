@@ -27,7 +27,7 @@
 //  Check if IRC server is still connected to remote web server
 //  If not connected, proceed to logout network request.
 //  Else, if the IRC is still connected, a web logout will leave the nickname present on IRC
-//  Make the logout-panel visible to notify user that IRC wil still
+//  Make the logout-panel visible to notify user that IRC will still
 //  connected and will remain connected after web page user logout.
 //
 // Public methods
@@ -61,6 +61,7 @@ window.customElements.define('logout-panel', class extends HTMLElement {
    */
   showPanel = () => {
     this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible', '');
+    document.dispatchEvent(new CustomEvent('cancel-zoom'));
     this._scrollToTop();
   };
 

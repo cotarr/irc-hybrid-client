@@ -311,7 +311,7 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
               window.globals.webState.websocketCount + '\n' +
               'Code: ' + event.code + ' ' + event.reason + '\n';
               if (!window.globals.webState.webConnectOn) {
-                window.shadowRoot.getElementById('reconnectStatusDivId').textContent +=
+                this.shadowRoot.getElementById('reconnectStatusDivId').textContent +=
                 'Automatic web reconnect is disabled. \nPlease reconnect manually.\n';
               }
             }
@@ -785,7 +785,7 @@ window.customElements.define('websocket-panel', class extends HTMLElement {
   // Group of heartbeat functions.
   //
   // Web server sends websocket message 'HEARTBEAT' at 10 second intervals
-  // Command parser intercept the HEATBEAT message and calls onHeartbeatReceived()
+  // Command parser intercept the HEARTBEAT message and calls onHeartbeatReceived()
   // ------------------------------------------------------------------------------
 
   heartbeatExpirationTimeSeconds = 15;

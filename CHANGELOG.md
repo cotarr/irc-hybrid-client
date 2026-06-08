@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+This is a pass through some of the files doing minor code clean up, spelling and comments
+
+- web-components/help-panel.js - Fix fetch request supervisory timeout
+- web-components/websocket-panel.js - Missing `this.` before shadowroot.
+
 ## [v2.1.17](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.1.17) 2026-05-23
 
 - Update outdated npm dependencies to clear npm audit warning

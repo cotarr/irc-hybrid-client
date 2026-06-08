@@ -98,9 +98,9 @@ window.customElements.define('help-panel', class extends HTMLElement {
     const activitySpinnerEl = document.getElementById('activitySpinner');
     const fetchOptions = {
       method: 'HEAD',
+      redirect: 'error',
+      signal: fetchController.signal,
       headers: {
-        redirect: 'error',
-        signal: fetchController.signal,
         Accept: 'text/html'
       }
     };

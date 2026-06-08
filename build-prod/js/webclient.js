@@ -312,7 +312,7 @@ window.globals.wsocket.close(3002,'Closed due to getIrcState() error.')}this.sho
 if(window.globals.webState.webConnected){if('code'in event&&event.code===3001){
 this.shadowRoot.getElementById('reconnectStatusDivId').textContent+='Web page disconnected at user request.\n'+'Auto-reconnect disabled\n'}else{
 this.shadowRoot.getElementById('reconnectStatusDivId').textContent+='Web socket connection closed, count: '+window.globals.webState.websocketCount+'\n'+'Code: '+event.code+' '+event.reason+'\n'
-;if(!window.globals.webState.webConnectOn){window.shadowRoot.getElementById('reconnectStatusDivId').textContent+='Automatic web reconnect is disabled. \nPlease reconnect manually.\n'}}}
+;if(!window.globals.webState.webConnectOn){this.shadowRoot.getElementById('reconnectStatusDivId').textContent+='Automatic web reconnect is disabled. \nPlease reconnect manually.\n'}}}
 window.globals.webState.webConnected=false;window.globals.webState.webConnecting=false;this._updateWebsocketStatus()}}}));window.globals.wsocket.addEventListener('error',(error=>{if(error){
 let errMessage=error.message||error.toString()||'Websocket error event occurred';console.log(errMessage);errMessage=errMessage.split('\n')[0]
 ;this.shadowRoot.getElementById('reconnectStatusDivId').textContent+='Websocket Error \n'}window.globals.webState.webConnected=false;window.globals.webState.webConnecting=false
@@ -692,7 +692,7 @@ this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible',''
 ;collapsePanel=()=>{this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible')};hidePanel=()=>{this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible')}
 ;handleHotKey=()=>{if(this.shadowRoot.getElementById('panelVisibilityDivId').hasAttribute('visible')){this.hidePanel()}else{this.showPanel()}};_setDocsFolderLinkVisibility=()=>{
 if(this.docsFolderTestComplete){return}this.docsFolderTestComplete=true;const fetchController=new AbortController;const fetchTimeout=document.getElementById('globVars').constants('fetchTimeout')
-;const activitySpinnerEl=document.getElementById('activitySpinner');const fetchOptions={method:'HEAD',headers:{redirect:'error',signal:fetchController.signal,Accept:'text/html'}}
+;const activitySpinnerEl=document.getElementById('activitySpinner');const fetchOptions={method:'HEAD',redirect:'error',signal:fetchController.signal,headers:{Accept:'text/html'}}
 ;const fetchURL='/irc/docs/index.html';activitySpinnerEl.requestActivitySpinner();const fetchTimerId=setTimeout((()=>fetchController.abort()),fetchTimeout)
 ;fetch(fetchURL,fetchOptions).then((response=>{if(response.ok){this.shadowRoot.getElementById('viewDocsButtonDivId').removeAttribute('hidden')}if(fetchTimerId){clearTimeout(fetchTimerId)}
 activitySpinnerEl.cancelActivitySpinner()})).catch((()=>{if(fetchTimerId){clearTimeout(fetchTimerId)}activitySpinnerEl.cancelActivitySpinner()}))};connectedCallback(){
@@ -729,17 +729,17 @@ if(typeof event.detail.except==='string'){if(event.detail.except!==this.id&&even
 if(event.detail.except.indexOf(this.id)<0&&event.detail.debug){this.showPanel()}}}else if(event.detail&&event.detail.debug){this.showPanel()}}))}})
 ;window.customElements.define('logout-panel',class extends HTMLElement{constructor(){super();const template=document.getElementById('logoutPanelTemplate');const templateContent=template.content
 ;this.attachShadow({mode:'open'}).appendChild(templateContent.cloneNode(true))}_scrollToTop=()=>{this.focus();const newVertPos=window.scrollY+this.getBoundingClientRect().top-50;window.scrollTo({
-top:newVertPos,behavior:'smooth'})};showPanel=()=>{this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible','');this._scrollToTop()};collapsePanel=()=>{
-this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible')};hidePanel=()=>{this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible')}
-;handleLogoutRequest=()=>{if(window.globals.ircState.ircConnected&&window.globals.webState.webConnected||!window.globals.webState.webConnected){this.showPanel()
-;document.dispatchEvent(new CustomEvent('global-scroll-to-top'))}else{window.localStorage.clear();window.location.href='/logout'}};connectedCallback(){
-this.shadowRoot.getElementById('closePanelButtonId').addEventListener('click',(()=>{this.hidePanel()}));this.shadowRoot.getElementById('cancelButtonId').addEventListener('click',(()=>{this.hidePanel()
-}));this.shadowRoot.getElementById('webLogoutButtonId').addEventListener('click',(()=>{window.localStorage.clear();window.location.href='/logout'}))
-;document.addEventListener('collapse-all-panels',(event=>{if(event.detail&&event.detail.except){if(typeof event.detail.except==='string'){if(event.detail.except!==this.id){this.collapsePanel()}
-}else if(Array.isArray(event.detail.except)){if(event.detail.except.indexOf(this.id)<0){this.collapsePanel()}}}else{this.collapsePanel()}}));document.addEventListener('hide-all-panels',(event=>{
-if(event.detail&&event.detail.except){if(typeof event.detail.except==='string'){if(event.detail.except!==this.id){this.hidePanel()}}else if(Array.isArray(event.detail.except)){
-if(event.detail.except.indexOf(this.id)<0){this.hidePanel()}}}else{this.hidePanel()}}));document.addEventListener('show-all-panels',(event=>{if(event.detail&&event.detail.except){
-if(typeof event.detail.except==='string'){if(event.detail.except!==this.id&&event.detail.debug){this.showPanel()}}else if(Array.isArray(event.detail.except)){
+top:newVertPos,behavior:'smooth'})};showPanel=()=>{this.shadowRoot.getElementById('panelVisibilityDivId').setAttribute('visible','');document.dispatchEvent(new CustomEvent('cancel-zoom'))
+;this._scrollToTop()};collapsePanel=()=>{this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible')};hidePanel=()=>{
+this.shadowRoot.getElementById('panelVisibilityDivId').removeAttribute('visible')};handleLogoutRequest=()=>{
+if(window.globals.ircState.ircConnected&&window.globals.webState.webConnected||!window.globals.webState.webConnected){this.showPanel();document.dispatchEvent(new CustomEvent('global-scroll-to-top'))
+}else{window.localStorage.clear();window.location.href='/logout'}};connectedCallback(){this.shadowRoot.getElementById('closePanelButtonId').addEventListener('click',(()=>{this.hidePanel()}))
+;this.shadowRoot.getElementById('cancelButtonId').addEventListener('click',(()=>{this.hidePanel()}));this.shadowRoot.getElementById('webLogoutButtonId').addEventListener('click',(()=>{
+window.localStorage.clear();window.location.href='/logout'}));document.addEventListener('collapse-all-panels',(event=>{if(event.detail&&event.detail.except){if(typeof event.detail.except==='string'){
+if(event.detail.except!==this.id){this.collapsePanel()}}else if(Array.isArray(event.detail.except)){if(event.detail.except.indexOf(this.id)<0){this.collapsePanel()}}}else{this.collapsePanel()}}))
+;document.addEventListener('hide-all-panels',(event=>{if(event.detail&&event.detail.except){if(typeof event.detail.except==='string'){if(event.detail.except!==this.id){this.hidePanel()}
+}else if(Array.isArray(event.detail.except)){if(event.detail.except.indexOf(this.id)<0){this.hidePanel()}}}else{this.hidePanel()}}));document.addEventListener('show-all-panels',(event=>{
+if(event.detail&&event.detail.except){if(typeof event.detail.except==='string'){if(event.detail.except!==this.id&&event.detail.debug){this.showPanel()}}else if(Array.isArray(event.detail.except)){
 if(event.detail.except.indexOf(this.id)<0&&event.detail.debug){this.showPanel()}}}else if(event.detail&&event.detail.debug){this.showPanel()}}))}})
 ;window.customElements.define('server-form-panel',class extends HTMLElement{constructor(){super();const template=document.getElementById('serverFormPanelTemplate')
 ;const templateContent=template.content;this.attachShadow({mode:'open'}).appendChild(templateContent.cloneNode(true))}fetchServerList=(index,lock)=>new Promise(((resolve,reject)=>{
@@ -1966,7 +1966,7 @@ this._handleCancelZoomEvent();this.shadowRoot.getElementById('multiLineSendSpanI
 ;this.shadowRoot.getElementById('multiLineActionDivId').removeAttribute('hidden');this.shadowRoot.getElementById('panelMessageInputId').setAttribute('rows','3')}};_handleMultiLineSendButtonClick=()=>{
 const panelMessageInputEl=this.shadowRoot.getElementById('panelMessageInputId');const multiLineActionDivEl=this.shadowRoot.getElementById('multiLineActionDivId')
 ;const errorPanelEl=document.getElementById('errorPanel');const multiLineArray=this._splitMultiLinePaste(panelMessageInputEl.value);if(multiLineArray.length>100){
-multiLineActionDivEl.setAttribute('hidden','');panelMessageInputEl.value='';errorPanelEl.showError('Maximum multi-line clipboard paste 100 Lin`es')}else{
+multiLineActionDivEl.setAttribute('hidden','');panelMessageInputEl.value='';errorPanelEl.showError('Maximum multi-line clipboard paste 100 Lines')}else{
 const lastIrcConnect=window.globals.ircState.times.ircConnect;const lastWebConnect=window.globals.webState.times.webConnect;let abortedFlag=false;const delayIntervalMs=2000;let delayMs=0
 ;if(multiLineArray.length>0){panelMessageInputEl.setAttribute('rows','1');panelMessageInputEl.value=multiLineArray[0];for(let i=0;i<multiLineArray.length;i++){delayMs+=delayIntervalMs
 ;setTimeout((()=>{let okToSend=false
