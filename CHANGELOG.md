@@ -6,9 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-This is a pass through some of the files doing minor code clean up, spelling and comments
+This is a pass through some of the browser web component files doing minor code clean up, spelling and comments
 
-- web-components/help-panel.js - Fix fetch request supervisory timeout
+- web-components/display-utils.js - Fixed typo in variable name detecting change in window size.
+- web-components/beep-sounds.js - Fixed some copy/paste error between sound 1, 2, and 3.
+- web-components/glob-vars.js - Fixed edge case where port 80 or 443 would end web socket URL with a colon character.
+- web-components/help-panel.js - Fixed fetch request supervisory timeout
 - web-components/websocket-panel.js - Missing `this.` before shadowroot.
 
 - Installed npm package cspell as development dependency

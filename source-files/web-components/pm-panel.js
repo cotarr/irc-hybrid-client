@@ -919,7 +919,7 @@ window.customElements.define('pm-panel', class extends HTMLElement {
       errorString += timestampString;
     }
     errorString += ' ' +
-      document.getElementById('globVar').constants('cacheErrorString') + '\n\n';
+      document.getElementById('globVars').constants('cacheErrorString') + '\n\n';
     this.shadowRoot.getElementById('panelMessageDisplayId').value = errorString;
   };
 

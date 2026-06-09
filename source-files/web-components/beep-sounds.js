@@ -120,16 +120,21 @@ window.customElements.define('beep-sounds', class extends HTMLElement {
       }
     }
     if (this.beep2InhibitTimer === 0) {
-      this.beep2.play().catch((error) => {
-        if (error.name === 'NotAllowedError') {
-          // Duplicate: use error message from beep1
-          // console.info('playBeep2Sound() ' + this.audioPromiseErrorStr);
-        } else if (error.name === 'NotSupportedError') {
-          console.log('Audio download not available.');
-        } else {
-          console.error(error);
-        }
-      });
+      this.beep2.play()
+        .then(() => {
+          // upon successful play sound, then hide the button
+          document.getElementById('headerBar').removeAttribute('beepicon');
+        })      
+        .catch((error) => {
+          if (error.name === 'NotAllowedError') {
+            // Duplicate: use error message from beep1
+            // console.info('playBeep2Sound() ' + this.audioPromiseErrorStr);
+          } else if (error.name === 'NotSupportedError') {
+            console.log('Audio download not available.');
+          } else {
+            console.error(error);
+          }
+        });
       this.beep2InhibitTimer = 5;
     }
   };

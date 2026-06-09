@@ -40,9 +40,9 @@ progName:'',times:{programRun:0,ircConnect:0},count:{ircConnect:0,ircConnectErro
 ;window.globals.webState.cacheReloadInProgress=false;window.globals.webState.lag={last:0,min:9999,max:0};window.globals.webState.dynamic={testAreaColumnPxWidth:null,textAreaPaddingPxWidth:null,
 textAreaRowPxHeight:null,textareaPaddingPxHeight:null,sendButtonWidthPx:null,collapseButtonWidthPx:null,commonMarginRightPx:50,lastDevicePixelRatio:1,
 panelPxWidth:document.querySelector('body').clientWidth,panelPxHeight:window.innerHeight,lastPanelPxWidth:document.querySelector('body').clientWidth,lastPanelPxHeight:window.innerHeight}
-;if(window.devicePixelRatio){window.globals.webState.dynamic.lastDevicePixelRatio=window.devicePixelRatio}this.webServerUrl='https://';this.webSocketUrl='wss://'
-;if(document.location.protocol==='http:'){this.webServerUrl='http://';this.webSocketUrl='ws://'}this.webServerUrl+=window.location.hostname+':'+window.location.port
-;this.webSocketUrl+=window.location.hostname+':'+window.location.port;window.globals.wsocket=null}});window.customElements.define('display-utils',class extends HTMLElement{toggleColorTheme=()=>{
+;if(window.devicePixelRatio){window.globals.webState.dynamic.lastDevicePixelRatio=window.devicePixelRatio}const webUrl=new URL(window.location.href);const socketUrl=new URL(window.location.href)
+;if(document.location.protocol==='http:'){webUrl.protocol='http:';socketUrl.protocol='ws:'}else{webUrl.protocol='https:';socketUrl.protocol='wss:'}this.webServerUrl=webUrl.origin
+;this.webSocketUrl=socketUrl.origin;window.globals.wsocket=null}});window.customElements.define('display-utils',class extends HTMLElement{toggleColorTheme=()=>{
 if(document.querySelector('body').getAttribute('theme')==='light'){document.querySelector('body').setAttribute('theme','dark');window.localStorage.setItem('colorTheme',JSON.stringify({theme:'dark'}))
 ;document.dispatchEvent(new CustomEvent('color-theme-changed',{detail:{theme:'dark'}}))}else{document.querySelector('body').setAttribute('theme','light')
 ;window.localStorage.setItem('colorTheme',JSON.stringify({theme:'light'}));document.dispatchEvent(new CustomEvent('color-theme-changed',{detail:{theme:'light'}}))}};timestampToHMS=timeString=>{
@@ -93,7 +93,7 @@ const cols=parseInt((window.globals.webState.dynamic.panelPxWidth-window.globals
 ;return cols.toString()}else{console.log('alcInputAreaColSize() invalid input');return null}}handleExternalWindowResizeEvent(){this._updatePageMeasurements()
 ;if(window.globals.webState.dynamic.testAreaColumnPxWidth){if(window.devicePixelRatio){if(window.globals.webState.dynamic.lastDevicePixelRatio!==window.devicePixelRatio){
 window.globals.webState.dynamic.lastDevicePixelRatio=window.devicePixelRatio;this._calibrateElementSize()}}document.dispatchEvent(new CustomEvent('resize-custom-elements'))
-;window.globals.webState.dynamic.lastPanelPxWidth=window.globals.webState.dynamic.panelPxWidth;window.globals.webState.dynamic.lastClientHeight=window.globals.webState.dynamic.panelPxHeight}}
+;window.globals.webState.dynamic.lastPanelPxWidth=window.globals.webState.dynamic.panelPxWidth;window.globals.webState.dynamic.lastPanelPxHeight=window.globals.webState.dynamic.panelPxHeight}}
 _checkVerticalSliderPageWidth(){this._updatePageMeasurements();if(window.globals.webState.dynamic.testAreaColumnPxWidth){
 if(window.globals.webState.dynamic.lastPanelPxWidth!==window.globals.webState.dynamic.panelPxWidth||window.globals.webState.dynamic.lastPanelPxHeight!==window.globals.webState.dynamic.panelPxHeight){
 window.globals.webState.dynamic.lastPanelPxWidth=window.globals.webState.dynamic.panelPxWidth;window.globals.webState.dynamic.lastPanelPxHeight=window.globals.webState.dynamic.panelPxHeight
@@ -114,16 +114,16 @@ if(!this.beep1){if(window.globals.ircState.customBeepSounds){this.beep1=new Audi
 this.beep1.play().then((()=>{document.getElementById('headerBar').removeAttribute('beepicon')})).catch((error=>{if(error.name==='NotAllowedError'){
 console.info('playBeep1Sound() '+this.audioPromiseErrorStr)}else if(error.name==='NotSupportedError'){console.log('Audio download not available.')}else{console.error(error)}}))
 ;this.beep1InhibitTimer=5}};playBeep2Sound=()=>{if(!this.beep2){if(window.globals.ircState.customBeepSounds){this.beep2=new Audio('sounds/custom-beep2.mp3')}else{
-this.beep2=new Audio('sounds/short-beep2.mp3')}}if(this.beep2InhibitTimer===0){this.beep2.play().catch((error=>{if(error.name==='NotAllowedError'){}else if(error.name==='NotSupportedError'){
-console.log('Audio download not available.')}else{console.error(error)}}));this.beep2InhibitTimer=5}};playBeep3Sound=()=>{if(!this.beep3){if(window.globals.ircState.customBeepSounds){
-this.beep3=new Audio('sounds/custom-beep3.mp3')}else{this.beep3=new Audio('sounds/short-beep3.mp3')}}if(this.beep3InhibitTimer===0){this.beep3.play().then((()=>{
-document.getElementById('headerBar').removeAttribute('beepicon')})).catch((error=>{if(error.name==='NotAllowedError'){console.info('playBeep3Sound() '+this.audioPromiseErrorStr)
-}else if(error.name==='NotSupportedError'){console.log('Audio download not available.')}else{console.error(error)}}));this.beep3InhibitTimer=5}};_areBeepsConfigured=()=>{let isAnyBeepEnabled=false
-;let beepEnableChanArray=null;beepEnableChanArray=JSON.parse(window.localStorage.getItem('beepEnableChanArray'));if(beepEnableChanArray&&Array.isArray(beepEnableChanArray)){
-if(beepEnableChanArray.length>0){for(let i=0;i<beepEnableChanArray.length;i++){if(beepEnableChanArray[i].beep1){isAnyBeepEnabled=true}if(beepEnableChanArray[i].beep2){isAnyBeepEnabled=true}
-if(beepEnableChanArray[i].beep3){isAnyBeepEnabled=true}}}}let beepEnableObj=null;beepEnableObj=JSON.parse(window.localStorage.getItem('privMsgBeep'))
-;if(beepEnableObj&&typeof beepEnableObj==='object'){if(beepEnableObj.beep){isAnyBeepEnabled=true}}return isAnyBeepEnabled};userInitiatedAudioPlay=()=>{
-document.getElementById('headerBar').removeAttribute('beepicon');if(this._areBeepsConfigured()){setTimeout(this.playBeep2Sound,100);setTimeout(this.playBeep3Sound,600)
+this.beep2=new Audio('sounds/short-beep2.mp3')}}if(this.beep2InhibitTimer===0){this.beep2.play().then((()=>{document.getElementById('headerBar').removeAttribute('beepicon')})).catch((error=>{
+if(error.name==='NotAllowedError'){}else if(error.name==='NotSupportedError'){console.log('Audio download not available.')}else{console.error(error)}}));this.beep2InhibitTimer=5}};playBeep3Sound=()=>{
+if(!this.beep3){if(window.globals.ircState.customBeepSounds){this.beep3=new Audio('sounds/custom-beep3.mp3')}else{this.beep3=new Audio('sounds/short-beep3.mp3')}}if(this.beep3InhibitTimer===0){
+this.beep3.play().then((()=>{document.getElementById('headerBar').removeAttribute('beepicon')})).catch((error=>{if(error.name==='NotAllowedError'){
+console.info('playBeep3Sound() '+this.audioPromiseErrorStr)}else if(error.name==='NotSupportedError'){console.log('Audio download not available.')}else{console.error(error)}}))
+;this.beep3InhibitTimer=5}};_areBeepsConfigured=()=>{let isAnyBeepEnabled=false;let beepEnableChanArray=null;beepEnableChanArray=JSON.parse(window.localStorage.getItem('beepEnableChanArray'))
+;if(beepEnableChanArray&&Array.isArray(beepEnableChanArray)){if(beepEnableChanArray.length>0){for(let i=0;i<beepEnableChanArray.length;i++){if(beepEnableChanArray[i].beep1){isAnyBeepEnabled=true}
+if(beepEnableChanArray[i].beep2){isAnyBeepEnabled=true}if(beepEnableChanArray[i].beep3){isAnyBeepEnabled=true}}}}let beepEnableObj=null
+;beepEnableObj=JSON.parse(window.localStorage.getItem('privMsgBeep'));if(beepEnableObj&&typeof beepEnableObj==='object'){if(beepEnableObj.beep){isAnyBeepEnabled=true}}return isAnyBeepEnabled}
+;userInitiatedAudioPlay=()=>{document.getElementById('headerBar').removeAttribute('beepicon');if(this._areBeepsConfigured()){setTimeout(this.playBeep2Sound,100);setTimeout(this.playBeep3Sound,600)
 ;setTimeout(this.playBeep1Sound,950)}};testPlayBeepSound1=()=>{this.beep1InhibitTimer=0;this.playBeep1Sound()};testPlayBeepSound2=()=>{this.beep2InhibitTimer=0;this.playBeep2Sound()}
 ;testPlayBeepSound3=()=>{this.beep3InhibitTimer=0;this.playBeep3Sound()};timerTickHandler=()=>{this._beepTimerTick()};initializePlugin=()=>{if(this._areBeepsConfigured()){
 document.getElementById('headerBar').setAttribute('beepicon','')}}});window.customElements.define('local-command-parser',class extends HTMLElement{
@@ -1726,7 +1726,7 @@ markerString+=' '+document.getElementById('globVars').constants('cacheReloadStri
 ;const uptime=now-window.globals.webState.times.webConnect;if(uptime<5&&!this.shadowRoot.getElementById('panelVisibilityDivId').hasAttribute('visible')){this.collapsePanel()}}
 ;_handelCacheReloadError=event=>{let errorString='\n';let timestampString='';if('detail'in event&&'timestamp'in event.detail){
 timestampString=document.getElementById('displayUtils').unixTimestampToHMS(event.detail.timestamp)}if(timestampString){errorString+=timestampString}
-errorString+=' '+document.getElementById('globVar').constants('cacheErrorString')+'\n\n';this.shadowRoot.getElementById('panelMessageDisplayId').value=errorString};_handleEraseBeforeReload=()=>{
+errorString+=' '+document.getElementById('globVars').constants('cacheErrorString')+'\n\n';this.shadowRoot.getElementById('panelMessageDisplayId').value=errorString};_handleEraseBeforeReload=()=>{
 this._removeSelfFromDOM()};_handleEraseAllButton=()=>{document.getElementById('ircControlsPanel').eraseIrcCache('PRIVMSG').then((()=>{if(!window.globals.webState.cacheReloadInProgress){
 document.dispatchEvent(new CustomEvent('update-from-cache'))}})).catch((err=>{console.log(err);let message=err.message||err.toString()||'Error occurred calling /irc/connect'
 ;message=message.split('\n')[0];document.getElementById('errorPanel').showError(message)}))};_setFixedElementTitles=()=>{
@@ -2012,9 +2012,9 @@ panelDivEl.setAttribute('beep2-enabled','');oneIsEnabled=true}if(manageChannelsP
 this._saveBeepEnableToLocalStorage()}}this._updateVisibility()};_handleChannelBeep1CBInputElClick=()=>{const panelDivEl=this.shadowRoot.getElementById('panelDivId')
 ;if(panelDivEl.hasAttribute('beep1-enabled')){panelDivEl.removeAttribute('beep1-enabled')}else{panelDivEl.setAttribute('beep1-enabled','');document.getElementById('beepSounds').playBeep1Sound()}
 this._saveBeepEnableToLocalStorage();this._updateVisibility()};_handleChannelBeep2CBInputElClick=event=>{const panelDivEl=this.shadowRoot.getElementById('panelDivId')
-;if(panelDivEl.hasAttribute('beep2-enabled')){panelDivEl.removeAttribute('beep2-enabled')}else{panelDivEl.setAttribute('beep2-enabled','');document.getElementById('beepSounds').playBeep1Sound()}
+;if(panelDivEl.hasAttribute('beep2-enabled')){panelDivEl.removeAttribute('beep2-enabled')}else{panelDivEl.setAttribute('beep2-enabled','');document.getElementById('beepSounds').playBeep2Sound()}
 this._saveBeepEnableToLocalStorage();this._updateVisibility()};_handleChannelBeep3CBInputElClick=event=>{const panelDivEl=this.shadowRoot.getElementById('panelDivId')
-;if(panelDivEl.hasAttribute('beep3-enabled')){panelDivEl.removeAttribute('beep3-enabled')}else{panelDivEl.setAttribute('beep3-enabled','');document.getElementById('beepSounds').playBeep1Sound()}
+;if(panelDivEl.hasAttribute('beep3-enabled')){panelDivEl.removeAttribute('beep3-enabled')}else{panelDivEl.setAttribute('beep3-enabled','');document.getElementById('beepSounds').playBeep3Sound()}
 this._saveBeepEnableToLocalStorage();this._updateVisibility()};_handleCancelBeepSounds=()=>{const panelDivEl=this.shadowRoot.getElementById('panelDivId');panelDivEl.removeAttribute('beep1-enabled')
 ;panelDivEl.removeAttribute('beep2-enabled');panelDivEl.removeAttribute('beep3-enabled')};_saveAutoOpenToLocalStorage=()=>{const now=Math.floor(Date.now()/1000);const channelAutoOpenObj={
 timestamp:now,channel:this.channelName.toLowerCase(),disableOnMessage:this.shadowRoot.getElementById('panelDivId').hasAttribute('disable-open-on-message'),

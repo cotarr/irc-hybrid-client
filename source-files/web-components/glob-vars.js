@@ -198,14 +198,17 @@ window.customElements.define('glob-vars', class extends HTMLElement {
       window.globals.webState.dynamic.lastDevicePixelRatio = window.devicePixelRatio;
     }
 
-    this.webServerUrl = 'https://';
-    this.webSocketUrl = 'wss://';
+    const webUrl = new URL(window.location.href);
+    const socketUrl = new URL(window.location.href);
     if (document.location.protocol === 'http:') {
-      this.webServerUrl = 'http://';
-      this.webSocketUrl = 'ws://';
+      webUrl.protocol = 'http:';
+      socketUrl.protocol = 'ws:';
+    } else {
+      webUrl.protocol = 'https:';
+      socketUrl.protocol = 'wss:';
     }
-    this.webServerUrl += window.location.hostname + ':' + window.location.port;
-    this.webSocketUrl += window.location.hostname + ':' + window.location.port;
+    this.webServerUrl = webUrl.origin;
+    this.webSocketUrl = socketUrl.origin;
 
     // -----------------------
     // WebSocket placeholder

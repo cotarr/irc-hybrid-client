@@ -1008,7 +1008,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       panelDivEl.removeAttribute('beep2-enabled');
     } else {
       panelDivEl.setAttribute('beep2-enabled', '');
-      document.getElementById('beepSounds').playBeep1Sound();
+      document.getElementById('beepSounds').playBeep2Sound();
     }
     this._saveBeepEnableToLocalStorage();
     this._updateVisibility();
@@ -1023,7 +1023,7 @@ window.customElements.define('channel-panel', class extends HTMLElement {
       panelDivEl.removeAttribute('beep3-enabled');
     } else {
       panelDivEl.setAttribute('beep3-enabled', '');
-      document.getElementById('beepSounds').playBeep1Sound();
+      document.getElementById('beepSounds').playBeep3Sound();
     }
     this._saveBeepEnableToLocalStorage();
     this._updateVisibility();

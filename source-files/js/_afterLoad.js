@@ -29,7 +29,7 @@
 //       to run initial functions inside each web component, executed in the proper order.
 //  - This script also contains a global 1 second timer that web components can hook.
 //  - This script has some eventListener functions for window events that
-//       are not available within web component shawDOM scope.
+//       are not available within web component shadowDOM scope.
 // ------------------------------------------------------------------------------
 'use strict';
 //
@@ -94,7 +94,7 @@ if (!(window.customElements && document.body.attachShadow)) {
     document.getElementById('beepSounds').timerTickHandler();
     // document.getElementById('localCommandParser').timerTickHandler();
     // document.getElementById('remoteCommandParser').timerTickHandler();
-    // document.getElementById('ctcpCommandParser').timerTickHandler();
+    // document.getElementById('ctcpParser').timerTickHandler();
     document.getElementById('headerBar').timerTickHandler();
     document.getElementById('websocketPanel').timerTickHandler();
     // document.getElementById('ircControlsPanel').timerTickHandler();

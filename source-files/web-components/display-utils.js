@@ -293,7 +293,7 @@ window.customElements.define('display-utils', class extends HTMLElement {
         }
       }
       // Hexadecimal colors 0x04 + 6 hexadecimal digits
-      // followed by optional comma and 6 hexadeciaml digits for background color
+      // followed by optional comma and 6 hexadecimal digits for background color
       // In this case, 6 characters are removed regardless if 0-9, A-F
       if ((active) && (i < l) && (inString.charCodeAt(i) === 4)) {
         active = false;
@@ -547,7 +547,7 @@ window.customElements.define('display-utils', class extends HTMLElement {
       // This is to prevent unnecessary resize event on timer check (next function below)
       window.globals.webState.dynamic.lastPanelPxWidth =
         window.globals.webState.dynamic.panelPxWidth;
-      window.globals.webState.dynamic.lastClientHeight =
+      window.globals.webState.dynamic.lastPanelPxHeight =
         window.globals.webState.dynamic.panelPxHeight;
     }
   };
