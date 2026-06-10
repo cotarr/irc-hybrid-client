@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v2.1.18](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.1.18) 2026-06-10
+
+- Update npm dependencies @dr.pogodin/csurf@1.17.1, morgan@1.11.0, redis@6.0.0
+
 This is a pass through some of the browser web component files doing minor code clean up, spelling and comments
 
 - web-components/display-utils.js - Fixed typo in variable name detecting change in window size.
