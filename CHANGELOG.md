@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+This is a pass through some of the web server files doing minor code clean up, spelling and comments
+
+- server/config/index.mjs - Added validation that when credentials.json is used, instanceNumber must be type number.
+- server/config/index.mjs - Increase minimum Node.js version to 20 to match package.json.
+- server/config/index.mjs - Fixed bug allowing mis-detection existence of configuraton.json
+
 ## [v2.1.18](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.1.18) 2026-06-10
 
 - Update npm dependencies @dr.pogodin/csurf@1.17.1, morgan@1.11.0, redis@6.0.0

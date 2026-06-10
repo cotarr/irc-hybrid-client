@@ -43,7 +43,7 @@ import dotenv from 'dotenv';
 dotenv.config({ quiet: true });
 
 // Check requirement for minimum node version
-const minNodeVersion = 16;
+const minNodeVersion = 20;
 if (parseInt(process.version.replace('v', '').split('.')[0]) < minNodeVersion) {
   console.error('Error: this program requires node version ' +
     minNodeVersion.toString() + ' or greater.');
@@ -51,6 +51,7 @@ if (parseInt(process.version.replace('v', '').split('.')[0]) < minNodeVersion) {
 }
 
 // The NODE_ENV variable should be assigned external to the .env file
+// NODE_ENV is intentionally required from the parent process because legacy modules read it before/without dotenv config loading
 try {
   const dotEnvFile = fs.readFileSync('./.env', 'utf8');
   if (dotEnvFile.indexOf('NODE_ENV') >= 0) {
@@ -75,29 +76,34 @@ if ((!Object.hasOwn(process.env, 'NODE_ENV')) ||
 }
 // const nodeEnv = process.env.NODE_ENV || 'development';
 
+// fcf abbreviation for: Found Configuration.json File
+// Case of configuration file: fcf = true;
+// Case of environment variables: fcf = false;
+let fcf = false;
+
 // Attempt to read credentials.json.
 // This file should not exist if configuration is using environment variables.
 let credentials = null;
 try {
   credentials = JSON.parse(fs.readFileSync('./credentials.json', 'utf8'));
+  fcf = true;
 } catch (err) {
   if ((!Object.hasOwn(err, 'code')) || (err.code !== 'ENOENT')) {
     throw err;
   }
 }
 
-// fcf abbreviation for: Found Configuration.json File
-// Case of configuration file: fcf = true;
-// Case of environment variables: fcf = false;
-let fcf = false;
-if ((credentials) && (typeof credentials === 'object') && ('configVersion' in credentials)) {
-  if (credentials.configVersion === 1) {
-    console.log('\nPassword hash requires regeneration due to upgrade of hash function to bcrypt.\n');
-    process.exit(1);
-  } else if (credentials.configVersion === 2) {
-    fcf = true;
+if (fcf) {
+  if ((credentials) && (typeof credentials === 'object') && ('configVersion' in credentials)) {
+    if (credentials.configVersion === 1) {
+      console.log('\nPassword hash requires regeneration due to upgrade of hash function to bcrypt.\n');
+      process.exit(1);
+    } else if (credentials.configVersion !== 2) {
+      console.log('Error, credentials.json unknown version in credentials.json');
+      process.exit(1);
+    }
   } else {
-    console.log('Error, credentials.js unknown version in credentials.json');
+    console.log('Error, credentials.json requires configVersion property');
     process.exit(1);
   }
 }
@@ -169,6 +175,12 @@ export const server = {
   logRotateSize: ((fcf) ? credentials.logRotationSize : process.env.SERVER_LOG_ROTATE_SIZE) || null,
   accessLogOnlyErrors: ((fcf) ? credentials.accessLogOnlyErrors : (process.env.SERVER_LOG_ONLY_ERRORS === 'true')) || false
 };
+// Validate that instance number was not configured as a string in credentials.json
+if ((fcf) && (Object.hasOwn(credentials, 'instanceNumber')) && (typeof credentials.instanceNumber !== 'number')) {
+  console.error('Error: In file credentials.json instanceNumber must be type number');
+  process.exit(1);
+}
+
 // to avoid 0 or '0' interpreted as false
 if ((!Object.hasOwn(server, 'instanceNumber')) ||
   (isNaN(server.instanceNumber)) ||

@@ -113,7 +113,7 @@
           <tr><td>SERVER_PID_FILENAME</td>         <td>pidFilename</td>             <td>server.pidFilename</td>          <td>&quot;&quot;</td></tr>
           <tr><td>SERVER_INSTANCE_NUMBER</td>      <td>instanceNumber</td>          <td>server.instanceNumber</td>       <td>null</td></tr>
           <tr><td>SERVER_LOG_ROTATE_INTERVAL</td>  <td>logRotationInterval</td>     <td>server.logRotateInterval</td>    <td>&quot;&quot;</td></tr>
-          <tr><td>SERVER_LOG_ROTATE_SIZE</td>      <td>logRotationSize</td>         <td>server.logRotationSize</td>      <td>null</td></tr>
+          <tr><td>SERVER_LOG_ROTATE_SIZE</td>      <td>logRotationSize</td>         <td>server.logRotateSize</td>        <td>null</td></tr>
           <tr><td>SERVER_LOG_ONLY_ERRORS</td>      <td>accessLogOnlyErrors</td>     <td>server.accessLogOnlyErrors</td>  <td>false</td></tr>
           <tr><td>SESSION_SET_ROLLING_COOKIE</td>  <td>sessionRollingCookie</td>    <td>session.rollingCookie</td>       <td>false</td></tr>
           <tr><td>SESSION_EXPIRE_SEC</td>          <td>sessionExpireAfterSec</td>   <td>session.ttl</td>                 <td>604800</td></tr>
@@ -357,11 +357,11 @@ SERVER_PORT=3003
           login of one session would likely disconnect the other session due
           to replacement of the browser session cookie of the same cookie name.
           The instanceNumber property is used to make the cookie name unique.
-          The instanceNumber should be an integer between 0 and 65535.
+          The instanceNumber should be an integer between 1 and 65535.
           The instanceNumber should be unique for each instance running on a web server.
         </p>
         <p>
-          When running multiple servers, one suggested option would be to optinally set the 
+          When running multiple servers, one suggested option would be to optionally set the 
           instance number to the same value as the port number. This makes the cookies 
           easy to identify.
         </p>
