@@ -10,7 +10,9 @@ This is a pass through some of the web server files doing minor code clean up, s
 
 - server/config/index.mjs - Added validation that when credentials.json is used, instanceNumber must be type number.
 - server/config/index.mjs - Increase minimum Node.js version to 20 to match package.json.
-- server/config/index.mjs - Fixed bug allowing mis-detection existence of configuraton.json
+- server/config/index.mjs - Fixed bug allowing mis-detection of the existence of configuration.json
+- server/config/index.mjs - Resequence the order that event listeners are added to the server object.
+- server/config.index.mjs - Added `server.headersTimeout = 5000;`
 
 ## [v2.1.18](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.1.18) 2026-06-10
 

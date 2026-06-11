@@ -60,20 +60,20 @@ if (config.server.tls) {
   server = http.createServer(app);
 }
 
-const port = config.server.port;
-
-// See TLS/SSL handshakeTimeout above
-//
-// Timeout to receive entire client request
-server.requestTimeout = 5000;
-
-// Socket idle timeout
-server.timeout = 5000;
-
-// Time for additional requests
-server.keepAliveTimeout = 5000;
-
-server.listen(port);
+server.on('error', function (error) {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+  if (error.code === 'EACCES') {
+    console.log('Port requires elevated privileges');
+    process.exit(1);
+  }
+  if (error.code === 'EADDRINUSE') {
+    console.log('Address or port in use');
+    process.exit(1);
+  }
+  throw error;
+});
 
 server.on('listening', function () {
   const address = server.address();
@@ -96,17 +96,19 @@ server.on('listening', function () {
 // web socket upgrade handler
 server.on('upgrade', wsOnUpgrade);
 
-server.on('error', function (error) {
-  if (error.syscall !== 'listen') {
-    throw error;
-  }
-  if (error.code === 'EACCES') {
-    console.log('Port requires elevated privileges');
-    process.exit(1);
-  }
-  if (error.code === 'EADDRINUSE') {
-    console.log('Address or port in use');
-    process.exit(1);
-  }
-  throw error;
-});
+const port = config.server.port;
+
+// See TLS/SSL handshakeTimeout above
+//
+// Timeout to receive entire client request
+server.requestTimeout = 5000;
+
+// Socket idle timeout
+server.timeout = 5000;
+
+// Time for additional requests
+server.keepAliveTimeout = 5000;
+
+server.headersTimeout = 5000;
+
+server.listen(port);
