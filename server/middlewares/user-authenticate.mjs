@@ -263,13 +263,14 @@ export const authorizeOrFail = function (req, res, next) {
 
 const generateRandomNonce = function (nonceLength) {
   if ((typeof nonceLength !== 'number') || (nonceLength < 3)) {
-    throw new Error('generateRandonNonce() length too short');
+    throw new Error('generateRandomNonce() length too short');
   }
   const intNonceLength = parseInt(nonceLength);
   let nonce = '';
   const charSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   for (let i = 0; i < intNonceLength; i++) {
-    nonce += charSet.charAt(parseInt(Math.random() * charSet.length));
+    const charIndex = crypto.randomInt(0, charSet.length);
+    nonce += charSet.charAt(charIndex);
   }
   return nonce;
 };
@@ -291,6 +292,7 @@ const sanitizeStringInput = function (inString) {
 
 //
 // Timing safe compare (From github.com/LionC/express-basic-auth)
+// The safeCompare function returns type number 1=success 0=fail
 //
 const safeCompare = function (userInput, secret) {
   const userInputLength = Buffer.byteLength(userInput);

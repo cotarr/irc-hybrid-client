@@ -283,9 +283,12 @@ if (config.session.enableRedis) {
     redisClientOptions.password = config.session.redisPassword;
   }
   const redisClient = createClient(redisClientOptions);
+  redisClient.on('error', function (err) {
+    console.log('redis-server error: ', err.toString());
+  });
   redisClient.connect()
     .catch((err) => {
-      console.log('redis-server error: ', err.toString());
+      console.log('redis-server connect error: ', err.toString());
       // fatal error
       process.exit(1);
     });

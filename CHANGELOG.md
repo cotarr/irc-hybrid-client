@@ -8,6 +8,8 @@ and this project adheres to
 
 This is a pass through some of the web server files doing minor code clean up, spelling and comments
 
+- server/web-server.mjs - Add `redisClient.on('error', ...)` to prevent crash if redis-server unavailable.
+- server/middlewares/user-authenticate.mjs - login nonce replace Math.random() with crypto.randomInt()
 - server/config/index.mjs - Added validation that when credentials.json is used, instanceNumber must be type number.
 - server/config/index.mjs - Increase minimum Node.js version to 20 to match package.json.
 - server/config/index.mjs - Fixed bug allowing mis-detection of the existence of configuration.json

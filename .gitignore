@@ -14,6 +14,7 @@ logs/
 tools/showIrcLogTimeZone.json
 *.bak
 .env
+*.swp
 custom*
 debug
 .agents
