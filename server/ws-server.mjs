@@ -118,7 +118,7 @@ setInterval(function () {
 //
 // 1) Validate route
 // 2) Validate cookie on upgrade request
-// 3) Connect the webscket
+// 3) Connect the websocket
 // ----------------------------------------
 export const wsOnUpgrade = function (request, socket, head) {
   let upgradePath = '';
