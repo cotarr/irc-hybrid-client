@@ -21,6 +21,7 @@
       "pogodin",
       "PRIVMSG",
       "RAWCOMMAND",
+      "RFC",
       "SERVLIST",
       "SQUERY",
       "SQUIT",

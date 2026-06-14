@@ -17,6 +17,7 @@ tools/showIrcLogTimeZone.json
 *.swp
 custom*
 debug
+.codex
 .agents
 AGENTS.md
 

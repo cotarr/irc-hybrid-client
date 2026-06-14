@@ -28,7 +28,7 @@
 // -----------------------------------------------------------------------------
 'use strict';
 // ------------------------------------------------------------------------
-// Two servers available on same port (express web server, websocket server)
+// The server has one socket serviced by two server-like systems (express web server, websocket server)
 
 import { app } from '../server/web-server.mjs';
 import { wsOnUpgrade } from '../server/ws-server.mjs';

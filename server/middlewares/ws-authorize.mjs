@@ -24,30 +24,33 @@
 //                     Websocket authorization
 //
 // -----------------------------------------------------------------------------
-// App has two separate web servers: 1) express API server, 2) websocket server
+// App has one socket serviced by two server-like systems: 1) express API server, 2) websocket server
 // The websocket server does not have access to express (req, res, next) objects,
 // and therefore does not have access to express-session authentication status.
 // The websocket server must extract cookie from request object
 // and validate the cookie manually using handshake values between
 // web-server.js and ws-server.js.
 //
-// 1) Browser attempts to load IRC web client page
-// 2) If cookie invalid, redirect to user login, validate user, then redirect back
-// 3) Browser loads web client page webclient.html
-// 4) On load javascript webclient.js, browser fetchs POST request to /irc/wsauth
-// 5) In web-server.js, /irc/wsauth POST request, session cookie validated by express-session.
-// 5) In web-server.js, route handler, cookie value obtained from cookieParser in req object
-// 6) In web-server.js, route handler, Cookie value and +10 second expiry saved as global
-// 7) Upon POST received event, browser attempts to open websocket
-// 8) Thd websocket server (bin/www) calls on 'upgrade' handler in ws-server.js
-// 9) wsOnUpgrade() calls _authorizeWebSocket
-// 10) Check: cookie present
-// 11) Validate cookie signature
-// 12) Safe compare cookie value to stored global cookie value (from web-server.js POST route)
-// 13) and... global timetamp (10 seconds) is not expired.
-// 14) Authorize websocket to upgrade
-// 15) On websocket open event, request ircState from web server by calling getIrcState().
-// 16) On receipt event getIrcState() POST, set connected state in browser, accept user input.
+// 1  Browser attempts to load IRC web client page at /irc/webclient.html
+// 2  If cookie invalid, redirect to user login, validate user, then redirect back to /irc/webclient.html
+// 3  Browser loads web client page webclient.html
+// 3  On load javascript webclient.mjs, browser will fetch POST request to /irc/wsauth
+// 5  In web-server.mjs, /irc/wsauth POST request, session cookie validated by express-session.
+// 6  In web-server.mjs, route handler, CSRF token is validated by csurf middleware
+// 7  In web-server.mjs, route handler, extract cookie from cookieParser in req object
+// 8  In web-server.mjs, route handler, save cookie and +10 second expiry into global variables
+// 9  POST response '{"error":false}' returned to web browser.
+// 10 Upon negative error response to POST request, browser attempts to open websocket using Chrome ws:// or wss:// protocol.
+// 11 The websocket server (bin/www) calls on 'upgrade' handler in ws-server.mjs
+// 12 wsOnUpgrade() calls _authorizeWebSocket()
+// 13 Check: cookie present
+// 14 Validate cookie signature
+// 15 Safe compare cookie value to stored global cookie value (from web-server.mjs POST route)
+// 16 and... global timestamp (10 seconds) is not expired.
+// 17 Authorize websocket to upgrade
+// 18 When Chrome detects websocket open event, request ircState from web server by calling getIrcState().
+// 19 On receipt event getIrcState() POST, set connected state in browser.
+// 10 Begin accepting and parsing IRC RFC-2812 messages over websocket.
 // ---------------------------------------------------------------------------------------------
 'use strict';
 
