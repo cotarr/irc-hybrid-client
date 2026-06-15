@@ -8,6 +8,9 @@ and this project adheres to
 
 This is a pass through some of the web server files doing minor code clean up, spelling and comments
 
+- server/config/index.mjs - trim whitespace from OAUTH2_REMOTE_SCOPE env config values
+- server/middlewares/remote-authenticate.mjs - Extend access_token metadata validation.
+- server/middlewares/remote-authenticate.mjs - random nonce replace Math.random() with crypto.randomInt()
 - server/web-server.mjs - Add `redisClient.on('error', ...)` to prevent crash if redis-server unavailable.
 - server/middlewares/user-authenticate.mjs - login nonce replace Math.random() with crypto.randomInt()
 - server/config/index.mjs - Added validation that when credentials.json is used, instanceNumber must be type number.

@@ -217,7 +217,11 @@ function _getScope (fcf, credentials) {
       (process.env.OAUTH2_REMOTE_SCOPE.length > 0)) {
       if (process.env.OAUTH2_REMOTE_SCOPE.indexOf(',') >= 0) {
         // first check for comma separated list, split to array of stings
-        scope = process.env.OAUTH2_REMOTE_SCOPE.split(',');
+        scope = [];
+        process.env.OAUTH2_REMOTE_SCOPE.split(',').forEach((scopeItem) => {
+          const trimmedScopeItem = scopeItem.trim();
+          if (trimmedScopeItem.length > 0) scope.push(trimmedScopeItem);
+        });
       } else {
         // else, use the scope string directly
         scope = process.env.OAUTH2_REMOTE_SCOPE;

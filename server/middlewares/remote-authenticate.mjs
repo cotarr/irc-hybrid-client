@@ -66,6 +66,7 @@
 // node native modules
 import fs from 'fs';
 import path from 'path';
+import crypto from 'node:crypto';
 import { fileURLToPath } from 'url';
 
 import config, { oauth2 } from '../config/index.mjs';
@@ -192,7 +193,8 @@ const generateRandomNonce = function (nonceLength) {
   let nonce = '';
   const charSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   for (let i = 0; i < intNonceLength; i++) {
-    nonce += charSet.charAt(parseInt(Math.random() * charSet.length));
+    const charIndex = crypto.randomInt(0, charSet.length);
+    nonce += charSet.charAt(charIndex);
   }
   return nonce;
 };
@@ -524,6 +526,8 @@ const _validateTokenResponse = function (chain) {
       (chain.tokenResponse.grant_type === 'authorization_code') &&
       (Object.hasOwn(chain.tokenResponse, 'expires_in')) &&
       (parseInt(chain.tokenResponse.expires_in) > 0) &&
+      (Object.hasOwn(chain.tokenResponse, 'auth_time')) &&
+      (parseInt(chain.tokenResponse.auth_time) > 0) &&
       (Object.hasOwn(chain.tokenResponse, 'access_token')) &&
       (typeof chain.tokenResponse.access_token === 'string') &&
       (chain.tokenResponse.access_token.length > 0)) {
@@ -693,6 +697,47 @@ const _introspectAccessToken = function (chain) {
   }); // new Promise()
 }; // _introspectAccessToken()
 
+
+const _validateMetaData = function (chain) {
+  return new Promise((resolve, reject) => {
+    // console.log('chain.tokenResponse', chain.tokenResponse);
+    // console.log('chain.tokenMetaData', chain.tokenMetaData);
+    if ((Object.hasOwn(chain, 'tokenResponse')) &&
+      (!(chain.tokenResponse == null)) &&
+      (Object.hasOwn(chain, 'tokenMetaData')) &&
+      (!(chain.tokenMetaData == null)) &&
+      (Object.hasOwn(chain.tokenMetaData, 'issuer')) &&
+      (chain.tokenMetaData.issuer === oauth2.remoteAuthHost + '/oauth/token') &&
+      (Object.hasOwn(chain.tokenMetaData, 'auth_time')) &&
+      (chain.tokenResponse.auth_time === chain.tokenMetaData.auth_time) &&
+      // Token is associated with web server client from config.
+      (Object.hasOwn(chain.tokenMetaData, 'client')) &&
+      (Object.hasOwn(chain.tokenMetaData.client, 'id')) &&
+      (chain.tokenMetaData.client.id.length > 0) &&
+      (Object.hasOwn(chain.tokenMetaData.client, 'clientId')) &&
+      (chain.tokenMetaData.client.clientId.length > 0) &&
+      (chain.tokenMetaData.client.clientId === oauth2.remoteClientId) &&
+      // Token is associated with a user
+      (Object.hasOwn(chain.tokenMetaData, 'user')) &&
+      (Object.hasOwn(chain.tokenMetaData.user, 'id')) &&
+      (chain.tokenMetaData.user.id.length > 0) &&
+      (Object.hasOwn(chain.tokenMetaData.user, 'username')) &&
+      (chain.tokenMetaData.user.username.length > 0) &&
+      // Expected values
+      (Object.hasOwn(chain.tokenMetaData, 'grant_type')) &&
+      (chain.tokenMetaData.grant_type === 'authorization_code') &&
+      // consistent with token response
+      (Object.hasOwn(chain.tokenMetaData, 'expires_in')) &&
+      (parseInt(chain.tokenMetaData.expires_in) > 0)) {
+      resolve(chain);
+    } else {
+      const err = new Error('Error validating introspect meta-data');
+      err.status = 400;
+      reject(err);
+    }
+  });
+};
+
 // ---------------------------------------------------------------
 // Exchange authorization code for a new
 // new access token from Oauth 2.0 authorization server
@@ -825,6 +870,7 @@ export const exchangeAuthCode = function (req, res, next) {
     .then((chain) => _fetchNewAccessToken(chain))
     .then((chain) => _validateTokenResponse(chain))
     .then((chain) => _introspectAccessToken(chain))
+    .then((chain) => _validateMetaData(chain))
     .then((chain) => _authorizeTokenScope(chain))
     .then((chain) => _setSessionAuthorized(req, chain))
     .then((chain) => {
