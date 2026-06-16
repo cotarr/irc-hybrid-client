@@ -609,7 +609,7 @@ LOGIN_USER_HASH="$2a$10$0pr9Q21L7CFoSw5.FjbW0.izOzQtBTqQjOGbZJabM2MMNdSxKyfpO"
           The risk is probably small, because the web server does not 
           accept web socket upgrade requests, unless the upgrade request has a valid cookie
           and is preceded within 10 seconds by an unlocking POST request with valid CSRF token and 
-          valid session cookie. The Origin check may be omitted if desired by configuring an 
+          valid session cookie. The Origin check may be disabled if desired by configuring an 
           empty array, or omitting the configuration environment variables.
         </p>
         <p>
@@ -620,7 +620,7 @@ LOGIN_USER_HASH="$2a$10$0pr9Q21L7CFoSw5.FjbW0.izOzQtBTqQjOGbZJabM2MMNdSxKyfpO"
         </p>
         <p>
           <b>Software update note:</b> Should the irc-hybrid-client web server be updated 
-          to a version incorporating the Origin check, but without adding an allowed 
+          to version v2.2.0 or later incorporating the Origin check, but without adding an allowed 
           Origin List to the configuration, the Origin check will be disabled and 
           irc-hybrid-client should function as before, but without the origin check.
           Upgrading without configuration should not break the server.
