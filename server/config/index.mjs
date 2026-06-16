@@ -164,6 +164,35 @@ export const site = {
   securityExpires: ((fcf) ? credentials.securityExpires : process.env.SITE_SECURITY_EXPIRES) || ''
 };
 
+function _getWebsocketOriginAllowList (fcf, credentials) {
+  let websocketOriginAllowList = [];
+  if (fcf) {
+    // Case of scope from credentials.json file (Override ENV variables scope)
+    if ((Object.hasOwn(credentials, 'websocketOriginList')) &&
+      (Array.isArray(credentials.websocketOriginList)) &&
+      (credentials.websocketOriginList.length > 0)) {
+      // case of string and case of Array handled the same
+      websocketOriginAllowList = credentials.websocketOriginList;
+    }
+  } else {
+    // Case of scope from environment variable configuration
+    if ((process.env.SERVER_WEBSOCKET_ORIGIN_LIST) &&
+      (typeof process.env.SERVER_WEBSOCKET_ORIGIN_LIST === 'string') &&
+      (process.env.SERVER_WEBSOCKET_ORIGIN_LIST.length > 0)) {
+        // split to array of stings
+        process.env.SERVER_WEBSOCKET_ORIGIN_LIST.split(',').forEach((originItem) => {
+          const trimmedOriginItem = originItem.trim();
+          if (trimmedOriginItem.length > 0) websocketOriginAllowList.push(trimmedOriginItem);
+        });
+    }
+  }
+  if (websocketOriginAllowList.length === 0) {
+    console.log('Websocket Origin allow list has not been configured (recommended).')
+  }
+  return websocketOriginAllowList;
+}
+
+
 export const server = {
   serverTlsKey: ((fcf) ? credentials.serverTlsKey : process.env.SERVER_TLS_KEY) || '',
   serverTlsCert: ((fcf) ? credentials.serverTlsCert : process.env.SERVER_TLS_CERT) || '',
@@ -173,7 +202,8 @@ export const server = {
   instanceNumber: ((fcf) ? credentials.instanceNumber : parseInt(process.env.SERVER_INSTANCE_NUMBER)),
   logRotateInterval: ((fcf) ? credentials.logRotationInterval : process.env.SERVER_LOG_ROTATE_INTERVAL) || null,
   logRotateSize: ((fcf) ? credentials.logRotationSize : process.env.SERVER_LOG_ROTATE_SIZE) || null,
-  accessLogOnlyErrors: ((fcf) ? credentials.accessLogOnlyErrors : (process.env.SERVER_LOG_ONLY_ERRORS === 'true')) || false
+  accessLogOnlyErrors: ((fcf) ? credentials.accessLogOnlyErrors : (process.env.SERVER_LOG_ONLY_ERRORS === 'true')) || false,
+  websocketOriginAllowList: _getWebsocketOriginAllowList(fcf, credentials)
 };
 // Validate that instance number was not configured as a string in credentials.json
 if ((fcf) && (Object.hasOwn(credentials, 'instanceNumber')) && (typeof credentials.instanceNumber !== 'number')) {

@@ -103,7 +103,11 @@ Protect file permissions using `chmod 600 credentials.json`
   "serverTlsCert": "/home/user1/tls/fullchain.pem",
   "tls": true,
   "port": 3003,
-  "cookieSecret": "---COOKIE-SECRET-GOES-HERE---"
+  "cookieSecret": "---COOKIE-SECRET-GOES-HERE---",
+   "websocketOriginList": [
+    "http://example.com:3003",
+    "http://www.example.com:3003"
+  ],
 }
 ```
 
@@ -127,6 +131,7 @@ SERVER_TLS_CERT=/home/user/tls/fullchain.pem
 SERVER_TLS=true
 SERVER_PORT=3003
 SESSION_SECRET="---COOKIE-SECRET-GOES-HERE---"
+SERVER_WEBSOCKET_ORIGIN_LIST=http://example.com:3003,http://www.example.com:3003
 ```
 
 ### Option 3 - Create configuration.json using template
@@ -163,6 +168,7 @@ chmod 600 .env
 - Enter the full file path for TLS certificates. If not using TLS, the file path lines may be omitted and set `tls: false` or `SERVER_TLS=false`.
 - Set the port number to a valid integer value. This is the listening port of the web server.
 - Set a unique cookie secret to a unique random string (Required).
+- It is recommended to create an allow list to match the web page's URL host information when the browser is opening a websocket on the web server.
 
 ## Assign one user login password
 

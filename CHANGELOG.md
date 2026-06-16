@@ -6,8 +6,39 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Next
+
+### Implement websocket Origin allow list
+
+This change is a minor security hardening improvement for new websocket requests made by the web browser to the web server.
+In a websocket upgrade request, the web browser provides an Origin header containing the URL host of the web page that requested the websocket.
+A protocol upgrade request may not have the same CORS protection as a standard HTTP request/response exchange presenting a small cross site risk.
+The risk is probably small, because the web server does not accept web socket upgrade requests, unless the upgrade request has a valid cookie
+and is preceded within 10 seconds by an unlocking POST request with valid CSRF token and valid session cookie.
+
+The Origin check may be omitted if desired by configuring an empty array, or omitting the configuration environment variables, however, configuring the Origin allow list is recommended.
+
+In the event of an authorization failure due to an unrecognized websocket upgrade Origin header, the HTTP access log will include an error message showing the actual Origin header. The missing or incorrect origin URL may then be added to the allowed Origin list and the server restarted.
+
+Software upgrade note: Should the irc-hybrid-client web server be updated to a version incorporating the Origin check, but without adding an allowed Origin List to the configuration, the Origin check will be disabled and irc-hybrid-client should function as before, but without the origin check. 
+Upgrading without configuration should not break the server.
+
+
+- server/middlewares/ws-authorize.mjs - For new websocket connection requestes, added check that web page Origin header provided by browser is in webocket Origin allow list.
+- example-credentials.json - Added example websocket Origin list
+- example-.env - Added example websocket Origin list
+- server/config/index.mjs - Added new configuration for websocket Origin allow list
+- server/config/index.mjs - Added console.log message when websocket Origin allow list is emtpy
+- server/ws-server.mjs - Improve socket closure and error response message when websocket authorization fails.
+- server/middlewares/ws-authorize.mjs - Improve logging of new websocket connection errors, format change of websocket error messages
+- server/ws-server.mjs - Updated for new log format of websocket connections.
+- docs/ updated to address the websocket Origin allow list
+- README.md - updated to address the websocket Origin allow list
+- In git repository irc-hybrid-client-dev-tools, tests for debug/websocket-auth.js updated for websocket Origin allow list
+
 This is a pass through some of the web server files doing minor code clean up, spelling and comments
 
+- bin/www.mjs - Add console.log of Node.js version.
 - server/config/index.mjs - trim whitespace from OAUTH2_REMOTE_SCOPE env config values
 - server/middlewares/remote-authenticate.mjs - Extend access_token metadata validation.
 - server/middlewares/remote-authenticate.mjs - random nonce replace Math.random() with crypto.randomInt()

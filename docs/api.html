@@ -1241,9 +1241,12 @@ Cached message with 2 IRC channels.
           The cookie is validated. The CSRF token is validated.
           The cookie will be remembered. A 10 second timer is started.
           Within the 10 second time window, the browser submits a connection 
-          upgrade request to the /irc/ws route using ws:// or wss:// protocol including 
-          the same cookie in the request headers. Upon successful validation of the cookie 
-          the server passes the request to the ws library to manage the websocket. 
+          UPGRADE request to the /irc/ws route using ws:// or wss:// protocol including 
+          the same cookie in the request headers. First, the server validates the cookie.
+          Second, (if configured) the server checks to Origin header to see if the web page's URL host
+          is included in the list of allowed Origins. Third, the 10 second timer is checked for expiration.
+          After all conditions are met, the server passes the request to the ws library 
+          to manage the websocket. Acceptance of future upgrade requests is disabled.
           Unauthorized connection upgrade requests will return a status 401 Unauthorized error.
         </p>
         <p>

@@ -130,19 +130,27 @@ export const wsOnUpgrade = function (request, socket, head) {
       // logged into access.log with IP address:
       //      2022-09-18T12:12:58.585Z 1.2.3.4 websocket-connection /irc/ws
       if ((nodeEnv === 'development') || (nodeDebugLog) || (!config.server.accessLogOnlyErrors)) {
-        wsCustomLog(request, 'websocket-connection');
+        wsCustomLog(request, 'Connected');
       }
       wsServer.handleUpgrade(request, socket, head, function (socket) {
         wsServer.emit('connection', socket, request);
       });
     } else {
-      wsCustomLog(request, 'websocket-auth-fail');
-      socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
-      socket.destroy();
+      wsCustomLog(request, 'Auth-fail');
+      socket.end(
+        'HTTP/1.1 401 Unauthorized\r\n' +
+        'Connection: close\r\n' +
+        'Content-Type: text/plain; charset=utf-8\r\n' +
+        'Content-Length: 0\r\n'
+      );
     }
   } else {
-    wsCustomLog(request, 'websocket-path-not-found');
-    socket.write('HTTP/1.1 404 Not Found\r\n\r\n');
-    socket.destroy();
+    wsCustomLog(request, 'Path-not-found');
+    socket.end(
+      'HTTP/1.1 404 Not Found\r\n' +
+      'Connection: close\r\n' +
+      'Content-Type: text/plain; charset=utf-8\r\n' +
+      'Content-Length: 0\r\n'
+    );
   }
 };

@@ -47,10 +47,11 @@
 // 14 Validate cookie signature
 // 15 Safe compare cookie value to stored global cookie value (from web-server.mjs POST route)
 // 16 and... global timestamp (10 seconds) is not expired.
-// 17 Authorize websocket to upgrade
-// 18 When Chrome detects websocket open event, request ircState from web server by calling getIrcState().
-// 19 On receipt event getIrcState() POST, set connected state in browser.
-// 10 Begin accepting and parsing IRC RFC-2812 messages over websocket.
+// 17 If websocketOriginAllowList configured, reject unknown Origin
+// 18 Authorize websocket to upgrade
+// 19 When Chrome detects websocket open event, request ircState from web server by calling getIrcState().
+// 20 On receipt event getIrcState() POST, set connected state in browser.
+// 21 Begin accepting and parsing IRC RFC-2812 messages over websocket.
 // ---------------------------------------------------------------------------------------------
 'use strict';
 
@@ -77,7 +78,7 @@ if ((Object.hasOwn(config.server, 'instanceNumber')) &&
 }
 
 //
-// Custom log file (Option: setup to fail2ban to block IP addresses)
+// Custom WEBSOCKET log file with format similar to HTTP access log
 //
 export const wsCustomLog = function (request, logString) {
   //
@@ -89,7 +90,7 @@ export const wsCustomLog = function (request, logString) {
   } else {
     logEntry += 'NOADDRESS';
   }
-  logEntry += ' ' + logString;
+  logEntry += ' WEBSOCKET ' + logString;
   if ('url' in request) {
     logEntry += ' ' + request.url;
   }
@@ -100,7 +101,32 @@ export const wsCustomLog = function (request, logString) {
 };
 
 //
+// Custom log for websocket UPGRADE requests with format similar to HTTP access log
+//
+const wsUpgradeErrorLog = function (request, logString) {
+  //
+  // build log text string
+  //
+  let logEntry = '';
+  if (('connection' in request) && ('remoteAddress' in request.connection)) {
+    logEntry += request.connection.remoteAddress;
+  } else {
+    logEntry += 'NOADDRESS';
+  }
+  logEntry += ' UPGRADE ' + logString;
+  if ('url' in request) {
+    logEntry += ' ' + request.url;
+  }
+  
+  //
+  // Append string to file
+  //
+  ircLog.writeAccessLog(logEntry);
+};
+
+//
 // Timing safe compare (From github.com/LionC/express-basic-auth)
+// The safeCompare function returns type number 1=success 0=fail
 //
 const safeCompare = function (userInput, secret) {
   const userInputLength = Buffer.byteLength(userInput);
@@ -150,27 +176,64 @@ export const authorizeWebSocket = function (request) {
             (timeNow < global.webSocketAuth.expire)) {
             // Finished checking cookie, delete it
             delete global.webSocketAuth;
-            // console.log('websocket verified by cookie auth');
-            return true;
+            //
+            // Origin allow list for websocket upgrade request (Recommended)
+            //
+            // If the websocketOriginAllowList array contains one or more entries of URL host information
+            // this check will validate that the Origin header that was supplied by the web browser
+            // is present in the list of allowed Origin values.
+            // If the array is empty, any origin value is accepted.
+            //
+            if (config.server.websocketOriginAllowList.length > 0) {
+              // console.log('request.rawHeaders', request.rawHeaders);
+              // console.log('config.server.websocketOriginAllowList', config.server.websocketOriginAllowList);
+              if (Object.hasOwn(request, 'rawHeaders') && Array.isArray(request.rawHeaders) && request.rawHeaders.length > 1) {
+                let originValue = null;
+                for (let i = 0; i < request.rawHeaders.length; i += 2 ) {
+                  if (request.rawHeaders[i].toLowerCase() === 'origin' && (i + 1 < request.rawHeaders.length)) {
+                    originValue = request.rawHeaders[i+1];
+                  }
+                }
+                if (originValue != null && originValue.length > 0) {
+                  let found = false;
+                  config.server.websocketOriginAllowList.forEach((allowedOrigin) => {
+                    if (allowedOrigin.toLowerCase() === originValue.toLowerCase()) {
+                      found = true;
+                    }
+                  });
+                  if (found) {
+                    return true
+                  } else {
+                    wsUpgradeErrorLog(request, 'Unrecognized Origin (' + originValue + ')');
+                    return false
+                  }
+                } else {
+                  return false
+                }
+              }
+             } else {
+              // Case of not enforcing websocket upgrade request Origin allowlist, request is authorized as default
+              return true;
+            }
           } else {
-            console.log('_authorizeWebSocket time expired or cookie hash not match');
+            wsUpgradeErrorLog(request, 'Time expired or cookie hash not match');
             return false;
           }
         } else {
-          console.log('_authorizeWebSocket cookie signature invalid.');
+          wsUpgradeErrorLog(request, 'cookie signature invalid');
           return false;
         }
       } else {
-        console.log('_authorizeWebSocket cookie unsigned');
+        wsUpgradeErrorLog(request, 'cookie unsigned');
         return false;
       }
     } else {
-      console.log('_authorizeWebSocket named cookie not found');
+      wsUpgradeErrorLog(request, 'named cookie not found');
       return false;
     }
   } else {
     // case of no cookies
-    console.log('_authorizeWebSocket no cookies found');
+    wsUpgradeErrorLog(request, 'no cookies found');
     return false;
   }
   // In case of code error return false (unreachable return)

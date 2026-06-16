@@ -41,6 +41,10 @@ import fs from 'fs';
 
 import config from '../server/config/index.mjs';
 
+const timestamp = new Date();
+console.log('Server timestamp: ' + timestamp.toISOString());
+console.log('Node.js version:', process.version);
+
 const nodeEnv = process.env.NODE_ENV || 'development';
 
 let server = null;
@@ -79,8 +83,6 @@ server.on('listening', function () {
   const address = server.address();
   console.log('Web server listening interface: "' + address.address + '" port: ' + address.port +
     ' family: ' + address.family);
-  const timestamp = new Date();
-  console.log('Timestamp: ' + timestamp.toISOString());
   // intended for use in logrotate, or in restart bash script
   try {
     const pidFilename = config.server.pidFilename;
