@@ -11,6 +11,10 @@ Supporting parallel configurations can be problematic from a testing, documentat
 Therefore, in the future I plan to eliminate the credentials.json file.
 When this is rolled out, all configuration will employ environment variables and the .env file.
 
+## [v2.2.1](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.2.1) 2026-07-21
+
+- Update npm dependencies to clear npm audit warning.
+
 ## [v2.2.0](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.2.0) 2026-06-16
 
 ### Implement websocket Origin allow list
