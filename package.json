@@ -51,5 +51,8 @@
     "cspell": "^10.0.1",
     "eslint": "^10.4.0",
     "globals": "^17.7.0"
+  },
+  "allowScripts": {
+    "utf-8-validate@6.0.6": true
   }
 }
