@@ -11,6 +11,8 @@ Supporting parallel configurations can be problematic from a testing, documentat
 Therefore, in the future I plan to eliminate the credentials.json file.
 When this is rolled out, all configuration will employ environment variables and the .env file.
 
+## [v2.2.2](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.2.2) 2026-07-31
+
 - Dependency major revision required edit: 'cookie@2.0.1' switched to ESM import. Used in server/middlewares/ws-authorize.mjs to authenticate websocket upgrade requrest.
 - Run npm audit to clear npm audit warning.
 - package.json, added: `"allowScripts": {"utf-8-validate@6.0.6": true}`, required by npm to run utf-8-validate install script.
