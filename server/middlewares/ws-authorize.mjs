@@ -150,7 +150,7 @@ export const authorizeWebSocket = function (request) {
   if ((request.headers) &&
     (Object.hasOwn(request.headers, 'cookie'))) {
     // decode cookies into array of un-escaped strings
-    const cookies = cookie.parse(request.headers.cookie);
+    const cookies = cookie.parseCookie(request.headers.cookie);
     // console.log(JSON.stringify(cookies, null, 2));
     // Get cookie with matching name
     const raw = cookies[cookieName];
