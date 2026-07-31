@@ -28,7 +28,7 @@
     "bcryptjs": "^3.0.3",
     "compression": "^1.8.1",
     "connect-redis": "^9.0.0",
-    "cookie": "^1.1.1",
+    "cookie": "^2.0.1",
     "cookie-parser": "^1.4.7",
     "cookie-signature": "^1.2.2",
     "dotenv": "^17.4.2",

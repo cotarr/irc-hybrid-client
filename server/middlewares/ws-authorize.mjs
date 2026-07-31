@@ -57,7 +57,7 @@
 
 import crypto from 'crypto';
 import signature from 'cookie-signature';
-import cookie from 'cookie';
+import * as cookie from 'cookie';
 
 import ircLog from '../irc/irc-client-log.mjs';
 
