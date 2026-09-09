@@ -48,7 +48,7 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@eslint/json": "^2.0.1",
-    "cspell": "^10.0.1",
+    "cspell": "^10.3.0",
     "eslint": "^10.4.0",
     "globals": "^17.7.0"
   },
