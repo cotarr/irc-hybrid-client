@@ -11,6 +11,12 @@ Supporting parallel configurations can be problematic from a testing, documentat
 Therefore, in the future I plan to eliminate the credentials.json file.
 When this is rolled out, all configuration will employ environment variables and the .env file.
 
+---
+
+## Next
+
+- Upgraded npm dependency morgan@1.12.0 clear npm audit warning for morgan vulnerable to log forging via unescaped unicode.
+
 ## [v2.2.4](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.2.4) 2026-09-03
 
 - Run npm audit fix to clear npm audit warning.
