@@ -13,6 +13,11 @@ When this is rolled out, all configuration will employ environment variables and
 
 ---
 
+## [v2.2.7](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.2.7) 2026-09-29
+
+- Upgraded npm dependency morgan@1.12.1 clear npm audit warning
+- Upgraded npm dependency ip-address@10.7.2 in package-lock.json to clear npm audit warning
+
 ## [v2.2.6](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.2.6) 2026-09-09 #2
 
 - Upgraded npm development dependency cspell@10.3.0 to clean github dependbot warning that popped up when pushing v2.2.5
