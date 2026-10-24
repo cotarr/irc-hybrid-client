@@ -13,6 +13,10 @@ When this is rolled out, all configuration will employ environment variables and
 
 ---
 
+## [v2.2.11](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.2.10) 2026-10-23
+
+- Run npm audit fix to clear npm audit warning.
+
 ## [v2.2.10](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.2.10) 2026-10-23
 
 - Run npm audit fix to clear npm audit warning.
