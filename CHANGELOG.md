@@ -19,6 +19,8 @@ When this is rolled out, all configuration will employ environment variables and
 
 The npm package for CSRF protection was changed from "@dr.pogodin/csurf" to "csrf-sync".
 
+This change will requires all browsers to logout and login again.
+
 - The change involved a general refactoring of CSRF protection in two files:
   - server/webserver.mjs (Inserting CSRF token into webclient.html, and CSRF protection middleware for CSRF protected routes)
   - server/middlewares/user-authenticate.mjs (insert CSRF token to login form, and preserving session data after regenerating session.)
@@ -31,7 +33,12 @@ The npm package for CSRF protection was changed from "@dr.pogodin/csurf" to "csr
 - Updated /docs/api.html related to CSRF token websocket authentication and API testing.
 - The irc-hybrid-client tests in git repository irc-hybrid-client-dev-tools were refactored to accommodate csrf-sync middleware
 
+Other changes unrelated to CSRF middleware:
+
 - Logging change: When unexpected websocket messages are received by the webserver, the websocket message contents are no longer output to console.log, only a generic error message.
+
+- Update dependencies: express@5.3.0, express-rate-limit@8.7.2
+- Update dependencies: connect-redis@10.0.0, redis@6.3.0, dotenv@18.0.9, rotating-file-stream@3.2.10, ws@8.22.1
 
 ## [v2.2.11](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.2.10) 2026-10-23
 
