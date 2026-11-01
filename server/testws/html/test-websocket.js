@@ -75,7 +75,7 @@ function initWebSocketAuth () {
   if (!document.getElementById('noCsrfTokenCheckbox').checked) {
     if (document.getElementById('invalidCsrfTokenCheckbox').checked) {
       // This is a random generated CSRF token that will not match session storage
-      fetchOptions.headers['CSRF-Token'] = '0agVm341bCin1sfG9gF9ocYsdW8';
+      fetchOptions.headers['CSRF-Token'] = 'afde8cea594750f7bd6ac781ca5bb61af3b23fca9e6ab398bbdc724f2b61138d';
     } else {
       fetchOptions.headers['CSRF-Token'] = csrfToken;
     }
@@ -190,3 +190,9 @@ document.getElementById('sendUnexpectedMessage').addEventListener('click', funct
 });
 
 logMessage('Page loaded.');
+if (csrfToken && csrfToken.length > 0) {
+  logMessage('Login successful, the browser appears to have a valid cookie');
+  logMessage('CSRF token: ' + csrfToken);
+} else {
+  logMessage('Apparently not logged in, try refresh the page after login.')
+}

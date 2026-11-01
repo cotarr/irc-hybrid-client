@@ -13,6 +13,26 @@ When this is rolled out, all configuration will employ environment variables and
 
 ---
 
+## Next
+
+- CSRF Middleware changed
+
+The npm package for CSRF protection was changed from "@dr.pogodin/csurf" to "csrf-sync".
+
+- The change involved a general refactoring of CSRF protection in two files:
+  - server/webserver.mjs (Inserting CSRF token into webclient.html, and CSRF protection middleware for CSRF protected routes)
+  - server/middlewares/user-authenticate.mjs (insert CSRF token to login form, and preserving session data after regenerating session.)
+- The general process is as follows:
+  - Removed NPM package `@dr.pogodin/csurf` and installed `csrf-sync` package
+  - Defined custom header name `csrf-token` and body property `_csrf` to be consistent with the previous csurf module.
+  - For CSRF protected routes, the csurf middleware `csrfProtection` replaced with csrf-sync middleware `csrfSynchronisedProtection`
+  - csurf token function `req.csrfToken()` replaced with csrf-sync function `generateToken(req, false)`
+- Optional websocket test web page was refactored to accommodate csrf-sync middleware (used only for debugging, see server/testws/README.md)
+- Updated /docs/api.html related to CSRF token websocket authentication and API testing.
+- The irc-hybrid-client tests in git repository irc-hybrid-client-dev-tools were refactored to accommodate csrf-sync middleware
+
+- Logging change: When unexpected websocket messages are received by the webserver, the websocket message contents are no longer output to console.log, only a generic error message.
+
 ## [v2.2.11](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.2.10) 2026-10-23
 
 - Run npm audit fix to clear npm audit warning.

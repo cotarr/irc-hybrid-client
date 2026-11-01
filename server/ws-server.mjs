@@ -58,7 +58,7 @@ wsServer.on('connection', function (socket) {
   // console.log('ws-server.js connection');
   socket.on('message', function (message) {
     // All messages ignored.
-    console.log('ws-server.js: Unexpected websocket message: ' + message);
+    console.log('ws-server.js: Unexpected websocket message received by server');
   });
 });
 

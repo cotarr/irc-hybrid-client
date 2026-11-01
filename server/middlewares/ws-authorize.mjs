@@ -36,7 +36,7 @@
 // 3  Browser loads web client page webclient.html
 // 3  On load javascript webclient.mjs, browser will fetch POST request to /irc/wsauth
 // 5  In web-server.mjs, /irc/wsauth POST request, session cookie validated by express-session.
-// 6  In web-server.mjs, route handler, CSRF token is validated by csurf middleware
+// 6  In web-server.mjs, route handler, CSRF token is validated by csrf-sync middleware
 // 7  In web-server.mjs, route handler, extract cookie from cookieParser in req object
 // 8  In web-server.mjs, route handler, save cookie and +10 second expiry into global variables
 // 9  POST response '{"error":false}' returned to web browser.
@@ -237,6 +237,5 @@ export const authorizeWebSocket = function (request) {
     return false;
   }
   // In case of code error return false (unreachable return)
-  // eslint-disable-next-line no-unreachable
   return false;
 };

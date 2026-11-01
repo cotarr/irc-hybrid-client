@@ -43,7 +43,7 @@ import compression from 'compression';
 import { createClient } from 'redis';
 import {RedisStore} from "connect-redis"
 import memorystore from 'memorystore';
-import csrf from '@dr.pogodin/csurf';
+import { csrfSync } from "csrf-sync";
 
 // Web server configuration
 import config from './config/index.mjs';
@@ -74,7 +74,15 @@ const nodeEnv = process.env.NODE_ENV || 'development';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const csrfProtection = csrf({ cookie: false });
+const { generateToken,  csrfSynchronisedProtection } = csrfSync({
+  // Optional size (default 128 bytes)
+  size: config.server.csrfTokenLengthBytes,
+  // Redefine header and body property for backward compatibility with csurf middleware
+  getTokenFromRequest: (req) => {
+    return req.headers['csrf-token'] || req.body["_csrf"];
+  }
+});
+
 const app = express();
 
 let userAuth = null;
@@ -356,8 +364,15 @@ if (config.oauth2.enableRemoteLogin) {
   // See server/middlewares/user-authenticate.mjs
   //
   app.get('/login.css', userAuth.loginStyleSheet);
-  app.get('/login', csrfProtection, userAuth.loginPage);
-  app.post('/login-authorize', userAuth.cookieExists, csrfProtection, userAuth.loginAuthorize);
+  app.get('/login', (req, res, next) => {
+      generateToken(req, false);
+      next();
+    },
+    userAuth.loginPage);
+  app.post('/login-authorize',
+    userAuth.cookieExists,
+    csrfSynchronisedProtection,
+    userAuth.loginAuthorize);
   app.get('/logout', userAuth.logout);
   app.get('/blocked', userAuth.blockedCookies);
   app.get('/disabled', userAuth.overRateLimit);
@@ -375,7 +390,7 @@ if (config.oauth2.enableRemoteLogin) {
 //    "terminate": "YES"
 //  }
 //
-app.post('/terminate', authorizeOrFail, csrfProtection, function (req, res, next) {
+app.post('/terminate', authorizeOrFail, csrfSynchronisedProtection, function (req, res, next) {
   let inputVerifyString = '';
   if (('terminate' in req.body) && (typeof req.body.terminate === 'string')) {
     inputVerifyString = req.body.terminate;
@@ -442,7 +457,7 @@ app.get('/secure', authorizeOrFail, (req, res) => res.json({ secure: 'ok' }));
 // Data stored globally, time expiration 10 seconds.
 //
 // -----------------------------------------
-app.post('/irc/wsauth', authorizeOrFail, csrfProtection, function (req, res, next) {
+app.post('/irc/wsauth', authorizeOrFail, csrfSynchronisedProtection, function (req, res, next) {
   delete global.webSocketAuth;
   // requires cookie-parser
   if ('signedCookies' in req) {
@@ -471,12 +486,12 @@ app.post('/irc/wsauth', authorizeOrFail, csrfProtection, function (req, res, nex
 //
 //               Enable only for testing
 // -------------------------------------------------------
-// console.log('******** (debug) /testws route enabled without authorization **********');
-// if (nodeEnv === 'development') {
-//   // Dynamic import of ES Module, used only for debugging
-//   const module1 = await import('./testws/testws.mjs');
-//   app.use('/testws', module1.testWsRouter);
-// }
+console.log('******** (debug) /testws route enabled without authorization **********');
+if (nodeEnv === 'development') {
+  // Dynamic import of ES Module, used only for debugging
+  const module1 = await import('./testws/testws.mjs');
+  app.use('/testws', module1.testWsRouter);
+}
 
 // ----------------
 // User info API
@@ -490,14 +505,14 @@ app.get('/userinfo', authorizeOrFail, userAuth.getUserInfo);
 // ---------------------------------------
 // IRC client API routes served to browser
 // ---------------------------------------
-app.post('/irc/server', authorizeOrFail, csrfProtection, ircClient.serverHandler);
-app.post('/irc/connect', authorizeOrFail, csrfProtection, ircClient.connectHandler);
-app.post('/irc/disconnect', authorizeOrFail, csrfProtection, ircClient.disconnectHandler);
-app.post('/irc/message', authorizeOrFail, csrfProtection, ircClient.messageHandler);
+app.post('/irc/server', authorizeOrFail, csrfSynchronisedProtection, ircClient.serverHandler);
+app.post('/irc/connect', authorizeOrFail, csrfSynchronisedProtection, ircClient.connectHandler);
+app.post('/irc/disconnect', authorizeOrFail, csrfSynchronisedProtection, ircClient.disconnectHandler);
+app.post('/irc/message', authorizeOrFail, csrfSynchronisedProtection, ircClient.messageHandler);
 app.get('/irc/getircstate', authorizeOrFail, ircClient.getIrcState);
 app.get('/irc/cache', authorizeOrFail, ircClient.getCache);
-app.post('/irc/prune', authorizeOrFail, csrfProtection, ircClient.pruneChannel);
-app.post('/irc/erase', authorizeOrFail, csrfProtection, ircClient.eraseCache);
+app.post('/irc/prune', authorizeOrFail, csrfSynchronisedProtection, ircClient.pruneChannel);
+app.post('/irc/erase', authorizeOrFail, csrfSynchronisedProtection, ircClient.eraseCache);
 app.get('/irc/test1', authorizeOrFail, ircClient.test1Handler);
 app.get('/irc/test2', authorizeOrFail, ircClient.test2Handler);
 app.get('/irc/test3', authorizeOrFail, ircClient.test3Handler);
@@ -510,35 +525,35 @@ app.get('/irc/serverlist',
   ircServerListValidations.list,
   ircServerListEditor.list);
 if (config.irc.disableServerListEditor) {
-  app.post('/irc/serverlist', authorizeOrFail, csrfProtection,
+  app.post('/irc/serverlist', authorizeOrFail, csrfSynchronisedProtection,
     (req, res) => res.status(405).json({ Error: 'Server List Editor Disabled' }));
-  app.patch('/irc/serverlist', authorizeOrFail, csrfProtection,
+  app.patch('/irc/serverlist', authorizeOrFail, csrfSynchronisedProtection,
     (req, res) => res.status(405).json({ Error: 'Server List Editor Disabled' }));
-  app.copy('/irc/serverlist', authorizeOrFail, csrfProtection,
+  app.copy('/irc/serverlist', authorizeOrFail, csrfSynchronisedProtection,
     (req, res) => res.status(405).json({ Error: 'Server List Editor Disabled' }));
-  app.delete('/irc/serverlist', authorizeOrFail, csrfProtection,
+  app.delete('/irc/serverlist', authorizeOrFail, csrfSynchronisedProtection,
     (req, res) => res.status(405).json({ Error: 'Server List Editor Disabled' }));
-  app.post('/irc/serverlist/tools', authorizeOrFail, csrfProtection,
+  app.post('/irc/serverlist/tools', authorizeOrFail, csrfSynchronisedProtection,
     (req, res) => res.status(405).json({ Error: 'Server List Editor Disabled' }));
 } else {
   app.post('/irc/serverlist',
-    authorizeOrFail, csrfProtection,
+    authorizeOrFail, csrfSynchronisedProtection,
     ircServerListValidations.create,
     ircServerListEditor.create);
   app.patch('/irc/serverlist',
-    authorizeOrFail, csrfProtection,
+    authorizeOrFail, csrfSynchronisedProtection,
     ircServerListValidations.update,
     ircServerListEditor.update);
   app.copy('/irc/serverlist',
-    authorizeOrFail, csrfProtection,
+    authorizeOrFail, csrfSynchronisedProtection,
     ircServerListValidations.copy,
     ircServerListEditor.copy);
   app.delete('/irc/serverlist',
-    authorizeOrFail, csrfProtection,
+    authorizeOrFail, csrfSynchronisedProtection,
     ircServerListValidations.destroy,
     ircServerListEditor.destroy);
   app.post('/irc/serverlist/tools',
-    authorizeOrFail, csrfProtection,
+    authorizeOrFail, csrfSynchronisedProtection,
     ircServerListValidations.tools,
     ircServerListEditor.tools);
 }
@@ -569,18 +584,18 @@ console.log('secureDir', secureDir);
 // Else, past this point, all other static files return 403 if unauthorized
 // -------------------------------
 // Read contents of main web page for /irc/webclient.html and
-// substitute CSRF token into meta tag for csurf middleware
+// Substitute CSRF token into meta tag for csrf-sync middleware
+// If no previous token is found in session, a new CSRF token will be generated
 // -------------------------------
 app.get('/irc/webclient.html',
   authorizeOrLogin,
-  csrfProtection,
   function (req, res, next) {
     const filename = path.join(secureDir, 'webclient.html');
     fs.readFile(filename, 'utf8', function (err, data) {
       if (err) {
         next(err);
       } else {
-        res.send(data.replace('{{csrfToken}}', req.csrfToken()));
+        res.send(data.replace('{{csrfToken}}', generateToken(req, false)));
       }
     });
   }

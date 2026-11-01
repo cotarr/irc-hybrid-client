@@ -203,7 +203,8 @@ export const server = {
   logRotateInterval: ((fcf) ? credentials.logRotationInterval : process.env.SERVER_LOG_ROTATE_INTERVAL) || null,
   logRotateSize: ((fcf) ? credentials.logRotationSize : process.env.SERVER_LOG_ROTATE_SIZE) || null,
   accessLogOnlyErrors: ((fcf) ? credentials.accessLogOnlyErrors : (process.env.SERVER_LOG_ONLY_ERRORS === 'true')) || false,
-  websocketOriginAllowList: _getWebsocketOriginAllowList(fcf, credentials)
+  websocketOriginAllowList: _getWebsocketOriginAllowList(fcf, credentials),
+  csrfTokenLengthBytes: 32
 };
 // Validate that instance number was not configured as a string in credentials.json
 if ((fcf) && (Object.hasOwn(credentials, 'instanceNumber')) && (typeof credentials.instanceNumber !== 'number')) {

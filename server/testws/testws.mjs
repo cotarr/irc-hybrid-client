@@ -12,10 +12,8 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import csrf from '@dr.pogodin/csurf';
 import express from 'express';
 
-const csrfProtection = csrf({ cookie: false });
 export const testWsRouter = express.Router();
 
 // Custom case for use with ES modules
@@ -27,8 +25,12 @@ const testFolder = path.join(__dirname, 'html/');
 const testWebsocketHtml = fs.readFileSync(testFolder + 'test-websocket.html', 'utf8');
 
 // it is necessary to insert csrfToken to be accepted by the /irc/wsauth route.
-testWsRouter.get('/test-websocket.html', csrfProtection, function (req, res, next) {
-  res.send(testWebsocketHtml.replace('{{csrfToken}}', req.csrfToken()));
+testWsRouter.get('/test-websocket.html', function (req, res, next) {
+  if (req.session && Object.hasOwn(req.session, 'csrfToken')) {
+    res.send(testWebsocketHtml.replace('{{csrfToken}}', req.session.csrfToken));
+  } else {
+    res.send(testWebsocketHtml.replace('{{csrfToken}}', ''));
+  }
 });
 
 testWsRouter.get('/test-websocket.js', function (req, res, next) {

@@ -231,15 +231,22 @@ export const overRateLimit = function (req, res, next) {
 //
 // This is a work around for cookie check in
 // user-authenticate.mjs which was broken by
-// adding CSRF token middleware in front of cookie check.
+// adding CSRF middleware in front of cookie check.
 //
 // Since express-session options are  {saveUninitialized: false}
 // no cookie is created until the GET /login page request creates one.
 //
 // --> Create cookie:
-// app.get('/login', csrfProtection, userAuth.loginPage);
+// app.get('/login', (req, res, next) => {
+//     generateToken(req, false);
+//     next();
+//   },
+//   userAuth.loginPage);
 // --> Check cookie exists:
-// app.post('/login-authorize', userAuth.cookieExists, csrfProtection, userAuth.loginAuthorize);
+// app.post('/login-authorize',
+//   userAuth.cookieExists,
+//   csrfSynchronisedProtection,
+//   userAuth.loginAuthorize);
 // --------------------------------------------
 export const cookieExists = (req, res, next) => {
   if ((Object.hasOwn(req, 'signedCookies')) &&
@@ -354,21 +361,27 @@ export const loginAuthorize = [loginRateLimiter, function (req, res, next) {
   //
   // It is a general security practice to update session upon change in permission.
   // Copy existing session properties to new session
-  const csrfSecret = req.session.csrfSecret;
-  let sessionAuth = null;
+  let savedSessionAuth = null;
   if ((Object.hasOwn(req.session, 'sessionAuth')) &&
-    (typeof req.session.sessionAuth === 'object')) {
+  (typeof req.session.sessionAuth === 'object')) {
     // deep copy object so obsolete session does not have reference for garbage collection
-    sessionAuth = JSON.parse(JSON.stringify(req.session.sessionAuth));
+    savedSessionAuth = JSON.parse(JSON.stringify(req.session.sessionAuth));
   }
-  // new replacement session valid within scope of callback function
+  let savedCsrfToken = null;
+  if ((Object.hasOwn(req.session, 'csrfToken')) &&
+  (typeof req.session.csrfToken === 'string')) {
+    savedCsrfToken = req.session.csrfToken;
+  }
   req.session.regenerate(function (err) {
     if (err) {
       return next(err);
     } else {
-      // restore session properties from previous session
-      req.session.csrfSecret = csrfSecret;
-      req.session.sessionAuth = sessionAuth;
+      if (savedSessionAuth) {
+        req.session.sessionAuth = savedSessionAuth;
+      }
+      if (savedCsrfToken) {
+        req.session.csrfToken = savedCsrfToken;
+      }
       // wrap in try to catch errors
       try {
         // Check if browser cookies enabled and a session has been established.
@@ -551,13 +564,13 @@ export const loginPage = function (req, res, next) {
     const loginNonce = generateRandomNonce(8);
     req.session.sessionAuth.loginNonce = loginNonce;
     req.session.sessionAuth.loginExpireTimeSec = timeNowSeconds + 60;
-    // The csrfToken is added to req object in web-server.js using csurf middleware.
+    // The csrfToken is added to req object in web-server.js using csrf-sync middleware.
     // res.set('Cache-Control', 'no-store');
     return res.send(loginHtmlTop +
       loginFormFragment1 +
       '?nonce=' + loginNonce +
       loginFormFragment2 +
-      req.csrfToken() +
+      req.session.csrfToken +
       loginFormFragment3 +
       warningDiv + loginHtmlBottom);
   }

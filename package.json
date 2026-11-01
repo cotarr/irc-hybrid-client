@@ -8,7 +8,7 @@
     "node": ">=20"
   },
   "scripts": {
-    "lint": "npx eslint source-files/js/*.js source-files/web-components/*.js server/testws/html/*.js server/*/*.mjs server/*.mjs bin/www.mjs tools/*.mjs *.json",
+    "lint": "npx eslint source-files/js/*.js source-files/web-components/*.js server/testws/html/*.js server/*/*.mjs server/*.mjs bin/www.mjs tools/*.mjs",
     "spell": "npx cspell cspell bin docs server source-files README.md",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node bin/www.mjs"
@@ -24,13 +24,13 @@
   },
   "homepage": "https://github.com/cotarr/irc-hybrid-client#readme",
   "dependencies": {
-    "@dr.pogodin/csurf": "^1.17.1",
     "bcryptjs": "^3.0.3",
     "compression": "^1.8.1",
     "connect-redis": "^9.0.0",
     "cookie": "^2.0.1",
     "cookie-parser": "^1.4.7",
     "cookie-signature": "^1.2.2",
+    "csrf-sync": "^4.2.1",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "express-rate-limit": "^8.6.0",

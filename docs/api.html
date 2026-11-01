@@ -157,7 +157,8 @@
           A malicious page would attempt to trick a user to clicking an embedded form causing
           data to be submitted to a different web site where the user previously obtained a valid cookie. 
           A CSRF token is a random nonce that is embedded into the HTML of a web page. 
-          It changes each time the page is reloaded to a new random value.
+          It changes each time a new session and cookie are authorized.
+          The CSRF token is stored in the web server as part of the session meta-data.
         </p>
         <p>
           The hrc-hybrid-client web server requires CSRF tokens for HTTP methods 
@@ -167,7 +168,7 @@
         </p>
 <div class="pre-div"><pre>
   &lt;head&gt;
-    &lt;meta name="csrf-token" content="ob1P2QF3-bBXabc8At9xxiJyC2I44sAbjgsA"&gt;
+    &lt;meta name="csrf-token" content="afde8cea594750f7bd6ac781ca5bb61af3b23fca9e6ab398bbdc724f2b61138d"&gt;
   &lt;/head&gt;
 </pre></div>
 
@@ -177,7 +178,7 @@
         </p>
 <div class="pre-div"><pre>
 "accept": "application/json",
-"csrf-token": "ob1P2QF3-bBXabc8At9xxiJyC2I44sAbjgsA",
+"csrf-token": "afde8cea594750f7bd6ac781ca5bb61af3b23fca9e6ab398bbdc724f2b61138d",
 "content-type": "application/json",
 </pre></div>
         
@@ -1737,7 +1738,7 @@ http://localhost:3000/testws/test-websocket.html
           <q> server/testws</q> folder.
         </p>
 
-        <img src=images/websocket-trace.png width="600" height="870"alt="Websocket Example">
+        <img src=images/websocket-trace.png width="661" height="1070"alt="Websocket Example">
 
         <h2>Bruno API Client Setup</h2>
         <p>
