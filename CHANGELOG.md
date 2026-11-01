@@ -35,6 +35,8 @@ This change will requires all browsers to logout and login again.
 
 Other changes unrelated to CSRF middleware:
 
+- Increased Node.Js minimum version to node v22.
+
 - Logging change: When unexpected websocket messages are received by the webserver, the websocket message contents are no longer output to console.log, only a generic error message.
 
 - Update dependencies: express@5.3.0, express-rate-limit@8.7.2
