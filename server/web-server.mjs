@@ -486,12 +486,12 @@ app.post('/irc/wsauth', authorizeOrFail, csrfSynchronisedProtection, function (r
 //
 //               Enable only for testing
 // -------------------------------------------------------
-console.log('******** (debug) /testws route enabled without authorization **********');
-if (nodeEnv === 'development') {
-  // Dynamic import of ES Module, used only for debugging
-  const module1 = await import('./testws/testws.mjs');
-  app.use('/testws', module1.testWsRouter);
-}
+// console.log('******** (debug) /testws route enabled without authorization **********');
+// if (nodeEnv === 'development') {
+//   // Dynamic import of ES Module, used only for debugging
+//   const module1 = await import('./testws/testws.mjs');
+//   app.use('/testws', module1.testWsRouter);
+// }
 
 // ----------------
 // User info API
