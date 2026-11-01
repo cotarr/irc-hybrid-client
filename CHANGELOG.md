@@ -13,13 +13,13 @@ When this is rolled out, all configuration will employ environment variables and
 
 ---
 
-## Next
+## [v2.2.12](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.2.12) 2026-11-01
 
 - CSRF Middleware changed
 
 The npm package for CSRF protection was changed from "@dr.pogodin/csurf" to "csrf-sync".
 
-This change will requires all browsers to logout and login again.
+Note: This change will requires all browsers to logout and login again.
 
 - The change involved a general refactoring of CSRF protection in two files:
   - server/webserver.mjs (Inserting CSRF token into webclient.html, and CSRF protection middleware for CSRF protected routes)
@@ -35,14 +35,14 @@ This change will requires all browsers to logout and login again.
 
 Other changes unrelated to CSRF middleware:
 
-- Increased Node.Js minimum version to node v22.
+- Increased node.js minimum version to node v22.
 
 - Logging change: When unexpected websocket messages are received by the webserver, the websocket message contents are no longer output to console.log, only a generic error message.
 
 - Update dependencies: express@5.3.0, express-rate-limit@8.7.2
-- Update dependencies: connect-redis@10.0.0, redis@6.3.0, dotenv@18.0.9, rotating-file-stream@3.2.10, ws@8.22.1
+- Update dependencies: connect-redis@10.0.0, redis@6.3.1, dotenv@18.0.9, rotating-file-stream@3.2.10, ws@8.22.1
 
-## [v2.2.11](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.2.10) 2026-10-23
+## [v2.2.11](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.2.11) 2026-10-23
 
 - Run npm audit fix to clear npm audit warning.
 
