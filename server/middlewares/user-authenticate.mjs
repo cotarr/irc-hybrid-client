@@ -25,21 +25,8 @@
 //
 // -----------------------------------------------------------------------------
 //
-// Option 1 of 2 - configuration using credentials.json
+// Configuration with UNIX environment variables
 //
-// "enableRemoteLogin": false,
-// "loginUsers": [
-//   {
-//     "userid": 1,
-//     "user": "user1",
-//     "name": "My Name",
-//     "hash": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-//   }
-// ],
-//
-// ------------------------------------------------
-// Option 2 of 2 - Configuration with UNIX environment variables
-
 // OAUTH2_ENABLE_REMOTE_LOGIN=false
 // LOGIN_USER_USERID=1
 // LOGIN_USER_USER=user1

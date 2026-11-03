@@ -305,40 +305,21 @@ vars.ircState.channelStates = [];
 // --------------------------------------------------
 // Optional - Connect to IRC using socks5 client
 //
-// To be backward compatible with older credentials.json files
+// To be backward compatible with older configuration files
 // socks5 client will be disabled without error message in the
 // case that socks5 configuration properties are omitted.
 //
-// credentials.json socks5 properties
-// or env variables if credentials.json does not exist
-//
 // Option 1: socks5 client disabled (automatically disabled if property omitted)
-// {
-//   enableSocks5Proxy: false
-// }
 //
 // IRC_ENABLE_SOCKS5_PROXY=false
 //
 // Option 2: socks5 client unauthenticated
-//
-// {
-//   enableSocks5Proxy: true,
-//   socks5Host: '192.168.0.1',
-//   socks5Port: '1080'
-// }
 //
 // IRC_ENABLE_SOCKS5_PROXY=true
 // IRC_SOCKS5_HOST=192.168.0.1
 // IRC_SOCKS5_PORT=1080
 //
 // Option 3: socks5 client requires password authentication
-// {
-//   enableSocks5Proxy: true,
-//   socks5Host: '192.168.0.1',
-//   socks5Port: '1080',
-//   socks5Username: 'user1',
-//   socks5Password: 'xxxxxxxx'
-// }
 //
 // IRC_ENABLE_SOCKS5_PROXY=true
 // IRC_SOCKS5_HOST=192.168.0.1

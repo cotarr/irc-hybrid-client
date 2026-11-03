@@ -59,8 +59,7 @@
         </p>
         <p>
           It is also possible to globally disable the web page server list editor by setting 
-          &quot;disableServerListEditor:true&quot; in the credentials.json file 
-          or setting the environment variable &quot;IRC_DISABLE_LIST_EDITOR=true&quot;
+          the environment variable &quot;IRC_DISABLE_LIST_EDITOR=true&quot;.
           This may be useful if the IRC client is to be restricted to one IRC network.
           In the case where the editor has been disabled, the manual edit method must be used.
         </p>
@@ -74,7 +73,7 @@
         <p>
           Therefore, it is necessary to disconnect from the IRC network in order to make changes to 
           any IRC server definition. The IRC Server List may be opened at any time, even if connected
-          to IRC, but the buttons used to invoke the editor will be disabled on hidden in the server list table.
+          to IRC, but the buttons used to invoke the editor will be disabled or hidden in the server list table.
         </p>
         <p>
           Similarly, if a user decides to manually edit the servers.json file in the 
@@ -89,7 +88,8 @@
             <p>
               Starting in Version v2.0.0, the server list panel and the server list editor form 
               are integral to the application.
-            </p>            <p>
+            </p>
+            <p>
               From the application's dropdown navigation menu in the upper left of the page,
               the IRC Server List can be invoked from the &quot;View Panels...&quot;,  &quot;IRC Server List&quot;
               selection in the dropdown navigation menu.
@@ -271,9 +271,8 @@
               programs global socks5 configuration for the IRC connection.
               This setting is ignored when socks5 proxy is disabled or has 
               not been configured in the web server settings.
-              Socks5 settings must be configured globally in the credentials.json file 
-              or with environment variables in the .env file as described in the 
-              <a href="login-config.html">login config</a> section.
+              Socks5 settings must be configured globally with environment variables in the .env
+              file as described in the <a href="login-config.html">login config</a> section.
             </p>
             <p>
               If IRC server password field is optional.
@@ -476,7 +475,7 @@
         <p>
           When the &quot;proxy&quot; property is set to true, the IRC client
           will attempt to connect to IRC using the Socks5 proxy configuration
-          that was defined globally in the credentials.json file or environment variables.
+          that was defined globally using environment variables.
           This is described in the <a href="login-config.html">login config</a>
           page of the documentation. If the socks5 proxy is disabled globally,
           the proxy property is ignored.

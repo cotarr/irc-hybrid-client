@@ -45,7 +45,7 @@
         <div class="install-section-title">Project Status</div>
         <p>
           The irc-hybrid-client project was started in March 2021.
-          As it approaches 4 years old, irc-hybrid-client code is generally stable.
+          As it has now passed 5 years old, irc-hybrid-client code is generally stable.
           The project is currently in maintenance mode where NPM dependencies are updated to address outdated version and NPM audit warnings.
           No major revisions are planned. Minor feature additions are still possible.
         </p>
@@ -68,19 +68,19 @@
 
         <div class="install-section-title">System Requirements (Server)</div>
         <p>
-          NodeJs: As of irc-hybrid-client v2.1.1, the backend web 
-          server requires NodeJs version 20 or greater.
+          NodeJs: As of irc-hybrid-client v2.2.12, the backend web 
+          server requires NodeJs version 22 or greater.
         </p>
         <p>
           Current development occurs in a virtual machine 
-          running Debian 13 with the web server running Node v22.
-          No issues have been observed using NodeJs 20, 22, and 24. 
-          The author deploys it for personal use in a cloud VPS 
-          single-core shared cpu droplets with 1 GB RAM running Debian 12.
+          running Debian 13 with the web server running Node v24.
+          No issues have been observed using NodeJs 22, 24, and 26. 
+          The author deploys irc-hybrid-client for personal use in a cloud VPS 
+          single-core shared cpu droplets with 1 GB RAM running Debian 13.
           It has been run on a RaspberryPi 3 and 4 behind a home network NAT router.
         </p>
         <p>
-          No formal security evaluation has been performed.
+          No formal code review or security evaluations have been performed.
           As a security consideration, it is recommended to run the web
           server in a non-privileged shell without root access.
           It does not require a privileged port less than 1024,
@@ -103,7 +103,7 @@
         <div class="install-section-title">Other Requirements (IRC network)</div>
         <p>
           The IRC interface was primarily developed and tested using the DALnet
-          IRC network. Local testing was performed using ngirc v26 from the
+          IRC network. Local testing is currently performed using ngirc v27 from the
           Debian apt package. Other IRC servers have not been tested.
           RFC-2812 "Internet Relay Chat: Client Protocol" was the primary
           specification reference. Considering this is a limited functionality
@@ -121,7 +121,7 @@
           You can check if nodejs is installed by typing
           &quot;node -v&quot;
           in your terminal. If installed, the version will be displayed.
-          This program requires NodeJs Version v20 or greater.
+          This program requires NodeJs Version v22 or greater.
           If node is not installed, there are several options:
         </p>
         <p>
@@ -174,9 +174,9 @@ export NODE_ENV=development
 npm install
 
 # Option 2 Typical for server installation, use minified files, log output to files.
-# ci = clean install
+# ci = clean-install
 export NODE_ENV=production
-npm ci --omit=dev
+npm clean-install --omit=dev
 </pre></div>
 
         <div class="install-section-title">4 - TLS Certificates</div>
@@ -245,14 +245,20 @@ sudo certbot certonly --standalone -d abcd.example.com
           Web Server Configuration:
         </p>
         <p>
-          There are two possible methods that may be used to define the
-          web server configuration settings. The settings may be stored as 
-          properties in the "credentials.json" file, or the settings may 
-          be defined as environment variables or entries in the .env file.
-          Only one method can be used at a time. If the credentials.json 
-          file exists, it will be parsed for settings, otherwise 
-          the environment variables will be parsed for settings.  
+          Web server configuration settings are defined as Linux environment variables.
+          Irc-hybrid-client supports use of a .env file. The .env file is a hidden file
+          in the base folder of the repository that defines Linux environment variables
+          to be visible to the irc-hybrid-client when the server is started.
           See: <a href="login-config.html">Login Config Instructions</a>
+        </p>
+        <p>
+          Irc-hybrid-client no longer supports configuration using the &quot;credentials.json&quot; file.
+          If you are upgrading from an older version of irc-hybrid-client (v2.2.12 or earlier) you must switch
+          to a .env file to store configuration, or otherwise define environment variables. This is breaking change. 
+          A table of configuration variables that is located at the bottom 
+          at the bottom of the <a href="login-config.html">Login Config Instructions</a> help page
+          shows a side by side comparison of environment variables names and credentials.json
+          properties that may be useful in converting a legacy configuration file.
         </p>
           IRC Server Configuration:
         <p>
@@ -293,7 +299,8 @@ sudo certbot certonly --standalone -d abcd.example.com
         <p>
           If your server is running an identd daemon to listen on port 113, this
           would be outside the scope of these instructions. This is really
-          separate from the IRC client.
+          separate from the IRC client. Irc-hybrid-client does not
+          include a stand alone port 113 identd server.
         </p>
         <p>
           The firewall must configure one TCP port for incoming connections
@@ -321,17 +328,13 @@ sudo certbot certonly --standalone -d abcd.example.com
 
         <div class="install-section-title">8 - File Permissions</div>
         <p>
-          When running on a multi-user system, review directory or file permissions
+          When running on a multi-user system, review directory and file permissions
           to properly protect configuration passwords and log files.
           When the program first starts, if not existing, it will create a
           &quot;logs&quot; folder with 0o700 (drwx------) permissions.
-          The &quot;credentials.json&quot; and &quot;servers.json&quot; files
+          The &quot;.env&quot; and &quot;servers.json&quot; files
           are recommended to be 0o600 (drw-------).
-        </p>
-        <p>
-          Since GitHub supports other operating systems like MS Windows as well as others,
-          the file permissions flags may not map perfectly during the git clone operations.
-          It is always a good idea to review permissions after a clone.
+          It is always a good idea to review permissions after a cloning any repository.
         </p>
 
         <div class="install-section-title">9 - Log Files</div>
@@ -362,10 +365,11 @@ sudo certbot certonly --standalone -d abcd.example.com
             It is primarily intended for debugging, and should probably be left disabled.
           </li>
           <li>
-            node.log (Optional) - In the event that a server encounters an unexpected error,
+            In the event that a server encounters an unexpected error,
             error messages may be printed to stdout or errout. These may be captured for 
             later review by redirecting irc-hybrid-client output to a file, in this case the optional node.log file.
-            The next section shows an example where the output is captured to a node.log.
+            If you are running irc-hybrid-client as a systemd user service stdout and stderr output
+            will be written to the journal.
           </li>
         </ul>
         </p>
@@ -408,15 +412,18 @@ node bin/www.mjs
         </p>
         <p>
           There are several ways to
-          run the server unattended in the background. One way is to
+          run the server unattended in the background. One simple way is to
           append an &quot&amp&quot symbol to the end of the command line.
           An alternative method is to load the &quot;screen&quot;
           program which allows Linux to run a detached command shell
           that can be reattached at a later time as a console terminal.
           There are many other methods to manage servers, such as the NPM package 
-          &quot;pm2&quot; that can be installed globally and used to automatically restart the server.        </p>
+          &quot;pm2&quot; that can be installed globally and used to automatically restart the server.
+          The preferred method is to run irc-hybrid-client as a systemd user service.
+        </p>
         <p>
-          If you are running bash want to capture any console standard or error output while running in the background,
+          If you are starting the server from a bash command you want want to 
+          capture any console standard or error output while running in the background,
           you may redirect terminal output to a log file and
           launch to the program into the background by appending an &quot&amp&quot.
           Attempting this from a script or from cron may require full file pathnames.
@@ -493,7 +500,7 @@ node bin/www.mjs
         </p>
 <div class="pre-div"><pre>
 git pull --ff-only
-npm ci --omit=dev
+npm clean-install --omit=dev
 </pre></div>
 
         <div class="install-section-title">13 - Dependency Audit</div>

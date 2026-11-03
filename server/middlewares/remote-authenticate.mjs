@@ -26,30 +26,7 @@
 // These properties are not required when irc-hybrid-client is used with
 // the default configuration of internal user password login.
 //
-// Option 1 of 2 - configuration using credentials.json
-//
-//   {
-//     "enableRemoteLogin": true,
-//     "remoteAuthHost": "http://127.0.0.1:3500",
-//     "remoteCallbackHost": "http://localhost:3003",
-//     "remoteClientId": "irc_client_id",
-//     "remoteClientSecret": "irc_client_secret_TO_BE_CHANGED",
-//     "remoteScope": "irc.scope1"
-//   }
-//
-// The remoteScope can be either a single string (above) or an array of stings (below)
-//  {
-//    "remoteScope": [
-//      "irc.scope1",
-//      "irc.scope2"
-//    ]
-//  }
-//
-// In credentials.json file, user array is not required. --> "loginUsers": []
-//
-// ----------------------------------------
-//
-// Option 2 of 2 - Configuration with UNIX environment variables
+// Configuration with UNIX environment variables
 //
 // In the case of configuration with environment variables,
 // the configuration would be something like the following:

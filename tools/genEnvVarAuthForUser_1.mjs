@@ -135,26 +135,6 @@ getPass.question('Enter new user:', function (user) {
           'User login credentials generated with this utility are not applicable when ' +
           'configured for remote login.');
       }
-      try {
-        const credentials = JSON.parse(fs.readFileSync('../credentials.json', 'utf8'));
-        if (credentials) {
-          console.log('\nWarning: ' +
-            'The "credentials.json" file has been detected in the project base folder. ' +
-            'This indicates that environment variables are not being used for configuration. ' +
-            'In order to configure the program settings using environment variables the ' +
-            'credentials.json file must be deleted, and all configuration settings ' +
-            'entered using environment variables. Alternately, you can use the ' +
-            'updateAuthForUser_1.mjs program to configure a user ' +
-            'account into the credentials.json file.');
-          process.exit(1);
-        }
-      } catch (e) {
-        if (e.code !== 'ENOENT') {
-          console.log(e);
-          process.exit(1);
-        }
-        // no action, continue
-      }
       // one final blank line.
       console.log();
     });

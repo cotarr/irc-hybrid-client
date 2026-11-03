@@ -37,48 +37,23 @@
         </div>
         <div class="install-section-title">Select configuration method</div>
         <p>
-          There are two possible methods that may be used to define the
-          web server configuration settings. The settings may be stored as 
-          properties in the "credentials.json" file, or the settings may 
-          be defined as environment variables with use of .env file supported.
-          Only one method can be used at a time. If the credentials.json 
-          file exists, it will be parsed for settings, otherwise 
-          the environment variables will be parsed for settings.
+          Web server configuration settings are defined as Linux environment variables.
+          Irc-hybrid-client supports use of a .env file. The .env file is a hidden file
+          in the base folder of the repository used by irc-hybrid-client to load
+          configuration when the webserver starts.
         </p>
         <p>
-          On a multi-user system, you may want to change permissions 
-          on the config file to protect credentials.
+          On a multi-user system, you should check file permissions to protect
+          credentials that may be stored in the configuration.
         </p>
         <p>
-          The introduction of two concurrent configuration schemes may introduce 
-          some security questions. Configuration of security related properties
-          could contain ambiguous conflicting values between the two configuration methods.
-          To minimize risk of ambiguous configuration, only one method is used at one time.
-          In the case where the file "credentials.json" exists then configuration 
-          will be parsed from the credentials.json file and the environment 
-          variable configuration will be ignored.
-          In case case where the file "credentials.json" does not exist then
-          the configuration will be parsed from UNIX environment variables.
-          For configuration properties that have not been defined, the
-          server/config/index.mjs module will define fallback default values.
-          In a future release, the credentials.json config file may be deprecated (breaking change)
-          to standardize all of the server configuration with environment variables
-          or the .env file.
+          Irc-hybrid-client no longer supports configuration using the &quot;credentials.json&quot; file.
+          If you are upgrading from an older version of irc-hybrid-client (v2.2.12 or earlier) you must switch
+          to a .env file to store configuration, or otherwise define environment variables. This is breaking change. 
+          A table of configuration variables that is located at the bottom of this page
+          shows a side by side comparison of environment variables names and credentials.json properties
+          that may be useful in converting a legacy configuration file.
         </p>
-        <p>
-          The configuration examples on this page will include both
-          configuration methods, credentials.json method first
-          and environment variable method second, each with a slightly 
-          different background color.
-        </p>
-<div class="pre-div"><pre>
-  credentials.json method - Examples with this background color
-</pre></div>
-<div class="pre-div2"><pre>
-  environment variable method - Examples with this background color
-</pre></div>
-
-
         <div class="install-section-title">NODE_ENV environment variable</div>
         <p>
           Do not include the NODE_ENV environment variable in the .env file.
@@ -94,52 +69,51 @@
           each setting will fall back to a default value defined in the 
           server/config/index.mjs file. In order to reduce the size and 
           complexity of the configuration, setting that remain at the default 
-          values may be omitted from both credentials.json and environment variables.
+          values may be omitted from the environment variables or .env file.
         </p>
 
         <table class="account-table" border="1" cellpadding="5px">
-          <tr><th>Environment variable</th>        <th>credentials.json</th>        <th>Parsed config object</th>         <th>Default Value</th></tr>
-          <tr><td>ENV_VAR_CONFIG_VERSION</td>      <td>configVersion</td>           <td></td>                             <td>(See note-1)</td></tr>
-          <tr><td>LOGIN_USER_USERID</td>           <td>loginUsers[0].userid</td>    <td>loginusers[0].userid</td>         <td>(See note-2)</td></tr>
-          <tr><td>LOGIN_USER_USER</td>             <td>loginUsers[0].user</td>      <td>loginusers[0].user</td>           <td>(See note-2)</td></tr>
-          <tr><td>LOGIN_USER_NAME</td>             <td>loginUsers[0].name</td>      <td>loginusers[0].name</td>           <td>(See note-2)</td></tr>
-          <tr><td>LOGIN_USER_HASH</td>             <td>loginUsers[0].hash</td>      <td>loginusers[0].hash</td>           <td>(See note-2)</td></tr>
-          <tr><td>SITE_SECURITY_CONTACT</td>       <td>securityContact</td>         <td>site.securityContact</td>         <td>&quot;&quot;</td></tr>
-          <tr><td>SITE_SECURITY_EXPIRES</td>       <td>securityExpires</td>         <td>site.securityExpires</td>         <td>&quot;&quot;</td></tr>
-          <tr><td>SERVER_TLS_KEY</td>              <td>serverTlsKey</td>            <td>server.serverTlsKey</td>          <td>&quot;&quot;</td></tr>
-          <tr><td>SERVER_TLS_CERT</td>             <td>serverTlsCert</td>           <td>server.serverTlsCert</td>         <td>&quot;&quot;</td></tr>
-          <tr><td>SERVER_TLS</td>                  <td>tls</td>                     <td>server.tls</td>                   <td>false</td></tr>
-          <tr><td>SERVER_PORT</td>                 <td>port</td>                    <td>server.port</td>                  <td>3003</td></tr>
-          <tr><td>SERVER_PID_FILENAME</td>         <td>pidFilename</td>             <td>server.pidFilename</td>           <td>&quot;&quot;</td></tr>
-          <tr><td>SERVER_INSTANCE_NUMBER</td>      <td>instanceNumber</td>          <td>server.instanceNumber</td>        <td>null</td></tr>
-          <tr><td>SERVER_LOG_ROTATE_INTERVAL</td>  <td>logRotationInterval</td>     <td>server.logRotateInterval</td>     <td>&quot;&quot;</td></tr>
-          <tr><td>SERVER_LOG_ROTATE_SIZE</td>      <td>logRotationSize</td>         <td>server.logRotateSize</td>         <td>null</td></tr>
-          <tr><td>SERVER_LOG_ONLY_ERRORS</td>      <td>accessLogOnlyErrors</td>     <td>server.accessLogOnlyErrors</td>   <td>false</td></tr>
-          <tr><td>SERVER_WEBSOCKET_ORIGIN_LIST</td><td>websocketOriginList</td>     <td>server.websocketOriginAllowList</td> <td>[]</td></tr>
-          <tr><td>SESSION_SET_ROLLING_COOKIE</td>  <td>sessionRollingCookie</td>    <td>session.rollingCookie</td>        <td>false</td></tr>
-          <tr><td>SESSION_EXPIRE_SEC</td>          <td>sessionExpireAfterSec</td>   <td>session.ttl</td>                  <td>604800</td></tr>
-          <tr><td></td>                            <td></td>                        <td>session.maxAge</td>               <td>604800000</td></tr>
-          <tr><td>SESSION_SECRET</td>              <td>cookieSecret</td>            <td>session.secret</td>               <td>null</td></tr>
-          <tr><td>SESSION_ENABLE_REDIS</td>        <td>sessionEnableRedis</td>      <td>session.enableRedis</td>          <td>false</td></tr>
-          <tr><td>SESSION_REDIS_PREFIX</td>        <td>sessionRedisPrefix</td>      <td>session.redisPrefix</td>          <td>&quot;irc:&quot;</td></tr>
-          <tr><td>SESSION_REDIS_PASSWORD</td>      <td>sessionRedisPassword</td>    <td>session.redisPassword</td>        <td>&quot;&quot;</td></tr>
-          <tr><td>OAUTH2_ENABLE_REMOTE_LOGIN</td>  <td>enableRemoteLogin</td>       <td>oauth2.enableRemoteLogin</td>     <td>false</td></tr>
-          <tr><td>OAUTH2_REMOTE_AUTH_HOST</td>     <td>remoteAuthHost</td>          <td>oauth2.remoteAuthHost</td>        <td>null</td></tr>
-          <tr><td>OAUTH2_REMOTE_CALLBACK_HOST</td> <td>remoteCallbackHost</td>      <td>oauth2.remoteCallbackHost</td>    <td>null</td></tr>
-          <tr><td>OAUTH2_REMOTE_CLIENT_ID</td>     <td>remoteClientId</td>          <td>oauth2.remoteClientId</td>        <td>null</td></tr>
-          <tr><td>OAUTH2_REMOTE_CLIENT_SECRET</td> <td>remoteClientSecret</td>      <td>oauth2.remoteClientSecret</td>    <td>null</td></tr>
-          <tr><td>OAUTH2_REMOTE_SCOPE</td>         <td>remoteScope</td>             <td>oauth2.remoteScope</td>           <td>null</td></tr>
-          <tr><td>IRC_DISABLE_LIST_EDITOR</td>     <td>disableServerListEditor</td> <td>irc.disableServerListEditor</td>  <td>false</td></tr>
-          <tr><td>IRC_PERSIST_MESSAGE_CACHE</td>   <td>persistIrcMessageCache</td>  <td>irc.persistIrcMessageCache</td>   <td>false</td></tr>
-          <tr><td>IRC_SOCKET_LOCAL_ADDRESS</td>    <td>ircSocketLocalAddress</td>   <td>irc.ircSocketLocalAddress</td>    <td>null</td></tr>
-          <tr><td>IRC_SERVE_HTML_HELP_DOCS</td>    <td>serveHtmlHelpDocs</td>       <td>irc.serveHtmlHelpDocs</td>        <td>false</td></tr>
-          <tr><td>IRC_CUSTOM_BEEP_SOUNDS</td>      <td>customBeepSounds</td>        <td>irc.customBeepSounds</td>         <td>false</td></tr>
-          <tr><td>IRC_ENABLE_SOCKS5_PROXY</td>     <td>enableSocks5Proxy</td>       <td>proxy.enableSocks5Proxy</td>      <td>false</td></tr>
-          <tr><td>IRC_SOCKS5_HOST</td>             <td>socks5Host</td>              <td>proxy.socks5Host</td>             <td>null</td></tr>
-          <tr><td>IRC_SOCKS5_PORT</td>             <td>socks5Port</td>              <td>proxy.socks5Port</td>             <td>null</td></tr>
-          <tr><td>IRC_SOCKS5_USERNAME</td>         <td>socks5Username</td>          <td>proxy.socks5Username</td>         <td>null</td></tr>
-          <tr><td>IRC_SOCKS5_PASSWORD</td>         <td>socks5Password</td>          <td>proxy.socks5Password</td>         <td>null</td></tr>
-          <tr><td></td>        <td></td>  <td></td>      <td></td></tr>
+          <tr><th>Environment variable</th>        <th>Parsed config object</th>         <th>Default Value</th></tr>
+          <tr><td>ENV_VAR_CONFIG_VERSION</td>      <td></td>                             <td>(See note-1)</td></tr>
+          <tr><td>LOGIN_USER_USERID</td>           <td>loginusers[0].userid</td>         <td>(See note-2)</td></tr>
+          <tr><td>LOGIN_USER_USER</td>             <td>loginusers[0].user</td>           <td>(See note-2)</td></tr>
+          <tr><td>LOGIN_USER_NAME</td>             <td>loginusers[0].name</td>           <td>(See note-2)</td></tr>
+          <tr><td>LOGIN_USER_HASH</td>             <td>loginusers[0].hash</td>           <td>(See note-2)</td></tr>
+          <tr><td>SITE_SECURITY_CONTACT</td>       <td>site.securityContact</td>         <td>&quot;&quot;</td></tr>
+          <tr><td>SITE_SECURITY_EXPIRES</td>       <td>site.securityExpires</td>         <td>&quot;&quot;</td></tr>
+          <tr><td>SERVER_TLS_KEY</td>              <td>server.serverTlsKey</td>          <td>&quot;&quot;</td></tr>
+          <tr><td>SERVER_TLS_CERT</td>             <td>server.serverTlsCert</td>         <td>&quot;&quot;</td></tr>
+          <tr><td>SERVER_TLS</td>                  <td>server.tls</td>                   <td>false</td></tr>
+          <tr><td>SERVER_PORT</td>                 <td>server.port</td>                  <td>3003</td></tr>
+          <tr><td>SERVER_PID_FILENAME</td>         <td>server.pidFilename</td>           <td>&quot;&quot;</td></tr>
+          <tr><td>SERVER_INSTANCE_NUMBER</td>      <td>server.instanceNumber</td>        <td>null</td></tr>
+          <tr><td>SERVER_LOG_ROTATE_INTERVAL</td>  <td>server.logRotateInterval</td>     <td>&quot;&quot;</td></tr>
+          <tr><td>SERVER_LOG_ROTATE_SIZE</td>      <td>server.logRotateSize</td>         <td>null</td></tr>
+          <tr><td>SERVER_LOG_ONLY_ERRORS</td>      <td>server.accessLogOnlyErrors</td>   <td>false</td></tr>
+          <tr><td>SERVER_WEBSOCKET_ORIGIN_LIST</td><td>server.websocketOriginAllowList</td> <td>[]</td></tr>
+          <tr><td>SESSION_SET_ROLLING_COOKIE</td>  <td>session.rollingCookie</td>        <td>false</td></tr>
+          <tr><td>SESSION_EXPIRE_SEC</td>          <td>session.ttl</td>                  <td>604800</td></tr>
+          <tr><td></td>                            <td>session.maxAge</td>               <td>604800000</td></tr>
+          <tr><td>SESSION_SECRET</td>              <td>session.secret</td>               <td>null</td></tr>
+          <tr><td>SESSION_ENABLE_REDIS</td>        <td>session.enableRedis</td>          <td>false</td></tr>
+          <tr><td>SESSION_REDIS_PREFIX</td>        <td>session.redisPrefix</td>          <td>&quot;irc:&quot;</td></tr>
+          <tr><td>SESSION_REDIS_PASSWORD</td>      <td>session.redisPassword</td>        <td>&quot;&quot;</td></tr>
+          <tr><td>OAUTH2_ENABLE_REMOTE_LOGIN</td>  <td>oauth2.enableRemoteLogin</td>     <td>false</td></tr>
+          <tr><td>OAUTH2_REMOTE_AUTH_HOST</td>     <td>oauth2.remoteAuthHost</td>        <td>null</td></tr>
+          <tr><td>OAUTH2_REMOTE_CALLBACK_HOST</td> <td>oauth2.remoteCallbackHost</td>    <td>null</td></tr>
+          <tr><td>OAUTH2_REMOTE_CLIENT_ID</td>     <td>oauth2.remoteClientId</td>        <td>null</td></tr>
+          <tr><td>OAUTH2_REMOTE_CLIENT_SECRET</td> <td>oauth2.remoteClientSecret</td>    <td>null</td></tr>
+          <tr><td>OAUTH2_REMOTE_SCOPE</td>         <td>oauth2.remoteScope</td>           <td>null</td></tr>
+          <tr><td>IRC_DISABLE_LIST_EDITOR</td>     <td>irc.disableServerListEditor</td>  <td>false</td></tr>
+          <tr><td>IRC_PERSIST_MESSAGE_CACHE</td>   <td>irc.persistIrcMessageCache</td>   <td>false</td></tr>
+          <tr><td>IRC_SOCKET_LOCAL_ADDRESS</td>    <td>irc.ircSocketLocalAddress</td>    <td>null</td></tr>
+          <tr><td>IRC_SERVE_HTML_HELP_DOCS</td>    <td>irc.serveHtmlHelpDocs</td>        <td>false</td></tr>
+          <tr><td>IRC_CUSTOM_BEEP_SOUNDS</td>      <td>irc.customBeepSounds</td>         <td>false</td></tr>
+          <tr><td>IRC_ENABLE_SOCKS5_PROXY</td>     <td>proxy.enableSocks5Proxy</td>      <td>false</td></tr>
+          <tr><td>IRC_SOCKS5_HOST</td>             <td>proxy.socks5Host</td>             <td>null</td></tr>
+          <tr><td>IRC_SOCKS5_PORT</td>             <td>proxy.socks5Port</td>             <td>null</td></tr>
+          <tr><td>IRC_SOCKS5_USERNAME</td>         <td>proxy.socks5Username</td>         <td>null</td></tr>
+          <tr><td>IRC_SOCKS5_PASSWORD</td>         <td>proxy.socks5Password</td>         <td>null</td></tr>
         </table>
         <ul>
           <li>
@@ -169,39 +143,10 @@
 
         <div class="install-section-title">Create configuration settings</div>
         <p>
-          Option 1 of 4 - To make a minimal configuration that uses the credentials.json configuration method,
-          copy the following JSON object, then paste it into a new credentials.json file in the base folder of the repository.
-          Protect file permissions using "chmod 600 credentials.json".
-        </p>
-<div class="pre-div"><pre>
-{
-  "configVersion": 2,
-  "loginUsers": [
-    {
-      "userid": 1,
-      "user": "user1",
-      "name": "Bob Smith",
-      "hash": "---BCRYPT-HASH-GOES-HERE---"
-    }
-  ],
-  "serverTlsKey": "/home/user1/tls/privkey.pem",
-  "serverTlsCert": "/home/user1/tls/fullchain.pem",
-  "tls": true,
-  "port": 3003,
-  "cookieSecret": "---COOKIE-SECRET-GOES-HERE---",
-  "websocketOriginList": [
-    "http://example.com:3003",
-    "http://www.example.com:3003"
-  ]
-}
-</pre></div>
-        <p>
-          Option 2 of 4 - To make a minimal configuration that uses environment variables,
+          Option 1 of 2 - To make a minimal configuration that uses environment variables,
           copy the following environment variables, then paste them into 
           a .env file in the base folder of the repository.
           Protect file permissions using "chmod 600 .env".
-          To use environment variables as the configuration, make sure the
-          credentials.json file does not exist in the base folder of the repository.
         </p>
 <div class="pre-div2"><pre>
 ENV_VAR_CONFIG_VERSION=2
@@ -218,23 +163,9 @@ SERVER_WEBSOCKET_ORIGIN_LIST="http://example.com:3003,http://www.example.com:300
 </pre></div>
 
         <p>
-          Option 3 of 4 - To create a new credentials.json file using a full configuration template,
-          the git repository includes an example configuration file template 
-          named &quot;example-credentials.json&quot;.
-          Create a new credentials.json file as follows:
-        </p>
-
-<div class="pre-div"><pre>
-  cp -v example-credentials.json credentials.json
-  chmod 600 credentials.json
-</pre></div>
-
-        <p>
-          Option 4 of 4 - To create an environment variable .env file using a full configuration template.
+          Option 2 of 2 - To create an environment variable .env file using a full configuration template.
           the git repository includes an example environment variable template
           named &quot;example-.env&quot;.
-          To use environment variables as the configuration, make sure the
-          credentials.json file does not exist in the base folder of the repository.
           Create a new .env file as follows:
         </p>
 
@@ -255,11 +186,6 @@ SERVER_WEBSOCKET_ORIGIN_LIST="http://example.com:3003,http://www.example.com:300
           This was increased from 1 to 2 when the password hash function was
           upgraded to bcrypt in Version 0.1.0 as a breaking change.
         </p>
-<div class="pre-div"><pre>
-{
-  "configVersion": 2,
-}
-</pre></div>
 <div class="pre-div2"><pre>
 ENV_VAR_CONFIG_VERSION=2
 </pre></div>
@@ -282,13 +208,6 @@ ENV_VAR_CONFIG_VERSION=2
           To configure the web server to listen for HTTPS
           encrypted connections, this section would look something like this:
         </p>
-<div class="pre-div"><pre>
-{
-  "serverTlsKey": "/home/user1/tls/privkey.pem",
-  "serverTlsCert": "/home/user1/tls/fullchain.pem",
-  "tls": true,
-}
-</pre></div>
 <div class="pre-div2"><pre>
 SERVER_TLS_KEY=/home/user/tls/privkey.pem
 SERVER_TLS_CERT=/home/user/tls/fullchain.pem
@@ -301,13 +220,7 @@ SERVER_TLS=true
           set these lines as follows to disable TLS. The lines 
           containing empty filenames may be omitted from the configuration.
         </p>
-<div class="pre-div"><pre>
-{
-  "serverTlsKey": "",
-  "serverTlsCert": "",
-  "tls": false,
-}
-</pre></div>
+
 <div class="pre-div2"><pre>
 # SERVER_TLS_KEY=
 # SERVER_TLS_CERT=
@@ -325,11 +238,6 @@ SERVER_TLS=false
           iptables or nftables firewall rules to exchange 
           port numbers to 443 as packets cross the firewall.
         </p>
-<div class="pre-div"><pre>
-{
-  "port": 3003,
-}
-</pre></div>
 <div class="pre-div2"><pre>
 SERVER_PORT=3003
 </pre></div>
@@ -389,17 +297,11 @@ SERVER_PORT=3003
           a one web browser. This setup may be useful for one single user to use multiple
           browser tabs for simultaneous connection to different IRC networks.
         </p>
-<div class="pre-div"><pre>
-{
-  "cookieSecret": "Lg9HLgCEmtag4Ff7",
-  "sessionExpireAfterSec": 604800,
-  "instanceNumber": 3003,
-}
-</pre></div>
 <div class="pre-div2"><pre>
+SERVER_PORT=3003
+SERVER_INSTANCE_NUMBER=3003
 SESSION_SECRET="Lg9HLgCEmtag4Ff7"
 SESSION_EXPIRE_SEC=604800
-SERVER_INSTANCE_NUMBER=3003
 </pre></div>
 
         <div class="install-section-title">Assign Login Password</div>
@@ -420,100 +322,8 @@ SERVER_INSTANCE_NUMBER=3003
           the server configuration. Should the account password become compromised,
           the web interface allows remote shutdown of the server. This would protect
           it until a new password were set using the ssh terminal.
-        </p>
-        <p>
-          Case 1 - Configuration using credentials.json
-        </p>
-        <p>
-          A brief note about syntax. The credentials.json file represents a JSON structured data object.
-          JSON syntax must be exact, with matching curly braces and proper use of commas.
-          The credentials.json file includes a loginUsers property.
-          The square brackets [ ] define a javascript array.
-          Each of the curly braces { } within the array is a javascript object
-          used to define an individual user.
-          The user object contains 4 properties listed as key/value pairs.
-          Note the use of double quotes and commas between key/value pairs except the last has no comma.
-          In fact, there is only 1 user. Only the first array object at
-          index 0 (userid 1) is relevant.
-        </p>
-        <p>
-          A small javascript program has been included to create a user password hash
-          and automatically update the credentials.json file.
-          The program can be executed from the command line to
-          assign the username and password for the primary user at array index 0, (userid 1).
-          To run this program, change directory to the tools folder, and execute the
-          updateAuthForUser_1.mjs program as in the following example.
-        </p>
-
-<div class="pre-div"><pre>
-cd tools
-node updateAuthForUser_1.mjs
-</pre></div>
-        <p>
-          This will start an interactive session in the command line terminal.
-          In this example, the &quot;user&quot; was set to <blue-example>user1</blue-example>.
-          The &quot;name&quot; was set to <blue-example>Bob Smith</blue-example>.
-          In this example, the password was set to
-          <blue-example>zuwa79xoJxLJ</blue-example>, but you should select your own random password.
-          A bcrypt function was used to generate a salted hash.
-          The data was written to the credentials.json file, and
-          an excerpt from the credentials.json was displayed for your review.
-        </p>
-<div class="pre-div"><pre>
-$ node updateAuthForUser_1.mjs 
-
-Caution, you are editing the password file.
-
-This will set a new login user/password for userid=1 at array index=0.
-This is a static password not editable online.
-It is intended there is only one user for the program.
-This must be run from the tools/ folder to find credentials.json.
-
-User up to 16 characters a-z,A-Z,0-9
-Enter new user:<blue-example>user1</blue-example>
-
-Name up to 32 characters a-z,A-Z,0-9 and spaces
-Enter new name (user1):<blue-example>Bob Smith</blue-example>
-
-Enter new password:<blue-example>zuwa79xoJxLJ</blue-example>
-{
-  "loginUsers": [<yellow-example>
-    {
-      "userid": 1,
-      "user": "user1",
-      "name": "Bob Smith",
-      "hash": "$2a$10$eJDI3vQNIqblM4tBhCdwuumbpzRtsX6.AYApsaUfxa9CS.ztamKSC"
-    }</yellow-example>
-  ]
-}
-</pre></div>
-        <p>
-          Failed login attempts will increment a counter of failed attempts by IP address.
-          The limit is set to allow 5 failed password attempts per hour for each IP address.
-          Exceeding this limit will temporarily disable login for 1 hour.
-          The may be reset at any time by shutdown and restart of the web server.
-        </p>
-        <p>
-          Privacy Caution:
-          The web userid numeric value (userid: 1) and web login timestamp are saved in the web browsers's
-          localStorage API. See:
-          <a href="faq.html#localstorage">FAQ</a>
-        </p>
-        <p>
-          Next, return from the tools folder to the repository folder.
-        </p>
-<div class="pre-div"><pre>
-cd ..
-</pre></div>
-        <p>
-          If you really feel you need to create a second username/password entry,
-          such as one for your phone and one for your desktop,
-          you can create one at index 0 using the above script, then
-          copy/paste the entire javascript object as an additional javascript object in the array.
-          Use care to maintain valid JSON format with commas and braces.
-        </p>
-        <p>
-          Case 2 - Configuration using environment variables
+          If you run multiple instances on different ports, each instance may
+          have a different username and password.
         </p>
         <p>
           A small javascript program has been included to create a user password hash
@@ -572,8 +382,6 @@ LOGIN_USER_HASH="$2a$10$0pr9Q21L7CFoSw5.FjbW0.izOzQtBTqQjOGbZJabM2MMNdSxKyfpO"
 </pre></div>
         <p>
           Only 1 user account can be defined when using environment variables for configuration.
-          If you want to add a second login password, you will need to use the credentials.json or
-          configure the program to use the remote login feature.
         </p>
         <p>
           Failed login attempts will increment a counter of failed attempts by IP address.
@@ -625,14 +433,6 @@ LOGIN_USER_HASH="$2a$10$0pr9Q21L7CFoSw5.FjbW0.izOzQtBTqQjOGbZJabM2MMNdSxKyfpO"
           irc-hybrid-client should function as before, but without the origin check.
           Upgrading without configuration should not break the server.
         </p>
-<div class="pre-div"><pre>
-{
-  "websocketOriginList": [
-    "http://example.com:3003",
-    "http://www.example.com:3003"
-  ]
-}
-</pre></div>
 <div class="pre-div2"><pre>
 SERVER_WEBSOCKET_ORIGIN_LIST="http://example.com:3003,http://www.example.com:3003"
 </pre></div>
@@ -647,7 +447,7 @@ SERVER_WEBSOCKET_ORIGIN_LIST="http://example.com:3003,http://www.example.com:300
           The disadvantage of RAM based storage is that when the web server
           is restarted, such as following a reboot, the current login state
           is lost. A user login password entry will be required after a
-          server restart. If you are using a password manager, this is not a big deal.
+          server restart. If you are using a password manager, this would not be an issue.
         </p>
         <p>
           If you prefer persistent session storage, the application supports
@@ -676,15 +476,8 @@ SERVER_WEBSOCKET_ORIGIN_LIST="http://example.com:3003,http://www.example.com:300
           <li>Install redis from OS package manager, Debian: `apt-get install redis-server`.</li>
           <li>Customize redis server configuration as needed `/etc/redis/redis.conf`</li>
           <li>Set local firewall to protect redis TCP port.</li>
-          <li>Enable redis by editing `credentials.json` or environment variables as follows:</li>
+          <li>Enable redis by editing the environment variables as follows:</li>
         </ul>
-<div class="pre-div"><pre>
-{
-  "sessionEnableRedis": true,
-  "sessionRedisPrefix": "irc001:",
-  "sessionRedisPassword": "",
-}
-</pre></div>
 <div class="pre-div2"><pre>
 SESSION_ENABLE_REDIS=true
 SESSION_REDIS_PREFIX="irc001:"
@@ -716,12 +509,7 @@ SESSION_REDIS_PREFIX="irc001:"
 <pre>
         date --date='1 year' --rfc-email
 </pre>
-<div class="pre-div"><pre>
-{
-  "securityContact": "mailto:security@example.com",
-  "securityExpires": "Fri, 1 Apr 2022 08:00:00 -0600",
-}
-</pre></div>
+
 <div class="pre-div2"><pre>
 SITE_SECURITY_CONTACT=mailto:security@example.com
 SITE_SECURITY_EXPIRES="Fri, 1 Apr 2022 08:00:00 -0600"
@@ -729,12 +517,6 @@ SITE_SECURITY_EXPIRES="Fri, 1 Apr 2022 08:00:00 -0600"
         <p>
           To disable the security contact, modify these lines as follows:
         </p>
-<div class="pre-div"><pre>
-{
-  "securityContact": "",
-  "securityExpires": "",
-}
-</pre></div>
 <div class="pre-div2"><pre>
 # SITE_SECURITY_CONTACT=
 # SITE_SECURITY_EXPIRES=
@@ -752,35 +534,21 @@ SITE_SECURITY_EXPIRES="Fri, 1 Apr 2022 08:00:00 -0600"
         <p>
           Set the PID file path to an empty string to disable the PDF file.
         </p>
-
-<div class="pre-div"><pre>
-{
-  "pidFilename": "/home/user1/tmp/ircHybridClient.PID",
-}
-</pre></div>
 <div class="pre-div2"><pre>
 SERVER_PID_FILENAME=/home/user1/tmp/ircHybridClient.PID
 </pre></div>
         <div class="install-section-title">Restart using PID file (Optional)</div>
         <p>
-          After making changes to the configuration in credentials.json or .env, 
+          After making changes to the configuration the .env file, 
           it is necessary to stop and restart the irc-hybrid-client web server
           to load the new configuration.
         </p>
         <p>
           Assuming a PID filename (previous section) has been configured 
-          and contains a full path name, a bash script &quot;restart.sh&quot; for 
-          credentials.json configuration or &quot;restart2.sh&quot; for environment 
-          variable configuration may be executed from the base folder of the 
-          repository to retrieve the PID number, 
+          and contains a full path name, a bash script &quot;restart2.sh&quot; may be 
+          executed from the base folder of the repository to retrieve the PID number, 
           kill previous irc-hybrid-client instance, and launch a new
           instance of the irc-hybrid-client web server.
-        </p>
-        <p>
-          The restart.sh script requires the Linux &quot;jq&quot; utility for parsing JSON content.
-          The jq linux package may be installed using &quot;apt-get install jq&quot; in Debian or Ubuntu.
-          The restart2.sh script used with enviornment variables 
-          does not require this package to be installed.
         </p>
         <p>
           The restart2.sh script requires that the environment 
@@ -800,24 +568,16 @@ SERVER_PID_FILENAME=/home/user1/tmp/ircHybridClient.PID
 
 #!/bin/bash
 #
-# Determine irc-hybrid-client configuration method
-# Call proper restart.sh or restart2.sh
+# Assign env variables and then call proper restart2.sh
 #
-if [ -f credentials.json ] ; then
-echo "irc-hybrid-client config: credentials.json"
-./restart.sh
-else
-echo "irc-hybrid-client config: .env"
 export SERVER_INSTANCE_NUMBER=3
 export SERVER_PID_FILENAME=/home/user/tmp/ircHybridClient003.PID
 ./restart2.sh
-fi
-
 </pre>
 
       <p>
-        The restart.sh or restart2.sh utility is intended to be run manually to 
-        assist with editing of credentials.json or .env. 
+        The restart2.sh utility is intended to be run manually to 
+        assist with editing of .env. 
         It is not intended to be run from cron.
       </p>
 
@@ -854,12 +614,6 @@ fi
           Authorization to use the API requires user login and a valid 
           session cookie.
         </p>
-
-<div class="pre-div"><pre>
-{
-  "disableServerListEditor": false,
-}
-</pre></div>
 <div class="pre-div2"><pre>
 IRC_DISABLE_LIST_EDITOR=false
 </pre></div>
@@ -870,7 +624,7 @@ IRC_DISABLE_LIST_EDITOR=false
           a copy of the IRC message cache across web server restarts.
         </p>
         <p>
-          When enabled in the credentials.json file, Unix signals SIGINT and SIGTERM 
+          When enabled in the environment variables, Unix signals SIGINT and SIGTERM 
           will cause the web server to asynchronously write the cache file, then exit with status 0.
           The JSON encoded cache includes timestamp, cache pointer, and message 
           data converted to an array of type utf-8 String to file `logs/savedMessageCache.json`. 
@@ -904,19 +658,11 @@ IRC_DISABLE_LIST_EDITOR=false
           to write his own script, and this is only an 
           example to get you started.
           Assuming the &quot;pidFilename&quot; was configured
-          in the credentials.json file, the web server Unix process PID
+          in the environment variables, the web server Unix process PID
           number will be saved in that file when the web server starts.
           A bash script can read the PID number from the file
           and send the kill signal to the web server's process.
         </p>
-<div class="pre-div"><pre>
-IRC_HYBRID_CLIENT_PATH=$HOME/tmp/irc-hybrid-client.PID
-PID_NUMBER=$(cat $IRC_HYBRID_CLIENT_PATH)
-if [ -n "$PID_NUMBER" ] ; then
-  echo "Sending SIGTERM to $PID_NUMBER irc-hybrid-client"
-  kill -SIGTERM $PID_NUMBER
-fi
-</pre></div>
 <div class="pre-div2"><pre>
 IRC_HYBRID_CLIENT_PATH=$HOME/tmp/irc-hybrid-client.PID
 PID_NUMBER=$(cat $IRC_HYBRID_CLIENT_PATH)
@@ -926,17 +672,22 @@ if [ -n "$PID_NUMBER" ] ; then
 fi
 </pre></div>
           <p>
-          There are bash scripts &quot;restart.sh&quot; and &quot;restart2.sh&quot; that can 
-          be used to restart after changes were made to credentials.json. 
+          There is a bash scripts &quot;restart2.sh&quot; that can 
+          be used to restart after changes were made to environment variables. 
         </p>
-<div class="pre-div"><pre>
-{
-  "persistIrcMessageCache": true,
-}
-</pre></div>
+        <p>
+          If you are starting irc-hybrid-client automatically at boot as a
+          user systemd service. The &quot;systemctl --user stop irc-hybrid-client.service&quot;
+          has been show to reliably save the message cache in Debian Linux.
+        </p>
+        <p>
+          To enable the persistent IRC message cache, set the following:
+        </p>
+
 <div class="pre-div2"><pre>
 IRC_PERSIST_MESSAGE_CACHE=true
 </pre></div>
+
         <div class="install-section-title">Log Files and File Rotation</div>
         <p>
           Logging to disk file is enabled when the server is started 
@@ -962,16 +713,15 @@ IRC_PERSIST_MESSAGE_CACHE=true
           The file auth.log is not subject to log file rotation
         </p>
         <p>
-          Optional log file rotation may enabled by assigning the &quot;logRotationInterval&quot;
-          property or the &quot;logRotationSize&quot; property in 
-          credentials.json to the proper string value.
+          Optional log file rotation may enabled by assigning the &quot;SERVER_LOG_ROTATE_INTERVAL&quot;
+          property or the &quot;SERVER_LOG_ROTATE_SIZE&quot; in the environment variables.
           Log rotate time interval available time units (s, m, h, d) are used to specify the interval 
           string. (Example: '5m', '2h', '1d').
           Minutes and hours are a time divisor, but the day interval is a simple timer 
           that is re-initialized each time the application is restarted.
           Log rotate file size available time units (B, K, M, G) are used to specify the file size 
           string. (Example: '100K', '1M'). Optionally either interval, size, both, or neither
-          may be used. This will allow log file log rotation similar to Linux system files.
+          may be used. This will allow log file log rotation similar to Linux system log files.
           For more information see 
           <a href="https://github.com/iccicci/rotating-file-stream#readme">rotating-file-stream</a> 
           documentation. In the case where neither interval nor size properties exist 
@@ -983,13 +733,6 @@ IRC_PERSIST_MESSAGE_CACHE=true
           all log output will be directed to stdout. This is useful to view the 
           logs in real time when debugging a server when NODE_ENV===production.
         </p>
-
-<div class="pre-div"><pre>
-{
-  "logRotationInterval": "7d",
-  "logRotationSize": "1M",
-}
-</pre></div>
 <div class="pre-div2"><pre>
 SERVER_LOG_ROTATE_INTERVAL=7d
 SERVER_LOG_ROTATE_SIZE=1M
@@ -1005,16 +748,9 @@ SERVER_LOG_ROTATE_SIZE=1M
           If the web server is started with NODE_ENV=development or NODE_DEBUG_LOG=1,
           the the accessLogOnlyErrors property will be ignored and all HTTP requests will be visible.
         </p>
-
-<div class="pre-div"><pre>
-{
-  "accessLogOnlyErrors": false,
-}
-</pre></div>
 <div class="pre-div2"><pre>
 SERVER_LOG_ONLY_ERRORS=false
 </pre></div>
-
 
         <div class="install-section-title">Serve HTML Help Files</div>
         <p>
@@ -1034,16 +770,8 @@ SERVER_LOG_ONLY_ERRORS=false
         </p>
         <p>
           To enable the /docs file folder to be available at web path /irc/docs/, set the 
-          serveHtmlHelpDocs property to true. If the property does not exist
-          due to an earlier version of credentials.json, no error will 
-          be issued and the files will not be served.
+          IRC_SERVE_HTML_HELP_DOCS to &quot;true&quot;. 
         </p>
-
-<div class="pre-div"><pre>
-{
-  "serveHtmlHelpDocs": true
-}
-</pre></div>
 <div class="pre-div2"><pre>
 IRC_SERVE_HTML_HELP_DOCS=true
 </pre></div>
@@ -1076,19 +804,9 @@ secure/sounds/custom-beep3.mp3 (Private Message)
 </pre>
 
         <p>
-          To enable the optional custom sounds set the property 
-          &quot;customBeepSounds: true&quot; in the credentials.json file 
-          or set the environment variable &quot;IRC_CUSTOM_BEEP_SOUNDS=true&quot;
-          For backward compatibility, if this property does not exist
-          in credentials.json due to an upgrade from previous version the default 
-          sound filenames will be used and no error will be generated.
+          To enable the optional custom sounds set the environment 
+          variable &quot;IRC_CUSTOM_BEEP_SOUNDS=true&quot;
         </p> 
-
-<div class="pre-div"><pre>
-{
-  "customBeepSounds": true
-}
-</pre></div>
 <div class="pre-div2"><pre>
 IRC_CUSTOM_BEEP_SOUNDS=true
 </pre></div>          
@@ -1121,16 +839,6 @@ IRC_CUSTOM_BEEP_SOUNDS=true
           To globally enable use of a remote socks5 proxy server without authentication,
           update the configuration as shown in following example, changing address and port.
         </p>
-
-<div class="pre-div"><pre>
-{
-  "enableSocks5Proxy": true,
-  "socks5Host": "192.168.0.1",
-  "socks5Port": 1080,
-  "socks5Username": null,
-  "socks5Password": null  
-}
-</pre></div>
 <div class="pre-div2"><pre>
 IRC_ENABLE_SOCKS5_PROXY=false
 IRC_SOCKS5_HOST=192.168.0.1
@@ -1145,16 +853,6 @@ IRC_SOCKS5_PORT=1080
           This issue can be addressed by passing the socks5 connection through a TLS
           encrypted VPN tunnel.
         </p>
-
-<div class="pre-div"><pre>
-{
-  "enableSocks5Proxy": true,
-  "socks5Host": "192.168.0.1",
-  "socks5Port": 1080,
-  "socks5Username": "user1",
-  "socks5Password": "xxxxxxxx"
-} 
-</pre></div>
 <div class="pre-div2"><pre>
 IRC_ENABLE_SOCKS5_PROXY=false
 IRC_SOCKS5_HOST=192.168.0.1
@@ -1163,10 +861,13 @@ IRC_SOCKS5_USERNAME=user1
 IRC_SOCKS5_PASSWORD="xxxxxxxx"
 </pre></div>
         <p>
-          Socks5 support was debugged using the dante-server apt package in Debian 10
+          Socks5 support was originally written and debugged using the dante-server apt package in Debian 10
           using danted.conf configuration set to &quot;socksmethod: none&quot; (Not authenticated)
           and &quot;socksmethod: username&quot; (password authentication).
           Other authentication methods are not supported.
+          In the current Debian 13 distribution, danted is no longer included as a Debian apt 
+          package. As a replacement used for debugging and  testing, the apt package &quot;microsocks&quot; is being used
+          to test and debug the socks5 proxy features of irc-hybrid-client.
           Socks5 socket connections are handled internally using the npm package 
           <a href="https://github.com/mattcg/socks5-client">socks5-client</a>.
         </p>
@@ -1183,7 +884,7 @@ IRC_SOCKS5_PASSWORD="xxxxxxxx"
           The intention of this feature is to allow multiple IRC clients on 
           the same server to each use different unique IPV6 address.
           Many commercial VPS servers are capable of multiple IPV6 addresses within a specified range.
-          Multiple IPV4 address are less common, but IPV4 will work if configured.
+          Multiple IPV4 address are less common, but IPV4 may work if configured (IPv4 not tested).
         </p>
         <p>
           When an IPV4 or IPV6 address is specified as the IRC socket local address, 
@@ -1204,22 +905,16 @@ IRC_SOCKS5_PASSWORD="xxxxxxxx"
           This feature is optional and it may be disabled by setting ircSocketLocalAddress to an empty string.
           For backward compatibility, if the property is not present, the feature is disabled and no error will be generated.
         </p>
-
-<div class="pre-div"><pre>
-{
-  "ircSocketLocalAddress": "fc00:10::1000"
-} 
-</pre></div>
 <div class="pre-div2"><pre>
-IRC_SOCKET_LOCAL_ADDRESS=fc00:10::1000
+IRC_SOCKET_LOCAL_ADDRESS=fd00:10::1000
 </pre></div>
   
         <div class="vh-20"></div>
         <div class="desc-title">
-          Optional Remote Login
+          Legacy Remote Login
         </div>
 
-        <p></p>
+        <p>
           The (optional) &quot;collab-auth&quot; remote authentication server is no longer available.
         </p>
         <p>
@@ -1248,6 +943,65 @@ IRC_SOCKET_LOCAL_ADDRESS=fc00:10::1000
           The intent of this documentation is to assist with 
           troubleshooting for any users who continue to use legacy remote authentication.
         </p>
+
+        <div class="vh-20"></div>
+        <div class="desc-title">
+          Converting Legacy Configuration
+        </div>
+        <p>
+          Irc-hybrid-client no longer supports configuration using the &quot;credentials.json&quot; file.
+          If you are upgrading from an older version of irc-hybrid-client (v2.2.12 or earlier) you must switch
+          to a .env file to store configuration, or otherwise define environment variables. This is breaking change. 
+          The following table shows configuration variables as a side by side comparison of
+          environment variables names and credentials.json properties that may be useful in converting
+          a legacy credentials.json file to a .env file.
+        </p>
+
+        <table class="account-table" border="1" cellpadding="5px">
+          <tr><th>Environment variable</th>        <th>credentials.json</th>        <th>Parsed config object</th>         <th>Default Value</th></tr>
+          <tr><td>ENV_VAR_CONFIG_VERSION</td>      <td>configVersion</td>           <td></td>                             <td>(See note-1)</td></tr>
+          <tr><td>LOGIN_USER_USERID</td>           <td>loginUsers[0].userid</td>    <td>loginusers[0].userid</td>         <td>(See note-2)</td></tr>
+          <tr><td>LOGIN_USER_USER</td>             <td>loginUsers[0].user</td>      <td>loginusers[0].user</td>           <td>(See note-2)</td></tr>
+          <tr><td>LOGIN_USER_NAME</td>             <td>loginUsers[0].name</td>      <td>loginusers[0].name</td>           <td>(See note-2)</td></tr>
+          <tr><td>LOGIN_USER_HASH</td>             <td>loginUsers[0].hash</td>      <td>loginusers[0].hash</td>           <td>(See note-2)</td></tr>
+          <tr><td>SITE_SECURITY_CONTACT</td>       <td>securityContact</td>         <td>site.securityContact</td>         <td>&quot;&quot;</td></tr>
+          <tr><td>SITE_SECURITY_EXPIRES</td>       <td>securityExpires</td>         <td>site.securityExpires</td>         <td>&quot;&quot;</td></tr>
+          <tr><td>SERVER_TLS_KEY</td>              <td>serverTlsKey</td>            <td>server.serverTlsKey</td>          <td>&quot;&quot;</td></tr>
+          <tr><td>SERVER_TLS_CERT</td>             <td>serverTlsCert</td>           <td>server.serverTlsCert</td>         <td>&quot;&quot;</td></tr>
+          <tr><td>SERVER_TLS</td>                  <td>tls</td>                     <td>server.tls</td>                   <td>false</td></tr>
+          <tr><td>SERVER_PORT</td>                 <td>port</td>                    <td>server.port</td>                  <td>3003</td></tr>
+          <tr><td>SERVER_PID_FILENAME</td>         <td>pidFilename</td>             <td>server.pidFilename</td>           <td>&quot;&quot;</td></tr>
+          <tr><td>SERVER_INSTANCE_NUMBER</td>      <td>instanceNumber</td>          <td>server.instanceNumber</td>        <td>null</td></tr>
+          <tr><td>SERVER_LOG_ROTATE_INTERVAL</td>  <td>logRotationInterval</td>     <td>server.logRotateInterval</td>     <td>&quot;&quot;</td></tr>
+          <tr><td>SERVER_LOG_ROTATE_SIZE</td>      <td>logRotationSize</td>         <td>server.logRotateSize</td>         <td>null</td></tr>
+          <tr><td>SERVER_LOG_ONLY_ERRORS</td>      <td>accessLogOnlyErrors</td>     <td>server.accessLogOnlyErrors</td>   <td>false</td></tr>
+          <tr><td>SERVER_WEBSOCKET_ORIGIN_LIST</td><td>websocketOriginList</td>     <td>server.websocketOriginAllowList</td> <td>[]</td></tr>
+          <tr><td>SESSION_SET_ROLLING_COOKIE</td>  <td>sessionRollingCookie</td>    <td>session.rollingCookie</td>        <td>false</td></tr>
+          <tr><td>SESSION_EXPIRE_SEC</td>          <td>sessionExpireAfterSec</td>   <td>session.ttl</td>                  <td>604800</td></tr>
+          <tr><td></td>                            <td></td>                        <td>session.maxAge</td>               <td>604800000</td></tr>
+          <tr><td>SESSION_SECRET</td>              <td>cookieSecret</td>            <td>session.secret</td>               <td>null</td></tr>
+          <tr><td>SESSION_ENABLE_REDIS</td>        <td>sessionEnableRedis</td>      <td>session.enableRedis</td>          <td>false</td></tr>
+          <tr><td>SESSION_REDIS_PREFIX</td>        <td>sessionRedisPrefix</td>      <td>session.redisPrefix</td>          <td>&quot;irc:&quot;</td></tr>
+          <tr><td>SESSION_REDIS_PASSWORD</td>      <td>sessionRedisPassword</td>    <td>session.redisPassword</td>        <td>&quot;&quot;</td></tr>
+          <tr><td>OAUTH2_ENABLE_REMOTE_LOGIN</td>  <td>enableRemoteLogin</td>       <td>oauth2.enableRemoteLogin</td>     <td>false</td></tr>
+          <tr><td>OAUTH2_REMOTE_AUTH_HOST</td>     <td>remoteAuthHost</td>          <td>oauth2.remoteAuthHost</td>        <td>null</td></tr>
+          <tr><td>OAUTH2_REMOTE_CALLBACK_HOST</td> <td>remoteCallbackHost</td>      <td>oauth2.remoteCallbackHost</td>    <td>null</td></tr>
+          <tr><td>OAUTH2_REMOTE_CLIENT_ID</td>     <td>remoteClientId</td>          <td>oauth2.remoteClientId</td>        <td>null</td></tr>
+          <tr><td>OAUTH2_REMOTE_CLIENT_SECRET</td> <td>remoteClientSecret</td>      <td>oauth2.remoteClientSecret</td>    <td>null</td></tr>
+          <tr><td>OAUTH2_REMOTE_SCOPE</td>         <td>remoteScope</td>             <td>oauth2.remoteScope</td>           <td>null</td></tr>
+          <tr><td>IRC_DISABLE_LIST_EDITOR</td>     <td>disableServerListEditor</td> <td>irc.disableServerListEditor</td>  <td>false</td></tr>
+          <tr><td>IRC_PERSIST_MESSAGE_CACHE</td>   <td>persistIrcMessageCache</td>  <td>irc.persistIrcMessageCache</td>   <td>false</td></tr>
+          <tr><td>IRC_SOCKET_LOCAL_ADDRESS</td>    <td>ircSocketLocalAddress</td>   <td>irc.ircSocketLocalAddress</td>    <td>null</td></tr>
+          <tr><td>IRC_SERVE_HTML_HELP_DOCS</td>    <td>serveHtmlHelpDocs</td>       <td>irc.serveHtmlHelpDocs</td>        <td>false</td></tr>
+          <tr><td>IRC_CUSTOM_BEEP_SOUNDS</td>      <td>customBeepSounds</td>        <td>irc.customBeepSounds</td>         <td>false</td></tr>
+          <tr><td>IRC_ENABLE_SOCKS5_PROXY</td>     <td>enableSocks5Proxy</td>       <td>proxy.enableSocks5Proxy</td>      <td>false</td></tr>
+          <tr><td>IRC_SOCKS5_HOST</td>             <td>socks5Host</td>              <td>proxy.socks5Host</td>             <td>null</td></tr>
+          <tr><td>IRC_SOCKS5_PORT</td>             <td>socks5Port</td>              <td>proxy.socks5Port</td>             <td>null</td></tr>
+          <tr><td>IRC_SOCKS5_USERNAME</td>         <td>socks5Username</td>          <td>proxy.socks5Username</td>         <td>null</td></tr>
+          <tr><td>IRC_SOCKS5_PASSWORD</td>         <td>socks5Password</td>          <td>proxy.socks5Password</td>         <td>null</td></tr>
+          <tr><td></td>        <td></td>  <td></td>      <td></td></tr>
+        </table>
+
 
 
       </div> <!-- /text-div -->

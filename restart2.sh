@@ -9,9 +9,7 @@
 # changes to the .env file.
 #
 # The restart2.sh script assumes you are using environment variables
-# to configure the irc-hybrid-client. If you are using 
-# the alternate configuration stored in the \credentials.json" file,
-# you should use the "restart.sh" script instead.
+# to configure the irc-hybrid-client.
 #
 # If the irc-hybrid-client is not currently running, the irc-hybrid-client
 # will be started. Any error message from the kill command may be ignored.
@@ -19,7 +17,7 @@
 # Assumptions:
 #   - User starts script from base folder of repository, example: ./restart2.sh
 #   - The environment variable SERVER_PID_FILE contains the full path the irc-hybrid-client PID file.
-#   - This is a user run untility and not intended for use with cron
+#   - This is a user run utility and not intended for use with cron
 #
 # Optional:
 #   - The environment variable SERVER_INSTANCE_NUMBER contains an 

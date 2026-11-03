@@ -725,10 +725,9 @@ Cached message with 2 IRC channels.
           editing the servers.json file.
         </p
         ><p>
-          The IRC server list editor can be disabled by setting 
-          <q>disableServerListEditor: true</q> in the credentials.json file
-          or by setting the environment variable <q>IRC_DISABLE_LIST_EDITOR=true</q>
-           When disabled, all attempts to access the 
+          The IRC server list editor can be disabled by setting the environment 
+          variable <q>IRC_DISABLE_LIST_EDITOR=true</q>
+          When disabled, all attempts to access the 
           /irc/serverlist API will return Status 405 Method not allowed 
           <q>Server List Editor Disabled</q>
         </p><p>
@@ -2458,26 +2457,6 @@ https://my-irc-client.example.com:3003/login/callback?code=OxKoqECVeRsxeEHU6e3vR
         </ul>
 
         <h3>Example OAuth 2.0 configuration</h3>
-
-        <p>
-          The following irc-hybrid-client configuration example using a credentials.json file.
-        </p>
-
-<div class="pre-div"><pre>
-{
-  ...
-  
-  "enableRemoteLogin": true,
-  "remoteAuthHost": "https://auth.example.com",
-  "remoteCallbackHost": "https://my-irc-client.example.com:3003",
-  "remoteClientId": irc_client_1,
-  "remoteClientSecret": "this-is-a-client-secret",
-  "remoteScope": [
-    "irc.all",
-    "irc.demo1"
-  ]
-}
-</pre></div>    
 
         <p>
           The following irc-hybrid-client configuration example using a .env file.

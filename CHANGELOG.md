@@ -2,16 +2,71 @@
 
 All notable changes to this project will be documented in this file.
 
-- Notice of upcoming configuration change
+## Next 2026-11-02
 
-Back in 2021 the first versions of irc-hybrid-client stored configuration in a file "credentials.json".
-In order to address deployment issues, a parallel configuration was implemented using enviornment variables and ".env" file.
-Currently, both are supported. When credentials.json exists, it superseeds the .env file and enviornment variables.
-Supporting parallel configurations can be problematic from a testing, documentation and security perspective.
-Therefore, in the future I plan to eliminate the credentials.json file.
-When this is rolled out, all configuration will employ environment variables and the .env file.
+BREAKING CHANGE: Legacy webserver configuration using the &quot;credentials.json&quot; file has been deprecated and removed from the application.
 
----
+Since irc-hybrid-client v0.2.24 2023-06-13 the application supported using envitonment variables and a .env file for webserver configuration. This allows a standardized method to provide configuration settings to the irc-hybrid-client when running in a container . Using environment variable configuration was helpful for automating testing for multiple webserver configurations. To avoid making a breaking change, the original configuration file &quot;credentials.json&quot; had been supported as a parallel configuration method. Supporting two concurrent configuration formats is confusing to users, imposes unnecessary risks, so credentials.json is being deprecated and removed in this change.
+
+### Notes
+
+- This is a breaking change for users of credentials.json configuration.
+- Unrelated code changes have been excluded from the scope of this commit in order to simplify debug of conversion issues.
+
+### Actions
+
+Current users of .env file: No actions necessary.
+
+Current users of credentials.json:
+
+- Refactor your credentials.json file into environment variables or a .env file. The /docs/login-config.html files list side by side credential.json property names and environment variables names at the bottom of the page.
+- Examine your auto-start method to determine if any action is needed to initialize env variables at runtime if they exist outside a .env file.
+- The file &quot;example-.env&quot; may be helpful as a template to convert configurations.
+- The values of login username and and hashed password should copy/paste into a .env file. It may be much easier to run tools/genEnvVarAuthForUser_1.mjs as it will provide a copy block of env variables that are ready to copy/paste directly to an .env file.
+- There are no significant code changes associated with this commit, so if you encounter any errors, it is probably a configuration issue.
+
+### Modified Files
+
+This change primarily involves refactoring only one file: `server/config/index.mjs`. In older versions, the index.mjs script first parsed the properties from the credentials.json file. It then conditionally parsed the environment variables depending on the presence of a credentials.json file. This returned a common configuration object that is available to various modules in the program. All code associated with parsing credentials.json was removed.
+
+The following files had non-code changes such as references to credentials.json filename, or references to property names in comments.
+
+```txt
+server/middlewares/user-authenticate.mjs (Update comments)
+server/middlewares/remote-authenticate.mjs (Update comments)
+server/irc/irc-client.mjs (Update comments)
+```
+
+A section of text in a popup help window for socks5 proxy settings contained text description of credentials.json settings. The minor change this HTML file concurrently changed the large bundled minified html file webclient.html.
+
+```txt
+source-files/web-components/server-form-panel.js (minor text-only change)
+build-prod/webclient.html (same change, bundled, minified)
+```
+
+Numerous changes have also been made to the configuration examples shown in the /docs/ folder help files. The most relevant changes are in:
+
+```txt
+docs/installation.html
+docs/login-config.html
+```
+
+The following files required minor refactoring to consolidate one configuration method. This are offline tools independent of the application itself.
+
+```txt
+restart2.sh
+tools/genEnvVarAuthForUser_1.mjs (remove checks for credentials.json)
+example.env (reordered the variables to match index.mjs)
+README.md
+```
+
+The following files are no longer needed and have been deleted from the repository.
+
+```txt
+tools/updateAuthForUser_1.mjs (created login hash)
+example-credentials.json
+restart.sh
+```
 
 ## [v2.2.12](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.2.12) 2026-11-01
 

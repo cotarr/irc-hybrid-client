@@ -11,7 +11,7 @@ Screen capture images are available in the [documentation](https://cotarr.github
 ## Project Status
 
 The irc-hybrid-client project was started in March 2021.
-As it approaches 4 years old, irc-hybrid-client code is generally stable.
+As it has now passed 5 years old, irc-hybrid-client code is generally stable
 The project is currently in maintenance mode where NPM dependencies are updated to address outdated version and NPM audit warnings.
 No major revisions are planned. Minor feature additions are still possible.
 
@@ -29,7 +29,6 @@ from the socket server in the `bin/` folder.
 
 The repository contains a /docs/ folder with HTML help documentation for the project.
 The /docs/ web pages can be enabled in the web server configuration.
-(The /docs/ are not updated for V2 TBD)
 
 ## Installation
 
@@ -39,7 +38,7 @@ The steps listed here in the README.md are a minimal installation guide for
 people very familiar with deploying Node.js/Express servers.
 It is recommended to follow the documentation installation instructions instead.
 
-- Backend web server requires NodeJs Version 20 or greater.
+- Backend web server requires NodeJs Version 22 or greater.
 
 ```bash
 # clone the github repository
@@ -59,15 +58,10 @@ npm ci --omit=dev
 
 ## Web Server Configuration
 
-### Choose a configuration method
-
-There are two possible methods that may be used to define the
-web server configuration settings. The settings may be stored as
-properties in the "credentials.json" file, or the settings may
-be defined as environment variables or entries in the .env file.
-Only one method can be used at a time. If the credentials.json
-file exists, it will be parsed for settings, otherwise
-the environment variables will be parsed for settings.
+Web server configuration settings are defined as Linux environment variables.
+Irc-hybrid-client supports use of a .env file. The .env file is a hidden file
+in the base folder of the repository used by irc-hybrid-client to load
+configuration when the webserver starts.
 
 In the case where someone may want to try the irc-hybrid-client in a
 virtual machine on a private network, it is possible to setup
@@ -81,44 +75,12 @@ At minimum, the configuration needs these items:
 - A cookie secret.
 - If using TLS, the full path names to the certificate files.
 
-### Option 1 - Bare minimum settings using credentials.json file
-
-To create a minimal configuration that uses the credentials.json,
-copy the following JSON object, then paste it into a "credentials.json" file
-in the base folder of the repository.
-Protect file permissions using `chmod 600 credentials.json`
-
-```json
-{
-  "configVersion": 2,
-  "loginUsers": [
-    {
-      "userid": 1,
-      "user": "user1",
-      "name": "Bob Smith",
-      "hash": "---BCRYPT-HASH-GOES-HERE---"
-    }
-  ],
-  "serverTlsKey": "/home/user1/tls/privkey.pem",
-  "serverTlsCert": "/home/user1/tls/fullchain.pem",
-  "tls": true,
-  "port": 3003,
-  "cookieSecret": "---COOKIE-SECRET-GOES-HERE---",
-   "websocketOriginList": [
-    "http://example.com:3003",
-    "http://www.example.com:3003"
-  ],
-}
-```
-
-### Option 2 - Bare minimum settings using environment variables
+### Option 1 - Bare minimum settings
 
 To make a minimal configuration that uses environment variables,
 copy the following environment variables, then paste them into a .env file
 in the base folder of the repository.
 Protect file permissions using `chmod 600 .env`.
-To use environment variables as the configuration, make sure the
-credentials.json file does not exist in the base folder of the repository.
 
 ```sh
 ENV_VAR_CONFIG_VERSION=2
@@ -134,30 +96,16 @@ SESSION_SECRET="---COOKIE-SECRET-GOES-HERE---"
 SERVER_WEBSOCKET_ORIGIN_LIST=http://example.com:3003,http://www.example.com:3003
 ```
 
-### Option 3 - Create configuration.json using template
-
-To create a new credentials.json file from a full settings template:
-
-```bash
-# copy example-credentials.json and edit
-cp -v example-credentials.json credentials.json
-# If multi user system optionally change permission
-chmod 600 credentials.json
-```
-
-### Option 4 - Create example .env file using template
+### Option 2 - Create example .env file using template
 
 If you are using an external method to manage environment variables,
 such as running irc-hybrid-client in a container, then
 use the environment variable template as a guide.
 
-To use environment variables as the configuration, make sure the
-credentials.json file does not exist in the base folder of the repository.
-
 For configuration using a full settings template:
 
 ```bash
-# copy example-credentials.json and edit
+# copy .env and edit
 cp -v example-.env .env
 # If multi user system optionally change permission
 chmod 600 .env
@@ -174,27 +122,14 @@ chmod 600 .env
 
 It is necessary to assign one web page username and password.
 There is a detailed example in the documentation.
+This must be done after creating the .env configuration file in the project folder
 
-When using credentials.json file or .env file as configuration, this must be done after copying
-the example-credentials.json into the project folder
-
-The user account used for web page login may be created using one of two
-javascript files in the tools/ folder. Either the "updateAuthForUser_1.mjs" script maybe
-be used to add a user account to the credentials.json file, or the "genEnvVarAuthForUser_1.mjs"
-script may be used to generate the user account for environment variable configuration.
+The user account used for web page login may be created using a
+javascript file in the tools/ folder. Use the "genEnvVarAuthForUser_1.mjs"
+script to generate the user account for environment variable configuration.
 The generated environment variables can be copy / paste into the .env file using a text editor.
 
-Option 1 of 2: To add a user account to the credentials.json file.
-
-```bash
-cd tools/
-# fill in user and password when prompted.
-node updateAuthForUser_1.mjs
-# A revised copy of credentials.json will be displayed after password assignment
-cd ..
-```
-
-Option 2 of 2: To generate a user account when using environment variable configuration:
+To generate a user account when using environment variable configuration:
 
 ```bash
 cd tools/
@@ -239,9 +174,9 @@ detail explanation related to manual edit of the server list.
 This section is optional. This repository contains both minified and
 original un-minified files.
 The repository can be cloned and deployed as-is,
-requiring only editing of the configurations files.
+requiring only editing of the webserver configurations.
 
-In the case where the web page files have been edited, you may want
+In the case where the source code files have been edited, you may want
 to regenerate a new folder containing replacement minified files for the web page.
 The there is a separate repository for this called
 [irc-hybrid-client-dev-tools](https://github.com/cotarr/irc-hybrid-client-dev-tools).
@@ -279,7 +214,7 @@ page of the irc-hybrid-client documentation for information.
 The (optional) "collab-auth" remote authentication server is no longer available.
 
 Since some users may continue to use remote authentication with a legacy
-copy of collab-auth, or by a different OAuth 2 method, the remote authentication
+copy of collab-auth, or by a different OAuth 2.0 method, the remote authentication
 code will remain in irc-hybrid-client at this time.
 A description of the authentication workflow can be found at the bottom of
 the API Examples page in the /docs/.
