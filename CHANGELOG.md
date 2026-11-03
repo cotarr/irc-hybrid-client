@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## Next 2026-11-02
+## [v2.3.0](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.3.0) 2026-11-03
 
 BREAKING CHANGE: Legacy webserver configuration using the &quot;credentials.json&quot; file has been deprecated and removed from the application.
 
