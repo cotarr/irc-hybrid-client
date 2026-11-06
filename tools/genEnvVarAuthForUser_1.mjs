@@ -12,9 +12,10 @@
 import readline from 'readline';
 import fs from 'fs';
 import bcrypt from 'bcryptjs';
-import dotenv from 'dotenv';
 
-dotenv.config({ quiet: true, path: '../.env' });
+if (fs.existsSync('./.env')) {
+  process.loadEnvFile();
+}
 
 try {
   const packageJson = JSON.parse(fs.readFileSync('../package.json', 'utf8'));

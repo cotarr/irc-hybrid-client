@@ -37,14 +37,17 @@
         </div>
         <div class="install-section-title">Select configuration method</div>
         <p>
-          Web server configuration settings are defined as Linux environment variables.
-          Irc-hybrid-client supports use of a .env file. The .env file is a hidden file
-          in the base folder of the repository used by irc-hybrid-client to load
-          configuration when the webserver starts.
+          Web server configuration settings are defined using Linux environment variables.
+          Irc-hybrid-client also supports use of a .env file.
+          The .env file is a hidden file in the base folder of the repository used
+          by irc-hybrid-client to locally define environment variables.
+          Lines in the .env file that start with # are treated as comments and ignored.
+          Exported shell variables will override .env file definitions.
         </p>
         <p>
-          On a multi-user system, you should check file permissions to protect
-          credentials that may be stored in the configuration.
+          The .env file is stored in plaintext without encryption.
+          On a multi-user system, file permissions should be reviewed to protect
+          credentials that may be stored in the .env configuration file.
         </p>
         <p>
           Irc-hybrid-client no longer supports configuration using the &quot;credentials.json&quot; file.

@@ -31,9 +31,17 @@
 
 // import path from 'path';
 import fs from 'fs';
-import dotenv from 'dotenv';
-// Import the .env file
-dotenv.config({ quiet: true });
+// Verify that running version of NodeJs supports loadEnvFile()
+import { loadEnvFile } from 'node:process';
+
+// The presence of a .env file is optional.
+// Configuration may be defined either using shell env variables, a .env file, or both.
+// Lines in the .env file that start with # are treated as comments and ignored.
+// Exported shell variables will override .env file definitions.
+if (fs.existsSync('./.env')) {
+  // If file .env exists, import configuration environment variables from .env
+  loadEnvFile();
+}
 
 // Check requirement for minimum node version
 const minNodeVersion = 22;
