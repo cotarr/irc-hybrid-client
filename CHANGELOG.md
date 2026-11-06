@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ## Next 2026-11-06
 
+- Force upgrade npm package minimatch@11.0.4 to clear npm audit warning. This is development dependency in eslint, not in server.
 - Removed npm package dotenv. Nodejs natively supports import of .env file to process.env.
 - Update server/config/index.js to handle direct .env file import
 - Update tools/genEnvVarAuthForUser_1.mjs to handle direct .env file import
