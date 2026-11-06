@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## Next 2026-11-06
+## [v2.3.1](https://github.com/cotarr/irc-hybrid-client/releases/tag/v2.3.1) 2026-11-06
 
 - Force upgrade npm package minimatch@11.0.4 to clear npm audit warning. This is development dependency in eslint, not in server.
 - Removed npm package dotenv. Nodejs natively supports import of .env file to process.env.
